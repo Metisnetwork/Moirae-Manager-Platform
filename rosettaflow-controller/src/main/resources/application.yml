@@ -1,0 +1,10 @@
+server:
+  port: 8234
+  servlet:
+    context-path: /rosettaflow-console
+    encoding:
+      charset: UTF-8
+
+spring:
+  profiles:
+    active: dev

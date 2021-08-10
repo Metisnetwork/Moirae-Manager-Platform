@@ -1,0 +1,33 @@
+plugins {
+    id "com.google.protobuf" version "0.8.17"
+    id "java"
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation 'com.google.protobuf:protobuf-java:3.17.3'
+    implementation group: 'io.grpc', name: 'grpc-all', version: '1.39.0'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.17.3"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.39.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}

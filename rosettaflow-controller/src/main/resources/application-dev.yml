@@ -1,0 +1,46 @@
+server:
+  port: 8234
+  servlet:
+    context-path: /rosettaflow-console
+    encoding:
+      charset: UTF-8
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/db_rosettaflow?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 3000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+  redis:
+    host: localhost
+    port: 6779
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 200
+        max-idle: 10
+        min-idle: 0
+        max-wait: -1
+
+# 系统参数配置
+system:
+  config:
+    # 登录超时时间,单位: 毫秒
+    loginTimeOut: 18000000000
+    # 登录互踢模式： true-是,false-否
+    kickMode: false
+
+grpc:
+  client:
+    carrier-grpc-server:
+      address: 'static://192.168.10.146:4444'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext

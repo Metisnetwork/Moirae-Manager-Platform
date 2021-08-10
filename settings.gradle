@@ -1,0 +1,9 @@
+rootProject.name = 'rosettaflow'
+include 'rosettaflow-common'
+include 'rosettaflow-mapper'
+include 'rosettaflow-service'
+include 'rosettaflow-controller'
+include 'rosettaflow-grpc-lib'
+include 'rosettaflow-grpc-client'
+include 'rosettaflow-quartz'
+

@@ -1,0 +1,12 @@
+jar{
+    enabled =true
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api 'org.springframework.boot:spring-boot-starter-quartz:2.5.3'
+    api project(':rosettaflow-service')
+}

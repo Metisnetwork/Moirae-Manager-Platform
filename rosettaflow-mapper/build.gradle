@@ -1,0 +1,12 @@
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.3'
+
+}
