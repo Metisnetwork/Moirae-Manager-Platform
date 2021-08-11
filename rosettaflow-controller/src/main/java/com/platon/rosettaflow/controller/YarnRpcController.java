@@ -1,7 +1,5 @@
 package com.platon.rosettaflow.controller;
 
-import com.platon.rosettaflow.annotation.Roles;
-import com.platon.rosettaflow.common.enums.RoleEnum;
 import com.platon.rosettaflow.req.user.GrpcReq;
 import com.platon.rosettaflow.service.IAuthServiceRpc;
 import com.platon.rosettaflow.service.IYarnServiceRpc;
@@ -36,7 +34,6 @@ public class YarnRpcController {
 
     @PostMapping("test")
     @ApiOperation(value = "grpc测试", notes = "grpc测试")
-    @Roles(RoleEnum.ADMIN)
     public ResponseVo<String> testGrpc(@RequestBody @Valid GrpcReq grpcReq) {
         log.info("grpc测试");
         String result = yarnServiceRpc.getNodeInfo();

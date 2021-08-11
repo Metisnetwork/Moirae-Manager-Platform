@@ -79,10 +79,6 @@ public class UserDto implements Serializable {
      */
     private String token;
     /**
-     * 用户角色数组
-     */
-    private String[] roles;
-    /**
      * 用户权限数组
      */
     private String[] permissions;
