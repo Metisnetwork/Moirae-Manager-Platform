@@ -68,6 +68,27 @@ public class TaskServiceClient {
     }
 
     /**
+     * 查看全部任务详情列表
+     */
+    public void getTaskDetailList() {
+        CommonMessage.EmptyGetParams emptyGetParams = CommonMessage.EmptyGetParams.newBuilder().build();
+        GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(emptyGetParams);
+
+        if (getTaskDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            throw new BusinessException(getTaskDetailListResponse.getStatus(), getTaskDetailListResponse.getMsg());
+        }
+
+        for (int i = 0; i < getTaskDetailListResponse.getTaskListCount(); i++) {
+
+        }
+
+    }
+
+
+
+
+
+    /**
      * 拼装符合rosettaNet发送任务请求参数
      *
      * @param taskDto 任务请求参数

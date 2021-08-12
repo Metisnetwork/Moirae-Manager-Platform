@@ -10,8 +10,8 @@ dependencies {
     api project(':rosettaflow-quartz')
 
     implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.0'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.3'
-    runtimeOnly 'mysql:mysql-connector-java:8.0.25'
-    implementation 'org.springframework.boot:spring-boot-starter-aop:2.5.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'mysql:mysql-connector-java'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     api "com.platone.client:core:0.1.6.0-SNAPSHOT"
 }
