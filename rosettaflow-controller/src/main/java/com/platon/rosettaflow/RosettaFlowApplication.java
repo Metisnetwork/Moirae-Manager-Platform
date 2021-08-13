@@ -21,11 +21,4 @@ public class RosettaFlowApplication {
     public static void main(String[] args) {
         SpringApplication.run(RosettaFlowApplication.class, args);
     }
-
-    @Bean
-    public TaskScheduler taskScheduler() {
-        ThreadPoolTaskScheduler taskExecutor = new ThreadPoolTaskScheduler();
-        taskExecutor.setPoolSize(15);
-        return taskExecutor;
-    }
 }

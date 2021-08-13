@@ -28,6 +28,11 @@ spring:
         max-idle: 10
         min-idle: 0
         max-wait: -1
+  task:
+    scheduling:
+      pool:
+        size: 5
+      thread-name-prefix: RosettaFlow-Task-
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -39,6 +44,9 @@ system:
     loginTimeOut: 18000000000
     # 登录互踢模式： true-是,false-否
     kickMode: false
+    # 是否是主服务: true-主服务,false-从服务
+    masterNode: true
+
 
 grpc:
   client:

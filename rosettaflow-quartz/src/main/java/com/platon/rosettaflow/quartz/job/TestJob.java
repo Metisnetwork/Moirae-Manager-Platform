@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @author hudenian
  * @date 2021/8/2
- * @Desc ob中的任务有可能并发执行，例如任务的执行时间过长，而每次触发的时间间隔太短，则会导致任务会被并发执行。如果是并发执行，就需要一个数据库锁去避免一个数据被多次处理。
+ * @description ob中的任务有可能并发执行，例如任务的执行时间过长，而每次触发的时间间隔太短，则会导致任务会被并发执行。如果是并发执行，就需要一个数据库锁去避免一个数据被多次处理。
  */
 @DisallowConcurrentExecution
 public class TestJob implements Job {

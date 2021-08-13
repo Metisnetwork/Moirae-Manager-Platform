@@ -14,4 +14,5 @@ import org.springframework.stereotype.Component;
 public class SysConfig {
     private long loginTimeOut = 1800000;
     private boolean kickMode = true;
+    private boolean masterNode = false;
 }
