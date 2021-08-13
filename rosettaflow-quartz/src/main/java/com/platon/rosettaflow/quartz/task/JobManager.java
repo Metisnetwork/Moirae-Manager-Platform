@@ -53,11 +53,11 @@ public class JobManager {
                 SimpleScheduleBuilder simpleScheduleBuilder;
                 if (JobRepeatEnum.NOREPEAT.getValue() == job.getRepeatFlag()) {
                     simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInMinutes(job.getRepeatInterval().intValue())
+                            .withIntervalInMinutes(job.getRepeatInterval())
                             .withRepeatCount(1);
                 } else {
                     simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInMinutes(job.getRepeatInterval().intValue())
+                            .withIntervalInMinutes(job.getRepeatInterval())
                             .repeatForever();
                 }
 

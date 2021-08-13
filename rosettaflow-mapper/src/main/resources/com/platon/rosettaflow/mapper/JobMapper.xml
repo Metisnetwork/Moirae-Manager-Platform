@@ -7,7 +7,7 @@
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="desc" jdbcType="VARCHAR" property="desc"/>
         <result column="repeat_flag" jdbcType="TINYINT" property="repeatFlag"/>
-        <result column="repeat_interval" jdbcType="BIGINT" property="repeatInterval"/>
+        <result column="repeat_interval" jdbcType="INTEGER" property="repeatInterval"/>
         <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
         <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
