@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service;
+package com.platon.rosettaflow.rpcservice;
 
 /**
  * @author hudenian

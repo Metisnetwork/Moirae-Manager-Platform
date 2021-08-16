@@ -137,7 +137,7 @@ CREATE TABLE `t_project_member` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '项目成员ID(自增长)',
   `project_id` bigint(20) NOT NULL COMMENT '项目id',
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
-  `role` bigint(20) DEFAULT NULL COMMENT '角色：1-管理员，2-编辑着, 3-查看着',
+  `role` tinyint(4) DEFAULT NULL COMMENT '角色：1-管理员，2-编辑着, 3-查看着',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -249,7 +249,7 @@ CREATE TABLE `t_workflow` (
 DROP TABLE IF EXISTS `t_workflow_template`;
 CREATE TABLE `t_workflow_template` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '项目工作流模板ID(自增长)',
-  `project_id` bigint(20) DEFAULT NULL COMMENT '项目id',
+  `project_temp_id` bigint(20) DEFAULT NULL COMMENT '项目模板表id',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id(创建方id)',
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
@@ -333,10 +333,25 @@ CREATE TABLE `t_workflow_node_variable` (
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY (`workflow_node_id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工作流节点变量表';
 
+-- ----------------------------
+-- Table structure for `t_workflow_node_variable_template`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_workflow_node_variable_template`;
+CREATE TABLE `t_workflow_node_variable_template` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
+    `workflow_node_temp_id` bigint(20) DEFAULT NULL COMMENT '工作流节点模板id',
+    `var_node_type`  tinyint(4)   NOT NULL DEFAULT 1 COMMENT '变量类型: 1-自变量, 2-因变量',
+    `var_node_key` varchar(128) NOT NULL COMMENT '变量key',
+    `var_node_value` varchar(128) NOT NULL COMMENT '变量值',
+    `var_node_desc`  varchar(200) DEFAULT NULL COMMENT '变量描述',
+    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工作流节点变量模板表';
 
 
 -- ----------------------------

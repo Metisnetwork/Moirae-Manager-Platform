@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.rpcservice.Impl;
 
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.grpc.client.TaskServiceClient;
@@ -8,7 +8,7 @@ import com.platon.rosettaflow.grpc.task.dto.TaskDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 import com.platon.rosettaflow.service.IJobService;
-import com.platon.rosettaflow.service.ITaskServiceRpc;
+import com.platon.rosettaflow.rpcservice.ITaskServiceRpc;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;

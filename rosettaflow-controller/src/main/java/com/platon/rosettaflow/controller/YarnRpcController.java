@@ -1,8 +1,8 @@
 package com.platon.rosettaflow.controller;
 
 import com.platon.rosettaflow.req.user.GrpcReq;
-import com.platon.rosettaflow.service.IAuthServiceRpc;
-import com.platon.rosettaflow.service.IYarnServiceRpc;
+import com.platon.rosettaflow.rpcservice.IAuthServiceRpc;
+import com.platon.rosettaflow.rpcservice.IYarnServiceRpc;
 import com.platon.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

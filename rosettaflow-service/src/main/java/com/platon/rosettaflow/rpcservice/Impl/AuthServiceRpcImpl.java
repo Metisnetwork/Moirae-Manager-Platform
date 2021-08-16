@@ -1,10 +1,8 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.rpcservice.Impl;
 
 import com.platon.rosettaflow.grpc.client.AuthServiceClient;
-import com.platon.rosettaflow.grpc.client.YarnServiceClient;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
-import com.platon.rosettaflow.service.IAuthServiceRpc;
-import com.platon.rosettaflow.service.IYarnServiceRpc;
+import com.platon.rosettaflow.rpcservice.IAuthServiceRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

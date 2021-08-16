@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service;
+package com.platon.rosettaflow.rpcservice;
 
 import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.platon.rosettaflow.grpc.task.dto.PublishTaskDeclareResponseDto;
