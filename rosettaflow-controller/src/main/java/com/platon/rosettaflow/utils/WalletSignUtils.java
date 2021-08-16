@@ -42,10 +42,10 @@ public class WalletSignUtils {
      *
      * @param message 签名明文
      * @param signMsg 签名信息
-     * @param addr    签名人地址
+     * @param address    签名人地址
      * @return 验证成功失败标识
      */
-    public static boolean verifySign(String message, String signMsg, String addr) {
+    public static boolean verifySign(String message, String signMsg, String address) {
         byte[] bs = Base64.decodeBase64(signMsg);
         Sign.SignatureData signatureData = new Sign.SignatureData(bs[0], Arrays.copyOfRange(bs, 1, 33), Arrays.copyOfRange(bs, 33, 65));
 
@@ -56,8 +56,8 @@ public class WalletSignUtils {
             e.printStackTrace();
             return false;
         }
-        String tmpAddr = Keys.getAddress(bigInteger);
-        return Numeric.cleanHexPrefix(addr).equals(Numeric.cleanHexPrefix(tmpAddr));
+        String tmpAddress = Keys.getAddress(bigInteger);
+        return Numeric.cleanHexPrefix(address).equals(Numeric.cleanHexPrefix(tmpAddress));
     }
 
     public static void main(String[] args) {

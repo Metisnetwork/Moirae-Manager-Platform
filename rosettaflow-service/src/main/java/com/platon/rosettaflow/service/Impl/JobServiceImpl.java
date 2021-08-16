@@ -25,7 +25,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public List<Job> getAllUnfinishedJob() {
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Job::getStatus, JobStatusEnum.UNFINISH);
+        wrapper.eq(Job::getStatus, JobStatusEnum.UNFINISH.getValue());
         wrapper.le(Job::getBeginTime, new Date(System.currentTimeMillis()));
         wrapper.ge(Job::getEndTime, new Date(System.currentTimeMillis()));
         return this.baseMapper.selectList(wrapper);

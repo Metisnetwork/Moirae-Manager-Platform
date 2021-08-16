@@ -11,8 +11,11 @@ import java.util.List;
 @Data
 public class TaskDto {
 
-
-
+    /**
+     * 工作流节点id
+     */
+    private Long workFlowNodeId;
+    
     /**
      * 任务名称
      */

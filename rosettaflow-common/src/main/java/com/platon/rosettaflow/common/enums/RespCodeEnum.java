@@ -53,13 +53,14 @@ public enum RespCodeEnum {
     UN_ROLE(20007, "Current user no permission"),
 
     /**
+     * 作业调度处理失败
+     */
+    JOB_FAILED(20008, "Job failed"),
+
+    /**
      * 业务失败
      */
     BIZ_FAILED(20008, "Business failed"),
-    /**
-     * 新手机号已注册
-     */
-    USER_UN_EXIST(20009, "User not exists"),
 
     /**
      * 系统异常

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author admin
@@ -47,22 +48,22 @@ public class TaskServiceClient {
     /**
      * 发布一个任务,异步等待结果
      */
-    public void asyncPublishTask(TaskDto taskDto) {
+    public void asyncPublishTask(TaskDto taskDto, Consumer<PublishTaskDeclareResponse> callback) {
 
         StreamObserver<PublishTaskDeclareResponse> streamObserver = new StreamObserver<PublishTaskDeclareResponse>() {
             @Override
             public void onNext(PublishTaskDeclareResponse value) {
-
+                callback.accept(value);
             }
 
             @Override
             public void onError(Throwable t) {
-
+                log.info("task {} process fail", taskDto.getTaskName());
             }
 
             @Override
             public void onCompleted() {
-
+                log.info("task {} process finish", taskDto.getTaskName());
             }
         };
         taskServiceStub.publishTaskDeclare(assemblyPublishTaskDeclareRequest(taskDto), streamObserver);

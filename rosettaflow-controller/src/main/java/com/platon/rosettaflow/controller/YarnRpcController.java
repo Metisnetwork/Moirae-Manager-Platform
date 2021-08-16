@@ -29,6 +29,9 @@ public class YarnRpcController {
     @Resource
     private IYarnServiceRpc yarnServiceRpc;
 
+//    @Resource
+//    private ITaskTaskServiceClient taskTaskServiceClient;
+
     @Resource
     private IAuthServiceRpc authServiceRpc;
 
