@@ -377,6 +377,22 @@ CREATE TABLE `t_workflow_node_output` (
   KEY (`workflow_node_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目工作流节点输出表';
 
+-- ----------------------------
+-- Table structure for `t_workflow_node_code`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_workflow_node_code`;
+CREATE TABLE `t_workflow_node_code` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点代码表ID(自增长)',
+  `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
+  `edit_type` tinyint(4) DEFAULT NULL COMMENT '编辑类型:1-sql, 2-noteBook',
+  `calculate_contract_code` TEXT DEFAULT NULL COMMENT '计算合约',
+  `data_split_contract_code` TEXT DEFAULT NULL COMMENT '数据分片合约',
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY (`workflow_node_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工作流节点代码表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_resource`
