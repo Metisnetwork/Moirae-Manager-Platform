@@ -48,9 +48,9 @@ public enum RespCodeEnum {
     UN_LOGIN(20006, "User not login"),
 
     /**
-     * 用户没有权限
+     * token invalid
      */
-    UN_ROLE(20007, "Current user no permission"),
+    TOKEN_INVALID(20007, "Token invalid"),
 
     /**
      * 作业调度处理失败

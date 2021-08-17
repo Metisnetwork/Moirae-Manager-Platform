@@ -36,14 +36,19 @@ import java.util.List;
 @Import(BeanValidatorPluginsConfiguration.class)
 public class SwaggerConfiguration {
     static final String TOKEN_KEY_DESC = "User's Access-Token";
+    static final String LANGUAGE_KEY_DESC = "User's Accept-Language";
 
     @Bean
     public Docket docketCreateRestApi() {
         RequestParameterBuilder tokenPar = new RequestParameterBuilder();
+        RequestParameterBuilder languagePar = new RequestParameterBuilder();
         List<RequestParameter> pars = new ArrayList<>();
         tokenPar.name(SysConstant.HEADER_TOKEN_KEY).description(TOKEN_KEY_DESC).in(ParameterType.HEADER)
                 .required(false).query(q -> q.model(m -> m.scalarModel(ScalarType.STRING))).build();
         pars.add(tokenPar.build());
+        languagePar.name(SysConstant.HEADER_LANGUAGE_KEY).description(LANGUAGE_KEY_DESC).in(ParameterType.HEADER)
+                .required(false).query(q -> q.model(m -> m.scalarModel(ScalarType.STRING))).build();
+        pars.add(languagePar.build());
 
         return new Docket(DocumentationType.OAS_30).globalRequestParameters(pars).apiInfo(apiInfoApiInfo()).select()
                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))

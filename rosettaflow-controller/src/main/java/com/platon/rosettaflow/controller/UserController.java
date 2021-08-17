@@ -1,10 +1,15 @@
 package com.platon.rosettaflow.controller;
 
-import com.platon.rosettaflow.dto.MemberRoleDto;
-import com.platon.rosettaflow.mapper.domain.MemberRole;
-import com.platon.rosettaflow.req.user.RegisterReq;
-import com.platon.rosettaflow.service.IMemberRole;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.dto.UserDto;
+import com.platon.rosettaflow.req.user.LoginReq;
+import com.platon.rosettaflow.service.IUserService;
+import com.platon.rosettaflow.utils.ConvertUtils;
+import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.user.UserVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * @author admin
- * @date 2021/7/20
+ * @date 2021/8/17
  */
 @Slf4j
 @RestController
@@ -29,13 +33,15 @@ import java.util.List;
 public class UserController {
 
     @Resource
-    private IMemberRole memberRole;
+    private IUserService userService;
 
-    @PostMapping("register")
-    @ApiOperation(value = "用户注册", notes = "用户注册")
-    public ResponseVo<List<MemberRoleDto>> register(@RequestBody @Valid RegisterReq registerReq) {
-        log.info("用户注册");
-        List<MemberRoleDto> memberRoleDtoList = memberRole.getAll();
-        return ResponseVo.createSuccess(memberRoleDtoList);
+    @PostMapping("login")
+    @ApiOperation(value = "用户登录", notes = "用户登录")
+    public ResponseVo<UserVo> register(@RequestBody @Valid LoginReq registerReq) {
+        if (!WalletSignUtils.verifySign(registerReq.getAddress(), registerReq.getSign(), registerReq.getAddress())) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
+        }
+        UserDto userDto = userService.generatorToken(registerReq.getAddress());
+        return ResponseVo.createSuccess(ConvertUtils.convert2Vo(userDto));
     }
 }

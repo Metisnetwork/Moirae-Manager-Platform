@@ -9,14 +9,12 @@
         <result column="workflow_desc" jdbcType="VARCHAR" property="workflowDesc"/>
         <result column="node_number" jdbcType="INTEGER" property="nodeNumber"/>
         <result column="run_status" jdbcType="TINYINT" property="runStatus"/>
-        <result column="task_id" jdbcType="VARCHAR" property="taskId"/>
-        <result column="run_msg" jdbcType="VARCHAR" property="runMsg"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, project_id, user_id, workflow_name, workflow_desc, node_number, run_status, task_id,
-    run_msg, `status`, create_time, update_time
+    id, project_id, user_id, workflow_name, workflow_desc, node_number, run_status, `status`, 
+    create_time, update_time
   </sql>
 </mapper>

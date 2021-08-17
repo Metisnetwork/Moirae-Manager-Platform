@@ -6,12 +6,13 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户ID(自增长)',
-  `user_name` varchar(20) NOT NULL COMMENT '用户名',
+  `user_name` varchar(64) NOT NULL COMMENT '用户名',
   `address` varchar(64)  NOT NULL COMMENT '用户钱包地址',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_ADDRESS` (`address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 -- ----------------------------

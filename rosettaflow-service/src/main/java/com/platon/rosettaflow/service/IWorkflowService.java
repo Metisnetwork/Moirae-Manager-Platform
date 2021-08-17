@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 
 /**
@@ -9,4 +10,6 @@ import com.platon.rosettaflow.mapper.domain.Workflow;
  * @description 工作流服务
  */
 public interface IWorkflowService extends IService<Workflow> {
+
+    void start(WorkflowDto workflowDto);
 }

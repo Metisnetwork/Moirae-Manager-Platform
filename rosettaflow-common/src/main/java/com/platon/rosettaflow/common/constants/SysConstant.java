@@ -49,5 +49,13 @@ public class SysConstant {
      * 国际化英文
      */
     public static final String EN_US = "en-US";
+    /**
+     * 用户登录URI
+     */
+    public static final String[] LOGIN_URIS = {"user/login",
+            "swagger",
+            "error",
+            "api-docs"
+    };
 
 }

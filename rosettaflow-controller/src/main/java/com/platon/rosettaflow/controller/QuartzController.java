@@ -2,7 +2,7 @@ package com.platon.rosettaflow.controller;
 
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.quartz.job.TestJob;
-import com.platon.rosettaflow.service.IMemberRole;
+import com.platon.rosettaflow.service.IUserService;
 import com.platon.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class QuartzController {
     private Scheduler scheduler;
 
     @Resource
-    private IMemberRole memberRole;
+    private IUserService memberRole;
 
     @PostMapping("create")
     @ApiOperation(value = "创建一个定时任务", notes = "创建一个定时任务")

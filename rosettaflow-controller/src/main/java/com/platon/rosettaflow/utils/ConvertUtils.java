@@ -1,7 +1,9 @@
 package com.platon.rosettaflow.utils;
 
 import com.platon.rosettaflow.dto.ProjectTemplateDto;
+import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.vo.projectTemplate.ProjectTemplateVo;
+import com.platon.rosettaflow.vo.user.UserVo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,15 @@ import java.util.List;
  * @description 功能描述
  */
 public class ConvertUtils {
+
+    public static UserVo convert2Vo(UserDto userDto) {
+        UserVo userVo = new UserVo();
+        userVo.setUserName(userDto.getUserName());
+        userVo.setAddress(userDto.getAddress());
+        userVo.setStatus(userDto.getStatus());
+        userVo.setToken(userDto.getToken());
+        return userVo;
+    }
 
     public static ProjectTemplateVo convert2Vo(ProjectTemplateDto projectTemplateDto) {
         ProjectTemplateVo projectTemplateVo = new ProjectTemplateVo();
