@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author admin
  * @date 2021/7/20
  */
-public class IpUtil {
+public class IpUtils {
     private static final String IP_UTILS_FLAG = ",";
     private static final String UNKNOWN = "unknown";
 

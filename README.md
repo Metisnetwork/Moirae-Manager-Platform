@@ -3,6 +3,12 @@
 ### 1.后台服务api接口文档，采用swagger
 - 访问地址：http://10.10.8.182:8234/rosettaflow-console/doc.html
 
+#### swagger调试流程
+- 先获取token
+![获取token](./scripts/images/登录获取token.png)
+- 请求后台携带token
+![获取token](./scripts/images/请求头携带token.png)
+
 ### 2.Jenkins自动部署管理后台
 > 为了不影响前端开发，目前设置手动构建
 - 访问地址：http://10.10.8.182:8080/login?from=%2F
@@ -86,3 +92,4 @@ model是常用注解说明
 【@Version】
     @Version             用于字段实现乐观锁
 ```
+

@@ -8,7 +8,7 @@ import com.platon.rosettaflow.common.utils.LanguageContext;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.service.ITokenService;
 import com.platon.rosettaflow.service.utils.UserContext;
-import com.platon.rosettaflow.utils.IpUtil;
+import com.platon.rosettaflow.utils.IpUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -54,7 +54,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         LanguageContext.set(request.getHeader("Accept-Language"));
 
         log.info("Request Info: [Method = {}], [URI = {}], [Client-IP = {}], [userAgent = {}]", request.getMethod(),
-                request.getRequestURI(), IpUtil.getIpAddr(request), request.getHeader("user-agent"));
+                request.getRequestURI(), IpUtils.getIpAddr(request), request.getHeader("user-agent"));
 
         String token = request.getHeader(SysConstant.HEADER_TOKEN_KEY);
         UserDto userDto;

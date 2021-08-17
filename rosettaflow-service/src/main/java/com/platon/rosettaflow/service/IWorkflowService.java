@@ -11,5 +11,10 @@ import com.platon.rosettaflow.mapper.domain.Workflow;
  */
 public interface IWorkflowService extends IService<Workflow> {
 
+    /**
+     * 启动工作流
+     *
+     * @param workflowDto 启动工作流请求对象
+     */
     void start(WorkflowDto workflowDto);
 }
