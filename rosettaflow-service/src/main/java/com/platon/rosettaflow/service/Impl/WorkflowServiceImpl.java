@@ -1,11 +1,13 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.WorkflowDto;
-import com.platon.rosettaflow.grpc.task.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.rpcservice.ITaskServiceRpc;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +27,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> implements IWorkflowService {
+
+    @Resource
+    private CommonService commonService;
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
@@ -76,7 +82,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
         //获取工作流代码输入信息
         WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
-        if(workflowNodeCode == null){
+        if (workflowNodeCode == null) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_CODE_NOT_EXIST.getMsg());
         }
 
@@ -93,9 +99,91 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
 
         TaskDto taskDto = new TaskDto();
-        //TODO 拼装请求参数
+        //TODO 拼装请求参数(待底层处理完成后完善)
+        taskDto.setWorkFlowNodeId(workflowNode.getId());
+        //任务名称
+        taskDto.setTaskName(commonService.generateTaskName(workflowNode.getId()));
+
+        //TODO 任务发起方（待底层接口调整）
+
+        //算力提供方
+        int i = 0;
+        List<String> powerPartyIds = new ArrayList<>();
+
+        //数据提供方
+        List<TaskDataSupplierDeclareDto> taskDataSupplierDeclareDtoList = new ArrayList<>();
+        TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
+
+        TaskOrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
+        TaskMetaDataDeclareDto taskMetaDataDeclareDto;
+        for (WorkflowNodeInput input : workflowNodeInputList) {
+            taskOrganizationIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
+            taskOrganizationIdentityInfoDto.setPartyId(input.getPartyId());
+            taskOrganizationIdentityInfoDto.setName(input.getIdentityName());
+            taskOrganizationIdentityInfoDto.setNodeId(input.getNodeId());
+            taskOrganizationIdentityInfoDto.setIdentityId(input.getIdentityId());
+
+            taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
+            taskMetaDataDeclareDto.setMetaDataId(input.getDataTableId());
+
+            List<Integer> columnIndexList = new ArrayList<>();
+            String[] columnIdsArr = input.getDataColumnIds().split(",");
+            for (String s : columnIdsArr) {
+                columnIndexList.add(Integer.valueOf(s.trim()));
+            }
+            taskMetaDataDeclareDto.setColumnIndexList(columnIndexList);
+
+            taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
+            taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(taskOrganizationIdentityInfoDto);
+            taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
+
+            taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
+            //算力提供方标签 TODO 待确认
+            powerPartyIds.add("p" + (++i));
+        }
+        taskDto.setTaskDataSupplierDeclareDtoList(taskDataSupplierDeclareDtoList);
+
+        //设置魏算力提供方标签
+        taskDto.setPowerPartyIds(powerPartyIds);
+
+        //任务结果接受者(flow暂定)
+        List<TaskResultReceiverDeclareDto> taskResultReceiverDeclareDtoList = new ArrayList<>();
+        TaskResultReceiverDeclareDto taskResultReceiverDeclareDto = new TaskResultReceiverDeclareDto();
+        TaskOrganizationIdentityInfoDto organizationIdentityInfoDto;
+        for (WorkflowNodeOutput output : workflowNodeOutputList) {
+            organizationIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
+            organizationIdentityInfoDto.setPartyId(output.getPartyId());
+            organizationIdentityInfoDto.setName(output.getIdentityName());
+            organizationIdentityInfoDto.setNodeId(output.getNodeId());
+            organizationIdentityInfoDto.setIdentityId(output.getIdentityId());
+
+            taskResultReceiverDeclareDto.setMemberInfo(organizationIdentityInfoDto);
+            //TODO 待确认
+            taskResultReceiverDeclareDto.setProviderList(null);
+
+            taskResultReceiverDeclareDtoList.add(taskResultReceiverDeclareDto);
+        }
+        taskDto.setTaskResultReceiverDeclareDtoList(taskResultReceiverDeclareDtoList);
+
+        //任务的所需操作成本
+        TaskOperationCostDeclareDto taskOperationCostDeclareDto = new TaskOperationCostDeclareDto();
+        taskOperationCostDeclareDto.setCostMem(workflowNodeResource.getCostMem());
+        taskOperationCostDeclareDto.setCostProcessor(workflowNodeResource.getCostProcessor());
+        taskOperationCostDeclareDto.setCostBandwidth(workflowNodeResource.getCostBandwidth());
+        taskOperationCostDeclareDto.setDuration(workflowNodeResource.getDuration());
+        taskDto.setTaskOperationCostDeclareDto(taskOperationCostDeclareDto);
+
+        //算法代码（python代码）
+        taskDto.setCalculateContractCode(workflowNodeCode.getCalculateContractCode());
+        taskDto.setDataSplitContractCode(workflowNodeCode.getDataSplitContractCode());
+
+        //算法额外参数
+        JSONObject jsonObject = JSONUtil.createObj();
+        for (WorkflowNodeVariable variable : workflowNodeVariableList) {
+            jsonObject.set(variable.getVarNodeKey(), variable.getVarNodeValue());
+        }
+        taskDto.setContractExtraParams(jsonObject.toString());
 
         return taskDto;
-
     }
 }

@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.rosettaflow.mapper.WorkflowNodeInputMapper">
-    <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.WorkflowNodeInput">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
-        <result column="data_type" jdbcType="VARCHAR" property="dataType"/>
-        <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
-        <result column="identity_name" jdbcType="VARCHAR" property="identityName"/>
-        <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId"/>
-        <result column="data_table_name" jdbcType="VARCHAR" property="dataTableName"/>
-        <result column="data_column_id" jdbcType="VARCHAR" property="dataColumnId"/>
-        <result column="data_column_name" jdbcType="VARCHAR" property="dataColumnName"/>
-        <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId"/>
-        <result column="party_id" jdbcType="VARCHAR" property="partyId"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-    id, workflow_node_id, data_type, identity_id, identity_name, data_table_id, data_table_name,
-    data_column_id, data_column_name, data_file_id, party_id, `status`, create_time,
-    update_time
-    </sql>
+  <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.WorkflowNodeInput">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId" />
+    <result column="data_type" jdbcType="VARCHAR" property="dataType" />
+    <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
+    <result column="identity_name" jdbcType="VARCHAR" property="identityName" />
+    <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+    <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId" />
+    <result column="data_table_name" jdbcType="VARCHAR" property="dataTableName" />
+    <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds" />
+    <result column="data_column_names" jdbcType="VARCHAR" property="dataColumnNames" />
+    <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId" />
+    <result column="party_id" jdbcType="VARCHAR" property="partyId" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, workflow_node_id, data_type, identity_id, identity_name, node_id, data_table_id, 
+    data_table_name, data_column_ids, data_column_names, data_file_id, party_id, `status`, 
+    create_time, update_time
+  </sql>
 </mapper>

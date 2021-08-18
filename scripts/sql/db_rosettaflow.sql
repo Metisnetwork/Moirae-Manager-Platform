@@ -16,6 +16,22 @@ CREATE TABLE `t_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 -- ----------------------------
+-- Table structure for `t_org`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_org`;
+CREATE TABLE `t_org` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '组织表ID(自增长)',
+    `identity_id` varchar(64)  DEFAULT NULL COMMENT '组织的身份标识Id',
+    `identity_name` varchar(100)  DEFAULT NULL COMMENT '组织的身份名称',
+    `node_id` varchar(256) DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
+    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UK_ORG_IDENTITY_ID` (`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='组织表';
+
+-- ----------------------------
 -- Table structure for `t_user_org`
 -- 是否需要同步机构待底层联调结果调整
 -- ----------------------------
@@ -56,7 +72,7 @@ CREATE TABLE `t_user_data` (
     `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
     `identity_id` bigint(20) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
     `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
-    `node_id` bigint(20) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
+    `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
     `meta_data_id` bigint(20) DEFAULT NULL COMMENT '元数据id',
     `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
     `data_name` varchar(128) NOT NULL COMMENT '数据名称',
@@ -182,8 +198,8 @@ CREATE TABLE `t_algorithm` (
   `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
   `cost_mem`  bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
   `cost_processor`  bigint(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
-  `cost_gpu`  bigint(20) DEFAULT NULL COMMENT '所需gpu数 (单位: 个)',
-  `cost_bandwidth`  bigint(20) DEFAULT NULL COMMENT '所需的带宽 (单位: bps)',
+  `cost_gpu`  int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+  `cost_bandwidth`  bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
   `duration`  bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -308,10 +324,11 @@ CREATE TABLE `t_workflow_node_input` (
   `data_type` varchar(64) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
   `identity_id` varchar(64) DEFAULT NULL COMMENT '组织的身份标识Id',
   `identity_name` varchar(64) DEFAULT NULL COMMENT '组织名称',
+  `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
   `data_table_id` varchar(128) DEFAULT NULL COMMENT '数据表ID',
   `data_table_name` varchar(64) DEFAULT NULL COMMENT '数据表名称',
-  `data_column_id` varchar(128) DEFAULT NULL COMMENT '数据字段ID',
-  `data_column_name` varchar(64) DEFAULT NULL COMMENT '数据字段名称',
+  `data_column_ids` varchar(256) DEFAULT NULL COMMENT '数据字段ID,多个以”,“分隔',
+  `data_column_names` varchar(512) DEFAULT NULL COMMENT '数据字段名称,多个以”,“分隔',
   `data_file_id` varchar(128) DEFAULT NULL COMMENT '数据文件id',
   `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
@@ -366,7 +383,7 @@ CREATE TABLE `t_workflow_node_output` (
   `identity_name` varchar(64) DEFAULT NULL COMMENT '协同方组织名称',
   `save_partner_flag` tinyint(4) DEFAULT NULL COMMENT '是否发起方: 0-否,1-是',
   `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
-  `node_id` varchar(64) DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
+  `node_id` varchar(256) DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
   `store_pattern` tinyint(4) DEFAULT 1 COMMENT '存储形式: 1-明文，2:密文',
   `store_path` varchar(200) DEFAULT NULL COMMENT '存储路径',
   `output_content`  TEXT DEFAULT NULL COMMENT '输出内容',
@@ -401,11 +418,11 @@ DROP TABLE IF EXISTS `t_workflow_node_resource`;
 CREATE TABLE `t_workflow_node_resource` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '节点资源表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
-  `cpu` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'cpu核数（单位：核）',
-  `cost_mem` int(11) NOT NULL DEFAULT 0 COMMENT '内存大小（G）',
-  `gpu` int(11) NOT NULL DEFAULT 0 COMMENT 'GPU大小（G）',
-  `bandwidth` int(11) NOT NULL DEFAULT 0 COMMENT '带宽（M）',
-  `duration` bigint(20) NOT NULL DEFAULT 0 COMMENT '所需的运行时长 (单位: ms)',
+  `cost_mem`  bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+  `cost_processor`  bigint(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+  `cost_gpu`  int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+  `cost_bandwidth`  bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
+  `duration`  bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -421,11 +438,11 @@ DROP TABLE IF EXISTS `t_workflow_node_resource_template`;
 CREATE TABLE `t_workflow_node_resource_template` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '节点资源表ID(自增长)',
   `workflow_node_template_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
-  `cpu` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'cpu核数（单位：核）',
-  `cost_mem` int(11) NOT NULL DEFAULT 0 COMMENT '内存大小（G）',
-  `gpu` int(11) NOT NULL DEFAULT 0 COMMENT 'GPU大小（G）',
-  `bandwidth` int(11) NOT NULL DEFAULT 0 COMMENT '带宽（M）',
-  `duration` bigint(20) NOT NULL DEFAULT 0 COMMENT '所需的运行时长 (单位: ms)',
+  `cost_mem`  bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+  `cost_processor`  bigint(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+  `cost_gpu`  int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+  `cost_bandwidth`  bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
+  `duration`  bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

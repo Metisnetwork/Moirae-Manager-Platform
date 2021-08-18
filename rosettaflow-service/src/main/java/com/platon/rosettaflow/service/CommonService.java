@@ -19,14 +19,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CommonService {
     static final String CODE_DATE_FMT = "yyMMdd";
+    static final String DATE_TIME_FMT = "yyyyMMddHHmmss";
     static final long REDIS_CODE_KEY_EXPIRE_TIME = 24 * 60 * 60;
+    static final String JOB_NO_PRE = "task_";
+    static final String TASK_NAME_PRE = "task_";
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
-    String generateJobNo(String prefixKey) {
+    /**
+     * 生成任务编号
+     *
+     * @return 任务编号
+     */
+    public String generateJobNo() {
         String date = DateUtil.format(new Date(), CODE_DATE_FMT);
-        String key = prefixKey + date;
+        String key = JOB_NO_PRE + date;
         Long seq = redisTemplate.opsForValue().increment(key);
         if (null == seq) {
             log.error("Failed to call the increment method of redis.");
@@ -37,4 +45,15 @@ public class CommonService {
         }
         return date + String.format("%06d", seq);
     }
+
+    /**
+     * 根据工作流节点id生成任务名称
+     *
+     * @param workflowNodeId 工作流节点id
+     * @return 任务名称
+     */
+    public String generateTaskName(Long workflowNodeId) {
+        return TASK_NAME_PRE + workflowNodeId + "_" + DateUtil.format(new Date(), DATE_TIME_FMT);
+    }
+
 }

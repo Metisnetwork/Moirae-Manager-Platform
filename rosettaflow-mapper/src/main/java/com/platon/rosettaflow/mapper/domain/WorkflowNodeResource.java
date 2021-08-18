@@ -28,21 +28,21 @@ public class WorkflowNodeResource implements Serializable {
      */
     private Long workflowNodeId;
     /**
-     * cpu核数（单位：核）
+     * 所需的内存 (单位: byte)
      */
-    private Byte cpu;
+    private Long costMem;
     /**
-     * 内存大小（G）
+     * 所需的核数 (单位: 个)
      */
-    private Integer costMem;
+    private Long costProcessor;
     /**
-     * GPU大小（G）
+     * GPU核数(单位：核)
      */
-    private Integer gpu;
+    private Integer costGpu;
     /**
-     * 带宽（M）
+     * 所需的带宽 (单位: bps)
      */
-    private Integer bandwidth;
+    private Long costBandwidth;
     /**
      * 所需的运行时长 (单位: ms)
      */
@@ -75,10 +75,10 @@ public class WorkflowNodeResource implements Serializable {
         WorkflowNodeResource other = (WorkflowNodeResource) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getWorkflowNodeId() == null ? other.getWorkflowNodeId() == null : this.getWorkflowNodeId().equals(other.getWorkflowNodeId()))
-                && (this.getCpu() == null ? other.getCpu() == null : this.getCpu().equals(other.getCpu()))
                 && (this.getCostMem() == null ? other.getCostMem() == null : this.getCostMem().equals(other.getCostMem()))
-                && (this.getGpu() == null ? other.getGpu() == null : this.getGpu().equals(other.getGpu()))
-                && (this.getBandwidth() == null ? other.getBandwidth() == null : this.getBandwidth().equals(other.getBandwidth()))
+                && (this.getCostProcessor() == null ? other.getCostProcessor() == null : this.getCostProcessor().equals(other.getCostProcessor()))
+                && (this.getCostGpu() == null ? other.getCostGpu() == null : this.getCostGpu().equals(other.getCostGpu()))
+                && (this.getCostBandwidth() == null ? other.getCostBandwidth() == null : this.getCostBandwidth().equals(other.getCostBandwidth()))
                 && (this.getDuration() == null ? other.getDuration() == null : this.getDuration().equals(other.getDuration()))
                 && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
                 && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
@@ -91,10 +91,10 @@ public class WorkflowNodeResource implements Serializable {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getWorkflowNodeId() == null) ? 0 : getWorkflowNodeId().hashCode());
-        result = prime * result + ((getCpu() == null) ? 0 : getCpu().hashCode());
         result = prime * result + ((getCostMem() == null) ? 0 : getCostMem().hashCode());
-        result = prime * result + ((getGpu() == null) ? 0 : getGpu().hashCode());
-        result = prime * result + ((getBandwidth() == null) ? 0 : getBandwidth().hashCode());
+        result = prime * result + ((getCostProcessor() == null) ? 0 : getCostProcessor().hashCode());
+        result = prime * result + ((getCostGpu() == null) ? 0 : getCostGpu().hashCode());
+        result = prime * result + ((getCostBandwidth() == null) ? 0 : getCostBandwidth().hashCode());
         result = prime * result + ((getDuration() == null) ? 0 : getDuration().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
@@ -109,10 +109,10 @@ public class WorkflowNodeResource implements Serializable {
                 "Hash = " + hashCode() +
                 ", id=" + id +
                 ", workflowNodeId=" + workflowNodeId +
-                ", cpu=" + cpu +
                 ", costMem=" + costMem +
-                ", gpu=" + gpu +
-                ", bandwidth=" + bandwidth +
+                ", costProcessor=" + costProcessor +
+                ", costGpu=" + costGpu +
+                ", costBandwidth=" + costBandwidth +
                 ", duration=" + duration +
                 ", status=" + status +
                 ", createTime=" + createTime +

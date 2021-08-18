@@ -15,9 +15,9 @@ public class TaskResultReceiverDeclareDto {
     /**
      * 结果接收方身份信息
      */
-    private CommonMessage.TaskOrganizationIdentityInfo memberInfo;
+    private TaskOrganizationIdentityInfoDto memberInfo;
     /**
      * 被接收结果的生成方身份信息
      */
-    private List<CommonMessage.TaskOrganizationIdentityInfo> providerList;
+    private List<TaskOrganizationIdentityInfoDto> providerList;
 }
