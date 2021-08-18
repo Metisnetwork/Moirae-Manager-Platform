@@ -1,10 +1,7 @@
 package com.platon.rosettaflow.rpcservice;
 
-import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.platon.rosettaflow.grpc.task.dto.PublishTaskDeclareResponseDto;
 import com.platon.rosettaflow.grpc.task.dto.TaskDto;
-
-import java.util.function.Consumer;
 
 /**
  * @author hudenian
@@ -24,7 +21,7 @@ public interface ITaskServiceRpc {
     /**
      * 异步发送任务服务,单个工作流的启动
      *
-     * @param taskDto  任务处理类
+     * @param taskDto 任务处理类
      */
     void asyncPublishTask(TaskDto taskDto);
 }

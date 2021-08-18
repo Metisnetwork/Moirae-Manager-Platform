@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * @author hudenian
  * @date 2021/8/13
- * @description 功能描述
+ * @description 发布任务Job
  */
 @DisallowConcurrentExecution
 public class PublishTaskJob implements Job {

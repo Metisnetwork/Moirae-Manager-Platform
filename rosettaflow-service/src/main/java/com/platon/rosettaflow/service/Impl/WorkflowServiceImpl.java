@@ -5,15 +5,16 @@ import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.grpc.task.dto.TaskDto;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
-import com.platon.rosettaflow.mapper.domain.Workflow;
-import com.platon.rosettaflow.mapper.domain.WorkflowNode;
-import com.platon.rosettaflow.service.IWorkflowNodeService;
-import com.platon.rosettaflow.service.IWorkflowService;
+import com.platon.rosettaflow.mapper.domain.*;
+import com.platon.rosettaflow.rpcservice.ITaskServiceRpc;
+import com.platon.rosettaflow.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author admin
@@ -26,6 +27,24 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
+
+    @Resource
+    private IWorkflowNodeCodeService workflowNodeCodeService;
+
+    @Resource
+    private IWorkflowNodeInputService workflowNodeInputService;
+
+    @Resource
+    private IWorkflowNodeOutputService workflowNodeOutputService;
+
+    @Resource
+    private IWorkflowNodeResourceService workflowNodeResourceService;
+
+    @Resource
+    private IWorkflowNodeVariableService workflowNodeVariableService;
+
+    @Resource
+    private ITaskServiceRpc taskServiceRpc;
 
     @Override
     public void start(WorkflowDto workflowDto) {
@@ -40,13 +59,43 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
 
         //TODO 当有多个任务节点时，需要将第一个节点执行成功后，并获取执行结果数据做为下个节点入参，才可以继续执行后面节点
-        //所以此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
-        WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflow.getId(), workflowDto.getStartNode());
+        //TODO 所以此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
+        TaskDto taskDto = assemblyTaskDto(workflow.getId(), workflowDto.getStartNode());
+        taskServiceRpc.asyncPublishTask(taskDto);
+    }
+
+    /**
+     * 组装发布任务请求对象
+     *
+     * @param workFlowId  工作流id
+     * @param currentNode 工作流节点序号
+     * @return 发布任务请求对象
+     */
+    public TaskDto assemblyTaskDto(Long workFlowId, Integer currentNode) {
+        WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workFlowId, currentNode);
+
+        //获取工作流代码输入信息
+        WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
+        if(workflowNodeCode == null){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_CODE_NOT_EXIST.getMsg());
+        }
 
         //获取工作流节点输入信息
+        List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
 
         //获取工作流节点输出信息
+        List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
 
         //获取工作流节点自变量及因变量
+        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
+
+        //工作流节点资源表
+        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+
+        TaskDto taskDto = new TaskDto();
+        //TODO 拼装请求参数
+
+        return taskDto;
+
     }
 }
