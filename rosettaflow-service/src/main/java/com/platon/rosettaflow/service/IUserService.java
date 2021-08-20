@@ -23,4 +23,17 @@ public interface IUserService extends IService<User> {
      * @return 用户信息
      */
     UserDto generatorToken(String address);
+
+    /**
+     * 登出
+     * @param address 钱包地址
+     */
+    void logout(String address);
+
+    /**
+     * 修改昵称
+     * @param address 钱包地址
+     * @param nickName 昵称
+     */
+    void updateNickName(String address, String nickName);
 }
