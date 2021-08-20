@@ -5,15 +5,14 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * @author admin
  * @date 2021/8/17
  */
 @Data
-@ApiModel
-public class LoginReq {
+@ApiModel("登录请求参数")
+public class LoginInReq {
 
     @ApiModelProperty(value = "用户钱包地址", required = true, name = "address", example = "501eb3eeb2a40e6f2ff6f481302435e6e8af3666")
     @NotBlank(message = "{user.address.notBlank}")

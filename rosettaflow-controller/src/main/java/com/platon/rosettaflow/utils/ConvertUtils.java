@@ -4,6 +4,7 @@ import com.platon.rosettaflow.dto.ProjectTemplateDto;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.vo.projectTemplate.ProjectTemplateVo;
 import com.platon.rosettaflow.vo.user.UserVo;
+import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,7 @@ public class ConvertUtils {
 
     public static UserVo convert2Vo(UserDto userDto) {
         UserVo userVo = new UserVo();
-        userVo.setUserName(userDto.getUserName());
-        userVo.setAddress(userDto.getAddress());
-        userVo.setStatus(userDto.getStatus());
-        userVo.setToken(userDto.getToken());
+        BeanUtils.copyProperties(userDto, userVo);
         return userVo;
     }
 
