@@ -474,6 +474,7 @@ DROP TABLE IF EXISTS `t_sub_job`;
 CREATE TABLE `t_sub_job` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '子作业表ID(自增长)',
   `job_id` bigint(20) DEFAULT NULL COMMENT '作业表id',
+  `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
   `begin_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
   `end_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '结束时间',
   `run_time` varchar(10) DEFAULT NULL COMMENT '运行时长',
@@ -492,9 +493,12 @@ DROP TABLE IF EXISTS `t_sub_job_node`;
 CREATE TABLE `t_sub_job_node` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务表ID(自增长)',
   `sub_job_id` bigint(20) DEFAULT NULL COMMENT '字作业表id',
+  `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
   `node_step` tinyint(4) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
   `run_status` tinyint(4) DEFAULT NULL COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
+  `task_id` varchar(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
+  `run_msg` varchar(256) DEFAULT NULL COMMENT '任务处理结果描述',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
