@@ -9,13 +9,18 @@
 - 请求后台携带token
 ![获取token](./scripts/images/请求头携带token.png)
 
-### 2.Jenkins自动部署管理后台
+### 2.Jenkins自动部署
+#### 管理后台
 > 为了不影响前端开发，目前设置手动构建
 - 访问地址：http://10.10.8.182:8080/login?from=%2F
 - 用户名：admin
 - 密码：admin
 - 将代码提交develop分支，点击构建，如下图所示：
 ![执行构建](./scripts/images/jenkins构建后台服务.png)
+
+#### 前端
+前端访问地址：http://10.10.8.182/home
+![执行构建](./scripts/images/jenkins构建前端服务.png)
 
 ### 3.mysql数据库反向生成java类
 - idea需要先安装mybatis-generator插件：File->settings->plugins
