@@ -10,7 +10,7 @@ import java.util.List;
  * @description 任务详情
  */
 @Data
-public class TaskDetailShowDto {
+public class TaskDetailDto {
     /**
      * 任务Id
      */
@@ -20,9 +20,17 @@ public class TaskDetailShowDto {
      */
     private String taskName;
     /**
-     * 任务发起发
+     * 发起任务的用户的信息 (task是属于用户的)
      */
-    private TaskOrganizationIdentityInfoDto owner;
+    private String user;
+    /**
+     * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+     */
+    private byte userType;
+    /**
+     * 任务发起方
+     */
+    private TaskOrganizationIdentityInfoDto sender;
     /**
      * 算法提供方 (目前就是和 任务发起方是同一个 ...)
      */
@@ -30,11 +38,11 @@ public class TaskDetailShowDto {
     /**
      * 数据提供方
      */
-    private List<TaskDataSupplierShowDto> dataSuppliers;
+    private List<TaskDataSupplierDto> dataSuppliers;
     /**
      * 算力提供方
      */
-    private List<TaskPowerSupplierShowDto> powerSuppliers;
+    private List<TaskPowerSupplierDto> powerSuppliers;
     /**
      * 任务结果方
      */

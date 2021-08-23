@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.grpc.client;
 
+import com.google.protobuf.ByteString;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
@@ -83,25 +84,29 @@ public class TaskServiceClient {
 
         TaskDetailResponseDto taskDetailResponseDto;
         GetTaskDetailResponse getTaskDetailResponse;
-        TaskDetailShowDto taskDetailShowDto;
+        TaskDetailDto taskDetailDto;
         for (int i = 0; i < getTaskDetailListResponse.getTaskListCount(); i++) {
             getTaskDetailResponse = getTaskDetailListResponse.getTaskList(i);
 
             taskDetailResponseDto = new TaskDetailResponseDto();
             //任务详情
-            taskDetailShowDto = new TaskDetailShowDto();
+            taskDetailDto = new TaskDetailDto();
             // 任务Id
-            taskDetailShowDto.setTaskId(getTaskDetailResponse.getInformation().getTaskId());
+            taskDetailDto.setTaskId(getTaskDetailResponse.getInformation().getTaskId());
             // 任务名称
-            taskDetailShowDto.setTaskName(getTaskDetailResponse.getInformation().getTaskName());
+            taskDetailDto.setTaskName(getTaskDetailResponse.getInformation().getTaskName());
+            // 发起任务的用户的信息 (task是属于用户的)
+            taskDetailDto.setUser(getTaskDetailResponse.getInformation().getUser());
+            //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+            taskDetailDto.setUserType((byte) getTaskDetailResponse.getInformation().getUserType().getNumber());
 
-            // 任务发起发
-            TaskOrganizationIdentityInfoDto owner = new TaskOrganizationIdentityInfoDto();
-            owner.setPartyId(getTaskDetailResponse.getInformation().getOwner().getPartyId());
-            owner.setName(getTaskDetailResponse.getInformation().getOwner().getName());
-            owner.setNodeId(getTaskDetailResponse.getInformation().getOwner().getNodeId());
-            owner.setIdentityId(getTaskDetailResponse.getInformation().getOwner().getIdentityId());
-            taskDetailShowDto.setOwner(owner);
+            // 任务发起方
+            TaskOrganizationIdentityInfoDto sender = new TaskOrganizationIdentityInfoDto();
+            sender.setPartyId(getTaskDetailResponse.getInformation().getSender().getPartyId());
+            sender.setName(getTaskDetailResponse.getInformation().getSender().getName());
+            sender.setNodeId(getTaskDetailResponse.getInformation().getSender().getNodeId());
+            sender.setIdentityId(getTaskDetailResponse.getInformation().getSender().getIdentityId());
+            taskDetailDto.setSender(sender);
 
             //算法提供方 (目前就是和 任务发起方是同一个 ...)
             TaskOrganizationIdentityInfoDto algoSupplier = new TaskOrganizationIdentityInfoDto();
@@ -109,15 +114,15 @@ public class TaskServiceClient {
             algoSupplier.setName(getTaskDetailResponse.getInformation().getAlgoSupplier().getName());
             algoSupplier.setNodeId(getTaskDetailResponse.getInformation().getAlgoSupplier().getNodeId());
             algoSupplier.setIdentityId(getTaskDetailResponse.getInformation().getAlgoSupplier().getIdentityId());
-            taskDetailShowDto.setAlgoSupplier(algoSupplier);
+            taskDetailDto.setAlgoSupplier(algoSupplier);
 
             //数据提供方
-            List<TaskDataSupplierShowDto> taskDataSupplierShowDtoList = new ArrayList<>();
-            TaskDataSupplierShowDto taskDataSupplierShowDto;
+            List<TaskDataSupplierDto> taskDataSupplierShowDtoList = new ArrayList<>();
+            TaskDataSupplierDto taskDataSupplierDto;
 
             TaskOrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getDataSupplierCount(); j++) {
-                taskDataSupplierShowDto = new TaskDataSupplierShowDto();
+                taskDataSupplierDto = new TaskDataSupplierDto();
 
                 taskOrganizationIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
                 taskOrganizationIdentityInfoDto.setPartyId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getPartyId());
@@ -125,40 +130,43 @@ public class TaskServiceClient {
                 taskOrganizationIdentityInfoDto.setNodeId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getNodeId());
                 taskOrganizationIdentityInfoDto.setIdentityId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getIdentityId());
 
-                taskDataSupplierShowDto.setMemberInfo(taskOrganizationIdentityInfoDto);
-                taskDataSupplierShowDto.setMetaDataId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMetaDataId());
-                taskDataSupplierShowDto.setMetaDataName(getTaskDetailResponse.getInformation().getDataSupplier(j).getMetaDataName());
+                taskDataSupplierDto.setMemberInfo(taskOrganizationIdentityInfoDto);
+                taskDataSupplierDto.setMetaDataId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMetaDataId());
+                taskDataSupplierDto.setMetaDataName(getTaskDetailResponse.getInformation().getDataSupplier(j).getMetaDataName());
 
-                taskDataSupplierShowDtoList.add(taskDataSupplierShowDto);
+                taskDataSupplierShowDtoList.add(taskDataSupplierDto);
             }
-            taskDetailShowDto.setDataSuppliers(taskDataSupplierShowDtoList);
+            taskDetailDto.setDataSuppliers(taskDataSupplierShowDtoList);
 
             //算力提供方
-            List<TaskPowerSupplierShowDto> taskPowerSupplierShowDtoList = new ArrayList<>();
-            TaskPowerSupplierShowDto taskPowerSupplierShowDto;
-            ResourceUsedDetailShowDto resourceUsedDetailShowDto;
+            List<TaskPowerSupplierDto> taskPowerSupplierShowDtoList = new ArrayList<>();
+            TaskPowerSupplierDto taskPowerSupplierShowDto;
+            ResourceUsedDetailDto resourceUsedDetailShowDto;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getPowerSupplierCount(); j++) {
                 //算力提供方成员信息
-                taskPowerSupplierShowDto = new TaskPowerSupplierShowDto();
+                taskPowerSupplierShowDto = new TaskPowerSupplierDto();
                 TaskOrganizationIdentityInfoDto powerIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
                 powerIdentityInfoDto.setPartyId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getPartyId());
                 powerIdentityInfoDto.setName(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getName());
                 powerIdentityInfoDto.setNodeId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getNodeId());
                 powerIdentityInfoDto.setIdentityId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getIdentityId());
                 //算力提供方资源信息
-                ResourceUsedDetailShowDto powerInfo = new ResourceUsedDetailShowDto();
+                ResourceUsedDetailDto powerInfo = new ResourceUsedDetailDto();
                 powerInfo.setTotalMem(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalMem());
-                powerInfo.setUsedMem(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedMem());
                 powerInfo.setTotalProcessor(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalProcessor());
-                powerInfo.setUsedProcessor(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedProcessor());
                 powerInfo.setTotalBandwidth(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalBandwidth());
+                powerInfo.setTotalDisk(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalDisk());
+
+                powerInfo.setUsedMem(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedMem());
+                powerInfo.setUsedProcessor(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedProcessor());
                 powerInfo.setUsedBandwidth(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedBandwidth());
+                powerInfo.setUsedDisk(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedDisk());
 
                 taskPowerSupplierShowDto.setMemberInfo(powerIdentityInfoDto);
                 taskPowerSupplierShowDto.setPowerInfo(powerInfo);
                 taskPowerSupplierShowDtoList.add(taskPowerSupplierShowDto);
             }
-            taskDetailShowDto.setPowerSuppliers(taskPowerSupplierShowDtoList);
+            taskDetailDto.setPowerSuppliers(taskPowerSupplierShowDtoList);
 
             //任务结果方
             List<TaskOrganizationIdentityInfoDto> receivers = new ArrayList<>();
@@ -171,13 +179,13 @@ public class TaskServiceClient {
                 receiver.setIdentityId(getTaskDetailResponse.getInformation().getReceivers(i).getIdentityId());
                 receivers.add(receiver);
             }
-            taskDetailShowDto.setReceivers(receivers);
+            taskDetailDto.setReceivers(receivers);
 
             //TODO 联调测试验证日期格式
-            taskDetailShowDto.setCreateAt(getTaskDetailResponse.getInformation().getCreateAt());
-            taskDetailShowDto.setStartAt(getTaskDetailResponse.getInformation().getStartAt());
-            taskDetailShowDto.setEndAt(getTaskDetailResponse.getInformation().getEndAt());
-            taskDetailShowDto.setState(getTaskDetailResponse.getInformation().getState());
+            taskDetailDto.setCreateAt(getTaskDetailResponse.getInformation().getCreateAt());
+            taskDetailDto.setStartAt(getTaskDetailResponse.getInformation().getStartAt());
+            taskDetailDto.setEndAt(getTaskDetailResponse.getInformation().getEndAt());
+            taskDetailDto.setState(getTaskDetailResponse.getInformation().getState());
 
             //任务所需资源声明
             TaskOperationCostDeclareDto taskOperationCostDeclareDto = new TaskOperationCostDeclareDto();
@@ -185,10 +193,10 @@ public class TaskServiceClient {
             taskOperationCostDeclareDto.setCostProcessor(getTaskDetailResponse.getInformation().getOperationCost().getCostProcessor());
             taskOperationCostDeclareDto.setCostBandwidth(getTaskDetailResponse.getInformation().getOperationCost().getCostBandwidth());
             taskOperationCostDeclareDto.setDuration(getTaskDetailResponse.getInformation().getOperationCost().getDuration());
-            taskDetailShowDto.setOperationCost(taskOperationCostDeclareDto);
+            taskDetailDto.setOperationCost(taskOperationCostDeclareDto);
 
             //拼装最外层信息
-            taskDetailResponseDto.setInformation(taskDetailShowDto);
+            taskDetailResponseDto.setInformation(taskDetailDto);
             taskDetailResponseDto.setRole(getTaskDetailResponse.getRole());
             taskDetailResponseDtoList.add(taskDetailResponseDto);
         }
@@ -249,16 +257,20 @@ public class TaskServiceClient {
     public PublishTaskDeclareRequest assemblyPublishTaskDeclareRequest(TaskDto taskDto) {
         //task_name
         PublishTaskDeclareRequest.Builder publishTaskDeclareRequestBuilder = PublishTaskDeclareRequest.newBuilder()
-                .setTaskName("任务名称");
+                .setTaskName(taskDto.getTaskName());
 
-        //owner
-        CommonMessage.TaskOrganizationIdentityInfo owner = CommonMessage.TaskOrganizationIdentityInfo.newBuilder()
+        // 发起任务的用户的信息 (task是属于用户的)
+        publishTaskDeclareRequestBuilder.setUser(taskDto.getUser());
+        //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+        publishTaskDeclareRequestBuilder.setUserType(CommonMessage.UserType.forNumber(taskDto.getUserType()));
+        //任务发起者 组织信息
+        CommonMessage.TaskOrganizationIdentityInfo sender = CommonMessage.TaskOrganizationIdentityInfo.newBuilder()
                 .setPartyId("partyId")
                 .setName("name")
                 .setNodeId("nodeId")
                 .setIdentityId("identityId")
                 .build();
-        publishTaskDeclareRequestBuilder.setOwner(owner);
+        publishTaskDeclareRequestBuilder.setSender(sender);
 
         // data_supplier
         TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
@@ -275,7 +287,7 @@ public class TaskServiceClient {
             TaskMetaDataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetaDataDeclare.newBuilder();
             for (int j = 0; j < taskDataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().size(); j++) {
                 taskMetaDataDeclareBuilder
-                        .setMetaDataId("metaDataId")
+                        .setMetaDataId(taskDataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
                         .setColumnIndexList(j, taskDataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().get(j));
             }
 
@@ -330,6 +342,9 @@ public class TaskServiceClient {
         publishTaskDeclareRequestBuilder.setCalculateContractcode(taskDto.getCalculateContractCode());
         publishTaskDeclareRequestBuilder.setDatasplitContractcode(taskDto.getDataSplitContractCode());
         publishTaskDeclareRequestBuilder.setContractExtraParams(taskDto.getContractExtraParams());
+
+        //发起任务的账户的签名
+        publishTaskDeclareRequestBuilder.setSign(ByteString.copyFromUtf8(taskDto.getSign()));
 
         return publishTaskDeclareRequestBuilder.build();
     }

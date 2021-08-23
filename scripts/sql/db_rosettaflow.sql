@@ -253,6 +253,7 @@ CREATE TABLE `t_workflow` (
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
   `node_number` int(11) DEFAULT NULL COMMENT '节点数',
+  `sign`  varchar(512) DEFAULT NULL COMMENT ' 发起任务的账户的签名',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

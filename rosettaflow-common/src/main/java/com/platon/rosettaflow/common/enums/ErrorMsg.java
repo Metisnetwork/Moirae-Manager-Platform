@@ -4,9 +4,9 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.utils.LanguageContext;
 
 /**
- * @author admin
- * @date 2021/8/10
- * @description 错误码描述
+ * @author  hudenian
+ * @date
+ * @description
  */
 public enum ErrorMsg {
 

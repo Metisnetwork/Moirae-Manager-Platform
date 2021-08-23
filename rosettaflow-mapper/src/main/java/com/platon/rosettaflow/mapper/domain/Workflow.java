@@ -48,6 +48,10 @@ public class Workflow implements Serializable {
      * 节点数
      */
     private Integer nodeNumber;
+    /**
+     * 发起任务的账户的签名
+     */
+    private String sign;
 
     /**
      * 运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败

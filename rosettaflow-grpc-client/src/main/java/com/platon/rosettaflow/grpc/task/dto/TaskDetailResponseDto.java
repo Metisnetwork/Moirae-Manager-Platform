@@ -12,7 +12,7 @@ public class TaskDetailResponseDto {
     /**
      * 任务详情
      */
-    private TaskDetailShowDto information;
+    private TaskDetailDto information;
     /**
      * 我在任务中的角色 (owner: 任务发起方; dataSupplier: 数据提供方: powerSupplier: 算力提供方; receiver: 结果接收方)
      */

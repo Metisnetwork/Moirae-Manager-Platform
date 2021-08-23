@@ -20,11 +20,19 @@ public class TaskDto {
      * 任务名称
      */
     private String taskName;
+    /**
+     * 发起任务的用户的信息 (task是属于用户的)
+     */
+    private String user;
+    /**
+     * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+     */
+    private Integer userType;
 
     /**
      * 任务发起者 组织信息
      */
-    private TaskOrganizationIdentityInfoDto owner;
+    private TaskOrganizationIdentityInfoDto sender;
 
     /**
      * 任务的数据提供方, 包含发起者和参与方
@@ -50,9 +58,17 @@ public class TaskDto {
      * 算法代码（python代码）
      */
     private String calculateContractCode;
-
+    /**
+     *  数据分片合约
+     */
     private String dataSplitContractCode;
-
+    /**
+     * 合约调用的额外可变入参 (json 字符串, 根据算法来)
+     */
     private String contractExtraParams;
+    /**
+     * 发起任务的账户的签名
+     */
+    private String sign;
 
 }
