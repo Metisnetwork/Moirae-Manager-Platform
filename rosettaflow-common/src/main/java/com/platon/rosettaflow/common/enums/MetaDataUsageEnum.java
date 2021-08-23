@@ -3,29 +3,25 @@ package com.platon.rosettaflow.common.enums;
 /**
  * @author hudenian
  * @date 2021/8/23
- * @description 用户类型枚举
+ * @description 元数据的使用方式定义
  */
-public enum UserTypeEnum {
+public enum MetaDataUsageEnum {
     /**
-     * 未定义
+     * 未定义类型
      */
-    UNKNOWN(0),
+    USAGE_UNKNOWN(0),
     /**
-     * 以太坊地址
+     * 依照时间段来使用
      */
-    ETH(1),
+    PERIOD(1),
     /**
-     * Alaya地址
+     * 依照次数来使用
      */
-    ATP(2),
-    /**
-     * PlatON地址
-     */
-    LAT(3);
+    TIMES(2);
 
     private final int value;
 
-    UserTypeEnum(int value) {
+    MetaDataUsageEnum(int value) {
         this.value = value;
     }
 

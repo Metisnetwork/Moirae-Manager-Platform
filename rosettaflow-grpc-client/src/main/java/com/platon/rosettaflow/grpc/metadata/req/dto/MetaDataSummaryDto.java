@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.grpc.metaData.dto;
+package com.platon.rosettaflow.grpc.metadata.req.dto;
 
 import lombok.Data;
 

@@ -7,7 +7,8 @@ import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.WorkflowDto;
-import com.platon.rosettaflow.grpc.task.dto.*;
+import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
+import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.rpcservice.ITaskServiceRpc;
@@ -114,10 +115,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<TaskDataSupplierDeclareDto> taskDataSupplierDeclareDtoList = new ArrayList<>();
         TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
 
-        TaskOrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
+        OrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
         TaskMetaDataDeclareDto taskMetaDataDeclareDto;
         for (WorkflowNodeInput input : workflowNodeInputList) {
-            taskOrganizationIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
+            taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             taskOrganizationIdentityInfoDto.setPartyId(input.getPartyId());
             taskOrganizationIdentityInfoDto.setName(input.getIdentityName());
             taskOrganizationIdentityInfoDto.setNodeId(input.getNodeId());
@@ -149,9 +150,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //任务结果接受者(flow暂定)
         List<TaskResultReceiverDeclareDto> taskResultReceiverDeclareDtoList = new ArrayList<>();
         TaskResultReceiverDeclareDto taskResultReceiverDeclareDto = new TaskResultReceiverDeclareDto();
-        TaskOrganizationIdentityInfoDto organizationIdentityInfoDto;
+        OrganizationIdentityInfoDto organizationIdentityInfoDto;
         for (WorkflowNodeOutput output : workflowNodeOutputList) {
-            organizationIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
+            organizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             organizationIdentityInfoDto.setPartyId(output.getPartyId());
             organizationIdentityInfoDto.setName(output.getIdentityName());
             organizationIdentityInfoDto.setNodeId(output.getNodeId());

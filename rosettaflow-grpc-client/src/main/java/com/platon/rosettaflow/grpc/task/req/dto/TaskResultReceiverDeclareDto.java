@@ -1,6 +1,6 @@
-package com.platon.rosettaflow.grpc.task.dto;
+package com.platon.rosettaflow.grpc.task.req.dto;
 
-import com.platon.rosettaflow.grpc.service.CommonMessage;
+import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import lombok.Data;
 
 import java.util.List;
@@ -15,9 +15,9 @@ public class TaskResultReceiverDeclareDto {
     /**
      * 结果接收方身份信息
      */
-    private TaskOrganizationIdentityInfoDto memberInfo;
+    private OrganizationIdentityInfoDto memberInfo;
     /**
      * 被接收结果的生成方身份信息
      */
-    private List<TaskOrganizationIdentityInfoDto> providerList;
+    private List<OrganizationIdentityInfoDto> providerList;
 }

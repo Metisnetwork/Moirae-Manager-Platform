@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.grpc.task.dto;
+package com.platon.rosettaflow.grpc.task.req.dto;
 
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import lombok.Data;

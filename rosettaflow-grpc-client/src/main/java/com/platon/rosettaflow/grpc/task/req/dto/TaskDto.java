@@ -1,5 +1,6 @@
-package com.platon.rosettaflow.grpc.task.dto;
+package com.platon.rosettaflow.grpc.task.req.dto;
 
+import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import lombok.Data;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class TaskDto {
     /**
      * 任务发起者 组织信息
      */
-    private TaskOrganizationIdentityInfoDto sender;
+    private OrganizationIdentityInfoDto sender;
 
     /**
      * 任务的数据提供方, 包含发起者和参与方
