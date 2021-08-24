@@ -1,7 +1,7 @@
 server:
   port: 8234
   servlet:
-    context-path: /rosettaflow-console
+    context-path: /rosettaflow
     encoding:
       charset: UTF-8
 
@@ -35,7 +35,9 @@ spring:
       thread-name-prefix: RosettaFlow-Task-
 mybatis-plus:
   configuration:
+    call-setters-on-nulls: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 
 # 系统参数配置
 system:

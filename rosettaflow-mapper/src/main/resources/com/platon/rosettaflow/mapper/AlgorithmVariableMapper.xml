@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.rosettaflow.mapper.AlgorithmVariableMapper">
+  <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.AlgorithmVariable">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
+    <result column="var_key" jdbcType="VARCHAR" property="varKey" />
+    <result column="var_value" jdbcType="VARCHAR" property="varValue" />
+    <result column="var_type" jdbcType="TINYINT" property="varType" />
+    <result column="var_desc" jdbcType="VARCHAR" property="varDesc" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, algorithm_id, var_key, var_value, var_type, var_desc, `status`, create_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_algorithm_variable
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_algorithm_variable
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmVariable" useGeneratedKeys="true">
+    insert into t_algorithm_variable (algorithm_id, var_key, var_value, 
+      var_type, var_desc, `status`, 
+      create_time, update_time)
+    values (#{algorithmId,jdbcType=BIGINT}, #{varKey,jdbcType=VARCHAR}, #{varValue,jdbcType=VARCHAR}, 
+      #{varType,jdbcType=TINYINT}, #{varDesc,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmVariable" useGeneratedKeys="true">
+    insert into t_algorithm_variable
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="algorithmId != null">
+        algorithm_id,
+      </if>
+      <if test="varKey != null">
+        var_key,
+      </if>
+      <if test="varValue != null">
+        var_value,
+      </if>
+      <if test="varType != null">
+        var_type,
+      </if>
+      <if test="varDesc != null">
+        var_desc,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="algorithmId != null">
+        #{algorithmId,jdbcType=BIGINT},
+      </if>
+      <if test="varKey != null">
+        #{varKey,jdbcType=VARCHAR},
+      </if>
+      <if test="varValue != null">
+        #{varValue,jdbcType=VARCHAR},
+      </if>
+      <if test="varType != null">
+        #{varType,jdbcType=TINYINT},
+      </if>
+      <if test="varDesc != null">
+        #{varDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmVariable">
+    update t_algorithm_variable
+    <set>
+      <if test="algorithmId != null">
+        algorithm_id = #{algorithmId,jdbcType=BIGINT},
+      </if>
+      <if test="varKey != null">
+        var_key = #{varKey,jdbcType=VARCHAR},
+      </if>
+      <if test="varValue != null">
+        var_value = #{varValue,jdbcType=VARCHAR},
+      </if>
+      <if test="varType != null">
+        var_type = #{varType,jdbcType=TINYINT},
+      </if>
+      <if test="varDesc != null">
+        var_desc = #{varDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmVariable">
+    update t_algorithm_variable
+    set algorithm_id = #{algorithmId,jdbcType=BIGINT},
+      var_key = #{varKey,jdbcType=VARCHAR},
+      var_value = #{varValue,jdbcType=VARCHAR},
+      var_type = #{varType,jdbcType=TINYINT},
+      var_desc = #{varDesc,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

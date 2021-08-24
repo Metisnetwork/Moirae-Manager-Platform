@@ -163,32 +163,11 @@ CREATE TABLE `t_project_member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目成员表';
 
 -- ----------------------------
--- Table structure for `t_user_algorithm`
--- ----------------------------
-DROP TABLE IF EXISTS `t_user_algorithm`;
-CREATE TABLE `t_user_algorithm` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户算法表ID(自增长)',
-    `user_id` bigint(20) NOT NULL COMMENT '用户id',
-    `algorithm_id` bigint(20) NOT NULL COMMENT '算法表id',
-    `auth_type`  tinyint(4) DEFAULT NULL COMMENT '授权方式: 1-按时间, 2-按次数, 3-永久',
-    `auth_value` bigint(20) DEFAULT NULL COMMENT '授权值: 按次数单位为（次）',
-    `auth_begin_time` datetime DEFAULT NULL COMMENT '授权开始时间',
-    `auth_end_time` datetime DEFAULT NULL COMMENT '授权结束时间',
-    `auth_status` tinyint(4)  NOT NULL DEFAULT 0 COMMENT '授权状态: 0-待申请,1-申请中, 2-已授权,3-已拒绝',
-    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    KEY (`user_id`, `algorithm_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户算法表';
-
--- ----------------------------
 -- Table structure for `t_algorithm`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm`;
 CREATE TABLE `t_algorithm` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
-  `user_id` bigint(20) NOT NULL COMMENT '用户id(算法作者ID)',
   `algorithm_name` varchar(30) DEFAULT NULL COMMENT '算法名称',
   `algorithm_desc` varchar(200) DEFAULT NULL COMMENT '算法描述',
   `max_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最大数量',
@@ -206,6 +185,26 @@ CREATE TABLE `t_algorithm` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='算法表';
+
+-- ----------------------------
+-- Table structure for `t_algorithm_auth`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_algorithm_auth`;
+CREATE TABLE `t_algorithm_auth` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法授权表ID(自增长)',
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `algorithm_id` bigint(20) NOT NULL COMMENT '算法表id',
+    `auth_type`  tinyint(4) DEFAULT NULL COMMENT '授权方式: 1-按时间, 2-按次数, 3-永久',
+    `auth_value` bigint(20) DEFAULT NULL COMMENT '授权值: 按次数单位为（次）',
+    `auth_begin_time` datetime DEFAULT NULL COMMENT '授权开始时间',
+    `auth_end_time` datetime DEFAULT NULL COMMENT '授权结束时间',
+    `auth_status` tinyint(4)  NOT NULL DEFAULT 0 COMMENT '授权状态: 0-待申请,1-申请中, 2-已授权,3-已拒绝',
+    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `user_algorithm_id` (`user_id`, `algorithm_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='算法授权表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm_code`
