@@ -64,43 +64,39 @@ CREATE TABLE `t_login_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户登录日志表';
 
 -- ----------------------------
--- Table structure for `t_user_data`
+-- Table structure for `t_meta_data`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_user_data`;
-CREATE TABLE `t_user_data` (
+DROP TABLE IF EXISTS `t_meta_data`;
+CREATE TABLE `t_meta_data` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户数据表ID(自增长)',
-    `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
     `identity_id` bigint(20) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
     `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
     `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
     `meta_data_id` bigint(20) DEFAULT NULL COMMENT '元数据id',
     `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
-    `data_name` varchar(128) NOT NULL COMMENT '数据名称',
-    `data_desc` varchar(128) NOT NULL COMMENT '数据的描述 (摘要)',
-    `file_path` varchar(128) NOT NULL COMMENT '文件存储路径',
-    `rows` bigint(20) NOT NULL DEFAULT '0' COMMENT '数据行数(不算title)',
-    `columns` bigint(20) NOT NULL DEFAULT '0' COMMENT '数据列数',
-    `size` bigint(20) NOT NULL DEFAULT '0' COMMENT '文件大小(字节)',
-    `file_type` varchar(20) NOT NULL COMMENT '文件后缀/类型, csv',
+    `data_name` varchar(128) NOT NULL COMMENT '元数据名称|数据名称 (表名)',
+    `data_desc` varchar(128) NOT NULL COMMENT '元数据的描述 (摘要)',
+    `file_path` varchar(128) NOT NULL COMMENT '源文件存放路径',
+    `rows` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的行数',
+    `columns` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的列数',
+    `size` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的大小 (单位: byte)',
+    `file_type` varchar(20) NOT NULL COMMENT '源文件的类型 (目前只有 csv)',
     `has_title` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否带标题,0表示不带，1表示带标题',
-    `auth_type`  tinyint(4) DEFAULT NULL COMMENT '授权方式: 1-按时间, 2-按次数, 3-永久',
-    `auth_value` bigint(20) DEFAULT NULL COMMENT '授权值:按次数单位为（次）',
-    `auth_begin_time` datetime DEFAULT NULL COMMENT '授权开始时间',
-    `auth_end_time` datetime DEFAULT NULL COMMENT '授权结束时间',
-    `auth_status`  tinyint(4)  NOT NULL DEFAULT 0 COMMENT '授权状态: 0-待申请,1-申请中, 2-已授权,3-已拒绝',
+    `industry` varchar(20) DEFAULT NULL COMMENT '元数据所属行业',
+    `data_status`  tinyint(4)  NOT NULL DEFAULT 0 COMMENT '元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)',
     `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户数据表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='元数据表';
 
 -- ----------------------------
--- Table structure for `t_user_data_details`
+-- Table structure for `t_meta_data_details`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_user_data_details`;
-CREATE TABLE `t_user_data_details` (
+DROP TABLE IF EXISTS `t_meta_data_details`;
+CREATE TABLE `t_meta_data_details` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '数据详情表ID(自增长)',
-	`data_id` bigint(20) DEFAULT NULL COMMENT '用户数据表id',
+	`data_id` bigint(20) DEFAULT NULL COMMENT '元数据表id',
     `column_index` bigint(11) DEFAULT NULL COMMENT '列索引',
     `column_name` varchar(32) DEFAULT NULL COMMENT '列名',
     `column_type` varchar(32) DEFAULT NULL COMMENT '列类型',
@@ -111,7 +107,25 @@ CREATE TABLE `t_user_data_details` (
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`data_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户数据详情表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='元数据列详情表';
+
+-- ----------------------------
+-- Table structure for `t_user_meta_data`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_meta_data`;
+CREATE TABLE `t_user_meta_data` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '数据详情表ID(自增长)',
+    `data_id` bigint(20) DEFAULT NULL COMMENT '元数据表id',
+    `address` varchar(64)  NOT NULL COMMENT '用户钱包地址',
+    `auth_type`  tinyint(4) DEFAULT NULL COMMENT '授权方式: 1-按时间, 2-按次数, 3-永久',
+    `auth_value` bigint(20) DEFAULT NULL COMMENT '授权值:按次数单位为（次）',
+    `auth_begin_time` datetime DEFAULT NULL COMMENT '授权开始时间',
+    `auth_end_time` datetime DEFAULT NULL COMMENT '授权结束时间',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY (`data_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户元数据授权表';
 
 -- ----------------------------
 -- Table structure for `t_project`

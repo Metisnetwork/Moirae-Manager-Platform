@@ -14,6 +14,8 @@ public enum ErrorMsg {
      * 用户签名错误
      */
     USER_SIGN_ERROR("签名错误", "Sign error"),
+
+    APPLY_METADATA_USAGE_TYPE_ERROR("元数据使用方式输入格式错误", "Apply metadata usage type error"),
     /**
      * 截止节点不能大于工作流最大节点数
      */

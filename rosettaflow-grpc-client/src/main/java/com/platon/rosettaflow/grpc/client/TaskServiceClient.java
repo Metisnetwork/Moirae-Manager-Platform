@@ -4,8 +4,10 @@ import com.google.protobuf.ByteString;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
+import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.*;
-import com.platon.rosettaflow.grpc.task.dto.*;
+import com.platon.rosettaflow.grpc.task.req.dto.*;
+import com.platon.rosettaflow.grpc.task.resp.dto.*;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -101,7 +103,7 @@ public class TaskServiceClient {
             taskDetailDto.setUserType((byte) getTaskDetailResponse.getInformation().getUserType().getNumber());
 
             // 任务发起方
-            TaskOrganizationIdentityInfoDto sender = new TaskOrganizationIdentityInfoDto();
+            OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
             sender.setPartyId(getTaskDetailResponse.getInformation().getSender().getPartyId());
             sender.setName(getTaskDetailResponse.getInformation().getSender().getName());
             sender.setNodeId(getTaskDetailResponse.getInformation().getSender().getNodeId());
@@ -109,7 +111,7 @@ public class TaskServiceClient {
             taskDetailDto.setSender(sender);
 
             //算法提供方 (目前就是和 任务发起方是同一个 ...)
-            TaskOrganizationIdentityInfoDto algoSupplier = new TaskOrganizationIdentityInfoDto();
+            OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
             algoSupplier.setPartyId(getTaskDetailResponse.getInformation().getAlgoSupplier().getPartyId());
             algoSupplier.setName(getTaskDetailResponse.getInformation().getAlgoSupplier().getName());
             algoSupplier.setNodeId(getTaskDetailResponse.getInformation().getAlgoSupplier().getNodeId());
@@ -120,11 +122,11 @@ public class TaskServiceClient {
             List<TaskDataSupplierDto> taskDataSupplierShowDtoList = new ArrayList<>();
             TaskDataSupplierDto taskDataSupplierDto;
 
-            TaskOrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
+            OrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getDataSupplierCount(); j++) {
                 taskDataSupplierDto = new TaskDataSupplierDto();
 
-                taskOrganizationIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
+                taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
                 taskOrganizationIdentityInfoDto.setPartyId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getPartyId());
                 taskOrganizationIdentityInfoDto.setName(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getName());
                 taskOrganizationIdentityInfoDto.setNodeId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getNodeId());
@@ -145,7 +147,7 @@ public class TaskServiceClient {
             for (int j = 0; j < getTaskDetailResponse.getInformation().getPowerSupplierCount(); j++) {
                 //算力提供方成员信息
                 taskPowerSupplierShowDto = new TaskPowerSupplierDto();
-                TaskOrganizationIdentityInfoDto powerIdentityInfoDto = new TaskOrganizationIdentityInfoDto();
+                OrganizationIdentityInfoDto powerIdentityInfoDto = new OrganizationIdentityInfoDto();
                 powerIdentityInfoDto.setPartyId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getPartyId());
                 powerIdentityInfoDto.setName(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getName());
                 powerIdentityInfoDto.setNodeId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getNodeId());
@@ -169,10 +171,10 @@ public class TaskServiceClient {
             taskDetailDto.setPowerSuppliers(taskPowerSupplierShowDtoList);
 
             //任务结果方
-            List<TaskOrganizationIdentityInfoDto> receivers = new ArrayList<>();
-            TaskOrganizationIdentityInfoDto receiver;
+            List<OrganizationIdentityInfoDto> receivers = new ArrayList<>();
+            OrganizationIdentityInfoDto receiver;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getReceiversCount(); j++) {
-                receiver = new TaskOrganizationIdentityInfoDto();
+                receiver = new OrganizationIdentityInfoDto();
                 receiver.setPartyId(getTaskDetailResponse.getInformation().getReceivers(i).getPartyId());
                 receiver.setName(getTaskDetailResponse.getInformation().getReceivers(i).getName());
                 receiver.setNodeId(getTaskDetailResponse.getInformation().getReceivers(i).getNodeId());

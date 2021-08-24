@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.grpc.task.dto;
+package com.platon.rosettaflow.grpc.identity.dto;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2021/8/4
  */
 @Data
-public class TaskOrganizationIdentityInfoDto {
+public class OrganizationIdentityInfoDto {
     /**
      * 任务里面定义的 (p0 -> pN 方 ...)
      */
@@ -27,5 +27,4 @@ public class TaskOrganizationIdentityInfoDto {
      * 机构身份标识ID
      */
     private String identityId;
-
 }

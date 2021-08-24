@@ -1,7 +1,7 @@
 package com.platon.rosettaflow.rpcservice;
 
-import com.platon.rosettaflow.grpc.task.dto.PublishTaskDeclareResponseDto;
-import com.platon.rosettaflow.grpc.task.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
 
 /**
  * @author hudenian

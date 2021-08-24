@@ -1,5 +1,6 @@
-package com.platon.rosettaflow.grpc.task.dto;
+package com.platon.rosettaflow.grpc.task.req.dto;
 
+import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import lombok.Data;
 
 /**
@@ -12,7 +13,7 @@ public class TaskPowerSupplierDto {
     /**
      * 身份信息
      */
-    private TaskOrganizationIdentityInfoDto memberInfo;
+    private OrganizationIdentityInfoDto memberInfo;
     /**
      * 算力使用情况
      */

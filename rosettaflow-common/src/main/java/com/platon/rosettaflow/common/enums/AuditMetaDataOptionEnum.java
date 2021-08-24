@@ -3,29 +3,25 @@ package com.platon.rosettaflow.common.enums;
 /**
  * @author hudenian
  * @date 2021/8/23
- * @description 用户类型枚举
+ * @description 元数据审核结果枚举
  */
-public enum UserTypeEnum {
+public enum AuditMetaDataOptionEnum {
     /**
-     * 未定义
+     * 等待审核中
      */
-    UNKNOWN(0),
+    AUDIT_PENDING(0),
     /**
-     * 以太坊地址
+     * 审核通过
      */
-    ETH(1),
+    AUDIT_PASSED(1),
     /**
-     * Alaya地址
+     * 审核拒绝
      */
-    ATP(2),
-    /**
-     * PlatON地址
-     */
-    LAT(3);
+    AUDIT_REFUSED(2);
 
     private final int value;
 
-    UserTypeEnum(int value) {
+    AuditMetaDataOptionEnum(int value) {
         this.value = value;
     }
 

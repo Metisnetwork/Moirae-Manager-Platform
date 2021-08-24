@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.grpc.task.dto;
+package com.platon.rosettaflow.grpc.task.resp.dto;
 
 import lombok.Data;
 
