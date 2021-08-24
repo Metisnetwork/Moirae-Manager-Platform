@@ -1,7 +1,7 @@
 package com.platon.rosettaflow.controller;
 
 import com.platon.rosettaflow.dto.ProjectTemplateDto;
-import com.platon.rosettaflow.service.IProjectTemplate;
+import com.platon.rosettaflow.service.IProjectTemplateService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.projectTemplate.ProjectTemplateVo;
@@ -28,7 +28,7 @@ import java.util.List;
 public class ProjectTemplateController {
 
     @Resource
-    private IProjectTemplate projectTemplate;
+    private IProjectTemplateService projectTemplate;
 
     @GetMapping("list")
     @ApiOperation(value = "项目模板列表", notes = "项目模板列表")

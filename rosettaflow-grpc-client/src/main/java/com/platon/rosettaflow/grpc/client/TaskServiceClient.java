@@ -75,7 +75,7 @@ public class TaskServiceClient {
     /**
      * 查看全部任务详情列表
      */
-    public void getTaskDetailList() {
+    public List<TaskDetailResponseDto> getTaskDetailList() {
         List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
         CommonMessage.EmptyGetParams emptyGetParams = CommonMessage.EmptyGetParams.newBuilder().build();
         GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(emptyGetParams);
@@ -202,6 +202,7 @@ public class TaskServiceClient {
             taskDetailResponseDto.setRole(getTaskDetailResponse.getRole());
             taskDetailResponseDtoList.add(taskDetailResponseDto);
         }
+        return taskDetailResponseDtoList;
     }
 
     /**

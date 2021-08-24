@@ -7,7 +7,7 @@ import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.dto.ProjectTemplateDto;
 import com.platon.rosettaflow.mapper.ProjectTemplateMapper;
 import com.platon.rosettaflow.mapper.domain.ProjectTemplate;
-import com.platon.rosettaflow.service.IProjectTemplate;
+import com.platon.rosettaflow.service.IProjectTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class ProjectTemplateImpl extends ServiceImpl<ProjectTemplateMapper, ProjectTemplate> implements IProjectTemplate {
+public class ProjectTemplateImpl extends ServiceImpl<ProjectTemplateMapper, ProjectTemplate> implements IProjectTemplateService {
 
     public static List<ProjectTemplateDto> convert2Dto(List<ProjectTemplate> projectTemplateList) {
         List<ProjectTemplateDto> list = new ArrayList<>();

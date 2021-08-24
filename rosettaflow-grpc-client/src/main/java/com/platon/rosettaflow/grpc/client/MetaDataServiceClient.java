@@ -5,7 +5,7 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailShowDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
 import com.platon.rosettaflow.grpc.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +103,7 @@ public class MetaDataServiceClient {
 
         metaDataDetailResponseDto.setOwner(nodeIdentityDto);
 
-        MetaDataDetailShowDto metaDataDetailShowDto = new MetaDataDetailShowDto();
+        MetaDataDetailDto metaDataDetailShowDto = new MetaDataDetailDto();
         //元文件详情主体
         MetaDataSummaryDto metaDataSummaryDto = new MetaDataSummaryDto();
         metaDataSummaryDto.setMetaDataId(metaDataDetailResponse.getInformation().getMetaDataSummary().getMetaDataId());
@@ -134,7 +134,7 @@ public class MetaDataServiceClient {
         }
         metaDataDetailShowDto.setMetaDataColumnDetailDtoList(metaDataColumnDetailDtoList);
 
-        metaDataDetailResponseDto.setMetaDataDetailShowDto(metaDataDetailShowDto);
+        metaDataDetailResponseDto.setMetaDataDetailDto(metaDataDetailShowDto);
     }
 
 }

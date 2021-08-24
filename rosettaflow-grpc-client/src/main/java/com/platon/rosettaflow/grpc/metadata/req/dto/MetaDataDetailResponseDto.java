@@ -18,5 +18,5 @@ public class MetaDataDetailResponseDto {
     /**
      * 元文件详情主体
      */
-    private MetaDataDetailShowDto metaDataDetailShowDto;
+    private MetaDataDetailDto metaDataDetailDto;
 }

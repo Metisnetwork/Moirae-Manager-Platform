@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.rosettaflow.mapper.MetaDataMapper">
+    <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.MetaData">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
+        <result column="identity_name" jdbcType="VARCHAR" property="identityName"/>
+        <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
+        <result column="meta_data_id" jdbcType="VARCHAR" property="metaDataId"/>
+        <result column="file_id" jdbcType="VARCHAR" property="fileId"/>
+        <result column="data_name" jdbcType="VARCHAR" property="dataName"/>
+        <result column="data_desc" jdbcType="VARCHAR" property="dataDesc"/>
+        <result column="file_path" jdbcType="VARCHAR" property="filePath"/>
+        <result column="rows" jdbcType="INTEGER" property="rows"/>
+        <result column="columns" jdbcType="INTEGER" property="columns"/>
+        <result column="size" jdbcType="BIGINT" property="size"/>
+        <result column="file_type" jdbcType="VARCHAR" property="fileType"/>
+        <result column="has_title" jdbcType="TINYINT" property="hasTitle"/>
+        <result column="industry" jdbcType="VARCHAR" property="industry"/>
+        <result column="data_status" jdbcType="VARCHAR" property="dataStatus"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, identity_id, identity_name, node_id, meta_data_id, file_id, data_name, data_desc,
+    file_path, `rows`, `columns`, `size`, file_type, has_title, industry, data_status,
+    `status`, create_time, update_time
+  </sql>
+    <update id="truncate">
+        TRUNCATE TABLE t_meta_data
+    </update>
+</mapper>

@@ -1,0 +1,55 @@
+package com.platon.rosettaflow.grpc.service.impl;
+
+import com.platon.rosettaflow.grpc.client.TaskServiceClient;
+import com.platon.rosettaflow.grpc.service.GrpcTaskService;
+import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventShowDto;
+import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * @author hudenian
+ * @date 2021/8/24
+ * @description 功能描述
+ */
+@Slf4j
+@Service
+@Profile({"test", "prod"})
+public class GrpcTaskServiceImpl implements GrpcTaskService {
+
+    @Resource
+    private TaskServiceClient taskServiceClient;
+
+    @Override
+    public PublishTaskDeclareResponseDto syncPublishTask(TaskDto taskDto) {
+        return taskServiceClient.syncPublishTask(taskDto);
+    }
+
+    @Override
+    public void asyncPublishTask(TaskDto taskDto, Consumer<PublishTaskDeclareResponse> callback) {
+        taskServiceClient.asyncPublishTask(taskDto, callback);
+    }
+
+    @Override
+    public List<TaskDetailResponseDto> getTaskDetailList() {
+        return taskServiceClient.getTaskDetailList();
+    }
+
+    @Override
+    public List<TaskEventShowDto> getTaskEventList(String taskId) {
+        return taskServiceClient.getTaskEventList(taskId);
+    }
+
+    @Override
+    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds) {
+        return taskServiceClient.getTaskEventListByTaskIds(taskIds);
+    }
+}

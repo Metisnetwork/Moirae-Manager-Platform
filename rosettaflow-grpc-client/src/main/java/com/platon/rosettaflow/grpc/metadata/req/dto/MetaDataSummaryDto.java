@@ -50,6 +50,10 @@ public class MetaDataSummaryDto {
      */
     private Boolean hasTitle;
     /**
+     * 元数据所属行业
+     */
+    private String industry;
+    /**
      * 元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)
      */
     private String state;

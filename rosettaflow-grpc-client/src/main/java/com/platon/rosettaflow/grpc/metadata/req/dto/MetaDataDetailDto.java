@@ -10,7 +10,7 @@ import java.util.List;
  * @description 元文件详情主体
  */
 @Data
-public class MetaDataDetailShowDto {
+public class MetaDataDetailDto {
     /**
      * 源数据的摘要内容
      */

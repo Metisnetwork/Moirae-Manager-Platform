@@ -11,7 +11,7 @@ import java.util.List;
  * @date 2021/8/16
  * @description 功能描述
  */
-public interface IProjectTemplate extends IService<ProjectTemplate> {
+public interface IProjectTemplateService extends IService<ProjectTemplate> {
     /**
      * 获取所有本项目模板
      * @return 项目模板列表

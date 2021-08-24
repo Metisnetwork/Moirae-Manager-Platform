@@ -21,7 +21,7 @@ CREATE TABLE `t_user` (
 DROP TABLE IF EXISTS `t_org`;
 CREATE TABLE `t_org` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '组织表ID(自增长)',
-    `identity_id` varchar(64)  DEFAULT NULL COMMENT '组织的身份标识Id',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '组织的身份标识Id',
     `identity_name` varchar(100)  DEFAULT NULL COMMENT '组织的身份名称',
     `node_id` varchar(256) DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
     `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
@@ -39,7 +39,7 @@ DROP TABLE IF EXISTS `t_user_org`;
 CREATE TABLE `t_user_org` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '机构绑定表ID(自增长)',
   `user_id` bigint(20)  NOT NULL COMMENT '用户ID',
-  `identity_id` varchar(64)  DEFAULT NULL COMMENT '组织的身份标识Id',
+  `identity_id` varchar(128)  DEFAULT NULL COMMENT '组织的身份标识Id',
   `identity_name` varchar(100)  DEFAULT NULL COMMENT '组织的身份名称',
   `bind_status`  tinyint(4)   NOT NULL DEFAULT 0 COMMENT '绑定状态: 0-未绑定, 1-已绑定, 2-已拒绝',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -69,21 +69,21 @@ CREATE TABLE `t_login_log` (
 DROP TABLE IF EXISTS `t_meta_data`;
 CREATE TABLE `t_meta_data` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户数据表ID(自增长)',
-    `identity_id` bigint(20) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
+    `identity_id` varchar(128) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
     `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
     `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
-    `meta_data_id` bigint(20) DEFAULT NULL COMMENT '元数据id',
+    `meta_data_id` varchar(128) DEFAULT NULL COMMENT '元数据id',
     `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
     `data_name` varchar(128) NOT NULL COMMENT '元数据名称|数据名称 (表名)',
     `data_desc` varchar(128) NOT NULL COMMENT '元数据的描述 (摘要)',
     `file_path` varchar(128) NOT NULL COMMENT '源文件存放路径',
-    `rows` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的行数',
-    `columns` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的列数',
+    `rows` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的行数',
+    `columns` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的列数',
     `size` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的大小 (单位: byte)',
     `file_type` varchar(20) NOT NULL COMMENT '源文件的类型 (目前只有 csv)',
     `has_title` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否带标题,0表示不带，1表示带标题',
     `industry` varchar(20) DEFAULT NULL COMMENT '元数据所属行业',
-    `data_status`  tinyint(4)  NOT NULL DEFAULT 0 COMMENT '元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)',
+    `data_status`  varchar(20)  NOT NULL DEFAULT 0 COMMENT '元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)',
     `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -96,8 +96,8 @@ CREATE TABLE `t_meta_data` (
 DROP TABLE IF EXISTS `t_meta_data_details`;
 CREATE TABLE `t_meta_data_details` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '数据详情表ID(自增长)',
-	`data_id` bigint(20) DEFAULT NULL COMMENT '元数据表id',
-    `column_index` bigint(11) DEFAULT NULL COMMENT '列索引',
+    `meta_data_id` varchar(128) DEFAULT NULL COMMENT '元数据id',
+    `column_index` int(11) DEFAULT NULL COMMENT '列索引',
     `column_name` varchar(32) DEFAULT NULL COMMENT '列名',
     `column_type` varchar(32) DEFAULT NULL COMMENT '列类型',
     `column_size` bigint(20) DEFAULT '0' COMMENT '列大小（byte）',
@@ -106,7 +106,7 @@ CREATE TABLE `t_meta_data_details` (
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY (`data_id`)
+    KEY (`meta_data_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='元数据列详情表';
 
 -- ----------------------------
@@ -337,7 +337,7 @@ CREATE TABLE `t_workflow_node_input` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `data_type` varchar(64) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
-  `identity_id` varchar(64) DEFAULT NULL COMMENT '组织的身份标识Id',
+  `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
   `identity_name` varchar(64) DEFAULT NULL COMMENT '组织名称',
   `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
   `data_table_id` varchar(128) DEFAULT NULL COMMENT '数据表ID',
@@ -394,7 +394,7 @@ DROP TABLE IF EXISTS `t_workflow_node_output`;
 CREATE TABLE `t_workflow_node_output` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输出表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
-  `identity_id` varchar(64) DEFAULT NULL COMMENT '协同方组织的身份标识Id',
+  `identity_id` varchar(128) DEFAULT NULL COMMENT '协同方组织的身份标识Id',
   `identity_name` varchar(64) DEFAULT NULL COMMENT '协同方组织名称',
   `save_partner_flag` tinyint(4) DEFAULT NULL COMMENT '是否发起方: 0-否,1-是',
   `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
@@ -528,7 +528,7 @@ CREATE TABLE `t_task_event` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务表ID(自增长)',
   `task_id` varchar(256) NOT NULL COMMENT '任务ID,hash',
   `type` varchar(20) NOT NULL COMMENT '事件类型',
-  `identity_id` varchar(256) NOT NULL COMMENT '产生事件的组织身份ID',
+  `identity_id` varchar(128) NOT NULL COMMENT '产生事件的组织身份ID',
   `event_time` datetime NOT NULL COMMENT '产生事件的时间',
   `content` varchar(512) NOT NULL COMMENT '事件内容',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

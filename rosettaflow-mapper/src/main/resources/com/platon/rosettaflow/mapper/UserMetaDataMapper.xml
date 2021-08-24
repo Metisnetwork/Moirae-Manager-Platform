@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.rosettaflow.mapper.UserMetaDataMapper">
+    <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.UserMetaData">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="data_id" jdbcType="BIGINT" property="dataId"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="auth_type" jdbcType="TINYINT" property="authType"/>
+        <result column="auth_value" jdbcType="BIGINT" property="authValue"/>
+        <result column="auth_begin_time" jdbcType="TIMESTAMP" property="authBeginTime"/>
+        <result column="auth_end_time" jdbcType="TIMESTAMP" property="authEndTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, data_id, address, auth_type, auth_value, auth_begin_time, auth_end_time, create_time, 
+    update_time
+  </sql>
+</mapper>
