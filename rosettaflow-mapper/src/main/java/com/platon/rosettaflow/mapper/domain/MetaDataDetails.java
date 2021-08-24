@@ -15,7 +15,7 @@ import java.util.Date;
  * @author admin
  */
 @Data
-@TableName(value = "t_meta_data_detail")
+@TableName(value = "t_meta_data_details")
 public class MetaDataDetails implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
