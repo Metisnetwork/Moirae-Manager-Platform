@@ -1,17 +1,16 @@
-package com.platon.rosettaflow.mapper.domain;
+package com.platon.rosettaflow.dto;
 
-import java.io.Serializable;
-import java.util.Date;
+
 import lombok.Data;
 
 /**
- * t_algorithm
- * @author 
+ * @author houz
  */
 @Data
-public class Algorithm implements Serializable {
+public class AlgorithmDto {
+
     /**
-     * 算法表ID(自增长)
+     * 算法id
      */
     private Long id;
 
@@ -76,20 +75,14 @@ public class Algorithm implements Serializable {
     private Long duration;
 
     /**
-     * 状态: 0-无效，1- 有效
+     * 算法代码
      */
-    private Byte status;
+    private String algorithmCode;
 
     /**
-     * 创建时间
+     * 代码类型
      */
-    private Date createTime;
+    private Byte editType;
 
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    private static final long serialVersionUID = 1L;
 
 }

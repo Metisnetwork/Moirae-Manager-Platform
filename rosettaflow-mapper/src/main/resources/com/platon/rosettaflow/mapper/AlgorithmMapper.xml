@@ -3,20 +3,55 @@
 <mapper namespace="com.platon.rosettaflow.mapper.AlgorithmMapper">
   <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.Algorithm">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="desc" jdbcType="VARCHAR" property="desc" />
-    <result column="auth" jdbcType="VARCHAR" property="auth" />
-    <result column="max_numbers" jdbcType="INTEGER" property="maxNumbers" />
-    <result column="min_numbers" jdbcType="INTEGER" property="minNumbers" />
-    <result column="support_language" jdbcType="INTEGER" property="supportLanguage" />
-    <result column="support_os_system" jdbcType="INTEGER" property="supportOsSystem" />
-    <result column="type" jdbcType="TINYINT" property="type" />
-    <result column="code_path" jdbcType="VARCHAR" property="codePath" />
+    <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
+    <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc" />
+    <result column="max_numbers" jdbcType="BIGINT" property="maxNumbers" />
+    <result column="min_numbers" jdbcType="BIGINT" property="minNumbers" />
+    <result column="support_language" jdbcType="VARCHAR" property="supportLanguage" />
+    <result column="support_os_system" jdbcType="VARCHAR" property="supportOsSystem" />
+    <result column="algorithm_type" jdbcType="TINYINT" property="algorithmType" />
+    <result column="cost_mem" jdbcType="BIGINT" property="costMem" />
+    <result column="cost_processor" jdbcType="BIGINT" property="costProcessor" />
+    <result column="cost_gpu" jdbcType="INTEGER" property="costGpu" />
+    <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth" />
+    <result column="duration" jdbcType="BIGINT" property="duration" />
+    <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, `name`, `desc`, auth, max_numbers, min_numbers, support_language, support_os_system, 
-    `type`, code_path, create_time, update_time
+    id, algorithm_name, algorithm_desc, max_numbers, min_numbers, support_language,
+    support_os_system, algorithm_type, cost_mem, cost_processor, cost_gpu, cost_bandwidth, 
+    duration, `status`, create_time, update_time
   </sql>
+
+  <!-- 查询算法列表 -->
+  <select id="queryAlgorithmList" resultType="com.platon.rosettaflow.dto.AlgorithmDto">
+    select
+        a.algorithm_name as algorithmName,
+        a.algorithm_desc as algorithmDesc,
+        a.algorithm_type as algorithmType
+    from
+        t_algorithm a, t_algorithm_auth b
+    where 1=1
+        and a.status = '1'
+        and b.status = '1'
+        and a.id = b.algorithm_id
+        and b.user_id = #{userId, jdbcType=BIGINT}
+  </select>
+
+  <!-- 查询算法详情 -->
+  <select id="queryAlgorithmDetails" resultType="com.platon.rosettaflow.dto.AlgorithmDto">
+    select
+        <include refid="Base_Column_List" />,
+        b.calculate_contract_code as algorithmCode
+    from
+        t_algorithm a, t_algorithm_code b
+    where 1=1
+        and a.status = '1'
+        and b.status = '1'
+        and a.id = b.algorithm_id
+        and a.id = #{algorithmId, jdbcType=BIGINT}
+  </select>
+
 </mapper>

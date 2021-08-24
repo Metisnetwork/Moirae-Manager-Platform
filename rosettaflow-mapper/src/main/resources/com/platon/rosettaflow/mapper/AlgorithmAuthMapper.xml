@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.rosettaflow.mapper.AlgorithmAuthMapper">
+  <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.AlgorithmAuth">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
+    <result column="auth_type" jdbcType="TINYINT" property="authType" />
+    <result column="auth_value" jdbcType="BIGINT" property="authValue" />
+    <result column="auth_begin_time" jdbcType="TIMESTAMP" property="authBeginTime" />
+    <result column="auth_end_time" jdbcType="TIMESTAMP" property="authEndTime" />
+    <result column="auth_status" jdbcType="TINYINT" property="authStatus" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, algorithm_id, auth_type, auth_value, auth_begin_time, auth_end_time, 
+    auth_status, `status`, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_algorithm_auth
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_algorithm_auth
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmAuth" useGeneratedKeys="true">
+    insert into t_algorithm_auth (user_id, algorithm_id, auth_type, 
+      auth_value, auth_begin_time, auth_end_time, 
+      auth_status, `status`, create_time, 
+      update_time)
+    values (#{userId,jdbcType=BIGINT}, #{algorithmId,jdbcType=BIGINT}, #{authType,jdbcType=TINYINT}, 
+      #{authValue,jdbcType=BIGINT}, #{authBeginTime,jdbcType=TIMESTAMP}, #{authEndTime,jdbcType=TIMESTAMP}, 
+      #{authStatus,jdbcType=TINYINT}, #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmAuth" useGeneratedKeys="true">
+    insert into t_algorithm_auth
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="algorithmId != null">
+        algorithm_id,
+      </if>
+      <if test="authType != null">
+        auth_type,
+      </if>
+      <if test="authValue != null">
+        auth_value,
+      </if>
+      <if test="authBeginTime != null">
+        auth_begin_time,
+      </if>
+      <if test="authEndTime != null">
+        auth_end_time,
+      </if>
+      <if test="authStatus != null">
+        auth_status,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="algorithmId != null">
+        #{algorithmId,jdbcType=BIGINT},
+      </if>
+      <if test="authType != null">
+        #{authType,jdbcType=TINYINT},
+      </if>
+      <if test="authValue != null">
+        #{authValue,jdbcType=BIGINT},
+      </if>
+      <if test="authBeginTime != null">
+        #{authBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="authEndTime != null">
+        #{authEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="authStatus != null">
+        #{authStatus,jdbcType=TINYINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmAuth">
+    update t_algorithm_auth
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="algorithmId != null">
+        algorithm_id = #{algorithmId,jdbcType=BIGINT},
+      </if>
+      <if test="authType != null">
+        auth_type = #{authType,jdbcType=TINYINT},
+      </if>
+      <if test="authValue != null">
+        auth_value = #{authValue,jdbcType=BIGINT},
+      </if>
+      <if test="authBeginTime != null">
+        auth_begin_time = #{authBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="authEndTime != null">
+        auth_end_time = #{authEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="authStatus != null">
+        auth_status = #{authStatus,jdbcType=TINYINT},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.platon.rosettaflow.mapper.domain.AlgorithmAuth">
+    update t_algorithm_auth
+    set user_id = #{userId,jdbcType=BIGINT},
+      algorithm_id = #{algorithmId,jdbcType=BIGINT},
+      auth_type = #{authType,jdbcType=TINYINT},
+      auth_value = #{authValue,jdbcType=BIGINT},
+      auth_begin_time = #{authBeginTime,jdbcType=TIMESTAMP},
+      auth_end_time = #{authEndTime,jdbcType=TIMESTAMP},
+      auth_status = #{authStatus,jdbcType=TINYINT},
+      `status` = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
