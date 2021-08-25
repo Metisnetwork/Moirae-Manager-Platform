@@ -2,6 +2,10 @@ package com.platon.rosettaflow.mapper.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
@@ -9,10 +13,12 @@ import lombok.Data;
  * @author 
  */
 @Data
+@TableName(value = "t_algorithm_auth")
 public class AlgorithmAuth implements Serializable {
     /**
      * 算法授权表ID(自增长)
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

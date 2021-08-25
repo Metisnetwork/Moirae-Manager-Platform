@@ -9,37 +9,32 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * t_algorithm_code
+ * t_project_member
  * @author 
  */
 @Data
-@TableName(value = "t_algorithm_code")
-public class AlgorithmCode implements Serializable {
+@TableName(value = "t_project_member")
+public class ProjectMember implements Serializable {
     /**
-     * 算法代码表ID(自增长)
+     * 项目成员ID(自增长)
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 算法id
+     * 项目id
      */
-    private Long algorithmId;
+    private Long projectId;
 
     /**
-     * 编辑类型:1-sql,2-noteBook
+     * 用户id
      */
-    private Byte editType;
+    private Long userId;
 
     /**
-     * 计算合约
+     * 角色：1-管理员，2-编辑着, 3-查看着
      */
-    private String calculateContractCode;
-
-    /**
-     * 数据分片合约
-     */
-    private String dataSplitContractCode;
+    private Byte role;
 
     /**
      * 状态: 0-无效，1- 有效

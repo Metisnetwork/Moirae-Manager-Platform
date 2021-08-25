@@ -36,37 +36,55 @@ public class ConvertUtils {
     }
 
     /**
-     * 列表对象转换工具
+     * 列表对象并行转换工具
      * @param list1 数组
      * @param o2 对象
      * @param <T> 泛型
      * @return
      */
-    public static <T> List<T> convertToVoList(List<T> list1, T o2) {
+    public static <T> List<T> convertParallelToList(List<T> list1, T o2) {
         List<T> list2 = new ArrayList();
-        list1.stream().forEach(o1 -> {
-            BeanUtils.copyProperties(o1, o2);
-            list2.add(o2);
-            }
-        );
+        synchronized (list2) {
+            list1.parallelStream().forEach(o1 -> {
+                BeanUtils.copyProperties(o1, o2);
+                list2.add(o2);
+            });
+        }
+        return list2;
+    }
+    /**
+     * 列表对象非并行转换工具
+     * @param list1 数组
+     * @param o2 对象
+     * @param <T> 泛型
+     * @return
+     */
+    public static <T> List<T> convertSerialToList(List<T> list1, T o2) {
+        List<T> list2 = new ArrayList();
+        synchronized (list2) {
+            list1.stream().forEach(o1 -> {
+                BeanUtils.copyProperties(o1, o2);
+                list2.add(o2);
+            });
+        }
         return list2;
     }
 
-    public static ProjectTemplateVo convert2Vo(ProjectTemplateDto projectTemplateDto) {
-        ProjectTemplateVo projectTemplateVo = new ProjectTemplateVo();
-        projectTemplateVo.setId(projectTemplateDto.getId());
-        projectTemplateVo.setProjectName(projectTemplateDto.getProjectName());
-        projectTemplateVo.setProjectDesc(projectTemplateDto.getProjectDesc());
-        return projectTemplateVo;
-    }
-
-    public static List<ProjectTemplateVo> convert2Vo(List<ProjectTemplateDto> projectTemplateDtoList) {
-        List<ProjectTemplateVo> list = new ArrayList<>();
-        if (null != projectTemplateDtoList) {
-            projectTemplateDtoList.forEach(projectTemplateDto -> list.add(convert2Vo(projectTemplateDto)));
-        }
-        return list;
-    }
+//    public static ProjectTemplateVo convert2Vo(ProjectTemplateDto projectTemplateDto) {
+//        ProjectTemplateVo projectTemplateVo = new ProjectTemplateVo();
+//        projectTemplateVo.setId(projectTemplateDto.getId());
+//        projectTemplateVo.setProjectName(projectTemplateDto.getProjectName());
+//        projectTemplateVo.setProjectDesc(projectTemplateDto.getProjectDesc());
+//        return projectTemplateVo;
+//    }
+//
+//    public static List<ProjectTemplateVo> convert2Vo(List<ProjectTemplateDto> projectTemplateDtoList) {
+//        List<ProjectTemplateVo> list = new ArrayList<>();
+//        if (null != projectTemplateDtoList) {
+//            projectTemplateDtoList.forEach(projectTemplateDto -> list.add(convert2Vo(projectTemplateDto)));
+//        }
+//        return list;
+//    }
 
 //    public static List<ProjectTemplateVo> convert2Vo(List<ProjectTemplateDto> projectTemplateDtoList) {
 //        List<ProjectTemplateVo> list = new ArrayList<>();

@@ -31,11 +31,11 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     IAlgorithmCodeService algorithmCodeService;
 
     @Override
-    public void addAlgorithm(AlgorithmDto algorithmDto) {
+    public void saveAlgorithm(AlgorithmDto algorithmDto) {
         Algorithm algorithm = new Algorithm();
         BeanUtils.copyProperties(algorithmDto, algorithm);
         // 新增
-        if (null == algorithmDto.getId()) {
+        if (null == algorithmDto.getId() || algorithmDto.getId() == 0) {
             // 保存算法
             this.save(algorithm);
             // 保存算法代码
@@ -46,7 +46,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             algorithmCodeService.addAlgorithmCode(algorithmCode);
         }
         // 修改
-        if (null != algorithmDto.getId()) {
+        if (null != algorithmDto.getId() && algorithmDto.getId() > 0) {
             // 修改算法
             this.updateById(algorithm);
             // 修改算法代码

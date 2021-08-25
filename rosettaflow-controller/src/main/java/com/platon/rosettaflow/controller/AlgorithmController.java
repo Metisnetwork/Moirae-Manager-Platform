@@ -1,7 +1,6 @@
 package com.platon.rosettaflow.controller;
 
 import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.req.algorithm.AlgorithmListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
@@ -36,11 +35,11 @@ public class AlgorithmController {
     private IAlgorithmService algorithmService;
 
     @PostMapping("saveAlgorithm")
-    @ApiOperation(value = "新增算法", notes = "新增算法")
-    public ResponseVo<AlgDetailsVo> addAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
+    @ApiOperation(value = "保存算法", notes = "保存算法")
+    public ResponseVo<AlgDetailsVo> saveAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
         try {
-            AlgorithmDto algorithmDto = (AlgorithmDto)ConvertUtils.convertToVo(algorithmReq, new Algorithm());
-            algorithmService.addAlgorithm(algorithmDto);
+            AlgorithmDto algorithmDto = (AlgorithmDto)ConvertUtils.convertToVo(algorithmReq, new AlgorithmDto());
+            algorithmService.saveAlgorithm(algorithmDto);
             return ResponseVo.createSuccess();
         } catch (Exception e) {
             log.error("algorithm--queryAlgorithmDetails--查询算法详情失败, 错误信息:{}", e);
@@ -53,7 +52,7 @@ public class AlgorithmController {
     public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@RequestBody @Valid AlgorithmListReq algListReq) {
         try {
             List listVo = algorithmService.queryAlgorithmList(algListReq.getUserId());
-            List<AlgorithmListVo> algVoList = (List)ConvertUtils.convertToVoList(listVo, new AlgorithmListVo());
+            List<AlgorithmListVo> algVoList = (List)ConvertUtils.convertSerialToList(listVo, new AlgorithmListVo());
             return ResponseVo.createSuccess(algVoList);
         } catch (Exception e) {
             log.error("algorithm--queryAlgorithmList--查询算法列表失败, 错误信息:{}", e);

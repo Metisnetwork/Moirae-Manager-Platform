@@ -17,8 +17,7 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "算法列表请求参数")
 public class AlgorithmReq {
 
-    @ApiModelProperty(value = "算法ID", example = "", required = true)
-    @NotNull(message = "算法ID不能为空")
+    @ApiModelProperty(value = "算法ID", example = "")
     private Long id;
 
     @ApiModelProperty(value = "算法名称", example = "", required = true)
@@ -43,6 +42,7 @@ public class AlgorithmReq {
     private String supportOsSystem;
 
     @ApiModelProperty(value = "算法所属大类:1-统计分析,2-特征工程,3-机器学习", example = "")
+    @NotNull(message = "算法所属大类不能为空")
     private Byte algorithmType;
 
     @ApiModelProperty(value = "所需的内存 (单位: byte)", example = "")
