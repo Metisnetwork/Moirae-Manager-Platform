@@ -19,7 +19,7 @@ import java.util.Date;
 public class MetaData implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
-     * 用户数据表ID(自增长)
+     * 元数据表ID(自增长)
      */
     @TableId(type = IdType.AUTO)
     private Long id;
