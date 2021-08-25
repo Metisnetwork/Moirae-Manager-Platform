@@ -15,4 +15,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, UserMetaData> implements IUserMetaDataService {
+    @Override
+    public void truncate() {
+        this.baseMapper.truncate();
+    }
 }

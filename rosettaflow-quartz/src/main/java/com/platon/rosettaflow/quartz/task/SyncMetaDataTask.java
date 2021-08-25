@@ -2,7 +2,6 @@ package com.platon.rosettaflow.quartz.task;
 
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.StatusEnum;
-import com.platon.rosettaflow.grpc.client.MetaDataServiceClient;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
@@ -34,9 +33,6 @@ public class SyncMetaDataTask {
     @Resource
     private SysConfig sysConfig;
 
-//    @Resource
-//    private MetaDataServiceClient metaDataServiceClient;
-
     @Resource
     private GrpcMetaDataService grpcMetaDataService;
 
@@ -46,12 +42,13 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 3600000, initialDelay = 1000)
+//    @Scheduled(fixedDelay = 3600000, initialDelay = 10000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
 
+        log.info("元数据信息同步开始>>>>");
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getMetaDataDetailList();
 
         //元数据同步成功，删除旧数据
@@ -60,6 +57,8 @@ public class SyncMetaDataTask {
             metaDataService.truncate();
             //删除元数据详情
             metaDataDetailsService.truncate();
+        } else {
+            return;
         }
 
         List<MetaData> newMetaDataList = new ArrayList<>();
@@ -90,14 +89,14 @@ public class SyncMetaDataTask {
             //添加元数据简介
             newMetaDataList.add(metaData);
             ++metaDataSize;
-            if (metaDataSize == BATCH_SIZE) {
+            if (metaDataSize % BATCH_SIZE == 0) {
                 metaDataService.saveBatch(newMetaDataList);
                 newMetaDataList.clear();
             }
 
-            metaDataDetail = new MetaDataDetails();
             List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
             for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
+                metaDataDetail = new MetaDataDetails();
                 metaDataDetail.setMetaDataId(metaData.getMetaDataId());
                 metaDataDetail.setColumnIndex(metaDataColumnDetailDto.getIndex());
                 metaDataDetail.setColumnName(metaDataColumnDetailDto.getName());
@@ -108,7 +107,7 @@ public class SyncMetaDataTask {
                 //添加元数据详情
                 newMetaDataDetailsList.add(metaDataDetail);
                 ++metaDataDetailSize;
-                if (metaDataDetailSize == BATCH_SIZE) {
+                if (metaDataDetailSize % BATCH_SIZE == 0) {
                     metaDataDetailsService.saveBatch(newMetaDataDetailsList);
                     newMetaDataDetailsList.clear();
                 }
@@ -121,5 +120,6 @@ public class SyncMetaDataTask {
         if (newMetaDataDetailsList.size() > 0) {
             metaDataDetailsService.saveBatch(newMetaDataDetailsList);
         }
+        log.info("元数据信息同步结束>>>>");
     }
 }

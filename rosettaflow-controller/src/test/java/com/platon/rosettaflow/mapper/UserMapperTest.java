@@ -1,6 +1,6 @@
 package com.platon.rosettaflow.mapper;
 
-import com.platon.rosettaflow.mapper.domain.MemberRole;
+import com.platon.rosettaflow.mapper.domain.User;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,15 +12,15 @@ import javax.annotation.Resource;
  * @date 2021/7/20
  */
 @SpringBootTest
-public class MemberRoleMapperTest {
+public class UserMapperTest {
 
     @Resource
-    private MemberRoleMapper memberRoleMapper;
+    private UserMapper userMapper;
 
     @Test
     @Disabled
     public void test() {
-        MemberRole memberRole = memberRoleMapper.selectById(1L);
-        System.out.println(memberRole.getName());
+        User user = userMapper.selectById(1L);
+        System.out.println(user.getUserName());
     }
 }

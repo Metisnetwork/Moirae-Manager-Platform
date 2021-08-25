@@ -7,4 +7,5 @@ import com.platon.rosettaflow.mapper.domain.UserMetaData;
  * @author admin
  */
 public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
+    void truncate();
 }

@@ -9,4 +9,8 @@ import com.platon.rosettaflow.mapper.domain.UserMetaData;
  * @description 用户元数据授权服务
  */
 public interface IUserMetaDataService extends IService<UserMetaData> {
+    /**
+     * 清空用户授权数据信息
+     */
+    void truncate();
 }

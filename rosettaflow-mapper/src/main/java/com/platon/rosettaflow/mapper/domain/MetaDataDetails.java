@@ -24,7 +24,7 @@ public class MetaDataDetails implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
     /**
-     * 元数据表id
+     * 元数据id
      */
     private String metaDataId;
     /**
