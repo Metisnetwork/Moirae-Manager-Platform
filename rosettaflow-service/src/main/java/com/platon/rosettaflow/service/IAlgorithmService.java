@@ -14,9 +14,9 @@ public interface IAlgorithmService extends IService<Algorithm> {
 
     /**
      * 新增算法
-     * @param algorithm
+     * @param algorithmDto
      */
-    void addAlgorithm(AlgorithmDto algorithmDto);
+    void saveAlgorithm(AlgorithmDto algorithmDto);
 
     /**
      * 查询算法列表
