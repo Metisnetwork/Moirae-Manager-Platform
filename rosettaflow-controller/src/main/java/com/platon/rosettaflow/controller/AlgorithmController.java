@@ -2,7 +2,8 @@ package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.req.algorithm.AlgorithmListReq;
+import com.platon.rosettaflow.req.algorithm.AlgDetailsReq;
+import com.platon.rosettaflow.req.algorithm.AlgListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.utils.ConvertUtils;
@@ -50,9 +51,9 @@ public class AlgorithmController {
 
     @PostMapping("queryAlgorithmList")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
-    public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@RequestBody @Valid AlgorithmListReq algListReq) {
+    public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@RequestBody @Valid AlgListReq algListReq) {
         try {
-            List listVo = algorithmService.queryAlgorithmList(algListReq.getUserId());
+            List listVo = algorithmService.queryAlgorithmList(algListReq.getUserId(), algListReq.getAlgorithmName());
             List<AlgorithmListVo> algVoList = ConvertUtils.convertSerialToList(listVo, AlgorithmListVo.class);
             return ResponseVo.createSuccess(algVoList);
         } catch (Exception e) {
@@ -64,9 +65,9 @@ public class AlgorithmController {
 
     @PostMapping("queryAlgorithmDetails")
     @ApiOperation(value = "查询算法详情", notes = "查询算法详情")
-    public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@RequestBody @Valid AlgorithmListReq algListReq) {
+    public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@RequestBody @Valid AlgDetailsReq algDetailsReq) {
         try {
-            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algListReq.getUserId());
+            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algDetailsReq.getId());
             AlgDetailsVo algDetailsVo = BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class);
             return ResponseVo.createSuccess(algDetailsVo);
         } catch (Exception e) {
