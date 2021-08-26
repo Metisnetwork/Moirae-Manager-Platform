@@ -2,10 +2,12 @@ package com.platon.rosettaflow.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
+import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
 import com.platon.rosettaflow.req.data.MetaDataDetailReq;
 import com.platon.rosettaflow.req.data.MetaDataReq;
+import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import com.platon.rosettaflow.service.IMetaDataService;
 import com.platon.rosettaflow.service.IUserMetaDataService;
 import com.platon.rosettaflow.vo.PageVo;
@@ -44,14 +46,17 @@ public class DataController {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
+    @Resource
+    private IMetaDataDetailsService metaDataDetailsService;
+
     @GetMapping("list")
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
     public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
         IPage<MetaDataDto> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
-        return convertToResponseVo(servicePage);
+        return convertToMetaDataVo(servicePage);
     }
 
-    @GetMapping(value = "/detail")
+    @GetMapping(value = "detail")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
     public ResponseVo<MetaDataDetailVo> detail(@Valid MetaDataDetailReq metaDataDetailReq) {
         MetaDataDto metaDataDto = metaDataService.detail(metaDataDetailReq.getId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
@@ -65,12 +70,19 @@ public class DataController {
         return convertUserMetaDataToResponseVo(servicePage);
     }
 
-    private ResponseVo<PageVo<MetaDataVo>> convertToResponseVo(IPage<MetaDataDto> pageDto) {
+    @GetMapping(value = "columnList")
+    @ApiOperation(value = "获取元数据列分页列表", notes = "获取元数据列分页列表")
+    public ResponseVo<PageVo<MetaDataColumnsVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
+        IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findById(metaDataDetailReq.getId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
+        return convertToResponseVo(servicePage);
+    }
+
+    private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {
         List<MetaDataVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(metaDataDto -> {
-            MetaDataVo metaDataVo = new MetaDataVo();
-            BeanCopierUtils.copy(metaDataDto, metaDataVo);
-            items.add(metaDataVo);
+        pageDto.getRecords().forEach(dto -> {
+            MetaDataVo vo = new MetaDataVo();
+            BeanCopierUtils.copy(dto, vo);
+            items.add(vo);
         });
 
         PageVo<MetaDataVo> pageVo = new PageVo<>();
@@ -110,6 +122,22 @@ public class DataController {
         });
 
         PageVo<UserMetaDataVo> pageVo = new PageVo<>();
+        pageVo.setCurrent(pageDto.getCurrent());
+        pageVo.setItems(items);
+        pageVo.setSize(pageDto.getSize());
+        pageVo.setTotal(pageDto.getTotal());
+        return ResponseVo.createSuccess(pageVo);
+    }
+
+    private ResponseVo<PageVo<MetaDataColumnsVo>> convertToResponseVo(IPage<MetaDataDetailsDto> pageDto) {
+        List<MetaDataColumnsVo> items = new ArrayList<>();
+        pageDto.getRecords().forEach(dto -> {
+            MetaDataColumnsVo vo = new MetaDataColumnsVo();
+            BeanCopierUtils.copy(dto, vo);
+            items.add(vo);
+        });
+
+        PageVo<MetaDataColumnsVo> pageVo = new PageVo<>();
         pageVo.setCurrent(pageDto.getCurrent());
         pageVo.setItems(items);
         pageVo.setSize(pageDto.getSize());

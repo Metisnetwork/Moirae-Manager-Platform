@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -31,22 +32,30 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
 
     @Override
     public IPage<MetaDataDetailsDto> findByMetaDataId(String metaDataId, Long current, Long size) {
-        LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
         Page<MetaDataDetails> page = new Page<>(current, size);
-        wrapper.eq(MetaDataDetails::getMetaDataId, metaDataId);
+        LambdaQueryWrapper<MetaDataDetails> wrapper = getQueryWrapper(metaDataId, null);
         this.page(page, wrapper);
         return this.convertToPageDto(page);
     }
 
-//    private List<MetaDataDetailsDto> convertToListDto(List<MetaDataDetails> poList) {
-//        List<MetaDataDetailsDto> dtoList = new ArrayList<>();
-//        poList.forEach(po -> {
-//            MetaDataDetailsDto m = new MetaDataDetailsDto();
-//            BeanCopierUtils.copy(po, m);
-//            dtoList.add(m);
-//        });
-//        return dtoList;
-//    }
+    @Override
+    public IPage<MetaDataDetailsDto> findById(Long id, Long current, Long size) {
+        Page<MetaDataDetails> page = new Page<>(current, size);
+        LambdaQueryWrapper<MetaDataDetails> wrapper = getQueryWrapper(null, id);
+        this.page(page, wrapper);
+        return this.convertToPageDto(page);
+    }
+
+    private LambdaQueryWrapper<MetaDataDetails> getQueryWrapper(String metaDataId, Long id) {
+        LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
+        if (StrUtil.isNotBlank(metaDataId)) {
+            wrapper.eq(MetaDataDetails::getMetaDataId, metaDataId);
+        }
+        if (id != null) {
+            wrapper.eq(MetaDataDetails::getId, id);
+        }
+        return wrapper;
+    }
 
     IPage<MetaDataDetailsDto> convertToPageDto(Page<?> page) {
         List<MetaDataDetailsDto> records = new ArrayList<>();

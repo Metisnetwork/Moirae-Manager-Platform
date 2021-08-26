@@ -27,4 +27,14 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @return 元数据列详情列表
      */
     IPage<MetaDataDetailsDto> findByMetaDataId(String metaDataId, Long current, Long size);
+
+    /**
+     * 根据id获取元数据详情
+     *
+     * @param id 元数据详情表id
+     * @param current 元数据详情中列数据当前页
+     * @param size    元数据详情中列数据每页大小
+     * @return 元数据列详情列表
+     */
+    IPage<MetaDataDetailsDto> findById(Long id, Long current, Long size);
 }
