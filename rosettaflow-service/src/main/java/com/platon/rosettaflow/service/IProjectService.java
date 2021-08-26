@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.dto.ProjectTemplateDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 
@@ -25,7 +26,15 @@ public interface IProjectService extends IService<Project> {
      * @param projectName
      * @param pageNumber
      * @param pageSize
+     * @return
      */
-    List<Project>  queryProjectList(Long userId, String projectName, Integer pageNumber, Integer pageSize);
+    List<ProjectDto>  queryProjectList(Long userId, String projectName, Integer pageNumber, Integer pageSize);
+
+    /**
+     * 查询项目详情
+     * @param id
+     * @return
+     */
+    Project queryProjectDetails(Long id);
 
 }

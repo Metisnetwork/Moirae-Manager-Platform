@@ -2,11 +2,13 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.poi.PoiChecker;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
+import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.dto.ProjectTemplateDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
 import com.platon.rosettaflow.mapper.domain.Project;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author admin
@@ -43,13 +46,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public List<Project> queryProjectList(Long userId, String projectName, Integer pageNumber, Integer pageSize) {
-//        Page<Project> page = new Page<>(pageNumber,pageSize);
-        LambdaQueryChainWrapper<Project> queryWrapper = lambdaQuery();
-        queryWrapper.eq(Project::getUserId, userId)
-                .eq(Project::getProjectName, projectName)
-                .last(" limit" + pageNumber + "," + pageSize);
-        List list = this.list(queryWrapper);
-        return null;
+    public List<ProjectDto> queryProjectList(Long userId, String projectName, Integer pageNumber, Integer pageSize) {
+        IPage page = new Page<>(pageNumber,pageSize);
+        IPage<ProjectDto> iPage = projectMapper.queryProjectList(userId, projectName, page);
+        return (List)iPage.getRecords();
+    }
+
+    @Override
+    public Project queryProjectDetails(Long id) {
+        return this.getById(id);
     }
 }

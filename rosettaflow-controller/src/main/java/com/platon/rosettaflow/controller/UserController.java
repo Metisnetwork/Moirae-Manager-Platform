@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -44,7 +45,7 @@ public class UserController {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         UserDto userDto = userService.generatorToken(loginInReq.getAddress());
-        return ResponseVo.createSuccess(ConvertUtils.convert2Vo(userDto));
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 
     @PostMapping("logout")

@@ -13,13 +13,19 @@
   <sql id="Base_Column_List">
     id, user_id, project_name, project_desc, `status`, create_time, update_time
   </sql>
-  <select id="queryProjectList" resultMap="BaseResultMap">
-    select 
-        <include refid="Base_Column_List" />
+  <select id="queryProjectList" resultType="com.platon.rosettaflow.dto.ProjectDto">
+    select
+        a.id as id,
+        a.project_name as projectName,
+        a.create_time as createTime,
+        b.user_name as userName
     from
-        t_project
+        t_project a, t_user b
     where 1=1
-        and user_id = #{userId,jdbcType=BIGINT}
-        and project_name LIKE CONCAT('%', #{projectName,jdbcType=VARCHAR}, '%')
+        and a.user_id = b.id
+        and a.user_id = #{userId, jdbcType=BIGINT}
+      <if test="projectName != null and projectName != ''">
+          and a.project_name LIKE CONCAT('%', #{projectName, jdbcType=VARCHAR}, '%')
+      </if>
   </select>
 </mapper>
