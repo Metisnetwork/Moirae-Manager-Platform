@@ -1,7 +1,9 @@
 package com.platon.rosettaflow.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
@@ -28,20 +30,37 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
     }
 
     @Override
-    public List<MetaDataDetailsDto> findByMetaDataId(String metaDataId) {
+    public IPage<MetaDataDetailsDto> findByMetaDataId(String metaDataId, Long current, Long size) {
         LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
+        Page<MetaDataDetails> page = new Page<>(current, size);
         wrapper.eq(MetaDataDetails::getMetaDataId, metaDataId);
-        List<MetaDataDetails> metaDataDetailsList = this.list(wrapper);
-        return this.convertToListDto(metaDataDetailsList);
+        this.page(page, wrapper);
+        return this.convertToPageDto(page);
     }
 
-    private List<MetaDataDetailsDto> convertToListDto(List<MetaDataDetails> poList) {
-        List<MetaDataDetailsDto> dtoList = new ArrayList<>();
-        poList.forEach(po -> {
+//    private List<MetaDataDetailsDto> convertToListDto(List<MetaDataDetails> poList) {
+//        List<MetaDataDetailsDto> dtoList = new ArrayList<>();
+//        poList.forEach(po -> {
+//            MetaDataDetailsDto m = new MetaDataDetailsDto();
+//            BeanCopierUtils.copy(po, m);
+//            dtoList.add(m);
+//        });
+//        return dtoList;
+//    }
+
+    IPage<MetaDataDetailsDto> convertToPageDto(Page<?> page) {
+        List<MetaDataDetailsDto> records = new ArrayList<>();
+        page.getRecords().forEach(r -> {
             MetaDataDetailsDto m = new MetaDataDetailsDto();
-            BeanCopierUtils.copy(po, m);
-            dtoList.add(m);
+            BeanCopierUtils.copy(r, m);
+            records.add(m);
         });
-        return dtoList;
+
+        IPage<MetaDataDetailsDto> pageDto = new Page<>();
+        pageDto.setCurrent(page.getCurrent());
+        pageDto.setRecords(records);
+        pageDto.setSize(page.getSize());
+        pageDto.setTotal(page.getTotal());
+        return pageDto;
     }
 }

@@ -6,16 +6,22 @@ import lombok.Data;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
  * @author hudenian
  * @date 2021/8/25
- * @description 元数据列表请求参数
+ * @description 元数据详情请求参数
  */
 @Data
-@ApiModel(value = "元数据请求参数")
-public class MetaDataReq {
+@ApiModel(value = "元数据详情请求参数")
+public class MetaDataDetailReq {
+
+    @ApiModelProperty(value = "元数据表id", required = true)
+    @NotNull(message = "元数据表ID不能为空")
+    @Positive(message = "元数据表ID错误")
+    private Long id;
 
     @ApiModelProperty(value = "当前页码, 默认第一页")
     @Positive(message = "页码不能小于等于0")
@@ -26,6 +32,5 @@ public class MetaDataReq {
     @Max(value = 1000L, message = "每页大小不能超过1000")
     private Long size = 10L;
 
-    @ApiModelProperty(value = "元数据名称|数据名称 (表名)")
-    private String dataName;
+
 }

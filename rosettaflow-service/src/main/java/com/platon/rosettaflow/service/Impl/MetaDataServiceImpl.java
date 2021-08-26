@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -38,21 +39,24 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public IPage<MetaDataDto> list(Long current, Long size) {
+    public IPage<MetaDataDto> list(Long current, Long size, String dataName) {
         Page<MetaData> page = new Page<>(current, size);
         LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaData::getDataStatus, MetaDataStatusEnum.RELEASE.getValue());
+        if (StrUtil.isNotBlank(dataName)) {
+            wrapper.like(MetaData::getDataName, dataName);
+        }
         this.page(page, wrapper);
         return this.convertToPageDto(page);
     }
 
     @Override
-    public MetaDataDto detail(Long id) {
+    public MetaDataDto detail(Long id, Long current, Long size) {
         MetaData metaData = this.getById(id);
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
-        List<MetaDataDetailsDto> metaDataDetailsDtoList = metaDataDetailsService.findByMetaDataId(metaData.getMetaDataId());
-        metaDataDto.setMetaDataDetailsDtoList(metaDataDetailsDtoList);
+        IPage<MetaDataDetailsDto> metaDataDetailsDtoPage = metaDataDetailsService.findByMetaDataId(metaData.getMetaDataId(),current,size);
+        metaDataDto.setMetaDataDetailsDtoPageList(metaDataDetailsDtoPage);
         return metaDataDto;
     }
 

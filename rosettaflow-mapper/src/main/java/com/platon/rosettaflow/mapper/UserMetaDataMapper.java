@@ -12,5 +12,5 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
     void truncate();
 
-    IPage<UserMetaDataDto> listByOwner(@Param("page") IPage<UserMetaData> page, @Param("address") String address);
+    IPage<UserMetaDataDto> listByOwner(@Param("page") IPage<UserMetaData> page, @Param("address") String address, @Param("dataName") String dataName);
 }

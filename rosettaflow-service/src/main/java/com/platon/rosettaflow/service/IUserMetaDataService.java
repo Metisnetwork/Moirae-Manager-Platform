@@ -21,7 +21,8 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      *
      * @param current 当前页
      * @param size    每页大小
+     * @param dataName    元数据名称
      * @return 分页数据
      */
-    IPage<UserMetaDataDto> list(Long current, Long size);
+    IPage<UserMetaDataDto> list(Long current, Long size,String dataName);
 }
