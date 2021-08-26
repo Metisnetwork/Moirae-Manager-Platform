@@ -60,8 +60,8 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     }
 
     @Override
-    public List<AlgorithmDto> queryAlgorithmList(Long userId) {
-        return algorithmMapper.queryAlgorithmList(userId);
+    public List<AlgorithmDto> queryAlgorithmList(Long userId, String algorithmName) {
+        return algorithmMapper.queryAlgorithmList(userId, algorithmName);
     }
 
     @Override

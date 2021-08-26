@@ -16,10 +16,13 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(value = "算法列表请求参数")
-public class AlgorithmListReq {
+public class AlgListReq {
 
     @ApiModelProperty(value = "用户ID", example = "", required = true)
     @NotNull(message = "用户ID不能为空")
     private Long userId;
+
+    @ApiModelProperty(value = "算法名称", example = "")
+    private String algorithmName;
 
 }

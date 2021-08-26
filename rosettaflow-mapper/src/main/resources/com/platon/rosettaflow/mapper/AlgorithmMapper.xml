@@ -38,6 +38,9 @@
         and b.status = '1'
         and a.id = b.algorithm_id
         and b.user_id = #{userId, jdbcType=BIGINT}
+        <if test="algorithmName != null and algorithmName != ''">
+            and a.algorithm_name LIKE CONCAT('%', #{algorithmName, jdbcType=VARCHAR}, '%')
+        </if>
   </select>
 
   <!-- 查询算法详情 -->
