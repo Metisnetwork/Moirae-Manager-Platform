@@ -2,6 +2,7 @@ package com.platon.rosettaflow.vo.data;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.platon.rosettaflow.common.constants.SysConstant;
+import com.platon.rosettaflow.vo.PageVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -77,6 +78,6 @@ public class MetaDataDetailVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date updateTime;
 
-    @ApiModelProperty(value = "元数据列列表")
-    private List<MetaDataColumnsVo> metaDataColumnsVoList;
+    @ApiModelProperty(value = "元数据列分页列表")
+    private PageVo<MetaDataColumnsVo> metaDataColumnsVoPageVo;
 }

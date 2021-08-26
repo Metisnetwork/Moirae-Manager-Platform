@@ -1,10 +1,9 @@
 package com.platon.rosettaflow.dto;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.mapper.domain.MetaData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * @author hudenian
@@ -15,5 +14,5 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class MetaDataDto extends MetaData {
 
-    List<MetaDataDetailsDto> metaDataDetailsDtoList;
+    IPage<MetaDataDetailsDto> metaDataDetailsDtoPageList;
 }

@@ -30,27 +30,31 @@
   </update>
     <select id="listByOwner" resultType="com.platon.rosettaflow.dto.UserMetaDataDto">
         SELECT
-            u.id,
-            m.data_name,
-            u.meta_data_id,
-            u.identity_id,
-            u.identity_name,
-            u.node_id,
-            u.address,
-            u.auth_type,
-            u.auth_value,
-            u.auth_begin_time,
-            u.auth_end_time,
-            u.auth_status,
-            u.apply_time,
-            u.audit_time,
-            u.`status`,
-            u.create_time,
-            u.update_time
+        u.id,
+        m.data_name,
+        u.meta_data_id,
+        u.identity_id,
+        u.identity_name,
+        u.node_id,
+        u.address,
+        u.auth_type,
+        u.auth_value,
+        u.auth_begin_time,
+        u.auth_end_time,
+        u.auth_status,
+        u.apply_time,
+        u.audit_time,
+        u.`status`,
+        u.create_time,
+        u.update_time
         FROM
-            t_user_meta_data u
+        t_user_meta_data u
         INNER JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id
         WHERE
-            u.address = #{address}
+        u.address = #{address}
+        <if test="dataName != null and dataName != ''">
+            AND
+            m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
+        </if>
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
@@ -21,7 +22,9 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * 根据元数据id获取元数据
      *
      * @param metaDataId 元数据id
+     * @param current 元数据详情中列数据当前页
+     * @param size    元数据详情中列数据每页大小
      * @return 元数据列详情列表
      */
-    List<MetaDataDetailsDto> findByMetaDataId(String metaDataId);
+    IPage<MetaDataDetailsDto> findByMetaDataId(String metaDataId, Long current, Long size);
 }

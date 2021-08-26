@@ -28,11 +28,11 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public IPage<UserMetaDataDto> list(Long current, Long size) {
+    public IPage<UserMetaDataDto> list(Long current, Long size,String dataName) {
         Page<UserMetaData> page = new Page<>(current, size);
         if (null == UserContext.get().getAddress()) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
         }
-        return this.baseMapper.listByOwner(page, UserContext.get().getAddress());
+        return this.baseMapper.listByOwner(page, UserContext.get().getAddress(),dataName);
     }
 }
