@@ -1,11 +1,6 @@
 package com.platon.rosettaflow.utils;
 
-import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.dto.ProjectTemplateDto;
-import com.platon.rosettaflow.dto.UserDto;
-import com.platon.rosettaflow.vo.algorithm.AlgorithmListVo;
-import com.platon.rosettaflow.vo.projectTemplate.ProjectTemplateVo;
-import com.platon.rosettaflow.vo.user.UserVo;
+import cn.hutool.core.util.ReflectUtil;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -18,53 +13,39 @@ import java.util.List;
  */
 public class ConvertUtils {
 
-    public static UserVo convert2Vo(UserDto userDto) {
-        UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(userDto, userVo);
-        return userVo;
-    }
-
     /**
-     * 对象转换工具
-     * @param o1
-     * @param o2
+     * 列表对象非并行转换工具
+     * @param list1
+     * @param tClass
+     * @param <T>
      * @return
      */
-    public static Object convertToVo(Object o1, Object o2) {
-        BeanUtils.copyProperties(o1, o2);
-        return o2;
-    }
-
-    /**
-     * 列表对象并行转换工具
-     * @param list1 数组
-     * @param o2 对象
-     * @param <T> 泛型
-     * @return
-     */
-    public static <T> List<T> convertParallelToList(List<T> list1, T o2) {
+    public static <T> List<T> convertSerialToList(List<T> list1, Class<T> tClass) {
         List<T> list2 = new ArrayList();
         synchronized (list2) {
-            list1.parallelStream().forEach(o1 -> {
-                BeanUtils.copyProperties(o1, o2);
-                list2.add(o2);
+            list1.stream().forEach(o1 -> {
+                T target = ReflectUtil.newInstanceIfPossible(tClass);
+                BeanUtils.copyProperties(o1, target);
+                list2.add(target);
             });
         }
         return list2;
     }
+
     /**
-     * 列表对象非并行转换工具
-     * @param list1 数组
-     * @param o2 对象
-     * @param <T> 泛型
+     * 列表对象并行转换工具(性能好，会乱序)
+     * @param list1
+     * @param tClass
+     * @param <T>
      * @return
      */
-    public static <T> List<T> convertSerialToList(List<T> list1, T o2) {
+    public static <T> List<T> convertParallelToList(List<T> list1, Class<T> tClass) {
         List<T> list2 = new ArrayList();
         synchronized (list2) {
-            list1.stream().forEach(o1 -> {
-                BeanUtils.copyProperties(o1, o2);
-                list2.add(o2);
+            list1.parallelStream().forEach(o1 -> {
+                T target = ReflectUtil.newInstanceIfPossible(tClass);
+                BeanUtils.copyProperties(o1, target);
+                list2.add(target);
             });
         }
         return list2;

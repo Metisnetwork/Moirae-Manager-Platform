@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.vo.projectTemplate;
+package com.platon.rosettaflow.vo.project;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

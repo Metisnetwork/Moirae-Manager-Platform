@@ -1,7 +1,10 @@
 package com.platon.rosettaflow.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,10 +18,12 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * 查询项目列表-分页
      * @param userId
      * @param projectName
-     * @param pageNumber
-     * @param pageSize
+     * @param page
+     * @return
      */
-    List<Project> queryProjectList(Long userId, String projectName, Integer pageNumber, Integer pageSize);
+    IPage<ProjectDto> queryProjectList(@Param(value = "userId")Long userId,
+                                      @Param(value = "projectName")String projectName,
+                                      IPage<ProjectDto> page);
 
 
 

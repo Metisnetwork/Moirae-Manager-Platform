@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.req.algorithm.AlgorithmListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
@@ -38,7 +39,7 @@ public class AlgorithmController {
     @ApiOperation(value = "保存算法", notes = "保存算法")
     public ResponseVo<AlgDetailsVo> saveAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
         try {
-            AlgorithmDto algorithmDto = (AlgorithmDto)ConvertUtils.convertToVo(algorithmReq, new AlgorithmDto());
+            AlgorithmDto algorithmDto = BeanUtil.copyProperties(algorithmReq, AlgorithmDto.class);
             algorithmService.saveAlgorithm(algorithmDto);
             return ResponseVo.createSuccess();
         } catch (Exception e) {
@@ -52,7 +53,7 @@ public class AlgorithmController {
     public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@RequestBody @Valid AlgorithmListReq algListReq) {
         try {
             List listVo = algorithmService.queryAlgorithmList(algListReq.getUserId());
-            List<AlgorithmListVo> algVoList = (List)ConvertUtils.convertSerialToList(listVo, new AlgorithmListVo());
+            List<AlgorithmListVo> algVoList = ConvertUtils.convertSerialToList(listVo, AlgorithmListVo.class);
             return ResponseVo.createSuccess(algVoList);
         } catch (Exception e) {
             log.error("algorithm--queryAlgorithmList--查询算法列表失败, 错误信息:{}", e);
@@ -66,7 +67,7 @@ public class AlgorithmController {
     public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@RequestBody @Valid AlgorithmListReq algListReq) {
         try {
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algListReq.getUserId());
-            AlgDetailsVo algDetailsVo = (AlgDetailsVo)ConvertUtils.convertToVo(algorithmDto, new AlgDetailsVo());
+            AlgDetailsVo algDetailsVo = BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class);
             return ResponseVo.createSuccess(algDetailsVo);
         } catch (Exception e) {
             log.error("algorithm--queryAlgorithmDetails--查询算法详情失败, 错误信息:{}", e);
