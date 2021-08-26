@@ -28,4 +28,29 @@
     <update id="truncate">
         TRUNCATE TABLE t_user_meta_data
   </update>
+    <select id="listByOwner" resultType="com.platon.rosettaflow.dto.UserMetaDataDto">
+        SELECT
+            u.id,
+            m.data_name,
+            u.meta_data_id,
+            u.identity_id,
+            u.identity_name,
+            u.node_id,
+            u.address,
+            u.auth_type,
+            u.auth_value,
+            u.auth_begin_time,
+            u.auth_end_time,
+            u.auth_status,
+            u.apply_time,
+            u.audit_time,
+            u.`status`,
+            u.create_time,
+            u.update_time
+        FROM
+            t_user_meta_data u
+        INNER JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id
+        WHERE
+            u.address = #{address}
+    </select>
 </mapper>

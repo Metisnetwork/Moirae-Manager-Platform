@@ -49,7 +49,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
         for (int i = 0; i < 23; i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
             getMetaDataAuthorityDto.setMetaDataAuthId("metaDataAuthId" + i);
-            getMetaDataAuthorityDto.setUser("0x123456789" + i);
+            getMetaDataAuthorityDto.setUser("501eb3eeb2a40e6f2ff6f481302435e6e8af3666");
             getMetaDataAuthorityDto.setUserType(UserTypeEnum.ATP.getValue());
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
