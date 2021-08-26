@@ -24,4 +24,12 @@ public interface IMetaDataService extends IService<MetaData> {
      * @return 分页数据
      */
     IPage<MetaDataDto> list(Long current, Long size);
+
+    /**
+     * 获取元数据详情
+     *
+     * @param id 元数据id
+     * @return 元数据详情
+     */
+    MetaDataDto detail(Long id);
 }

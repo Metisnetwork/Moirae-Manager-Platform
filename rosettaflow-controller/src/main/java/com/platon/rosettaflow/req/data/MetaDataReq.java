@@ -11,7 +11,7 @@ import javax.validation.constraints.Positive;
 /**
  * @author hudenian
  * @date 2021/8/25
- * @description 功能描述
+ * @description 元数据列表请求参数
  */
 @Data
 @ApiModel(value = "元数据请求参数")

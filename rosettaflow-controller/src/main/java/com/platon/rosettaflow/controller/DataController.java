@@ -7,13 +7,16 @@ import com.platon.rosettaflow.req.data.MetaDataReq;
 import com.platon.rosettaflow.service.IMetaDataService;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.data.MetaDataColumnsVo;
+import com.platon.rosettaflow.vo.data.MetaDataDetailVo;
 import com.platon.rosettaflow.vo.data.MetaDataVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,9 +41,16 @@ public class DataController {
 
     @GetMapping("list")
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
-    public ResponseVo<PageVo<MetaDataVo>> list(@RequestBody @Valid MetaDataReq metaDataReq) {
+    public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
         IPage<MetaDataDto> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize());
         return convertToResponseVo(servicePage);
+    }
+
+    @GetMapping(value = "/detail/{id}")
+    @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
+    public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "项目ID", required = true) @PathVariable Long id) {
+        MetaDataDto metaDataDto = metaDataService.detail(id);
+        return convertToResponseVo(metaDataDto);
     }
 
     private ResponseVo<PageVo<MetaDataVo>> convertToResponseVo(IPage<MetaDataDto> pageDto) {
@@ -58,4 +68,19 @@ public class DataController {
         pageVo.setTotal(pageDto.getTotal());
         return ResponseVo.createSuccess(pageVo);
     }
+
+    private ResponseVo<MetaDataDetailVo> convertToResponseVo(MetaDataDto dto) {
+        MetaDataDetailVo metaDataDetailVo = new MetaDataDetailVo();
+        BeanCopierUtils.copy(dto, metaDataDetailVo);
+        List<MetaDataColumnsVo> columnsVoList = new ArrayList<>();
+        dto.getMetaDataDetailsDtoList().forEach(c -> {
+            MetaDataColumnsVo cVo = new MetaDataColumnsVo();
+            BeanCopierUtils.copy(c, cVo);
+            columnsVoList.add(cVo);
+
+        });
+        metaDataDetailVo.setMetaDataColumnsVoList(columnsVoList);
+        return ResponseVo.createSuccess(metaDataDetailVo);
+    }
+
 }

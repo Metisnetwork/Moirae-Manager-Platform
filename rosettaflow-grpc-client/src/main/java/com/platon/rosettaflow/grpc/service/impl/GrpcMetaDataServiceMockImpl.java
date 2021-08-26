@@ -51,7 +51,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
             metaDataSummaryDto.setFileType("csv");
             metaDataSummaryDto.setHasTitle(true);
             metaDataSummaryDto.setIndustry("计算机");
-            metaDataSummaryDto.setState("create");
+            metaDataSummaryDto.setState("release");
 
             metaDataDetailDto.setMetaDataSummary(metaDataSummaryDto);
 
