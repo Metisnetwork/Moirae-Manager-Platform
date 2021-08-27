@@ -11,8 +11,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-
 /**
  * @author admin
  * @date 2021/7/20
@@ -35,12 +33,8 @@ public class ControllerAspect {
         String clazzName = pjp.getTarget().getClass().getName();
         // 被拦截的方法签名
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
-        // 被拦截的方法
-        Method method = methodSignature.getMethod();
         // 被拦截的方法名
         String methodName = methodSignature.getName();
-        // 被拦截的方法
-        Class<?> returnType = method.getReturnType();
         // 请求参数
         Object[] args = pjp.getArgs();
 
@@ -62,8 +56,7 @@ public class ControllerAspect {
             returnObj = ResponseVo.create(RespCodeEnum.EXCEPTION);
         }
 
-        log.info("End of request, Used Time: {}ms, Return result: {}.", (System.currentTimeMillis() - start),
-                returnObj);
+        log.info("End of request, Used Time: {}ms, Return result: {}.", (System.currentTimeMillis() - start), returnObj);
         return returnObj;
     }
 }

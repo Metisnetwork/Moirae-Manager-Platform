@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.quartz.task;
+package com.platon.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;

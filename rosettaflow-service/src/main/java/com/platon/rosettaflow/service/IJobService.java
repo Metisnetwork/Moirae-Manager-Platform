@@ -18,4 +18,17 @@ public interface IJobService extends IService<Job> {
      * @return 待处理作业列表
      */
     List<Job> getAllUnfinishedJob();
+
+    /**
+     * 添加作业
+     *
+     * @param jobDto 添加作业请求对象
+     */
+    void add(JobDto jobDto);
+
+    /**
+     * 编辑作业
+     * @param jobDto 编辑作业请求对象
+     */
+    void edit(JobDto jobDto);
 }

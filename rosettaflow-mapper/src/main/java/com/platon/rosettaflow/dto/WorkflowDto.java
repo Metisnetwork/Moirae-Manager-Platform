@@ -20,5 +20,9 @@ public class WorkflowDto extends Workflow {
      * 截止节点
      */
     private Integer endNode;
+    /**
+     * 是否是job任务
+     */
+    private boolean jobFlg;
 
 }

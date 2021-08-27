@@ -58,4 +58,13 @@ public class SysConstant {
             "api-docs"
     };
 
+    /**
+     * 作业添加队列
+     */
+    public static final String JOB_ADD_QUEUE = "JOB_ADD_LIST";
+    /**
+     * 作业修改队列
+     */
+    public static final String JOB_EDIT_QUEUE = "JOB_ADD_LIST";
+
 }

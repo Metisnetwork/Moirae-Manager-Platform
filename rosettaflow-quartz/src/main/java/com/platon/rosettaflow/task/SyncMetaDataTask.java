@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.quartz.task;
+package com.platon.rosettaflow.task;
 
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.StatusEnum;

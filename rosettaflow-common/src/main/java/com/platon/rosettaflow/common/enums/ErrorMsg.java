@@ -33,7 +33,13 @@ public enum ErrorMsg {
     /**
      * 工作流节点代码不存在
      */
-    WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "workflow node code not exist");
+    WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "workflow node code not exist"),
+
+    JOB_ADD_ERROR("新增作业失败", "Add job error"),
+
+    JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
+
+    JOB_NOT_EXIST("原作业不存在", "Job not exist");
 
     private final String zh;
     private final String en;
