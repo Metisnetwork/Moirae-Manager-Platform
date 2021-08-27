@@ -6,6 +6,7 @@
         <result column="user_name" jdbcType="VARCHAR" property="userName"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="user_type" jdbcType="TINYINT" property="userType"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>

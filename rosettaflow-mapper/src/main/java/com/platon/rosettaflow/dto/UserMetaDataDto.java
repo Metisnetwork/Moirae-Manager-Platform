@@ -14,4 +14,8 @@ import lombok.EqualsAndHashCode;
 public class UserMetaDataDto extends UserMetaData {
 
     private String dataName;
+
+    private Byte userType;
+
+    private String sign;
 }

@@ -63,7 +63,13 @@ public enum ErrorMsg {
 
     JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
 
-    JOB_NOT_EXIST("原作业不存在", "Job not exist");
+    JOB_NOT_EXIST("原作业不存在", "Job not exist"),
+
+    METADATA_NOT_EXIST("元数据不存在", "Meta data not exist"),
+
+    METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by time, the times must be greater than zero"),
+
+    METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error");
 
     private final String zh;
     private final String en;

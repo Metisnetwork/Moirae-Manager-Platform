@@ -5,6 +5,7 @@ import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
+import com.platon.rosettaflow.req.data.MetaDataAuthReq;
 import com.platon.rosettaflow.req.data.MetaDataDetailReq;
 import com.platon.rosettaflow.req.data.MetaDataReq;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
@@ -20,9 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -70,11 +69,20 @@ public class DataController {
         return convertUserMetaDataToResponseVo(servicePage);
     }
 
-    @GetMapping(value = "columnList")
+    @GetMapping("columnList")
     @ApiOperation(value = "获取元数据列分页列表", notes = "获取元数据列分页列表")
     public ResponseVo<PageVo<MetaDataColumnsVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
         IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findById(metaDataDetailReq.getId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
         return convertToResponseVo(servicePage);
+    }
+
+    @PostMapping("auth")
+    @ApiOperation(value = "元数据申请授权", notes = "元数据申请授权")
+    public ResponseVo<?> auth(@RequestBody @Valid MetaDataAuthReq metaDataAuthReq) {
+        UserMetaDataDto userMetaDataDto = new UserMetaDataDto();
+        BeanCopierUtils.copy(metaDataAuthReq, userMetaDataDto);
+        userMetaDataService.auth(userMetaDataDto);
+        return ResponseVo.createSuccess();
     }
 
     private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {

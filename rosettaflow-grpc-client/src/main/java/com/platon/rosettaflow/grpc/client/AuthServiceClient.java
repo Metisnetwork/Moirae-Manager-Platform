@@ -52,7 +52,7 @@ public class AuthServiceClient {
 
         //元数据怎么使用请求对象
         MetaDataUsage.Builder metaDataUsageBuilder = MetaDataUsage.newBuilder();
-        metaDataUsageBuilder.setUsageType(MetaDataUsageType.forNumber(requestDto.getAuth().getMetaDataUsageDto().getUserType()));
+        metaDataUsageBuilder.setUsageType(MetaDataUsageType.forNumber(requestDto.getAuth().getMetaDataUsageDto().getUseType()));
         if (requestDto.getUserType() == MetaDataUsageEnum.PERIOD.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null && requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
@@ -122,7 +122,7 @@ public class AuthServiceClient {
             owner.setIdentityId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getIdentityId());
 
             metaDataUsageDto = new MetaDataUsageDto();
-            metaDataUsageDto.setUserType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getUsageTypeValue());
+            metaDataUsageDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getUsageTypeValue());
             metaDataUsageDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getStartAt());
             metaDataUsageDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getEndAt());
             metaDataUsageDto.setTimes((long) getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getTimes());

@@ -19,10 +19,17 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
     /**
      * 获取用户授权元数据摘要列表
      *
-     * @param current 当前页
-     * @param size    每页大小
-     * @param dataName    元数据名称
+     * @param current  当前页
+     * @param size     每页大小
+     * @param dataName 元数据名称
      * @return 分页数据
      */
-    IPage<UserMetaDataDto> list(Long current, Long size,String dataName);
+    IPage<UserMetaDataDto> list(Long current, Long size, String dataName);
+
+    /**
+     * 用户元数据授权申请
+     *
+     * @param userMetaDataDto 元数据授权申请对象
+     */
+    void auth(UserMetaDataDto userMetaDataDto);
 }

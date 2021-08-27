@@ -44,7 +44,7 @@ public class UserController {
         if (!WalletSignUtils.verifySign(loginInReq.getAddress(), loginInReq.getSign(), loginInReq.getAddress())) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
-        UserDto userDto = userService.generatorToken(loginInReq.getAddress());
+        UserDto userDto = userService.generatorToken(loginInReq.getAddress(),loginInReq.getUserType());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 

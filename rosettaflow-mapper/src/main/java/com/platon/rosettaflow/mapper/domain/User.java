@@ -31,6 +31,11 @@ public class User implements Serializable {
      * 用户钱包地址
      */
     private String address;
+
+    /**
+     * 0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址
+     */
+    private Byte userType;
     /**
      * 状态: 0-无效，1- 有效
      */

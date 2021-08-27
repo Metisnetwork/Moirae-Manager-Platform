@@ -39,7 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public UserDto generatorToken(String address) {
+    public UserDto generatorToken(String address,Byte userType) {
         User user = this.getByAddress(address);
         if (user == null) {
             user = new User();
@@ -47,6 +47,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             user.setUserName(address.substring(0, 12) + address.substring(address.length() - 4));
             // 钱包地址
             user.setAddress(address);
+            //用户类型
+            user.setUserType(userType);
             this.save(user);
         }
         UserDto userDto = new UserDto();

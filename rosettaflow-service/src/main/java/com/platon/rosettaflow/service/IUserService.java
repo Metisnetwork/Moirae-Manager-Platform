@@ -20,9 +20,10 @@ public interface IUserService extends IService<User> {
     /**
      * 生成用户token
      * @param address 用户钱包地址
+     * @param userType 用户类型
      * @return 用户信息
      */
-    UserDto generatorToken(String address);
+    UserDto generatorToken(String address,Byte userType);
 
     /**
      * 登出
