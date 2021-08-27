@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -19,8 +20,8 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "算法详情请求参数")
 public class AlgDetailsReq {
 
-    @ApiModelProperty(value = "算法ID", example = "", required = true)
-    @NotNull(message = "算法ID不能为空")
+    @ApiModelProperty(value = "算法ID", required = true)
+    @NotBlank(message = "{algorithm.id.notBlank}")
     private Long id;
 
 }

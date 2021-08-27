@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 /**
  * 查询项目列表请求参数
@@ -14,19 +14,19 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "查询项目列表请求参数")
 public class ProjListReq {
 
-    @ApiModelProperty(value = "用户id(创建者id)", example = "", required = true)
-    @NotNull(message = "用户ID不能为空")
+    @ApiModelProperty(value = "用户id(创建者id)", required = true)
+    @NotBlank(message = "{user.id.notBlank}")
     private Long userId;
 
-    @ApiModelProperty(value = "项目名称", example = "", required = true)
+    @ApiModelProperty(value = "项目名称")
     private String projectName;
 
-    @NotNull(message = "起始页号不能为空")
-    @ApiModelProperty(value = "起始页号", example = "", required = true)
+    @ApiModelProperty(value = "起始页号", required = true)
+    @NotBlank(message = "{page.number.notBlank}")
     private int pageNumber;
 
-    @NotNull(message = "每页数据条数不能为空")
-    @ApiModelProperty(value = "每页数据条数", example = "", required = true)
+    @ApiModelProperty(value = "每页数据条数", required = true)
+    @NotBlank(message = "{each.page.row.notBlank}")
     private int pageSize;
 
 
