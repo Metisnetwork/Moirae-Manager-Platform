@@ -6,7 +6,6 @@ import com.platon.rosettaflow.req.algorithm.AlgDetailsReq;
 import com.platon.rosettaflow.req.algorithm.AlgListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
-import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.algorithm.AlgDetailsVo;
 import com.platon.rosettaflow.vo.algorithm.AlgorithmListVo;
@@ -24,6 +23,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
+ * 算法相关接口
  * @author admin
  * @date 2021/8/17
  */
@@ -36,44 +36,34 @@ public class AlgorithmController {
     @Resource
     private IAlgorithmService algorithmService;
 
-    @PostMapping("saveAlgorithm")
-    @ApiOperation(value = "保存算法", notes = "保存算法")
-    public ResponseVo<AlgDetailsVo> saveAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
-        try {
-            AlgorithmDto algorithmDto = BeanUtil.copyProperties(algorithmReq, AlgorithmDto.class);
-            algorithmService.saveAlgorithm(algorithmDto);
-            return ResponseVo.createSuccess();
-        } catch (Exception e) {
-            log.error("algorithm--queryAlgorithmDetails--查询算法详情失败, 错误信息:{}", e);
-            return ResponseVo.createFail();
-        }
+    @PostMapping("addAlgorithm")
+    @ApiOperation(value = "新增算法", notes = "新增算法")
+    public ResponseVo<AlgDetailsVo> addAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
+        algorithmService.addAlgorithm(BeanUtil.copyProperties(algorithmReq, AlgorithmDto.class));
+        return ResponseVo.createSuccess();
+
+    }
+
+    @PostMapping("updateAlgorithm")
+    @ApiOperation(value = "修改算法", notes = "修改算法")
+    public ResponseVo<AlgDetailsVo> updateAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
+        algorithmService.updateAlgorithm(BeanUtil.copyProperties(algorithmReq, AlgorithmDto.class));
+        return ResponseVo.createSuccess();
     }
 
     @PostMapping("queryAlgorithmList")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
     public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@RequestBody @Valid AlgListReq algListReq) {
-        try {
-            List listVo = algorithmService.queryAlgorithmList(algListReq.getUserId(), algListReq.getAlgorithmName());
-            List<AlgorithmListVo> algVoList = ConvertUtils.convertSerialToList(listVo, AlgorithmListVo.class);
-            return ResponseVo.createSuccess(algVoList);
-        } catch (Exception e) {
-            log.error("algorithm--queryAlgorithmList--查询算法列表失败, 错误信息:{}", e);
-            return ResponseVo.createFail();
-        }
+        List<AlgorithmDto> listVo = algorithmService.queryAlgorithmList(algListReq.getUserId(), algListReq.getAlgorithmName());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(listVo, AlgorithmListVo.class));
 
     }
 
     @PostMapping("queryAlgorithmDetails")
     @ApiOperation(value = "查询算法详情", notes = "查询算法详情")
     public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@RequestBody @Valid AlgDetailsReq algDetailsReq) {
-        try {
-            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algDetailsReq.getId());
-            AlgDetailsVo algDetailsVo = BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class);
-            return ResponseVo.createSuccess(algDetailsVo);
-        } catch (Exception e) {
-            log.error("algorithm--queryAlgorithmDetails--查询算法详情失败, 错误信息:{}", e);
-            return ResponseVo.createFail();
-        }
+        AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algDetailsReq.getId());
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class));
     }
 
 
