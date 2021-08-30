@@ -28,6 +28,10 @@ public class WorkflowNode implements Serializable {
      */
     private Long workflowId;
     /**
+     * 工作流节点名称
+     */
+    private String nodeName;
+    /**
      * 算法id
      */
     private Long algorithmId;

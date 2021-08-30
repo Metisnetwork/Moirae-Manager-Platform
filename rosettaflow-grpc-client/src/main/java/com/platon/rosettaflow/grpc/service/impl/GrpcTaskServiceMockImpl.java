@@ -5,7 +5,7 @@ import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskEventShowDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -41,9 +41,9 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskEventShowDto> getTaskEventList(String taskId) {
-        List<TaskEventShowDto> taskEventShowDtoList = new ArrayList<>();
-        TaskEventShowDto taskEventShowDto = new TaskEventShowDto();
+    public List<TaskEventDto> getTaskEventList(String taskId) {
+        List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
+        TaskEventDto taskEventShowDto = new TaskEventDto();
         NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
 
         taskEventShowDto.setType("1");
@@ -61,13 +61,13 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds) {
-        List<TaskEventShowDto> taskEventShowDtoList = new ArrayList<>();
-        TaskEventShowDto taskEventShowDto;
+    public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds) {
+        List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
+        TaskEventDto taskEventShowDto;
         NodeIdentityDto nodeIdentityDto;
 
         for (int i = 0; i < taskIds.length; i++) {
-            taskEventShowDto = new TaskEventShowDto();
+            taskEventShowDto = new TaskEventDto();
             taskEventShowDto.setType("1");
             taskEventShowDto.setTaskId(taskIds[i]);
 

@@ -5,7 +5,7 @@ import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskEventShowDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -44,12 +44,12 @@ public class GrpcTaskServiceImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskEventShowDto> getTaskEventList(String taskId) {
+    public List<TaskEventDto> getTaskEventList(String taskId) {
         return taskServiceClient.getTaskEventList(taskId);
     }
 
     @Override
-    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds) {
+    public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds) {
         return taskServiceClient.getTaskEventListByTaskIds(taskIds);
     }
 }

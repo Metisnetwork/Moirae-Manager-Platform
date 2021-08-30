@@ -5,6 +5,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
     <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
     <result column="max_numbers" jdbcType="BIGINT" property="maxNumbers" />
     <result column="min_numbers" jdbcType="BIGINT" property="minNumbers" />
     <result column="support_language" jdbcType="VARCHAR" property="supportLanguage" />

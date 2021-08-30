@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.service.Impl;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,7 +13,7 @@ import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
-import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.*;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
@@ -65,8 +64,68 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public IPage<WorkflowDto> list(WorkflowDto workflowDto, Long current, Long size) {
         Page<Workflow> page = new Page<>(current, size);
-        this.baseMapper.listByProjectId(page,workflowDto.getProjectId(), workflowDto.getWorkflowName());
-        return this.baseMapper.listByProjectId(page,workflowDto.getProjectId(), workflowDto.getWorkflowName());
+        this.baseMapper.listByProjectId(page, workflowDto.getProjectId(), workflowDto.getWorkflowName());
+        return this.baseMapper.listByProjectId(page, workflowDto.getProjectId(), workflowDto.getWorkflowName());
+    }
+
+    @Override
+    public WorkflowDto detail(Long id) {
+        //获取工作流
+        Workflow workflow = this.getById(id);
+        WorkflowDto workflowDto = new WorkflowDto();
+        BeanCopierUtils.copy(workflow, workflowDto);
+
+        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
+        List<WorkflowNodeInputDto> workflowNodeInputDtoList = new ArrayList<>();
+        List<WorkflowNodeOutputDto> workflowNodeOutputDtoList = new ArrayList<>();
+        WorkflowNodeDto workflowNodeDto;
+        WorkflowNodeCodeDto workflowNodeCodeDto;
+        WorkflowNodeResourceDto workflowNodeResourceDto;
+        WorkflowNodeInputDto workflowNodeInputDto;
+        WorkflowNodeOutputDto workflowNodeOutputDto;
+
+        //获取工作流节点列表
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getByWorkflowId(id);
+        for (int i = 0; i < workflowNodeList.size(); i++) {
+            WorkflowNode workflowNode = workflowNodeList.get(i);
+            workflowNodeDto = new WorkflowNodeDto();
+            BeanCopierUtils.copy(workflowNode, workflowNodeDto);
+
+            //算法对象
+            WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
+            workflowNodeCodeDto = new WorkflowNodeCodeDto();
+            BeanCopierUtils.copy(workflowNodeCode, workflowNodeCodeDto);
+            workflowNodeDto.setWorkflowNodeCodeDto(workflowNodeCodeDto);
+
+            //环境
+            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+            workflowNodeResourceDto = new WorkflowNodeResourceDto();
+            BeanCopierUtils.copy(workflowNodeResource, workflowNodeResourceDto);
+            workflowNodeDto.setWorkflowNodeResourceDto(workflowNodeResourceDto);
+
+            //工作流节点输入列表
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+            for (int j = 0; j < workflowNodeInputList.size(); j++) {
+                workflowNodeInputDto = new WorkflowNodeInputDto();
+                BeanCopierUtils.copy(workflowNodeInputList.get(i), workflowNodeInputDto);
+                workflowNodeInputDtoList.add(workflowNodeInputDto);
+            }
+            workflowNodeDto.setWorkflowNodeInputDtoList(workflowNodeInputDtoList);
+
+            //工作流节点输出列表
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
+            for (WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
+                workflowNodeOutputDto = new WorkflowNodeOutputDto();
+                BeanCopierUtils.copy(workflowNodeOutput, workflowNodeOutputDto);
+                workflowNodeOutputDtoList.add(workflowNodeOutputDto);
+            }
+            workflowNodeDto.setWorkflowNodeOutputDtoList(workflowNodeOutputDtoList);
+
+            workflowNodeDtoList.add(workflowNodeDto);
+        }
+
+        workflowDto.setWorkflowNodeDtoList(workflowNodeDtoList);
+        return workflowDto;
     }
 
     @Override

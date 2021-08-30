@@ -208,7 +208,7 @@ public class TaskServiceClient {
     /**
      * 查看某个任务的全部事件列表通过单个任务ID
      */
-    public List<TaskEventShowDto> getTaskEventList(String taskId) {
+    public List<TaskEventDto> getTaskEventList(String taskId) {
         GetTaskEventListRequest getTaskEventListRequest = GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
         GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
         return getTaskEventShowDots(taskEventListResponse);
@@ -217,7 +217,7 @@ public class TaskServiceClient {
     /**
      * 查看某个任务的全部事件列表通过批量的任务ID
      */
-    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds) {
+    public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds) {
         GetTaskEventListByTaskIdsRequest.Builder getTaskEventListByTaskIdsRequestBuilder = GetTaskEventListByTaskIdsRequest.newBuilder();
         for (int i = 0; i < taskIds.length; i++) {
             getTaskEventListByTaskIdsRequestBuilder.setTaskIds(i, taskIds[i]);
@@ -226,15 +226,15 @@ public class TaskServiceClient {
         return getTaskEventShowDots(taskEventListResponse);
     }
 
-    private List<TaskEventShowDto> getTaskEventShowDots(GetTaskEventListResponse taskEventListResponse) {
+    private List<TaskEventDto> getTaskEventShowDots(GetTaskEventListResponse taskEventListResponse) {
         if (taskEventListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(taskEventListResponse.getStatus(), taskEventListResponse.getMsg());
         }
 
-        List<TaskEventShowDto> taskEventShowDtoList = new ArrayList<>();
-        TaskEventShowDto taskEventShowDto;
+        List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
+        TaskEventDto taskEventShowDto;
         for (int i = 0; i < taskEventListResponse.getTaskEventListCount(); i++) {
-            taskEventShowDto = new TaskEventShowDto();
+            taskEventShowDto = new TaskEventDto();
             taskEventShowDto.setType(taskEventListResponse.getTaskEventList(i).getType());
             taskEventShowDto.setTaskId(taskEventListResponse.getTaskEventList(i).getTaskId());
 

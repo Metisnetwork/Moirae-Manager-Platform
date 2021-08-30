@@ -1,7 +1,7 @@
 package com.platon.rosettaflow.rpcservice;
 
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskEventShowDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public interface ITaskServiceRpc {
      * @param taskId 任务id
      * @return 事件列表
      */
-    List<TaskEventShowDto> getTaskEventList(String taskId);
+    List<TaskEventDto> getTaskEventList(String taskId);
 
     /**
      * 查看某个任务的全部事件列表通过批量的任务ID
@@ -42,5 +42,5 @@ public interface ITaskServiceRpc {
      * @param taskIds 任务id数组
      * @return 事件列表
      */
-    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds);
+    public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds);
 }

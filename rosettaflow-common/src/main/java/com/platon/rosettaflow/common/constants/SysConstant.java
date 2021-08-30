@@ -34,7 +34,7 @@ public class SysConstant {
     /**
      * 系统默认时间格式
      */
-    public static final String DEFAULT_TIME_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    public static final String DEFAULT_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * 时区默认东八区北京时间

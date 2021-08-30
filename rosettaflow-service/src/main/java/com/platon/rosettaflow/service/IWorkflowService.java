@@ -45,7 +45,7 @@ public interface IWorkflowService extends IService<Workflow> {
     /**
      * 复制工作流
      *
-     * @param workflowDto
+     * @param workflowDto 创建工作流请求对象
      */
     void copy(WorkflowDto workflowDto);
 
@@ -64,4 +64,10 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     void delete(Long id);
 
+    /**
+     * 获取工作流详情
+     * @param id 工作流id
+     * @return 工作流详情
+     */
+    WorkflowDto detail(Long id);
 }

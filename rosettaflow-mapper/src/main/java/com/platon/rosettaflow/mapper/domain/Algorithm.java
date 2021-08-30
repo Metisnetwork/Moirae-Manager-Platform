@@ -33,6 +33,11 @@ public class Algorithm implements Serializable {
     private String algorithmDesc;
 
     /**
+     * 算法作者
+     */
+    private String author;
+
+    /**
      * 支持协同方最大数量
      */
     private Long maxNumbers;

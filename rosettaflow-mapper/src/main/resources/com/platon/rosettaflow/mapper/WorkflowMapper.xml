@@ -22,17 +22,23 @@
         SELECT
             w.id,
             w.project_id,
-            u.user_name,
+            u.user_name AS userName,
             w.workflow_name,
             w.run_status,
             w.`STATUS`,
             w.create_time,
-            GROUP_CONCAT(wni.identity_name) AS coordinators
+            GROUP_CONCAT(DISTINCT wni.identity_name) AS coordinators
         FROM
             t_workflow w
         LEFT JOIN t_workflow_node wn ON w.id = wn.workflow_id
         LEFT JOIN t_workflow_node_input wni ON wn.id = wni.workflow_node_id
         LEFT JOIN t_user u ON w.user_id = u.id
+        WHERE
+        w.project_id = #{projectId}
+        <if test="workflowName != null and workflowName != ''">
+            AND
+            w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
+        </if>
         GROUP BY
             w.id,
             w.project_id,
@@ -41,11 +47,5 @@
             w.run_status,
             w.`STATUS`,
             w.create_time
-        WHERE
-            w.project_id = #{projectId}
-        <if test="workflowName != null and workflowName != ''">
-            AND
-            w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
-        </if>
     </select>
 </mapper>

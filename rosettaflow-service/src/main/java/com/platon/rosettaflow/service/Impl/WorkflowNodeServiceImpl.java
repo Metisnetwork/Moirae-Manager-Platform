@@ -12,6 +12,8 @@ import com.platon.rosettaflow.service.IWorkflowNodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author hudenian
  * @date 2021/8/16
@@ -30,5 +32,13 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
         return workflowNode;
+    }
+
+    @Override
+    public List<WorkflowNode> getByWorkflowId(Long workflowId) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
+        wrapper.orderByAsc(WorkflowNode::getNodeStep);
+        return this.list(wrapper);
     }
 }

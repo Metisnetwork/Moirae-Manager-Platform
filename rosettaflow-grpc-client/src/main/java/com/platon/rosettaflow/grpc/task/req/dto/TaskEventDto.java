@@ -9,7 +9,7 @@ import lombok.Data;
  * @description 某个任务的全部事件响应体
  */
 @Data
-public class TaskEventShowDto {
+public class TaskEventDto {
     /**
      * 事件类型码
      */

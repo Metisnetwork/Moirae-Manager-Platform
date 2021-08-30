@@ -1,12 +1,17 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.grpc.service.GrpcTaskService;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.req.workflow.*;
 import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.workflow.TaskEventVo;
+import com.platon.rosettaflow.vo.workflow.WorkflowDetailVo;
 import com.platon.rosettaflow.vo.workflow.WorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,13 +40,34 @@ public class WorkflowController {
     @Resource
     private IWorkflowService workflowService;
 
+    @Resource
+    private GrpcTaskService grpcTaskService;
+
     @GetMapping("list")
-    @ApiOperation(value = "工作流列表列表", notes = "工作流列表列表")
+    @ApiOperation(value = "工作流列表", notes = "工作流列表")
     public ResponseVo<PageVo<WorkflowVo>> list(@Valid ListWorkflowReq listWorkflowReq) {
         WorkflowDto workflowDto = new WorkflowDto();
         BeanCopierUtils.copy(listWorkflowReq, workflowDto);
         IPage<WorkflowDto> servicePage = workflowService.list(workflowDto, listWorkflowReq.getCurrent(), listWorkflowReq.getSize());
         return convertToWorkflowVo(servicePage);
+    }
+
+    @GetMapping(value = "detail/{id}")
+    @ApiOperation(value = "获取工作流详情", notes = "获取工作流详情")
+    public ResponseVo<WorkflowDetailVo> detail(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id) {
+        WorkflowDto workflowDto = workflowService.detail(id);
+        WorkflowDetailVo vo = new WorkflowDetailVo();
+        return convertToWorkflowVo(workflowDto);
+    }
+
+    @PostMapping("save")
+    @ApiOperation(value = "工作流明细保存", notes = "工作流明细保存")
+    public ResponseVo<?> save(@RequestBody @Validated AddWorkflowReq addWorkflowReq) {
+        WorkflowDto workflowDto = new WorkflowDto();
+        workflowDto.setWorkflowName(addWorkflowReq.getWorkflowName());
+        workflowDto.setWorkflowDesc(addWorkflowReq.getWorkflowDesc());
+        workflowService.add(workflowDto);
+        return ResponseVo.createSuccess();
     }
 
     private ResponseVo<PageVo<WorkflowVo>> convertToWorkflowVo(IPage<WorkflowDto> servicePage) {
@@ -58,6 +84,12 @@ public class WorkflowController {
         pageVo.setSize(servicePage.getSize());
         pageVo.setTotal(servicePage.getTotal());
         return ResponseVo.createSuccess(pageVo);
+    }
+
+    private ResponseVo<WorkflowDetailVo> convertToWorkflowVo(WorkflowDto workflowDto) {
+        WorkflowDetailVo vo = new WorkflowDetailVo();
+        //TODO
+        return ResponseVo.createSuccess(vo);
     }
 
     @PostMapping("add")
@@ -110,5 +142,25 @@ public class WorkflowController {
         workflowService.start(workflowDto);
         //TODO
         return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("getLog/{taskId}")
+    @ApiOperation(value = "获取运行日志", notes = "获取运行日志")
+    public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
+        List<TaskEventDto> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
+        List<TaskEventVo> taskEventVoList = new ArrayList<>();
+        TaskEventVo vo;
+        for (TaskEventDto taskEventDto : taskEventShowDtoList) {
+            vo = new TaskEventVo();
+            vo.setType(taskEventDto.getType());
+            vo.setTaskId(taskEventDto.getTaskId());
+            vo.setName(taskEventDto.getOwner().getName());
+            vo.setNodeId(taskEventDto.getOwner().getNodeId());
+            vo.setIdentityId(taskEventDto.getOwner().getIdentityId());
+            vo.setContent(taskEventDto.getContent());
+            vo.setCreateAt(DateUtil.date(taskEventDto.getCreateAt()));
+            taskEventVoList.add(vo);
+        }
+        return ResponseVo.createSuccess(taskEventVoList);
     }
 }
