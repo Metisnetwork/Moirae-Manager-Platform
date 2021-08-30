@@ -5,26 +5,19 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * t_project_template
+ * t_project_temp
  * @author 
  */
 @Data
-@TableName(value = "t_project_template")
-public class ProjectTemplate implements Serializable {
+public class ProjectTemp implements Serializable {
     /**
      * 项目模板表ID(自增长)
      */
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    /**
-     * 用户id(创建者id)
-     */
-    private Long userId;
 
     /**
      * 项目名称

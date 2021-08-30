@@ -51,17 +51,17 @@ public class AlgorithmController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("queryAlgorithmList")
+    @GetMapping("queryAlgorithmList")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
-    public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@RequestBody @Valid AlgListReq algListReq) {
+    public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@Valid AlgListReq algListReq) {
         List<AlgorithmDto> listVo = algorithmService.queryAlgorithmList(algListReq.getUserId(), algListReq.getAlgorithmName());
         return ResponseVo.createSuccess(BeanUtil.copyToList(listVo, AlgorithmListVo.class));
 
     }
 
-    @PostMapping("queryAlgorithmDetails")
+    @GetMapping("queryAlgorithmDetails")
     @ApiOperation(value = "查询算法详情", notes = "查询算法详情")
-    public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@RequestBody @Valid AlgDetailsReq algDetailsReq) {
+    public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@Valid AlgDetailsReq algDetailsReq) {
         AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algDetailsReq.getId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class));
     }
