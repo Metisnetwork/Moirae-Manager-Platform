@@ -8,16 +8,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.MetaDataStatusEnum;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
-import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.mapper.MetaDataMapper;
 import com.platon.rosettaflow.mapper.domain.MetaData;
-import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import com.platon.rosettaflow.service.IMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +26,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> implements IMetaDataService {
-
-    @Resource
-    private IMetaDataDetailsService metaDataDetailsService;
 
     @Override
     public void truncate() {
@@ -51,12 +45,10 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public MetaDataDto detail(Long id, Long current, Long size) {
+    public MetaDataDto detail(Long id) {
         MetaData metaData = this.getById(id);
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
-        IPage<MetaDataDetailsDto> metaDataDetailsDtoPage = metaDataDetailsService.findByMetaDataId(metaData.getMetaDataId(),current,size);
-        metaDataDto.setMetaDataDetailsDtoPageList(metaDataDetailsDtoPage);
         return metaDataDto;
     }
 

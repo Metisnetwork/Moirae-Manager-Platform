@@ -3,6 +3,7 @@ package com.platon.rosettaflow.rpcservice.Impl;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.grpc.client.TaskServiceClient;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventShowDto;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author hudenian
@@ -75,5 +77,15 @@ public class TaskServiceRpcImpl implements ITaskServiceRpc {
 
                     workflowService.updateById(workflow);
                 });
+    }
+
+    @Override
+    public List<TaskEventShowDto> getTaskEventList(String taskId) {
+        return taskServiceClient.getTaskEventList(taskId);
+    }
+
+    @Override
+    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds) {
+        return taskServiceClient.getTaskEventListByTaskIds(taskIds);
     }
 }

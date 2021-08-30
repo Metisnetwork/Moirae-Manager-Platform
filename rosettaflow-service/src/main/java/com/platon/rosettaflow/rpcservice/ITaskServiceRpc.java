@@ -1,7 +1,10 @@
 package com.platon.rosettaflow.rpcservice;
 
-import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventShowDto;
+import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
+
+import java.util.List;
 
 /**
  * @author hudenian
@@ -24,4 +27,20 @@ public interface ITaskServiceRpc {
      * @param taskDto 任务处理类
      */
     void asyncPublishTask(TaskDto taskDto);
+
+    /**
+     * 查看某个任务id的事件列表
+     *
+     * @param taskId 任务id
+     * @return 事件列表
+     */
+    List<TaskEventShowDto> getTaskEventList(String taskId);
+
+    /**
+     * 查看某个任务的全部事件列表通过批量的任务ID
+     *
+     * @param taskIds 任务id数组
+     * @return 事件列表
+     */
+    public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds);
 }

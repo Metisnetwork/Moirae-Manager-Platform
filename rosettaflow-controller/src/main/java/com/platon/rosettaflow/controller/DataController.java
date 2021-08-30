@@ -19,6 +19,7 @@ import com.platon.rosettaflow.vo.data.MetaDataVo;
 import com.platon.rosettaflow.vo.data.UserMetaDataVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -55,11 +56,13 @@ public class DataController {
         return convertToMetaDataVo(servicePage);
     }
 
-    @GetMapping(value = "detail")
+    @GetMapping(value = "detail/{id}")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
-    public ResponseVo<MetaDataDetailVo> detail(@Valid MetaDataDetailReq metaDataDetailReq) {
-        MetaDataDto metaDataDto = metaDataService.detail(metaDataDetailReq.getId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
-        return convertToResponseVo(metaDataDto);
+    public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "元数据表ID", required = true) @PathVariable Long id) {
+        MetaDataDto metaDataDto = metaDataService.detail(id);
+        MetaDataDetailVo vo = new MetaDataDetailVo();
+        BeanCopierUtils.copy(metaDataDto, vo);
+        return ResponseVo.createSuccess(vo);
     }
 
     @GetMapping("listByOwner")
@@ -99,26 +102,6 @@ public class DataController {
         pageVo.setSize(pageDto.getSize());
         pageVo.setTotal(pageDto.getTotal());
         return ResponseVo.createSuccess(pageVo);
-    }
-
-    private ResponseVo<MetaDataDetailVo> convertToResponseVo(MetaDataDto dto) {
-        MetaDataDetailVo metaDataDetailVo = new MetaDataDetailVo();
-        BeanCopierUtils.copy(dto, metaDataDetailVo);
-        List<MetaDataColumnsVo> columnsVoList = new ArrayList<>();
-        dto.getMetaDataDetailsDtoPageList().getRecords().forEach(c -> {
-            MetaDataColumnsVo cVo = new MetaDataColumnsVo();
-            BeanCopierUtils.copy(c, cVo);
-            columnsVoList.add(cVo);
-
-        });
-        PageVo<MetaDataColumnsVo> pageVo = new PageVo<>();
-        pageVo.setCurrent(dto.getMetaDataDetailsDtoPageList().getCurrent());
-        pageVo.setItems(columnsVoList);
-        pageVo.setSize(dto.getMetaDataDetailsDtoPageList().getSize());
-        pageVo.setTotal(dto.getMetaDataDetailsDtoPageList().getTotal());
-
-        metaDataDetailVo.setMetaDataColumnsVoPageVo(pageVo);
-        return ResponseVo.createSuccess(metaDataDetailVo);
     }
 
     private ResponseVo<PageVo<UserMetaDataVo>> convertUserMetaDataToResponseVo(IPage<UserMetaDataDto> pageDto) {
