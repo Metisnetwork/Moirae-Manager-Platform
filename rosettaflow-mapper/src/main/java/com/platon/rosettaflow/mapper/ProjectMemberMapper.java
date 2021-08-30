@@ -1,17 +1,24 @@
 package com.platon.rosettaflow.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
+import org.apache.ibatis.annotations.Param;
 
-public interface ProjectMemberMapper {
-    int deleteByPrimaryKey(Long id);
+import java.util.List;
 
-    int insert(ProjectMember record);
+/**
+ *  项目成员mapper类
+ * @author houz
+ */
+public interface ProjectMemberMapper extends BaseMapper<ProjectMember> {
 
-    int insertSelective(ProjectMember record);
-
-    ProjectMember selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKeySelective(ProjectMember record);
-
-    int updateByPrimaryKey(ProjectMember record);
+    /**
+     * 查询项目成员列表
+     * @param projectId 项目id
+     * @param userName 用户昵称
+     * @return
+     */
+    List<ProjMemberDto> queryProjMemberList(@Param(value = "projectId")Long projectId,
+                                            @Param(value = "userName")String userName);
 }

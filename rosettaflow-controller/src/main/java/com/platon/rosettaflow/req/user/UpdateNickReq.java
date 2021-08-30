@@ -19,6 +19,6 @@ public class UpdateNickReq {
     private String address;
 
     @ApiModelProperty(value = "昵称", required = true, example = "用户1")
-    @NotBlank(message = "{user.nickName.notBlank}")
+    @NotBlank(message = "{user.nickname.notBlank}")
     private String nickName;
 }

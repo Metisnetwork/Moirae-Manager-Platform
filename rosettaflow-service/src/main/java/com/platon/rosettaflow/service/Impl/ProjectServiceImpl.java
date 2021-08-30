@@ -6,10 +6,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
+import com.platon.rosettaflow.mapper.ProjectMemberMapper;
 import com.platon.rosettaflow.mapper.ProjectTempMapper;
 import com.platon.rosettaflow.mapper.domain.Project;
+import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.service.IProjectService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +33,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     ProjectMapper projectMapper;
 
     @Resource
-    ProjectTempMapper ProjectTempMapper;
+    ProjectTempMapper projectTempMapper;
+
+    @Resource
+    ProjectMemberMapper projectMemberMapper;
 
     @Override
     public void addProject(Project project) {
@@ -52,9 +58,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
     }
     @Override
-    public List<ProjectDto> queryProjectList(Long userId, String projectName, Integer pageNumber, Integer pageSize) {
+    public List<ProjectDto> queryProjectList(Long userId, String projectName, Integer current, Integer size) {
        try {
-           IPage<ProjectDto> page = new Page<>(pageNumber,pageSize);
+           IPage<ProjectDto> page = new Page<>(current, size);
            IPage<ProjectDto> iPage = projectMapper.queryProjectList(userId, projectName, page);
            return iPage.getRecords();
        } catch (Exception e) {
@@ -77,6 +83,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public List<ProjectTemp> queryProjectTempList() {
-        return ProjectTempMapper.queryProjectTempList();
+        return projectTempMapper.queryProjectTempList();
+    }
+
+    @Override
+    public List<ProjMemberDto> queryProjMemberList(Long projectId, String userName) {
+        return projectMemberMapper.queryProjMemberList(projectId, userName);
+    }
+
+    @Override
+    public void addProjMember(ProjectMember projectMember) {
+        projectMemberMapper.insert(projectMember);
     }
 }

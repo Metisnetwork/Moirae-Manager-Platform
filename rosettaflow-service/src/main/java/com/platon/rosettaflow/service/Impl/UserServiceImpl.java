@@ -15,6 +15,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author admin
@@ -24,6 +26,9 @@ import javax.annotation.Resource;
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+
+    @Resource
+    private UserMapper userMapper;
 
     @Resource
     private ITokenService tokenService;
@@ -78,6 +83,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         updateWrapper.eq(User::getAddress, address);
         updateWrapper.set(User::getUserName, nickName);
         this.update(updateWrapper);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryAllUserNickname() {
+        return userMapper.queryAllUserNickname();
     }
 
 }

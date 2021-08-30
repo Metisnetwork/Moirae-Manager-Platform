@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.domain.User;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author admin
  * @date 2021/8/16
@@ -37,4 +40,10 @@ public interface IUserService extends IService<User> {
      * @param nickName 昵称
      */
     void updateNickName(String address, String nickName);
+
+    /**
+     * 查询所有用户昵称
+     * @return
+     */
+    List<Map<String, Object>> queryAllUserNickname();
 }
