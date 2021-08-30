@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -31,6 +30,11 @@ public class Algorithm implements Serializable {
      * 算法描述
      */
     private String algorithmDesc;
+
+    /**
+     * 作者
+     */
+    private String author;
 
     /**
      * 支持协同方最大数量
@@ -65,7 +69,7 @@ public class Algorithm implements Serializable {
     /**
      * 所需的核数 (单位: 个)
      */
-    private Long costProcessor;
+    private Long costCpu;
 
     /**
      * GPU核数(单位：核)
@@ -80,7 +84,7 @@ public class Algorithm implements Serializable {
     /**
      * 所需的运行时长 (单位: ms)
      */
-    private Long duration;
+    private Long runTime;
 
     /**
      * 状态: 0-无效，1- 有效

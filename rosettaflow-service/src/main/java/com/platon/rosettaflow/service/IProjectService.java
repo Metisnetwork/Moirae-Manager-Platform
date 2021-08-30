@@ -29,13 +29,12 @@ public interface IProjectService extends IService<Project> {
 
     /**
      * 查询项目列表-分页
-     * @param userId 用户id
      * @param projectName 项目名称
      * @param current 当前页数
      * @param size 每页条数
      * @return ProjectDto
      */
-    List<ProjectDto>  queryProjectList(Long userId, String projectName, Integer current, Integer size);
+    List<ProjectDto>  queryProjectList(String projectName, Integer current, Integer size);
 
     /**
      * 查询项目详情
@@ -59,10 +58,17 @@ public interface IProjectService extends IService<Project> {
     List<ProjMemberDto> queryProjMemberList(Long projectId, String userName);
 
     /**
-     * 添加项目成员
+     * 新增项目成员
      * @param projectMember
      * @return
      */
     void addProjMember(ProjectMember projectMember);
+
+    /**
+     * 修改项目成员
+     * @param projectMember
+     * @return
+     */
+    void updateProjMember(ProjectMember projectMember);
 
 }

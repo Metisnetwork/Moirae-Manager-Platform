@@ -5,24 +5,25 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
     <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
     <result column="max_numbers" jdbcType="BIGINT" property="maxNumbers" />
     <result column="min_numbers" jdbcType="BIGINT" property="minNumbers" />
     <result column="support_language" jdbcType="VARCHAR" property="supportLanguage" />
     <result column="support_os_system" jdbcType="VARCHAR" property="supportOsSystem" />
     <result column="algorithm_type" jdbcType="TINYINT" property="algorithmType" />
     <result column="cost_mem" jdbcType="BIGINT" property="costMem" />
-    <result column="cost_processor" jdbcType="BIGINT" property="costProcessor" />
+    <result column="cost_cpu" jdbcType="BIGINT" property="costCpu" />
     <result column="cost_gpu" jdbcType="INTEGER" property="costGpu" />
     <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth" />
-    <result column="duration" jdbcType="BIGINT" property="duration" />
+    <result column="run_time" jdbcType="BIGINT" property="runTime" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
     id, algorithm_name, algorithm_desc, max_numbers, min_numbers, support_language,
-    support_os_system, algorithm_type, cost_mem, cost_processor, cost_gpu, cost_bandwidth, 
-    duration, `status`, create_time, update_time
+    support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
+    run_time, `status`, create_time, update_time
   </sql>
 
   <!-- 查询算法列表 -->
@@ -46,7 +47,20 @@
   <!-- 查询算法详情 -->
   <select id="queryAlgorithmDetails" resultType="com.platon.rosettaflow.dto.AlgorithmDto">
     select
-        <include refid="Base_Column_List" />,
+        a.id as algorithmId,
+        a.algorithm_name as algorithmName,
+        a.algorithm_desc as algorithmDesc,
+        a.author as author,
+        a.max_numbers as maxNumbers,
+        a.min_numbers as minNumbers,
+        a.support_language as supportLanguage,
+        a.algorithm_type as algorithmType,
+        a.cost_mem as costMem,
+        a.cost_cpu as costCpu,
+        a.cost_gpu as costGpu,
+        a.cost_bandwidth as costBandwidth,
+        a.run_time as runTime,
+        b.edit_type as editType
         b.calculate_contract_code as algorithmCode
     from
         t_algorithm a, t_algorithm_code b

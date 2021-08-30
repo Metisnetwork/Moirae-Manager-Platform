@@ -10,6 +10,7 @@ import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -55,11 +56,13 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         try {
             Algorithm algorithm = new Algorithm();
             BeanUtils.copyProperties(algorithmDto, algorithm);
+            // 算法id
+            algorithm.setId(algorithmDto.getAlgorithmId());
             // 修改算法
             this.updateById(algorithm);
             // 修改算法代码
             AlgorithmCode algorithmCode = new AlgorithmCode();
-            algorithmCode.setAlgorithmId(algorithmDto.getId());
+            algorithmCode.setAlgorithmId(algorithmDto.getAlgorithmId());
             algorithmCode.setEditType(algorithmDto.getEditType());
             algorithmCode.setCalculateContractCode(algorithmDto.getAlgorithmCode());
             algorithmCodeService.updateAlgorithmCode(algorithmCode);
@@ -71,9 +74,13 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     }
 
     @Override
-    public List<AlgorithmDto> queryAlgorithmList(Long userId, String algorithmName) {
+    public List<AlgorithmDto> queryAlgorithmList(String algorithmName) {
         try {
-            return algorithmMapper.queryAlgorithmList(userId, algorithmName);
+            Long userId = UserContext.get().getId();
+            if (userId != null && userId > 0) {
+                return algorithmMapper.queryAlgorithmList(userId, algorithmName);
+            }
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
         } catch (Exception e) {
             log.error("queryAlgorithmList--查询算法列表失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_ALG_LIST_ERROR.getMsg());

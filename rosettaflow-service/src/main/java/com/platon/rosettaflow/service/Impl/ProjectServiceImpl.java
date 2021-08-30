@@ -15,6 +15,7 @@ import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.service.IProjectService;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -58,8 +59,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
     }
     @Override
-    public List<ProjectDto> queryProjectList(Long userId, String projectName, Integer current, Integer size) {
+    public List<ProjectDto> queryProjectList(String projectName, Integer current, Integer size) {
        try {
+           Long userId = UserContext.get().getId();
+           if (userId == null ||  userId == 0) {
+               throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
+           }
            IPage<ProjectDto> page = new Page<>(current, size);
            IPage<ProjectDto> iPage = projectMapper.queryProjectList(userId, projectName, page);
            return iPage.getRecords();
@@ -94,5 +99,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void addProjMember(ProjectMember projectMember) {
         projectMemberMapper.insert(projectMember);
+    }
+
+    @Override
+    public void updateProjMember(ProjectMember projectMember) {
+        projectMemberMapper.updateById(projectMember);
     }
 }

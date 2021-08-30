@@ -19,10 +19,6 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "算法列表请求参数")
 public class AlgListReq {
 
-    @ApiModelProperty(value = "用户ID", required = true)
-    @NotBlank(message = "{user.id.notBlank}")
-    private Long userId;
-
     @ApiModelProperty(value = "算法名称")
     private String algorithmName;
 

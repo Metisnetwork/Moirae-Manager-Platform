@@ -17,6 +17,9 @@ public enum ErrorMsg {
 
     USER_UN_LOGIN("用户未登录", "User un login"),
 
+    /** 用户缓存信息丢失 */
+    USER_CACHE_LOST_ERROR("查询算法列表错误", "user cache lost error"),
+
     /** 新增算法错误 */
     ADD_ALG_ERROR("新增算法错误", "add algorithm error"),
 

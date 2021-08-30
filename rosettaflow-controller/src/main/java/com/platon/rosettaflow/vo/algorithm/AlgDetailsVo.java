@@ -17,6 +17,9 @@ public class AlgDetailsVo {
     @ApiModelProperty(value = "算法描述")
     private String algorithmDesc;
 
+    @ApiModelProperty(value = "作者")
+    private String author;
+
     @ApiModelProperty(value = "支持协同方最大数量")
     private Long maxNumbers;
 
@@ -36,7 +39,7 @@ public class AlgDetailsVo {
     private Long costMem;
 
     @ApiModelProperty(value = "所需的核数 (单位: 个)")
-    private Long costProcessor;
+    private Long costCpu;
 
     @ApiModelProperty(value = "GPU核数(单位：核)")
     private Integer costGpu;
@@ -45,7 +48,10 @@ public class AlgDetailsVo {
     private Long costBandwidth;
 
     @ApiModelProperty(value = "所需的运行时长 (单位: ms)")
-    private Long duration;
+    private Long runTime;
+
+    @ApiModelProperty(value = "代码编辑类型")
+    private String editType;
 
     @ApiModelProperty(value = "算法代码")
     private String algorithmCode;
