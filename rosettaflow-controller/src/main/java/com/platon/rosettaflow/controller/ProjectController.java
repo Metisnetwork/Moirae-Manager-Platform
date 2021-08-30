@@ -9,7 +9,6 @@ import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.req.project.*;
 import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.vo.ResponseVo;
-import com.platon.rosettaflow.vo.algorithm.AlgDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjMemberListVo;
 import com.platon.rosettaflow.vo.project.ProjTempListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
@@ -18,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -41,13 +39,13 @@ public class ProjectController {
 
     @PostMapping("addProject")
     @ApiOperation(value = "新增项目信息", notes = "新增项目信息")
-    public ResponseVo<AlgDetailsVo> addProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
+    public ResponseVo addProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
         projectService.addProject(BeanUtil.copyProperties(saveProjectReq, Project.class));
         return ResponseVo.createSuccess();
     }
     @PostMapping("updateProject")
     @ApiOperation(value = "修改项目信息", notes = "修改项目信息")
-    public ResponseVo<AlgDetailsVo> saveProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
+    public ResponseVo saveProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
         projectService.updateProject(BeanUtil.copyProperties(saveProjectReq, Project.class));
         return ResponseVo.createSuccess();
     }
@@ -55,8 +53,7 @@ public class ProjectController {
     @GetMapping("queryProjectList")
     @ApiOperation(value = "查询项目列表", notes = "查询项目列表")
     public ResponseVo<List<ProjectListVo>> queryProjectList(@Valid ProjListReq projListReq) {
-        List<ProjectDto> list  = projectService.queryProjectList(projListReq.getUserId(),
-                projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
+        List<ProjectDto> list  = projectService.queryProjectList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectListVo.class));
     }
 
@@ -83,19 +80,19 @@ public class ProjectController {
     }
 
     @PostMapping("addProjMember")
-    @ApiOperation(value = "添加项目成员", notes = "添加项目成员")
+    @ApiOperation(value = "新增项目成员", notes = "新增项目成员")
     public ResponseVo addProjMember(@Valid ProjMemberReq projMemberReq) {
         ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
         projectService.addProjMember(projectMember);
         return ResponseVo.createSuccess();
     }
 
-//    @PostMapping("addProjMember")
-//    @ApiOperation(value = "添加项目成员", notes = "添加项目成员")
-//    public ResponseVo addProjMember(@Valid ProjMemberReq projMemberReq) {
-//        ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
-//        projectService.addProjMember(projectMember);
-//        return ResponseVo.createSuccess();
-//    }
+    @PostMapping("updateProjMember")
+    @ApiOperation(value = "修改项目成员", notes = "修改项目成员")
+    public ResponseVo updateProjMember(@Valid ProjMemberReq projMemberReq) {
+        ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
+        projectService.updateProjMember(projectMember);
+        return ResponseVo.createSuccess();
+    }
 
 }

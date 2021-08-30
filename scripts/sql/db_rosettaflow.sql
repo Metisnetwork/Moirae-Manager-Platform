@@ -306,7 +306,6 @@ CREATE TABLE `t_workflow_template` (
 DROP TABLE IF EXISTS `t_workflow_node`;
 CREATE TABLE `t_workflow_node` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
-  `node_name` varchar(32) DEFAULT NULL COMMENT '工作流节点名称',
   `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
   `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
   `node_step` int(11) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
@@ -341,7 +340,7 @@ CREATE TABLE `t_workflow_node_template` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node_input`;
 CREATE TABLE `t_workflow_node_input` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表主键ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `data_type` varchar(64) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
@@ -364,7 +363,7 @@ CREATE TABLE `t_workflow_node_input` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node_variable`;
 CREATE TABLE `t_workflow_node_variable` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入变量表ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `var_node_type`  tinyint(4)   NOT NULL DEFAULT 1 COMMENT '变量类型: 1-自变量, 2-因变量',
   `var_node_key` varchar(128) NOT NULL COMMENT '变量key',

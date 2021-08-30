@@ -70,7 +70,7 @@ public class Algorithm implements Serializable {
     /**
      * 所需的核数 (单位: 个)
      */
-    private Long costProcessor;
+    private Long costCpu;
 
     /**
      * GPU核数(单位：核)

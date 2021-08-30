@@ -14,10 +14,6 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value = "查询项目列表请求参数")
 public class ProjListReq {
 
-    @ApiModelProperty(value = "用户id(创建者id)", required = true)
-    @NotBlank(message = "{user.id.notBlank}")
-    private Long userId;
-
     @ApiModelProperty(value = "项目名称")
     private String projectName;
 

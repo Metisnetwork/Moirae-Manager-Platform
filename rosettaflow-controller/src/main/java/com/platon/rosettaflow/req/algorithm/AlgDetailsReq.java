@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 public class AlgDetailsReq {
 
     @ApiModelProperty(value = "算法ID", required = true)
-    @NotBlank(message = "{algorithm.id.notBlank}")
+    @NotNull(message = "{algorithm.id.notBlank}")
     private Long id;
 
 }

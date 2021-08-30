@@ -12,7 +12,7 @@ public class AlgorithmDto {
     /**
      * 算法id
      */
-    private Long id;
+    private Long algorithmId;
 
     /**
      * 算法名称
@@ -23,6 +23,11 @@ public class AlgorithmDto {
      * 算法描述
      */
     private String algorithmDesc;
+
+    /**
+     * 作者
+     */
+    private String author;
 
     /**
      * 支持协同方最大数量
@@ -57,7 +62,7 @@ public class AlgorithmDto {
     /**
      * 所需的核数 (单位: 个)
      */
-    private Long costProcessor;
+    private Long costCpu;
 
     /**
      * GPU核数(单位：核)
@@ -72,17 +77,19 @@ public class AlgorithmDto {
     /**
      * 所需的运行时长 (单位: ms)
      */
-    private Long duration;
+    private Long runTime;
+
+    /**
+     * 代码类型
+     */
+    private Byte editType;
 
     /**
      * 算法代码
      */
     private String algorithmCode;
 
-    /**
-     * 代码类型
-     */
-    private Byte editType;
+
 
 
 }

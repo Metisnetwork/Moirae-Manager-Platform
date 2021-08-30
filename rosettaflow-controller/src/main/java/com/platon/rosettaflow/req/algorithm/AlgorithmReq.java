@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author houz
@@ -28,11 +29,11 @@ public class AlgorithmReq {
     private String algorithmDesc;
 
     @ApiModelProperty(value = "支持协同方最大数量", example = "2", required = true)
-    @NotBlank(message = "{support.partner.max.number.notBlank}")
+    @NotNull(message = "{support.partner.max.number.notBlank}")
     private Long maxNumbers;
 
     @ApiModelProperty(value = "支持协同方最小数量", example = "3", required = true)
-    @NotBlank(message = "{support.partner.min.number.notBlank}")
+    @NotNull(message = "{support.partner.min.number.notBlank}")
     private Long minNumbers;
 
     @ApiModelProperty(value = "支持语言,多个以','进行分隔")
@@ -42,7 +43,7 @@ public class AlgorithmReq {
     private String supportOsSystem;
 
     @ApiModelProperty(value = "算法所属大类:1-统计分析,2-特征工程,3-机器学习", example = "1")
-    @NotBlank(message = "{algorithm.reside.type.notBlank}")
+    @NotNull(message = "{algorithm.reside.type.notBlank}")
     private Byte algorithmType;
 
     @ApiModelProperty(value = "所需的内存 (单位: byte)", example = "2000")

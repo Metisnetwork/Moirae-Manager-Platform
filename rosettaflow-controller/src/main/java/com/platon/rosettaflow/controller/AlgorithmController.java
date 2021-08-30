@@ -51,7 +51,7 @@ public class AlgorithmController {
     @GetMapping("queryAlgorithmList")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
     public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@Valid AlgListReq algListReq) {
-        List<AlgorithmDto> listVo = algorithmService.queryAlgorithmList(algListReq.getUserId(), algListReq.getAlgorithmName());
+        List<AlgorithmDto> listVo = algorithmService.queryAlgorithmList(algListReq.getAlgorithmName());
         return ResponseVo.createSuccess(BeanUtil.copyToList(listVo, AlgorithmListVo.class));
 
     }
