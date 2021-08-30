@@ -1,11 +1,19 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.StatusEnum;
+import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
@@ -13,6 +21,7 @@ import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.rpcservice.ITaskServiceRpc;
 import com.platon.rosettaflow.service.*;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +61,75 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private ITaskServiceRpc taskServiceRpc;
+
+    @Override
+    public IPage<WorkflowDto> list(WorkflowDto workflowDto, Long current, Long size) {
+        Page<Workflow> page = new Page<>(current, size);
+        this.baseMapper.listByProjectId(page,workflowDto.getProjectId(), workflowDto.getWorkflowName());
+        return this.baseMapper.listByProjectId(page,workflowDto.getProjectId(), workflowDto.getWorkflowName());
+    }
+
+    @Override
+    public void add(WorkflowDto workflowDto) {
+        Workflow workflow = getByWorkflowName(workflowDto.getWorkflowName());
+        if (null != workflow) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
+        }
+        workflow = new Workflow();
+        workflow.setWorkflowName(workflowDto.getWorkflowName());
+        workflow.setWorkflowDesc(workflowDto.getWorkflowDesc());
+        this.save(workflow);
+    }
+
+    @Override
+    public void edit(WorkflowDto workflowDto) {
+        Workflow workflow = this.getById(workflowDto.getId());
+        if (null == workflow) {
+            log.error("workflow not found by id:{}", workflowDto.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+        }
+        workflow.setWorkflowName(workflowDto.getWorkflowName());
+        workflow.setWorkflowDesc(workflowDto.getWorkflowDesc());
+        this.updateById(workflow);
+    }
+
+    @Override
+    public void copy(WorkflowDto workflowDto) {
+        Workflow originWorkflow = this.getById(workflowDto.getId());
+        if (null == originWorkflow) {
+            log.error("Origin workflow not found by id:{}", workflowDto.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ORIGIN_NOT_EXIST.getMsg());
+        }
+
+        Workflow workflow = getByWorkflowName(workflowDto.getWorkflowName());
+        if (null != workflow) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
+        }
+
+        Workflow newWorkflow = new Workflow();
+        newWorkflow.setProjectId(originWorkflow.getProjectId());
+        newWorkflow.setUserId(UserContext.get().getId());
+        newWorkflow.setWorkflowName(workflowDto.getWorkflowName());
+        newWorkflow.setWorkflowDesc(workflowDto.getWorkflowDesc());
+        newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());
+        newWorkflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
+        newWorkflow.setStatus(StatusEnum.VALID.getValue());
+        this.save(newWorkflow);
+    }
+
+    @Override
+    public Workflow getByWorkflowName(String name) {
+        LambdaQueryWrapper<Workflow> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Workflow::getWorkflowName, name);
+        return this.getOne(wrapper);
+    }
+
+    @Override
+    public void delete(Long id) {
+        Workflow workflow = this.getById(id);
+        workflow.setStatus(StatusEnum.UN_VALID.getValue());
+        this.updateById(workflow);
+    }
 
     @Override
     public void start(WorkflowDto workflowDto) {
@@ -186,5 +264,21 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskDto.setContractExtraParams(jsonObject.toString());
 
         return taskDto;
+    }
+
+    IPage<WorkflowDto> convertToPageDto(Page<?> page) {
+        List<WorkflowDto> records = new ArrayList<>();
+        page.getRecords().forEach(r -> {
+            WorkflowDto m = new WorkflowDto();
+            BeanCopierUtils.copy(r, m);
+            records.add(m);
+        });
+
+        IPage<WorkflowDto> pageDto = new Page<>();
+        pageDto.setCurrent(page.getCurrent());
+        pageDto.setRecords(records);
+        pageDto.setSize(page.getSize());
+        pageDto.setTotal(page.getTotal());
+        return pageDto;
     }
 }

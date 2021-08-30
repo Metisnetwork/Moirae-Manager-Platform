@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.grpc.service.impl;
 
+import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
@@ -10,13 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * @author hudenian
  * @date 2021/8/24
- * @description 功能描述
+ * @description 任务处理mock服务
  */
 @Slf4j
 @Service
@@ -40,11 +42,45 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
 
     @Override
     public List<TaskEventShowDto> getTaskEventList(String taskId) {
-        return null;
+        List<TaskEventShowDto> taskEventShowDtoList = new ArrayList<>();
+        TaskEventShowDto taskEventShowDto = new TaskEventShowDto();
+        NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
+
+        taskEventShowDto.setType("1");
+        taskEventShowDto.setTaskId(taskId);
+
+        nodeIdentityDto.setName("name");
+        nodeIdentityDto.setNodeId("nodeId");
+        nodeIdentityDto.setIdentityId("identityId");
+
+        taskEventShowDto.setOwner(nodeIdentityDto);
+        taskEventShowDto.setContent("处理成功");
+        taskEventShowDto.setCreateAt(1877777777787L);
+        taskEventShowDtoList.add(taskEventShowDto);
+        return taskEventShowDtoList;
     }
 
     @Override
     public List<TaskEventShowDto> getTaskEventListByTaskIds(String[] taskIds) {
-        return null;
+        List<TaskEventShowDto> taskEventShowDtoList = new ArrayList<>();
+        TaskEventShowDto taskEventShowDto;
+        NodeIdentityDto nodeIdentityDto;
+
+        for (int i = 0; i < taskIds.length; i++) {
+            taskEventShowDto = new TaskEventShowDto();
+            taskEventShowDto.setType("1");
+            taskEventShowDto.setTaskId(taskIds[i]);
+
+            nodeIdentityDto = new NodeIdentityDto();
+            nodeIdentityDto.setName("name" + i);
+            nodeIdentityDto.setNodeId("nodeId" + i);
+            nodeIdentityDto.setIdentityId("identityId" + i);
+
+            taskEventShowDto.setOwner(nodeIdentityDto);
+            taskEventShowDto.setContent("处理成功");
+            taskEventShowDto.setCreateAt(1877777777787L);
+            taskEventShowDtoList.add(taskEventShowDto);
+        }
+        return taskEventShowDtoList;
     }
 }

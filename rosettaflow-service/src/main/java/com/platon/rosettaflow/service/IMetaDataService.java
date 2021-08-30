@@ -19,20 +19,18 @@ public interface IMetaDataService extends IService<MetaData> {
     /**
      * 获取元数据摘要列表
      *
-     * @param current 当前页
-     * @param size    每页大小
-     * @param dataName    元数据名称
+     * @param current  当前页
+     * @param size     每页大小
+     * @param dataName 元数据名称
      * @return 分页数据
      */
-    IPage<MetaDataDto> list(Long current, Long size,String dataName);
+    IPage<MetaDataDto> list(Long current, Long size, String dataName);
 
     /**
      * 获取元数据详情
      *
      * @param id 元数据id
-     * @param current 元数据详情中列数据当前页
-     * @param size    元数据详情中列数据每页大小
      * @return 元数据详情
      */
-    MetaDataDto detail(Long id, Long current, Long size);
+    MetaDataDto detail(Long id);
 }

@@ -18,4 +18,34 @@
     id, project_id, user_id, workflow_name, workflow_desc, node_number,sign, run_status, `status`,
     create_time, update_time
   </sql>
+    <select id="listByProjectId" resultType="com.platon.rosettaflow.dto.WorkflowDto">
+        SELECT
+            w.id,
+            w.project_id,
+            u.user_name,
+            w.workflow_name,
+            w.run_status,
+            w.`STATUS`,
+            w.create_time,
+            GROUP_CONCAT(wni.identity_name) AS coordinators
+        FROM
+            t_workflow w
+        LEFT JOIN t_workflow_node wn ON w.id = wn.workflow_id
+        LEFT JOIN t_workflow_node_input wni ON wn.id = wni.workflow_node_id
+        LEFT JOIN t_user u ON w.user_id = u.id
+        GROUP BY
+            w.id,
+            w.project_id,
+            w.user_id,
+            w.workflow_name,
+            w.run_status,
+            w.`STATUS`,
+            w.create_time
+        WHERE
+            w.project_id = #{projectId}
+        <if test="workflowName != null and workflowName != ''">
+            AND
+            w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
+        </if>
+    </select>
 </mapper>

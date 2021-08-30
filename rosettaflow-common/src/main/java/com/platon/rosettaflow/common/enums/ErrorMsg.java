@@ -50,6 +50,8 @@ public enum ErrorMsg {
      * 工作流不存在
      */
     WORKFLOW_NOT_EXIST("工作流不存在", "workflow not exist"),
+    WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow not exist"),
+    WORKFLOW_EXIST("工作流已存在", "workflow exist"),
     /**
      * 工作流节点不存在
      */

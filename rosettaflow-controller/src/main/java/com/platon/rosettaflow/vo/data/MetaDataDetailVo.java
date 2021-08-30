@@ -78,6 +78,6 @@ public class MetaDataDetailVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date updateTime;
 
-    @ApiModelProperty(value = "元数据列分页列表")
-    private PageVo<MetaDataColumnsVo> metaDataColumnsVoPageVo;
+//    @ApiModelProperty(value = "元数据列分页列表")
+//    private PageVo<MetaDataColumnsVo> metaDataColumnsVoPageVo;
 }
