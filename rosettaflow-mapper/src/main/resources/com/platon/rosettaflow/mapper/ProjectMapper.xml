@@ -22,10 +22,13 @@
     from
         t_project a, t_user b
     where 1=1
+        and a.status = '1'
+        and b.status = '1'
         and a.user_id = b.id
         and a.user_id = #{userId, jdbcType=BIGINT}
       <if test="projectName != null and projectName != ''">
           and a.project_name LIKE CONCAT('%', #{projectName, jdbcType=VARCHAR}, '%')
       </if>
+    order by a.create_time
   </select>
 </mapper>

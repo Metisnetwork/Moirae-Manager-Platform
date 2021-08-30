@@ -152,19 +152,17 @@ CREATE TABLE `t_project` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目表';
 
 -- ----------------------------
--- Table structure for `t_project_template`
+-- Table structure for `t_project_temp`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_project_template`;
-CREATE TABLE `t_project_template` (
+DROP TABLE IF EXISTS `t_project_temp`;
+CREATE TABLE `t_project_temp` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '项目模板表ID(自增长)',
-  `user_id` bigint(20) DEFAULT NULL COMMENT '用户id(创建者id)',
-  `project_name` varchar(128) NOT NULL COMMENT '项目名称',
-  `project_desc`  varchar(512) DEFAULT NULL COMMENT '项目描述',
+  `project_name` varchar(30) NOT NULL COMMENT '项目名称',
+  `project_desc`  varchar(200) DEFAULT NULL COMMENT '项目描述',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_NAME` (`project_name`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目模板表';
 
 

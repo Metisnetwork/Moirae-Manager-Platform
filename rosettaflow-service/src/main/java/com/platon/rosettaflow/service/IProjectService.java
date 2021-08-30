@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
+import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 
 import java.util.List;
 
@@ -40,5 +41,11 @@ public interface IProjectService extends IService<Project> {
      * @return Project
      */
     Project queryProjectDetails(Long id);
+
+    /**
+     * 查询项目模板列表
+     * @return
+     */
+    List<ProjectTemp> queryProjectTempList();
 
 }

@@ -8,7 +8,9 @@ import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
+import com.platon.rosettaflow.mapper.ProjectTempMapper;
 import com.platon.rosettaflow.mapper.domain.Project;
+import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.service.IProjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Resource
     ProjectMapper projectMapper;
+
+    @Resource
+    ProjectTempMapper ProjectTempMapper;
 
     @Override
     public void addProject(Project project) {
@@ -68,5 +73,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_DETAILS_ERROR.getMsg());
         }
 
+    }
+
+    @Override
+    public List<ProjectTemp> queryProjectTempList() {
+        return ProjectTempMapper.queryProjectTempList();
     }
 }

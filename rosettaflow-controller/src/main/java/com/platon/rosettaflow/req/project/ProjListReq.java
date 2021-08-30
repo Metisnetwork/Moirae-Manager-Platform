@@ -23,11 +23,11 @@ public class ProjListReq {
 
     @ApiModelProperty(value = "起始页号", required = true)
     @NotBlank(message = "{page.number.notBlank}")
-    private int pageNumber;
+    private int current;
 
     @ApiModelProperty(value = "每页数据条数", required = true)
     @NotBlank(message = "{each.page.row.notBlank}")
-    private int pageSize;
+    private int size;
 
 
 }

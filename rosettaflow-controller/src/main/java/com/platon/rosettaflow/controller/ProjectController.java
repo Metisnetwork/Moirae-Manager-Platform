@@ -3,12 +3,14 @@ package com.platon.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
+import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.req.project.ProjDetailsReq;
 import com.platon.rosettaflow.req.project.ProjListReq;
 import com.platon.rosettaflow.req.project.SaveProjectReq;
 import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.algorithm.AlgDetailsVo;
+import com.platon.rosettaflow.vo.project.ProjTempListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjectListVo;
 import io.swagger.annotations.Api;
@@ -48,19 +50,26 @@ public class ProjectController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("queryProjectList")
+    @GetMapping("queryProjectList")
     @ApiOperation(value = "查询项目列表", notes = "查询项目列表")
-    public ResponseVo<List<ProjectListVo>> queryProjectList(@RequestBody @Valid ProjListReq projListReq) {
+    public ResponseVo<List<ProjectListVo>> queryProjectList(@Valid ProjListReq projListReq) {
         List<ProjectDto> list  = projectService.queryProjectList(projListReq.getUserId(),
                 projListReq.getProjectName(), projListReq.getPageNumber(), projListReq.getPageSize());
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectListVo.class));
     }
 
-    @PostMapping("queryProjectDetails")
+    @GetMapping("queryProjectDetails")
     @ApiOperation(value = "查询项目详情", notes = "查询项目详情")
-    public ResponseVo<ProjectDetailsVo> queryProjectDetails(@RequestBody @Valid ProjDetailsReq projDetailsReq) {
+    public ResponseVo<ProjectDetailsVo> queryProjectDetails(@Valid ProjDetailsReq projDetailsReq) {
         Project project  = projectService.queryProjectDetails(projDetailsReq.getId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(project, ProjectDetailsVo.class));
+    }
+
+    @GetMapping("queryProjectTempList")
+    @ApiOperation(value = "查询模板项目列表", notes = "查询模板项目列表")
+    public ResponseVo<List<ProjTempListVo>> queryProjectTempList() {
+        List<ProjectTemp> list  = projectService.queryProjectTempList();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjTempListVo.class));
     }
 
 }
