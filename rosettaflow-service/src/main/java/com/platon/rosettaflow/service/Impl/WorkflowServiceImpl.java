@@ -14,11 +14,12 @@ import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.*;
+import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
+import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
-import com.platon.rosettaflow.rpcservice.ITaskServiceRpc;
 import com.platon.rosettaflow.service.*;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IWorkflowNodeVariableService workflowNodeVariableService;
 
     @Resource
-    private ITaskServiceRpc taskServiceRpc;
+    private GrpcTaskService grpcTaskService;
 
     @Override
     public IPage<WorkflowDto> list(WorkflowDto workflowDto, Long current, Long size) {
@@ -192,20 +193,54 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public void start(WorkflowDto workflowDto) {
-        Workflow workflow = this.getById(workflowDto.getId());
-        if (workflow == null) {
+        Workflow orgWorkflow = this.getById(workflowDto.getId());
+        if (orgWorkflow == null) {
             log.error("workflow not found by id:{}", workflowDto.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
-        if (workflow.getNodeNumber() < workflowDto.getEndNode()) {
-            log.error("endNode is:{} can not more than workflow nodeNumber:{}", workflowDto.getEndNode(), workflow.getNodeNumber());
+        //截止节点必须
+        if (orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
+            log.error("endNode is:{} can not more than workflow nodeNumber:{}", workflowDto.getEndNode(),orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
 
         //TODO 当有多个任务节点时，需要将第一个节点执行成功后，并获取执行结果数据做为下个节点入参，才可以继续执行后面节点
         //TODO 所以此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
-        TaskDto taskDto = assemblyTaskDto(workflow.getId(), workflowDto.getStartNode());
-        taskServiceRpc.asyncPublishTask(taskDto);
+        TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode());
+        grpcTaskService.asyncPublishTask(taskDto, publishTaskDeclareResponse -> {
+            //更新工作流节点
+            WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
+            Workflow workflow;
+            if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+                //处理成功
+                workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId());
+                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
+
+                //更新整个工作流信息:如果是最后一个节点，整个工作流更新成处理成功，否则更新成处理中
+                workflow = this.getById(workflowNode.getWorkflowId());
+                if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
+                    workflow.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
+                } else {
+                    workflow.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());
+                    //当前工作流执行成功，继续执行下一个节点工作流
+                    //TODO 执行下一个工作流节点
+                    workflowDto.setStartNode(workflowNode.getNextNodeStep());
+                    this.start(workflowDto);
+                }
+            } else {
+                //处理失败
+                workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId() != null ? publishTaskDeclareResponse.getTaskId() : "");
+                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+
+                //更新整个工作流信息:处理失败
+                workflow = this.getById(workflowNode.getWorkflowId());
+                workflow.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+            }
+            workflowNode.setRunMsg(publishTaskDeclareResponse.getMsg());
+            workflowNodeService.updateById(workflowNode);
+
+            this.updateById(workflow);
+        });
     }
 
     /**

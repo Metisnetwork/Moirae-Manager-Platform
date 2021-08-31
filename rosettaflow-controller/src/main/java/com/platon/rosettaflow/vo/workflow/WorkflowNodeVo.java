@@ -30,6 +30,9 @@ public class WorkflowNodeVo {
     @ApiModelProperty(value = "节点在工作流中序号,从1开始")
     private Integer nodeStep;
 
+    @ApiModelProperty(value = "下个节点在工作流中序号,从1开始")
+    private Integer nextNodeStep;
+
     @ApiModelProperty(value = "运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败")
     private Byte runStatus;
 
