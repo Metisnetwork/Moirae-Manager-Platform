@@ -7,11 +7,11 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 /**
- * 查询项目成员列表请求参数
+ * 保存项目成员请求参数
  * @author houz
  */
 @Data
-@ApiModel(value = "查询项目成员列表请求参数")
+@ApiModel(value = "保存项目成员请求参数")
 public class ProjMemberReq {
 
     @ApiModelProperty(value = "项目ID", required = true)
