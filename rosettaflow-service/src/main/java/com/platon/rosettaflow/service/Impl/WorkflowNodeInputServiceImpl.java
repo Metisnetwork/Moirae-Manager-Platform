@@ -19,11 +19,19 @@ import java.util.List;
 @Slf4j
 @Service
 public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputMapper, WorkflowNodeInput> implements IWorkflowNodeInputService {
+
     @Override
     public List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeInput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
         wrapper.orderByAsc(WorkflowNodeInput::getPartyId);
         return this.list(wrapper);
+    }
+
+    @Override
+    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+        LambdaQueryWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaQuery();
+        delWrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
+        this.remove(delWrapper);
     }
 }

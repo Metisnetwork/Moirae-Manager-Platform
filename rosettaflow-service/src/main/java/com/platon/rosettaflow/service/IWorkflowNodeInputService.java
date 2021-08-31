@@ -18,4 +18,11 @@ public interface IWorkflowNodeInputService extends IService<WorkflowNodeInput> {
      * @return 工作流节点输入列表
      */
     List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 根据工作流节点id删除工作流节点输入
+     *
+     * @param workflowNodeId 工作流节点id
+     */
+    void deleteByWorkflowNodeId(Long workflowNodeId);
 }

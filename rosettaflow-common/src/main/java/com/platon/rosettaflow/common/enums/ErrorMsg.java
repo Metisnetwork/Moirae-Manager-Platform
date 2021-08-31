@@ -4,7 +4,7 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.utils.LanguageContext;
 
 /**
- * @author  hudenian
+ * @author hudenian
  * @date
  * @description
  */
@@ -17,31 +17,49 @@ public enum ErrorMsg {
 
     USER_UN_LOGIN("用户未登录", "User un login"),
 
-    /** 用户缓存信息丢失 */
+    /**
+     * 用户缓存信息丢失
+     */
     USER_CACHE_LOST_ERROR("查询算法列表错误", "user cache lost error"),
 
-    /** 新增算法错误 */
+    /**
+     * 新增算法错误
+     */
     ADD_ALG_ERROR("新增算法错误", "add algorithm error"),
 
-    /** 修改算法错误 */
+    /**
+     * 修改算法错误
+     */
     UPDATE_ALG_ERROR("修改算法错误", "update algorithm error"),
 
-    /** 查询算法列表错误 */
+    /**
+     * 查询算法列表错误
+     */
     QUERY_ALG_LIST_ERROR("查询算法列表错误", "query algorithm list error"),
 
-    /** 查询算法详情错误 */
+    /**
+     * 查询算法详情错误
+     */
     QUERY_ALG_DETAILS_ERROR("查询算法详情错误", "query algorithm details error"),
 
-    /** 新增项目错误 */
+    /**
+     * 新增项目错误
+     */
     ADD_PROJ_ERROR("新增项目错误", "add project error"),
 
-    /** 修改项目错误 */
+    /**
+     * 修改项目错误
+     */
     UPDATE_PROJ_ERROR("修改项目错误", "update project error"),
 
-    /** 查询项目列表错误 */
+    /**
+     * 查询项目列表错误
+     */
     QUERY_PROJ_LIST_ERROR("查询项目列表错误", "query project list error"),
 
-    /** 查询项目详情错误 */
+    /**
+     * 查询项目详情错误
+     */
     QUERY_PROJ_DETAILS_ERROR("查询项目详情错误", "query project details error"),
 
     APPLY_METADATA_USAGE_TYPE_ERROR("元数据使用方式输入格式错误", "Apply metadata usage type error"),
@@ -59,6 +77,7 @@ public enum ErrorMsg {
      * 工作流节点不存在
      */
     WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "workflow node not exist"),
+    WORKFLOW_NODE_EXIST("工作流节点已存在", "workflow node exist"),
     /**
      * 工作流节点代码不存在
      */
@@ -74,7 +93,9 @@ public enum ErrorMsg {
 
     METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by time, the times must be greater than zero"),
 
-    METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error");
+    METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
+
+    ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation");
 
     private final String zh;
     private final String en;

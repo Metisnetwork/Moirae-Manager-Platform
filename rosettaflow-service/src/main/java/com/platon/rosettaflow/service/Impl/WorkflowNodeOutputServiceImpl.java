@@ -26,4 +26,11 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
         wrapper.orderByAsc(WorkflowNodeOutput::getPartyId);
         return this.list(wrapper);
     }
+
+    @Override
+    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+        LambdaQueryWrapper<WorkflowNodeOutput> delWrapper = Wrappers.lambdaQuery();
+        delWrapper.eq(WorkflowNodeOutput::getWorkflowNodeId, workflowNodeId);
+        this.remove(delWrapper);
+    }
 }

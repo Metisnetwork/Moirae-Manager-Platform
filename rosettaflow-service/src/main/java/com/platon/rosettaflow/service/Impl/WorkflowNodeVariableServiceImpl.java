@@ -25,4 +25,11 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
         wrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
         return this.list(wrapper);
     }
+
+    @Override
+    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+        LambdaQueryWrapper<WorkflowNodeVariable> delWrapper = Wrappers.lambdaQuery();
+        delWrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
+        this.remove(delWrapper);
+    }
 }

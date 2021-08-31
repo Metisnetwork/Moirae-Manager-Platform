@@ -1,17 +1,13 @@
 package com.platon.rosettaflow.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmAuth;
 
-public interface AlgorithmAuthMapper {
-    int deleteByPrimaryKey(Long id);
+/**
+ * t_algorithm_auth
+ *
+ * @author admin
+ */
+public interface AlgorithmAuthMapper extends BaseMapper<AlgorithmAuth> {
 
-    int insert(AlgorithmAuth record);
-
-    int insertSelective(AlgorithmAuth record);
-
-    AlgorithmAuth selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKeySelective(AlgorithmAuth record);
-
-    int updateByPrimaryKey(AlgorithmAuth record);
 }

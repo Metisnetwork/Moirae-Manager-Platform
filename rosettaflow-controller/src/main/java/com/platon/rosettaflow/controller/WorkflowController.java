@@ -7,6 +7,7 @@ import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.req.workflow.*;
+import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
@@ -58,16 +59,6 @@ public class WorkflowController {
         WorkflowDto workflowDto = workflowService.detail(id);
         WorkflowDetailVo vo = new WorkflowDetailVo();
         return convertToWorkflowVo(workflowDto);
-    }
-
-    @PostMapping("save")
-    @ApiOperation(value = "工作流明细保存", notes = "工作流明细保存")
-    public ResponseVo<?> save(@RequestBody @Validated AddWorkflowReq addWorkflowReq) {
-        WorkflowDto workflowDto = new WorkflowDto();
-        workflowDto.setWorkflowName(addWorkflowReq.getWorkflowName());
-        workflowDto.setWorkflowDesc(addWorkflowReq.getWorkflowDesc());
-        workflowService.add(workflowDto);
-        return ResponseVo.createSuccess();
     }
 
     private ResponseVo<PageVo<WorkflowVo>> convertToWorkflowVo(IPage<WorkflowDto> servicePage) {

@@ -31,4 +31,11 @@ public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, A
 
     }
 
+    @Override
+    public AlgorithmCode getByAlgorithmId(Long algorithmId) {
+        LambdaUpdateWrapper<AlgorithmCode> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(AlgorithmCode::getAlgorithmId, algorithmId);
+        return this.getOne(wrapper);
+    }
+
 }

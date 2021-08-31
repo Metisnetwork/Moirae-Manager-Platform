@@ -16,4 +16,11 @@ public interface IWorkflowNodeCodeService extends IService<WorkflowNodeCode> {
      * @return 工作流节点节点代码
      */
     WorkflowNodeCode getByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 根据工作流节点id删除工作流节点代码
+     *
+     * @param workflowNodeId 工作流节点id
+     */
+    void deleteByWorkflowNodeId(Long workflowNodeId);
 }
