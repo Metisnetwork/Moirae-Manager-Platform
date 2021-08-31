@@ -44,6 +44,12 @@ public interface IProjectService extends IService<Project> {
     Project queryProjectDetails(Long id);
 
     /**
+     * 删除项目
+     * @param id 项目id
+     */
+    void deleteProject(Long id);
+
+    /**
      * 查询项目模板列表
      * @return
      */
@@ -70,5 +76,12 @@ public interface IProjectService extends IService<Project> {
      * @return
      */
     void updateProjMember(ProjectMember projectMember);
+
+    /**
+     * 删除项目成员
+     * @param projMemberId 项目成员id
+     * @return
+     */
+    void deleteProjMember(Long projMemberId);
 
 }

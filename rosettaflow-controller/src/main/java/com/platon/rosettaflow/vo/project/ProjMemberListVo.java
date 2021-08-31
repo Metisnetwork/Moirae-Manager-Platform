@@ -14,11 +14,11 @@ import java.util.Date;
 @ApiModel(value = "项目成员列表返回参数")
 public class ProjMemberListVo {
 
-    @ApiModelProperty(value = "用户名称")
-    private String userName;
-
     @ApiModelProperty(value = "项目成员id")
     private String memberId;
+
+    @ApiModelProperty(value = "用户名称")
+    private String userName;
 
     @ApiModelProperty(value = "项目成员角色")
     private Byte role;

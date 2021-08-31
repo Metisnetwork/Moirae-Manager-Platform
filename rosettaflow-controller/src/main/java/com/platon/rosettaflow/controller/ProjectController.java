@@ -64,6 +64,13 @@ public class ProjectController {
         return ResponseVo.createSuccess(BeanUtil.copyProperties(project, ProjectDetailsVo.class));
     }
 
+    @PostMapping("deleteProject")
+    @ApiOperation(value = "修改项目信息", notes = "修改项目信息")
+    public ResponseVo deleteProject(@RequestBody @Valid ProjDetailsReq projDetailsReq) {
+        projectService.deleteProject(projDetailsReq.getId());
+        return ResponseVo.createSuccess();
+    }
+
     @GetMapping("queryProjectTempList")
     @ApiOperation(value = "查询模板项目列表", notes = "查询模板项目列表")
     public ResponseVo<List<ProjTempListVo>> queryProjectTempList() {
@@ -72,7 +79,7 @@ public class ProjectController {
     }
 
     @GetMapping("queryProjMemberList")
-    @ApiOperation(value = "查询成员项目列表", notes = "查询成员项目列表")
+    @ApiOperation(value = "查询项目成员列表", notes = "查询项目成员列表")
     public ResponseVo<List<ProjMemberListVo>> queryProjMemberList(@Valid ProjMemberListReq projMemberListReq) {
         List<ProjMemberDto> list  = projectService.queryProjMemberList(
                 projMemberListReq.getProjectId(), projMemberListReq.getUserName());
@@ -92,6 +99,13 @@ public class ProjectController {
     public ResponseVo updateProjMember(@Valid ProjMemberReq projMemberReq) {
         ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
         projectService.updateProjMember(projectMember);
+        return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("deleteProjMember")
+    @ApiOperation(value = "删除项目成员", notes = "删除项目成员")
+    public ResponseVo deleteProjMember(@Valid DeleteMemberReq deleteMemberReq) {
+        projectService.deleteProjMember(deleteMemberReq.getMemberId());
         return ResponseVo.createSuccess();
     }
 

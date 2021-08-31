@@ -18,9 +18,12 @@ import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author admin
@@ -42,7 +45,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void addProject(Project project) {
         try {
-            this.updateById(project);
+            this.save(project);
         } catch (Exception e) {
             log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJ_ERROR.getMsg());
@@ -87,6 +90,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void deleteProject(Long id) {
+        // 删除项目信息
+        this.removeById(id);
+        // 删除项目成员
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("projectId", id);
+        projectMemberMapper.deleteByMap(map);
+    }
+
+    @Override
     public List<ProjectTemp> queryProjectTempList() {
         return projectTempMapper.queryProjectTempList();
     }
@@ -104,5 +118,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void updateProjMember(ProjectMember projectMember) {
         projectMemberMapper.updateById(projectMember);
+    }
+
+    @Override
+    public void deleteProjMember(Long  projMemberId) {
+        projectMemberMapper.deleteById(projMemberId);
     }
 }
