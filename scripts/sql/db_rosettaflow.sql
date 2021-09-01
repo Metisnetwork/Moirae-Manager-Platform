@@ -273,12 +273,14 @@ CREATE TABLE `t_workflow` (
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
   `node_number` int(11) DEFAULT NULL COMMENT '节点数',
-  `sign`  varchar(512) DEFAULT NULL COMMENT ' 发起任务的账户的签名',
+  `sign`  varchar(512) DEFAULT NULL COMMENT '发起任务的账户的签名',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY (`project_id`),
+  KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流表';
 
 -- ----------------------------
@@ -308,6 +310,7 @@ CREATE TABLE `t_workflow_node` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
   `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
   `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
+  `node_name` varchar(30) DEFAULT NULL COMMENT '节点名称',
   `node_step` int(11) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
   `next_node_step` int(11) DEFAULT NULL COMMENT '下一个节点,如果为空则无下个节点',
   `run_status` tinyint(4) DEFAULT NULL COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
@@ -316,7 +319,8 @@ CREATE TABLE `t_workflow_node` (
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `flow_alg_id` (`workflow_id`, `algorithm_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点表';
 
 -- ----------------------------

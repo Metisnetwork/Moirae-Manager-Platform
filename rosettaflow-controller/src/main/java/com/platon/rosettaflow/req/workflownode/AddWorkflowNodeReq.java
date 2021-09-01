@@ -22,13 +22,13 @@ public class AddWorkflowNodeReq {
     private Long workflowId;
 
     @ApiModelProperty(value = "算法ID", required = true)
-    @NotNull(message = "算法ID不能为空")
-    @Positive(message = "算法ID错误")
+    @NotNull(message = "{algorithm id can not be empty}")
+    @Positive(message = "{algorithm.id.positive}")
     private Long algorithmId;
 
     @ApiModelProperty(value = " 节点在工作流中序号,从1开始", required = true)
-    @NotNull(message = " 节点在工作流中序号不能为空")
-    @Positive(message = " 节点在工作流中序号错误")
+    @NotNull(message = "{workflow.node.step.notNull}")
+    @Positive(message = "{workflow.node.step.positive}")
     private Integer nodeStep;
 
 }

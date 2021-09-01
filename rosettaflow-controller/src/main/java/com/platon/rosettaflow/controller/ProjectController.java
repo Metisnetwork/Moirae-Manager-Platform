@@ -38,14 +38,14 @@ public class ProjectController {
     private IProjectService projectService;
 
     @PostMapping("addProject")
-    @ApiOperation(value = "新增项目信息", notes = "新增项目信息")
-    public ResponseVo addProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
+    @ApiOperation(value = "新增项目", notes = "新增项目")
+    public ResponseVo<?> addProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
         projectService.addProject(BeanUtil.copyProperties(saveProjectReq, Project.class));
         return ResponseVo.createSuccess();
     }
     @PostMapping("updateProject")
-    @ApiOperation(value = "修改项目信息", notes = "修改项目信息")
-    public ResponseVo saveProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
+    @ApiOperation(value = "修改项目", notes = "修改项目")
+    public ResponseVo<?> saveProject(@RequestBody @Valid SaveProjectReq saveProjectReq) {
         projectService.updateProject(BeanUtil.copyProperties(saveProjectReq, Project.class));
         return ResponseVo.createSuccess();
     }
@@ -65,8 +65,8 @@ public class ProjectController {
     }
 
     @PostMapping("deleteProject")
-    @ApiOperation(value = "修改项目信息", notes = "修改项目信息")
-    public ResponseVo deleteProject(@RequestBody @Valid ProjDetailsReq projDetailsReq) {
+    @ApiOperation(value = "删除项目", notes = "修改项目")
+    public ResponseVo<?> deleteProject(@RequestBody @Valid ProjDetailsReq projDetailsReq) {
         projectService.deleteProject(projDetailsReq.getId());
         return ResponseVo.createSuccess();
     }
@@ -88,7 +88,7 @@ public class ProjectController {
 
     @PostMapping("addProjMember")
     @ApiOperation(value = "新增项目成员", notes = "新增项目成员")
-    public ResponseVo addProjMember(@Valid ProjMemberReq projMemberReq) {
+    public ResponseVo<?> addProjMember(@Valid ProjMemberReq projMemberReq) {
         ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
         projectService.addProjMember(projectMember);
         return ResponseVo.createSuccess();
@@ -96,7 +96,7 @@ public class ProjectController {
 
     @PostMapping("updateProjMember")
     @ApiOperation(value = "修改项目成员", notes = "修改项目成员")
-    public ResponseVo updateProjMember(@Valid ProjMemberReq projMemberReq) {
+    public ResponseVo<?> updateProjMember(@Valid ProjMemberReq projMemberReq) {
         ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
         projectService.updateProjMember(projectMember);
         return ResponseVo.createSuccess();
@@ -104,7 +104,7 @@ public class ProjectController {
 
     @PostMapping("deleteProjMember")
     @ApiOperation(value = "删除项目成员", notes = "删除项目成员")
-    public ResponseVo deleteProjMember(@Valid DeleteMemberReq deleteMemberReq) {
+    public ResponseVo<?> deleteProjMember(@Valid DeleteMemberReq deleteMemberReq) {
         projectService.deleteProjMember(deleteMemberReq.getMemberId());
         return ResponseVo.createSuccess();
     }

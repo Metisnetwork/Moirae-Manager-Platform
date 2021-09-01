@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -9,7 +10,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
@@ -18,21 +18,24 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
+import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
+ * 工作流服务实现类
  * @author admin
  * @date 2021/8/16
- * @description 工作流服务实现类
  */
 @Slf4j
 @Service
@@ -40,6 +43,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private CommonService commonService;
+
+    @Resource
+    AlgorithmMapper algorithmMapper;
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
@@ -63,118 +69,116 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private GrpcTaskService grpcTaskService;
 
     @Override
-    public IPage<WorkflowDto> list(WorkflowDto workflowDto, Long current, Long size) {
-        Page<Workflow> page = new Page<>(current, size);
-        this.baseMapper.listByProjectId(page, workflowDto.getProjectId(), workflowDto.getWorkflowName());
-        return this.baseMapper.listByProjectId(page, workflowDto.getProjectId(), workflowDto.getWorkflowName());
+    public IPage<WorkflowDto> queryWorkFlowList(Long projectId, String workflowName, Long current, Long size) {
+        IPage<WorkflowDto> page = new Page<>(current, size);
+        return this.baseMapper.queryWorkFlowList(projectId, workflowName, page);
     }
 
     @Override
-    public WorkflowDto detail(Long id) {
-        //获取工作流
-        Workflow workflow = this.getById(id);
-        WorkflowDto workflowDto = new WorkflowDto();
-        BeanCopierUtils.copy(workflow, workflowDto);
-
-        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
-        List<WorkflowNodeInputDto> workflowNodeInputDtoList = new ArrayList<>();
-        List<WorkflowNodeOutputDto> workflowNodeOutputDtoList = new ArrayList<>();
-        WorkflowNodeDto workflowNodeDto;
-        WorkflowNodeCodeDto workflowNodeCodeDto;
-        WorkflowNodeResourceDto workflowNodeResourceDto;
-        WorkflowNodeInputDto workflowNodeInputDto;
-        WorkflowNodeOutputDto workflowNodeOutputDto;
-
-        //获取工作流节点列表
+    public WorkflowDto queryWorkflowDetail(Long id) {
+        // 获取工作流
+        WorkflowDto workflowDto = BeanUtil.toBean(this.getById(id), WorkflowDto.class);
+        // 获取工作流节点列表
         List<WorkflowNode> workflowNodeList = workflowNodeService.getByWorkflowId(id);
-        for (int i = 0; i < workflowNodeList.size(); i++) {
-            WorkflowNode workflowNode = workflowNodeList.get(i);
-            workflowNodeDto = new WorkflowNodeDto();
-            BeanCopierUtils.copy(workflowNode, workflowNodeDto);
-
-            //算法对象
-            WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
-            workflowNodeCodeDto = new WorkflowNodeCodeDto();
-            BeanCopierUtils.copy(workflowNodeCode, workflowNodeCodeDto);
-            workflowNodeDto.setWorkflowNodeCodeDto(workflowNodeCodeDto);
-
-            //环境
-            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
-            workflowNodeResourceDto = new WorkflowNodeResourceDto();
-            BeanCopierUtils.copy(workflowNodeResource, workflowNodeResourceDto);
-            workflowNodeDto.setWorkflowNodeResourceDto(workflowNodeResourceDto);
-
+        if (workflowNodeList == null || workflowNodeList.size() == 0) {
+            return workflowDto;
+        }
+        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
+        for (WorkflowNode workflowNode : workflowNodeList) {
+            // 工作流节点dto
+            WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
+            // 算法对象
+            AlgorithmDto algorithmDto = algorithmMapper.queryAlgorithmDetails(workflowNode.getAlgorithmId());
+            if(Objects.nonNull(algorithmDto)) {
+                // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
+                WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
+                if (Objects.nonNull(workflowNodeCode)) {
+                    algorithmDto.setEditType(workflowNodeCode.getEditType());
+                    algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
+                    workflowNodeDto.setAlgorithmDto(algorithmDto);
+                }
+            }
             //工作流节点输入列表
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
-            for (int j = 0; j < workflowNodeInputList.size(); j++) {
-                workflowNodeInputDto = new WorkflowNodeInputDto();
-                BeanCopierUtils.copy(workflowNodeInputList.get(i), workflowNodeInputDto);
-                workflowNodeInputDtoList.add(workflowNodeInputDto);
-            }
-            workflowNodeDto.setWorkflowNodeInputDtoList(workflowNodeInputDtoList);
-
-            //工作流节点输出列表
+            workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
+           //工作流节点输出列表
             List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
-            for (WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
-                workflowNodeOutputDto = new WorkflowNodeOutputDto();
-                BeanCopierUtils.copy(workflowNodeOutput, workflowNodeOutputDto);
-                workflowNodeOutputDtoList.add(workflowNodeOutputDto);
+            workflowNodeDto.setWorkflowNodeOutputList(workflowNodeOutputList);
+            // 环境
+            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+            if (Objects.nonNull(workflowNodeResource)) {
+                workflowNodeDto.setWorkflowNodeResource(workflowNodeResource);
             }
-            workflowNodeDto.setWorkflowNodeOutputDtoList(workflowNodeOutputDtoList);
-
             workflowNodeDtoList.add(workflowNodeDto);
         }
-
         workflowDto.setWorkflowNodeDtoList(workflowNodeDtoList);
         return workflowDto;
     }
 
     @Override
-    public void add(WorkflowDto workflowDto) {
-        Workflow workflow = getByWorkflowName(workflowDto.getWorkflowName());
-        if (null != workflow) {
+    public void addWorkflow(Long projectId, String workflowName, String workflowDesc) {
+        Workflow workflow = getByWorkflowName(workflowName);
+        if (Objects.nonNull(workflow)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
+        Long userId = UserContext.get().getId();
         workflow = new Workflow();
-        workflow.setWorkflowName(workflowDto.getWorkflowName());
-        workflow.setWorkflowDesc(workflowDto.getWorkflowDesc());
+        workflow.setUserId(userId);
+        workflow.setProjectId(projectId);
+        workflow.setWorkflowName(workflowName);
+        workflow.setWorkflowDesc(workflowDesc);
         this.save(workflow);
     }
 
     @Override
-    public void edit(WorkflowDto workflowDto) {
-        Workflow workflow = this.getById(workflowDto.getId());
-        if (null == workflow) {
-            log.error("workflow not found by id:{}", workflowDto.getId());
+    public void editWorkflow(Long id, String workflowName, String workflowDesc) {
+        Workflow workflow = this.getById(id);
+        if (Objects.isNull(workflow)) {
+            log.error("workflow not found by id:{}", id);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
-        workflow.setWorkflowName(workflowDto.getWorkflowName());
-        workflow.setWorkflowDesc(workflowDto.getWorkflowDesc());
+        workflow.setWorkflowName(workflowName);
+        workflow.setWorkflowDesc(workflowDesc);
         this.updateById(workflow);
     }
 
     @Override
-    public void copy(WorkflowDto workflowDto) {
-        Workflow originWorkflow = this.getById(workflowDto.getId());
-        if (null == originWorkflow) {
-            log.error("Origin workflow not found by id:{}", workflowDto.getId());
+    public void deleteWorkflow(Long id) {
+        // 删除工作流
+        this.removeById(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void copyWorkflow(Long originId, String workflowName, String workflowDesc) {
+        Workflow originWorkflow = this.getById(originId);
+        if (Objects.isNull(originWorkflow)) {
+            log.error("Origin workflow not found by id:{}", originId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ORIGIN_NOT_EXIST.getMsg());
         }
-
-        Workflow workflow = getByWorkflowName(workflowDto.getWorkflowName());
-        if (null != workflow) {
+        Workflow workflow = getByWorkflowName(workflowName);
+        if (Objects.nonNull(workflow)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
-
-        Workflow newWorkflow = new Workflow();
-        newWorkflow.setProjectId(originWorkflow.getProjectId());
-        newWorkflow.setUserId(UserContext.get().getId());
-        newWorkflow.setWorkflowName(workflowDto.getWorkflowName());
-        newWorkflow.setWorkflowDesc(workflowDto.getWorkflowDesc());
-        newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());
-        newWorkflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
-        newWorkflow.setStatus(StatusEnum.VALID.getValue());
+        // 将复制的工作流数据id置空，新增一条新的工作流数据
+        Workflow newWorkflow = BeanUtil.toBean(originWorkflow, Workflow.class);
+        newWorkflow.setId(null);
+        newWorkflow.setWorkflowName(workflowName);
+        newWorkflow.setWorkflowDesc(workflowDesc);
         this.save(newWorkflow);
+        // 查询原工作流节点
+        LambdaQueryWrapper<WorkflowNode> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(WorkflowNode::getWorkflowId, originWorkflow.getId());
+        List<WorkflowNode> workflowNodeList = workflowNodeService.list(queryWrapper);
+        // 保存为新工作流节点
+        List<WorkflowNode> newNodeList = new ArrayList<>();
+        for (WorkflowNode workflowNode : workflowNodeList) {
+            WorkflowNode newNode = BeanUtil.toBean(workflowNode, WorkflowNode.class);
+            newNode.setId(null);
+            newNode.setWorkflowId(newWorkflow.getId());
+            newNodeList.add(newNode);
+        }
+        workflowNodeService.saveBatch(newNodeList);
     }
 
     @Override
@@ -182,13 +186,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         LambdaQueryWrapper<Workflow> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(Workflow::getWorkflowName, name);
         return this.getOne(wrapper);
-    }
-
-    @Override
-    public void delete(Long id) {
-        Workflow workflow = this.getById(id);
-        workflow.setStatus(StatusEnum.UN_VALID.getValue());
-        this.updateById(workflow);
     }
 
     @Override

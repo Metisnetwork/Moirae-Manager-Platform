@@ -7,12 +7,12 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * 工作流节点响应对象
  * @author hudenian
  * @date 2021/8/30
- * @description 工作流节点响应对象
  */
 @Data
-@ApiModel
+@ApiModel(value = "工作流节点响应对象")
 public class WorkflowNodeVo {
 
     @ApiModelProperty(value = "工作流节点主键ID")

@@ -34,11 +34,14 @@ spring:
         size: 5
       thread-name-prefix: RosettaFlow-Task-
 mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: status #实体名称
+      logic-delete-value: 0 #已经删除标志值
+      logic-not-delete-value: 1 #未删除标志值
   configuration:
     call-setters-on-nulls: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-
 # 系统参数配置
 system:
   config:

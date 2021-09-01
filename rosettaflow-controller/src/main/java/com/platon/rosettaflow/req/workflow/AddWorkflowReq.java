@@ -6,6 +6,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author hudenian
@@ -17,13 +18,16 @@ import javax.validation.constraints.NotBlank;
 public class AddWorkflowReq {
 
     @ApiModelProperty(value = "工作流名称", required = true)
-    @NotBlank(message = "工作流名称不能为空")
-    @Length(max = 30, message = "工作流名称不能大于30个字符")
+    @NotNull(message = "{project.id.notNull}")
+    private Long projectId;
+
+    @ApiModelProperty(value = "工作流名称", required = true)
+    @NotBlank(message = "{workflow.id.notNull}")
+    @Length(max = 30, message = "{workflow.name.Length}")
     private String workflowName;
 
-    @ApiModelProperty(value = "工作流描述", required = true)
-    @NotBlank(message = "工作流描述不能为空")
-    @Length(max = 50, message = "工作流描述不能大于50个字符")
+    @ApiModelProperty(value = "工作流描述")
+    @Length(max = 30, message = "{workflow.desc.Length}")
     private String workflowDesc;
 
 }

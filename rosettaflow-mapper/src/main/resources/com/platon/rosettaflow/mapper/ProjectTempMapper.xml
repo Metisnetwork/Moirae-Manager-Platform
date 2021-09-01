@@ -12,11 +12,4 @@
   <sql id="Base_Column_List">
     id, project_name, project_desc, `status`, create_time, update_time
   </sql>
-  <select id="queryProjectTempList" resultMap="BaseResultMap">
-    select
-        <include refid="Base_Column_List" />
-    from
-        t_project_temp
-    where status = '1'
-  </select>
 </mapper>

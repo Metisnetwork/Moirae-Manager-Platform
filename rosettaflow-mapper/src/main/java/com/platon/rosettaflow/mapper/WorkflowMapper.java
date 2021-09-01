@@ -14,6 +14,15 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface WorkflowMapper extends BaseMapper<Workflow> {
 
-    IPage<WorkflowDto> listByProjectId(@Param("page") IPage<Workflow> page, @Param("projectId") Long projectId, @Param("workflowName") String workflowName);
+    /**
+     * 查询工作流列表
+     * @param projectId
+     * @param workflowName
+     * @param page
+     * @return
+     */
+    IPage<WorkflowDto> queryWorkFlowList(@Param("projectId") Long projectId,
+                                         @Param("workflowName") String workflowName,
+                                         IPage<WorkflowDto> page);
 
 }

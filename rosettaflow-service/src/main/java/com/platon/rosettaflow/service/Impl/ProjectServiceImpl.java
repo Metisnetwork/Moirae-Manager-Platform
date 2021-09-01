@@ -1,6 +1,9 @@
 package com.platon.rosettaflow.service.Impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -95,14 +98,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         // 删除项目信息
         this.removeById(id);
         // 删除项目成员
-        Map<String, Object> map = new HashMap<>(2);
-        map.put("projectId", id);
-        projectMemberMapper.deleteByMap(map);
+        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(ProjectMember::getProjectId, id);
+        projectMemberMapper.delete(queryWrapper);
     }
 
     @Override
     public List<ProjectTemp> queryProjectTempList() {
-        return projectTempMapper.queryProjectTempList();
+        return projectTempMapper.selectList(null);
     }
 
     @Override
