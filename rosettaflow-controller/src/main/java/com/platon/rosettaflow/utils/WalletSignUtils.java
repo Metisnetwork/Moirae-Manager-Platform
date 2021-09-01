@@ -1,6 +1,8 @@
 package com.platon.rosettaflow.utils;
 
+import com.platone.sdk.utlis.Bech32;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
@@ -8,11 +10,10 @@ import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.Arrays;
+
+import static com.platon.rosettaflow.utils.AddressChangeUtils.convertBits;
 
 /**
  * @author hudenian
@@ -42,7 +43,7 @@ public class WalletSignUtils {
      *
      * @param message 签名明文
      * @param signMsg 签名信息
-     * @param address    签名人地址
+     * @param address 签名人地址
      * @return 验证成功失败标识
      */
     public static boolean verifySign(String message, String signMsg, String address) {
@@ -62,15 +63,16 @@ public class WalletSignUtils {
 
     public static void main(String[] args) {
         try {
-            ECKeyPair ecKeyPair = Keys.createEcKeyPair();
-            String address = Keys.getAddress(ecKeyPair);
+            Credentials credentials = Credentials.create("b4b282bf890abfc11e9b1832a2735f4c77fb3267978723034f84beb4e71fdf79");
+            String address = credentials.getAddress();
+            address = DataChangeUtils.bytesToHex(Bech32.addressDecode(address));
             System.out.println("钱包地址为>>>" + address);
-            String signStr = sign(address, ecKeyPair);
+            String signStr = sign(address, credentials.getEcKeyPair());
             System.out.println("钱包地址签名后的内容为>>>" + signStr);
 
             System.out.println("验证签名的结果为>>>" + verifySign(address, signStr, address));
 
-        } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
