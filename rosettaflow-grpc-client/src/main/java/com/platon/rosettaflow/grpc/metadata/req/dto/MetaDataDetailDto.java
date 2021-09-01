@@ -19,4 +19,8 @@ public class MetaDataDetailDto {
      * 列的描述详情
      */
     private List<MetaDataColumnDetailDto> metaDataColumnDetailDtoList;
+    /**
+     * 该元数据参与过得任务数 (已完成的和正在执行的)
+     */
+    private Integer totalTaskCount;
 }

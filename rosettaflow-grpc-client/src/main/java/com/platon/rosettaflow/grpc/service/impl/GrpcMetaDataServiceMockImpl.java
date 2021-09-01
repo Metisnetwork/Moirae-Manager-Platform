@@ -34,7 +34,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
         for (int i = 0; i < 10; i++) {
             MetaDataDetailResponseDto metaData = new MetaDataDetailResponseDto();
             NodeIdentityDto identityDto = new NodeIdentityDto();
-            identityDto.setName("hudenian" + i);
+            identityDto.setNodeName("hudenian" + i);
             identityDto.setNodeId("nodeId" + i);
             identityDto.setIdentityId("identityId" + i);
 

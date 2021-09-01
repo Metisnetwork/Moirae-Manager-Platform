@@ -9,11 +9,10 @@ import lombok.Data;
  */
 @Data
 public class NodeIdentityDto {
-
     /**
      * 组织名称
      */
-    private String name;
+    private String nodeName;
     /**
      * 组织中调度服务的 nodeId
      */

@@ -58,7 +58,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             nodeIdentityDto = new NodeIdentityDto();
-            nodeIdentityDto.setName("name" + i);
+            nodeIdentityDto.setNodeName("nodeName" + i);
             nodeIdentityDto.setNodeId("nodeId" + i);
             nodeIdentityDto.setIdentityId("identityId" + i);
             metaDataAuthorityDto.setOwner(nodeIdentityDto);

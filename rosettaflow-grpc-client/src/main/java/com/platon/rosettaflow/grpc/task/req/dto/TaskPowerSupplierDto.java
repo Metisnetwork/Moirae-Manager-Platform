@@ -17,5 +17,5 @@ public class TaskPowerSupplierDto {
     /**
      * 算力使用情况
      */
-    private ResourceUsedDetailDto powerInfo;
+    private ResourceUsedDetailDto resourceUsedInfo;
 }

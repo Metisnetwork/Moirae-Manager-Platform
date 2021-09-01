@@ -42,9 +42,9 @@ public class MetaDataSummaryDto {
      */
     private Integer size;
     /**
-     * 源文件的类型 (目前只有 csv)
+     * 0-未知 1-源文件的类型 (目前只有 csv)
      */
-    private String fileType;
+    private Integer fileType;
     /**
      * 源文件是否包含标题
      */
@@ -54,7 +54,7 @@ public class MetaDataSummaryDto {
      */
     private String industry;
     /**
-     * 元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)
+     * 元数据的状态 (0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表)
      */
-    private String state;
+    private Integer state;
 }

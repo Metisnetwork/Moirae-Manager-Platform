@@ -21,17 +21,9 @@ public class TaskDetailDto {
      */
     private String taskName;
     /**
-     * 发起任务的用户的信息 (task是属于用户的)
-     */
-    private String user;
-    /**
-     * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
-     */
-    private byte userType;
-    /**
      * 任务发起方
      */
-    private OrganizationIdentityInfoDto sender;
+    private OrganizationIdentityInfoDto owner;
     /**
      * 算法提供方 (目前就是和 任务发起方是同一个 ...)
      */
@@ -61,11 +53,15 @@ public class TaskDetailDto {
      */
     private Long endAt;
     /**
-     * 任务的状态 (pending: 等在中; running: 计算中; failed: 失败; success: 成功)
+     * 任务的状态 (0: 未知; 1: 等在中; 2: 计算中; 3: 失败; 4: 成功)
      */
-    private String state;
+    private Integer state;
     /**
      * 任务所需资源声明
      */
-    private TaskOperationCostDeclareDto operationCost;
+    private TaskResourceCostDeclareDto operationCost;
+    /**
+     * 任务描述 (非必须)
+     */
+    private String desc;
 }

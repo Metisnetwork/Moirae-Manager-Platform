@@ -5,6 +5,7 @@ import lombok.Data;
 /**
  * @author hudenian
  * @date 2021/8/4
+ * @description 组织信息
  */
 @Data
 public class OrganizationIdentityInfoDto {
@@ -16,7 +17,7 @@ public class OrganizationIdentityInfoDto {
     /**
      * 组织名称
      */
-    private String name;
+    private String nodeName;
 
     /**
      * 组织中调度服务的 nodeId

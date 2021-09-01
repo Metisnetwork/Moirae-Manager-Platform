@@ -27,7 +27,7 @@ public class GetMetaDataAuthorityDto {
      */
     private MetaDataAuthorityDto metaDataAuthorityDto;
     /**
-     * 审核结果
+     * 审核结果：0-等待审核中，1-审核通过，2-审核拒绝
      */
     private Integer auditMetaDataOption;
     /**

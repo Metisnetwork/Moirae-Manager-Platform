@@ -1,11 +1,12 @@
 package com.platon.rosettaflow.grpc.client;
 
+import com.google.protobuf.Empty;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
 import com.platon.rosettaflow.grpc.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import java.util.List;
 
 /**
  * @author admin
- * @date 2021/8/10
+ * @date 2021/9/1
  * @description 元数据相关接口
  */
 @Slf4j
@@ -40,25 +41,24 @@ public class MetaDataServiceClient {
 
         GetMetaDataDetailRequest getMetaDataDetailRequest = GetMetaDataDetailRequest.newBuilder()
                 .setIdentityId(identityId)
-                .setMetaDataId(metaDataId)
+                .setMetadataId(metaDataId)
                 .build();
         GetMetaDataDetailResponse metaDataDetailResponse = metaDataServiceBlockingStub.getMetaDataDetail(getMetaDataDetailRequest);
 
         convertToDto(metaDataDetailResponse, metaDataDetailResponseDto);
-
         return metaDataDetailResponseDto;
     }
 
     /**
-     * 查看元数据详情列表
+     * 查看全网元数据列表
      *
      * @return 获取所有元数据列表
      */
     public List<MetaDataDetailResponseDto> getMetaDataDetailList() {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = new ArrayList<>();
 
-        CommonMessage.EmptyGetParams emptyGetParams = CommonMessage.EmptyGetParams.newBuilder().build();
-        GetMetaDataDetailListResponse metaDataDetailList = metaDataServiceBlockingStub.getMetaDataDetailList(emptyGetParams);
+        Empty empty = Empty.newBuilder().build();
+        GetMetaDataDetailListResponse metaDataDetailList = metaDataServiceBlockingStub.getMetaDataDetailList(empty);
 
         processRespList(metaDataDetailResponseDtoList, metaDataDetailList);
 
@@ -66,7 +66,7 @@ public class MetaDataServiceClient {
     }
 
     /**
-     * 通过表的拥有者（owner）获取元数据详情
+     * 查看某个组织元数据列表
      *
      * @return 获取所有元数据列表
      */
@@ -97,14 +97,14 @@ public class MetaDataServiceClient {
     private void convertToDto(GetMetaDataDetailResponse metaDataDetailResponse, MetaDataDetailResponseDto metaDataDetailResponseDto) {
         //元数据的拥有者
         NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
-        nodeIdentityDto.setName(metaDataDetailResponse.getOwner().getName());
+        nodeIdentityDto.setNodeName(metaDataDetailResponse.getOwner().getNodeName());
         nodeIdentityDto.setNodeId(metaDataDetailResponse.getOwner().getNodeId());
         nodeIdentityDto.setIdentityId(metaDataDetailResponse.getOwner().getIdentityId());
-
         metaDataDetailResponseDto.setOwner(nodeIdentityDto);
 
+        //元数据的详情信息
         MetaDataDetailDto metaDataDetailShowDto = new MetaDataDetailDto();
-        //元文件详情主体
+        //元数据摘要
         MetaDataSummaryDto metaDataSummaryDto = new MetaDataSummaryDto();
         metaDataSummaryDto.setMetaDataId(metaDataDetailResponse.getInformation().getMetaDataSummary().getMetaDataId());
         metaDataSummaryDto.setOriginId(metaDataDetailResponse.getInformation().getMetaDataSummary().getOriginId());
@@ -114,27 +114,28 @@ public class MetaDataServiceClient {
         metaDataSummaryDto.setRows(metaDataDetailResponse.getInformation().getMetaDataSummary().getRows());
         metaDataSummaryDto.setColumns(metaDataDetailResponse.getInformation().getMetaDataSummary().getColumns());
         metaDataSummaryDto.setSize(metaDataDetailResponse.getInformation().getMetaDataSummary().getSize());
-        metaDataSummaryDto.setFileType(metaDataDetailResponse.getInformation().getMetaDataSummary().getFileType());
+        metaDataSummaryDto.setFileType(metaDataDetailResponse.getInformation().getMetaDataSummary().getFileTypeValue());
         metaDataSummaryDto.setHasTitle(metaDataDetailResponse.getInformation().getMetaDataSummary().getHasTitle());
-        metaDataSummaryDto.setState(metaDataDetailResponse.getInformation().getMetaDataSummary().getState());
+        metaDataSummaryDto.setIndustry(metaDataDetailResponse.getInformation().getMetaDataSummary().getIndustry());
+        metaDataSummaryDto.setState(metaDataDetailResponse.getInformation().getMetaDataSummary().getStateValue());
         metaDataDetailShowDto.setMetaDataSummary(metaDataSummaryDto);
-        //元数据列详情
+        //元数据对应原始文件对外暴露的列描述列表
         List<MetaDataColumnDetailDto> metaDataColumnDetailDtoList = new ArrayList<>();
         MetaDataColumnDetailDto metaDataColumnDetailDto;
-        MetaDataColumnDetail metaDataColumnDetail;
-        for (int i = 0; i < metaDataDetailResponse.getInformation().getColumnMetaList().size(); i++) {
-            metaDataColumnDetail = metaDataDetailResponse.getInformation().getColumnMetaList().get(i);
+        MetadataColumn metadataColumn;
+        for (int i = 0; i < metaDataDetailResponse.getInformation().getMetadataColumnListCount(); i++) {
+            metadataColumn = metaDataDetailResponse.getInformation().getMetadataColumnList(i);
             metaDataColumnDetailDto = new MetaDataColumnDetailDto();
-            metaDataColumnDetailDto.setIndex(metaDataColumnDetail.getCindex());
-            metaDataColumnDetailDto.setName(metaDataColumnDetail.getCname());
-            metaDataColumnDetailDto.setType(metaDataColumnDetail.getCtype());
-            metaDataColumnDetailDto.setSize(metaDataColumnDetail.getCsize());
-            metaDataColumnDetailDto.setComment(metaDataColumnDetail.getCcomment());
+            metaDataColumnDetailDto.setIndex(metadataColumn.getCIndex());
+            metaDataColumnDetailDto.setName(metadataColumn.getCName());
+            metaDataColumnDetailDto.setType(metadataColumn.getCType());
+            metaDataColumnDetailDto.setSize(metadataColumn.getCSize());
+            metaDataColumnDetailDto.setComment(metadataColumn.getCComment());
             metaDataColumnDetailDtoList.add(metaDataColumnDetailDto);
         }
         metaDataDetailShowDto.setMetaDataColumnDetailDtoList(metaDataColumnDetailDtoList);
-
+        //该元数据参与过得任务数 (已完成的和正在执行的)
+        metaDataDetailShowDto.setTotalTaskCount(metaDataDetailResponse.getInformation().getTotalTaskCount());
         metaDataDetailResponseDto.setMetaDataDetailDto(metaDataDetailShowDto);
     }
-
 }

@@ -80,7 +80,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         MetaDataAuthorityDto metaDataAuthorityDto = new MetaDataAuthorityDto();
         //元数据所属组织
         NodeIdentityDto owner = new NodeIdentityDto();
-        owner.setName(metaData.getIdentityName());
+        owner.setNodeName(metaData.getIdentityName());
         owner.setNodeId(metaData.getNodeId());
         owner.setIdentityId(metaData.getIdentityId());
         metaDataAuthorityDto.setOwner(owner);

@@ -1,11 +1,10 @@
 package com.platon.rosettaflow.grpc.service.impl;
 
+import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.service.PublishTaskDeclareResponse;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
+import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -49,7 +48,7 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
         taskEventShowDto.setType("1");
         taskEventShowDto.setTaskId(taskId);
 
-        nodeIdentityDto.setName("name");
+        nodeIdentityDto.setNodeName("nodeName");
         nodeIdentityDto.setNodeId("nodeId");
         nodeIdentityDto.setIdentityId("identityId");
 
@@ -72,7 +71,7 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
             taskEventShowDto.setTaskId(taskIds[i]);
 
             nodeIdentityDto = new NodeIdentityDto();
-            nodeIdentityDto.setName("name" + i);
+            nodeIdentityDto.setNodeName("nodeName" + i);
             nodeIdentityDto.setNodeId("nodeId" + i);
             nodeIdentityDto.setIdentityId("identityId" + i);
 
@@ -82,5 +81,13 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
             taskEventShowDtoList.add(taskEventShowDto);
         }
         return taskEventShowDtoList;
+    }
+
+    @Override
+    public TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto) {
+        TerminateTaskRespDto respDto = new TerminateTaskRespDto();
+        respDto.setStatus(GrpcConstant.GRPC_SUCCESS_CODE);
+        respDto.setMsg("处理成功");
+        return respDto;
     }
 }

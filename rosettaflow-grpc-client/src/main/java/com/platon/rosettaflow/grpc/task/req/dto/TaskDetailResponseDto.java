@@ -14,7 +14,12 @@ public class TaskDetailResponseDto {
      */
     private TaskDetailDto information;
     /**
-     * 我在任务中的角色 (owner: 任务发起方; dataSupplier: 数据提供方: powerSupplier: 算力提供方; receiver: 结果接收方)
+     * 0-未知的任务角色
+     * 1-任务发起方
+     * 2-数据提供方
+     * 3-算力提供方
+     * 4-结果接收方
+     * 5-算法提供方
      */
-    private String role;
+    private Integer role;
 }
