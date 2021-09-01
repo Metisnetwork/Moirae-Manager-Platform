@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
@@ -8,11 +9,14 @@ import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.req.project.*;
 import com.platon.rosettaflow.service.IProjectService;
+import com.platon.rosettaflow.utils.ConvertUtils;
+import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.project.ProjMemberListVo;
 import com.platon.rosettaflow.vo.project.ProjTempListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjectListVo;
+import com.platon.rosettaflow.vo.workflow.WorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +56,10 @@ public class ProjectController {
 
     @GetMapping("queryProjectList")
     @ApiOperation(value = "查询项目列表", notes = "查询项目列表")
-    public ResponseVo<List<ProjectListVo>> queryProjectList(@Valid ProjListReq projListReq) {
-        List<ProjectDto> list  = projectService.queryProjectList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectListVo.class));
+    public ResponseVo<PageVo<ProjectListVo>> queryProjectList(@Valid ProjListReq projListReq) {
+        IPage<ProjectDto> iPage  = projectService.queryProjectList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
+        List<ProjectListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjectListVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));
     }
 
     @GetMapping("queryProjectDetails")
@@ -80,10 +85,11 @@ public class ProjectController {
 
     @GetMapping("queryProjMemberList")
     @ApiOperation(value = "查询项目成员列表", notes = "查询项目成员列表")
-    public ResponseVo<List<ProjMemberListVo>> queryProjMemberList(@Valid ProjMemberListReq projMemberListReq) {
-        List<ProjMemberDto> list  = projectService.queryProjMemberList(
-                projMemberListReq.getProjectId(), projMemberListReq.getUserName());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjMemberListVo.class));
+    public ResponseVo<PageVo<ProjMemberListVo>> queryProjMemberList(@Valid ProjMemberListReq listReq) {
+        IPage<ProjMemberDto> iPage  = projectService.queryProjMemberList(listReq.getProjectId(),
+                listReq.getUserName(), listReq.getCurrent(), listReq.getSize());
+        List<ProjMemberListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjMemberListVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));
     }
 
     @PostMapping("addProjMember")

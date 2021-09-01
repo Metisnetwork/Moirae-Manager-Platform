@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
@@ -34,7 +35,7 @@ public interface IProjectService extends IService<Project> {
      * @param size 每页条数
      * @return ProjectDto
      */
-    List<ProjectDto>  queryProjectList(String projectName, Integer current, Integer size);
+    IPage<ProjectDto> queryProjectList(String projectName, Long current, Long size);
 
     /**
      * 查询项目详情
@@ -61,7 +62,7 @@ public interface IProjectService extends IService<Project> {
      * @param userName 用户昵称
      * @return
      */
-    List<ProjMemberDto> queryProjMemberList(Long projectId, String userName);
+    IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size);
 
     /**
      * 新增项目成员
