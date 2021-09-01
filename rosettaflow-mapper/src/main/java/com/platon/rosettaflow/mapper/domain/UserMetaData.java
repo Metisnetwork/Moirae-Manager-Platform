@@ -50,7 +50,7 @@ public class UserMetaData implements Serializable {
     /**
      * 授权值:按次数单位为（次）
      */
-    private Long authValue;
+    private Integer authValue;
     /**
      * 授权开始时间
      */

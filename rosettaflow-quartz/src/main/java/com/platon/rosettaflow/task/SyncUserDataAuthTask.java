@@ -68,7 +68,7 @@ public class SyncUserDataAuthTask {
             userMetaData.setAddress(authorityDto.getUser());
             userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
             //授权次数
-            Long times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();
+            Integer times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();
             if (null != times && times > 0) {
                 userMetaData.setAuthValue(times);
             }
