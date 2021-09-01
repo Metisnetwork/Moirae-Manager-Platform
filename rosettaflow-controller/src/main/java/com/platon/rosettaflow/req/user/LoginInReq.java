@@ -22,8 +22,8 @@ public class LoginInReq {
     private String address;
 
     @ApiModelProperty(value = "用户类型 0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址", required = true)
-    @NotNull(message = "用户类型不能为空")
-    @Range(min = 0, max = 3, message = "用户类型错误")
+    @NotNull(message = "{user.type.noBlank}")
+    @Range(min = 0, max = 3, message = "{user.type.range.error}")
     private Byte userType;
 
     @ApiModelProperty(value = "钱包地址签名", required = true, notes = "sign", example = "HPXfBL0ZYeSMt6GcG8h8zOlPtlA8+LIQvF1AhEq4YZQLNfsgujDFDCzCSr/4ayfw4USAffxxA9OL0xMCVgE5Eg4=")

@@ -51,7 +51,7 @@
         t_user_meta_data u
         INNER JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id
         WHERE
-        u.address = #{address}
+        u.address = #{address,jdbcType=VARCHAR}
         <if test="dataName != null and dataName != ''">
             AND
             m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
