@@ -1,8 +1,6 @@
 package com.platon.rosettaflow.grpc.service;
 
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
+import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 
 import java.util.List;
@@ -52,4 +50,12 @@ public interface GrpcTaskService {
      * @return 任务事件列表
      */
     List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds);
+
+    /**
+     * 终止任务
+     *
+     * @param requestDto 终止任务请求对象
+     * @return 终止任务响应对象
+     */
+    TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto);
 }

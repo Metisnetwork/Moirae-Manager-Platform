@@ -289,7 +289,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         for (WorkflowNodeInput input : workflowNodeInputList) {
             taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             taskOrganizationIdentityInfoDto.setPartyId(input.getPartyId());
-            taskOrganizationIdentityInfoDto.setName(input.getIdentityName());
+            taskOrganizationIdentityInfoDto.setNodeName(input.getIdentityName());
             taskOrganizationIdentityInfoDto.setNodeId(input.getNodeId());
             taskOrganizationIdentityInfoDto.setIdentityId(input.getIdentityId());
 
@@ -317,31 +317,29 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskDto.setPowerPartyIds(powerPartyIds);
 
         //任务结果接受者(flow暂定)
-        List<TaskResultReceiverDeclareDto> taskResultReceiverDeclareDtoList = new ArrayList<>();
-        TaskResultReceiverDeclareDto taskResultReceiverDeclareDto = new TaskResultReceiverDeclareDto();
+//        List<TaskResultReceiverDeclareDto> taskResultReceiverDeclareDtoList = new ArrayList<>();
+//        TaskResultReceiverDeclareDto taskResultReceiverDeclareDto = new TaskResultReceiverDeclareDto();
         OrganizationIdentityInfoDto organizationIdentityInfoDto;
         for (WorkflowNodeOutput output : workflowNodeOutputList) {
             organizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             organizationIdentityInfoDto.setPartyId(output.getPartyId());
-            organizationIdentityInfoDto.setName(output.getIdentityName());
+            organizationIdentityInfoDto.setNodeName(output.getIdentityName());
             organizationIdentityInfoDto.setNodeId(output.getNodeId());
             organizationIdentityInfoDto.setIdentityId(output.getIdentityId());
 
-            taskResultReceiverDeclareDto.setMemberInfo(organizationIdentityInfoDto);
-            //TODO 待确认
-            taskResultReceiverDeclareDto.setProviderList(null);
+//            taskResultReceiverDeclareDto.setMemberInfo(organizationIdentityInfoDto);
 
-            taskResultReceiverDeclareDtoList.add(taskResultReceiverDeclareDto);
+//            taskResultReceiverDeclareDtoList.add(taskResultReceiverDeclareDto);
         }
-        taskDto.setTaskResultReceiverDeclareDtoList(taskResultReceiverDeclareDtoList);
+//        taskDto.setTaskResultReceiverDeclareDtoList(taskResultReceiverDeclareDtoList);
 
         //任务的所需操作成本
-        TaskOperationCostDeclareDto taskOperationCostDeclareDto = new TaskOperationCostDeclareDto();
+        TaskResourceCostDeclareDto taskOperationCostDeclareDto = new TaskResourceCostDeclareDto();
         taskOperationCostDeclareDto.setCostMem(workflowNodeResource.getCostMem());
-        taskOperationCostDeclareDto.setCostProcessor(workflowNodeResource.getCostProcessor());
+//        taskOperationCostDeclareDto.setCostProcessor(workflowNodeResource.getCostProcessor());
         taskOperationCostDeclareDto.setCostBandwidth(workflowNodeResource.getCostBandwidth());
         taskOperationCostDeclareDto.setDuration(workflowNodeResource.getDuration());
-        taskDto.setTaskOperationCostDeclareDto(taskOperationCostDeclareDto);
+//        taskDto.setTaskOperationCostDeclareDto(taskOperationCostDeclareDto);
 
         //算法代码（python代码）
         taskDto.setCalculateContractCode(workflowNodeCode.getCalculateContractCode());

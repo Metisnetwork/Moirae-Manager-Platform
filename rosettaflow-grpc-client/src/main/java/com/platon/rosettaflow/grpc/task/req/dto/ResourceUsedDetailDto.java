@@ -16,7 +16,7 @@ public class ResourceUsedDetailDto {
     /**
      * 服务的总内核数 (单位: 个)
      */
-    private Long totalProcessor;
+    private Integer totalProcessor;
     /**
      * 服务的总带宽数 (单位: bps)
      */
@@ -32,7 +32,7 @@ public class ResourceUsedDetailDto {
     /**
      * 服务的总内核数 (单位: 个)
      */
-    private Long usedProcessor;
+    private Integer usedProcessor;
     /**
      * 服务的已用带宽数 (单位: bps)
      */

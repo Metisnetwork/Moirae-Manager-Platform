@@ -136,7 +136,7 @@ public class WorkflowController {
             vo = new TaskEventVo();
             vo.setType(taskEventDto.getType());
             vo.setTaskId(taskEventDto.getTaskId());
-            vo.setName(taskEventDto.getOwner().getName());
+            vo.setName(taskEventDto.getOwner().getNodeName());
             vo.setNodeId(taskEventDto.getOwner().getNodeId());
             vo.setIdentityId(taskEventDto.getOwner().getIdentityId());
             vo.setContent(taskEventDto.getContent());

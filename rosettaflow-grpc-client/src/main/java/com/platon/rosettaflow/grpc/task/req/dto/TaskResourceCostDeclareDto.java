@@ -8,7 +8,7 @@ import lombok.Data;
  * @description 任务的所需操作成本 (定义任务的大小)
  */
 @Data
-public class TaskOperationCostDeclareDto {
+public class TaskResourceCostDeclareDto {
     /**
      * 任务所需的内存 (单位: byte)
      */
@@ -17,7 +17,7 @@ public class TaskOperationCostDeclareDto {
     /**
      * 任务所需的核数 (单位: 个)
      */
-    private Long costProcessor;
+    private Integer costProcessor;
 
     /**
      * 任务所需的带宽 (单位: bps)

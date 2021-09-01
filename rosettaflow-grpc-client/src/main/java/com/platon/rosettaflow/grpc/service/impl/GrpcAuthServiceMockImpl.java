@@ -58,7 +58,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             nodeIdentityDto = new NodeIdentityDto();
-            nodeIdentityDto.setName("name" + i);
+            nodeIdentityDto.setNodeName("nodeName" + i);
             nodeIdentityDto.setNodeId("nodeId" + i);
             nodeIdentityDto.setIdentityId("identityId" + i);
             metaDataAuthorityDto.setOwner(nodeIdentityDto);
@@ -69,7 +69,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             metaDataUsageDto.setUseType(1);
             metaDataUsageDto.setStartAt(1629877270100L);
             metaDataUsageDto.setEndAt(1629877270100L);
-            metaDataUsageDto.setTimes(100L + i);
+            metaDataUsageDto.setTimes(100 + i);
             metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageDto);
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
 

@@ -71,7 +71,7 @@ public class SyncMetaDataTask {
         for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
             metaData = new MetaData();
             metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
-            metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getName());
+            metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
             metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
             metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
             metaData.setFileId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getOriginId());

@@ -25,5 +25,5 @@ public class MetaDataUsageDto {
     /**
      * 使用次数 (当 usage_type 为 2 时才需要的字段)
      */
-    private Long times;
+    private Integer times;
 }

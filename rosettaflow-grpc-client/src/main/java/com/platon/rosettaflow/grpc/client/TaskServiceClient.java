@@ -1,13 +1,15 @@
 package com.platon.rosettaflow.grpc.client;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Empty;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.*;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
-import com.platon.rosettaflow.grpc.task.resp.dto.*;
+import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -73,12 +75,12 @@ public class TaskServiceClient {
     }
 
     /**
-     * 查看全部任务详情列表
+     * 查看本组织参与过的全部任务详情列表
      */
     public List<TaskDetailResponseDto> getTaskDetailList() {
         List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
-        CommonMessage.EmptyGetParams emptyGetParams = CommonMessage.EmptyGetParams.newBuilder().build();
-        GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(emptyGetParams);
+        Empty empty = Empty.newBuilder().build();
+        GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(empty);
 
         if (getTaskDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(getTaskDetailListResponse.getStatus(), getTaskDetailListResponse.getMsg());
@@ -89,117 +91,94 @@ public class TaskServiceClient {
         TaskDetailDto taskDetailDto;
         for (int i = 0; i < getTaskDetailListResponse.getTaskListCount(); i++) {
             getTaskDetailResponse = getTaskDetailListResponse.getTaskList(i);
-
             taskDetailResponseDto = new TaskDetailResponseDto();
             //任务详情
             taskDetailDto = new TaskDetailDto();
+
             // 任务Id
             taskDetailDto.setTaskId(getTaskDetailResponse.getInformation().getTaskId());
+
             // 任务名称
             taskDetailDto.setTaskName(getTaskDetailResponse.getInformation().getTaskName());
-            // 发起任务的用户的信息 (task是属于用户的)
-            taskDetailDto.setUser(getTaskDetailResponse.getInformation().getUser());
-            //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
-            taskDetailDto.setUserType((byte) getTaskDetailResponse.getInformation().getUserType().getNumber());
 
-            // 任务发起方
-            OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
-            sender.setPartyId(getTaskDetailResponse.getInformation().getSender().getPartyId());
-            sender.setName(getTaskDetailResponse.getInformation().getSender().getName());
-            sender.setNodeId(getTaskDetailResponse.getInformation().getSender().getNodeId());
-            sender.setIdentityId(getTaskDetailResponse.getInformation().getSender().getIdentityId());
-            taskDetailDto.setSender(sender);
+            // 任务发起方组织信息
+            taskDetailDto.setOwner(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getOwner()));
 
-            //算法提供方 (目前就是和 任务发起方是同一个 ...)
-            OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
-            algoSupplier.setPartyId(getTaskDetailResponse.getInformation().getAlgoSupplier().getPartyId());
-            algoSupplier.setName(getTaskDetailResponse.getInformation().getAlgoSupplier().getName());
-            algoSupplier.setNodeId(getTaskDetailResponse.getInformation().getAlgoSupplier().getNodeId());
-            algoSupplier.setIdentityId(getTaskDetailResponse.getInformation().getAlgoSupplier().getIdentityId());
-            taskDetailDto.setAlgoSupplier(algoSupplier);
+            // 算法提供方组织信息 (目前就是和 任务发起方是同一个 ...)
+            taskDetailDto.setAlgoSupplier(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getAlgoSupplier()));
 
-            //数据提供方
-            List<TaskDataSupplierDto> taskDataSupplierShowDtoList = new ArrayList<>();
-            TaskDataSupplierDto taskDataSupplierDto;
-
-            OrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
+            //数据提供方组织信息
+            List<TaskDataSupplierDto> dataSuppliers = new ArrayList<>();
+            TaskDataSupplierDto dataSupplierDto;
+            TaskDataSupplierShow dataSupplierShow;
+            OrganizationIdentityInfoDto supplier;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getDataSupplierCount(); j++) {
-                taskDataSupplierDto = new TaskDataSupplierDto();
-
-                taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
-                taskOrganizationIdentityInfoDto.setPartyId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getPartyId());
-                taskOrganizationIdentityInfoDto.setName(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getName());
-                taskOrganizationIdentityInfoDto.setNodeId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getNodeId());
-                taskOrganizationIdentityInfoDto.setIdentityId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMemberInfo().getIdentityId());
-
-                taskDataSupplierDto.setMemberInfo(taskOrganizationIdentityInfoDto);
-                taskDataSupplierDto.setMetaDataId(getTaskDetailResponse.getInformation().getDataSupplier(j).getMetaDataId());
-                taskDataSupplierDto.setMetaDataName(getTaskDetailResponse.getInformation().getDataSupplier(j).getMetaDataName());
-
-                taskDataSupplierShowDtoList.add(taskDataSupplierDto);
+                dataSupplierShow = getTaskDetailResponse.getInformation().getDataSupplier(j);
+                dataSupplierDto = new TaskDataSupplierDto();
+                dataSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(dataSupplierShow.getMemberInfo()));
+                dataSupplierDto.setMetaDataId(dataSupplierShow.getMetadataId());
+                dataSupplierDto.setMetaDataName(dataSupplierShow.getMetadataName());
+                dataSuppliers.add(dataSupplierDto);
             }
-            taskDetailDto.setDataSuppliers(taskDataSupplierShowDtoList);
+            taskDetailDto.setDataSuppliers(dataSuppliers);
 
-            //算力提供方
-            List<TaskPowerSupplierDto> taskPowerSupplierShowDtoList = new ArrayList<>();
-            TaskPowerSupplierDto taskPowerSupplierShowDto;
-            ResourceUsedDetailDto resourceUsedDetailShowDto;
+            // 算力提供方组织信息
+            List<TaskPowerSupplierDto> powerSuppliers = new ArrayList<>();
+            TaskPowerSupplierDto powerSupplierDto;
+            TaskPowerSupplierShow powerSupplierShow;
+            ResourceUsedDetailDto resourceUsedDetailDto;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getPowerSupplierCount(); j++) {
-                //算力提供方成员信息
-                taskPowerSupplierShowDto = new TaskPowerSupplierDto();
-                OrganizationIdentityInfoDto powerIdentityInfoDto = new OrganizationIdentityInfoDto();
-                powerIdentityInfoDto.setPartyId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getPartyId());
-                powerIdentityInfoDto.setName(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getName());
-                powerIdentityInfoDto.setNodeId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getNodeId());
-                powerIdentityInfoDto.setIdentityId(getTaskDetailResponse.getInformation().getPowerSupplier(j).getMemberInfo().getIdentityId());
-                //算力提供方资源信息
-                ResourceUsedDetailDto powerInfo = new ResourceUsedDetailDto();
-                powerInfo.setTotalMem(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalMem());
-                powerInfo.setTotalProcessor(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalProcessor());
-                powerInfo.setTotalBandwidth(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalBandwidth());
-                powerInfo.setTotalDisk(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getTotalDisk());
+                powerSupplierShow = getTaskDetailResponse.getInformation().getPowerSupplier(j);
+                powerSupplierDto = new TaskPowerSupplierDto();
 
-                powerInfo.setUsedMem(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedMem());
-                powerInfo.setUsedProcessor(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedProcessor());
-                powerInfo.setUsedBandwidth(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedBandwidth());
-                powerInfo.setUsedDisk(getTaskDetailResponse.getInformation().getPowerSupplier(j).getPowerInfo().getUsedDisk());
+                resourceUsedDetailDto = new ResourceUsedDetailDto();
+                resourceUsedDetailDto.setTotalMem(powerSupplierShow.getPowerInfo().getTotalMem());
+                resourceUsedDetailDto.setTotalProcessor(powerSupplierShow.getPowerInfo().getTotalProcessor());
+                resourceUsedDetailDto.setTotalBandwidth(powerSupplierShow.getPowerInfo().getTotalBandwidth());
+                resourceUsedDetailDto.setTotalDisk(powerSupplierShow.getPowerInfo().getTotalDisk());
+                resourceUsedDetailDto.setUsedMem(powerSupplierShow.getPowerInfo().getUsedMem());
+                resourceUsedDetailDto.setUsedProcessor(powerSupplierShow.getPowerInfo().getUsedProcessor());
+                resourceUsedDetailDto.setUsedBandwidth(powerSupplierShow.getPowerInfo().getUsedBandwidth());
+                resourceUsedDetailDto.setUsedDisk(powerSupplierShow.getPowerInfo().getUsedDisk());
 
-                taskPowerSupplierShowDto.setMemberInfo(powerIdentityInfoDto);
-                taskPowerSupplierShowDto.setPowerInfo(powerInfo);
-                taskPowerSupplierShowDtoList.add(taskPowerSupplierShowDto);
+                powerSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(powerSupplierShow.getMemberInfo()));
+                powerSupplierDto.setResourceUsedInfo(resourceUsedDetailDto);
+                powerSuppliers.add(powerSupplierDto);
             }
-            taskDetailDto.setPowerSuppliers(taskPowerSupplierShowDtoList);
+            taskDetailDto.setPowerSuppliers(powerSuppliers);
 
-            //任务结果方
+            // 任务结果方
             List<OrganizationIdentityInfoDto> receivers = new ArrayList<>();
+            TaskOrganization organization;
             OrganizationIdentityInfoDto receiver;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getReceiversCount(); j++) {
-                receiver = new OrganizationIdentityInfoDto();
-                receiver.setPartyId(getTaskDetailResponse.getInformation().getReceivers(i).getPartyId());
-                receiver.setName(getTaskDetailResponse.getInformation().getReceivers(i).getName());
-                receiver.setNodeId(getTaskDetailResponse.getInformation().getReceivers(i).getNodeId());
-                receiver.setIdentityId(getTaskDetailResponse.getInformation().getReceivers(i).getIdentityId());
-                receivers.add(receiver);
+                receivers.add(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getReceivers(i)));
             }
             taskDetailDto.setReceivers(receivers);
 
-            //TODO 联调测试验证日期格式
+            // 任务发起时间 (单位: ms)
             taskDetailDto.setCreateAt(getTaskDetailResponse.getInformation().getCreateAt());
+            // 任务启动时间 (单位: ms)
             taskDetailDto.setStartAt(getTaskDetailResponse.getInformation().getStartAt());
+            // 任务结束时间 (单位: ms)
             taskDetailDto.setEndAt(getTaskDetailResponse.getInformation().getEndAt());
-            taskDetailDto.setState(getTaskDetailResponse.getInformation().getState());
+            // 任务的状态 (0: 未知; 1: 等在中; 2: 计算中; 3: 失败; 4: 成功)
+            taskDetailDto.setState(getTaskDetailResponse.getInformation().getState().getNumber());
 
             //任务所需资源声明
-            TaskOperationCostDeclareDto taskOperationCostDeclareDto = new TaskOperationCostDeclareDto();
+            TaskResourceCostDeclareDto taskOperationCostDeclareDto = new TaskResourceCostDeclareDto();
             taskOperationCostDeclareDto.setCostMem(getTaskDetailResponse.getInformation().getOperationCost().getCostMem());
             taskOperationCostDeclareDto.setCostProcessor(getTaskDetailResponse.getInformation().getOperationCost().getCostProcessor());
             taskOperationCostDeclareDto.setCostBandwidth(getTaskDetailResponse.getInformation().getOperationCost().getCostBandwidth());
             taskOperationCostDeclareDto.setDuration(getTaskDetailResponse.getInformation().getOperationCost().getDuration());
             taskDetailDto.setOperationCost(taskOperationCostDeclareDto);
 
+            // 任务描述 (非必须)
+            taskDetailDto.setDesc(getTaskDetailResponse.getInformation().getDesc());
+
             //拼装最外层信息
             taskDetailResponseDto.setInformation(taskDetailDto);
-            taskDetailResponseDto.setRole(getTaskDetailResponse.getRole());
+            taskDetailResponseDto.setRole(getTaskDetailResponse.getRole().getNumber());
             taskDetailResponseDtoList.add(taskDetailResponseDto);
         }
         return taskDetailResponseDtoList;
@@ -215,7 +194,7 @@ public class TaskServiceClient {
     }
 
     /**
-     * 查看某个任务的全部事件列表通过批量的任务ID
+     * 查看多个任务的全部事件列表
      */
     public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds) {
         GetTaskEventListByTaskIdsRequest.Builder getTaskEventListByTaskIdsRequestBuilder = GetTaskEventListByTaskIdsRequest.newBuilder();
@@ -224,6 +203,24 @@ public class TaskServiceClient {
         }
         GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventListByTaskIds(getTaskEventListByTaskIdsRequestBuilder.build());
         return getTaskEventShowDots(taskEventListResponse);
+    }
+
+    /**
+     * 终止任务
+     *
+     * @return 终止任务响应对象
+     */
+    public TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto) {
+        TerminateTaskRequest terminateReq = TerminateTaskRequest.newBuilder()
+                .setUser(requestDto.getUser())
+                .setUserTypeValue(requestDto.getUserType())
+                .setTaskId(requestDto.getTaskId())
+                .setSign(ByteString.copyFromUtf8(requestDto.getSign()))
+                .build();
+        SimpleResponse simpleResponse = taskServiceBlockingStub.terminateTask(terminateReq);
+        TerminateTaskRespDto terminateTaskRespDto = new TerminateTaskRespDto();
+        BeanCopierUtils.copy(simpleResponse, terminateTaskRespDto);
+        return terminateTaskRespDto;
     }
 
     private List<TaskEventDto> getTaskEventShowDots(GetTaskEventListResponse taskEventListResponse) {
@@ -239,7 +236,7 @@ public class TaskServiceClient {
             taskEventShowDto.setTaskId(taskEventListResponse.getTaskEventList(i).getTaskId());
 
             NodeIdentityDto owner = new NodeIdentityDto();
-            owner.setName(taskEventListResponse.getTaskEventList(i).getOwner().getName());
+            owner.setNodeName(taskEventListResponse.getTaskEventList(i).getOwner().getNodeName());
             owner.setNodeId(taskEventListResponse.getTaskEventList(i).getOwner().getNodeId());
             owner.setIdentityId(taskEventListResponse.getTaskEventList(i).getOwner().getIdentityId());
 
@@ -265,37 +262,37 @@ public class TaskServiceClient {
         // 发起任务的用户的信息 (task是属于用户的)
         publishTaskDeclareRequestBuilder.setUser(taskDto.getUser());
         //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
-        publishTaskDeclareRequestBuilder.setUserType(CommonMessage.UserType.forNumber(taskDto.getUserType()));
+        publishTaskDeclareRequestBuilder.setUserType(UserType.forNumber(taskDto.getUserType()));
         //任务发起者 组织信息
-        CommonMessage.TaskOrganizationIdentityInfo sender = CommonMessage.TaskOrganizationIdentityInfo.newBuilder()
-                .setPartyId("partyId")
-                .setName("name")
-                .setNodeId("nodeId")
-                .setIdentityId("identityId")
+        TaskOrganization sender = TaskOrganization.newBuilder()
+                .setPartyId(taskDto.getSender().getPartyId())
+                .setNodeName(taskDto.getSender().getNodeName())
+                .setNodeId(taskDto.getSender().getNodeId())
+                .setIdentityId(taskDto.getSender().getIdentityId())
                 .build();
         publishTaskDeclareRequestBuilder.setSender(sender);
 
         // data_supplier
-        TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
+        TaskDataSupplierDeclareDto dataSupplierDeclareDto;
         for (int i = 0; i < taskDto.getTaskDataSupplierDeclareDtoList().size(); i++) {
-            taskDataSupplierDeclareDto = taskDto.getTaskDataSupplierDeclareDtoList().get(i);
+            dataSupplierDeclareDto = taskDto.getTaskDataSupplierDeclareDtoList().get(i);
             // member_info
-            CommonMessage.TaskOrganizationIdentityInfo taskOrganizationIdentityInfo = CommonMessage.TaskOrganizationIdentityInfo.newBuilder()
-                    .setPartyId("partyId")
-                    .setName("name")
-                    .setNodeId("nodeId")
-                    .setIdentityId("identityId")
+            TaskOrganization dataSupplierOrganization = TaskOrganization.newBuilder()
+                    .setPartyId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getPartyId())
+                    .setNodeName(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getNodeName())
+                    .setNodeId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getNodeId())
+                    .setIdentityId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getIdentityId())
                     .build();
             //meta_data_info
             TaskMetaDataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetaDataDeclare.newBuilder();
-            for (int j = 0; j < taskDataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().size(); j++) {
+            for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().size(); j++) {
                 taskMetaDataDeclareBuilder
-                        .setMetaDataId(taskDataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
-                        .setColumnIndexList(j, taskDataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().get(j));
+                        .setMetaDataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
+                        .setColumnIndexList(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().get(j));
             }
 
             TaskDataSupplierDeclare taskDataSupplierDeclare = TaskDataSupplierDeclare.newBuilder()
-                    .setMemberInfo(taskOrganizationIdentityInfo)
+                    .setMemberInfo(dataSupplierOrganization)
                     .setMetaDataInfo(taskMetaDataDeclareBuilder.build())
                     .build();
 
@@ -308,47 +305,54 @@ public class TaskServiceClient {
         }
 
         //receivers
-        TaskResultReceiverDeclare.Builder taskResultReceiverDeclare;
+        TaskOrganization receiver;
+        OrganizationIdentityInfoDto receiverDto;
         for (int i = 0; i < taskDto.getTaskResultReceiverDeclareDtoList().size(); i++) {
-            taskResultReceiverDeclare = TaskResultReceiverDeclare.newBuilder();
-            TaskResultReceiverDeclareDto taskResultReceiverDeclareDto = taskDto.getTaskResultReceiverDeclareDtoList().get(i);
-            //member_info
-            CommonMessage.TaskOrganizationIdentityInfo taskOrganizationIdentityInfo = CommonMessage.TaskOrganizationIdentityInfo.newBuilder()
-                    .setIdentityId(taskResultReceiverDeclareDto.getMemberInfo().getIdentityId())
-                    .setPartyId(taskResultReceiverDeclareDto.getMemberInfo().getPartyId())
-                    .setName(taskResultReceiverDeclareDto.getMemberInfo().getName())
-                    .setNodeId(taskResultReceiverDeclareDto.getMemberInfo().getNodeId())
+            receiverDto = taskDto.getTaskResultReceiverDeclareDtoList().get(i);
+            receiver = TaskOrganization.newBuilder()
+                    .setPartyId(receiverDto.getPartyId())
+                    .setNodeName(receiverDto.getNodeName())
+                    .setNodeId(receiverDto.getNodeId())
+                    .setIdentityId(receiverDto.getIdentityId())
                     .build();
-            taskResultReceiverDeclare.setMemberInfo(taskOrganizationIdentityInfo);
-
-            //providers
-            for (int j = 0; j < taskResultReceiverDeclareDto.getProviderList().size(); j++) {
-                CommonMessage.TaskOrganizationIdentityInfo provider = CommonMessage.TaskOrganizationIdentityInfo.newBuilder()
-                        .setIdentityId(taskResultReceiverDeclareDto.getProviderList().get(j).getIdentityId())
-                        .setPartyId(taskResultReceiverDeclareDto.getProviderList().get(j).getPartyId())
-                        .setName(taskResultReceiverDeclareDto.getProviderList().get(j).getName())
-                        .setNodeId(taskResultReceiverDeclareDto.getProviderList().get(j).getNodeId())
-                        .build();
-                taskResultReceiverDeclare.setProviders(j, provider);
-            }
-            publishTaskDeclareRequestBuilder.setReceivers(i, taskResultReceiverDeclare);
+            publishTaskDeclareRequestBuilder.setReceivers(i, receiver);
         }
 
-        //operation_cost
-        TaskOperationCostDeclare taskOperationCostDeclare = TaskOperationCostDeclare.newBuilder()
-                .setCostMem(taskDto.getTaskOperationCostDeclareDto().getCostMem())
-                .setCostProcessor(taskDto.getTaskOperationCostDeclareDto().getCostProcessor())
-                .setCostBandwidth(taskDto.getTaskOperationCostDeclareDto().getCostBandwidth())
-                .setDuration(taskDto.getTaskOperationCostDeclareDto().getDuration())
+        //任务所需资源声明
+        TaskResourceCostDeclare resourceCostBuilder = TaskResourceCostDeclare.newBuilder()
+                .setCostMem(taskDto.getResourceCostDeclareDto().getCostMem())
+                .setCostProcessor(taskDto.getResourceCostDeclareDto().getCostProcessor())
+                .setCostBandwidth(taskDto.getResourceCostDeclareDto().getCostBandwidth())
+                .setDuration(taskDto.getResourceCostDeclareDto().getDuration())
                 .build();
-        publishTaskDeclareRequestBuilder.setOperationCost(taskOperationCostDeclare);
-        publishTaskDeclareRequestBuilder.setCalculateContractcode(taskDto.getCalculateContractCode());
-        publishTaskDeclareRequestBuilder.setDatasplitContractcode(taskDto.getDataSplitContractCode());
-        publishTaskDeclareRequestBuilder.setContractExtraParams(taskDto.getContractExtraParams());
+        publishTaskDeclareRequestBuilder.setOperationCost(resourceCostBuilder);
 
+        //  计算合约代码
+        publishTaskDeclareRequestBuilder.setCalculateContractCode(taskDto.getCalculateContractCode());
+        //  数据分片合约代码
+        publishTaskDeclareRequestBuilder.setDataSplitContractCode(taskDto.getDataSplitContractCode());
+        //  合约调用的额外可变入参 (json 字符串, 根据算法来)
+        publishTaskDeclareRequestBuilder.setContractExtraParams(taskDto.getContractExtraParams());
         //发起任务的账户的签名
         publishTaskDeclareRequestBuilder.setSign(ByteString.copyFromUtf8(taskDto.getSign()));
+        //任务描述 (非必须)
+        publishTaskDeclareRequestBuilder.setDesc(taskDto.getDesc());
 
         return publishTaskDeclareRequestBuilder.build();
+    }
+
+    /**
+     * 转换组织信息
+     *
+     * @param org 原组织信息
+     * @return 转换后的dto对象
+     */
+    private OrganizationIdentityInfoDto getOrganizationIdentityInfoDto(TaskOrganization org) {
+        OrganizationIdentityInfoDto owner = new OrganizationIdentityInfoDto();
+        owner.setPartyId(org.getPartyId());
+        owner.setNodeName(org.getNodeName());
+        owner.setNodeId(org.getNodeId());
+        owner.setIdentityId(org.getIdentityId());
+        return owner;
     }
 }

@@ -62,13 +62,13 @@ public class SyncUserDataAuthTask {
             userMetaData = new UserMetaData();
             userMetaData.setMetaDataId(authorityDto.getMetaDataAuthorityDto().getMetaDataId());
             userMetaData.setIdentityId(authorityDto.getMetaDataAuthorityDto().getOwner().getIdentityId());
-            userMetaData.setIdentityName(authorityDto.getMetaDataAuthorityDto().getOwner().getName());
+            userMetaData.setIdentityName(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeName());
             userMetaData.setNodeId(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeId());
 
             userMetaData.setAddress(authorityDto.getUser());
             userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
             //授权次数
-            Long times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();
+            Integer times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();
             if (null != times && times > 0) {
                 userMetaData.setAuthValue(times);
             }

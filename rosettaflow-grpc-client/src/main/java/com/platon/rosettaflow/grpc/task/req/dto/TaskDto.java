@@ -48,12 +48,12 @@ public class TaskDto {
     /**
      * 任务结果接受者
      */
-    private List<TaskResultReceiverDeclareDto> taskResultReceiverDeclareDtoList;
+    private List<OrganizationIdentityInfoDto> taskResultReceiverDeclareDtoList;
 
     /**
      * 任务的所需操作成本 (定义任务的大小)
      */
-    private TaskOperationCostDeclareDto taskOperationCostDeclareDto;
+    private TaskResourceCostDeclareDto resourceCostDeclareDto;
 
     /**
      * 算法代码（python代码）
@@ -71,5 +71,9 @@ public class TaskDto {
      * 发起任务的账户的签名
      */
     private String sign;
+    /**
+     * 任务描述 (非必须)
+     */
+    private String desc;
 
 }

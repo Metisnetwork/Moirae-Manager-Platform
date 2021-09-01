@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.grpc.client;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Empty;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
@@ -22,7 +23,7 @@ import java.util.List;
 
 /**
  * @author admin
- * @date 2021/8/23
+ * @date 2021/9/1
  * @description 身份相关接口
  */
 @Slf4j
@@ -35,46 +36,45 @@ public class AuthServiceClient {
     public ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto) {
         ApplyMetaDataAuthorityRequest.Builder applyMetaDataAuthorityRequest = ApplyMetaDataAuthorityRequest.newBuilder();
 
-        //设置发起任务的用户的信息
+        //1.设置发起任务的用户的信息
         applyMetaDataAuthorityRequest.setUser(requestDto.getUser());
 
-        //设置用户类型
-        applyMetaDataAuthorityRequest.setUserType(CommonMessage.UserType.forNumber(requestDto.getUserType()));
+        //2.设置用户类型
+        applyMetaDataAuthorityRequest.setUserTypeValue(requestDto.getUserType());
 
+        //3.元数据使用授权信息
         MetaDataAuthority.Builder metaDataAuthorityBuilder = MetaDataAuthority.newBuilder();
 
-        //元数据所属用户
-        CommonMessage.OrganizationIdentityInfo owner = CommonMessage.OrganizationIdentityInfo.newBuilder()
+        //3.1元数据所属的组织信息
+        Organization owner = Organization.newBuilder()
                 .setIdentityId(requestDto.getAuth().getOwner().getIdentityId())
-                .setName(requestDto.getAuth().getOwner().getName())
+                .setNodeName(requestDto.getAuth().getOwner().getNodeName())
                 .setNodeId(requestDto.getAuth().getOwner().getNodeId())
                 .build();
+        metaDataAuthorityBuilder.setOwner(owner);
 
-        //元数据怎么使用请求对象
+        // 3.2元数据Id
+        metaDataAuthorityBuilder.setMetaDataId(requestDto.getAuth().getMetaDataId());
+
+        //3.3元数据怎么使用
         MetaDataUsage.Builder metaDataUsageBuilder = MetaDataUsage.newBuilder();
-        metaDataUsageBuilder.setUsageType(MetaDataUsageType.forNumber(requestDto.getAuth().getMetaDataUsageDto().getUseType()));
-        if (requestDto.getUserType() == MetaDataUsageEnum.PERIOD.getValue()) {
-            if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null && requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
+        metaDataUsageBuilder.setUsageTypeValue(requestDto.getAuth().getMetaDataUsageDto().getUseType());
+        if (requestDto.getAuth().getMetaDataUsageDto().getUseType() == MetaDataUsageEnum.PERIOD.getValue()) {
+            if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null || requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
             }
-        } else if (requestDto.getUserType() == MetaDataUsageEnum.TIMES.getValue()) {
+        } else if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == MetaDataUsageEnum.TIMES.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getTimes() == null) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
             }
         }
-
         metaDataUsageBuilder.setStartAt(requestDto.getAuth().getMetaDataUsageDto().getStartAt());
         metaDataUsageBuilder.setEndAt(requestDto.getAuth().getMetaDataUsageDto().getEndAt());
         metaDataUsageBuilder.setTimes(requestDto.getAuth().getMetaDataUsageDto().getTimes().intValue());
-
-        //设置元数据使用授权信息
+        metaDataAuthorityBuilder.setUsage(metaDataUsageBuilder);
         applyMetaDataAuthorityRequest.setAuth(metaDataAuthorityBuilder.build());
 
-        metaDataAuthorityBuilder.setOwner(owner);
-        metaDataAuthorityBuilder.setMetaDataId(requestDto.getAuth().getMetaDataId());
-        metaDataAuthorityBuilder.setUsage(metaDataUsageBuilder.build());
-
-        //设置签名
+        // 4.发起数据授权申请的账户的签名
         applyMetaDataAuthorityRequest.setSign(ByteString.copyFromUtf8(requestDto.getSign()));
 
         ApplyMetaDataAuthorityResponse applyMetaDataAuthorityResponse = authServiceBlockingStub.applyMetaDataAuthority(applyMetaDataAuthorityRequest.build());
@@ -92,13 +92,15 @@ public class AuthServiceClient {
     }
 
     /**
-     * @return 获取元数据审核表列
+     * 获取数据授权申请列表
+     *
+     * @return 获取数据授权申请列表
      */
     public List<GetMetaDataAuthorityDto> getMetaDataAuthorityList() {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
 
-        CommonMessage.EmptyGetParams emptyGetParams = CommonMessage.EmptyGetParams.newBuilder().build();
-        GetMetaDataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getMetaDataAuthorityList(emptyGetParams);
+        Empty empty = Empty.newBuilder().build();
+        GetMetaDataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getMetaDataAuthorityList(empty);
 
         if (getMetaDataAuthorityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(getMetaDataAuthorityListResponse.getStatus(), getMetaDataAuthorityListResponse.getMsg());
@@ -110,14 +112,9 @@ public class AuthServiceClient {
         MetaDataUsageDto metaDataUsageDto;
         for (int i = 0; i < getMetaDataAuthorityListResponse.getListCount(); i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
-            getMetaDataAuthorityDto.setMetaDataAuthId(getMetaDataAuthorityListResponse.getList(i).getMetaDataAuthId());
-            getMetaDataAuthorityDto.setUser(getMetaDataAuthorityListResponse.getList(i).getUser());
-            getMetaDataAuthorityDto.setUserType(getMetaDataAuthorityListResponse.getList(i).getUserTypeValue());
-
-            metaDataAuthorityDto = new MetaDataAuthorityDto();
 
             owner = new NodeIdentityDto();
-            owner.setName(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getName());
+            owner.setNodeName(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeName());
             owner.setNodeId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeId());
             owner.setIdentityId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getIdentityId());
 
@@ -125,18 +122,26 @@ public class AuthServiceClient {
             metaDataUsageDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getUsageTypeValue());
             metaDataUsageDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getStartAt());
             metaDataUsageDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getEndAt());
-            metaDataUsageDto.setTimes((long) getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getTimes());
+            metaDataUsageDto.setTimes(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getTimes());
 
+            metaDataAuthorityDto = new MetaDataAuthorityDto();
             metaDataAuthorityDto.setOwner(owner);
             metaDataAuthorityDto.setMetaDataId(getMetaDataAuthorityListResponse.getList(i).getAuth().getMetaDataId());
             metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageDto);
 
+            //元数据授权申请Id
+            getMetaDataAuthorityDto.setMetaDataAuthId(getMetaDataAuthorityListResponse.getList(i).getMetaDataAuthId());
+            //发起任务的用户的信息 (task是属于用户的)
+            getMetaDataAuthorityDto.setUser(getMetaDataAuthorityListResponse.getList(i).getUser());
+            //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+            getMetaDataAuthorityDto.setUserType((getMetaDataAuthorityListResponse.getList(i).getUserTypeValue()));
+            //元数据使用授权信息
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
-
-            //审核结果
-            getMetaDataAuthorityDto.setAuditMetaDataOption(getMetaDataAuthorityListResponse.getList(i).getAudit().getNumber());
-
+            //审核结果:0-等待审核中 1-审核通过 2-审核拒绝
+            getMetaDataAuthorityDto.setAuditMetaDataOption(getMetaDataAuthorityListResponse.getList(i).getAuditValue());
+            //发起授权申请的时间 (单位: ms)
             getMetaDataAuthorityDto.setApplyAt(getMetaDataAuthorityListResponse.getList(i).getApplyAt());
+            //审核授权申请的时间 (单位: ms)
             getMetaDataAuthorityDto.setAuditAt(getMetaDataAuthorityListResponse.getList(i).getAuditAt());
 
             getMetaDataAuthorityDtoList.add(getMetaDataAuthorityDto);
@@ -150,15 +155,14 @@ public class AuthServiceClient {
      * @return 返回组织信息
      */
     public NodeIdentityDto getNodeIdentity() {
-        CommonMessage.EmptyGetParams emptyGetParams = CommonMessage.EmptyGetParams.newBuilder().build();
-        GetNodeIdentityResponse nodeIdentity = authServiceBlockingStub.getNodeIdentity(emptyGetParams);
+        Empty empty = Empty.newBuilder().build();
+        GetNodeIdentityResponse nodeIdentity = authServiceBlockingStub.getNodeIdentity(empty);
 
         if (nodeIdentity.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(nodeIdentity.getStatus(), nodeIdentity.getMsg());
         }
 
         NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
-        nodeIdentityDto.setName(nodeIdentity.getOwner().getName());
         nodeIdentityDto.setNodeId(nodeIdentity.getOwner().getNodeId());
         nodeIdentityDto.setIdentityId(nodeIdentity.getOwner().getIdentityId());
 

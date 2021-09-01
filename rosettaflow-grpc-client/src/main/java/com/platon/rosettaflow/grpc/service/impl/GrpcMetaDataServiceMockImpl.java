@@ -34,7 +34,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
         for (int i = 0; i < 10; i++) {
             MetaDataDetailResponseDto metaData = new MetaDataDetailResponseDto();
             NodeIdentityDto identityDto = new NodeIdentityDto();
-            identityDto.setName("hudenian" + i);
+            identityDto.setNodeName("hudenian" + i);
             identityDto.setNodeId("nodeId" + i);
             identityDto.setIdentityId("identityId" + i);
 
@@ -48,10 +48,10 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
             metaDataSummaryDto.setRows(i);
             metaDataSummaryDto.setColumns(i);
             metaDataSummaryDto.setSize(i);
-            metaDataSummaryDto.setFileType("csv");
+            metaDataSummaryDto.setFileType(1);
             metaDataSummaryDto.setHasTitle(true);
             metaDataSummaryDto.setIndustry("计算机");
-            metaDataSummaryDto.setState("release");
+            metaDataSummaryDto.setState(1);
 
             metaDataDetailDto.setMetaDataSummary(metaDataSummaryDto);
 
