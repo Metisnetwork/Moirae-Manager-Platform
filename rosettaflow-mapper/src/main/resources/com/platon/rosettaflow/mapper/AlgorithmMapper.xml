@@ -60,7 +60,7 @@
         a.cost_gpu as costGpu,
         a.cost_bandwidth as costBandwidth,
         a.run_time as runTime,
-        b.edit_type as editType
+        b.edit_type as editType,
         b.calculate_contract_code as algorithmCode
     from
         t_algorithm a, t_algorithm_code b

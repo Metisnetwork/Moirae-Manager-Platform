@@ -1,19 +1,21 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.platon.rosettaflow.req.workflow.*;
-import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
+import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
-import com.platon.rosettaflow.vo.workflow.TaskEventVo;
-import com.platon.rosettaflow.vo.workflow.WorkflowDetailVo;
-import com.platon.rosettaflow.vo.workflow.WorkflowVo;
+import com.platon.rosettaflow.vo.workflow.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,80 +47,69 @@ public class WorkflowController {
     private GrpcTaskService grpcTaskService;
 
     @GetMapping("list")
-    @ApiOperation(value = "工作流列表", notes = "工作流列表")
-    public ResponseVo<PageVo<WorkflowVo>> list(@Valid ListWorkflowReq listWorkflowReq) {
-        WorkflowDto workflowDto = new WorkflowDto();
-        BeanCopierUtils.copy(listWorkflowReq, workflowDto);
-        IPage<WorkflowDto> servicePage = workflowService.list(workflowDto, listWorkflowReq.getCurrent(), listWorkflowReq.getSize());
-        return convertToWorkflowVo(servicePage);
+    @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
+    public ResponseVo<PageVo<WorkflowVo>> list(@Valid ListWorkflowReq listReq) {
+        IPage<WorkflowDto> page = workflowService.queryWorkFlowList(listReq.getProjectId(),
+                listReq.getWorkflowName(), listReq.getCurrent(), listReq.getSize());
+        List<WorkflowVo> items = BeanUtil.copyToList(page.getRecords(), WorkflowVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, items));
     }
 
     @GetMapping(value = "detail/{id}")
     @ApiOperation(value = "获取工作流详情", notes = "获取工作流详情")
     public ResponseVo<WorkflowDetailVo> detail(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id) {
-        WorkflowDto workflowDto = workflowService.detail(id);
-        WorkflowDetailVo vo = new WorkflowDetailVo();
-        return convertToWorkflowVo(workflowDto);
+        WorkflowDto workflowDto = workflowService.queryWorkflowDetail(id);
+        return ResponseVo.createSuccess(convertToWorkflowVo(workflowDto));
     }
-
-    private ResponseVo<PageVo<WorkflowVo>> convertToWorkflowVo(IPage<WorkflowDto> servicePage) {
-        List<WorkflowVo> items = new ArrayList<>();
-        servicePage.getRecords().forEach(dto -> {
-            WorkflowVo vo = new WorkflowVo();
-            BeanCopierUtils.copy(dto, vo);
-            items.add(vo);
-        });
-
-        PageVo<WorkflowVo> pageVo = new PageVo<>();
-        pageVo.setCurrent(servicePage.getCurrent());
-        pageVo.setItems(items);
-        pageVo.setSize(servicePage.getSize());
-        pageVo.setTotal(servicePage.getTotal());
-        return ResponseVo.createSuccess(pageVo);
-    }
-
-    private ResponseVo<WorkflowDetailVo> convertToWorkflowVo(WorkflowDto workflowDto) {
-        WorkflowDetailVo vo = new WorkflowDetailVo();
-        //TODO
-        return ResponseVo.createSuccess(vo);
+    /** 转换响应参数 */
+    private WorkflowDetailVo convertToWorkflowVo(WorkflowDto workflowDto) {
+        WorkflowDetailVo workflowDetailVo = BeanUtil.toBean(workflowDto, WorkflowDetailVo.class);
+        List<WorkflowNodeDto> workflowNodeDtoList = workflowDto.getWorkflowNodeDtoList();
+        List<WorkflowNodeVo> workflowNodeVoList = new ArrayList<>();
+        if (workflowNodeDtoList != null && workflowNodeDtoList.size() > 0) {
+            for(WorkflowNodeDto nodeDto: workflowNodeDtoList){
+                WorkflowNodeVo workflowNodeVo = BeanUtil.toBean(nodeDto, WorkflowNodeVo.class);
+                // 输入参数转换
+                List<WorkflowNodeInput> nodeInputList = nodeDto.getWorkflowNodeInputList();
+                workflowNodeVo.setWorkflowNodeInputVoList(BeanUtil.copyToList(nodeInputList, WorkflowNodeInputVo.class));
+                // 输出参数转换
+                List<WorkflowNodeOutput> nodeOutputList = nodeDto.getWorkflowNodeOutputList();
+                workflowNodeVo.setWorkflowNodeOutputVoList(BeanUtil.copyToList(nodeOutputList, WorkflowNodeOutputVo.class));
+                // 节点资源转换
+                WorkflowNodeResource nodeResource = nodeDto.getWorkflowNodeResource();
+                workflowNodeVo.setWorkflowNodeResourceVo(BeanUtil.toBean(nodeResource, WorkflowNodeResourceVo.class));
+                workflowNodeVoList.add(workflowNodeVo);
+            }
+        }
+        workflowDetailVo.setWorkflowNodeVoList(workflowNodeVoList);
+        return workflowDetailVo;
     }
 
     @PostMapping("add")
     @ApiOperation(value = "添加工作流", notes = "添加工作流")
-    public ResponseVo<?> add(@RequestBody @Validated AddWorkflowReq addWorkflowReq) {
-        WorkflowDto workflowDto = new WorkflowDto();
-        workflowDto.setWorkflowName(addWorkflowReq.getWorkflowName());
-        workflowDto.setWorkflowDesc(addWorkflowReq.getWorkflowDesc());
-        workflowService.add(workflowDto);
+    public ResponseVo<?> add(@RequestBody @Validated AddWorkflowReq addReq) {
+        workflowService.addWorkflow(addReq.getProjectId(), addReq.getWorkflowName(), addReq.getWorkflowDesc());
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("edit")
     @ApiOperation(value = "编辑工作流", notes = "编辑工作流")
-    public ResponseVo<?> edit(@RequestBody @Validated EditWorkflowReq editWorkflowReq) {
-        WorkflowDto workflowDto = new WorkflowDto();
-        workflowDto.setId(editWorkflowReq.getId());
-        workflowDto.setWorkflowName(editWorkflowReq.getWorkflowName());
-        workflowDto.setWorkflowDesc(editWorkflowReq.getWorkflowDesc());
-        workflowService.edit(workflowDto);
-        return ResponseVo.createSuccess();
-    }
-
-    @PostMapping("copy")
-    @ApiOperation(value = "复制工作流", notes = "复制工作流")
-    public ResponseVo<?> copy(@RequestBody @Validated CopyWorkflowReq copyWorkflowReq) {
-        WorkflowDto workflowDto = new WorkflowDto();
-        workflowDto.setId(copyWorkflowReq.getOriginId());
-        workflowDto.setWorkflowName(copyWorkflowReq.getWorkflowName());
-        workflowDto.setWorkflowDesc(copyWorkflowReq.getWorkflowDesc());
-        workflowService.copy(workflowDto);
+    public ResponseVo<?> edit(@RequestBody @Validated EditWorkflowReq editReq) {
+        workflowService.editWorkflow(editReq.getId(), editReq.getWorkflowName(), editReq.getWorkflowDesc());
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("delete/{id}")
     @ApiOperation(value = "删除工作流", notes = "删除工作流")
     public ResponseVo<?> delete(@ApiParam(value = "工作流表ID", required = true) @PathVariable Long id) {
-        workflowService.delete(id);
+        workflowService.deleteWorkflow(id);
+        return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("copy")
+    @ApiOperation(value = "复制工作流", notes = "复制工作流")
+    public ResponseVo<?> copy(@RequestBody @Validated CopyWorkflowReq copyReq) {
+        workflowService.copyWorkflow(copyReq.getOriginId(), copyReq.getWorkflowName(), copyReq.getWorkflowDesc());
         return ResponseVo.createSuccess();
     }
 

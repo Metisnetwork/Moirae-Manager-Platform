@@ -19,19 +19,22 @@ import javax.validation.constraints.Positive;
 public class ListWorkflowReq {
 
     @ApiModelProperty(value = "项目ID", required = true)
-    @NotNull(message = "项目ID不能为空")
-    @Positive(message = "项目ID不能小于等于0")
+    @NotNull(message = "{project.id.notNull}")
     private Long projectId;
-
-    @ApiModelProperty(value = "当前页码, 默认第一页")
-    @Positive(message = "页码不能小于等于0")
-    private Long current = 1L;
-
-    @ApiModelProperty(value = "每页大小, 默认每页十条. 最小支持每页1条, 最大支持每页1000条")
-    @Min(value = 1L, message = "每页大小不能小于1")
-    @Max(value = 1000L, message = "每页大小不能超过1000")
-    private Long size = 10L;
 
     @ApiModelProperty(value = "工作流名称")
     private String workflowName;
+
+    @ApiModelProperty(value = "当前页码, 默认第一页")
+    @NotNull(message = "{page.number.notBlank}")
+    @Positive(message = "{page.number.positive}")
+    private Long current;
+
+    @ApiModelProperty(value = "每页大小, 默认每页十条. 最小支持每页1条, 最大支持每页1000条")
+    @NotNull(message = "{page.number.notBlank}")
+    @Min(value = 1L, message = "{each.page.row.min}")
+    @Max(value = 1000L, message = "{each.page.row.max}")
+    private Long size;
+
+
 }

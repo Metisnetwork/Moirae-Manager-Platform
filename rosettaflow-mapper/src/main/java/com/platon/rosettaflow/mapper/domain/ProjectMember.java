@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -39,6 +40,7 @@ public class ProjectMember implements Serializable {
     /**
      * 状态: 0-无效，1- 有效
      */
+    @TableLogic
     private Byte status;
 
     /**

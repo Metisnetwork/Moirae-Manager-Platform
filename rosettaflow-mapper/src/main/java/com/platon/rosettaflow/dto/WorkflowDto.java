@@ -14,6 +14,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class WorkflowDto extends Workflow {
+
+    /** 创建者 */
+    private String userName;
+
     /**
      * 起始节点
      */
@@ -22,18 +26,11 @@ public class WorkflowDto extends Workflow {
      * 截止节点
      */
     private Integer endNode;
+
     /**
      * 是否是job任务
      */
     private boolean jobFlg;
-    /**
-     * 创建者
-     */
-    private String userName;
-    /**
-     * 项目协同方
-     */
-    private String coordinators;
 
     /**
      * 工作流节点列表

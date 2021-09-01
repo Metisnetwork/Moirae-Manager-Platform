@@ -5,6 +5,8 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
@@ -12,6 +14,7 @@ import lombok.Data;
  * @author 
  */
 @Data
+@TableName(value = "t_project_temp")
 public class ProjectTemp implements Serializable {
     /**
      * 项目模板表ID(自增长)
@@ -32,7 +35,8 @@ public class ProjectTemp implements Serializable {
     /**
      * 状态: 0-无效，1- 有效
      */
-    private Byte status;
+    @TableLogic
+    private Integer status;
 
     /**
      * 创建时间

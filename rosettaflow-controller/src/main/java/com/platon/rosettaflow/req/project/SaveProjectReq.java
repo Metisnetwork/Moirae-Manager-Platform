@@ -19,7 +19,7 @@ public class SaveProjectReq {
     private Long id;
 
     @ApiModelProperty(value = "用户id(创建者id)", required = true)
-    @NotBlank(message = "{user.id.notBlank}")
+    @NotNull(message = "{user.id.notBlank}")
     private Long userId;
 
     @ApiModelProperty(value = "项目名称", required = true)

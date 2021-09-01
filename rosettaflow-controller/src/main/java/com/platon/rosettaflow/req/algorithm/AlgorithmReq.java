@@ -22,18 +22,18 @@ public class AlgorithmReq {
     private Long id;
 
     @ApiModelProperty(value = "算法名称", example = "名称", required = true)
-    @NotBlank(message = "{algorithm.name.notBlank}")
+    @NotBlank(message = "{algorithm.name.notNull}")
     private String algorithmName;
 
     @ApiModelProperty(value = "算法描述", example = "描述")
     private String algorithmDesc;
 
     @ApiModelProperty(value = "支持协同方最大数量", example = "2", required = true)
-    @NotNull(message = "{support.partner.max.number.notBlank}")
+    @NotNull(message = "{support.partner.max.number.notNull}")
     private Long maxNumbers;
 
     @ApiModelProperty(value = "支持协同方最小数量", example = "3", required = true)
-    @NotNull(message = "{support.partner.min.number.notBlank}")
+    @NotNull(message = "{support.partner.min.number.notNull}")
     private Long minNumbers;
 
     @ApiModelProperty(value = "支持语言,多个以','进行分隔")
@@ -43,7 +43,7 @@ public class AlgorithmReq {
     private String supportOsSystem;
 
     @ApiModelProperty(value = "算法所属大类:1-统计分析,2-特征工程,3-机器学习", example = "1")
-    @NotNull(message = "{algorithm.reside.type.notBlank}")
+    @NotNull(message = "{algorithm.reside.type.notNull}")
     private Byte algorithmType;
 
     @ApiModelProperty(value = "所需的内存 (单位: byte)", example = "2000")

@@ -34,9 +34,6 @@ public class WorkflowDetailVo {
     @ApiModelProperty(value = "运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败")
     private Byte runStatus;
 
-    @ApiModelProperty(value = "状态: 0-无效，1- 有效")
-    private Byte status;
-
     @ApiModelProperty(value = "节点数")
     private Integer nodeNumber;
 

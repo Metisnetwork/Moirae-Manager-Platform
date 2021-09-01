@@ -19,18 +19,17 @@ import javax.validation.constraints.Positive;
 public class CopyWorkflowReq {
 
     @ApiModelProperty(value = "原工作流ID", required = true)
-    @NotNull(message = "原工作流ID不能为空")
-    @Positive(message = "原工作流ID错误")
+    @NotNull(message = "{workflow.id.notNull}")
+    @Positive(message = "{workflow.id.positive}")
     private Long originId;
 
     @ApiModelProperty(value = "工作流名称", required = true)
-    @NotBlank(message = "工作流名称不能为空")
-    @Length(max = 30, message = "工作流名称不能大于30个字符")
+    @NotBlank(message = "{workflow.name.notBlank}")
+    @Length(max = 30, message = "{workflow.name.Length}")
     private String workflowName;
 
     @ApiModelProperty(value = "工作流描述", required = true)
-    @NotBlank(message = "工作流描述不能为空")
-    @Length(max = 50, message = "工作流描述不能大于50个字符")
+    @Length(max = 50, message = "{workflow.desc.Length}}")
     private String workflowDesc;
 
 }
