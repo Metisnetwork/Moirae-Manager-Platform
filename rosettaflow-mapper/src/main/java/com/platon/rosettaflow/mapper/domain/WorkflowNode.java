@@ -1,9 +1,6 @@
 package com.platon.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -42,6 +39,7 @@ public class WorkflowNode implements Serializable {
     /**
      * 下一个节点在工作流中序号,如果没有下个节点则为空
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED )
     private Integer nextNodeStep;
     /**
      * 运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败

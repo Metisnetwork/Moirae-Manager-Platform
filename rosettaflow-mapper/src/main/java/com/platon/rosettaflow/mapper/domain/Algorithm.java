@@ -85,7 +85,7 @@ public class Algorithm implements Serializable {
     /**
      * 所需的运行时长 (单位: ms)
      */
-    private Long duration;
+    private Long runTime;
 
     /**
      * 状态: 0-无效，1- 有效

@@ -5,16 +5,16 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="cost_mem" jdbcType="BIGINT" property="costMem"/>
-        <result column="cost_processor" jdbcType="BIGINT" property="costProcessor"/>
+        <result column="cost_cpu" jdbcType="INTEGER" property="costCpu"/>
         <result column="cost_gpu" jdbcType="INTEGER" property="costGpu"/>
         <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth"/>
-        <result column="duration" jdbcType="BIGINT" property="duration"/>
+        <result column="run_time" jdbcType="BIGINT" property="runTime"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, workflow_node_id, cost_mem, cost_processor, cost_gpu, cost_bandwidth, duration, 
+    id, workflow_node_id, cost_mem, cost_cpu, cost_gpu, cost_bandwidth, run_time,
     `status`, create_time, update_time
   </sql>
 </mapper>

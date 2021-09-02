@@ -79,7 +79,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 获取工作流
         WorkflowDto workflowDto = BeanUtil.toBean(this.getById(id), WorkflowDto.class);
         // 获取工作流节点列表
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getByWorkflowId(id);
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(id);
         if (workflowNodeList == null || workflowNodeList.size() == 0) {
             return workflowDto;
         }
@@ -338,7 +338,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskOperationCostDeclareDto.setCostMem(workflowNodeResource.getCostMem());
 //        taskOperationCostDeclareDto.setCostProcessor(workflowNodeResource.getCostProcessor());
         taskOperationCostDeclareDto.setCostBandwidth(workflowNodeResource.getCostBandwidth());
-        taskOperationCostDeclareDto.setDuration(workflowNodeResource.getDuration());
+        taskOperationCostDeclareDto.setDuration(workflowNodeResource.getRunTime());
 //        taskDto.setTaskOperationCostDeclareDto(taskOperationCostDeclareDto);
 
         //算法代码（python代码）

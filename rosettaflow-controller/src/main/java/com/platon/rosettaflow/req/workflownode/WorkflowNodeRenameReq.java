@@ -10,26 +10,21 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
+ * 重命名工作流节点名称请求对象
  * @author hudenian
  * @date 2021/8/27
- * @description 修改工作流节点名称请求对象
  */
 @Data
-@ApiModel
+@ApiModel(value = "重命名工作流节点名称请求对象")
 public class WorkflowNodeRenameReq {
 
-    @ApiModelProperty(value = "工作流ID", required = true)
-    @NotNull(message = "{workflow.id.notNull}")
-    @Positive(message = "{workflow.id.positive}")
-    private Long workflowId;
+    @ApiModelProperty(value = "工作流节点ID", required = true)
+    @NotNull(message = "{workflow.node.id.notNull}")
+    @Positive(message = "{workflow.node.id.positive}")
+    private Long nodeId;
 
     @ApiModelProperty(value = "工作流节点名称",required = true)
-    @NotBlank(message = "工作流节点名称不能为空")
+    @NotBlank(message = "{workflow.node.name.NotBlank}")
     private String nodeName;
-
-    @ApiModelProperty(value = " 节点在工作流中序号,从1开始", required = true)
-    @NotNull(message = " 节点在工作流中序号不能为空")
-    @Positive(message = " 节点在工作流中序号错误")
-    private Integer nodeStep;
 
 }
