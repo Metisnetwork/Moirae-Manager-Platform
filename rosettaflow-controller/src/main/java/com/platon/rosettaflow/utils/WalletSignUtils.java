@@ -1,19 +1,18 @@
 package com.platon.rosettaflow.utils;
 
-import com.platone.sdk.utlis.Bech32;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
+import org.web3j.crypto.StructuredDataEncoder;
 import org.web3j.utils.Numeric;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 import java.util.Arrays;
-
-import static com.platon.rosettaflow.utils.AddressChangeUtils.convertBits;
+import java.util.Map;
 
 /**
  * @author hudenian
@@ -61,16 +60,52 @@ public class WalletSignUtils {
         return Numeric.cleanHexPrefix(address).equals(Numeric.cleanHexPrefix(tmpAddress));
     }
 
+    /**
+     * 验证Sign Typed Data v4 的签名
+     *
+     * @param jsonMessage json格式签名明文
+     * @param signMsg     签名数据
+     * @param address     钱包地址
+     * @return 是否成功标识
+     */
+    public static boolean verifyTypedDataV4(String jsonMessage, String signMsg, String address) throws IOException {
+        StructuredDataEncoder dataEncoder = new StructuredDataEncoder(jsonMessage);
+        Map<Integer, String> addresses = CryptoUtils.ecrecover(signMsg, dataEncoder.hashStructuredData());
+        return addresses.toString().contains(address.toLowerCase());
+    }
+
     public static void main(String[] args) {
         try {
-            Credentials credentials = Credentials.create("b4b282bf890abfc11e9b1832a2735f4c77fb3267978723034f84beb4e71fdf79");
-            String address = credentials.getAddress();
-            address = DataChangeUtils.bytesToHex(Bech32.addressDecode(address));
-            System.out.println("钱包地址为>>>" + address);
-            String signStr = sign(address, credentials.getEcKeyPair());
-            System.out.println("钱包地址签名后的内容为>>>" + signStr);
-
-            System.out.println("验证签名的结果为>>>" + verifySign(address, signStr, address));
+            System.out.println("验证签名结果>>>" + verifyTypedDataV4("{\n" +
+                            "    \"domain\": {\n" +
+                            "        \"name\": \"Moirae\"\n" +
+                            "    },\n" +
+                            "    \"message\": {\n" +
+                            "        \"key\": \"uuid\",\n" +
+                            "        \"desc\": \"Login to Moirae\"\n" +
+                            "    },\n" +
+                            "    \"primaryType\": \"Login\",\n" +
+                            "    \"types\": {\n" +
+                            "        \"EIP712Domain\": [\n" +
+                            "            {\n" +
+                            "                \"name\": \"name\",\n" +
+                            "                \"type\": \"string\"\n" +
+                            "            }\n" +
+                            "        ],\n" +
+                            "        \"Login\": [\n" +
+                            "            {\n" +
+                            "                \"name\": \"key\",\n" +
+                            "                \"type\": \"string\"\n" +
+                            "            },\n" +
+                            "            {\n" +
+                            "                \"name\": \"desc\",\n" +
+                            "                \"type\": \"string\"\n" +
+                            "            }\n" +
+                            "        ]\n" +
+                            "    }\n" +
+                            "}",
+                    "0xb231d71fd53950d6473373a0eeff7591810b20cf437208c26e3286cfefd03de625a653e9f73e01d67e60efb55ce477cb8f6754ae731a2e8652278f16fd3f2c741b",
+                    "0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20"));
 
         } catch (Exception e) {
             e.printStackTrace();
