@@ -14,10 +14,10 @@
         <result column="rows" jdbcType="INTEGER" property="rows"/>
         <result column="columns" jdbcType="INTEGER" property="columns"/>
         <result column="size" jdbcType="BIGINT" property="size"/>
-        <result column="file_type" jdbcType="VARCHAR" property="fileType"/>
+        <result column="file_type" jdbcType="TINYINT" property="fileType"/>
         <result column="has_title" jdbcType="TINYINT" property="hasTitle"/>
         <result column="industry" jdbcType="VARCHAR" property="industry"/>
-        <result column="data_status" jdbcType="VARCHAR" property="dataStatus"/>
+        <result column="data_status" jdbcType="TINYINT" property="dataStatus"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
@@ -30,4 +30,20 @@
     <update id="truncate">
         TRUNCATE TABLE t_meta_data
     </update>
+
+
+    <resultMap id="BaseResultMap_With_Auth" type="com.platon.rosettaflow.dto.MetaDataDto" extends="BaseResultMap">
+        <result column="auth_status" property="authStatus" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <select id="selectMetaDataWithAuth" resultMap="BaseResultMap_With_Auth">
+        SELECT
+            tmd.*, tumd.auth_status
+        FROM
+            t_meta_data AS tmd
+            LEFT JOIN t_user_meta_data AS tumd ON tmd.meta_data_id = tumd.meta_data_id
+        WHERE
+            tumd.address = #{address, jdbcType=VARCHAR}
+    </select>
+
 </mapper>

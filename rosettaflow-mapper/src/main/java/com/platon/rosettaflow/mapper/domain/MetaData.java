@@ -68,9 +68,9 @@ public class MetaData implements Serializable {
      */
     private Long size;
     /**
-     * 源文件的类型 (目前只有 csv)
+     * 源文件类型: 0-未知，1- CSV类型
      */
-    private Integer fileType;
+    private Byte fileType;
     /**
      * 是否带标题,0表示不带，1表示带标题
      */
@@ -80,9 +80,9 @@ public class MetaData implements Serializable {
      */
     private String industry;
     /**
-     * 元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)
+     * 元数据的状态 (1- 还未发布的新表; 2- 已发布的表; 3- 已撤销的表)
      */
-    private Integer dataStatus;
+    private Byte dataStatus;
     /**
      * 状态: 0-无效，1- 有效
      */

@@ -6,17 +6,23 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.MetaDataStateEnum;
 import com.platon.rosettaflow.common.enums.MetaDataStatusEnum;
+import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.mapper.MetaDataMapper;
 import com.platon.rosettaflow.mapper.domain.MetaData;
+import com.platon.rosettaflow.mapper.domain.UserMetaData;
 import com.platon.rosettaflow.service.IMetaDataService;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author hudenian
@@ -36,12 +42,13 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     public IPage<MetaDataDto> list(Long current, Long size, String dataName) {
         Page<MetaData> page = new Page<>(current, size);
         LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(MetaData::getDataStatus, MetaDataStatusEnum.RELEASE.getValue());
+        wrapper.eq(MetaData::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
         if (StrUtil.isNotBlank(dataName)) {
             wrapper.like(MetaData::getDataName, dataName);
         }
         this.page(page, wrapper);
-        return this.convertToPageDto(page);
+        List<MetaDataDto> metaDataWithAuthList = baseMapper.selectMetaDataWithAuth(UserContext.get().getAddress());
+        return this.convertToPageDto(page,metaDataWithAuthList);
     }
 
     @Override
@@ -52,11 +59,16 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         return metaDataDto;
     }
 
-    IPage<MetaDataDto> convertToPageDto(Page<?> page) {
+    IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<MetaDataDto> metaDataWithAuthList) {
         List<MetaDataDto> records = new ArrayList<>();
+        Map<String,Byte> authMap = new HashMap<>(metaDataWithAuthList.size());
+        for (MetaDataDto dataAuth :metaDataWithAuthList) {
+            authMap.put(dataAuth.getMetaDataId(),dataAuth.getAuthStatus());
+        }
         page.getRecords().forEach(r -> {
             MetaDataDto m = new MetaDataDto();
             BeanCopierUtils.copy(r, m);
+            m.setAuthStatus(authMap.containsKey(r.getMetaDataId()) ? authMap.get(r.getMetaDataId()) : UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
             records.add(m);
         });
 
