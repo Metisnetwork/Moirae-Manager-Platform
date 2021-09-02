@@ -16,7 +16,6 @@ import com.platon.rosettaflow.vo.project.ProjMemberListVo;
 import com.platon.rosettaflow.vo.project.ProjTempListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjectListVo;
-import com.platon.rosettaflow.vo.workflow.WorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
