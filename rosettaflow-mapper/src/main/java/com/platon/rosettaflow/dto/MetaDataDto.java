@@ -14,5 +14,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class MetaDataDto extends MetaData {
 
+    /**
+     * 授权状态:-1未知(未发起过数据授权申请) 0-等待审核中, 1-审核通过, 2-审核拒绝
+     */
+    Byte authStatus;
+
     IPage<MetaDataDetailsDto> metaDataDetailsDtoPageList;
 }

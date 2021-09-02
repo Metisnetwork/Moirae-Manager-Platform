@@ -6,6 +6,11 @@ package com.platon.rosettaflow.common.enums;
  * @description 用户元数据审核状态枚举
  */
 public enum UserMetaDataAuditEnum {
+
+    /**
+     * 未知
+     */
+    AUDIT_UNKNOWN((byte) -1),
     /**
      * 等待审核中
      */
