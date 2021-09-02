@@ -16,16 +16,16 @@ import javax.validation.constraints.NotNull;
 public class ProjMemberReq {
 
     @ApiModelProperty(value = "项目ID", required = true)
-    @NotNull(message = "{project.id.notBlank}")
+    @NotNull(message = "{project.id.NotNull}")
     private Long projectId;
 
     @ApiModelProperty(value = "用户ID")
-    @NotBlank(message = "{user.id.notBlank}")
-    private String userId;
+    @NotNull(message = "{user.id.NotNull}")
+    private Long userId;
 
-    @ApiModelProperty(value = "用户ID")
-    @NotBlank(message = "{project.member.role.notBlank}")
-    private String role;
+    @ApiModelProperty(value = "用户成员角色")
+    @NotNull(message = "{project.member.role.NotNull}")
+    private Integer role;
 
 
 }

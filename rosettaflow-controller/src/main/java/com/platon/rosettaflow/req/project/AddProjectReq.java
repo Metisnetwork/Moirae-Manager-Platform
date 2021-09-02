@@ -5,18 +5,14 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
- * 保存项目信息请求参数
+ * 添加项目请求参数
  * @author houz
  */
 @Data
-@ApiModel(value = "保存项目信息请求参数")
-public class SaveProjectReq {
-
-    @ApiModelProperty(value = "项目ID(自增长)")
-    private Long id;
+@ApiModel(value = "添加项目请求参数")
+public class AddProjectReq {
 
     @ApiModelProperty(value = "项目名称", required = true)
     @NotBlank(message = "{project.name.notBlank}")

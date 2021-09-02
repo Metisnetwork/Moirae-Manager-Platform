@@ -51,6 +51,12 @@ public interface IProjectService extends IService<Project> {
     void deleteProject(Long id);
 
     /**
+     * 批量删除项目
+     * @param ids 项目id
+     */
+    void deleteProjectBatch(String ids);
+
+    /**
      * 查询项目模板列表
      * @return
      */
@@ -84,5 +90,12 @@ public interface IProjectService extends IService<Project> {
      * @return
      */
     void deleteProjMember(Long projMemberId);
+
+    /**
+     * 批量删除项目成员
+     * @param projMemberIds 项目成员id
+     * @return
+     */
+    void deleteProjMemberBatch(String projMemberIds);
 
 }

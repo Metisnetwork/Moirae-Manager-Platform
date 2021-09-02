@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 public class ProjDetailsReq {
 
     @ApiModelProperty(value = "项目ID", required = true)
-    @NotNull(message = "项目ID不能为空")
+    @NotNull(message = "project.id.notNull")
     private Long id;
 
 }

@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 public class DeleteMemberReq {
 
     @ApiModelProperty(value = "项目成员ID", required = true)
-    @NotNull(message = "{project.member.id.notBlank}")
-    private Long memberId;
+    @NotNull(message = "{project.member.id.notNull}")
+    private Long projMemberId;
 
 }

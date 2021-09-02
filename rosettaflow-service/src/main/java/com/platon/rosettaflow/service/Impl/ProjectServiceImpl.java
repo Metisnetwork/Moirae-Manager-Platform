@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author admin
@@ -105,6 +108,26 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void deleteProjectBatch(String ids) {
+        // 转换id类型
+        List<Long> idsList = convertIdType(ids);
+        // 删除项目成员
+        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(ProjectMember::getProjectId, idsList);
+        List<ProjectMember> projectMemberList = projectMemberMapper.selectList(queryWrapper);
+        List<Long> memberIdsList = new ArrayList<>();
+        if (projectMemberList != null && projectMemberList.size() > 0) {
+            for (ProjectMember projectMember : projectMemberList) {
+                memberIdsList.add(projectMember.getId());
+            }
+            projectMemberMapper.deleteBatchIds(memberIdsList);
+        }
+        // 删除项目信息
+        this.removeByIds(idsList);
+    }
+
+    @Override
     public List<ProjectTemp> queryProjectTempList() {
         return projectTempMapper.selectList(null);
     }
@@ -128,5 +151,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void deleteProjMember(Long  projMemberId) {
         projectMemberMapper.deleteById(projMemberId);
+    }
+
+    @Override
+    public void deleteProjMemberBatch(String  projMemberIds) {
+        projectMemberMapper.deleteBatchIds(convertIdType(projMemberIds));
+    }
+
+    /** 转换id类型 */
+    private List<Long> convertIdType(String ids){
+        String[] idsArr = ids.split(",");
+        return Arrays.stream(idsArr).map(id ->Long.parseLong(id.trim())).collect(Collectors.toList());
     }
 }
