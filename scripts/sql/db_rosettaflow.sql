@@ -69,27 +69,27 @@ CREATE TABLE `t_login_log` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_meta_data`;
 CREATE TABLE `t_meta_data` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '元数据表ID(自增长)',
-    `identity_id` varchar(128) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
-    `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
-    `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
-    `meta_data_id` varchar(128) DEFAULT NULL COMMENT '元数据id',
-    `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
-    `data_name` varchar(128) NOT NULL COMMENT '元数据名称|数据名称 (表名)',
-    `data_desc` varchar(128) NOT NULL COMMENT '元数据的描述 (摘要)',
-    `file_path` varchar(128) NOT NULL COMMENT '源文件存放路径',
-    `rows` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的行数',
-    `columns` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的列数',
-    `size` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的大小 (单位: byte)',
-    `file_type` varchar(20) NOT NULL COMMENT '源文件的类型 (目前只有 csv)',
-    `has_title` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否带标题,0表示不带，1表示带标题',
-    `industry` varchar(20) DEFAULT NULL COMMENT '元数据所属行业',
-    `data_status`  varchar(20)  NOT NULL DEFAULT 0 COMMENT '元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)',
-    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='元数据表';
+   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户数据表ID(自增长)',
+   `identity_id` varchar(128) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
+   `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
+   `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
+   `meta_data_id` varchar(128) DEFAULT NULL COMMENT '元数据id',
+   `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
+   `data_name` varchar(128) NOT NULL COMMENT '元数据名称|数据名称 (表名)',
+   `data_desc` varchar(128) NOT NULL COMMENT '元数据的描述 (摘要)',
+   `file_path` varchar(128) NOT NULL COMMENT '源文件存放路径',
+   `rows` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的行数',
+   `columns` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的列数',
+   `size` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的大小 (单位: byte)',
+   `file_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '源文件的类型: 0-未知，1- CSV类型',
+   `has_title` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否带标题,0表示不带，1表示带标题',
+   `industry` varchar(20) DEFAULT NULL COMMENT '元数据所属行业',
+   `data_status` varchar(20) NOT NULL DEFAULT '0' COMMENT '元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)',
+   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COMMENT='元数据表';
 
 -- ----------------------------
 -- Table structure for `t_meta_data_details`
