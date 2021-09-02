@@ -45,6 +45,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void addProject(Project project) {
         try {
+            Long userId = UserContext.get().getId();
+            if (userId == null ||  userId == 0) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
+            }
+            project.setUserId(userId);
             this.save(project);
         } catch (Exception e) {
             log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage());
