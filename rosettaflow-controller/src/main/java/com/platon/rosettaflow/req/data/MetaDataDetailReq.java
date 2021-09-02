@@ -4,9 +4,8 @@ import com.platon.rosettaflow.req.CommonPageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -15,6 +14,7 @@ import javax.validation.constraints.Positive;
  * @date 2021/8/25
  * @description 元数据详情请求参数
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "元数据详情请求参数")
 public class MetaDataDetailReq extends CommonPageReq {

@@ -4,6 +4,7 @@ import com.platon.rosettaflow.req.CommonPageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 
 /**
@@ -12,6 +13,7 @@ import lombok.Data;
  * @description 元数据列表请求参数
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "元数据请求参数")
 public class MetaDataReq extends CommonPageReq {
 

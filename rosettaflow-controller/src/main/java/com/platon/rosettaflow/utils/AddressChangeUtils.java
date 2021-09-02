@@ -22,7 +22,11 @@ import org.web3j.utils.Numeric;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Locale;
-
+/**
+ * @author  hudenian
+ * @date    2021/9/2
+ * @description 
+ */
 public class AddressChangeUtils {
 
     public static final String HRP_LAT = "lat";
