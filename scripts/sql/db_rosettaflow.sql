@@ -81,7 +81,7 @@ CREATE TABLE `t_meta_data` (
    `rows` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的行数',
    `columns` int(11) NOT NULL DEFAULT '0' COMMENT '源文件的列数',
    `size` bigint(20) NOT NULL DEFAULT '0' COMMENT '源文件的大小 (单位: byte)',
-   `file_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态: 0-未知，1- CSV类型',
+   `file_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '源文件的类型: 0-未知，1- CSV类型',
    `has_title` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否带标题,0表示不带，1表示带标题',
    `industry` varchar(20) DEFAULT NULL COMMENT '元数据所属行业',
    `data_status` varchar(20) NOT NULL DEFAULT '0' COMMENT '元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)',
@@ -90,8 +90,6 @@ CREATE TABLE `t_meta_data` (
    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COMMENT='元数据表';
-
-
 
 -- ----------------------------
 -- Table structure for `t_meta_data_details`
