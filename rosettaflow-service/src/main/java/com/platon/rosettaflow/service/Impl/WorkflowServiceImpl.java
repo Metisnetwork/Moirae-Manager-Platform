@@ -116,7 +116,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public void addWorkflow(Long projectId, String workflowName, String workflowDesc) {
+    public Workflow addWorkflow(Long projectId, String workflowName, String workflowDesc) {
         // 校验工作流名称
         Workflow workflow = checkWorkflowName(projectId, workflowName);
         if (Objects.nonNull(workflow)) {
@@ -128,6 +128,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         workflow.setWorkflowName(workflowName);
         workflow.setWorkflowDesc(workflowDesc);
         this.save(workflow);
+        return workflow;
     }
 
     @Override

@@ -13,7 +13,7 @@ public interface IProjectTempService extends IService<ProjectTemp> {
 
     /**
      * 查询项目模板列表
-     * @return
+     * @return ProjectTemp
      */
     List<ProjectTemp> queryProjectTempList();
 

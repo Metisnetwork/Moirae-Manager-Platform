@@ -3,45 +3,43 @@ package com.platon.rosettaflow.mapper.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * t_workflow_node_variable_temp
+ * t_algorithm_code_temp
  * @author houz
  */
 @Data
-@TableName(value = "t_workflow_node_variable_temp")
-public class WorkflowNodeVariableTemp implements Serializable {
+@TableName(value = "t_algorithm_code_temp")
+public class AlgorithmCodeTemp implements Serializable {
     /**
-     * 工作流节点变量表ID(自增长)
+     * 算法代码模板表ID(自增长)
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 工作流节点模板表id
+     * 算法模板表id
      */
-    private Long workflowNodeTempId;
+    private Long algorithmTempId;
 
     /**
-     * 变量类型: 1-自变量, 2-因变量
+     * 编辑类型:1-sql,2-noteBook
      */
-    private Byte varNodeType;
+    private Byte editType;
 
     /**
-     * 变量key
+     * 计算合约
      */
-    private String varNodeKey;
+    private String calculateContractCode;
 
     /**
-     * 变量值
+     * 数据分片合约
      */
-    private String varNodeValue;
-
-    /**
-     * 变量描述
-     */
-    private String varNodeDesc;
+    private String dataSplitContractCode;
 
     /**
      * 状态: 0-无效，1- 有效

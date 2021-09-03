@@ -4,20 +4,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * t_algorithm
- * @author 
+ * t_algorithm_temp
+ * @author houz
  */
 @Data
-@TableName(value = "t_algorithm")
-public class Algorithm implements Serializable {
+@TableName(value = "t_algorithm_temp")
+public class AlgorithmTemp implements Serializable {
     /**
-     * 算法表ID(自增长)
+     * 算法模板表ID(自增长)
      */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -88,11 +87,6 @@ public class Algorithm implements Serializable {
     private Long runTime;
 
     /**
-     * 是否是共有算法
-     */
-    private Byte publicFlag;
-
-    /**
      * 状态: 0-无效，1- 有效
      */
     private Byte status;
@@ -108,5 +102,4 @@ public class Algorithm implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
 }

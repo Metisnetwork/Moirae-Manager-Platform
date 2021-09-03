@@ -33,8 +33,9 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param projectId 项目id
      * @param workflowName 工作流名称
      * @param workflowDesc 工作流描述
+     * @return
      */
-    void addWorkflow(Long projectId, String workflowName, String workflowDesc);
+    Workflow addWorkflow(Long projectId, String workflowName, String workflowDesc);
 
     /**
      * 编辑工作流

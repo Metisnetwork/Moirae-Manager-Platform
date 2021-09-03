@@ -45,10 +45,13 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     WorkflowNodeTempMapper workflowNodeTempMapper;
 
     @Resource
-    WorkflowNodeCodeTempMapper workflowNodeCodeTempMapper;
+    AlgorithmMapper algorithmMapper;
 
     @Resource
-    WorkflowNodeVariableTempMapper workflowNodeVariableTempMapper;
+    AlgorithmCodeMapper algorithmCodeMapper;
+
+    @Resource
+    AlgorithmVariableMapper algorithmVariableMapper;
 
 
     @Override
@@ -74,7 +77,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         }
         for (WorkflowTemp workflowTemp : workflowTempList) {
             // 保存工作流
-            saveWorkflow(project.getId(), workflowTemp);
+            Workflow workflow = saveWorkflow(project.getId(), workflowTemp);
 
             // 查询工作流节点模板
             List<WorkflowNodeTemp> workflowNodeTempList = queryWorkflowNodeTempList(workflowTemp.getId());
@@ -82,15 +85,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
                 continue;
             }
             // 保存工作流节点
-
-
-
-            for(WorkflowNodeTemp workflowNodeTemp : workflowNodeTempList) {
-                // 查询工作流节点算法代码模板
-                WorkflowNodeCodeTemp codeTemp = queryWorkflowNodeCodeTempList(workflowNodeTemp.getId());
-                // 查询工作流节点变量模板
-                List<WorkflowNodeVariableTemp> variableTemp = queryWorkflowNodeVariableTempList(workflowNodeTemp.getId());
-            }
+            saveWorkflowNode(workflow.getId(), workflowNodeTempList);
         }
     }
 
@@ -108,19 +103,17 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         return workflowNodeTempMapper.selectList(queryWrapper);
     }
 
-    /** 查询工作流节点算法代码模板列表 */
-    private WorkflowNodeCodeTemp queryWorkflowNodeCodeTempList(Long workflowNodeTempId){
-        LambdaQueryWrapper<WorkflowNodeCodeTemp> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WorkflowNodeCodeTemp::getWorkflowNodeTempId, workflowNodeTempId);
-        return workflowNodeCodeTempMapper.selectOne(queryWrapper);
+    /** 查询工作流模板所使用算法 */
+    private Algorithm queryAlgorithmObj(Long algorithmId){
+        return algorithmMapper.selectById(algorithmId);
     }
 
-    /** 查询工作流节点变量模板列表 */
-    private List<WorkflowNodeVariableTemp> queryWorkflowNodeVariableTempList(Long workflowNodeTempId){
-        LambdaQueryWrapper<WorkflowNodeVariableTemp> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WorkflowNodeVariableTemp::getWorkflowNodeTempId, workflowNodeTempId);
-        return workflowNodeVariableTempMapper.selectList(queryWrapper);
-    }
+//    /** 查询工作流节点变量模板列表 */
+//    private List<WorkflowNodeVariableTemp> queryWorkflowNodeVariableTempList(Long workflowNodeTempId){
+//        LambdaQueryWrapper<WorkflowNodeVariableTemp> queryWrapper = Wrappers.lambdaQuery();
+//        queryWrapper.eq(WorkflowNodeVariableTemp::getWorkflowNodeTempId, workflowNodeTempId);
+//        return workflowNodeVariableTempMapper.selectList(queryWrapper);
+//    }
 
     /** 保存项目 */
     private Project saveProject(ProjectTemp projectTemp){
@@ -132,8 +125,8 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     }
 
     /** 保存工作流 */
-    private void saveWorkflow(Long projectId, WorkflowTemp workflowTemp){
-        workflowService.addWorkflow(projectId,
+    private Workflow saveWorkflow(Long projectId, WorkflowTemp workflowTemp){
+        return workflowService.addWorkflow(projectId,
                 workflowTemp.getWorkflowName(),workflowTemp.getWorkflowDesc());
     }
 
@@ -143,11 +136,13 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         for (WorkflowNodeTemp nodeTemp : nodeTempList) {
             WorkflowNode workflowNode = new WorkflowNode();
             workflowNode.setWorkflowId(workflowId);
+            workflowNode.setAlgorithmId(nodeTemp.getAlgorithmId());
             workflowNode.setNodeName(nodeTemp.getNodeName());
             workflowNode.setNodeStep(nodeTemp.getNodeStep());
             workflowNode.setNextNodeStep(nodeTemp.getNextNodeStep());
             nodeList.add(workflowNode);
         }
-
+        workflowNodeService.saveBatch(nodeList);
+        // 查询工作流模板所使用算法
     }
 }

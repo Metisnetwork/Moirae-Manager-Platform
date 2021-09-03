@@ -9,37 +9,42 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * t_workflow_node_code_temp
+ * t_algorithm_variable_temp
  * @author houz
  */
 @Data
-@TableName(value = "t_workflow_node_code_temp")
-public class WorkflowNodeCodeTemp implements Serializable {
+@TableName(value = "t_algorithm_variable_temp")
+public class AlgorithmVariableTemp implements Serializable {
     /**
-     * 工作流节点算法代码模板表ID(自增长)
+     * 算法变量模板表ID(自增长)
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 工作流节点id
+     * 算法模板表id
      */
-    private Long workflowNodeTempId;
+    private Long algorithmTempId;
 
     /**
-     * 编辑类型:1-sql, 2-noteBook
+     * 变量类型: 1-自变量, 2-因变量
      */
-    private Byte editType;
+    private Byte varType;
 
     /**
-     * 计算合约
+     * 变量key
      */
-    private String calculateContractCode;
+    private String varKey;
 
     /**
-     * 数据分片合约
+     * 变量值
      */
-    private String dataSplitContractCode;
+    private String varValue;
+
+    /**
+     * 变量描述
+     */
+    private String varDesc;
 
     /**
      * 状态: 0-无效，1- 有效

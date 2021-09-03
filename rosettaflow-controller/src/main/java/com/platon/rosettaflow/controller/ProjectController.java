@@ -93,7 +93,7 @@ public class ProjectController {
 
     @PostMapping("addProjMember")
     @ApiOperation(value = "新增项目成员", notes = "新增项目成员")
-    public ResponseVo<?> addProjMember(@Valid ProjMemberReq projMemberReq) {
+    public ResponseVo<?> addProjMember(@RequestBody @Valid ProjMemberReq projMemberReq) {
         ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
         projectService.addProjMember(projectMember);
         return ResponseVo.createSuccess();
@@ -101,7 +101,7 @@ public class ProjectController {
 
     @PostMapping("updateProjMember")
     @ApiOperation(value = "修改项目成员", notes = "修改项目成员")
-    public ResponseVo<?> updateProjMember(@Valid ProjMemberReq projMemberReq) {
+    public ResponseVo<?> updateProjMember(@RequestBody @Valid ProjMemberReq projMemberReq) {
         ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
         projectService.updateProjMember(projectMember);
         return ResponseVo.createSuccess();
@@ -109,14 +109,14 @@ public class ProjectController {
 
     @PostMapping("deleteProjMember")
     @ApiOperation(value = "删除项目成员", notes = "删除项目成员")
-    public ResponseVo<?> deleteProjMember(@Valid DeleteMemberReq deleteMemberReq) {
+    public ResponseVo<?> deleteProjMember(@RequestBody @Valid DeleteMemberReq deleteMemberReq) {
         projectService.deleteProjMember(deleteMemberReq.getProjMemberId());
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("deleteProjMemberBatch")
     @ApiOperation(value = "批量删除项目成员", notes = "批量删除项目成员")
-    public ResponseVo<?> deleteProjMemberBatch(@Valid DeleteMemberBatchReq deleteBatchReq) {
+    public ResponseVo<?> deleteProjMemberBatch(@RequestBody @Valid DeleteMemberBatchReq deleteBatchReq) {
         projectService.deleteProjMemberBatch(deleteBatchReq.getProjMemberIds());
         return ResponseVo.createSuccess();
     }

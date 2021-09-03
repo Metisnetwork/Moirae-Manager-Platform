@@ -16,6 +16,7 @@
     <result column="cost_gpu" jdbcType="INTEGER" property="costGpu" />
     <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth" />
     <result column="run_time" jdbcType="BIGINT" property="runTime" />
+    <result column="public_flag" jdbcType="TINYINT" property="publicFlag" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -23,7 +24,7 @@
   <sql id="Base_Column_List">
     id, algorithm_name, algorithm_desc, max_numbers, min_numbers, support_language,
     support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
-    run_time, `status`, create_time, update_time
+    run_time, public_flag, `status`, create_time, update_time
   </sql>
 
   <!-- 查询算法列表 -->
