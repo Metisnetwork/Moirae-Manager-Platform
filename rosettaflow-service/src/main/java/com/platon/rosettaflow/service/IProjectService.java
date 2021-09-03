@@ -57,12 +57,6 @@ public interface IProjectService extends IService<Project> {
     void deleteProjectBatch(String ids);
 
     /**
-     * 查询项目模板列表
-     * @return
-     */
-    List<ProjectTemp> queryProjectTempList();
-
-    /**
      * 查询项目成员列表
      * @param projectId 项目id
      * @param userName 用户昵称

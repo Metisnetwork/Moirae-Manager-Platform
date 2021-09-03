@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.rosettaflow.mapper.AlgorithmTempMapper">
+  <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.AlgorithmTemp">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
+    <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
+    <result column="max_numbers" jdbcType="BIGINT" property="maxNumbers" />
+    <result column="min_numbers" jdbcType="BIGINT" property="minNumbers" />
+    <result column="support_language" jdbcType="VARCHAR" property="supportLanguage" />
+    <result column="support_os_system" jdbcType="VARCHAR" property="supportOsSystem" />
+    <result column="algorithm_type" jdbcType="TINYINT" property="algorithmType" />
+    <result column="cost_mem" jdbcType="BIGINT" property="costMem" />
+    <result column="cost_cpu" jdbcType="BIGINT" property="costCpu" />
+    <result column="cost_gpu" jdbcType="INTEGER" property="costGpu" />
+    <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth" />
+    <result column="run_time" jdbcType="BIGINT" property="runTime" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, algorithm_name, algorithm_desc, author, max_numbers, min_numbers, support_language, 
+    support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth, 
+    run_time, `status`, create_time, update_time
+  </sql>
+</mapper>

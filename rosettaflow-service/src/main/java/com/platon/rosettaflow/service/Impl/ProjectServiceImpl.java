@@ -15,7 +15,6 @@ import com.platon.rosettaflow.mapper.ProjectMemberMapper;
 import com.platon.rosettaflow.mapper.ProjectTempMapper;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
-import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +37,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Resource
     ProjectMapper projectMapper;
-
-    @Resource
-    ProjectTempMapper projectTempMapper;
 
     @Resource
     ProjectMemberMapper projectMemberMapper;
@@ -128,11 +124,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public List<ProjectTemp> queryProjectTempList() {
-        return projectTempMapper.selectList(null);
-    }
-
-    @Override
     public IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size) {
        IPage<ProjMemberDto> iPage = new Page<>(current, size);
         return projectMemberMapper.queryProjMemberList(projectId, userName, iPage);
@@ -140,6 +131,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public void addProjMember(ProjectMember projectMember) {
+//        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
+//        queryWrapper.eq(ProjectMember::getProjectId, projectMember.getProjectId());
+//        queryWrapper.eq(ProjectMember::getProjectId, projectMember.getUserId());
+//        ProjectMember ProjectMemberOld = projectMemberMapper.selectOne(queryWrapper);
+//        if (Objects.nonNull(ProjectMemberOld)) {
+//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_DETAILS_ERROR.getMsg());
+//
+//        }
         projectMemberMapper.insert(projectMember);
     }
 

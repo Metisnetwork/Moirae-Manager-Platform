@@ -23,7 +23,7 @@ public class ProjMemberReq {
     @NotNull(message = "{user.id.NotNull}")
     private Long userId;
 
-    @ApiModelProperty(value = "用户成员角色")
+    @ApiModelProperty(value = "成员角色(1-管理员，2-编辑着, 3-查看着)")
     @NotNull(message = "{project.member.role.NotNull}")
     private Integer role;
 
