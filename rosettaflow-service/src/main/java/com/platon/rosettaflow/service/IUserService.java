@@ -43,7 +43,18 @@ public interface IUserService extends IService<User> {
 
     /**
      * 查询所有用户昵称
-     * @return
      */
     List<Map<String, Object>> queryAllUserNickname();
+
+    /**
+     * 获取登录nonce
+     * @return 返回uuid
+     */
+    String getLoginNonce();
+
+    /**
+     * 检查nonce有效性
+     * @return  true：nonce有效 、false:nonce无效
+     */
+    boolean checkNonceValidity(String nonce);
 }

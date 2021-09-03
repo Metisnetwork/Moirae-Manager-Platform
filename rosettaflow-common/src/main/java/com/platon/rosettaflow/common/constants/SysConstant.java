@@ -53,6 +53,7 @@ public class SysConstant {
      * 用户登录URI
      */
     public static final String[] LOGIN_URIS = {"user/login",
+            "user/getLoginNonce",
             "swagger",
             "error",
             "api-docs"

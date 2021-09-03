@@ -9,9 +9,9 @@ import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.LoginOutReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.service.IUserService;
-import com.platon.rosettaflow.utils.EthWalletSignUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.user.NonceVo;
 import com.platon.rosettaflow.vo.user.UserNicknameVo;
 import com.platon.rosettaflow.vo.user.UserVo;
 import io.swagger.annotations.Api;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,13 +38,27 @@ public class UserController {
     @Resource
     private IUserService userService;
 
+
+    @GetMapping("getLoginNonce")
+    @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
+    public ResponseVo<NonceVo> getLoginNonce() {
+        String nonce = userService.getLoginNonce();
+        NonceVo nonceVo = new NonceVo();
+        nonceVo.setNonce(nonce);
+        return ResponseVo.createSuccess(nonceVo);
+    }
+
+
     @PostMapping("login")
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
         boolean flg;
+        if(!userService.checkNonceValidity(loginInReq.getSignMessage())){
+            throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
+        }
         try {
             flg = WalletSignUtils.verifyTypedDataV4(loginInReq.getSignMessage(), loginInReq.getSign(), loginInReq.getAddress());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         if (!flg) {
