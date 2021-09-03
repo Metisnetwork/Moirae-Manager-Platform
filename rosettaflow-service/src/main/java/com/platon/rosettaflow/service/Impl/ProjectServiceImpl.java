@@ -128,11 +128,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public List<ProjectTemp> queryProjectTempList() {
-        return projectTempMapper.selectList(null);
-    }
-
-    @Override
     public IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size) {
        IPage<ProjMemberDto> iPage = new Page<>(current, size);
         return projectMemberMapper.queryProjMemberList(projectId, userName, iPage);

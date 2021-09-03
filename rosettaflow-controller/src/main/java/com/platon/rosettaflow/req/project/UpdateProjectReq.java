@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "修改项目请求参数")
 public class UpdateProjectReq {
 
-    @ApiModelProperty(value = "项目ID")
+    @ApiModelProperty(value = "项目ID", required = true)
     @NotNull(message = "{project.id.notNull}")
     private Long id;
 

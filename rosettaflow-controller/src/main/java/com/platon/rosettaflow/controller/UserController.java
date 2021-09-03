@@ -12,6 +12,7 @@ import com.platon.rosettaflow.service.IUserService;
 import com.platon.rosettaflow.utils.EthWalletSignUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.user.UserNicknameVo;
 import com.platon.rosettaflow.vo.user.UserVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author admin
@@ -68,9 +71,9 @@ public class UserController {
 
     @GetMapping("queryAllUserNickname")
     @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称")
-    public ResponseVo<UserVo> queryAllUserNickname() {
-        userService.queryAllUserNickname();
-        return ResponseVo.create(RespCodeEnum.SUCCESS);
+    public ResponseVo<List<UserNicknameVo>> queryAllUserNickname() {
+        List<Map<String, Object>> list = userService.queryAllUserNickname();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
 
 }

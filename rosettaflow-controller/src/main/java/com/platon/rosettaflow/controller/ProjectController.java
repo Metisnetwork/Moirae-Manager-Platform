@@ -27,7 +27,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 项目模板管理
+ * 项目管理关接口
  * @author admin
  * @date 2021/8/16
  */
@@ -80,13 +80,6 @@ public class ProjectController {
     public ResponseVo<?> deleteProjectBatch(@RequestBody @Valid DeleteProjBatchReq deleteBatchReq) {
         projectService.deleteProjectBatch(deleteBatchReq.getIds());
         return ResponseVo.createSuccess();
-    }
-
-    @GetMapping("queryProjectTempList")
-    @ApiOperation(value = "查询模板项目列表", notes = "查询模板项目列表")
-    public ResponseVo<List<ProjTempListVo>> queryProjectTempList() {
-        List<ProjectTemp> list  = projectService.queryProjectTempList();
-        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjTempListVo.class));
     }
 
     @GetMapping("queryProjMemberList")

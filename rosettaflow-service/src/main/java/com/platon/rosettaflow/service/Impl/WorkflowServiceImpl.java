@@ -117,13 +117,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public void addWorkflow(Long projectId, String workflowName, String workflowDesc) {
-        Workflow workflow = getByWorkflowName(workflowName);
+        // 校验工作流名称
+        Workflow workflow = checkWorkflowName(projectId, workflowName);
         if (Objects.nonNull(workflow)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
-        Long userId = UserContext.get().getId();
         workflow = new Workflow();
-        workflow.setUserId(userId);
+        workflow.setUserId(UserContext.get().getId());
         workflow.setProjectId(projectId);
         workflow.setWorkflowName(workflowName);
         workflow.setWorkflowDesc(workflowDesc);
@@ -156,7 +156,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.error("Origin workflow not found by id:{}", originId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ORIGIN_NOT_EXIST.getMsg());
         }
-        Workflow workflow = getByWorkflowName(workflowName);
+        // 校验工作流名称
+        Workflow workflow = checkWorkflowName(originWorkflow.getProjectId(), workflowName);
         if (Objects.nonNull(workflow)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
@@ -182,9 +183,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public Workflow getByWorkflowName(String name) {
+    public Workflow checkWorkflowName(Long projectId, String workflowName) {
         LambdaQueryWrapper<Workflow> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Workflow::getWorkflowName, name);
+        wrapper.eq(Workflow::getProjectId, projectId);
+        wrapper.eq(Workflow::getWorkflowName, workflowName);
         return this.getOne(wrapper);
     }
 

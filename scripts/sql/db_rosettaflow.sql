@@ -267,14 +267,14 @@ CREATE TABLE `t_algorithm_variable` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow`;
 CREATE TABLE `t_workflow` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '项目工作流ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流ID(自增长)',
   `project_id` bigint(20) DEFAULT NULL COMMENT '项目id',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id(创建方id)',
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
   `node_number` int(11) DEFAULT NULL COMMENT '节点数',
   `sign`  varchar(512) DEFAULT NULL COMMENT '发起任务的账户的签名',
-  `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
+  `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未完成,1-已完成',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -284,15 +284,14 @@ CREATE TABLE `t_workflow` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流表';
 
 -- ----------------------------
--- Table structure for `t_workflow_template`
+-- Table structure for `t_workflow_temp`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_workflow_template`;
-CREATE TABLE `t_workflow_template` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '项目工作流模板ID(自增长)',
+DROP TABLE IF EXISTS `t_workflow_temp`;
+CREATE TABLE `t_workflow_temp` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流模板ID(自增长)',
   `project_temp_id` bigint(20) DEFAULT NULL COMMENT '项目模板表id',
-  `user_id` bigint(20) DEFAULT NULL COMMENT '用户id(创建方id)',
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
-  `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
+  `workflow_desc` varchar(128) DEFAULT NULL COMMENT '工作流描述',
   `node_number` bigint(20) DEFAULT NULL COMMENT '节点数',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未完成,1-已完成',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
@@ -307,7 +306,7 @@ CREATE TABLE `t_workflow_template` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node`;
 CREATE TABLE `t_workflow_node` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
   `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
   `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
   `node_name` varchar(30) DEFAULT NULL COMMENT '节点名称',
@@ -324,14 +323,15 @@ CREATE TABLE `t_workflow_node` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点表';
 
 -- ----------------------------
--- Table structure for `t_workflow_node`
+-- Table structure for `t_workflow_node_temp`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_workflow_node_template`;
-CREATE TABLE `t_workflow_node_template` (
+DROP TABLE IF EXISTS `t_workflow_node_temp`;
+CREATE TABLE `t_workflow_node_temp` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点模板表ID(自增长)',
-  `workflow_temp_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
+  `workflow_temp_id` bigint(20) DEFAULT NULL COMMENT '工作流模板表id',
   `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
-  `node_step` tinyint(4) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
+  `node_name` varchar(30) DEFAULT NULL COMMENT '节点名称',
+  `node_step` int(11) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
   `next_node_step` int(11) DEFAULT NULL COMMENT '下一个节点,如果为空则无下个节点',
   `run_status` tinyint(4) DEFAULT NULL COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
@@ -346,7 +346,7 @@ CREATE TABLE `t_workflow_node_template` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node_input`;
 CREATE TABLE `t_workflow_node_input` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `data_type` varchar(64) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
@@ -361,15 +361,16 @@ CREATE TABLE `t_workflow_node_input` (
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点数据提供方列表';
+  PRIMARY KEY (`id`),
+  KEY (`workflow_node_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点输入表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_variable`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node_variable`;
 CREATE TABLE `t_workflow_node_variable` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点变量表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `var_node_type`  tinyint(4)   NOT NULL DEFAULT 1 COMMENT '变量类型: 1-自变量, 2-因变量',
   `var_node_key` varchar(128) NOT NULL COMMENT '变量key',
@@ -382,12 +383,12 @@ CREATE TABLE `t_workflow_node_variable` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点变量表';
 
 -- ----------------------------
--- Table structure for `t_workflow_node_variable_template`
+-- Table structure for `t_workflow_node_variable_temp`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_workflow_node_variable_template`;
-CREATE TABLE `t_workflow_node_variable_template` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点ID(自增长)',
-    `workflow_node_temp_id` bigint(20) DEFAULT NULL COMMENT '工作流节点模板id',
+DROP TABLE IF EXISTS `t_workflow_node_variable_temp`;
+CREATE TABLE `t_workflow_node_variable_temp` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点变量模板表ID(自增长)',
+    `workflow_node_temp_id` bigint(20) DEFAULT NULL COMMENT '工作流节点模板表id',
     `var_node_type`  tinyint(4)   NOT NULL DEFAULT 1 COMMENT '变量类型: 1-自变量, 2-因变量',
     `var_node_key` varchar(128) NOT NULL COMMENT '变量key',
     `var_node_value` varchar(128) NOT NULL COMMENT '变量值',
@@ -397,7 +398,6 @@ CREATE TABLE `t_workflow_node_variable_template` (
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点变量模板表';
-
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_output`
@@ -426,7 +426,7 @@ CREATE TABLE `t_workflow_node_output` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node_code`;
 CREATE TABLE `t_workflow_node_code` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点代码表ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点算法代码表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `edit_type` tinyint(4) DEFAULT NULL COMMENT '编辑类型:1-sql, 2-noteBook',
   `calculate_contract_code` TEXT DEFAULT NULL COMMENT '计算合约',
@@ -436,14 +436,31 @@ CREATE TABLE `t_workflow_node_code` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY (`workflow_node_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点代码表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点算法代码表';
+
+-- ----------------------------
+-- Table structure for `t_workflow_node_code_temp`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_workflow_node_code_temp`;
+CREATE TABLE `t_workflow_node_code_temp` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点算法代码模板表ID(自增长)',
+  `workflow_node_temp_id` bigint(20) DEFAULT NULL COMMENT '工作流节点模板表id',
+  `edit_type` tinyint(4) DEFAULT NULL COMMENT '编辑类型:1-sql, 2-noteBook',
+  `calculate_contract_code` TEXT DEFAULT NULL COMMENT '计算合约',
+  `data_split_contract_code` TEXT DEFAULT NULL COMMENT '数据分片合约',
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY (`workflow_node_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点算法代码模板表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_resource`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_workflow_node_resource`;
 CREATE TABLE `t_workflow_node_resource` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '节点资源表ID(自增长)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点资源表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `cost_mem`  bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
   `cost_cpu`  int(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
@@ -456,25 +473,6 @@ CREATE TABLE `t_workflow_node_resource` (
   PRIMARY KEY (`id`),
   KEY (`workflow_node_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点资源表';
-
-
--- ----------------------------
--- Table structure for `t_workflow_node_resource_template`
--- ----------------------------
-DROP TABLE IF EXISTS `t_workflow_node_resource_template`;
-CREATE TABLE `t_workflow_node_resource_template` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '节点资源表ID(自增长)',
-  `workflow_node_template_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
-  `cost_mem`  bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
-  `cost_processor`  bigint(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
-  `cost_gpu`  int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
-  `cost_bandwidth`  bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
-  `duration`  bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点资源模板表';
 
 -- ----------------------------
 -- Table structure for `t_job`
