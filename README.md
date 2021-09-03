@@ -1,7 +1,7 @@
 ## RosettaFlow-api-server 管理后台
 
 ### 1.后台服务api接口文档，采用swagger
-- 访问地址：http://10.10.8.182:8234/rosettaflow-console/doc.html
+- 访问地址：http://10.10.8.182:8234/rosettaflow/doc.html
 
 #### swagger调试流程
 - 先获取token

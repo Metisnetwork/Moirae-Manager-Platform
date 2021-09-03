@@ -27,6 +27,7 @@ public class LoginInReq {
     private Byte userType;
 
     @ApiModelProperty(value = "签名明文(json格式字符串)", required = true,example = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"uuid\",\"desc\":\"Login to Moirae\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}")
+    @NotNull(message = "{user.sign.plaintext.notBlank}")
     private String signMessage;
 
     @ApiModelProperty(value = "签名", required = true, notes = "sign", example = "HPXfBL0ZYeSMt6GcG8h8zOlPtlA8+LIQvF1AhEq4YZQLNfsgujDFDCzCSr/4ayfw4USAffxxA9OL0xMCVgE5Eg4=")

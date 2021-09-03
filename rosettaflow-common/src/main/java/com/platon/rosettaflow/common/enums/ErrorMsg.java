@@ -11,8 +11,15 @@ import com.platon.rosettaflow.common.utils.LanguageContext;
 public enum ErrorMsg {
 
     /**
+     * 请求参数错误
+     */
+    PARAM_ERROR("请求参数错误", "Request param error"),
+
+    /**
      * 用户签名错误
      */
+    USER_NONCE_INVALID("nonce无效", "Nonce invalid"),
+
     USER_SIGN_ERROR("签名错误", "Sign error"),
 
     USER_UN_LOGIN("用户未登录", "User un login"),

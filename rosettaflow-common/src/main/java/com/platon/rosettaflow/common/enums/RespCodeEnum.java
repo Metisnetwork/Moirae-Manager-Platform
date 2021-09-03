@@ -60,7 +60,7 @@ public enum RespCodeEnum {
     /**
      * 业务失败
      */
-    BIZ_FAILED(20008, "Business failed"),
+    BIZ_FAILED(20009, "Business failed"),
 
     /**
      * 系统异常
@@ -70,7 +70,12 @@ public enum RespCodeEnum {
     /**
      * 业务异常
      */
-    BIZ_EXCEPTION(30001, "Business exception");
+    BIZ_EXCEPTION(30001, "Business exception"),
+
+    /**
+     * nonce invalid
+     */
+    NONCE_INVALID(30002, "Nonce invalid");
 
     private final int code;
     private final String msg;

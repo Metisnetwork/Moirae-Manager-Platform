@@ -15,4 +15,5 @@ public class SysConfig {
     private long loginTimeOut = 1800000;
     private boolean kickMode = true;
     private boolean masterNode = false;
+    private long nonceTimeOut = 5 * 60 * 1000;
 }

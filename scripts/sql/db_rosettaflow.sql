@@ -513,8 +513,8 @@ CREATE TABLE `t_job` (
     `repeat_interval` int(11) DEFAULT NULL COMMENT '重复间隔，单位分钟',
     `begin_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
     `end_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '结束时间',
-    `job_status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-未运行，1-运行中',
-    `status`  tinyint(4)   NOT NULL DEFAULT 0 COMMENT '状态: 0-未结束，1-已结束',
+    `job_status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-未结束，1-已结束',
+    `status`  tinyint(4)   NOT NULL DEFAULT 0 COMMENT '状态: 0-无效，1- 有效',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)

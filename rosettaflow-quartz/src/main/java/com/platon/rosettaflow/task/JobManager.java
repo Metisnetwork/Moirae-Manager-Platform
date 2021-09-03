@@ -9,11 +9,13 @@ import com.platon.rosettaflow.quartz.job.PublishTaskJob;
 import com.platon.rosettaflow.service.IJobService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hudenian
@@ -23,6 +25,8 @@ import java.util.List;
 @Slf4j
 @Component
 public class JobManager {
+
+    static final String DEFAULT_GROUP_PRE = "DEFAULT.";
 
     @Resource
     private Scheduler scheduler;
@@ -41,7 +45,7 @@ public class JobManager {
         if (sysConfig.isMasterNode()) {
             List<Job> jobList = jobService.getAllUnfinishedJob();
             for (Job job : jobList) {
-                startJob(job, false);
+                startJob(job);
             }
         }
     }
@@ -49,22 +53,28 @@ public class JobManager {
     /**
      * 创建一个job信息
      *
-     * @param job       job信息
-     * @param modifyFlg 是否修改已有的job
+     * @param job job信息
      */
-    public void startJob(Job job, boolean modifyFlg) {
-        if (modifyFlg) {
-            try {
-                //暂停触发器
-                scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString()));
-                //移除触发器
-                scheduler.unscheduleJob(TriggerKey.triggerKey(job.getId().toString()));
-                //删除Job
-                scheduler.deleteJob(JobKey.jobKey(job.getId().toString()));
-            } catch (SchedulerException e) {
-                log.error("stop old job error,error msg is:{}", e.getMessage(), e);
+    public void startJob(Job job) {
+        try {
+            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.anyGroup());
+            if (jobKeySet.contains(JobKey.jobKey(DEFAULT_GROUP_PRE + job.getId()))) {
+                try {
+                    //暂停触发器
+                    scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString()));
+                    //移除触发器
+                    scheduler.unscheduleJob(TriggerKey.triggerKey(job.getId().toString()));
+                    //删除Job
+                    scheduler.deleteJob(JobKey.jobKey(job.getId().toString()));
+                } catch (SchedulerException e) {
+                    log.error("stop old job error,error msg is:{}", e.getMessage(), e);
+                }
             }
+        } catch (SchedulerException e) {
+            log.error("获取正在执行的job失败:失败原因>>>>>>", e);
+            throw new BusinessException(RespCodeEnum.EXCEPTION);
         }
+
         Long workflowId = job.getWorkflowId();
 
         JobDetail jobDetail = JobBuilder.newJob(PublishTaskJob.class)

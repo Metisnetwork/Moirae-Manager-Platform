@@ -1,9 +1,19 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.platon.rosettaflow.common.constants.SysConfig;
+import com.platon.rosettaflow.common.constants.SysConstant;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.dto.SignMessageDto;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.UserMapper;
 import com.platon.rosettaflow.mapper.domain.User;
@@ -17,6 +27,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author admin
@@ -35,6 +47,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private SysConfig sysConfig;
 
     @Override
     public User getByAddress(String address) {
@@ -88,6 +103,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public List<Map<String, Object>> queryAllUserNickname() {
         return userMapper.queryAllUserNickname();
+    }
+
+    @Override
+    public String getLoginNonce() {
+        String nonce = generateNonce();
+        redisTemplate.opsForValue().set(nonce, getNonceValue(nonce), sysConfig.getNonceTimeOut(), TimeUnit.MILLISECONDS);
+        return nonce;
+    }
+
+    @Override
+    public boolean checkNonceValidity(String signMessage) {
+
+        SignMessageDto signMessageDto;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            signMessageDto = objectMapper.readValue(signMessage, SignMessageDto.class);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
+        }
+        String nonce = signMessageDto.getMessage().getKey();
+        if(!StrUtil.isNotEmpty(nonce)){
+            throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
+        }
+        boolean isExistKey = Boolean.TRUE.equals(redisTemplate.hasKey(nonce));
+        if(!isExistKey){
+            return false;
+        }
+        String value = (String) redisTemplate.opsForValue().get(nonce);
+        if(!StrUtil.equals(value, getNonceValue(nonce))){
+            return false;
+        }
+        redisTemplate.delete(nonce);
+        return true;
+    }
+
+
+    public static String generateNonce() {
+        return UUID.randomUUID().toString().replace("-", "").toUpperCase();
+    }
+
+    public static String getNonceValue(String nonce) {
+        return SysConstant.REDIS_USER_PREFIX_KEY + nonce;
     }
 
 }
