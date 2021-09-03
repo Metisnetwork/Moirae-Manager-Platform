@@ -38,6 +38,11 @@ public class ProjectMember implements Serializable {
     private Byte role;
 
     /**
+     * 版本标识，用于逻辑删除
+     */
+    private Long delVersion;
+
+    /**
      * 状态: 0-无效，1- 有效
      */
     @TableLogic

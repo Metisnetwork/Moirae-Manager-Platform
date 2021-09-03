@@ -12,6 +12,11 @@ import java.util.Date;
 public class ProjMemberDto {
 
     /**
+     * 用户ID
+     */
+    private String userId;
+
+    /**
      * 用户名称
      */
     private String userName;

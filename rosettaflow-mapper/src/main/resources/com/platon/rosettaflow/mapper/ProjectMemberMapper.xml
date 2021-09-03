@@ -6,17 +6,19 @@
     <result column="project_id" jdbcType="BIGINT" property="projectId" />
     <result column="user_id" jdbcType="BIGINT" property="userId" />
     <result column="role" jdbcType="TINYINT" property="role" />
+    <result column="del_version" jdbcType="BIGINT" property="delVersion" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, project_id, user_id, `role`, `status`, create_time, update_time
+    id, project_id, user_id, `role`, del_version, `status`, create_time, update_time
   </sql>
   <!-- 查询项目成员列表 -->
   <select id="queryProjMemberList" resultType="com.platon.rosettaflow.dto.ProjMemberDto">
     select
       a.id as memberId,
+      a.user_id as userId,
       a.role as role,
       a.create_time as createTime,
       b.user_name as userName

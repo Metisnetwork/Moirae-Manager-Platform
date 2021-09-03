@@ -40,19 +40,6 @@ public class ProjectController {
     @Resource
     private IProjectService projectService;
 
-    @PostMapping("addProject")
-    @ApiOperation(value = "新增项目", notes = "新增项目")
-    public ResponseVo<?> addProject(@RequestBody @Valid AddProjectReq addProjectReq) {
-        projectService.addProject(BeanUtil.copyProperties(addProjectReq, Project.class));
-        return ResponseVo.createSuccess();
-    }
-    @PostMapping("updateProject")
-    @ApiOperation(value = "修改项目", notes = "修改项目")
-    public ResponseVo<?> saveProject(@RequestBody @Valid UpdateProjectReq updateProjectReq) {
-        projectService.updateProject(BeanUtil.copyProperties(updateProjectReq, Project.class));
-        return ResponseVo.createSuccess();
-    }
-
     @GetMapping("queryProjectList")
     @ApiOperation(value = "查询项目列表", notes = "查询项目列表")
     public ResponseVo<PageVo<ProjectListVo>> queryProjectList(@Valid ProjListReq projListReq) {
@@ -66,6 +53,19 @@ public class ProjectController {
     public ResponseVo<ProjectDetailsVo> queryProjectDetails(@Valid ProjDetailsReq projDetailsReq) {
         Project project  = projectService.queryProjectDetails(projDetailsReq.getId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(project, ProjectDetailsVo.class));
+    }
+
+    @PostMapping("addProject")
+    @ApiOperation(value = "新增项目", notes = "新增项目")
+    public ResponseVo<?> addProject(@RequestBody @Valid AddProjectReq addProjectReq) {
+        projectService.addProject(BeanUtil.copyProperties(addProjectReq, Project.class));
+        return ResponseVo.createSuccess();
+    }
+    @PostMapping("updateProject")
+    @ApiOperation(value = "修改项目", notes = "修改项目")
+    public ResponseVo<?> saveProject(@RequestBody @Valid UpdateProjectReq updateProjectReq) {
+        projectService.updateProject(BeanUtil.copyProperties(updateProjectReq, Project.class));
+        return ResponseVo.createSuccess();
     }
 
     @PostMapping("deleteProject")

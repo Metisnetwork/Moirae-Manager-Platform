@@ -6,12 +6,13 @@
     <result column="user_id" jdbcType="BIGINT" property="userId" />
     <result column="project_name" jdbcType="VARCHAR" property="projectName" />
     <result column="project_desc" jdbcType="VARCHAR" property="projectDesc" />
+    <result column="del_version" jdbcType="BIGINT" property="delVersion" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, project_name, project_desc, `status`, create_time, update_time
+    id, user_id, project_name, project_desc, del_version, `status`, create_time, update_time
   </sql>
   <select id="queryProjectList" resultType="com.platon.rosettaflow.dto.ProjectDto">
     select

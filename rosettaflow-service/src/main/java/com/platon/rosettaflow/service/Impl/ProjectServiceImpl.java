@@ -12,18 +12,20 @@ import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
 import com.platon.rosettaflow.mapper.ProjectMemberMapper;
-import com.platon.rosettaflow.mapper.ProjectTempMapper;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
+import com.platon.rosettaflow.service.IProjectMemberService;
 import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,17 +43,23 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Resource
     ProjectMemberMapper projectMemberMapper;
 
+    @Resource
+    IProjectMemberService projectMemberService;
+
     @Override
     public void addProject(Project project) {
         try {
             Long userId = UserContext.get().getId();
-            if (userId == null ||  userId == 0) {
+            if (userId == null ||  userId == 0L) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
             }
             project.setUserId(userId);
             this.save(project);
-        } catch (Exception e) {
+        }catch (Exception e) {
             log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage());
+            if (e instanceof DuplicateKeyException){
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
+            }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJ_ERROR.getMsg());
         }
     }
@@ -61,6 +69,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             this.updateById(project);
         } catch (Exception e) {
+            if (e instanceof DuplicateKeyException){
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
+            }
             log.error("updateProject--修改项目信息失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.UPDATE_PROJ_ERROR.getMsg());
         }
@@ -95,12 +106,41 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProject(Long id) {
+        // 修改项目版本标识，解决逻辑删除唯一校验问题
+        this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
         // 删除项目信息
         this.removeById(id);
+        // 根据项目id获取成员id
+        List<Long> idList = getMemberIdByProjectId(id);
+        // 修改项目成员版本标识
+        projectMemberService.updateBatchById(idList);
         // 删除项目成员
-        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(ProjectMember::getProjectId, id);
-        projectMemberMapper.delete(queryWrapper);
+        projectMemberMapper.deleteBatchIds(idList);
+    }
+
+    /**  根据项目id获取成员id */
+    private List<Long> getMemberIdByProjectId(Long projectId) {
+        List<ProjectMember> projectMemberList = projectMemberService.queryByProjectId(projectId);
+        if (projectMemberList == null || projectMemberList.size() == 0) {
+            return new ArrayList<>();
+        }
+        List<Long> idList = new ArrayList<>();
+        projectMemberList.forEach(projectMember -> idList.add(projectMember.getId()));
+        return idList;
+    }
+
+    /** 修改版本标识，解决逻辑删除唯一校验问题 */
+    private List<Project> updateDelVersionById(List<Long> idList){
+        List<Project> projectList = new ArrayList<>();
+        if (idList != null && idList.size() > 0) {
+            idList.forEach(id -> {
+                Project project = new Project();
+                project.setId(id);
+                project.setDelVersion(id);
+                projectList.add(project);
+            });
+        }
+        return projectList;
     }
 
     @Override
@@ -117,8 +157,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             for (ProjectMember projectMember : projectMemberList) {
                 memberIdsList.add(projectMember.getId());
             }
+            // 修改项目成员版本标识
+            projectMemberService.updateBatchById(memberIdsList);
+            // 删除项目成员
             projectMemberMapper.deleteBatchIds(memberIdsList);
         }
+        // 修改版本标识，解决逻辑删除唯一校验问题
+        this.updateBatchById(updateDelVersionById(idsList));
         // 删除项目信息
         this.removeByIds(idsList);
     }
@@ -131,30 +176,36 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public void addProjMember(ProjectMember projectMember) {
-//        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
-//        queryWrapper.eq(ProjectMember::getProjectId, projectMember.getProjectId());
-//        queryWrapper.eq(ProjectMember::getProjectId, projectMember.getUserId());
-//        ProjectMember ProjectMemberOld = projectMemberMapper.selectOne(queryWrapper);
-//        if (Objects.nonNull(ProjectMemberOld)) {
-//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_DETAILS_ERROR.getMsg());
-//
-//        }
-        projectMemberMapper.insert(projectMember);
+        try {
+            projectMemberMapper.insert(projectMember);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
+        }
     }
 
     @Override
     public void updateProjMember(ProjectMember projectMember) {
-        projectMemberMapper.updateById(projectMember);
+        try {
+            projectMemberMapper.updateById(projectMember);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
+        }
     }
 
     @Override
     public void deleteProjMember(Long  projMemberId) {
+        // 修改项目成员版本标识
+        projectMemberService.updateBatchById(Collections.singletonList(projMemberId));
+        // 删除项目成员
         projectMemberMapper.deleteById(projMemberId);
     }
 
     @Override
     public void deleteProjMemberBatch(String  projMemberIds) {
-        projectMemberMapper.deleteBatchIds(convertIdType(projMemberIds));
+        List<Long> idList = convertIdType(projMemberIds);
+        // 修改项目成员版本标识
+        projectMemberService.updateBatchById(idList);
+        projectMemberMapper.deleteBatchIds(idList);
     }
 
     /** 转换id类型 */

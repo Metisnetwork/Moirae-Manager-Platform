@@ -48,6 +48,11 @@ public enum ErrorMsg {
     ADD_PROJ_ERROR("新增项目错误", "add project error"),
 
     /**
+     * 项目名称已存在
+     */
+    PROJECT_NAME_EXISTED("项目名称已存在", "project name existed"),
+
+    /**
      * 修改项目错误
      */
     UPDATE_PROJ_ERROR("修改项目错误", "update project error"),
