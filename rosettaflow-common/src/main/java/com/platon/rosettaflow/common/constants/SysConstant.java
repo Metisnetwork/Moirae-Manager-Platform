@@ -50,13 +50,14 @@ public class SysConstant {
      */
     public static final String EN_US = "en-US";
     /**
-     * 用户登录URI
+     * 不需要用户登录可以访问的接口
      */
     public static final String[] LOGIN_URIS = {"user/login",
             "user/getLoginNonce",
             "swagger",
             "error",
-            "api-docs"
+            "api-docs",
+            "data/list"
     };
 
     /**

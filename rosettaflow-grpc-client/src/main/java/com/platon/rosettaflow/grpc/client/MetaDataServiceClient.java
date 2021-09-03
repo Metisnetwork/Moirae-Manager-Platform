@@ -123,8 +123,8 @@ public class MetaDataServiceClient {
         List<MetaDataColumnDetailDto> metaDataColumnDetailDtoList = new ArrayList<>();
         MetaDataColumnDetailDto metaDataColumnDetailDto;
         MetadataColumn metadataColumn;
-        for (int i = 0; i < metaDataDetailResponse.getInformation().getMetadataColumnListCount(); i++) {
-            metadataColumn = metaDataDetailResponse.getInformation().getMetadataColumnList(i);
+        for (int i = 0; i < metaDataDetailResponse.getInformation().getMetadataColumnsCount(); i++) {
+            metadataColumn = metaDataDetailResponse.getInformation().getMetadataColumns(i);
             metaDataColumnDetailDto = new MetaDataColumnDetailDto();
             metaDataColumnDetailDto.setIndex(metadataColumn.getCIndex());
             metaDataColumnDetailDto.setName(metadataColumn.getCName());

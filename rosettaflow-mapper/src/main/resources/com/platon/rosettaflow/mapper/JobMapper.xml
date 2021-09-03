@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.rosettaflow.mapper.JobMapper">
-    <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.Job">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="workflow_id" jdbcType="BIGINT" property="workflowId"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="desc" jdbcType="VARCHAR" property="desc"/>
-        <result column="repeat_flag" jdbcType="TINYINT" property="repeatFlag"/>
-        <result column="repeat_interval" jdbcType="INTEGER" property="repeatInterval"/>
-        <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
-        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-    </resultMap>
-    <sql id="Base_Column_List">
+  <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.Job">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="workflow_id" jdbcType="BIGINT" property="workflowId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="repeat_flag" jdbcType="TINYINT" property="repeatFlag" />
+    <result column="repeat_interval" jdbcType="INTEGER" property="repeatInterval" />
+    <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="job_status" jdbcType="TINYINT" property="jobStatus" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
     id, workflow_id, `name`, `desc`, repeat_flag, repeat_interval, begin_time, end_time, 
-    `status`, create_time, update_time
+    job_status, `status`, create_time, update_time
   </sql>
 </mapper>
