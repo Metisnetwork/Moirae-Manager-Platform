@@ -9,7 +9,6 @@ import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.LoginOutReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.service.IUserService;
-import com.platon.rosettaflow.utils.EthWalletSignUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.user.UserVo;
@@ -40,15 +39,15 @@ public class UserController {
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
         boolean flg;
-        try {
-            flg = WalletSignUtils.verifyTypedDataV4(loginInReq.getSignMessage(), loginInReq.getSign(), loginInReq.getAddress());
-        } catch (IOException e) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
-        }
-        if (!flg) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
-        }
-        UserDto userDto = userService.generatorToken(loginInReq.getAddress(),loginInReq.getUserType());
+//        try {
+//            flg = WalletSignUtils.verifyTypedDataV4(loginInReq.getSignMessage(), loginInReq.getSign(), loginInReq.getAddress());
+//        } catch (IOException e) {
+//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
+//        }
+//        if (!flg) {
+//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
+//        }
+        UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getUserType());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 

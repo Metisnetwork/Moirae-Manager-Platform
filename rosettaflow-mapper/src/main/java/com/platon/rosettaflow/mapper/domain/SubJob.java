@@ -50,7 +50,7 @@ public class SubJob implements Serializable {
     /**
      * 状态: 0-无效，1- 有效
      */
-    @TableField(value = "`desc`")
+    @TableField(value = "`status`")
     private Byte status;
     /**
      * 创建时间
