@@ -27,7 +27,6 @@ public class SignMessageDto {
 
     @Data
     public static class Types {
-
     }
 
 
