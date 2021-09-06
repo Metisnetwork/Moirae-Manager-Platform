@@ -56,13 +56,16 @@ public class RedisUtil {
     /**
      * 指定缓存失效时间
      *
-     * @param key  键
+     * @param key  key  键
      * @param time 时间（秒）
+     * @return 是否成功
      */
-    public void expire(String key, long time) {
+    @SuppressWarnings("all")
+    public boolean expire(String key, long time) {
         if (time > 0) {
-            redisTemplate.expire(key, time, TimeUnit.SECONDS);
+            return redisTemplate.expire(key, time, TimeUnit.SECONDS);
         }
+        return true;
     }
 
     /**
@@ -119,6 +122,17 @@ public class RedisUtil {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * 普通删除
+     *
+     * @param key 删除的键
+     * @return true / false
+     */
+    @SuppressWarnings("all")
+    public boolean delete(String key) {
+        return redisTemplate.delete(key);
     }
 
     /**

@@ -15,6 +15,7 @@ public interface IUserService extends IService<User> {
 
     /**
      * 根据地址获取用户信息
+     *
      * @param address 用户地址
      * @return 用户信息
      */
@@ -22,39 +23,48 @@ public interface IUserService extends IService<User> {
 
     /**
      * 生成用户token
-     * @param address 用户钱包地址
+     *
+     * @param address  用户钱包地址
      * @param userType 用户类型
      * @return 用户信息
      */
-    UserDto generatorToken(String address,Byte userType);
+    UserDto generatorToken(String address, Byte userType);
 
     /**
      * 登出
+     *
      * @param address 钱包地址
      */
     void logout(String address);
 
     /**
      * 修改昵称
-     * @param address 钱包地址
+     *
+     * @param address  钱包地址
      * @param nickName 昵称
      */
     void updateNickName(String address, String nickName);
 
     /**
      * 查询所有用户昵称
+     *
+     * @return 所有用户昵称
      */
-    List<Map<String, Object>> queryAllUserNickname();
+    List<Map<String, Object>> queryAllUserNickName();
 
     /**
      * 获取登录nonce
-     * @return 返回uuid
+     *
+     * @param address 用户钱包地址
+     * @return nonce
      */
-    String getLoginNonce();
+    String getLoginNonce(String address);
 
     /**
      * 检查nonce有效性
-     * @return  true：nonce有效 、false:nonce无效
+     *
+     * @param nonce   nonce
+     * @param address 用户地址
      */
-    boolean checkNonceValidity(String nonce);
+    void checkNonceValidity(String nonce, String address);
 }

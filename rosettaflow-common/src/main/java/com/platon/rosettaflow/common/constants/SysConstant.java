@@ -22,6 +22,11 @@ public class SysConstant {
     public static final String REDIS_USER_PREFIX_KEY = "User:";
 
     /**
+     * redis数据库 用户NONCE前缀 Nonce:{address}:{nonce}
+     */
+    public static final String REDIS_USER_NONCE_KEY = "Nonce:{}:{}";
+
+    /**
      * redis数据库 key值 Token前缀
      */
     public static final String REDIS_TOKEN_PREFIX_KEY = "Token:";

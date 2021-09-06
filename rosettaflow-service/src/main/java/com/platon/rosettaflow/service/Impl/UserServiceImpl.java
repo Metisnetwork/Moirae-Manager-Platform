@@ -12,23 +12,22 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.SignMessageDto;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.UserMapper;
 import com.platon.rosettaflow.mapper.domain.User;
+import com.platon.rosettaflow.service.CommonService;
 import com.platon.rosettaflow.service.ITokenService;
 import com.platon.rosettaflow.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author admin
@@ -46,10 +45,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private ITokenService tokenService;
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisUtil redisUtil;
 
     @Resource
     private SysConfig sysConfig;
+
+    @Resource
+    private CommonService commonService;
 
     @Override
     public User getByAddress(String address) {
@@ -59,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public UserDto generatorToken(String address,Byte userType) {
+    public UserDto generatorToken(String address, Byte userType) {
         User user = this.getByAddress(address);
         if (user == null) {
             user = new User();
@@ -85,11 +87,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 获取token的key
         String key = TokenServiceImpl.getTokenKey(user.getId());
         // 获取token
-        String token = (String) redisTemplate.opsForValue().get(key);
+        String token = (String) redisUtil.get(key);
         // 删除缓存中的token
-        redisTemplate.delete(key);
+        redisUtil.delete(key);
         // 删除缓存中的用户信息
-        redisTemplate.delete(TokenServiceImpl.getUserKey(token));
+        redisUtil.delete(TokenServiceImpl.getUserKey(token));
     }
 
     @Override
@@ -101,19 +103,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public List<Map<String, Object>> queryAllUserNickname() {
+    public List<Map<String, Object>> queryAllUserNickName() {
         return userMapper.queryAllUserNickname();
     }
 
     @Override
-    public String getLoginNonce() {
-        String nonce = generateNonce();
-        redisTemplate.opsForValue().set(nonce, getNonceValue(nonce), sysConfig.getNonceTimeOut(), TimeUnit.MILLISECONDS);
+    public String getLoginNonce(String address) {
+        String nonce = commonService.generateUuid();
+        redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce), nonce, sysConfig.getNonceTimeOut());
         return nonce;
     }
 
     @Override
-    public boolean checkNonceValidity(String signMessage) {
+    public void checkNonceValidity(String signMessage, String address) {
 
         SignMessageDto signMessageDto;
         try {
@@ -123,29 +125,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         } catch (Exception e) {
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
-        if(Objects.isNull(signMessageDto.getMessage()) || !StrUtil.isNotEmpty(signMessageDto.getMessage().getKey())){
+        if (Objects.isNull(signMessageDto.getMessage()) || StrUtil.isEmpty(signMessageDto.getMessage().getKey())) {
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
         String nonce = signMessageDto.getMessage().getKey();
-        boolean isExistKey = Boolean.TRUE.equals(redisTemplate.hasKey(nonce));
-        if(!isExistKey){
-            return false;
+        if (StrUtil.isEmpty(nonce)) {
+            throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
-        String value = (String) redisTemplate.opsForValue().get(nonce);
-        if(!StrUtil.equals(value, getNonceValue(nonce))){
-            return false;
+
+        String redisKey = StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce);
+
+        if (!redisUtil.hasKey(redisKey)) {
+            throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
         }
-        redisTemplate.delete(nonce);
-        return true;
+        redisUtil.delete(redisKey);
     }
-
-
-    public static String generateNonce() {
-        return UUID.randomUUID().toString().replace("-", "").toUpperCase();
-    }
-
-    public static String getNonceValue(String nonce) {
-        return SysConstant.REDIS_USER_PREFIX_KEY + nonce;
-    }
-
 }
