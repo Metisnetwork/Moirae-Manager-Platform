@@ -127,7 +127,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
 
         // 获取算法自变量及因变量
-        AlgorithmVariable algorithmVariable = algorithmVariableService.getByAlgorithmId(workflowNode.getAlgorithmId());
+        List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNode.getAlgorithmId());
 
         WorkflowNode newNode = new WorkflowNode();
         newNode.setWorkflowId(workflowNode.getWorkflowId());
@@ -150,14 +150,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowNodeCodeService.save(workflowNodeCode);
 
         // 保存工作流节点变量
-        WorkflowNodeVariable workflowNodeVariable = new WorkflowNodeVariable();
-        workflowNodeVariable.setWorkflowNodeId(newNode.getId());
-        workflowNodeVariable.setVarNodeType(algorithmVariable.getVarType());
-        workflowNodeVariable.setVarNodeKey(algorithmVariable.getVarKey());
-        workflowNodeVariable.setVarNodeValue(algorithmVariable.getVarValue());
-        workflowNodeVariable.setVarNodeDesc(algorithmVariable.getVarDesc());
-        workflowNodeVariable.setStatus(StatusEnum.VALID.getValue());
-        workflowNodeVariableService.save(workflowNodeVariable);
+        for (AlgorithmVariable algorithmVariable : algorithmVariableList) {
+            WorkflowNodeVariable workflowNodeVariable = new WorkflowNodeVariable();
+            workflowNodeVariable.setWorkflowNodeId(newNode.getId());
+            workflowNodeVariable.setVarNodeType(algorithmVariable.getVarType());
+            workflowNodeVariable.setVarNodeKey(algorithmVariable.getVarKey());
+            workflowNodeVariable.setVarNodeValue(algorithmVariable.getVarValue());
+            workflowNodeVariable.setVarNodeDesc(algorithmVariable.getVarDesc());
+            workflowNodeVariable.setStatus(StatusEnum.VALID.getValue());
+            workflowNodeVariableService.save(workflowNodeVariable);
+        }
     }
 
     @Override
