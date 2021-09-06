@@ -92,13 +92,14 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
+        String uuid = "d5fd7f1d36b241ff8738c9dc9cf2d201";
         String json = "{\n" +
                 "    \"domain\": {\n" +
                 "        \"name\": \"Moirae\"\n" +
                 "    },\n" +
                 "    \"message\": {\n" +
-                "        \"key\": \"uuid\",\n" +
-                "        \"desc\": \"Login to Moirae\"\n" +
+                "        \"key\": \"{}\",\n" +
+                "        \"desc\": \"Welcome to Moirae!\"\n" +
                 "    },\n" +
                 "    \"primaryType\": \"Login\",\n" +
                 "    \"types\": {\n" +
@@ -122,6 +123,8 @@ public class WalletSignUtils {
                 "}";
 
         try {
+            json = StrUtil.format(json, uuid);
+            System.out.println("加密的json字符串为>>>" + json);
             Credentials credentials = Credentials.create("567762b8a66385de7bfc6fd96f5de618da1389b6974638c995c5e94a861b922b");
             System.out.println(credentials.getAddress());
 
@@ -129,7 +132,7 @@ public class WalletSignUtils {
 
             System.out.println("验证签名结果>>>" + verifyTypedDataV4(
                     json,
-                    "0xb231d71fd53950d6473373a0eeff7591810b20cf437208c26e3286cfefd03de625a653e9f73e01d67e60efb55ce477cb8f6754ae731a2e8652278f16fd3f2c741b",
+                    "0x78555f07148ba6fba51412e8a6cf44fd58a0fa643ee0605c2c229691f12bed2e3eda3034cb3af4f79e17f21f4757c4dd616a4c3814a4bfd20cd8db39c4baad0f1b",
                     "0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20"));
 
         } catch (Exception e) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,6 +55,15 @@ public class CommonService {
      */
     public String generateTaskName(Long workflowNodeId) {
         return TASK_NAME_PRE + workflowNodeId + "_" + DateUtil.format(new Date(), DATE_TIME_FMT);
+    }
+
+    /**
+     * 生成随机uuid
+     *
+     * @return 返回uuid
+     */
+    public String generateUuid() {
+        return UUID.randomUUID().toString().replace("-", "").toLowerCase();
     }
 
 }

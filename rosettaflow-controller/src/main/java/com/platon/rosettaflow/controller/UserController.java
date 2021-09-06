@@ -16,6 +16,7 @@ import com.platon.rosettaflow.vo.user.UserNicknameVo;
 import com.platon.rosettaflow.vo.user.UserVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -38,22 +39,17 @@ public class UserController {
     @Resource
     private IUserService userService;
 
-
-    @GetMapping("getLoginNonce")
+    @GetMapping("getLoginNonce/{address}")
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
-    public ResponseVo<NonceVo> getLoginNonce() {
-        String nonce = userService.getLoginNonce();
-        NonceVo nonceVo = new NonceVo();
-        nonceVo.setNonce(nonce);
-        return ResponseVo.createSuccess(nonceVo);
+    public ResponseVo<NonceVo> getLoginNonce(@ApiParam(value = "用户钱包地址", required = true) @PathVariable String address) {
+        return ResponseVo.createSuccess(new NonceVo(userService.getLoginNonce(address)));
     }
-
 
     @PostMapping("login")
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
         boolean flg;
-        if(!userService.checkNonceValidity(loginInReq.getSignMessage())){
+        if (!userService.checkNonceValidity(loginInReq.getSignMessage(),loginInReq.getAddress())) {
             throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
         }
         try {
@@ -64,7 +60,7 @@ public class UserController {
         if (!flg) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
-        UserDto userDto = userService.generatorToken(loginInReq.getAddress(),loginInReq.getUserType());
+        UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getUserType());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 
@@ -85,7 +81,7 @@ public class UserController {
     @GetMapping("queryAllUserNickname")
     @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称")
     public ResponseVo<List<UserNicknameVo>> queryAllUserNickname() {
-        List<Map<String, Object>> list = userService.queryAllUserNickname();
+        List<Map<String, Object>> list = userService.queryAllUserNickName();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
 
