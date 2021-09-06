@@ -30,7 +30,7 @@ public class MetaDataAuthReq {
 
     @ApiModelProperty(value = "授权次数，按次数时,此字段必输", required = true, example = "100")
     @Positive(message = "{metadata.auth.positive}")
-    private Long authValue;
+    private Integer authValue;
 
     @ApiModelProperty(value = "授权开始时间,按时间授权此字段必输", example = "2021-08-27 17:13:47")
     private Date authBeginTime;

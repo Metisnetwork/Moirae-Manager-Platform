@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.utils;
 
 import cn.hutool.core.util.StrUtil;
+import com.platone.sdk.utlis.Bech32;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.web3j.crypto.*;
@@ -97,7 +98,7 @@ public class WalletSignUtils {
                 "        \"name\": \"Moirae\"\n" +
                 "    },\n" +
                 "    \"message\": {\n" +
-                "        \"key\": \"uuid\",\n" +
+                "        \"key\": \"7D27BD561BE149578D9FDA89D2B10BFE\",\n" +
                 "        \"desc\": \"Login to Moirae\"\n" +
                 "    },\n" +
                 "    \"primaryType\": \"Login\",\n" +
@@ -124,12 +125,14 @@ public class WalletSignUtils {
         try {
             Credentials credentials = Credentials.create("567762b8a66385de7bfc6fd96f5de618da1389b6974638c995c5e94a861b922b");
             System.out.println(credentials.getAddress());
+            System.out.println(Bech32.addressDecodeHex(credentials.getAddress()));
+
 
             System.out.println("签名结果>>>" + signTypedDataV4(json, credentials.getEcKeyPair()));
 
             System.out.println("验证签名结果>>>" + verifyTypedDataV4(
                     json,
-                    "0xb231d71fd53950d6473373a0eeff7591810b20cf437208c26e3286cfefd03de625a653e9f73e01d67e60efb55ce477cb8f6754ae731a2e8652278f16fd3f2c741b",
+                    "0xc960e6505f5ace1e43b44653db5a769ba98983130008b5240b7eaa92260e042d4ab6cce1a1d450a2f1d291bf2e1841ecd60328bdd7b0d5c8c22346a6f8a54c161b",
                     "0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20"));
 
         } catch (Exception e) {

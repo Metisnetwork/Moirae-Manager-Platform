@@ -7,22 +7,17 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.MetaDataStateEnum;
-import com.platon.rosettaflow.common.enums.MetaDataStatusEnum;
 import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.mapper.MetaDataMapper;
 import com.platon.rosettaflow.mapper.domain.MetaData;
-import com.platon.rosettaflow.mapper.domain.UserMetaData;
 import com.platon.rosettaflow.service.IMetaDataService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author hudenian
@@ -47,7 +42,11 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
             wrapper.like(MetaData::getDataName, dataName);
         }
         this.page(page, wrapper);
-        List<MetaDataDto> metaDataWithAuthList = baseMapper.selectMetaDataWithAuth(UserContext.get().getAddress());
+        //登录时，查询数据授权状态
+        List<MetaDataDto> metaDataWithAuthList = new ArrayList<>();
+        if(!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())){
+            metaDataWithAuthList.addAll(baseMapper.selectMetaDataWithAuth(UserContext.get().getAddress()));
+        }
         return this.convertToPageDto(page,metaDataWithAuthList);
     }
 
