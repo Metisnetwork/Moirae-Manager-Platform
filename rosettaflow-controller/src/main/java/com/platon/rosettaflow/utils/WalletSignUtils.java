@@ -1,12 +1,12 @@
 package com.platon.rosettaflow.utils;
 
+import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.web3j.crypto.ECKeyPair;
-import org.web3j.crypto.Keys;
-import org.web3j.crypto.Sign;
-import org.web3j.crypto.StructuredDataEncoder;
+import org.web3j.crypto.*;
 import org.web3j.utils.Numeric;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -74,36 +74,61 @@ public class WalletSignUtils {
         return addresses.toString().contains(address.toLowerCase());
     }
 
+    /**
+     * 对数据进行eth_signTypedData_v4签名
+     *
+     * @param jsonMessage 签名数据结构体
+     * @param ecKeyPair   密钥对
+     * @return 签名字符串
+     */
+    public static String signTypedDataV4(String jsonMessage, ECKeyPair ecKeyPair) throws IOException {
+        StrUtil.replace(jsonMessage, "\\\"", "\"");
+        StructuredDataEncoder encoder = new StructuredDataEncoder(jsonMessage);
+        byte[] hash = encoder.hashStructuredData();
+        Sign.SignatureData signatureData = Sign.signMessage(hash, ecKeyPair, false);
+        byte[] bytesValue = ArrayUtils.addAll(signatureData.getR(), signatureData.getS());
+        bytesValue = ArrayUtils.addAll(bytesValue, signatureData.getV());
+        return "0x" + DatatypeConverter.printHexBinary(bytesValue).toLowerCase();
+    }
+
     public static void main(String[] args) {
+        String json = "{\n" +
+                "    \"domain\": {\n" +
+                "        \"name\": \"Moirae\"\n" +
+                "    },\n" +
+                "    \"message\": {\n" +
+                "        \"key\": \"uuid\",\n" +
+                "        \"desc\": \"Login to Moirae\"\n" +
+                "    },\n" +
+                "    \"primaryType\": \"Login\",\n" +
+                "    \"types\": {\n" +
+                "        \"EIP712Domain\": [\n" +
+                "            {\n" +
+                "                \"name\": \"name\",\n" +
+                "                \"type\": \"string\"\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"Login\": [\n" +
+                "            {\n" +
+                "                \"name\": \"key\",\n" +
+                "                \"type\": \"string\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"name\": \"desc\",\n" +
+                "                \"type\": \"string\"\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }\n" +
+                "}";
+
         try {
-            System.out.println("验证签名结果>>>" + verifyTypedDataV4("{\n" +
-                            "    \"domain\": {\n" +
-                            "        \"name\": \"Moirae\"\n" +
-                            "    },\n" +
-                            "    \"message\": {\n" +
-                            "        \"key\": \"uuid\",\n" +
-                            "        \"desc\": \"Login to Moirae\"\n" +
-                            "    },\n" +
-                            "    \"primaryType\": \"Login\",\n" +
-                            "    \"types\": {\n" +
-                            "        \"EIP712Domain\": [\n" +
-                            "            {\n" +
-                            "                \"name\": \"name\",\n" +
-                            "                \"type\": \"string\"\n" +
-                            "            }\n" +
-                            "        ],\n" +
-                            "        \"Login\": [\n" +
-                            "            {\n" +
-                            "                \"name\": \"key\",\n" +
-                            "                \"type\": \"string\"\n" +
-                            "            },\n" +
-                            "            {\n" +
-                            "                \"name\": \"desc\",\n" +
-                            "                \"type\": \"string\"\n" +
-                            "            }\n" +
-                            "        ]\n" +
-                            "    }\n" +
-                            "}",
+            Credentials credentials = Credentials.create("567762b8a66385de7bfc6fd96f5de618da1389b6974638c995c5e94a861b922b");
+            System.out.println(credentials.getAddress());
+
+            System.out.println("签名结果>>>" + signTypedDataV4(json, credentials.getEcKeyPair()));
+
+            System.out.println("验证签名结果>>>" + verifyTypedDataV4(
+                    json,
                     "0xb231d71fd53950d6473373a0eeff7591810b20cf437208c26e3286cfefd03de625a653e9f73e01d67e60efb55ce477cb8f6754ae731a2e8652278f16fd3f2c741b",
                     "0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20"));
 
