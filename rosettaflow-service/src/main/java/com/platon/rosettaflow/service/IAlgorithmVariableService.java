@@ -18,4 +18,11 @@ public interface IAlgorithmVariableService extends IService<AlgorithmVariable> {
      * @return 算法变量
      */
     List<AlgorithmVariable> getByAlgorithmId(Long algorithmId);
+
+    /**
+     * 复制保存算法变量
+     * @param oldAlgorithmId 源算法id
+     * @param newAlgorithmId 目的算法id
+     */
+    void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId);
 }

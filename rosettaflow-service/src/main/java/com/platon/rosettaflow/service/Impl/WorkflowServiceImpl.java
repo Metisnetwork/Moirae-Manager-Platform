@@ -3,9 +3,7 @@ package com.platon.rosettaflow.service.Impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -18,7 +16,6 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
-import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -46,7 +43,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private CommonService commonService;
 
     @Resource
-    AlgorithmMapper algorithmMapper;
+    private IAlgorithmService algorithmService;
+
+    @Resource
+    private IAlgorithmCodeService algorithmCodeService;
+
+    @Resource
+    private IAlgorithmVariableService algorithmVariableService;
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
@@ -89,7 +92,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             // 工作流节点dto
             WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
             // 算法对象
-            AlgorithmDto algorithmDto = algorithmMapper.queryAlgorithmDetails(workflowNode.getAlgorithmId());
+            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
             if(Objects.nonNull(algorithmDto)) {
                 // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
@@ -155,43 +158,48 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void copyWorkflow(Long originId, String workflowName, String workflowDesc) {
+        try {
+            // 将复制的工作流数据id置空，新增一条新的工作流数据
+            Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
+            // 查询原工作流节点
+            List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
+            if(workflowNodeOldList == null || workflowNodeOldList.size() == 0) {
+               return;
+            }
+            // 保存为新工作流节点
+            workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
+            // 复制算法、算法代码、算法变量
+            for (WorkflowNode oldNode : workflowNodeOldList) {
+                // 保存算法
+                Long newAlgorithmId = algorithmService.copySaveAlgorithm(oldNode);
+                // 保存算法代码(参数：源算法id、目的算法id)
+                algorithmCodeService.copySaveAlgorithmCode(oldNode.getAlgorithmId(), newAlgorithmId);
+                // 保存算法变量(参数：源算法id、目的算法id)
+                algorithmVariableService.saveAlgorithmVariable(oldNode.getAlgorithmId(), newAlgorithmId);
+            }
+        } catch (Exception e) {
+            if (e instanceof DuplicateKeyException) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
+            }
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
+        }
+    }
+
+    /** 将复制的工作流数据id置空，新增一条新的工作流数据 */
+    private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc){
         Workflow originWorkflow = this.getById(originId);
         if (Objects.isNull(originWorkflow)) {
             log.error("Origin workflow not found by id:{}", originId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ORIGIN_NOT_EXIST.getMsg());
         }
-        // 校验工作流名称
-        Workflow workflow = checkWorkflowName(originWorkflow.getProjectId(), workflowName);
-        if (Objects.nonNull(workflow)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
-        }
-        // 将复制的工作流数据id置空，新增一条新的工作流数据
-        Workflow newWorkflow = BeanUtil.toBean(originWorkflow, Workflow.class);
-        newWorkflow.setId(null);
+        Workflow newWorkflow = new Workflow();
+        newWorkflow.setProjectId(originWorkflow.getProjectId());
+        newWorkflow.setUserId(originWorkflow.getUserId());
         newWorkflow.setWorkflowName(workflowName);
         newWorkflow.setWorkflowDesc(workflowDesc);
+        newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());
         this.save(newWorkflow);
-        // 查询原工作流节点
-        LambdaQueryWrapper<WorkflowNode> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WorkflowNode::getWorkflowId, originWorkflow.getId());
-        List<WorkflowNode> workflowNodeList = workflowNodeService.list(queryWrapper);
-        // 保存为新工作流节点
-        List<WorkflowNode> newNodeList = new ArrayList<>();
-        for (WorkflowNode workflowNode : workflowNodeList) {
-            WorkflowNode newNode = BeanUtil.toBean(workflowNode, WorkflowNode.class);
-            newNode.setId(null);
-            newNode.setWorkflowId(newWorkflow.getId());
-            newNodeList.add(newNode);
-        }
-        workflowNodeService.saveBatch(newNodeList);
-    }
-
-    @Override
-    public Workflow checkWorkflowName(Long projectId, String workflowName) {
-        LambdaQueryWrapper<Workflow> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Workflow::getProjectId, projectId);
-        wrapper.eq(Workflow::getWorkflowName, workflowName);
-        return this.getOne(wrapper);
+        return newWorkflow.getId();
     }
 
     @Override

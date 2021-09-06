@@ -88,11 +88,11 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
             // 保存算法、算法代码、算法变量
             for (WorkflowNodeTemp nodeTemp : nodeTempList) {
                 // 保存算法
-                Long algorithmId = saveAlgorithm(nodeTemp);
-                // 保存算法代码
-                saveAlgorithmCode(algorithmId);
-                // 保存算法变量
-                saveAlgorithmVariable(algorithmId);
+                Long newAlgorithmId = saveAlgorithm(nodeTemp);
+                // 保存算法代码(参数：源算法id、目的算法id)
+                algorithmCodeService.copySaveAlgorithmCode(nodeTemp.getAlgorithmId(), newAlgorithmId);
+                // 保存算法变量(参数：源算法id、目的算法id)
+                algorithmVariableService.saveAlgorithmVariable(nodeTemp.getAlgorithmId(), newAlgorithmId);
             }
         }
     }
@@ -132,64 +132,12 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
 
     /** 保存工作流节点 */
     private void saveWorkflowNode(Long workflowId, List<WorkflowNodeTemp> nodeTempList){
-        List<WorkflowNode> nodeList = new ArrayList<>();
-        for (WorkflowNodeTemp nodeTemp : nodeTempList) {
-            WorkflowNode workflowNode = new WorkflowNode();
-            workflowNode.setWorkflowId(workflowId);
-            workflowNode.setAlgorithmId(nodeTemp.getAlgorithmId());
-            workflowNode.setNodeName(nodeTemp.getNodeName());
-            workflowNode.setNodeStep(nodeTemp.getNodeStep());
-            workflowNode.setNextNodeStep(nodeTemp.getNextNodeStep());
-            nodeList.add(workflowNode);
-        }
-        workflowNodeService.saveBatch(nodeList);
+        List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(nodeTempList, WorkflowNode.class);
+        workflowNodeService.copySaveWorkflowNode(workflowId, workflowNodeList);
     }
 
     /** 保存算法 */
     private Long saveAlgorithm(WorkflowNodeTemp nodeTemp){
-        Algorithm algorithmTemp = algorithmService.getById(nodeTemp.getId());
-        if (Objects.isNull(algorithmTemp)) {
-            return null;
-        }
-        Algorithm newAlgorithm = BeanUtil.toBean(algorithmTemp, Algorithm.class);
-        newAlgorithm.setId(null);
-        newAlgorithm.setAuthor(UserContext.get() == null ? "" : UserContext.get().getUserName());
-        newAlgorithm.setCreateTime(null);
-        newAlgorithm.setUpdateTime(null);
-        algorithmService.save(newAlgorithm);
-        return newAlgorithm.getId();
-    }
-
-    /** 保存算法代码 */
-    private void saveAlgorithmCode(Long algorithmId){
-        AlgorithmCode algorithmCodeTemp = algorithmCodeService.getByAlgorithmId(algorithmId);
-        if (Objects.isNull(algorithmCodeTemp)) {
-            return;
-        }
-        AlgorithmCode newAlgorithmCode = new AlgorithmCode();
-        newAlgorithmCode.setAlgorithmId(algorithmId);
-        newAlgorithmCode.setEditType(algorithmCodeTemp.getEditType());
-        newAlgorithmCode.setCalculateContractCode(algorithmCodeTemp.getCalculateContractCode());
-        newAlgorithmCode.setDataSplitContractCode(algorithmCodeTemp.getDataSplitContractCode());
-        algorithmCodeService.save(newAlgorithmCode);
-    }
-
-    /** 保存算法变量 */
-    private void saveAlgorithmVariable(Long algorithmId){
-        List<AlgorithmVariable> variableTempList = algorithmVariableService.getByAlgorithmId(algorithmId);
-        if (variableTempList == null || variableTempList.size() == 0) {
-            return;
-        }
-        List<AlgorithmVariable> newAlgorithmVariableList = new ArrayList<>();
-        for (AlgorithmVariable algorithmVariable : variableTempList) {
-            AlgorithmVariable newAlgorithmVariable = new AlgorithmVariable();
-            newAlgorithmVariable.setAlgorithmId(algorithmId);
-            newAlgorithmVariable.setVarType(algorithmVariable.getVarType());
-            newAlgorithmVariable.setVarKey(algorithmVariable.getVarKey());
-            newAlgorithmVariable.setVarValue(algorithmVariable.getVarValue());
-            newAlgorithmVariable.setVarDesc(algorithmVariable.getVarDesc());
-            newAlgorithmVariableList.add(newAlgorithmVariable);
-        }
-        algorithmVariableService.saveBatch(newAlgorithmVariableList);
+        return algorithmService.copySaveAlgorithm(BeanUtil.toBean(nodeTemp, WorkflowNode.class));
     }
 }

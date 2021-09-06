@@ -9,6 +9,7 @@ import com.platon.rosettaflow.service.IAlgorithmVariableService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,5 +25,24 @@ public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableM
         LambdaUpdateWrapper<AlgorithmVariable> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(AlgorithmVariable::getAlgorithmId, algorithmId);
         return this.list(wrapper);
+    }
+
+    @Override
+    public void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId){
+        List<AlgorithmVariable> variableOldList = this.getByAlgorithmId(oldAlgorithmId);
+        if (variableOldList == null || variableOldList.size() == 0) {
+            return;
+        }
+        List<AlgorithmVariable> newAlgorithmVariableList = new ArrayList<>();
+        for (AlgorithmVariable algorithmVariable : variableOldList) {
+            AlgorithmVariable newAlgorithmVariable = new AlgorithmVariable();
+            newAlgorithmVariable.setAlgorithmId(newAlgorithmId);
+            newAlgorithmVariable.setVarType(algorithmVariable.getVarType());
+            newAlgorithmVariable.setVarKey(algorithmVariable.getVarKey());
+            newAlgorithmVariable.setVarValue(algorithmVariable.getVarValue());
+            newAlgorithmVariable.setVarDesc(algorithmVariable.getVarDesc());
+            newAlgorithmVariableList.add(newAlgorithmVariable);
+        }
+        this.saveBatch(newAlgorithmVariableList);
     }
 }

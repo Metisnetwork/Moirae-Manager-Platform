@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -287,5 +288,20 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
         // 不存在算法代码新增数据
         workflowNodeResourceService.save(workflowNodeResource);
+    }
+
+    @Override
+    public void copySaveWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList) {
+        List<WorkflowNode> newNodeList = new ArrayList<>();
+        workflowNodeOldList.forEach(oldNode -> {
+            WorkflowNode newNode = new WorkflowNode();
+            newNode.setWorkflowId(newWorkflowId);
+            newNode.setAlgorithmId(oldNode.getAlgorithmId());
+            newNode.setNodeName(oldNode.getNodeName());
+            newNode.setNodeStep(oldNode.getNodeStep());
+            newNode.setNextNodeStep(oldNode.getNextNodeStep());
+            newNodeList.add(newNode);
+        });
+        this.saveBatch(newNodeList);
     }
 }
