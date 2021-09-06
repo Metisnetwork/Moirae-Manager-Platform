@@ -48,10 +48,10 @@ public class UserController {
     @PostMapping("login")
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
+
+        userService.checkNonceValidity(loginInReq.getSignMessage(), loginInReq.getAddress());
+
         boolean flg;
-        if (!userService.checkNonceValidity(loginInReq.getSignMessage(),loginInReq.getAddress())) {
-            throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
-        }
         try {
             flg = WalletSignUtils.verifyTypedDataV4(loginInReq.getSignMessage(), loginInReq.getSign(), loginInReq.getAddress());
         } catch (Exception e) {

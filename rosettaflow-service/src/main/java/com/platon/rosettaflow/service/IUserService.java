@@ -65,7 +65,6 @@ public interface IUserService extends IService<User> {
      *
      * @param nonce   nonce
      * @param address 用户地址
-     * @return 是否有效
      */
-    boolean checkNonceValidity(String nonce, String address);
+    void checkNonceValidity(String nonce, String address);
 }

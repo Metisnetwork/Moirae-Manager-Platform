@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platon.rosettaflow.common.constants.SysConfig;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author admin
@@ -115,7 +115,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public boolean checkNonceValidity(String signMessage, String address) {
+    public void checkNonceValidity(String signMessage, String address) {
 
         SignMessageDto signMessageDto;
         try {
@@ -125,7 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         } catch (Exception e) {
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
-        if(Objects.isNull(signMessageDto.getMessage()) || !StrUtil.isNotEmpty(signMessageDto.getMessage().getKey())){
+        if (Objects.isNull(signMessageDto.getMessage()) || StrUtil.isEmpty(signMessageDto.getMessage().getKey())) {
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
         String nonce = signMessageDto.getMessage().getKey();
@@ -136,9 +136,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String redisKey = StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce);
 
         if (!redisUtil.hasKey(redisKey)) {
-            return false;
+            throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
         }
-
-        return redisUtil.expire(redisKey, 1);
+        redisUtil.delete(redisKey);
     }
 }

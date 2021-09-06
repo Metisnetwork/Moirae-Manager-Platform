@@ -92,7 +92,7 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "d5fd7f1d36b241ff8738c9dc9cf2d201";
+        String uuid = "f00bda43c8e841389f38943f2b667e25";
         String json = "{\n" +
                 "    \"domain\": {\n" +
                 "        \"name\": \"Moirae\"\n" +
