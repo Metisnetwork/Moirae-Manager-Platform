@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.utils;
 
 import cn.hutool.core.util.StrUtil;
+import com.platone.sdk.utlis.Bech32;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.web3j.crypto.*;
@@ -71,7 +72,7 @@ public class WalletSignUtils {
     public static boolean verifyTypedDataV4(String jsonMessage, String signMsg, String address) throws IOException {
         StructuredDataEncoder dataEncoder = new StructuredDataEncoder(jsonMessage);
         Map<Integer, String> addresses = CryptoUtils.ecrecover(signMsg, dataEncoder.hashStructuredData());
-        return addresses.toString().contains(address.toLowerCase());
+        return addresses.toString().contains("0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(address)).toLowerCase());
     }
 
     /**
@@ -93,34 +94,7 @@ public class WalletSignUtils {
 
     public static void main(String[] args) {
         String uuid = "f00bda43c8e841389f38943f2b667e25";
-        String json = "{\n" +
-                "    \"domain\": {\n" +
-                "        \"name\": \"Moirae\"\n" +
-                "    },\n" +
-                "    \"message\": {\n" +
-                "        \"key\": \"{}\",\n" +
-                "        \"desc\": \"Welcome to Moirae!\"\n" +
-                "    },\n" +
-                "    \"primaryType\": \"Login\",\n" +
-                "    \"types\": {\n" +
-                "        \"EIP712Domain\": [\n" +
-                "            {\n" +
-                "                \"name\": \"name\",\n" +
-                "                \"type\": \"string\"\n" +
-                "            }\n" +
-                "        ],\n" +
-                "        \"Login\": [\n" +
-                "            {\n" +
-                "                \"name\": \"key\",\n" +
-                "                \"type\": \"string\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"name\": \"desc\",\n" +
-                "                \"type\": \"string\"\n" +
-                "            }\n" +
-                "        ]\n" +
-                "    }\n" +
-                "}";
+        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
 
         try {
             json = StrUtil.format(json, uuid);
@@ -132,7 +106,7 @@ public class WalletSignUtils {
 
             System.out.println("验证签名结果>>>" + verifyTypedDataV4(
                     json,
-                    "0x78555f07148ba6fba51412e8a6cf44fd58a0fa643ee0605c2c229691f12bed2e3eda3034cb3af4f79e17f21f4757c4dd616a4c3814a4bfd20cd8db39c4baad0f1b",
+                    "0xed299b526b7f6c4049147d7dbaaa8d903fcdb05e95839b7db1e49a3701ae927d7ae20f577268c9241d522d775ca18b4d3a4f5d6e692451216a02787a76247d471c",
                     "0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20"));
 
         } catch (Exception e) {
