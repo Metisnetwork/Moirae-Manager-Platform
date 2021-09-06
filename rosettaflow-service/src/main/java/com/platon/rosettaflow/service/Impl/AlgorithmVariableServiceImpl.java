@@ -9,6 +9,8 @@ import com.platon.rosettaflow.service.IAlgorithmVariableService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author hudenian
  * @date 2021/8/31
@@ -18,9 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableMapper, AlgorithmVariable> implements IAlgorithmVariableService {
     @Override
-    public AlgorithmVariable getByAlgorithmId(Long algorithmId) {
+    public List<AlgorithmVariable> getByAlgorithmId(Long algorithmId) {
         LambdaUpdateWrapper<AlgorithmVariable> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(AlgorithmVariable::getAlgorithmId, algorithmId);
-        return this.getOne(wrapper);
+        return this.list(wrapper);
     }
 }

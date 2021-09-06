@@ -337,12 +337,13 @@ CREATE TABLE `t_workflow` (
   `node_number` int(11) DEFAULT NULL COMMENT '节点数',
   `sign`  varchar(512) DEFAULT NULL COMMENT '发起任务的账户的签名',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未完成,1-已完成',
+  `del_version` bigint(11) DEFAULT 0 COMMENT '版本标识，用于逻辑删除',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  KEY (`project_id`),
-  KEY (`user_id`)
+  UNIQUE KEY UK_FLOW_NAME (`project_id`, `workflow_name`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流表';
 
 -- ----------------------------

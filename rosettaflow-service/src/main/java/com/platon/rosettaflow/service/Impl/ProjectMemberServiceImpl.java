@@ -33,7 +33,7 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
         this.updateBatchById(updateDelVersionById(idList));
     }
 
-    /** 修改版本标识，解决逻辑删除唯一校验问题 */
+    /** 逻辑删除项目成员，修改版本标识，解决逻辑删除唯一校验问题 */
     private List<ProjectMember> updateDelVersionById(List<Long> idList){
         List<ProjectMember> projectMemberList = new ArrayList<>();
         if (idList != null && idList.size() > 0) {
@@ -41,6 +41,7 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
                 ProjectMember projectMember = new ProjectMember();
                 projectMember.setId(id);
                 projectMember.setDelVersion(id);
+                projectMember.setStatus((byte)0);
                 projectMemberList.add(projectMember);
             });
         }

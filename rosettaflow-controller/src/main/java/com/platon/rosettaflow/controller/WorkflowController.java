@@ -7,6 +7,7 @@ import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
@@ -20,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -88,7 +90,8 @@ public class WorkflowController {
     @PostMapping("add")
     @ApiOperation(value = "添加工作流", notes = "添加工作流")
     public ResponseVo<?> add(@RequestBody @Validated AddWorkflowReq addReq) {
-        workflowService.addWorkflow(addReq.getProjectId(), addReq.getWorkflowName(), addReq.getWorkflowDesc());
+        Workflow workflow = BeanUtil.toBean(addReq, Workflow.class);
+        workflowService.addWorkflow(workflow);
         return ResponseVo.createSuccess();
     }
 

@@ -57,7 +57,12 @@ public enum ErrorMsg {
     /**
      * 项目名称已存在
      */
-    PROJECT_NAME_EXISTED("项目名称已存在", "project name existed"),
+    PROJECT_NAME_EXISTED("项目名称已存在", "project name already exist"),
+
+    /**
+     * 项目成员角色已存在
+     */
+    MEMBER_ROLE_EXISTED("成员角色已存在", "member role already exist"),
 
     /**
      * 修改项目错误
@@ -84,7 +89,7 @@ public enum ErrorMsg {
      */
     WORKFLOW_NOT_EXIST("工作流不存在", "workflow not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow not exist"),
-    WORKFLOW_EXIST("工作流已存在", "workflow exist"),
+    WORKFLOW_EXIST("工作流已存在", "workflow already exist"),
     /**
      * 工作流节点不存在
      */

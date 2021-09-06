@@ -69,10 +69,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             this.updateById(project);
         } catch (Exception e) {
+            log.error("updateProject--修改项目信息失败, 错误信息:{}", e.getMessage());
             if (e instanceof DuplicateKeyException){
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
             }
-            log.error("updateProject--修改项目信息失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.UPDATE_PROJ_ERROR.getMsg());
         }
     }
@@ -106,16 +106,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProject(Long id) {
-        // 修改项目版本标识，解决逻辑删除唯一校验问题
+        // 逻辑删除项目信息,修改项目版本标识，解决逻辑删除唯一校验问题
         this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
-        // 删除项目信息
-        this.removeById(id);
         // 根据项目id获取成员id
         List<Long> idList = getMemberIdByProjectId(id);
-        // 修改项目成员版本标识
+        // 批量逻辑删除项目成员，并修改项目成员版本标识
         projectMemberService.updateBatchById(idList);
-        // 删除项目成员
-        projectMemberMapper.deleteBatchIds(idList);
     }
 
     /**  根据项目id获取成员id */
@@ -137,6 +133,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 Project project = new Project();
                 project.setId(id);
                 project.setDelVersion(id);
+                project.setStatus((byte)0);
                 projectList.add(project);
             });
         }
@@ -157,15 +154,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             for (ProjectMember projectMember : projectMemberList) {
                 memberIdsList.add(projectMember.getId());
             }
-            // 修改项目成员版本标识
+            // 逻辑删除项目成员，并修改项目成员版本标识
             projectMemberService.updateBatchById(memberIdsList);
-            // 删除项目成员
-            projectMemberMapper.deleteBatchIds(memberIdsList);
         }
-        // 修改版本标识，解决逻辑删除唯一校验问题
+        // 逻辑删除项目信息，修改版本标识，解决逻辑删除唯一校验问题
         this.updateBatchById(updateDelVersionById(idsList));
-        // 删除项目信息
-        this.removeByIds(idsList);
     }
 
     @Override
@@ -179,7 +172,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             projectMemberMapper.insert(projectMember);
         } catch (DuplicateKeyException e) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
     }
 
@@ -188,24 +181,23 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             projectMemberMapper.updateById(projectMember);
         } catch (DuplicateKeyException e) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
     }
 
     @Override
-    public void deleteProjMember(Long  projMemberId) {
-        // 修改项目成员版本标识
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void deleteProjMember(Long projMemberId) {
+        // 逻辑删除项目成员，修改项目成员版本标识
         projectMemberService.updateBatchById(Collections.singletonList(projMemberId));
-        // 删除项目成员
-        projectMemberMapper.deleteById(projMemberId);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProjMemberBatch(String  projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
-        // 修改项目成员版本标识
+        // 批量逻辑删除项目成员，并修改项目成员版本标识
         projectMemberService.updateBatchById(idList);
-        projectMemberMapper.deleteBatchIds(idList);
     }
 
     /** 转换id类型 */
