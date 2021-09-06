@@ -67,7 +67,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     void addWorkflowNodeResource(WorkflowNodeResource workflowNodeResource);
 
     /**
-     * 服务保存工作流节点
+     * 复制保存工作流节点
      * @param newWorkflowId
      * @param workflowNodeOldList
      */

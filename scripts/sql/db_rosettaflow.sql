@@ -211,31 +211,6 @@ CREATE TABLE `t_algorithm` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法表';
 
 -- ----------------------------
--- Table structure for `t_algorithm_temp`
--- ----------------------------
-DROP TABLE IF EXISTS `t_algorithm_temp`;
-CREATE TABLE `t_algorithm_temp` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法模板表ID(自增长)',
-  `algorithm_name` varchar(30) DEFAULT NULL COMMENT '算法名称',
-  `algorithm_desc` varchar(200) DEFAULT NULL COMMENT '算法描述',
-  `author` varchar(30) DEFAULT NULL COMMENT '算法作者',
-  `max_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最大数量',
-  `min_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最小数量',
-  `support_language`  varchar(64) DEFAULT NULL COMMENT '支持语言,多个以","进行分隔',
-  `support_os_system`  varchar(64) DEFAULT NULL COMMENT '支持操作系统,多个以","进行分隔',
-  `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
-  `cost_mem`  bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
-  `cost_cpu`  bigint(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
-  `cost_gpu`  int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
-  `cost_bandwidth`  bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
-  `run_time`  bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法模板表';
-
--- ----------------------------
 -- Table structure for `t_algorithm_auth`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm_auth`;
@@ -273,23 +248,6 @@ CREATE TABLE `t_algorithm_code` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法代码表';
 
 -- ----------------------------
--- Table structure for `t_algorithm_code_temp`
--- ----------------------------
-DROP TABLE IF EXISTS `t_algorithm_code_temp`;
-CREATE TABLE `t_algorithm_code_temp` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法代码模板表ID(自增长)',
-  `algorithm_temp_id` bigint(20) DEFAULT NULL COMMENT '算法模板表id',
-  `edit_type` tinyint(4) DEFAULT NULL COMMENT '编辑类型:1-sql,2-noteBook',
-  `calculate_contract_code` TEXT DEFAULT NULL COMMENT '计算合约',
-  `data_split_contract_code` TEXT DEFAULT NULL COMMENT '数据分片合约',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法代码模板表';
-
-
--- ----------------------------
 -- Table structure for `t_algorithm_variable`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm_variable`;
@@ -306,23 +264,6 @@ CREATE TABLE `t_algorithm_variable` (
   PRIMARY KEY (`id`),
   KEY (`algorithm_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法变量表';
-
--- ----------------------------
--- Table structure for `t_algorithm_variable_temp`
--- ----------------------------
-DROP TABLE IF EXISTS `t_algorithm_variable_temp`;
-CREATE TABLE `t_algorithm_variable_temp` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法变量模板表ID(自增长)',
-  `algorithm_temp_id` bigint(20) DEFAULT NULL COMMENT '算法模板表id',
-  `var_type` tinyint(4) NOT NULL DEFAULT 1 COMMENT '变量类型: 1-自变量, 2-因变量',
-  `var_key` varchar(128) NOT NULL COMMENT '变量key',
-  `var_value` varchar(128) NOT NULL COMMENT '变量值',
-  `var_desc` varchar(512) DEFAULT NULL COMMENT '变量描述',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法变量模板表';
 
 -- ----------------------------
 -- Table structure for `t_workflow`
