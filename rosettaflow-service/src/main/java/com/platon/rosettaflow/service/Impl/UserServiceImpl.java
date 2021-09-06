@@ -122,13 +122,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             signMessageDto = objectMapper.readValue(signMessage, SignMessageDto.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
+            throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
+        }
+        if(Objects.isNull(signMessageDto.getMessage()) || !StrUtil.isNotEmpty(signMessageDto.getMessage().getKey())){
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
         String nonce = signMessageDto.getMessage().getKey();
         if (StrUtil.isEmpty(nonce)) {
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
+
         String redisKey = StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce);
 
         if (!redisUtil.hasKey(redisKey)) {

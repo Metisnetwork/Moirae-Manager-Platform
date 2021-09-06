@@ -108,7 +108,7 @@ public enum ErrorMsg {
 
     METADATA_NOT_EXIST("元数据不存在", "Meta data not exist"),
 
-    METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by time, the times must be greater than zero"),
+    METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by times, the times must be greater than zero"),
 
     METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
 
