@@ -1,14 +1,13 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.mapper.*;
 import com.platon.rosettaflow.mapper.domain.*;
-import com.platon.rosettaflow.service.IProjectService;
-import com.platon.rosettaflow.service.IProjectTempService;
-import com.platon.rosettaflow.service.IWorkflowNodeService;
-import com.platon.rosettaflow.service.IWorkflowService;
+import com.platon.rosettaflow.service.*;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +44,14 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     WorkflowNodeTempMapper workflowNodeTempMapper;
 
     @Resource
-    AlgorithmMapper algorithmMapper;
+    IAlgorithmService algorithmService;
 
     @Resource
-    AlgorithmCodeMapper algorithmCodeMapper;
+    IAlgorithmCodeService algorithmCodeService;
+
 
     @Resource
-    AlgorithmVariableMapper algorithmVariableMapper;
+    IAlgorithmVariableService algorithmVariableService;
 
 
     @Override
@@ -68,7 +68,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
             return;
         }
         // 保存项目
-        Project project = saveProject(projectTemp);
+        Long projectId = saveProject(projectTemp);
 
         // 查询工作流模板
         List<WorkflowTemp> workflowTempList = queryWorkflowTempList(projectTemp.getId());
@@ -77,15 +77,23 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         }
         for (WorkflowTemp workflowTemp : workflowTempList) {
             // 保存工作流
-            Workflow workflow = saveWorkflow(project.getId(), workflowTemp);
-
+            Long workflowId = saveWorkflow(projectId, workflowTemp);
             // 查询工作流节点模板
-            List<WorkflowNodeTemp> workflowNodeTempList = queryWorkflowNodeTempList(workflowTemp.getId());
-            if (workflowNodeTempList == null || workflowNodeTempList.size() == 0) {
+            List<WorkflowNodeTemp> nodeTempList = queryWorkflowNodeTempList(workflowTemp.getId());
+            if (nodeTempList == null || nodeTempList.size() == 0) {
                 continue;
             }
             // 保存工作流节点
-            saveWorkflowNode(workflow.getId(), workflowNodeTempList);
+            saveWorkflowNode(workflowId, nodeTempList);
+            // 保存算法、算法代码、算法变量
+            for (WorkflowNodeTemp nodeTemp : nodeTempList) {
+                // 保存算法
+                Long algorithmId = saveAlgorithm(nodeTemp);
+                // 保存算法代码
+                saveAlgorithmCode(algorithmId);
+                // 保存算法变量
+                saveAlgorithmVariable(algorithmId);
+            }
         }
     }
 
@@ -103,31 +111,23 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         return workflowNodeTempMapper.selectList(queryWrapper);
     }
 
-    /** 查询工作流模板所使用算法 */
-    private Algorithm queryAlgorithmObj(Long algorithmId){
-        return algorithmMapper.selectById(algorithmId);
-    }
-
-//    /** 查询工作流节点变量模板列表 */
-//    private List<WorkflowNodeVariableTemp> queryWorkflowNodeVariableTempList(Long workflowNodeTempId){
-//        LambdaQueryWrapper<WorkflowNodeVariableTemp> queryWrapper = Wrappers.lambdaQuery();
-//        queryWrapper.eq(WorkflowNodeVariableTemp::getWorkflowNodeTempId, workflowNodeTempId);
-//        return workflowNodeVariableTempMapper.selectList(queryWrapper);
-//    }
-
     /** 保存项目 */
-    private Project saveProject(ProjectTemp projectTemp){
+    private Long saveProject(ProjectTemp projectTemp){
         Project project = new Project();
         project.setProjectName(projectTemp.getProjectName());
         project.setProjectDesc(projectTemp.getProjectDesc());
         projectService.addProject(project);
-        return project;
+        return project.getId();
     }
 
     /** 保存工作流 */
-    private Workflow saveWorkflow(Long projectId, WorkflowTemp workflowTemp){
-        return workflowService.addWorkflow(projectId,
-                workflowTemp.getWorkflowName(),workflowTemp.getWorkflowDesc());
+    private Long saveWorkflow(Long projectId, WorkflowTemp workflowTemp){
+        Workflow workflow = new Workflow();
+        workflow.setProjectId(projectId);
+        workflow.setWorkflowName(workflowTemp.getWorkflowName());
+        workflow.setWorkflowDesc(workflowTemp.getWorkflowDesc());
+        workflowService.addWorkflow(workflow);
+        return workflow.getId();
     }
 
     /** 保存工作流节点 */
@@ -143,6 +143,53 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
             nodeList.add(workflowNode);
         }
         workflowNodeService.saveBatch(nodeList);
-        // 查询工作流模板所使用算法
+    }
+
+    /** 保存算法 */
+    private Long saveAlgorithm(WorkflowNodeTemp nodeTemp){
+        Algorithm algorithmTemp = algorithmService.getById(nodeTemp.getId());
+        if (Objects.isNull(algorithmTemp)) {
+            return null;
+        }
+        Algorithm newAlgorithm = BeanUtil.toBean(algorithmTemp, Algorithm.class);
+        newAlgorithm.setId(null);
+        newAlgorithm.setAuthor(UserContext.get() == null ? "" : UserContext.get().getUserName());
+        newAlgorithm.setCreateTime(null);
+        newAlgorithm.setUpdateTime(null);
+        algorithmService.save(newAlgorithm);
+        return newAlgorithm.getId();
+    }
+
+    /** 保存算法代码 */
+    private void saveAlgorithmCode(Long algorithmId){
+        AlgorithmCode algorithmCodeTemp = algorithmCodeService.getByAlgorithmId(algorithmId);
+        if (Objects.isNull(algorithmCodeTemp)) {
+            return;
+        }
+        AlgorithmCode newAlgorithmCode = new AlgorithmCode();
+        newAlgorithmCode.setAlgorithmId(algorithmId);
+        newAlgorithmCode.setEditType(algorithmCodeTemp.getEditType());
+        newAlgorithmCode.setCalculateContractCode(algorithmCodeTemp.getCalculateContractCode());
+        newAlgorithmCode.setDataSplitContractCode(algorithmCodeTemp.getDataSplitContractCode());
+        algorithmCodeService.save(newAlgorithmCode);
+    }
+
+    /** 保存算法变量 */
+    private void saveAlgorithmVariable(Long algorithmId){
+        List<AlgorithmVariable> variableTempList = algorithmVariableService.getByAlgorithmId(algorithmId);
+        if (variableTempList == null || variableTempList.size() == 0) {
+            return;
+        }
+        List<AlgorithmVariable> newAlgorithmVariableList = new ArrayList<>();
+        for (AlgorithmVariable algorithmVariable : variableTempList) {
+            AlgorithmVariable newAlgorithmVariable = new AlgorithmVariable();
+            newAlgorithmVariable.setAlgorithmId(algorithmId);
+            newAlgorithmVariable.setVarType(algorithmVariable.getVarType());
+            newAlgorithmVariable.setVarKey(algorithmVariable.getVarKey());
+            newAlgorithmVariable.setVarValue(algorithmVariable.getVarValue());
+            newAlgorithmVariable.setVarDesc(algorithmVariable.getVarDesc());
+            newAlgorithmVariableList.add(newAlgorithmVariable);
+        }
+        algorithmVariableService.saveBatch(newAlgorithmVariableList);
     }
 }

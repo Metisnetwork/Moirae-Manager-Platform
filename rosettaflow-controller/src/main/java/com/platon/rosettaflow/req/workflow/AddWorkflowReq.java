@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * @author hudenian
@@ -19,6 +20,7 @@ public class AddWorkflowReq {
 
     @ApiModelProperty(value = "工作流名称", required = true)
     @NotNull(message = "{project.id.notNull}")
+    @Positive(message = "{metadata.id.positive}")
     private Long projectId;
 
     @ApiModelProperty(value = "工作流名称", required = true)
@@ -27,7 +29,7 @@ public class AddWorkflowReq {
     private String workflowName;
 
     @ApiModelProperty(value = "工作流描述")
-    @Length(max = 30, message = "{workflow.desc.Length}")
+    @Length(max = 200, message = "{workflow.desc.Length}")
     private String workflowDesc;
 
 }

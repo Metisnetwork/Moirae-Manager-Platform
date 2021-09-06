@@ -24,6 +24,7 @@ import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,19 +117,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public Workflow addWorkflow(Long projectId, String workflowName, String workflowDesc) {
-        // 校验工作流名称
-        Workflow workflow = checkWorkflowName(projectId, workflowName);
-        if (Objects.nonNull(workflow)) {
+    public void addWorkflow(Workflow workflow) {
+        try {
+            workflow.setUserId(UserContext.get().getId());
+            this.save(workflow);
+        } catch (DuplicateKeyException dke) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
-        workflow = new Workflow();
-        workflow.setUserId(UserContext.get().getId());
-        workflow.setProjectId(projectId);
-        workflow.setWorkflowName(workflowName);
-        workflow.setWorkflowDesc(workflowDesc);
-        this.save(workflow);
-        return workflow;
     }
 
     @Override
@@ -138,15 +133,23 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.error("workflow not found by id:{}", id);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
-        workflow.setWorkflowName(workflowName);
-        workflow.setWorkflowDesc(workflowDesc);
-        this.updateById(workflow);
+        try {
+            workflow.setWorkflowName(workflowName);
+            workflow.setWorkflowDesc(workflowDesc);
+            this.updateById(workflow);
+        } catch (DuplicateKeyException dke) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
+        }
     }
 
     @Override
     public void deleteWorkflow(Long id) {
-        // 删除工作流
-        this.removeById(id);
+        // 逻辑删除工作流，并修改版本标识
+        Workflow workflow = new Workflow();
+        workflow.setId(id);
+        workflow.setDelVersion(id);
+        workflow.setStatus((byte)0);
+        this.updateById(workflow);
     }
 
     @Override
