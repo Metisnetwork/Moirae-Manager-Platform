@@ -4,6 +4,7 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.mapper.domain.Algorithm;
+import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 
 import java.util.List;
 
@@ -37,6 +38,13 @@ public interface IAlgorithmService extends IService<Algorithm> {
      * @return AlgorithmDto
      */
     AlgorithmDto queryAlgorithmDetails(Long id);
+
+    /**
+     * 复制保存算法
+     * @param oldNode 源算法信息
+     * @return
+     */
+    Long copySaveAlgorithm(WorkflowNode oldNode);
 
 
 }

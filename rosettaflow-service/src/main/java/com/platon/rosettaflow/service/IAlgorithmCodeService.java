@@ -29,4 +29,11 @@ public interface IAlgorithmCodeService extends IService<AlgorithmCode> {
      * @return 算法代码
      */
     AlgorithmCode getByAlgorithmId(Long algorithmId);
+
+    /**
+     * 复制保存算法代码
+     * @param oldAlgorithmId 源算法id
+     * @param newAlgorithmId 目的算法id
+     */
+    void copySaveAlgorithmCode(Long oldAlgorithmId,Long newAlgorithmId);
 }

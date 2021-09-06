@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
@@ -8,6 +9,8 @@ import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.service.utils.UserContext;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 算法实现类
@@ -96,6 +100,21 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_ALG_DETAILS_ERROR.getMsg());
         }
 
+    }
+
+    @Override
+    public Long copySaveAlgorithm(WorkflowNode oldNode){
+        Algorithm oldAlgorithm = this.getById(oldNode.getId());
+        if (Objects.isNull(oldAlgorithm)) {
+            return null;
+        }
+        Algorithm newAlgorithm = BeanUtil.toBean(oldAlgorithm, Algorithm.class);
+        newAlgorithm.setId(null);
+        newAlgorithm.setAuthor(UserContext.get() == null ? "" : UserContext.get().getUserName());
+        newAlgorithm.setCreateTime(null);
+        newAlgorithm.setUpdateTime(null);
+        this.save(newAlgorithm);
+        return newAlgorithm.getId();
     }
 
 }

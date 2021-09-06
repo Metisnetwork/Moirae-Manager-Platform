@@ -63,7 +63,7 @@ public class ProjectController {
     }
     @PostMapping("updateProject")
     @ApiOperation(value = "修改项目", notes = "修改项目")
-    public ResponseVo<?> saveProject(@RequestBody @Valid UpdateProjectReq updateProjectReq) {
+    public ResponseVo<?> updateProject(@RequestBody @Valid UpdateProjectReq updateProjectReq) {
         projectService.updateProject(BeanUtil.copyProperties(updateProjectReq, Project.class));
         return ResponseVo.createSuccess();
     }

@@ -63,12 +63,4 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     void start(WorkflowDto workflowDto);
 
-    /**
-     * 校验工作流名称
-     * @param projectId 项目id
-     * @param name 工作流名称
-     * @return 工作流
-     */
-    Workflow checkWorkflowName(Long projectId, String name);
-
 }

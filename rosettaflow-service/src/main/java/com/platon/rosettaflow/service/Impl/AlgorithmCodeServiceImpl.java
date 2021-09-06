@@ -9,6 +9,8 @@ import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * @author admin
  * @date 2021/8/23
@@ -36,6 +38,20 @@ public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, A
         LambdaUpdateWrapper<AlgorithmCode> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(AlgorithmCode::getAlgorithmId, algorithmId);
         return this.getOne(wrapper);
+    }
+
+    @Override
+    public void copySaveAlgorithmCode(Long oldAlgorithmId,Long newAlgorithmId){
+        AlgorithmCode algorithmCodeOld = this.getByAlgorithmId(oldAlgorithmId);
+        if (Objects.isNull(algorithmCodeOld)) {
+            return;
+        }
+        AlgorithmCode newAlgorithmCode = new AlgorithmCode();
+        newAlgorithmCode.setAlgorithmId(newAlgorithmId);
+        newAlgorithmCode.setEditType(algorithmCodeOld.getEditType());
+        newAlgorithmCode.setCalculateContractCode(algorithmCodeOld.getCalculateContractCode());
+        newAlgorithmCode.setDataSplitContractCode(algorithmCodeOld.getDataSplitContractCode());
+        this.save(newAlgorithmCode);
     }
 
 }
