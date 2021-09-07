@@ -10,9 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
+ * 工作流代码服务实现类
  * @author hudenian
  * @date 2021/8/18
- * @description 工作流代码服务实现类
  */
 @Slf4j
 @Service
@@ -21,6 +21,7 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
     public WorkflowNodeCode getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeCode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
+        wrapper.eq(WorkflowNodeCode::getStatus, 1);
         return this.getOne(wrapper);
     }
 
@@ -28,6 +29,7 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
     public void deleteByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeCode> delWrapper = Wrappers.lambdaQuery();
         delWrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
+        delWrapper.eq(WorkflowNodeCode::getStatus, 1);
         this.remove(delWrapper);
     }
 }
