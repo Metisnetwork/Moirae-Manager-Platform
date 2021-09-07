@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -53,7 +54,8 @@ public class UserController {
 
         boolean flg;
         try {
-            flg = WalletSignUtils.verifyTypedDataV4(loginInReq.getSignMessage(), loginInReq.getSign(), loginInReq.getAddress());
+            String signMessage = StrUtil.replace(loginInReq.getSignMessage(),"\\\"", "\"");
+            flg = WalletSignUtils.verifyTypedDataV4(signMessage, loginInReq.getSign(), loginInReq.getAddress());
         } catch (Exception e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
