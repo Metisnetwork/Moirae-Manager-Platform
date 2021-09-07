@@ -54,4 +54,9 @@ public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, A
         this.save(newAlgorithmCode);
     }
 
+    @Override
+    public void truncate() {
+        this.baseMapper.truncate();
+    }
+
 }

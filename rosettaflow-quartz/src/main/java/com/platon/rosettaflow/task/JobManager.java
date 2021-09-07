@@ -26,7 +26,8 @@ import java.util.Set;
 @Component
 public class JobManager {
 
-    static final String DEFAULT_GROUP_PRE = "DEFAULT.";
+    static final String GROUP = "MOIRAE";
+    static final String GROUP_SUF = ".";
 
     @Resource
     private Scheduler scheduler;
@@ -57,8 +58,8 @@ public class JobManager {
      */
     public void startJob(Job job) {
         try {
-            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.anyGroup());
-            if (jobKeySet.contains(JobKey.jobKey(DEFAULT_GROUP_PRE + job.getId()))) {
+            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(GROUP));
+            if (jobKeySet.contains(JobKey.jobKey(GROUP + GROUP_SUF + job.getId()))) {
                 try {
                     //暂停触发器
                     scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString()));
@@ -80,7 +81,7 @@ public class JobManager {
         JobDetail jobDetail = JobBuilder.newJob(PublishTaskJob.class)
                 .usingJobData("workflowId", workflowId)
                 .usingJobData("jobId", job.getId())
-                .withIdentity(job.getId().toString())
+                .withIdentity(job.getId().toString(), GROUP)
                 .build();
 
         SimpleScheduleBuilder simpleScheduleBuilder;
@@ -108,7 +109,6 @@ public class JobManager {
             log.info("作业id:{}启动成功>>>>>>", job.getId());
         } catch (SchedulerException e) {
             log.error("作业id:{}启动失败>>>>>>", job.getId(), e);
-            throw new BusinessException(RespCodeEnum.EXCEPTION);
         }
     }
 }

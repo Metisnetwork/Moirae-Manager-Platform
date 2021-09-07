@@ -23,5 +23,8 @@ public interface IProjectTempService extends IService<ProjectTemp> {
      */
     void addProjTemp(Long projTempId);
 
-
+    /**
+     * 清空项目模板表
+     */
+    void truncate();
 }

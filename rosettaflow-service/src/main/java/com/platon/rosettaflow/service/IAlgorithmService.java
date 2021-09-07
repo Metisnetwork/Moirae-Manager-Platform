@@ -46,5 +46,8 @@ public interface IAlgorithmService extends IService<Algorithm> {
      */
     Long copySaveAlgorithm(WorkflowNode oldNode);
 
-
+    /**
+     * 清空算法表
+     */
+    void truncate();
 }

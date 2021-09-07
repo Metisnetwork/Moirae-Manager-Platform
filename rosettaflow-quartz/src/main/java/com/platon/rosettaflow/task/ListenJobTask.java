@@ -29,13 +29,21 @@ public class ListenJobTask {
     @Resource
     private RedisUtil redisUtil;
 
-    @Scheduled(fixedDelay = 3000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 3000, initialDelay = 10000000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
         //获取新增job列表
         long size = redisUtil.listSize(SysConstant.JOB_ADD_QUEUE);
+        for (int i = 0; i < size; i++) {
+            String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
+            Job job = JSON.parseObject(jobJson, Job.class);
+            jobManager.startJob(job);
+        }
+
+        //获取修改job列表
+        size = redisUtil.listSize(SysConstant.JOB_EDIT_QUEUE);
         for (int i = 0; i < size; i++) {
             String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
             Job job = JSON.parseObject(jobJson, Job.class);

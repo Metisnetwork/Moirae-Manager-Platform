@@ -9,6 +9,7 @@ public enum MetaDataUsageEnum {
     /**
      * 未定义类型
      */
+    @SuppressWarnings("unused")
     USAGE_UNKNOWN(0),
     /**
      * 依照时间段来使用

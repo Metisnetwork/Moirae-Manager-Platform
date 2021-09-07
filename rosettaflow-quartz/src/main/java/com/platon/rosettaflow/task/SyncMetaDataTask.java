@@ -10,6 +10,7 @@ import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import com.platon.rosettaflow.service.IMetaDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -41,7 +42,7 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-//  @Scheduled(fixedDelay = 3600000, initialDelay = 10000)
+    @Scheduled(fixedDelay = 3600000, initialDelay = 10000000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;

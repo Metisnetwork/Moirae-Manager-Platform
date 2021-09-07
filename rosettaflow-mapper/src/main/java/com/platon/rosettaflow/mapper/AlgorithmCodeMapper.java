@@ -8,4 +8,5 @@ import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
  */
 public interface AlgorithmCodeMapper extends BaseMapper<AlgorithmCode> {
 
+    void truncate();
 }

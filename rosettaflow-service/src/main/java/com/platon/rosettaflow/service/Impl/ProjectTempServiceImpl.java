@@ -97,6 +97,11 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         }
     }
 
+    @Override
+    public void truncate() {
+        this.baseMapper.truncate();
+    }
+
     /** 查询工作流模板列表 */
     private List<WorkflowTemp> queryWorkflowTempList(Long projTempId){
         LambdaQueryWrapper<WorkflowTemp> queryWrapper = Wrappers.lambdaQuery();

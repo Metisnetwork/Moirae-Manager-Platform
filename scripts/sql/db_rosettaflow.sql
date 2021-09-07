@@ -258,7 +258,7 @@ CREATE TABLE `t_algorithm_variable` (
   `var_key` varchar(128) NOT NULL COMMENT '变量key',
   `var_value` varchar(128) NOT NULL COMMENT '变量值',
   `var_desc` varchar(512) DEFAULT NULL COMMENT '变量描述',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+  `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),

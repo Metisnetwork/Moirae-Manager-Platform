@@ -11,4 +11,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
+    <update id="truncate">
+      TRUNCATE TABLE t_algorithm_code
+    </update>
 </mapper>

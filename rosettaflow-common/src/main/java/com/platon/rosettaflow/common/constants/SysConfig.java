@@ -16,4 +16,5 @@ public class SysConfig {
     private boolean kickMode = true;
     private boolean masterNode = false;
     private long nonceTimeOut = 5 * 60;
+    private String algorithmFilepath = "classpath:script/algorithm.csv";
 }

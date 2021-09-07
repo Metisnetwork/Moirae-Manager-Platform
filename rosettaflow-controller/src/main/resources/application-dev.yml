@@ -53,6 +53,8 @@ system:
     masterNode: true
     # nonce存放时间，单位：秒
     nonceTimeOut: 300
+    # 算法初始化文件
+    algorithmFilepath: classpath:script/algorithm.csv
 
 
 grpc:

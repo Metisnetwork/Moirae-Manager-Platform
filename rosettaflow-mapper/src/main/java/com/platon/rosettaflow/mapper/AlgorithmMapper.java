@@ -27,5 +27,5 @@ public interface AlgorithmMapper extends BaseMapper<Algorithm> {
      */
     AlgorithmDto queryAlgorithmDetails(Long algorithmId);
 
-
+    void truncate();
 }

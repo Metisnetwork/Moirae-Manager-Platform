@@ -117,4 +117,9 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         return newAlgorithm.getId();
     }
 
+    @Override
+    public void truncate() {
+        this.baseMapper.truncate();
+    }
+
 }

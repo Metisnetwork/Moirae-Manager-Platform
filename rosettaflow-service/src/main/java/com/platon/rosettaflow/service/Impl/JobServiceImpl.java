@@ -74,6 +74,6 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
 
         //将作业保存至redis待后续处理
-        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
+        redisUtil.listLeftPush(SysConstant.JOB_EDIT_QUEUE, JSON.toJSONString(job), null);
     }
 }

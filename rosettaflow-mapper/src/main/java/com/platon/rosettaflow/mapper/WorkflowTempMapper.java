@@ -9,4 +9,5 @@ import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
  * @author houz
  */
 public interface WorkflowTempMapper extends BaseMapper<WorkflowTemp> {
+    void truncate();
 }

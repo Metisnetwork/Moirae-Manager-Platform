@@ -93,7 +93,7 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "f00bda43c8e841389f38943f2b667e25";
+        String uuid = "9a74458ea12b4828a294ab73373b6d0a";
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
 
         try {
@@ -106,8 +106,8 @@ public class WalletSignUtils {
 
             System.out.println("验证签名结果>>>" + verifyTypedDataV4(
                     json,
-                    "0xed299b526b7f6c4049147d7dbaaa8d903fcdb05e95839b7db1e49a3701ae927d7ae20f577268c9241d522d775ca18b4d3a4f5d6e692451216a02787a76247d471c",
-                    "0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20"));
+                    "0xfb71e85fb91026933d0057c263b549197e4d93e8a955728892f3ae9cd4cc6c4973c235ecc4dc2bf6927006b53f42bc3f56110649f040357489f41b3cd9c10af71c",
+                    "atp1qpagtcerpdwed2c4ar3hc738m2h98ecrt04c2x"));
 
         } catch (Exception e) {
             e.printStackTrace();

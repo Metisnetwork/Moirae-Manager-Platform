@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.grpc.service.impl;
 
+import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
 import com.platon.rosettaflow.common.enums.UserTypeEnum;
 import com.platon.rosettaflow.grpc.client.MetaDataServiceClient;
@@ -58,15 +59,15 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             nodeIdentityDto = new NodeIdentityDto();
-            nodeIdentityDto.setNodeName("nodeName" + i);
-            nodeIdentityDto.setNodeId("nodeId" + i);
-            nodeIdentityDto.setIdentityId("identityId" + i);
+            nodeIdentityDto.setNodeName("节点"+ i+"名字" );
+            nodeIdentityDto.setNodeId("节点" + i+"的Id");
+            nodeIdentityDto.setIdentityId("节点"+i+"的identityId" );
             metaDataAuthorityDto.setOwner(nodeIdentityDto);
 
             metaDataAuthorityDto.setMetaDataId("metaDataId" + i);
 
             metaDataUsageDto = new MetaDataUsageDto();
-            metaDataUsageDto.setUseType(1);
+            metaDataUsageDto.setUseType(MetaDataUsageEnum.TIMES.getValue());
             metaDataUsageDto.setStartAt(1629877270100L);
             metaDataUsageDto.setEndAt(1629877270100L);
             metaDataUsageDto.setTimes(100 + i);
