@@ -46,6 +46,8 @@ public class SysConstant {
      */
     public static final String DEFAULT_TIMEZONE = "GMT+8";
 
+    public static final String CLASSPATH = "classpath:";
+
     /**
      * 国际化中文
      */
