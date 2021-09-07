@@ -55,6 +55,53 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IWorkflowNodeResourceService workflowNodeResourceService;
 
     @Override
+    public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
+        if (workflowNodeList.size() == 0) {
+            return;
+        }
+        // 查询工作流节点，并获取所有节点的id
+        List<Long> idList = new ArrayList<>();
+        List<WorkflowNode> nodeList = getAllWorkflowNodeList(workflowId);
+        for (WorkflowNode nodeObj : nodeList) {
+            idList.add(nodeObj.getId());
+        }
+        // 过滤并删除不需要保存的节点，将需要保存的节点排序保存
+        List<Long> delIdList = new ArrayList<>();
+        for (WorkflowNode nodeReq : workflowNodeList) {
+            if (idList.contains(nodeReq.getId())) {
+                // 需要保存的节点按序号保存排序，并保持数据为生效状态
+                WorkflowNode node = new WorkflowNode();
+                node.setId(nodeReq.getId());
+                node.setNodeStep(nodeReq.getNodeStep());
+                node.setStatus((byte)1);
+                this.updateById(node);
+                // 去掉需要保存的节点，保留需要删除的节点
+                idList.remove(nodeReq.getId());
+            }
+        }
+        // 将不需要保存的节点及所属数据物理删除
+        removeWorkflowNode(idList);
+    }
+
+    /** 删除不需要保存的工作流节点 */
+    private void removeWorkflowNode(List<Long> nodeIdList) {
+        for (Long nodeId : nodeIdList) {
+            // 删除节点代码
+            workflowNodeCodeService.deleteByWorkflowNodeId(nodeId);
+            // 删除输入
+            workflowNodeInputService.deleteByWorkflowNodeId(nodeId);
+            // 删除节点变量
+            workflowNodeVariableService.deleteByWorkflowNodeId(nodeId);
+            // 删除输出
+            workflowNodeOutputService.deleteByWorkflowNodeId(nodeId);
+            // 删除节点资源（环境）
+            workflowNodeResourceService.deleteByWorkflowNodeId(nodeId);
+        }
+        // 将不需要保存的节点物理删除
+        this.removeByIds(nodeIdList);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWorkflowNode(WorkflowNode workflowNode) {
         // 查看工作流是否存在
@@ -111,56 +158,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         // 设置当前工作流节点数
         workflow.setNodeNumber(workflow.getNodeNumber() + 1);
         workflowService.updateById(workflow);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void copyWorkflowNode(WorkflowNode workflowNode) {
-        // 查看工作流是否存在
-        Workflow workflow = workflowService.getById(workflowNode.getWorkflowId());
-        if (Objects.isNull(workflow)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
-        // 添加当前节点
-        this.save(workflowNode);
-
-        // 获取算法详情
-        AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
-
-        // 获取算法自变量及因变量
-        List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNode.getAlgorithmId());
-
-        WorkflowNode newNode = new WorkflowNode();
-        newNode.setWorkflowId(workflowNode.getWorkflowId());
-        newNode.setNodeName(algorithmDto.getAlgorithmName());
-        newNode.setAlgorithmId(algorithmDto.getAlgorithmId());
-        newNode.setNodeStep(workflowNode.getNodeStep());
-        newNode.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
-        newNode.setTaskId("");
-        newNode.setRunMsg("");
-        newNode.setStatus(StatusEnum.VALID.getValue());
-        this.save(newNode);
-
-        //保存工作流节点代码
-        WorkflowNodeCode workflowNodeCode = new WorkflowNodeCode();
-        workflowNodeCode.setWorkflowNodeId(newNode.getId());
-        workflowNodeCode.setEditType(AlgorithmCodeEditTypeEnum.NOTEBOOK.getValue());
-        workflowNodeCode.setCalculateContractCode(algorithmDto.getAlgorithmCode());
-        workflowNodeCode.setDataSplitContractCode(null);
-        workflowNodeCode.setStatus(StatusEnum.VALID.getValue());
-        workflowNodeCodeService.save(workflowNodeCode);
-
-        // 保存工作流节点变量
-        for (AlgorithmVariable algorithmVariable : algorithmVariableList) {
-            WorkflowNodeVariable workflowNodeVariable = new WorkflowNodeVariable();
-            workflowNodeVariable.setWorkflowNodeId(newNode.getId());
-            workflowNodeVariable.setVarNodeType(algorithmVariable.getVarType());
-            workflowNodeVariable.setVarNodeKey(algorithmVariable.getVarKey());
-            workflowNodeVariable.setVarNodeValue(algorithmVariable.getVarValue());
-            workflowNodeVariable.setVarNodeDesc(algorithmVariable.getVarDesc());
-            workflowNodeVariable.setStatus(StatusEnum.VALID.getValue());
-            workflowNodeVariableService.save(workflowNodeVariable);
-        }
     }
 
     @Override
@@ -246,9 +243,19 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
+    public List<WorkflowNode> getAllWorkflowNodeList(Long workflowId) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
+        // 所有节点正序排序
+        wrapper.orderByAsc(WorkflowNode::getNodeStep);
+        return this.list(wrapper);
+    }
+
+    @Override
     public List<WorkflowNode> getWorkflowNodeList(Long workflowId) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowNode::getStatus, 1);
         // 所有节点正序排序
         wrapper.orderByAsc(WorkflowNode::getNodeStep);
         return this.list(wrapper);

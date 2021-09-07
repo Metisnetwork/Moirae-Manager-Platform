@@ -95,7 +95,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public Project queryProjectDetails(Long id) {
         try {
-            return this.getById(id);
+            LambdaQueryWrapper<Project> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.eq(Project::getId, id);
+            queryWrapper.eq(Project::getStatus, 1);
+            return this.getOne(queryWrapper);
         } catch (Exception e) {
             log.error("queryProjectDetails--查询项目详情失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_DETAILS_ERROR.getMsg());

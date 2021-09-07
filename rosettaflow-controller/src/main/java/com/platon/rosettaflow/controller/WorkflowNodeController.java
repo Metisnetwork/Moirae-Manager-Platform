@@ -1,13 +1,11 @@
 package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
-import com.platon.rosettaflow.req.workflownode.AddNodeCodeReq;
-import com.platon.rosettaflow.req.workflownode.AddNodeResourceReq;
-import com.platon.rosettaflow.req.workflownode.AddWorkflowNodeReq;
-import com.platon.rosettaflow.req.workflownode.WorkflowNodeRenameReq;
+import com.platon.rosettaflow.req.workflownode.*;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
@@ -19,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 工作流节点管理关接口
@@ -34,19 +33,19 @@ public class WorkflowNodeController {
     @Resource
     private IWorkflowNodeService workflowNodeService;
 
+    @PostMapping("save")
+    @ApiOperation(value = "保存工作流节点", notes = "保存工作流节点")
+    public ResponseVo<?> save(@RequestBody @Validated SaveWorkflowNodeReq saveNodeReq) {
+        List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(saveNodeReq.getWorkflowNodeReqList(), WorkflowNode.class);
+        workflowNodeService.saveWorkflowNode(saveNodeReq.getWorkflowId(), workflowNodeList);
+        return ResponseVo.createSuccess();
+    }
+
     @PostMapping("add")
     @ApiOperation(value = "添加工作流节点", notes = "添加工作流节点")
     public ResponseVo<?> add(@RequestBody @Validated AddWorkflowNodeReq addNodeReq) {
         WorkflowNode workflowNode = BeanUtil.toBean(addNodeReq, WorkflowNode.class);
         workflowNodeService.addWorkflowNode(workflowNode);
-        return ResponseVo.createSuccess();
-    }
-
-    @PostMapping("copy")
-    @ApiOperation(value = "复制工作流节点", notes = "复制工作流节点")
-    public ResponseVo<?> copy(@RequestBody @Validated AddWorkflowNodeReq addNodeReq) {
-        WorkflowNode workflowNode = BeanUtil.toBean(addNodeReq, WorkflowNode.class);
-        workflowNodeService.copyWorkflowNode(workflowNode);
         return ResponseVo.createSuccess();
     }
 
