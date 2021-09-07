@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.req.data;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,6 +8,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 
 /**
@@ -28,14 +30,16 @@ public class MetaDataAuthReq {
     @Range(min = 1, max = 2, message = "{metadata.auth.type.error}")
     private Byte authType;
 
-    @ApiModelProperty(value = "授权次数，按次数时,此字段必输", required = true, example = "100")
-    @Positive(message = "{metadata.auth.positive}")
+    @ApiModelProperty(value = "授权次数，按次数时,此字段必输,当authType按时间方式时，authValue默认输入0", required = true, example = "100")
+    @PositiveOrZero(message = "{metadata.auth.positive}")
     private Integer authValue;
 
     @ApiModelProperty(value = "授权开始时间,按时间授权此字段必输", example = "2021-08-27 17:13:47")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date authBeginTime;
 
     @ApiModelProperty(value = "授权结束时间,按时间授权此字段必输", example = "2021-10-27 17:13:47")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date authEndTime;
 
     @ApiModelProperty(value = "发起数据授权申请的账户的签名", required = true)
