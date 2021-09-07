@@ -45,4 +45,9 @@ public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableM
         }
         this.saveBatch(newAlgorithmVariableList);
     }
+
+    @Override
+    public void truncate() {
+        this.baseMapper.truncate();
+    }
 }

@@ -16,4 +16,7 @@
     id, algorithm_id, var_key, var_value, var_type, var_desc, `status`, create_time, 
     update_time
   </sql>
+    <update id="truncate">
+        TRUNCATE TABLE t_algorithm_variable
+    </update>
 </mapper>
