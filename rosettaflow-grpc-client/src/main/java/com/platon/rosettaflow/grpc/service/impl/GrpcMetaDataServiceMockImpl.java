@@ -40,18 +40,18 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
 
             MetaDataDetailDto metaDataDetailDto = new MetaDataDetailDto();
             MetaDataSummaryDto metaDataSummaryDto = new MetaDataSummaryDto();
-            metaDataSummaryDto.setMetaDataId("MetaDataId" + i);
+            metaDataSummaryDto.setMetaDataId("元数据的MetaDataId" + i);
             metaDataSummaryDto.setOriginId("OriginId" + i);
             metaDataSummaryDto.setTableName("TableName" + i);
-            metaDataSummaryDto.setDesc("desc" + i);
+            metaDataSummaryDto.setDesc("这是mock造的假数据" + i);
             metaDataSummaryDto.setFilePath("FilePath" + i);
-            metaDataSummaryDto.setRows(i);
+
             metaDataSummaryDto.setColumns(i);
-            metaDataSummaryDto.setSize(i);
+            metaDataSummaryDto.setSize((long)i+1000);
             metaDataSummaryDto.setFileType(1);
             metaDataSummaryDto.setHasTitle(true);
             metaDataSummaryDto.setIndustry("计算机");
-            metaDataSummaryDto.setState(1);
+            metaDataSummaryDto.setDataState(2);
 
             metaDataDetailDto.setMetaDataSummary(metaDataSummaryDto);
 
@@ -66,6 +66,8 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
                 metaDataColumnDetailDtoList.add(metaDataColumnDetailDto);
             }
             metaDataDetailDto.setMetaDataColumnDetailDtoList(metaDataColumnDetailDtoList);
+
+            metaDataSummaryDto.setRows(metaDataColumnDetailDtoList.size());
 
             metaData.setOwner(identityDto);
             metaData.setMetaDataDetailDto(metaDataDetailDto);

@@ -34,7 +34,7 @@ public class AuthServiceClient {
     private AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
 
     public ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto) {
-        ApplyMetaDataAuthorityRequest.Builder applyMetaDataAuthorityRequest = ApplyMetaDataAuthorityRequest.newBuilder();
+        ApplyMetadataAuthorityRequest.Builder applyMetaDataAuthorityRequest = ApplyMetadataAuthorityRequest.newBuilder();
 
         //1.设置发起任务的用户的信息
         applyMetaDataAuthorityRequest.setUser(requestDto.getUser());
@@ -43,7 +43,7 @@ public class AuthServiceClient {
         applyMetaDataAuthorityRequest.setUserTypeValue(requestDto.getUserType());
 
         //3.元数据使用授权信息
-        MetaDataAuthority.Builder metaDataAuthorityBuilder = MetaDataAuthority.newBuilder();
+        MetadataAuthority.Builder metaDataAuthorityBuilder = MetadataAuthority.newBuilder();
 
         //3.1元数据所属的组织信息
         Organization owner = Organization.newBuilder()
@@ -54,10 +54,10 @@ public class AuthServiceClient {
         metaDataAuthorityBuilder.setOwner(owner);
 
         // 3.2元数据Id
-        metaDataAuthorityBuilder.setMetaDataId(requestDto.getAuth().getMetaDataId());
+        metaDataAuthorityBuilder.setMetadataId(requestDto.getAuth().getMetaDataId());
 
         //3.3元数据怎么使用
-        MetaDataUsage.Builder metaDataUsageBuilder = MetaDataUsage.newBuilder();
+        MetadataUsage.Builder metaDataUsageBuilder = MetadataUsage.newBuilder();
         metaDataUsageBuilder.setUsageTypeValue(requestDto.getAuth().getMetaDataUsageDto().getUseType());
         if (requestDto.getAuth().getMetaDataUsageDto().getUseType() == MetaDataUsageEnum.PERIOD.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null || requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
@@ -77,7 +77,7 @@ public class AuthServiceClient {
         // 4.发起数据授权申请的账户的签名
         applyMetaDataAuthorityRequest.setSign(ByteString.copyFromUtf8(requestDto.getSign()));
 
-        ApplyMetaDataAuthorityResponse applyMetaDataAuthorityResponse = authServiceBlockingStub.applyMetaDataAuthority(applyMetaDataAuthorityRequest.build());
+        ApplyMetadataAuthorityResponse applyMetaDataAuthorityResponse = authServiceBlockingStub.applyMetadataAuthority(applyMetaDataAuthorityRequest.build());
 
         if (applyMetaDataAuthorityResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(applyMetaDataAuthorityResponse.getStatus(), applyMetaDataAuthorityResponse.getMsg());
@@ -87,7 +87,7 @@ public class AuthServiceClient {
         ApplyMetaDataAuthorityResponseDto applyMetaDataAuthorityResponseDto = new ApplyMetaDataAuthorityResponseDto();
         applyMetaDataAuthorityResponseDto.setStatus(applyMetaDataAuthorityResponse.getStatus());
         applyMetaDataAuthorityResponseDto.setMsg(applyMetaDataAuthorityResponse.getMsg());
-        applyMetaDataAuthorityResponseDto.setMetaDataAuthId(applyMetaDataAuthorityResponse.getMetaDataAuthId());
+        applyMetaDataAuthorityResponseDto.setMetaDataAuthId(applyMetaDataAuthorityResponse.getMetadataAuthId());
         return applyMetaDataAuthorityResponseDto;
     }
 
@@ -100,7 +100,7 @@ public class AuthServiceClient {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
 
         Empty empty = Empty.newBuilder().build();
-        GetMetaDataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getMetaDataAuthorityList(empty);
+        GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getMetadataAuthorityList(empty);
 
         if (getMetaDataAuthorityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(getMetaDataAuthorityListResponse.getStatus(), getMetaDataAuthorityListResponse.getMsg());
@@ -126,11 +126,11 @@ public class AuthServiceClient {
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             metaDataAuthorityDto.setOwner(owner);
-            metaDataAuthorityDto.setMetaDataId(getMetaDataAuthorityListResponse.getList(i).getAuth().getMetaDataId());
+            metaDataAuthorityDto.setMetaDataId(getMetaDataAuthorityListResponse.getList(i).getAuth().getMetadataId());
             metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageDto);
 
             //元数据授权申请Id
-            getMetaDataAuthorityDto.setMetaDataAuthId(getMetaDataAuthorityListResponse.getList(i).getMetaDataAuthId());
+            getMetaDataAuthorityDto.setMetaDataAuthId(getMetaDataAuthorityListResponse.getList(i).getMetadataAuthId());
             //发起任务的用户的信息 (task是属于用户的)
             getMetaDataAuthorityDto.setUser(getMetaDataAuthorityListResponse.getList(i).getUser());
             //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
