@@ -56,24 +56,32 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             idList.add(nodeObj.getId());
         }
         // 过滤并删除不需要保存的节点，将需要保存的节点排序保存
+        List<WorkflowNode> nodeBatchList = new ArrayList<>();
+        int count = 0;
         for (WorkflowNode nodeReq : workflowNodeList) {
             if (idList.contains(nodeReq.getId())) {
                 // 需要保存的节点按序号保存排序，并保持数据为生效状态
                 WorkflowNode node = new WorkflowNode();
                 node.setId(nodeReq.getId());
                 node.setNodeStep(nodeReq.getNodeStep());
+                node.setNextNodeStep(nodeReq.getNodeStep() + 1);
+                if (++count == workflowNodeList.size()) {
+                    // 将最后一个节点步骤的下一节点步骤字段值置空
+                    node.setNextNodeStep(null);
+                }
                 node.setStatus((byte)1);
-                this.updateById(node);
+                nodeBatchList.add(node);
                 // 去掉idList中需要保存的节点id，保留需要物理删除的节点
                 idList.remove(nodeReq.getId());
             }
         }
+        this.updateBatchById(nodeBatchList);
         // 将不需要保存的节点及所属数据物理删除
         removeWorkflowNode(idList);
         // 保存当前工作流节点数
         Workflow workflow = new Workflow();
         workflow.setId(workflowId);
-        workflow.setNodeNumber(nodeList.size());
+        workflow.setNodeNumber(count);
         workflowService.updateById(workflow);
     }
 
