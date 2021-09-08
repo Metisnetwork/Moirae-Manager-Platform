@@ -12,13 +12,16 @@ import lombok.Data;
 @ApiModel("算法列表响应参数")
 public class AlgorithmListVo {
 
-    @ApiModelProperty(value = "算法名称", required = true)
+    @ApiModelProperty(value = "算法ID")
+    private String algorithmId;
+
+    @ApiModelProperty(value = "算法名称")
     private String algorithmName;
 
-    @ApiModelProperty(value = "算法描述", required = true)
+    @ApiModelProperty(value = "算法描述")
     private String algorithmDesc;
 
-    @ApiModelProperty(value = "算法类型", required = true)
+    @ApiModelProperty(value = "算法类型")
     private String algorithmType;
 
 }

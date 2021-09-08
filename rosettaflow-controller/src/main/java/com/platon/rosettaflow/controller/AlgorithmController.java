@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 算法相关接口
@@ -63,5 +64,12 @@ public class AlgorithmController {
         return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class));
     }
 
+    @GetMapping("queryAlgorithmTreeList")
+    @ApiOperation(value = "查询算法树列表", notes = "查询算法树列表")
+    public ResponseVo<List<Map<String, Object>>> queryAlgorithmTreeList() {
+        List<Map<String, Object>> listVo = algorithmService.queryAlgorithmTreeList();
+        return ResponseVo.createSuccess(listVo);
+
+    }
 
 }

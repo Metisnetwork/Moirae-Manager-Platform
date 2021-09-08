@@ -26,13 +26,14 @@
     support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
     run_time, public_flag, `status`, create_time, update_time
   </sql>
-    <update id="truncate">
-        TRUNCATE TABLE t_algorithm
-    </update>
+  <update id="truncate">
+      TRUNCATE TABLE t_algorithm
+  </update>
 
-    <!-- 查询算法列表 -->
+  <!-- 查询算法列表 -->
   <select id="queryAlgorithmList" resultType="com.platon.rosettaflow.dto.AlgorithmDto">
     select
+        a.id as algorithmId,
         a.algorithm_name as algorithmName,
         a.algorithm_desc as algorithmDesc,
         a.algorithm_type as algorithmType

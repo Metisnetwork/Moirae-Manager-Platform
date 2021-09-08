@@ -15,7 +15,7 @@ import java.util.List;
 public interface IWorkflowNodeService extends IService<WorkflowNode> {
 
     /**
-     * 保存工作流节点
+     * 保存工作流节点位置
      * @param workflowId  工作流id
      * @param workflowNodeList  工作流节点信息列表
      */
@@ -49,18 +49,25 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer startNode);
 
     /**
-     * 根据工作流id获取所有工作流节点列表（包含所有数据）
+     * 根据工作流id获取所有工作流节点列表（查询所有数据）
      * @param workflowId 工作流主键id
      * @return 工作流节点列表
      */
     List<WorkflowNode> getAllWorkflowNodeList(Long workflowId);
 
     /**
-     * 根据工作流id获取工作流节点列表（只包含生效的数据）
+     * 根据工作流id获取工作流节点列表（只查询生效的数据）
      * @param workflowId 工作流主键id
      * @return 工作流节点列表
      */
     List<WorkflowNode> getWorkflowNodeList(Long workflowId);
+
+    /**
+     * 根据id查询工作流节点
+     * @param id 工作流主键id
+     * @return 工作流节点列表
+     */
+    WorkflowNode getWorkflowNodeById(Long id);
 
     /**
      * 添加工作流节点代码

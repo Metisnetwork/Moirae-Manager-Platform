@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -66,7 +65,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             idList.add(nodeObj.getId());
         }
         // 过滤并删除不需要保存的节点，将需要保存的节点排序保存
-        List<Long> delIdList = new ArrayList<>();
         for (WorkflowNode nodeReq : workflowNodeList) {
             if (idList.contains(nodeReq.getId())) {
                 // 需要保存的节点按序号保存排序，并保持数据为生效状态
@@ -81,20 +79,25 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
         // 将不需要保存的节点及所属数据物理删除
         removeWorkflowNode(idList);
+        // 保存当前工作流节点数
+        Workflow workflow = new Workflow();
+        workflow.setId(workflowId);
+        workflow.setNodeNumber(nodeList.size());
+        workflowService.updateById(workflow);
     }
 
-    /** 删除不需要保存的工作流节点 */
+    /** 物理删除不需要保存的工作流节点 */
     private void removeWorkflowNode(List<Long> nodeIdList) {
         for (Long nodeId : nodeIdList) {
-            // 删除节点代码
+            // 物理删除节点代码
             workflowNodeCodeService.deleteByWorkflowNodeId(nodeId);
-            // 删除输入
+            // 物理删除输入
             workflowNodeInputService.deleteByWorkflowNodeId(nodeId);
-            // 删除节点变量
+            // 物理删除节点变量
             workflowNodeVariableService.deleteByWorkflowNodeId(nodeId);
-            // 删除输出
+            // 物理删除输出
             workflowNodeOutputService.deleteByWorkflowNodeId(nodeId);
-            // 删除节点资源（环境）
+            // 物理删除节点资源（环境）
             workflowNodeResourceService.deleteByWorkflowNodeId(nodeId);
         }
         // 将不需要保存的节点物理删除
@@ -104,65 +107,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWorkflowNode(WorkflowNode workflowNode) {
-        // 查看工作流是否存在
-        Workflow workflow = workflowService.getById(workflowNode.getWorkflowId());
-        if (Objects.isNull(workflow)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
-
-        /* 判断新增节点的上一节点是否存在 */
-        // 上一节点序号
-        int previous  = workflowNode.getNodeStep() - 1;
-        // 当前节点为第一节点
-        if (previous <= 0) {
-            // 当前节点为第一节点，直接插入即可
-            this.save(workflowNode);
-            return;
-        }
-        // 当前节点不是第一节点，查询当前节点的上一节点
-        LambdaQueryWrapper<WorkflowNode> nodeWrapper = Wrappers.lambdaQuery();
-        nodeWrapper.eq(WorkflowNode::getWorkflowId, workflowNode.getWorkflowId());
-        nodeWrapper.eq(WorkflowNode::getNodeStep, previous);
-        WorkflowNode preWorkflowNode = this.getOne(nodeWrapper);
-        // 无上一节点，抛出异常
-        if (Objects.isNull(preWorkflowNode)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_EXIST.getMsg());
-        }
-        // 上一节点无后续节点，尾部直接插入即可
-        if (preWorkflowNode.getNextNodeStep() == null || preWorkflowNode.getNextNodeStep() == 0) {
-            this.save(workflowNode);
-            return;
-        }
-        // 上一节点有后续节点，需将插入节点位置的所有后续节点向后移一位
-        // 查询当前工作流中所有节点
-        List<WorkflowNode> workflowNodeList = getWorkflowNodeList(workflowNode.getWorkflowId());
-        for (WorkflowNode node : workflowNodeList) {
-            // 找出插入节点位及之后的所有节点，将后续所有节点依次后移1位
-            if (node.getNodeStep() >= workflowNode.getNodeStep()) {
-                // 修改节点和后续节点序号值
-                node.setNodeStep(node.getNodeStep() + 1);
-                if (node.getNextNodeStep() == null || node.getNextNodeStep() == 0) {
-                    // 最后一个节点，后续节点字段置空
-                    node.setNextNodeStep(null);
-                    this.updateById(node);
-                    continue;
-                }
-                node.setNextNodeStep(node.getNextNodeStep() + 1);
-                this.updateById(node);
-            }
-        }
-        // 中间插入，设置后续节点字段的值
-        workflowNode.setNextNodeStep(workflowNode.getNodeStep() + 1);
         this.save(workflowNode);
-
-        // 设置当前工作流节点数
-        workflow.setNodeNumber(workflow.getNodeNumber() + 1);
-        workflowService.updateById(workflow);
     }
 
     @Override
     public void renameWorkflowNode(Long nodeId, String nodeName) {
-        WorkflowNode workflowNode = this.getById(nodeId);
+        WorkflowNode workflowNode = getWorkflowNodeById(nodeId);
         if (null == workflowNode) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
@@ -259,6 +209,14 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         // 所有节点正序排序
         wrapper.orderByAsc(WorkflowNode::getNodeStep);
         return this.list(wrapper);
+    }
+
+    @Override
+    public WorkflowNode getWorkflowNodeById(Long id) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getId, id);
+        wrapper.eq(WorkflowNode::getStatus, 1);
+        return this.getOne(wrapper);
     }
 
     @Override
