@@ -1,30 +1,28 @@
-package com.platon.rosettaflow.req.workflownode;
+package com.platon.rosettaflow.req.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 /**
- * 保存工作流节点请求对象
+ * 添加工作流节点输入请求参数
  * @author hudenian
  * @date 2021/8/31
  */
 @Data
-@ApiModel
-public class WorkflowNodeReq {
+@ApiModel(value = "添加工作流节点输入请求参数")
+public class SaveNodeOutputListReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
     @NotNull(message = "{workflow.node.id.notNull}")
     @Positive(message = "{workflow.node.id.positive}")
-    private Long id;
+    private Long workflowNodeId;
 
-    @ApiModelProperty(value = "工作流当前节点序号,从1开始", required = true)
-    @NotNull(message = "{workflow.node.step.notNull}")
-    @Positive(message = "{workflow.node.step.positive}")
-    private Integer nodeStep;
+    @ApiModelProperty(value = "输入请求对象")
+    private List<SaveNodeOutputReq> saveNodeOutputReqList;
 
 }

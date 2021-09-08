@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.req.workflownode;
+package com.platon.rosettaflow.req.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,7 +21,7 @@ public class WorkflowNodeRenameReq {
     @ApiModelProperty(value = "工作流节点ID", required = true)
     @NotNull(message = "{workflow.node.id.notNull}")
     @Positive(message = "{workflow.node.id.positive}")
-    private Long nodeId;
+    private Long workflowNodeId;
 
     @ApiModelProperty(value = "工作流节点名称",required = true)
     @NotBlank(message = "{workflow.node.name.NotBlank}")

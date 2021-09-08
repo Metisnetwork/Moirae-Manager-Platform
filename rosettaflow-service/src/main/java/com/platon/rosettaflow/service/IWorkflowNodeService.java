@@ -1,9 +1,7 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.platon.rosettaflow.mapper.domain.WorkflowNode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
+import com.platon.rosettaflow.mapper.domain.*;
 
 import java.util.List;
 
@@ -22,20 +20,27 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList);
 
     /**
-     * 添加工作流节点
-     * @param workflowNode  工作流节点信息
+     * 清空工作流节点
+     * @param workflowId  工作流id
      */
-    void addWorkflowNode(WorkflowNode workflowNode);
+    void clearWorkflowNode(Long workflowId);
+
+    /**
+     * 添加工作流节点
+     * @param workflowNode 节点信息
+     * @return Long
+     */
+    Long addWorkflowNode(WorkflowNode workflowNode);
 
     /**
      * 工作流节点重命名
-     * @param nodeId 工作流节点id
+     * @param workflowNodeId 工作流节点id
      * @param nodeName 工作流节点名称
      */
-    void renameWorkflowNode(Long nodeId, String nodeName);
+    void renameWorkflowNode(Long workflowNodeId, String nodeName);
 
     /**
-     * 删除工作流中的节点
+     * 物理删除工作流中的节点
      * @param id 工作流节点id
      */
     void deleteWorkflowNode(Long id);
@@ -70,21 +75,35 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     WorkflowNode getWorkflowNodeById(Long id);
 
     /**
+     * 添加工作流节点输入数据
+     * @param workflowNodeId 工作流节点
+     * @param workflowNodeInputList 节点输入list
+     */
+    void saveWorkflowNodeInput(Long workflowNodeId, List<WorkflowNodeInput> workflowNodeInputList);
+
+    /**
+     * 添加工作流节点输出数据
+     * @param workflowNodeId
+     * @param workflowNodeOutputList
+     */
+    void saveWorkflowNodeOutput(Long workflowNodeId, List<WorkflowNodeOutput> workflowNodeOutputList);
+
+    /**
      * 添加工作流节点代码
      * @param workflowNodeCode  工作流节点代码
      */
-    void addWorkflowNodeCode(WorkflowNodeCode workflowNodeCode);
+    void saveWorkflowNodeCode(WorkflowNodeCode workflowNodeCode);
 
     /**
      * 添加工作流节点资源
      * @param workflowNodeResource  工作流节点资源
      */
-    void addWorkflowNodeResource(WorkflowNodeResource workflowNodeResource);
+    void saveWorkflowNodeResource(WorkflowNodeResource workflowNodeResource);
 
     /**
      * 复制保存工作流节点
-     * @param newWorkflowId
-     * @param workflowNodeOldList
+     * @param newWorkflowId 新工作流id
+     * @param workflowNodeOldList 源工作流list
      */
     void copySaveWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList);
 

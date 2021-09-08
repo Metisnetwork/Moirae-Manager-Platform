@@ -30,7 +30,7 @@ public class WorkflowNodeInput implements Serializable {
     /**
      * 数据类型：1:结构化数据，2:非结构化数据
      */
-    private String dataType;
+    private Byte dataType;
     /**
      * 组织的身份标识Id
      */

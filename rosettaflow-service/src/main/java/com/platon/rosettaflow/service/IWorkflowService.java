@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.List;
 
@@ -42,7 +41,6 @@ public interface IWorkflowService extends IService<Workflow> {
     /**
      * 添加工作流
      * @param workflow 工作流对象
-     * @return
      */
     void addWorkflow(Workflow workflow);
 

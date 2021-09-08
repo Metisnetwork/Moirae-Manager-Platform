@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.WorkflowNodeInput">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId" />
-    <result column="data_type" jdbcType="VARCHAR" property="dataType" />
+    <result column="data_type" jdbcType="TINYINT" property="dataType" />
     <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
     <result column="identity_name" jdbcType="VARCHAR" property="identityName" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
