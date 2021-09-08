@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 
 /**
@@ -13,4 +14,13 @@ public interface IWorkflowTempService extends IService<WorkflowTemp> {
      * 清空项目模板表
      */
     void truncate();
+
+    /**
+     * 根据项目id及工作流信息创建 项目工作流模板
+     *
+     * @param projectTemplateId 项目模板id
+     * @param workflow          工作流
+     * @return 工作流模板id
+     */
+    Long addWorkflowTemplate(long projectTemplateId, Workflow workflow);
 }

@@ -11,11 +11,11 @@ import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
-import com.platon.rosettaflow.mapper.ProjectMemberMapper;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
-import com.platon.rosettaflow.service.IProjectMemberService;
-import com.platon.rosettaflow.service.IProjectService;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
+import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
+import com.platon.rosettaflow.service.*;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -38,26 +38,53 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> implements IProjectService {
 
     @Resource
-    ProjectMapper projectMapper;
-
-    @Resource
-    ProjectMemberMapper projectMemberMapper;
-
-    @Resource
     IProjectMemberService projectMemberService;
 
+    @Resource
+    private IWorkflowTempService workflowTempService;
+
+    @Resource
+    private IWorkflowService workflowService;
+
+    @Resource
+    private IWorkflowNodeTempService workflowNodeTempService;
+
+    @Resource
+    private IWorkflowNodeService workflowNodeService;
+
     @Override
-    public void addProject(Project project) {
+    @Transactional(rollbackFor = Exception.class)
+    public void addProject(ProjectDto projectDto) {
         try {
             Long userId = UserContext.get().getId();
-            if (userId == null ||  userId == 0L) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
+            if (userId == null || userId == 0L) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
             }
+            Project project = new Project();
             project.setUserId(userId);
+            project.setProjectName(projectDto.getProjectName());
+            project.setProjectDesc(projectDto.getProjectDesc());
             this.save(project);
-        }catch (Exception e) {
+
+            //如果项目模板不为空，将项目模板中的工作流复制到当前项目
+            if (null != projectDto.getProjectTempId() && projectDto.getProjectTempId() > 0) {
+                WorkflowTemp workflowTemp = workflowTempService.getById(projectDto.getProjectTempId());
+                if (null != workflowTemp) {
+                    //添加工作流
+                    Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), workflowTemp);
+
+                    //从工作流节点模板中复制所有工作流节点
+                    List<WorkflowNodeTemp> workflowNodeTempList = workflowNodeTempService.getByWorkflowTempId(workflowTemp.getId());
+
+                    //根据工作流节点模板列表，添加工作流节点
+                    if (workflowNodeTempList.size() > 0) {
+                        workflowNodeService.addWorkflowNodeByTemplate(workflowId, workflowNodeTempList);
+                    }
+                }
+            }
+        } catch (Exception e) {
             log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException){
+            if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
             }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJ_ERROR.getMsg());
@@ -70,25 +97,26 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             this.updateById(project);
         } catch (Exception e) {
             log.error("updateProject--修改项目信息失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException){
+            if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
             }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.UPDATE_PROJ_ERROR.getMsg());
         }
     }
+
     @Override
     public IPage<ProjectDto> queryProjectList(String projectName, Long current, Long size) {
-       try {
-           Long userId = UserContext.get().getId();
-           if (userId == null ||  userId == 0) {
-               throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
-           }
-           IPage<ProjectDto> page = new Page<>(current, size);
-           return projectMapper.queryProjectList(userId, projectName, page);
-       } catch (Exception e) {
-           log.error("queryProjectList--查询项目列表失败, 错误信息:{}", e.getMessage());
-           throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_LIST_ERROR.getMsg());
-       }
+        try {
+            Long userId = UserContext.get().getId();
+            if (userId == null || userId == 0) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
+            }
+            IPage<ProjectDto> page = new Page<>(current, size);
+            return this.baseMapper.queryProjectList(userId, projectName, page);
+        } catch (Exception e) {
+            log.error("queryProjectList--查询项目列表失败, 错误信息:{}", e.getMessage());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_LIST_ERROR.getMsg());
+        }
 
     }
 
@@ -117,7 +145,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         projectMemberService.updateBatchById(idList);
     }
 
-    /**  根据项目id获取成员id */
+    /**
+     * 根据项目id获取成员id
+     */
     private List<Long> getMemberIdByProjectId(Long projectId) {
         List<ProjectMember> projectMemberList = projectMemberService.queryByProjectId(projectId);
         if (projectMemberList == null || projectMemberList.size() == 0) {
@@ -128,15 +158,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         return idList;
     }
 
-    /** 修改版本标识，解决逻辑删除唯一校验问题 */
-    private List<Project> updateDelVersionById(List<Long> idList){
+    /**
+     * 修改版本标识，解决逻辑删除唯一校验问题
+     */
+    private List<Project> updateDelVersionById(List<Long> idList) {
         List<Project> projectList = new ArrayList<>();
         if (idList != null && idList.size() > 0) {
             idList.forEach(id -> {
                 Project project = new Project();
                 project.setId(id);
                 project.setDelVersion(id);
-                project.setStatus((byte)0);
+                project.setStatus((byte) 0);
                 projectList.add(project);
             });
         }
@@ -151,7 +183,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         // 删除项目成员
         LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(ProjectMember::getProjectId, idsList);
-        List<ProjectMember> projectMemberList = projectMemberMapper.selectList(queryWrapper);
+        List<ProjectMember> projectMemberList = projectMemberService.getBaseMapper().selectList(queryWrapper);
         List<Long> memberIdsList = new ArrayList<>();
         if (projectMemberList != null && projectMemberList.size() > 0) {
             for (ProjectMember projectMember : projectMemberList) {
@@ -166,14 +198,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size) {
-       IPage<ProjMemberDto> iPage = new Page<>(current, size);
-        return projectMemberMapper.queryProjMemberList(projectId, userName, iPage);
+        IPage<ProjMemberDto> iPage = new Page<>(current, size);
+        return this.baseMapper.queryProjMemberList(projectId, userName, iPage);
     }
 
     @Override
     public void addProjMember(ProjectMember projectMember) {
         try {
-            projectMemberMapper.insert(projectMember);
+            projectMemberService.save(projectMember);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
@@ -182,7 +214,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public void updateProjMember(ProjectMember projectMember) {
         try {
-            projectMemberMapper.updateById(projectMember);
+            projectMemberService.updateById(projectMember);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
@@ -197,15 +229,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void deleteProjMemberBatch(String  projMemberIds) {
+    public void deleteProjMemberBatch(String projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
         // 批量逻辑删除项目成员，并修改项目成员版本标识
         projectMemberService.updateBatchById(idList);
     }
 
-    /** 转换id类型 */
-    private List<Long> convertIdType(String ids){
+    /**
+     * 转换id类型
+     */
+    private List<Long> convertIdType(String ids) {
         String[] idsArr = ids.split(",");
-        return Arrays.stream(idsArr).map(id ->Long.parseLong(id.trim())).collect(Collectors.toList());
+        return Arrays.stream(idsArr).map(id -> Long.parseLong(id.trim())).collect(Collectors.toList());
     }
 }

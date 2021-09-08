@@ -58,7 +58,7 @@ public class InitProjectTemplate {
         workflowTemp.setProjectTempId(projectTemp.getId());
         workflowTemp.setWorkflowName("黑名单查询对应工作流");
         workflowTemp.setWorkflowDesc("黑名单查询对应工作流");
-        workflowTemp.setNodeNumber(1L);
+        workflowTemp.setNodeNumber(1);
         workflowTemp.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
         workflowTempService.save(workflowTemp);
 

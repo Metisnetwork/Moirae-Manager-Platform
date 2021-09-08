@@ -18,9 +18,9 @@ public interface IProjectService extends IService<Project> {
 
     /**
      * 新增项目
-     * @param project 项目信息
+     * @param projectDto 项目信息
      */
-    void addProject(Project project);
+    void addProject(ProjectDto projectDto);
 
     /**
      * 修改项目

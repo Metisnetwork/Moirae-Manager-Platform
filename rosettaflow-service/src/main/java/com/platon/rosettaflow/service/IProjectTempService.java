@@ -13,15 +13,17 @@ public interface IProjectTempService extends IService<ProjectTemp> {
 
     /**
      * 查询项目模板列表
+     *
      * @return ProjectTemp
      */
-    List<ProjectTemp> queryProjectTempList();
+    List<ProjectTemp> projectTempList();
 
     /**
-     * 添加项目模板
-     * @param projTempId 项目模板id
+     * 根据已创建的项目工作流添加项目模板
+     *
+     * @param workflowId 工作流id
      */
-    void addProjTemp(Long projTempId);
+    void addProjectTemplate(Long workflowId);
 
     /**
      * 清空项目模板表

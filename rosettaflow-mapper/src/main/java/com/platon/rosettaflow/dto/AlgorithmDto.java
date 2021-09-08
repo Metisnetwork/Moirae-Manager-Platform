@@ -12,7 +12,7 @@ public class AlgorithmDto {
     /**
      * 算法id
      */
-    private Long algorithmId;
+    private Long id;
 
     /**
      * 算法名称

@@ -10,7 +10,6 @@ import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.service.utils.UserContext;
@@ -24,12 +23,13 @@ import java.util.Objects;
 
 /**
  * 算法实现类
+ *
  * @author admin
  * @date 2021/8/23
  */
 @Slf4j
 @Service
-public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm> implements IAlgorithmService{
+public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm> implements IAlgorithmService {
 
     @Resource
     AlgorithmMapper algorithmMapper;
@@ -52,21 +52,22 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             algorithmCodeService.addAlgorithmCode(algorithmCode);
         } catch (Exception e) {
             log.error("addAlgorithm--新增算法失败, 错误信息:{}", e.getMessage());
-           throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_ALG_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_ALG_ERROR.getMsg());
         }
     }
+
     @Override
     public void updateAlgorithm(AlgorithmDto algorithmDto) {
         try {
             Algorithm algorithm = new Algorithm();
             BeanUtils.copyProperties(algorithmDto, algorithm);
             // 算法id
-            algorithm.setId(algorithmDto.getAlgorithmId());
+            algorithm.setId(algorithmDto.getId());
             // 修改算法
             this.updateById(algorithm);
             // 修改算法代码
             AlgorithmCode algorithmCode = new AlgorithmCode();
-            algorithmCode.setAlgorithmId(algorithmDto.getAlgorithmId());
+            algorithmCode.setAlgorithmId(algorithmDto.getId());
             algorithmCode.setEditType(algorithmDto.getEditType());
             algorithmCode.setCalculateContractCode(algorithmDto.getAlgorithmCode());
             algorithmCodeService.updateAlgorithmCode(algorithmCode);
@@ -79,16 +80,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 
     @Override
     public List<AlgorithmDto> queryAlgorithmList(String algorithmName) {
-        try {
-            Long userId = UserContext.get().getId();
-            if (userId != null && userId > 0) {
-                return algorithmMapper.queryAlgorithmList(userId, algorithmName);
-            }
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
-        } catch (Exception e) {
-            log.error("queryAlgorithmList--查询算法列表失败, 错误信息:{}", e.getMessage());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_ALG_LIST_ERROR.getMsg());
-        }
+        return algorithmMapper.queryAlgorithmList(algorithmName);
     }
 
     @Override
@@ -103,7 +95,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     }
 
     @Override
-    public Long copySaveAlgorithm(WorkflowNode oldNode){
+    public Long copySaveAlgorithm(WorkflowNode oldNode) {
         Algorithm oldAlgorithm = this.getById(oldNode.getId());
         if (Objects.isNull(oldAlgorithm)) {
             return null;

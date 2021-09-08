@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.Impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -28,7 +29,7 @@ public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableM
     }
 
     @Override
-    public void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId){
+    public void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId) {
         List<AlgorithmVariable> variableOldList = this.getByAlgorithmId(oldAlgorithmId);
         if (variableOldList == null || variableOldList.size() == 0) {
             return;
@@ -49,5 +50,12 @@ public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableM
     @Override
     public void truncate() {
         this.baseMapper.truncate();
+    }
+
+    @Override
+    public List<AlgorithmVariable> listByAlgorithmId(Long algorithmId) {
+        LambdaQueryWrapper<AlgorithmVariable> algorithmVariableWrapper = Wrappers.lambdaQuery();
+        algorithmVariableWrapper.eq(AlgorithmVariable::getAlgorithmId, algorithmId);
+        return this.list(algorithmVariableWrapper);
     }
 }

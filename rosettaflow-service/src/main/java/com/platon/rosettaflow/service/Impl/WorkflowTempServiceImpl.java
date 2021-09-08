@@ -1,7 +1,9 @@
 package com.platon.rosettaflow.service.Impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowTempMapper;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 import com.platon.rosettaflow.service.IWorkflowTempService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,5 +20,17 @@ public class WorkflowTempServiceImpl extends ServiceImpl<WorkflowTempMapper, Wor
     @Override
     public void truncate() {
         this.baseMapper.truncate();
+    }
+
+    @Override
+    public Long addWorkflowTemplate(long projectTemplateId, Workflow workflow) {
+        WorkflowTemp workflowTemp = new WorkflowTemp();
+        workflowTemp.setProjectTempId(projectTemplateId);
+        workflowTemp.setWorkflowName(workflow.getWorkflowName());
+        workflowTemp.setWorkflowDesc(workflow.getWorkflowDesc());
+        workflowTemp.setNodeNumber(workflow.getNodeNumber());
+        workflowTemp.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
+        this.save(workflowTemp);
+        return workflowTemp.getId();
     }
 }

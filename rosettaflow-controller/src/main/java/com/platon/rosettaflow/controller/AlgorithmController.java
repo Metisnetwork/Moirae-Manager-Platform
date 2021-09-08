@@ -2,7 +2,6 @@ package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.req.algorithm.AlgDetailsReq;
 import com.platon.rosettaflow.req.algorithm.AlgListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
@@ -11,6 +10,7 @@ import com.platon.rosettaflow.vo.algorithm.AlgDetailsVo;
 import com.platon.rosettaflow.vo.algorithm.AlgorithmListVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * 算法相关接口
+ *
  * @author admin
  * @date 2021/8/17
  */
@@ -48,20 +49,18 @@ public class AlgorithmController {
         return ResponseVo.createSuccess();
     }
 
-    @GetMapping("queryAlgorithmList")
+    @GetMapping("list")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
-    public ResponseVo<List<AlgorithmListVo>> queryAlgorithmList(@Valid AlgListReq algListReq) {
-        List<AlgorithmDto> listVo = algorithmService.queryAlgorithmList(algListReq.getAlgorithmName());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(listVo, AlgorithmListVo.class));
-
+    public ResponseVo<List<AlgorithmListVo>> list(@Valid AlgListReq algListReq) {
+        List<AlgorithmDto> listDto = algorithmService.queryAlgorithmList(algListReq.getAlgorithmName());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(listDto, AlgorithmListVo.class));
     }
 
-    @GetMapping("queryAlgorithmDetails")
+    @GetMapping("details/{id}")
     @ApiOperation(value = "查询算法详情", notes = "查询算法详情")
-    public ResponseVo<AlgDetailsVo> queryAlgorithmDetails(@Valid AlgDetailsReq algDetailsReq) {
-        AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(algDetailsReq.getId());
+    public ResponseVo<AlgDetailsVo> detail(@ApiParam(value = "算法表ID", required = true) @PathVariable Long id) {
+        AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(id);
         return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class));
     }
-
 
 }

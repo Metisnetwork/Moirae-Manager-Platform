@@ -1,17 +1,19 @@
 package com.platon.rosettaflow.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.platon.rosettaflow.mapper.domain.Project;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
 /**
  * 项目信息转换dto
+ *
  * @author houz
  */
 @Data
-public class ProjectDto {
+@EqualsAndHashCode(callSuper = true)
+public class ProjectDto extends Project {
 
     /**
      * 项目ID(自增长)
@@ -37,5 +39,10 @@ public class ProjectDto {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 项目模板ID(自增长)
+     */
+    private Long projectTempId;
 
 }

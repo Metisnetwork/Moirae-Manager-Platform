@@ -11,11 +11,16 @@ import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
-import com.platon.rosettaflow.dto.*;
+import com.platon.rosettaflow.dto.AlgorithmDto;
+import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
-import com.platon.rosettaflow.grpc.task.req.dto.*;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDataSupplierDeclareDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskMetaDataDeclareDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskResourceCostDeclareDto;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -32,6 +37,7 @@ import java.util.Objects;
 
 /**
  * 工作流服务实现类
+ *
  * @author admin
  * @date 2021/8/16
  */
@@ -93,7 +99,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
             // 算法对象
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
-            if(Objects.nonNull(algorithmDto)) {
+            if (Objects.nonNull(algorithmDto)) {
                 // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(workflowNodeCode)) {
@@ -105,7 +111,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             //工作流节点输入列表
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
             workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
-           //工作流节点输出列表
+            //工作流节点输出列表
             List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
             workflowNodeDto.setWorkflowNodeOutputList(workflowNodeOutputList);
             // 环境
@@ -151,7 +157,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = new Workflow();
         workflow.setId(id);
         workflow.setDelVersion(id);
-        workflow.setStatus((byte)0);
+        workflow.setStatus((byte) 0);
         this.updateById(workflow);
     }
 
@@ -163,8 +169,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
             // 查询原工作流节点
             List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
-            if(workflowNodeOldList == null || workflowNodeOldList.size() == 0) {
-               return;
+            if (workflowNodeOldList == null || workflowNodeOldList.size() == 0) {
+                return;
             }
             // 保存为新工作流节点
             workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
@@ -185,8 +191,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    /** 将复制的工作流数据id置空，新增一条新的工作流数据 */
-    private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc){
+    /**
+     * 将复制的工作流数据id置空，新增一条新的工作流数据
+     */
+    private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
         Workflow originWorkflow = this.getById(originId);
         if (Objects.isNull(originWorkflow)) {
             log.error("Origin workflow not found by id:{}", originId);
@@ -211,7 +219,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         //截止节点必须
         if (orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
-            log.error("endNode is:{} can not more than workflow nodeNumber:{}", workflowDto.getEndNode(),orgWorkflow.getNodeNumber());
+            log.error("endNode is:{} can not more than workflow nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
 
@@ -252,6 +260,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
             this.updateById(workflow);
         });
+    }
+
+    @Override
+    public Long addWorkflowByTemplate(Long projectId, WorkflowTemp workflowTemp) {
+        Workflow workflow = new Workflow();
+        workflow.setProjectId(projectId);
+        workflow.setWorkflowName(workflowTemp.getWorkflowName());
+        workflow.setWorkflowDesc(workflowTemp.getWorkflowDesc());
+        workflow.setNodeNumber(workflowTemp.getNodeNumber());
+        workflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
+        this.save(workflow);
+        return workflow.getId();
     }
 
     /**

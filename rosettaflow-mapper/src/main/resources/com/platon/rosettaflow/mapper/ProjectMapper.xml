@@ -32,4 +32,24 @@
       </if>
     order by a.create_time
   </select>
+    <!-- 查询项目成员列表 -->
+    <select id="queryProjMemberList" resultType="com.platon.rosettaflow.dto.ProjMemberDto">
+        select
+        a.id as memberId,
+        a.user_id as userId,
+        a.role as role,
+        a.create_time as createTime,
+        b.user_name as userName
+        from
+        t_project_member a, t_user b
+        where 1=1
+        and a.status = '1'
+        and b.status = '1'
+        and a.user_id = b.id
+        and a.project_id = #{projectId, jdbcType=BIGINT}
+        <if test="userName != null and userName != ''">
+            and b.user_name LIKE CONCAT('%', #{userName, jdbcType=VARCHAR}, '%')
+        </if>
+        ORDER BY a.create_time
+    </select>
 </mapper>

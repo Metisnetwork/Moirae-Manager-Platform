@@ -4,18 +4,22 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.mapper.*;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.StatusEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.mapper.ProjectTempMapper;
+import com.platon.rosettaflow.mapper.WorkflowNodeTempMapper;
+import com.platon.rosettaflow.mapper.WorkflowTempMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
-import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author admin
@@ -27,74 +31,62 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
 
     @Resource
     IProjectService projectService;
-
-    @Resource
-    ProjectTempMapper projectTempMapper;
-
     @Resource
     IWorkflowService workflowService;
-
     @Resource
     WorkflowTempMapper workflowTempMapper;
-
     @Resource
     IWorkflowNodeService workflowNodeService;
-
     @Resource
     WorkflowNodeTempMapper workflowNodeTempMapper;
-
     @Resource
     IAlgorithmService algorithmService;
-
     @Resource
     IAlgorithmCodeService algorithmCodeService;
-
-
     @Resource
     IAlgorithmVariableService algorithmVariableService;
-
+    @Resource
+    private IWorkflowTempService workflowTempService;
+    @Resource
+    private IWorkflowNodeTempService workflowNodeTempService;
 
     @Override
-    public List<ProjectTemp> queryProjectTempList() {
-        return projectTempMapper.selectList(null);
+    public List<ProjectTemp> projectTempList() {
+        LambdaQueryWrapper<ProjectTemp> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(ProjectTemp::getStatus, StatusEnum.VALID.getValue());
+        List<ProjectTemp> returnList = this.list(wrapper);
+        //添加空白模板
+        ProjectTemp emptyTemp = new ProjectTemp();
+        emptyTemp.setId(0L);
+        emptyTemp.setProjectName("空白模板");
+        emptyTemp.setProjectDesc("空白模板");
+        returnList.add(0, emptyTemp);
+        return returnList;
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void addProjTemp(Long projTempId) {
-        // 查询项目模板
-        ProjectTemp projectTemp = projectTempMapper.selectById(projTempId);
-        if (Objects.isNull(projectTemp)) {
-            return;
-        }
-        // 保存项目
-        Long projectId = saveProject(projectTemp);
+    public void addProjectTemplate(Long workflowId) {
 
-        // 查询工作流模板
-        List<WorkflowTemp> workflowTempList = queryWorkflowTempList(projectTemp.getId());
-        if (workflowTempList == null || workflowTempList.size() == 0) {
-            return;
+        Workflow workflow = workflowService.getById(workflowId);
+        if (null == workflow) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
-        for (WorkflowTemp workflowTemp : workflowTempList) {
-            // 保存工作流
-            Long workflowId = saveWorkflow(projectId, workflowTemp);
-            // 查询工作流节点模板
-            List<WorkflowNodeTemp> nodeTempList = queryWorkflowNodeTempList(workflowTemp.getId());
-            if (nodeTempList == null || nodeTempList.size() == 0) {
-                continue;
-            }
-            // 保存工作流节点
-            saveWorkflowNode(workflowId, nodeTempList);
-            // 保存算法、算法代码、算法变量
-            for (WorkflowNodeTemp nodeTemp : nodeTempList) {
-                // 保存算法
-                Long newAlgorithmId = saveAlgorithm(nodeTemp);
-                // 保存算法代码(参数：源算法id、目的算法id)
-                algorithmCodeService.copySaveAlgorithmCode(nodeTemp.getAlgorithmId(), newAlgorithmId);
-                // 保存算法变量(参数：源算法id、目的算法id)
-                algorithmVariableService.saveAlgorithmVariable(nodeTemp.getAlgorithmId(), newAlgorithmId);
-            }
+
+        Project project = projectService.getById(workflow.getProjectId());
+        if (null == project) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NOT_EXIST.getMsg());
         }
+
+        // 添加项目模板
+        long projectTemplateId = addProjectTemplate(project);
+
+        // 添加工作流模板
+        long workflowTemplateId = workflowTempService.addWorkflowTemplate(projectTemplateId, workflow);
+
+        //添加工作流对应的节点模板
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
+        workflowNodeTempService.addWorkflowNodeList(workflowTemplateId, workflowNodeList);
     }
 
     @Override
@@ -102,31 +94,49 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         this.baseMapper.truncate();
     }
 
-    /** 查询工作流模板列表 */
-    private List<WorkflowTemp> queryWorkflowTempList(Long projTempId){
+    /**
+     * 查询工作流模板列表
+     */
+    private List<WorkflowTemp> queryWorkflowTempList(Long projTempId) {
         LambdaQueryWrapper<WorkflowTemp> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(WorkflowTemp::getProjectTempId, projTempId);
         return workflowTempMapper.selectList(queryWrapper);
     }
 
-    /** 查询工作流节点模板列表 */
-    private List<WorkflowNodeTemp> queryWorkflowNodeTempList(Long workflowTempId){
+    /**
+     * 查询工作流节点模板列表
+     */
+    private List<WorkflowNodeTemp> queryWorkflowNodeTempList(Long workflowTempId) {
         LambdaQueryWrapper<WorkflowNodeTemp> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(WorkflowNodeTemp::getWorkflowTempId, workflowTempId);
         return workflowNodeTempMapper.selectList(queryWrapper);
     }
 
-    /** 保存项目 */
-    private Long saveProject(ProjectTemp projectTemp){
-        Project project = new Project();
-        project.setProjectName(projectTemp.getProjectName());
-        project.setProjectDesc(projectTemp.getProjectDesc());
-        projectService.addProject(project);
-        return project.getId();
+    /**
+     * 保存项目模板
+     *
+     * @param project 项目模板
+     * @return projectTemplateId
+     */
+    private Long addProjectTemplate(Project project) {
+        ProjectTemp projectTemp = new ProjectTemp();
+        projectTemp.setProjectName(project.getProjectName());
+        projectTemp.setProjectDesc(project.getProjectDesc());
+        try {
+            this.save(projectTemp);
+        } catch (Exception e) {
+            if (e instanceof DuplicateKeyException) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_TEMPLATE_NAME_EXISTED.getMsg());
+            }
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJECT_TEMPLATE_ERROR.getMsg());
+        }
+        return projectTemp.getId();
     }
 
-    /** 保存工作流 */
-    private Long saveWorkflow(Long projectId, WorkflowTemp workflowTemp){
+    /**
+     * 保存工作流
+     */
+    private Long saveWorkflow(Long projectId, WorkflowTemp workflowTemp) {
         Workflow workflow = new Workflow();
         workflow.setProjectId(projectId);
         workflow.setWorkflowName(workflowTemp.getWorkflowName());
@@ -135,14 +145,18 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         return workflow.getId();
     }
 
-    /** 保存工作流节点 */
-    private void saveWorkflowNode(Long workflowId, List<WorkflowNodeTemp> nodeTempList){
+    /**
+     * 保存工作流节点
+     */
+    private void saveWorkflowNode(Long workflowId, List<WorkflowNodeTemp> nodeTempList) {
         List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(nodeTempList, WorkflowNode.class);
         workflowNodeService.copySaveWorkflowNode(workflowId, workflowNodeList);
     }
 
-    /** 保存算法 */
-    private Long saveAlgorithm(WorkflowNodeTemp nodeTemp){
+    /**
+     * 保存算法
+     */
+    private Long saveAlgorithm(WorkflowNodeTemp nodeTemp) {
         return algorithmService.copySaveAlgorithm(BeanUtil.toBean(nodeTemp, WorkflowNode.class));
     }
 }

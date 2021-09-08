@@ -3,9 +3,9 @@ package com.platon.rosettaflow.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.common.enums.*;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -20,6 +20,7 @@ import java.util.Objects;
 
 /**
  * 工作流节点服务实现类
+ *
  * @author hudenian
  * @date 2021/8/31
  */
@@ -35,9 +36,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Resource
     private IWorkflowNodeCodeService workflowNodeCodeService;
-
-    @Resource
-    private IAlgorithmCodeService algorithmCodeService;
 
     @Resource
     private IWorkflowNodeInputService workflowNodeInputService;
@@ -73,7 +71,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 WorkflowNode node = new WorkflowNode();
                 node.setId(nodeReq.getId());
                 node.setNodeStep(nodeReq.getNodeStep());
-                node.setStatus((byte)1);
+                node.setStatus((byte) 1);
                 this.updateById(node);
                 // 去掉需要保存的节点，保留需要删除的节点
                 idList.remove(nodeReq.getId());
@@ -83,7 +81,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         removeWorkflowNode(idList);
     }
 
-    /** 删除不需要保存的工作流节点 */
+    /**
+     * 删除不需要保存的工作流节点
+     */
     private void removeWorkflowNode(List<Long> nodeIdList) {
         for (Long nodeId : nodeIdList) {
             // 删除节点代码
@@ -112,7 +112,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
         /* 判断新增节点的上一节点是否存在 */
         // 上一节点序号
-        int previous  = workflowNode.getNodeStep() - 1;
+        int previous = workflowNode.getNodeStep() - 1;
         // 当前节点为第一节点
         if (previous <= 0) {
             // 当前节点为第一节点，直接插入即可
@@ -202,7 +202,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         // 多个节点，是最后节点，直接删除，并将上一节点的下一节点序号字段置空
         if (workflowNode.getNextNodeStep() == null || workflowNode.getNextNodeStep() == 0) {
             // 修改上一节点的下一节点序号
-            WorkflowNode lastNode = workflowNodeList.get(workflowNodeList.size() -1);
+            WorkflowNode lastNode = workflowNodeList.get(workflowNodeList.size() - 1);
             lastNode.setNextNodeStep(null);
             this.updateById(lastNode);
             // 删除当前节点
@@ -210,7 +210,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             return;
         }
         // 多个节点，不是最后节点，删除当前节点并处理后续节点
-        for(WorkflowNode node : workflowNodeList) {
+        for (WorkflowNode node : workflowNodeList) {
             // 将删除节点后的所有节点，向前移动一位
             if (node.getNodeStep() > workflowNode.getNodeStep()) {
                 node.setNodeStep(node.getNodeStep() - 1);
@@ -310,5 +310,26 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             newNodeList.add(newNode);
         });
         this.saveBatch(newNodeList);
+    }
+
+    @Override
+    public void addWorkflowNodeByTemplate(Long workflowId, List<WorkflowNodeTemp> workflowNodeTempList) {
+        WorkflowNode workflowNode;
+        for (WorkflowNodeTemp workflowNodeTemp : workflowNodeTempList) {
+            workflowNode = new WorkflowNode();
+            workflowNode.setWorkflowId(workflowId);
+            workflowNode.setNodeName(workflowNodeTemp.getNodeName());
+            workflowNode.setAlgorithmId(workflowNodeTemp.getAlgorithmId());
+            workflowNode.setNodeStep(workflowNodeTemp.getNodeStep());
+            workflowNode.setNextNodeStep(workflowNodeTemp.getNextNodeStep());
+            //保存工作流节点
+            this.save(workflowNode);
+            //添加工作流节点代码
+            workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
+            //查询节点代码对应的算法列表
+            List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.listByAlgorithmId(workflowNodeTemp.getAlgorithmId());
+            //保存工作流输入变量
+            workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
+        }
     }
 }

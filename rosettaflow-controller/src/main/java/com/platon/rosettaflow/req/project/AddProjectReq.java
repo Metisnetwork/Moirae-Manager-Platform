@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 
 /**
  * 添加项目请求参数
+ *
  * @author houz
  */
 @Data
@@ -21,5 +22,8 @@ public class AddProjectReq {
     @ApiModelProperty(value = "项目描述", required = true)
     @NotBlank(message = "{project.describe.notBlank}")
     private String projectDesc;
+
+    @ApiModelProperty(value = "项目模板ID")
+    private Long projectTempId;
 
 }

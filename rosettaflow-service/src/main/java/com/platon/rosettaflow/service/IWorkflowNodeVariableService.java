@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeVariable;
 
 import java.util.List;
@@ -25,4 +26,12 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
      * @param workflowNodeId 工作流节点id
      */
     void deleteByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 根据算法变量添加工作流节点算法变量
+     *
+     * @param workflowNodeId        工作流节点id
+     * @param algorithmVariableList 算法变量列表
+     */
+    void addByAlgorithmVariableList(Long workflowNodeId, List<AlgorithmVariable> algorithmVariableList);
 }

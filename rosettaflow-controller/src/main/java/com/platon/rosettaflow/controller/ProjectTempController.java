@@ -2,7 +2,7 @@ package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.mapper.domain.ProjectTemp;
-import com.platon.rosettaflow.req.project.temp.AddProjTempReq;
+import com.platon.rosettaflow.req.project.temp.AddProjectTemplateReq;
 import com.platon.rosettaflow.service.IProjectTempService;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.project.ProjTempListVo;
@@ -18,6 +18,7 @@ import java.util.List;
 
 /**
  * 项目模板相关接口
+ *
  * @author admin
  * @date 2021/8/16
  */
@@ -30,17 +31,17 @@ public class ProjectTempController {
     @Resource
     private IProjectTempService projectTempService;
 
-    @GetMapping("queryProjTempList")
+    @GetMapping("projectTempList")
     @ApiOperation(value = "查询项目模板列表", notes = "查询项目模板列表")
-    public ResponseVo<List<ProjTempListVo>> queryProjectTempList() {
-        List<ProjectTemp> list  = projectTempService.queryProjectTempList();
+    public ResponseVo<List<ProjTempListVo>> projectTempList() {
+        List<ProjectTemp> list = projectTempService.projectTempList();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjTempListVo.class));
     }
 
-    @PostMapping("addProjTemp")
+    @PostMapping("addProjectTemplate")
     @ApiOperation(value = "添加项目模板", notes = "添加项目模板")
-    public ResponseVo<?> addProjTemp(@RequestBody @Valid AddProjTempReq addProjTempReq) {
-        projectTempService.addProjTemp(addProjTempReq.getId());
+    public ResponseVo<?> addProjectTemplate(@RequestBody @Valid AddProjectTemplateReq dddProjectTemplateReq) {
+        projectTempService.addProjectTemplate(dddProjectTemplateReq.getId());
         return ResponseVo.createSuccess();
     }
 

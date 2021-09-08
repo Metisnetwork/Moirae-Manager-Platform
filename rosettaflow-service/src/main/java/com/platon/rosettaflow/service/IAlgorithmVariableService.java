@@ -14,6 +14,7 @@ public interface IAlgorithmVariableService extends IService<AlgorithmVariable> {
 
     /**
      * 根据算法id获取算法因变量及自变量
+     *
      * @param algorithmId 算法id
      * @return 算法变量
      */
@@ -21,12 +22,22 @@ public interface IAlgorithmVariableService extends IService<AlgorithmVariable> {
 
     /**
      * 复制保存算法变量
+     *
      * @param oldAlgorithmId 源算法id
      * @param newAlgorithmId 目的算法id
      */
     void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId);
+
     /**
      * 清空算法变量表
      */
     void truncate();
+
+    /**
+     * 根据算法id获取所有的算法变量
+     *
+     * @param algorithmId 算法id
+     * @return 算法变量列表
+     */
+    List<AlgorithmVariable> listByAlgorithmId(Long algorithmId);
 }

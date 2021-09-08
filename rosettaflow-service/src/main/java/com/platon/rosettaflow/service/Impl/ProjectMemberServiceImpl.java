@@ -1,8 +1,10 @@
 package com.platon.rosettaflow.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.mapper.ProjectMemberMapper;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.service.IProjectMemberService;
@@ -33,6 +35,11 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     public void updateBatchById(List<Long> idList) {
         this.updateBatchById(updateDelVersionById(idList));
     }
+
+//    @Override
+//    public IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, IPage<ProjMemberDto> iPage) {
+//        return this.baseMapper;
+//    }
 
     /** 逻辑删除项目成员，修改版本标识，解决逻辑删除唯一校验问题 */
     private List<ProjectMember> updateDelVersionById(List<Long> idList){

@@ -14,14 +14,15 @@ public interface AlgorithmMapper extends BaseMapper<Algorithm> {
 
     /**
      * 查询算法列表
-     * @param userId
-     * @param algorithmName
-     * @return
+     *
+     * @param algorithmName 算法名称
+     * @return 算法列表
      */
-    List<AlgorithmDto> queryAlgorithmList(@Param(value = "userId")Long userId, @Param(value = "algorithmName")String algorithmName);
+    List<AlgorithmDto> queryAlgorithmList(@Param(value = "algorithmName") String algorithmName);
 
     /**
      * 查询算法详情
+     *
      * @param algorithmId 算法id
      * @return
      */

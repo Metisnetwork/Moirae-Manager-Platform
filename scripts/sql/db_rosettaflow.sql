@@ -163,7 +163,8 @@ CREATE TABLE `t_project_temp` (
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_NAME` (`project_name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目模板表';
 
 
@@ -296,7 +297,7 @@ CREATE TABLE `t_workflow_temp` (
   `project_temp_id` bigint(20) DEFAULT NULL COMMENT '项目模板表id',
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc` varchar(128) DEFAULT NULL COMMENT '工作流描述',
-  `node_number` bigint(20) DEFAULT NULL COMMENT '节点数',
+  `node_number` int(11) DEFAULT NULL COMMENT '节点数',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未完成,1-已完成',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

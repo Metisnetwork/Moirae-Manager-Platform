@@ -36,7 +36,7 @@ public class WorkflowTemp implements Serializable {
     /**
      * 节点数
      */
-    private Long nodeNumber;
+    private Integer nodeNumber;
 
     /**
      * 运行状态:0-未完成,1-已完成

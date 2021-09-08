@@ -14,10 +14,13 @@ import java.util.Date;
 @ApiModel(value = "项目模板列表返回参数")
 public class ProjTempListVo {
 
-    @ApiModelProperty(value = "项目名称")
+    @ApiModelProperty(value = "项目模板ID")
+    private Long id;
+
+    @ApiModelProperty(value = "项目模板名称")
     private String projectName;
 
-    @ApiModelProperty(value = "项目描述")
+    @ApiModelProperty(value = "项目模板描述")
     private String projectDesc;
 
 }

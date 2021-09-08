@@ -25,11 +25,6 @@ public enum ErrorMsg {
     USER_UN_LOGIN("用户未登录", "User un login"),
 
     /**
-     * 用户缓存信息丢失
-     */
-    USER_CACHE_LOST_ERROR("查询算法列表错误", "user cache lost error"),
-
-    /**
      * 新增算法错误
      */
     ADD_ALG_ERROR("新增算法错误", "add algorithm error"),
@@ -58,6 +53,10 @@ public enum ErrorMsg {
      * 项目名称已存在
      */
     PROJECT_NAME_EXISTED("项目名称已存在", "project name already exist"),
+    /**
+     * 项目不存在
+     */
+    PROJECT_NOT_EXIST("项目不存在", "Project not exist"),
 
     /**
      * 项目成员角色已存在
@@ -112,7 +111,24 @@ public enum ErrorMsg {
 
     METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
 
-    ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation");
+    ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation"),
+
+    /**
+     * 项目模板对应的工作流节点代码不存在
+     */
+    ALGORITHM_CODE_NOT_NOT_EXISTS("项目模板对应的工作流节点代码不存在", "Project template algorithm code not exists"),
+
+
+
+
+    /**
+     * 新增项目模板错误
+     */
+    ADD_PROJECT_TEMPLATE_ERROR("新增项目模板错误", "Add project template error"),
+    /**
+     * 项目模板名称已存在
+     */
+    PROJECT_TEMPLATE_NAME_EXISTED("项目模板名称已存在", "Project template name already exist");
 
     private final String zh;
     private final String en;
