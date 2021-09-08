@@ -77,14 +77,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
     }
     @Override
-    public IPage<ProjectDto> queryProjectList(String projectName, Long current, Long size) {
+    public IPage<ProjectDto> queryProjectPageList(String projectName, Long current, Long size) {
        try {
            Long userId = UserContext.get().getId();
            if (userId == null ||  userId == 0) {
                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
            }
            IPage<ProjectDto> page = new Page<>(current, size);
-           return projectMapper.queryProjectList(userId, projectName, page);
+           return projectMapper.queryProjectPageList(userId, projectName, page);
        } catch (Exception e) {
            log.error("queryProjectList--查询项目列表失败, 错误信息:{}", e.getMessage());
            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_LIST_ERROR.getMsg());
@@ -165,9 +165,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size) {
+    public IPage<ProjMemberDto> queryProjMemberPageList(Long projectId, String userName, Long current, Long size) {
        IPage<ProjMemberDto> iPage = new Page<>(current, size);
-        return projectMemberMapper.queryProjMemberList(projectId, userName, iPage);
+        return projectMemberMapper.queryProjMemberPageList(projectId, userName, iPage);
     }
 
     @Override

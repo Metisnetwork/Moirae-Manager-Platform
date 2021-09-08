@@ -35,7 +35,7 @@ public interface IProjectService extends IService<Project> {
      * @param size 每页条数
      * @return ProjectDto
      */
-    IPage<ProjectDto> queryProjectList(String projectName, Long current, Long size);
+    IPage<ProjectDto> queryProjectPageList(String projectName, Long current, Long size);
 
     /**
      * 查询项目详情
@@ -62,7 +62,7 @@ public interface IProjectService extends IService<Project> {
      * @param userName 用户昵称
      * @return
      */
-    IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size);
+    IPage<ProjMemberDto> queryProjMemberPageList(Long projectId, String userName, Long current, Long size);
 
     /**
      * 新增项目成员

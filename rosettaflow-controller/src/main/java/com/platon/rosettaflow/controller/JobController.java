@@ -1,22 +1,27 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.JobDto;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.req.job.AddJobReq;
 import com.platon.rosettaflow.req.job.EditJobReq;
+import com.platon.rosettaflow.req.job.QueryWorkflowReq;
+import com.platon.rosettaflow.req.workflow.ListWorkflowReq;
 import com.platon.rosettaflow.service.IJobService;
+import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.job.QueryWorkflowVo;
+import com.platon.rosettaflow.vo.workflow.WorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author hudenian
@@ -50,6 +55,11 @@ public class JobController {
         return ResponseVo.createSuccess();
     }
 
-
+    @GetMapping("queryRelatedWorkflowName")
+    @ApiOperation(value = "查询关联工作流名称", notes = "查询关联工作流名称")
+    public ResponseVo<List<QueryWorkflowVo>> queryRelatedWorkflowName(@Valid QueryWorkflowReq queryWorkflowReq) {
+        List<Workflow> workflowList = jobService.queryRelatedWorkflowName(queryWorkflowReq.getProjectId());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(workflowList, QueryWorkflowVo.class));
+    }
 
 }

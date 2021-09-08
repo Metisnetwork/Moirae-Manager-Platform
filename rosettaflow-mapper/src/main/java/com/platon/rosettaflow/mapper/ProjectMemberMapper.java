@@ -19,7 +19,7 @@ public interface ProjectMemberMapper extends BaseMapper<ProjectMember> {
      * @param iPage 分页
      * @return IPage
      */
-    IPage<ProjMemberDto> queryProjMemberList(@Param(value = "projectId")Long projectId,
+    IPage<ProjMemberDto> queryProjMemberPageList(@Param(value = "projectId")Long projectId,
                                             @Param(value = "userName")String userName,
                                             IPage<ProjMemberDto> iPage);
 }

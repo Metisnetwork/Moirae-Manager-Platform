@@ -3,7 +3,9 @@ package com.platon.rosettaflow.service.Impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -73,9 +75,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private GrpcTaskService grpcTaskService;
 
     @Override
-    public IPage<WorkflowDto> queryWorkFlowList(Long projectId, String workflowName, Long current, Long size) {
+    public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
-        return this.baseMapper.queryWorkFlowList(projectId, workflowName, page);
+        return this.baseMapper.queryWorkFlowPageList(projectId, workflowName, page);
+    }
+
+    @Override
+    public List<Workflow> queryWorkFlowList(Long projectId) {
+        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Workflow::getProjectId, projectId);
+        queryWrapper.eq(Workflow::getStatus, 1);
+        return this.list(queryWrapper);
     }
 
     @Override

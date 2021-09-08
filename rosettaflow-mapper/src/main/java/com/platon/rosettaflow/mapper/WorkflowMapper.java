@@ -21,7 +21,7 @@ public interface WorkflowMapper extends BaseMapper<Workflow> {
      * @param page
      * @return
      */
-    IPage<WorkflowDto> queryWorkFlowList(@Param("projectId") Long projectId,
+    IPage<WorkflowDto> queryWorkFlowPageList(@Param("projectId") Long projectId,
                                          @Param("workflowName") String workflowName,
                                          IPage<WorkflowDto> page);
 

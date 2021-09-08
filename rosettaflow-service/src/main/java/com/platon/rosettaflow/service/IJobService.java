@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.JobDto;
 import com.platon.rosettaflow.mapper.domain.Job;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 
 import java.util.List;
 
@@ -31,4 +32,9 @@ public interface IJobService extends IService<Job> {
      * @param jobDto 编辑作业请求对象
      */
     void edit(JobDto jobDto);
+
+    /**
+     * 查询关联工作流
+     */
+    List<Workflow> queryRelatedWorkflowName(Long projectId);
 }

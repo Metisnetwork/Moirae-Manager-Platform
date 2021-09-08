@@ -21,7 +21,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @param page
      * @return
      */
-    IPage<ProjectDto> queryProjectList(@Param(value = "userId")Long userId,
+    IPage<ProjectDto> queryProjectPageList(@Param(value = "userId")Long userId,
                                       @Param(value = "projectName")String projectName,
                                       IPage<ProjectDto> page);
 

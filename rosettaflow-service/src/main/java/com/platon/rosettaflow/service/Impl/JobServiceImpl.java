@@ -14,7 +14,10 @@ import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.JobDto;
 import com.platon.rosettaflow.mapper.JobMapper;
 import com.platon.rosettaflow.mapper.domain.Job;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.service.IJobService;
+import com.platon.rosettaflow.service.IWorkflowService;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +37,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Resource
     private RedisUtil redisUtil;
+
+    @Resource
+    private IWorkflowService workflowService;
 
     @Override
     public List<Job> getAllUnfinishedJob() {
@@ -75,5 +81,10 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
         //将作业保存至redis待后续处理
         redisUtil.listLeftPush(SysConstant.JOB_EDIT_QUEUE, JSON.toJSONString(job), null);
+    }
+
+    @Override
+    public List<Workflow> queryRelatedWorkflowName(Long projectId) {
+        return workflowService.queryWorkFlowList(projectId);
     }
 }

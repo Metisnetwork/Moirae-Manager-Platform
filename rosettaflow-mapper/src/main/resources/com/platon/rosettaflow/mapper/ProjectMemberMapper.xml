@@ -15,7 +15,7 @@
     id, project_id, user_id, `role`, del_version, `status`, create_time, update_time
   </sql>
   <!-- 查询项目成员列表 -->
-  <select id="queryProjMemberList" resultType="com.platon.rosettaflow.dto.ProjMemberDto">
+  <select id="queryProjMemberPageList" resultType="com.platon.rosettaflow.dto.ProjMemberDto">
     select
       a.id as memberId,
       a.user_id as userId,

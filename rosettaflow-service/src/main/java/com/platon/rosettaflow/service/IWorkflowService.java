@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.List;
 
 /**
  * 工作流服务
@@ -11,15 +14,23 @@ import com.platon.rosettaflow.mapper.domain.Workflow;
  * @date 2021/8/16
  */
 public interface IWorkflowService extends IService<Workflow> {
+
     /**
-     * 获取工作流列表
+     * 获取工作流分页列表
      * @param projectId 项目id
      * @param workflowName 项目名称
      * @param current 当前页
      * @param size 条数
      * @return WorkflowDto
      */
-    IPage<WorkflowDto> queryWorkFlowList(Long projectId, String workflowName, Long current, Long size);
+    IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size);
+
+    /**
+     * 获取工作流列表（不分页）
+     * @param projectId 项目id
+     * @return Workflow 工作流
+     */
+    List<Workflow> queryWorkFlowList(Long projectId);
 
     /**
      * 获取工作流详情
