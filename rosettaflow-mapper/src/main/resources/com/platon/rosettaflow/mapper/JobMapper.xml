@@ -15,8 +15,31 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
+
   <sql id="Base_Column_List">
     id, workflow_id, `name`, `desc`, repeat_flag, repeat_interval, begin_time, end_time, 
     job_status, `status`, create_time, update_time
   </sql>
+
+
+  <resultMap id="BaseResultMapWithWorkFlow" type="com.platon.rosettaflow.dto.JobDto" extends="BaseResultMap">
+    <result column="workflow_name" jdbcType="VARCHAR" property="workflowName" />
+  </resultMap>
+
+
+  <select id="queryJobList" resultMap="BaseResultMapWithWorkFlow">
+    SELECT
+      tj.*,tw.workflow_name
+    FROM
+      t_job AS tj
+        LEFT JOIN t_workflow AS tw ON tj.workflow_id = tw.id
+    <where>
+      AND tj.status = 1
+      <if test="jobName != null and jobName != ''">
+      AND  tj.`name` LIKE CONCAT('%',#{jobName, jdbcType=VARCHAR},'%')
+      </if>
+    </where>
+    ORDER BY
+      tj.create_time DESC
+  </select>
 </mapper>

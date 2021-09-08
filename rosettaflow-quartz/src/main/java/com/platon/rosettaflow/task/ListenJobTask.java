@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  * @description 监听redis中的新增及修改job任务，并根据任务创建quartz来管理作业
  */
 @Slf4j
-@Component
+//@Component
 public class ListenJobTask {
 
     @Resource

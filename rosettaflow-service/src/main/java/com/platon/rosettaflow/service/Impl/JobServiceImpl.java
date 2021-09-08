@@ -1,11 +1,15 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.JobRepeatEnum;
 import com.platon.rosettaflow.common.enums.JobStatusEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -17,7 +21,6 @@ import com.platon.rosettaflow.mapper.domain.Job;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.service.IJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
-import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hudenian
@@ -52,12 +56,20 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
+    public IPage<JobDto> list(Long current, Long size, String jobName) {
+        Page<JobDto> jobPage = new Page<>(current, size);
+        return this.baseMapper.queryJobList(jobName, jobPage);
+    }
+
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(JobDto jobDto) {
+        checkParam(jobDto);
         //保存作业
         Job job = new Job();
         BeanCopierUtils.copy(jobDto, job);
-        job.setStatus(JobStatusEnum.UNFINISH.getValue());
+        job.setJobStatus(JobStatusEnum.UNFINISH.getValue());
 
         if (!this.save(job)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ADD_ERROR.getMsg());
@@ -73,8 +85,10 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
+        checkParam(jobDto);
+        //修改作业
         BeanCopierUtils.copy(jobDto, job);
-        job.setStatus(JobStatusEnum.UNFINISH.getValue());
+        job.setJobStatus(JobStatusEnum.UNFINISH.getValue());
         if (!this.updateById(job)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
         }
@@ -87,4 +101,32 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     public List<Workflow> queryRelatedWorkflowName(Long projectId) {
         return workflowService.queryWorkFlowList(projectId);
     }
+
+    @Override
+    public void pause(Long id) {
+
+    }
+
+    @Override
+    public void reStart(Long id) {
+
+    }
+
+    /**
+     * 检查入参合法性
+     */
+    private void checkParam(JobDto jobDto){
+        //校验开始时间 > 结束时间
+        if(!Objects.isNull(jobDto.getBeginTime()) && !Objects.isNull(jobDto.getEndTime()) && jobDto.getBeginTime().after(jobDto.getEndTime())){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_ERROR.getMsg());
+        }
+        //作业执行重复时,结束时间及重复次数合法性
+        if(jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()){
+            if(Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())){
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEATINTERVAL_ERROR.getMsg());
+            }
+        }
+    }
+
+
 }
