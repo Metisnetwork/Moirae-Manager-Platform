@@ -19,8 +19,8 @@ import java.util.Date;
 public class ActionJobReq {
 
     @ApiModelProperty(value = "作业ID", required = true)
-    @NotNull(message = "作业ID不能为空")
-    @Positive(message = "作业ID错误")
+    @NotNull(message = "{job.id.notNull}")
+    @Positive(message = "{job.id.positive}")
     private Long id;
 
     @ApiModelProperty(value = "操作作业类型: 1、暂停 2、重启", required = true)
