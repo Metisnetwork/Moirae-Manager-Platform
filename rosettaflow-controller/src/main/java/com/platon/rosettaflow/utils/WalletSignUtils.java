@@ -93,7 +93,7 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "9a74458ea12b4828a294ab73373b6d0a";
+        String uuid = "e287c5e6976e4b4497770de496bb1064";
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
 
         try {
@@ -107,7 +107,7 @@ public class WalletSignUtils {
             System.out.println("验证签名结果>>>" + verifyTypedDataV4(
                     json,
                     "0xfb71e85fb91026933d0057c263b549197e4d93e8a955728892f3ae9cd4cc6c4973c235ecc4dc2bf6927006b53f42bc3f56110649f040357489f41b3cd9c10af71c",
-                    "atp1qpagtcerpdwed2c4ar3hc738m2h98ecrt04c2x"));
+                    "lax1j0q78v8g9l94pkwyk3tgk0vfy5ukdz3q2e7wqa"));
 
         } catch (Exception e) {
             e.printStackTrace();

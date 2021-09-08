@@ -23,7 +23,7 @@ import java.util.Set;
  * @description 作业管理服务
  */
 @Slf4j
-@Component
+//@Component
 public class JobManager {
 
     static final String GROUP = "MOIRAE";

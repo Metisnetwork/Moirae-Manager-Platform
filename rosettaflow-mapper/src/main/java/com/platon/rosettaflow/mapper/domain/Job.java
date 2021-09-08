@@ -60,12 +60,12 @@ public class Job implements Serializable {
     private Date endTime;
 
     /**
-     * 状态: 0-未运行，1-运行中
+     * 状态: 0-未结束，1-已结束
      */
     private Byte jobStatus;
 
     /**
-     * 状态: 0-未结束，1-已结束
+     * 有效状态: 0-无效，1- 有效
      */
     @TableField(value = "`status`")
     private Byte status;
