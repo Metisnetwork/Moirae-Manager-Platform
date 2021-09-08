@@ -42,7 +42,7 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 3600000, initialDelay = 10000000)
+    @Scheduled(fixedDelay = 3600000, initialDelay = 1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
@@ -84,7 +84,7 @@ public class SyncMetaDataTask {
             metaData.setFileType(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFileType().byteValue());
             metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
             metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
-            metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getState().byteValue());
+            metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
             metaData.setStatus(StatusEnum.VALID.getValue());
             //添加元数据简介
             newMetaDataList.add(metaData);

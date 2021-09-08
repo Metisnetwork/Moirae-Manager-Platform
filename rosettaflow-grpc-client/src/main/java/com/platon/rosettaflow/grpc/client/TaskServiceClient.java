@@ -115,7 +115,7 @@ public class TaskServiceClient {
             for (int j = 0; j < getTaskDetailResponse.getInformation().getDataSupplierCount(); j++) {
                 dataSupplierShow = getTaskDetailResponse.getInformation().getDataSupplier(j);
                 dataSupplierDto = new TaskDataSupplierDto();
-                dataSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(dataSupplierShow.getMemberInfo()));
+                dataSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(dataSupplierShow.getOrganization()));
                 dataSupplierDto.setMetaDataId(dataSupplierShow.getMetadataId());
                 dataSupplierDto.setMetaDataName(dataSupplierShow.getMetadataName());
                 dataSuppliers.add(dataSupplierDto);
@@ -141,7 +141,7 @@ public class TaskServiceClient {
                 resourceUsedDetailDto.setUsedBandwidth(powerSupplierShow.getPowerInfo().getUsedBandwidth());
                 resourceUsedDetailDto.setUsedDisk(powerSupplierShow.getPowerInfo().getUsedDisk());
 
-                powerSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(powerSupplierShow.getMemberInfo()));
+                powerSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(powerSupplierShow.getOrganization()));
                 powerSupplierDto.setResourceUsedInfo(resourceUsedDetailDto);
                 powerSuppliers.add(powerSupplierDto);
             }
@@ -167,9 +167,9 @@ public class TaskServiceClient {
 
             //任务所需资源声明
             TaskResourceCostDeclareDto taskOperationCostDeclareDto = new TaskResourceCostDeclareDto();
-            taskOperationCostDeclareDto.setCostMem(getTaskDetailResponse.getInformation().getOperationCost().getCostMem());
-            taskOperationCostDeclareDto.setCostProcessor(getTaskDetailResponse.getInformation().getOperationCost().getCostProcessor());
-            taskOperationCostDeclareDto.setCostBandwidth(getTaskDetailResponse.getInformation().getOperationCost().getCostBandwidth());
+            taskOperationCostDeclareDto.setCostMem(getTaskDetailResponse.getInformation().getOperationCost().getMemory());
+            taskOperationCostDeclareDto.setCostProcessor(getTaskDetailResponse.getInformation().getOperationCost().getProcessor());
+            taskOperationCostDeclareDto.setCostBandwidth(getTaskDetailResponse.getInformation().getOperationCost().getBandwidth());
             taskOperationCostDeclareDto.setDuration(getTaskDetailResponse.getInformation().getOperationCost().getDuration());
             taskDetailDto.setOperationCost(taskOperationCostDeclareDto);
 
@@ -284,16 +284,16 @@ public class TaskServiceClient {
                     .setIdentityId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getIdentityId())
                     .build();
             //meta_data_info
-            TaskMetaDataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetaDataDeclare.newBuilder();
+            TaskMetadataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetadataDeclare.newBuilder();
             for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().size(); j++) {
                 taskMetaDataDeclareBuilder
-                        .setMetaDataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
+                        .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
                         .setColumnIndexList(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().get(j));
             }
 
             TaskDataSupplierDeclare taskDataSupplierDeclare = TaskDataSupplierDeclare.newBuilder()
-                    .setMemberInfo(dataSupplierOrganization)
-                    .setMetaDataInfo(taskMetaDataDeclareBuilder.build())
+                    .setOrganization(dataSupplierOrganization)
+                    .setMetadataInfo(taskMetaDataDeclareBuilder.build())
                     .build();
 
             publishTaskDeclareRequestBuilder.setDataSupplier(i, taskDataSupplierDeclare);
@@ -320,9 +320,9 @@ public class TaskServiceClient {
 
         //任务所需资源声明
         TaskResourceCostDeclare resourceCostBuilder = TaskResourceCostDeclare.newBuilder()
-                .setCostMem(taskDto.getResourceCostDeclareDto().getCostMem())
-                .setCostProcessor(taskDto.getResourceCostDeclareDto().getCostProcessor())
-                .setCostBandwidth(taskDto.getResourceCostDeclareDto().getCostBandwidth())
+                .setMemory(taskDto.getResourceCostDeclareDto().getCostMem())
+                .setProcessor(taskDto.getResourceCostDeclareDto().getCostProcessor())
+                .setBandwidth(taskDto.getResourceCostDeclareDto().getCostBandwidth())
                 .setDuration(taskDto.getResourceCostDeclareDto().getDuration())
                 .build();
         publishTaskDeclareRequestBuilder.setOperationCost(resourceCostBuilder);

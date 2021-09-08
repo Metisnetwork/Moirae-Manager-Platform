@@ -26,7 +26,7 @@ import java.util.List;
 public class MetaDataServiceClient {
 
     @GrpcClient("carrier-grpc-server")
-    private MetaDataServiceGrpc.MetaDataServiceBlockingStub metaDataServiceBlockingStub;
+    private MetadataServiceGrpc.MetadataServiceBlockingStub metaDataServiceBlockingStub;
 
     /**
      * 查看单个元数据详情 (包含 列字段描述)
@@ -39,13 +39,13 @@ public class MetaDataServiceClient {
 
         MetaDataDetailResponseDto metaDataDetailResponseDto = new MetaDataDetailResponseDto();
 
-        GetMetaDataDetailRequest getMetaDataDetailRequest = GetMetaDataDetailRequest.newBuilder()
+        GetMetadataDetailRequest getMetadataDetailRequest = GetMetadataDetailRequest.newBuilder()
                 .setIdentityId(identityId)
                 .setMetadataId(metaDataId)
                 .build();
-        GetMetaDataDetailResponse metaDataDetailResponse = metaDataServiceBlockingStub.getMetaDataDetail(getMetaDataDetailRequest);
+        GetMetadataDetailResponse getMetadataDetailResponse = metaDataServiceBlockingStub.getMetadataDetail(getMetadataDetailRequest);
 
-        convertToDto(metaDataDetailResponse, metaDataDetailResponseDto);
+        convertToDto(getMetadataDetailResponse, metaDataDetailResponseDto);
         return metaDataDetailResponseDto;
     }
 
@@ -58,7 +58,7 @@ public class MetaDataServiceClient {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = new ArrayList<>();
 
         Empty empty = Empty.newBuilder().build();
-        GetMetaDataDetailListResponse metaDataDetailList = metaDataServiceBlockingStub.getMetaDataDetailList(empty);
+        GetMetadataDetailListResponse metaDataDetailList = metaDataServiceBlockingStub.getMetadataDetailList(empty);
 
         processRespList(metaDataDetailResponseDtoList, metaDataDetailList);
 
@@ -73,28 +73,28 @@ public class MetaDataServiceClient {
     public List<MetaDataDetailResponseDto> getMetaDataDetailListByOwner(String identityId) {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = new ArrayList<>();
 
-        GetMetaDataDetailListByOwnerRequest getMetaDataDetailListByOwnerRequest = GetMetaDataDetailListByOwnerRequest.newBuilder()
+        GetMetadataDetailListByOwnerRequest getMetadataDetailListByOwnerRequest = GetMetadataDetailListByOwnerRequest.newBuilder()
                 .setIdentityId(identityId)
                 .build();
-        GetMetaDataDetailListResponse metaDataDetailListResponse = metaDataServiceBlockingStub.getMetaDataDetailListByOwner(getMetaDataDetailListByOwnerRequest);
+        GetMetadataDetailListResponse metaDataDetailListResponse = metaDataServiceBlockingStub.getMetadataDetailListByOwner(getMetadataDetailListByOwnerRequest);
         processRespList(metaDataDetailResponseDtoList, metaDataDetailListResponse);
         return metaDataDetailResponseDtoList;
     }
 
-    private void processRespList(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, GetMetaDataDetailListResponse metaDataDetailListResponse) {
+    private void processRespList(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, GetMetadataDetailListResponse metaDataDetailListResponse) {
         if (metaDataDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(metaDataDetailListResponse.getStatus(), metaDataDetailListResponse.getMsg());
         }
 
         MetaDataDetailResponseDto metaDataDetailResponseDto;
-        for (int i = 0; i < metaDataDetailListResponse.getMetaDataListCount(); i++) {
+        for (int i = 0; i < metaDataDetailListResponse.getMetadataListCount(); i++) {
             metaDataDetailResponseDto = new MetaDataDetailResponseDto();
-            convertToDto(metaDataDetailListResponse.getMetaDataList(i), metaDataDetailResponseDto);
+            convertToDto(metaDataDetailListResponse.getMetadataList(i), metaDataDetailResponseDto);
             metaDataDetailResponseDtoList.add(metaDataDetailResponseDto);
         }
     }
 
-    private void convertToDto(GetMetaDataDetailResponse metaDataDetailResponse, MetaDataDetailResponseDto metaDataDetailResponseDto) {
+    private void convertToDto(GetMetadataDetailResponse metaDataDetailResponse, MetaDataDetailResponseDto metaDataDetailResponseDto) {
         //元数据的拥有者
         NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
         nodeIdentityDto.setNodeName(metaDataDetailResponse.getOwner().getNodeName());
@@ -106,18 +106,18 @@ public class MetaDataServiceClient {
         MetaDataDetailDto metaDataDetailShowDto = new MetaDataDetailDto();
         //元数据摘要
         MetaDataSummaryDto metaDataSummaryDto = new MetaDataSummaryDto();
-        metaDataSummaryDto.setMetaDataId(metaDataDetailResponse.getInformation().getMetaDataSummary().getMetaDataId());
-        metaDataSummaryDto.setOriginId(metaDataDetailResponse.getInformation().getMetaDataSummary().getOriginId());
-        metaDataSummaryDto.setTableName(metaDataDetailResponse.getInformation().getMetaDataSummary().getTableName());
-        metaDataSummaryDto.setDesc(metaDataDetailResponse.getInformation().getMetaDataSummary().getDesc());
-        metaDataSummaryDto.setFilePath(metaDataDetailResponse.getInformation().getMetaDataSummary().getFilePath());
-        metaDataSummaryDto.setRows(metaDataDetailResponse.getInformation().getMetaDataSummary().getRows());
-        metaDataSummaryDto.setColumns(metaDataDetailResponse.getInformation().getMetaDataSummary().getColumns());
-        metaDataSummaryDto.setSize(metaDataDetailResponse.getInformation().getMetaDataSummary().getSize());
-        metaDataSummaryDto.setFileType(metaDataDetailResponse.getInformation().getMetaDataSummary().getFileTypeValue());
-        metaDataSummaryDto.setHasTitle(metaDataDetailResponse.getInformation().getMetaDataSummary().getHasTitle());
-        metaDataSummaryDto.setIndustry(metaDataDetailResponse.getInformation().getMetaDataSummary().getIndustry());
-        metaDataSummaryDto.setState(metaDataDetailResponse.getInformation().getMetaDataSummary().getStateValue());
+        metaDataSummaryDto.setMetaDataId(metaDataDetailResponse.getInformation().getMetadataSummary().getMetadataId());
+        metaDataSummaryDto.setOriginId(metaDataDetailResponse.getInformation().getMetadataSummary().getOriginId());
+        metaDataSummaryDto.setTableName(metaDataDetailResponse.getInformation().getMetadataSummary().getTableName());
+        metaDataSummaryDto.setDesc(metaDataDetailResponse.getInformation().getMetadataSummary().getDesc());
+        metaDataSummaryDto.setFilePath(metaDataDetailResponse.getInformation().getMetadataSummary().getFilePath());
+        metaDataSummaryDto.setRows(metaDataDetailResponse.getInformation().getMetadataSummary().getRows());
+        metaDataSummaryDto.setColumns(metaDataDetailResponse.getInformation().getMetadataSummary().getColumns());
+        metaDataSummaryDto.setSize(metaDataDetailResponse.getInformation().getMetadataSummary().getSize());
+        metaDataSummaryDto.setFileType(metaDataDetailResponse.getInformation().getMetadataSummary().getFileTypeValue());
+        metaDataSummaryDto.setHasTitle(metaDataDetailResponse.getInformation().getMetadataSummary().getHasTitle());
+        metaDataSummaryDto.setIndustry(metaDataDetailResponse.getInformation().getMetadataSummary().getIndustry());
+        metaDataSummaryDto.setDataState(metaDataDetailResponse.getInformation().getMetadataSummary().getStateValue());
         metaDataDetailShowDto.setMetaDataSummary(metaDataSummaryDto);
         //元数据对应原始文件对外暴露的列描述列表
         List<MetaDataColumnDetailDto> metaDataColumnDetailDtoList = new ArrayList<>();

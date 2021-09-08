@@ -40,7 +40,7 @@ public class MetaDataSummaryDto {
     /**
      * 源文件的大小 (单位: byte)
      */
-    private Integer size;
+    private Long size;
     /**
      * 0-未知 1-源文件的类型 (目前只有 csv)
      */
@@ -56,5 +56,5 @@ public class MetaDataSummaryDto {
     /**
      * 元数据的状态 (0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表)
      */
-    private Integer state;
+    private Integer dataState;
 }
