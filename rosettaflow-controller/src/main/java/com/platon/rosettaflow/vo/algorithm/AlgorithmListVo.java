@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.vo.algorithm;
 
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.Data;
 public class AlgorithmListVo {
 
     @ApiModelProperty(value = "算法ID")
-    private Long id;
+    private String algorithmId;
 
     @ApiModelProperty(value = "算法名称")
     private String algorithmName;

@@ -72,6 +72,27 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     List<WorkflowNode> getWorkflowNodeList(Long workflowId);
 
     /**
+     * 根据id查询工作流节点
+     * @param id 工作流主键id
+     * @return 工作流节点列表
+     */
+    WorkflowNode getWorkflowNodeById(Long id);
+
+    /**
+     * 添加工作流节点输入数据
+     * @param workflowNodeId 工作流节点
+     * @param workflowNodeInputList 节点输入list
+     */
+    void saveWorkflowNodeInput(Long workflowNodeId, List<WorkflowNodeInput> workflowNodeInputList);
+
+    /**
+     * 添加工作流节点输出数据
+     * @param workflowNodeId
+     * @param workflowNodeOutputList
+     */
+    void saveWorkflowNodeOutput(Long workflowNodeId, List<WorkflowNodeOutput> workflowNodeOutputList);
+
+    /**
      * 添加工作流节点代码
      *
      * @param workflowNodeCode 工作流节点代码
@@ -80,16 +101,15 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
 
     /**
      * 添加工作流节点资源
-     *
-     * @param workflowNodeResource 工作流节点资源
+     * @param workflowNodeResource  工作流节点资源
      */
     void addWorkflowNodeResource(WorkflowNodeResource workflowNodeResource);
 
     /**
      * 复制保存工作流节点
      *
-     * @param newWorkflowId
-     * @param workflowNodeOldList
+     * @param newWorkflowId 新工作流id
+     * @param workflowNodeOldList 源工作流list
      */
     void copySaveWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList);
 

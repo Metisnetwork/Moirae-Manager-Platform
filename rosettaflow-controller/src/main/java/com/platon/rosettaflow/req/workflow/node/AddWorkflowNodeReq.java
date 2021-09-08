@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.req.workflownode;
+package com.platon.rosettaflow.req.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,11 +26,6 @@ public class AddWorkflowNodeReq {
     @NotNull(message = "{algorithm id can not be empty}")
     @Positive(message = "{algorithm.id.positive}")
     private Long algorithmId;
-
-    @ApiModelProperty(value = "工作流当前节点序号,从1开始", required = true)
-    @NotNull(message = "{workflow.node.step.notNull}")
-    @Positive(message = "{workflow.node.step.positive}")
-    private Integer nodeStep;
 
     @ApiModelProperty(value = "工作流节点名称", required = true)
     @NotBlank(message = "{workflow.node.name.NotBlank}")

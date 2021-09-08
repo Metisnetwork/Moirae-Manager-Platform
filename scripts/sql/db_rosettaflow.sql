@@ -351,7 +351,7 @@ DROP TABLE IF EXISTS `t_workflow_node_input`;
 CREATE TABLE `t_workflow_node_input` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
-  `data_type` varchar(64) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
+  `data_type` tinyint(4) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
   `identity_name` varchar(64) DEFAULT NULL COMMENT '组织名称',
   `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
@@ -448,20 +448,20 @@ CREATE TABLE `t_workflow_node_resource` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_job`;
 CREATE TABLE `t_job` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务计划表ID(自增长)',
-    `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
-    `name` varchar(64) DEFAULT NULL COMMENT '作业名称',
-    `desc` varchar(64) DEFAULT NULL COMMENT '作业描述',
-    `repeat_flag` tinyint(4) DEFAULT NULL DEFAULT 1 COMMENT '是否重复：0-否,1-是',
-    `repeat_interval` int(11) DEFAULT NULL COMMENT '重复间隔，单位分钟',
-    `begin_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
-    `end_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '结束时间',
-    `job_status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-未结束，1-已结束',
-    `status`  tinyint(4)   NOT NULL DEFAULT 0 COMMENT '状态: 0-无效，1- 有效',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作业表';
+ `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务计划表ID(自增长)',
+ `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
+ `name` varchar(64) DEFAULT NULL COMMENT '作业名称',
+ `desc` varchar(64) DEFAULT NULL COMMENT '作业描述',
+ `repeat_flag` tinyint(4) DEFAULT '1' COMMENT '是否重复：0-否,1-是',
+ `repeat_interval` int(11) DEFAULT NULL COMMENT '重复间隔，单位分钟',
+ `begin_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
+ `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+ `job_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-未结束，1-已结束',
+ `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+ `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+ `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='作业表';
 -- ----------------------------
 -- Table structure for `t_sub_job`
 -- ----------------------------

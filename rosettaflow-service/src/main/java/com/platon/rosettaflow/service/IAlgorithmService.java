@@ -7,6 +7,7 @@ import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author houz
@@ -38,6 +39,12 @@ public interface IAlgorithmService extends IService<Algorithm> {
      * @return AlgorithmDto
      */
     AlgorithmDto queryAlgorithmDetails(Long id);
+
+    /**
+     * 查询算法树结构
+     * @return 数据
+     */
+    List<Map<String, Object>> queryAlgorithmTreeList();
 
     /**
      * 复制保存算法

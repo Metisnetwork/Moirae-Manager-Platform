@@ -84,7 +84,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             }
         } catch (Exception e) {
             log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException) {
+            if (e instanceof DuplicateKeyException){
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
             }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJ_ERROR.getMsg());

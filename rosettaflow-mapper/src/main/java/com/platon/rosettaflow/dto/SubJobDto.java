@@ -1,17 +1,16 @@
 package com.platon.rosettaflow.dto;
 
-import com.platon.rosettaflow.mapper.domain.Job;
+import com.platon.rosettaflow.mapper.domain.SubJob;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * @author hudenian
  * @date 2021/8/13
- * @description 调度任务dto
+ * @description 子作业dto
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class JobDto  extends Job {
+public class SubJobDto extends SubJob {
 
-    private String workflowName;
 }

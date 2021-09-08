@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.req.workflownode;
+package com.platon.rosettaflow.req.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,7 +15,7 @@ import javax.validation.constraints.Positive;
  */
 @Data
 @ApiModel(value = "添加工作流节点代码请求对象")
-public class AddNodeCodeReq {
+public class SaveNodeCodeReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
     @NotNull(message = "{workflow.node.id.notNull}")

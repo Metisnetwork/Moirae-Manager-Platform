@@ -11,16 +11,20 @@ import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
 public interface IWorkflowNodeResourceService extends IService<WorkflowNodeResource> {
     /**
      * 根据工作流节点id获取工作流节点资源
-     *
      * @param workflowNodeId 工作流节点id
      * @return 工作流节点资源
      */
     WorkflowNodeResource getByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     * 根据工作流节点id删除工作流节点资源表
-     *
+     * 物理删除工作流节点资源表, 根据工作流节点id
      * @param workflowNodeId 工作流节点id
      */
     void deleteByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 逻辑删除工作流节点资源表, 根据工作流节点id
+     * @param workflowNodeId 工作流节点id
+     */
+    void deleteLogicByWorkflowNodeId(Long workflowNodeId);
 }

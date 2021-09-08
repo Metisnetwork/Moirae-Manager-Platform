@@ -53,4 +53,12 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
         this.save(workflowNodeCode);
         return workflowNodeCode.getId();
     }
+
+    @Override
+    public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
+        LambdaUpdateWrapper<WorkflowNodeCode> delWrapper = Wrappers.lambdaUpdate();
+        delWrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
+        delWrapper.set(WorkflowNodeCode::getStatus, 0);
+        this.update(delWrapper);
+    }
 }

@@ -6,14 +6,12 @@ import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
-import com.platon.rosettaflow.mapper.domain.ProjectTemp;
 import com.platon.rosettaflow.req.project.*;
 import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.project.ProjMemberListVo;
-import com.platon.rosettaflow.vo.project.ProjTempListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjectListVo;
 import io.swagger.annotations.Api;
@@ -40,10 +38,10 @@ public class ProjectController {
     @Resource
     private IProjectService projectService;
 
-    @GetMapping("queryProjectList")
+    @GetMapping("queryProjectPageList")
     @ApiOperation(value = "查询项目列表", notes = "查询项目列表")
-    public ResponseVo<PageVo<ProjectListVo>> queryProjectList(@Valid ProjListReq projListReq) {
-        IPage<ProjectDto> iPage  = projectService.queryProjectList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
+    public ResponseVo<PageVo<ProjectListVo>> queryProjectPageList(@Valid ProjListReq projListReq) {
+        IPage<ProjectDto> iPage  = projectService.queryProjectPageList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
         List<ProjectListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjectListVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));
     }
@@ -82,10 +80,10 @@ public class ProjectController {
         return ResponseVo.createSuccess();
     }
 
-    @GetMapping("queryProjMemberList")
+    @GetMapping("queryProjMemberPageList")
     @ApiOperation(value = "查询项目成员列表", notes = "查询项目成员列表")
     public ResponseVo<PageVo<ProjMemberListVo>> queryProjMemberList(@Valid ProjMemberListReq listReq) {
-        IPage<ProjMemberDto> iPage  = projectService.queryProjMemberList(listReq.getProjectId(),
+        IPage<ProjMemberDto> iPage  = projectService.queryProjMemberPageList(listReq.getProjectId(),
                 listReq.getUserName(), listReq.getCurrent(), listReq.getSize());
         List<ProjMemberListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjMemberListVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));

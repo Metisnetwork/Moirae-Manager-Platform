@@ -2,6 +2,7 @@ package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
+import com.platon.rosettaflow.req.algorithm.AlgDetailsReq;
 import com.platon.rosettaflow.req.algorithm.AlgListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 算法相关接口
@@ -61,6 +63,14 @@ public class AlgorithmController {
     public ResponseVo<AlgDetailsVo> detail(@ApiParam(value = "算法表ID", required = true) @PathVariable Long id) {
         AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(id);
         return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class));
+    }
+
+    @GetMapping("queryAlgorithmTreeList")
+    @ApiOperation(value = "查询算法树列表", notes = "查询算法树列表")
+    public ResponseVo<List<Map<String, Object>>> queryAlgorithmTreeList() {
+        List<Map<String, Object>> listVo = algorithmService.queryAlgorithmTreeList();
+        return ResponseVo.createSuccess(listVo);
+
     }
 
 }

@@ -105,6 +105,10 @@ public enum ErrorMsg {
 
     JOB_NOT_EXIST("原作业不存在", "Job not exist"),
 
+    JOB_TIME_ERROR("作业时间错误", "Job time error"),
+
+    JOB_TIME_REPEATINTERVAL_ERROR("作业执行重复时，作业时间及执行间隔时间错误", "job is repeated,the job time or repeat interval error"),
+
     METADATA_NOT_EXIST("元数据不存在", "Meta data not exist"),
 
     METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by times, the times must be greater than zero"),

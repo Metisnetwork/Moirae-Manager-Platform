@@ -10,6 +10,7 @@ import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.service.utils.UserContext;
@@ -92,6 +93,59 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_ALG_DETAILS_ERROR.getMsg());
         }
 
+    }
+
+    @Override
+    public List<Map<String, Object>> queryAlgorithmTreeList() {
+//        Long userId = UserContext.get() == null ? null : UserContext.get().getId();
+//        if (userId == null ||  userId == 0L) {
+//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
+//        }
+        List<AlgorithmDto> algorithmDtoList = algorithmMapper.queryAlgorithmList(1L, null);
+        // 造三个父类型节点
+        List<Map<String, Object>> treeList = new ArrayList<>();
+        Map<String, Object> param1 = new HashMap<>(4);
+        param1.put("algorithmId", 1);
+        param1.put("algorithmName", "统计分析");
+        Map<String, Object> param2 = new HashMap<>(4);
+        param2.put("algorithmId", 2);
+        param2.put("algorithmName", "特征工程");
+        Map<String, Object> param3 = new HashMap<>(4);
+        param3.put("algorithmId", 3);
+        param3.put("algorithmName", "机器学习");
+
+        // 处理子节点
+        List<Map<String, Object>> childList1 = new ArrayList<>();
+        List<Map<String, Object>> childList2 = new ArrayList<>();
+        List<Map<String, Object>> childList3 = new ArrayList<>();
+        for (AlgorithmDto algorithmDto : algorithmDtoList) {
+            if (algorithmDto.getAlgorithmType() == 1) {
+                Map<String, Object> param = new HashMap<>(4);
+                param.put("algorithmId", algorithmDto.getAlgorithmId());
+                param.put("algorithmName", algorithmDto.getAlgorithmName());
+                childList1.add(param);
+
+            }
+            if (algorithmDto.getAlgorithmType() == 2) {
+                Map<String, Object> param = new HashMap<>(4);
+                param.put("algorithmId", algorithmDto.getAlgorithmId());
+                param.put("algorithmName", algorithmDto.getAlgorithmName());
+                childList2.add(param);
+            }
+            if (algorithmDto.getAlgorithmType() == 3) {
+                Map<String, Object> param = new HashMap<>(4);
+                param.put("algorithmId", algorithmDto.getAlgorithmId());
+                param.put("algorithmName", algorithmDto.getAlgorithmName());
+                childList3.add(param);
+            }
+        }
+        param1.put("child", childList1);
+        param2.put("child", childList2);
+        param3.put("child", childList3);
+        treeList.add(param1);
+        treeList.add(param2);
+        treeList.add(param3);
+        return treeList;
     }
 
     @Override

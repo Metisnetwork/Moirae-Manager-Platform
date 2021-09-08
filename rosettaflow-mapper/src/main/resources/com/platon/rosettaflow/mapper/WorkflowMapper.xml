@@ -29,7 +29,7 @@
         create_time,
         update_time
     </sql>
-    <select id="queryWorkFlowList" resultType="com.platon.rosettaflow.dto.WorkflowDto">
+    <select id="queryWorkFlowPageList" resultType="com.platon.rosettaflow.dto.WorkflowDto">
         SELECT
             w.id as id,
             w.workflow_name as workflowName,

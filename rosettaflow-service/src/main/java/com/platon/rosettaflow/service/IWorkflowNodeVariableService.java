@@ -34,4 +34,10 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
      * @param algorithmVariableList 算法变量列表
      */
     void addByAlgorithmVariableList(Long workflowNodeId, List<AlgorithmVariable> algorithmVariableList);
+
+    /**
+     * 逻辑删除工作流节点变量， 根据工作流节点id
+     * @param workflowNodeId 工作流节点id
+     */
+    void deleteLogicByWorkflowNodeId(Long workflowNodeId);
 }

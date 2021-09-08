@@ -1,13 +1,11 @@
 package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.platon.rosettaflow.dto.WorkflowNodeDto;
-import com.platon.rosettaflow.mapper.domain.WorkflowNode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
-import com.platon.rosettaflow.req.workflownode.*;
+import com.platon.rosettaflow.mapper.domain.*;
+import com.platon.rosettaflow.req.workflow.node.*;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.workflow.node.AddWorkflowNodeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,18 +39,27 @@ public class WorkflowNodeController {
         return ResponseVo.createSuccess();
     }
 
+    @PostMapping("clear")
+    @ApiOperation(value = "清空工作流节点", notes = "清空工作流节点")
+    public ResponseVo<?> clear(@RequestBody @Validated ClearWorkflowNodeReq clearNodeReq) {
+        workflowNodeService.clearWorkflowNode(clearNodeReq.getWorkflowId());
+        return ResponseVo.createSuccess();
+    }
+
     @PostMapping("add")
     @ApiOperation(value = "添加工作流节点", notes = "添加工作流节点")
-    public ResponseVo<?> add(@RequestBody @Validated AddWorkflowNodeReq addNodeReq) {
+    public ResponseVo<AddWorkflowNodeVo> add(@RequestBody @Validated AddWorkflowNodeReq addNodeReq) {
         WorkflowNode workflowNode = BeanUtil.toBean(addNodeReq, WorkflowNode.class);
-        workflowNodeService.addWorkflowNode(workflowNode);
-        return ResponseVo.createSuccess();
+        Long workflowNodeId = workflowNodeService.addWorkflowNode(workflowNode);
+        AddWorkflowNodeVo addWorkflowNodeVo = new AddWorkflowNodeVo();
+        addWorkflowNodeVo.setWorkflowNodeId(workflowNodeId);
+        return ResponseVo.createSuccess(addWorkflowNodeVo);
     }
 
     @PostMapping("rename")
     @ApiOperation(value = "工作流节点重命名", notes = "工作流节点重命名")
     public ResponseVo<?> rename(@RequestBody @Validated WorkflowNodeRenameReq renameReq) {
-        workflowNodeService.renameWorkflowNode(renameReq.getNodeId(), renameReq.getNodeName());
+        workflowNodeService.renameWorkflowNode(renameReq.getWorkflowNodeId(), renameReq.getNodeName());
         return ResponseVo.createSuccess();
     }
 
@@ -63,19 +70,37 @@ public class WorkflowNodeController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("addNodeCode")
-    @ApiOperation(value = "添加工作流节点代码", notes = "添加工作流节点代码")
-    public ResponseVo<?> addNodeCode(@RequestBody @Validated AddNodeCodeReq addCodeReq) {
-        WorkflowNodeCode workflowNodeCode = BeanUtil.toBean(addCodeReq, WorkflowNodeCode.class);
-        workflowNodeService.addWorkflowNodeCode(workflowNodeCode);
+    @PostMapping("addNodeInput")
+    @ApiOperation(value = "保存工作流节点输入", notes = "保存工作流节点输入")
+    public ResponseVo<?> addNodeInput(@RequestBody @Validated SaveNodeInputListReq saveInputReq) {
+        List<WorkflowNodeInput> workflowNodeInputList =
+                BeanUtil.copyToList(saveInputReq.getSaveNodeInputReqList(), WorkflowNodeInput.class);
+        workflowNodeService.saveWorkflowNodeInput(saveInputReq.getWorkflowNodeId(), workflowNodeInputList);
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("addNodeResource")
+    @PostMapping("addNodeOutput")
     @ApiOperation(value = "添加工作流节点依赖资源", notes = "添加工作流节点依赖资源")
-    public ResponseVo<?> addNodeResource(@RequestBody @Validated AddNodeResourceReq addResourceReq) {
-        WorkflowNodeResource workflowNodeResource = BeanUtil.toBean(addResourceReq, WorkflowNodeResource.class);
-        workflowNodeService.addWorkflowNodeResource(workflowNodeResource);
+    public ResponseVo<?> addNodeOutput(@RequestBody @Validated SaveNodeOutputListReq outputListReq) {
+        List<WorkflowNodeOutput> workflowNodeOutputList =
+                BeanUtil.copyToList(outputListReq.getSaveNodeOutputReqList(), WorkflowNodeOutput.class);
+        workflowNodeService.saveWorkflowNodeOutput(outputListReq.getWorkflowNodeId(), workflowNodeOutputList);
+        return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("saveNodeCode")
+    @ApiOperation(value = "保存工作流节点代码", notes = "保存工作流节点代码")
+    public ResponseVo<?> addNodeCode(@RequestBody @Validated SaveNodeCodeReq saveCodeReq) {
+        WorkflowNodeCode workflowNodeCode = BeanUtil.toBean(saveCodeReq, WorkflowNodeCode.class);
+        workflowNodeService.saveWorkflowNodeCode(workflowNodeCode);
+        return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("saveNodeResource")
+    @ApiOperation(value = "保存工作流节点依赖资源", notes = "保存工作流节点依赖资源")
+    public ResponseVo<?> addNodeResource(@RequestBody @Validated SaveNodeResourceReq saveResourceReq) {
+        WorkflowNodeResource workflowNodeResource = BeanUtil.toBean(saveResourceReq, WorkflowNodeResource.class);
+        workflowNodeService.saveWorkflowNodeResource(workflowNodeResource);
         return ResponseVo.createSuccess();
     }
 
