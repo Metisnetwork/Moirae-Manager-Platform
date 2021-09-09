@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.common.enums.MetaDataStateEnum;
-import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
+import com.platon.rosettaflow.common.enums.*;
+import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.mapper.MetaDataMapper;
@@ -38,6 +38,7 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         Page<MetaData> page = new Page<>(current, size);
         LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaData::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
+        wrapper.eq(MetaData::getStatus, StatusEnum.VALID.getValue());
         if (StrUtil.isNotBlank(dataName)) {
             wrapper.like(MetaData::getDataName, dataName);
         }
@@ -53,6 +54,9 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public MetaDataDto detail(Long id) {
         MetaData metaData = this.getById(id);
+        if(Objects.isNull(metaData)){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
+        }
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
         return metaDataDto;

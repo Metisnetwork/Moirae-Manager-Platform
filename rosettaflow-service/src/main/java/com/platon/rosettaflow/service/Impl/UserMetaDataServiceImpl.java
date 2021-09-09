@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author hudenian
@@ -51,7 +52,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Override
     public IPage<UserMetaDataDto> list(Long current, Long size, String dataName) {
         Page<UserMetaData> page = new Page<>(current, size);
-        if (null == UserContext.get().getAddress()) {
+        if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
         }
         return this.baseMapper.listByOwner(page, UserContext.get().getAddress(), dataName);
@@ -68,7 +69,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIMES_ERROR.getMsg());
             }
         } else {
-            if (null == userMetaDataDto.getAuthEndTime() || null == userMetaDataDto.getAuthBeginTime() || DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0) {
+            if (null == userMetaDataDto.getAuthEndTime() || null == userMetaDataDto.getAuthBeginTime() ||
+                DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0 || userMetaDataDto.getAuthEndTime().before(userMetaDataDto.getAuthBeginTime())) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
         }

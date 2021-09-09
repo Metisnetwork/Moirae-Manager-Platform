@@ -55,8 +55,8 @@ public class MetaDataDetailVo {
     @ApiModelProperty(value = "源文件的大小 (单位: byte)")
     private Long size;
 
-    @ApiModelProperty(value = "源文件的类型 (目前只有 csv)")
-    private String fileType;
+    @ApiModelProperty(value = "源文件类型: 0-未知，1- CSV类型")
+    private Byte fileType;
 
     @ApiModelProperty(value = "是否带标题,0表示不带，1表示带标题")
     private Byte hasTitle;
@@ -65,7 +65,7 @@ public class MetaDataDetailVo {
     private String industry;
 
     @ApiModelProperty(value = "元数据的状态 (create: 还未发布的新表; release: 已发布的表; revoke: 已撤销的表)")
-    private String dataStatus;
+    private Byte dataStatus;
 
     @ApiModelProperty(value = "状态: 0-无效，1- 有效")
     private Byte status;

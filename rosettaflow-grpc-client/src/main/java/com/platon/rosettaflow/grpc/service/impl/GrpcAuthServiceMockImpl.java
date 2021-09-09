@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.grpc.service.impl;
 
+import ch.qos.logback.core.util.ContextUtil;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
 import com.platon.rosettaflow.common.enums.UserTypeEnum;
@@ -53,8 +54,8 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
         for (int i = 0; i < 10; i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
-            getMetaDataAuthorityDto.setMetaDataAuthId("metaDataAuthId" + i);
-            getMetaDataAuthorityDto.setUser("501eb3eeb2a40e6f2ff6f481302435e6e8af3666");
+            getMetaDataAuthorityDto.setMetaDataAuthId("MetaDataId" + i);
+            getMetaDataAuthorityDto.setUser("0x93c1e3b0e82fcb50d9c4b4568b3d892539668a20");
             getMetaDataAuthorityDto.setUserType(UserTypeEnum.ALAYA.getValue());
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();

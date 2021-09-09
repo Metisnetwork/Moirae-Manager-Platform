@@ -49,12 +49,12 @@
         u.update_time
         FROM
         t_user_meta_data u
-        INNER JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id
+        LEFT JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id
         WHERE
         u.address = #{address,jdbcType=VARCHAR}
+        AND u.`status` = 1
         <if test="dataName != null and dataName != ''">
-            AND
-            m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
+        AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
         </if>
     </select>
 </mapper>

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.mapper.MetaDataDetailsMapper;
@@ -40,6 +41,7 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
 
     @Override
     public IPage<MetaDataDetailsDto> findById(Long id, Long current, Long size) {
+
         Page<MetaDataDetails> page = new Page<>(current, size);
         LambdaQueryWrapper<MetaDataDetails> wrapper = getQueryWrapper(null, id);
         this.page(page, wrapper);
@@ -48,6 +50,7 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
 
     private LambdaQueryWrapper<MetaDataDetails> getQueryWrapper(String metaDataId, Long id) {
         LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaDataDetails::getStatus, StatusEnum.VALID.getValue());
         if (StrUtil.isNotBlank(metaDataId)) {
             wrapper.eq(MetaDataDetails::getMetaDataId, metaDataId);
         }
