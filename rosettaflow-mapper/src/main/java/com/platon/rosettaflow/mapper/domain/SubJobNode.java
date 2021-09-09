@@ -34,7 +34,7 @@ public class SubJobNode implements Serializable {
     /**
      * 节点在工作流中序号,从1开始
      */
-    private Byte nodeStep;
+    private Integer nodeStep;
     /**
      * 运行状态:0-运行失败, 1-运行成功
      */

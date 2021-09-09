@@ -5,7 +5,7 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="sub_job_id" jdbcType="BIGINT" property="subJobId"/>
         <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId"/>
-        <result column="node_step" jdbcType="TINYINT" property="nodeStep"/>
+        <result column="node_step" jdbcType="INTEGER" property="nodeStep"/>
         <result column="run_status" jdbcType="TINYINT" property="runStatus"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>

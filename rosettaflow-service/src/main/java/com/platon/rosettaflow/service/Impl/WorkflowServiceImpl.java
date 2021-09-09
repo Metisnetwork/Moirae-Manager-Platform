@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
@@ -34,8 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static cn.hutool.core.date.DateTime.now;
 
 /**
  * 工作流服务实现类
@@ -82,6 +84,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private GrpcAuthService grpcAuthService;
+
+    @Resource
+    private ISubJobService subJobService;
+
+    @Resource
+    private ISubJobNodeService subJobNodeService;
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
@@ -224,6 +232,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void start(WorkflowDto workflowDto) {
         Workflow orgWorkflow = this.getById(workflowDto.getId());
         if (orgWorkflow == null) {
@@ -239,37 +248,63 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //所以此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
         grpcTaskService.asyncPublishTask(taskDto, publishTaskDeclareResponse -> {
-            //更新工作流节点
+
             WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
-            Workflow workflow;
-            if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
-                //处理成功
-                workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId());
-                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
+            if (workflowDto.isJobFlg()) {
+                //更新作业
+                SubJob subJob = subJobService.getById(workflowDto.getJobId());
+                subJob.setEndTime(now());
+                //子作业节点信息
+                SubJobNode subJobNode = new SubJobNode();
+                subJobNode.setSubJobId(subJob.getId());
+                subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
+                subJobNode.setNodeStep(workflowNode.getNodeStep());
 
-                //更新整个工作流信息:如果是最后一个节点，整个工作流更新成处理成功，否则更新成处理中
-                workflow = this.getById(workflowNode.getWorkflowId());
-                if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
-                    workflow.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
+                if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+                    //如果是最后一个节点
+                    if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
+                        subJob.setSubJobStatus(SubJobStatusEnum.RUN_SUCCESS.getValue());
+                    }
+                    subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
                 } else {
-                    workflow.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());
-                    //当前工作流执行成功，继续执行下一个节点工作流
-                    workflowDto.setStartNode(workflowNode.getNextNodeStep());
-                    this.start(workflowDto);
+                    subJob.setSubJobStatus(SubJobStatusEnum.RUN_FAIL.getValue());
+                    subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_FAIL.getValue());
                 }
+
+                subJobService.updateById(subJob);
+                subJobNodeService.save(subJobNode);
             } else {
-                //处理失败
-                workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId() != null ? publishTaskDeclareResponse.getTaskId() : "");
-                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                //更新工作流节点
+                Workflow workflow;
+                if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+                    //处理成功
+                    workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId());
+                    workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
 
-                //更新整个工作流信息:处理失败
-                workflow = this.getById(workflowNode.getWorkflowId());
-                workflow.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                    //更新整个工作流信息:如果是最后一个节点，整个工作流更新成处理成功，否则更新成处理中
+                    workflow = this.getById(workflowNode.getWorkflowId());
+                    if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
+                        workflow.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
+                    } else {
+                        workflow.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());
+                        //当前工作流执行成功，继续执行下一个节点工作流
+                        workflowDto.setStartNode(workflowNode.getNextNodeStep());
+                        this.start(workflowDto);
+                    }
+                } else {
+                    //处理失败
+                    workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId() != null ? publishTaskDeclareResponse.getTaskId() : "");
+                    workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+
+                    //更新整个工作流信息:处理失败
+                    workflow = this.getById(workflowNode.getWorkflowId());
+                    workflow.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                }
+                workflowNode.setRunMsg(publishTaskDeclareResponse.getMsg());
+                workflowNodeService.updateById(workflowNode);
+
+                this.updateById(workflow);
             }
-            workflowNode.setRunMsg(publishTaskDeclareResponse.getMsg());
-            workflowNodeService.updateById(workflowNode);
-
-            this.updateById(workflow);
         });
     }
 
@@ -325,7 +360,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskDto.setUserType(UserTypeEnum.checkUserType(address));
         //设置发起方
         taskDto.setSender(getSender());
-        // TODO 算力提供方
+        // 算力提供方 暂定三方
         taskDto.setPowerPartyIds(getPowerPartyIds());
         //数据提供方
         taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList));
@@ -402,7 +437,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return 算力提供方列表
      */
     private List<String> getPowerPartyIds() {
-        return null;
+        return new ArrayList<>(Arrays.asList("y1", "y2", "y3"));
     }
 
     /**
@@ -457,21 +492,5 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         sender.setNodeId(nodeIdentityDto.getNodeId());
         sender.setIdentityId(nodeIdentityDto.getIdentityId());
         return sender;
-    }
-
-    IPage<WorkflowDto> convertToPageDto(Page<?> page) {
-        List<WorkflowDto> records = new ArrayList<>();
-        page.getRecords().forEach(r -> {
-            WorkflowDto m = new WorkflowDto();
-            BeanCopierUtils.copy(r, m);
-            records.add(m);
-        });
-
-        IPage<WorkflowDto> pageDto = new Page<>();
-        pageDto.setCurrent(page.getCurrent());
-        pageDto.setRecords(records);
-        pageDto.setSize(page.getSize());
-        pageDto.setTotal(page.getTotal());
-        return pageDto;
     }
 }

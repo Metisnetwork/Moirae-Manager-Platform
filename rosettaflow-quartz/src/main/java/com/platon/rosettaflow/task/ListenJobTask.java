@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  * @description 监听redis中的新增及修改job任务，并根据任务创建quartz来管理作业
  */
 @Slf4j
-//@Component
+@Component
 public class ListenJobTask {
 
     @Resource
@@ -29,7 +29,7 @@ public class ListenJobTask {
     @Resource
     private RedisUtil redisUtil;
 
-    @Scheduled(fixedDelay = 3000, initialDelay = 10000000)
+    @Scheduled(fixedDelay = 3000, initialDelay = 1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
@@ -48,6 +48,13 @@ public class ListenJobTask {
             String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
             Job job = JSON.parseObject(jobJson, Job.class);
             jobManager.startJob(job);
+        }
+        //获取暂停ob列表
+        size = redisUtil.listSize(SysConstant.JOB_PAUSE_QUEUE);
+        for (int i = 0; i < size; i++) {
+            String jobJson = redisUtil.listRightPop(SysConstant.JOB_PAUSE_QUEUE);
+            Job job = JSON.parseObject(jobJson, Job.class);
+            jobManager.pauseJob(job);
         }
     }
 }

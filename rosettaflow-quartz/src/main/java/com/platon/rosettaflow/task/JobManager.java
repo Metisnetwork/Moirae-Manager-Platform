@@ -2,6 +2,7 @@ package com.platon.rosettaflow.task;
 
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.JobRepeatEnum;
+import com.platon.rosettaflow.common.enums.JobStatusEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.mapper.domain.Job;
@@ -23,7 +24,7 @@ import java.util.Set;
  * @description 作业管理服务
  */
 @Slf4j
-//@Component
+@Component
 public class JobManager {
 
     static final String GROUP = "MOIRAE";
@@ -57,25 +58,7 @@ public class JobManager {
      * @param job job信息
      */
     public void startJob(Job job) {
-        try {
-            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(GROUP));
-            if (jobKeySet.contains(JobKey.jobKey(GROUP + GROUP_SUF + job.getId()))) {
-                try {
-                    //暂停触发器
-                    scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString()));
-                    //移除触发器
-                    scheduler.unscheduleJob(TriggerKey.triggerKey(job.getId().toString()));
-                    //删除Job
-                    scheduler.deleteJob(JobKey.jobKey(job.getId().toString()));
-                } catch (SchedulerException e) {
-                    log.error("stop old job error,error msg is:{}", e.getMessage(), e);
-                }
-            }
-        } catch (SchedulerException e) {
-            log.error("获取正在执行的job失败:失败原因>>>>>>", e);
-            throw new BusinessException(RespCodeEnum.EXCEPTION);
-        }
-
+        stopJob(job);
         Long workflowId = job.getWorkflowId();
 
         JobDetail jobDetail = JobBuilder.newJob(PublishTaskJob.class)
@@ -110,5 +93,43 @@ public class JobManager {
         } catch (SchedulerException e) {
             log.error("作业id:{}启动失败>>>>>>", job.getId(), e);
         }
+    }
+
+    /**
+     * 停止作业
+     *
+     * @param job 作业信息
+     */
+    private void stopJob(Job job) {
+        try {
+            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(GROUP));
+            if (jobKeySet.contains(JobKey.jobKey(GROUP + GROUP_SUF + job.getId()))) {
+                try {
+                    //暂停触发器
+                    scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString()));
+                    //移除触发器
+                    scheduler.unscheduleJob(TriggerKey.triggerKey(job.getId().toString()));
+                    //删除Job
+                    scheduler.deleteJob(JobKey.jobKey(job.getId().toString()));
+                } catch (SchedulerException e) {
+                    log.error("stop old job error,error msg is:{}", e.getMessage(), e);
+                }
+            }
+        } catch (SchedulerException e) {
+            log.error("获取正在执行的job失败:失败原因>>>>>>", e);
+            throw new BusinessException(RespCodeEnum.EXCEPTION);
+        }
+    }
+
+    /**
+     * 暂停job
+     *
+     * @param job job信息
+     */
+    public void pauseJob(Job job) {
+        stopJob(job);
+        job.setJobStatus(JobStatusEnum.STOP.getValue());
+        jobService.updateById(job);
+
     }
 }
