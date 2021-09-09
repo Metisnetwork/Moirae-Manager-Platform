@@ -2,6 +2,8 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.constants.AlgorithmConstant;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -29,9 +31,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm> implements IAlgorithmService {
-
-    @Resource
-    AlgorithmMapper algorithmMapper;
 
     @Resource
     IAlgorithmCodeService algorithmCodeService;
@@ -79,13 +78,13 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 
     @Override
     public List<AlgorithmDto> queryAlgorithmList(String algorithmName) {
-        return algorithmMapper.queryAlgorithmList(algorithmName);
+        return this.baseMapper.queryAlgorithmList(algorithmName);
     }
 
     @Override
     public AlgorithmDto queryAlgorithmDetails(Long algorithmId) {
         try {
-            return algorithmMapper.queryAlgorithmDetails(algorithmId);
+            return this.baseMapper.queryAlgorithmDetails(algorithmId);
         } catch (Exception e) {
             log.error("queryAlgorithmDetails--查询算法详情失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_ALG_DETAILS_ERROR.getMsg());
@@ -95,43 +94,44 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 
     @Override
     public List<Map<String, Object>> queryAlgorithmTreeList() {
-//        Long userId = UserContext.get() == null ? null : UserContext.get().getId();
-//        if (userId == null ||  userId == 0L) {
-//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
-//        }
-        List<AlgorithmDto> algorithmDtoList = algorithmMapper.queryAlgorithmList(null);
         // 造三个父类型节点
-        List<Map<String, Object>> treeList = new ArrayList<>();
-        Map<String, Object> param1 = new HashMap<>(4);
-        param1.put("algorithmId", 1);
-        param1.put("algorithmName", "统计分析");
-        Map<String, Object> param2 = new HashMap<>(4);
-        param2.put("algorithmId", 2);
-        param2.put("algorithmName", "特征工程");
-        Map<String, Object> param3 = new HashMap<>(4);
-        param3.put("algorithmId", 3);
-        param3.put("algorithmName", "机器学习");
-
+        List<Map<String, Object>> treeList = new ArrayList<>(SysConstant.INT_4);
+        Map<String, Object> param1 = new HashMap<>(SysConstant.INT_4);
+        param1.put("algorithmId", SysConstant.INT_1);
+        param1.put("algorithmName", AlgorithmConstant.ALGORITHM_TYPE_1);
+        Map<String, Object> param2 = new HashMap<>(SysConstant.INT_4);
+        param2.put("algorithmId", SysConstant.INT_2);
+        param2.put("algorithmName", AlgorithmConstant.ALGORITHM_TYPE_2);
+        Map<String, Object> param3 = new HashMap<>(SysConstant.INT_4);
+        param3.put("algorithmId", SysConstant.INT_3);
+        param3.put("algorithmName", AlgorithmConstant.ALGORITHM_TYPE_3);
+        List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmList(null);
+        if (algorithmDtoList == null || algorithmDtoList.size() == 0) {
+            treeList.add(param1);
+            treeList.add(param2);
+            treeList.add(param3);
+            return treeList;
+        }
         // 处理子节点
-        List<Map<String, Object>> childList1 = new ArrayList<>();
-        List<Map<String, Object>> childList2 = new ArrayList<>();
-        List<Map<String, Object>> childList3 = new ArrayList<>();
+        List<Map<String, Object>> childList1 = new ArrayList<>(SysConstant.INT_3);
+        List<Map<String, Object>> childList2 = new ArrayList<>(SysConstant.INT_3);
+        List<Map<String, Object>> childList3 = new ArrayList<>(SysConstant.INT_3);
         for (AlgorithmDto algorithmDto : algorithmDtoList) {
-            if (algorithmDto.getAlgorithmType() == 1) {
-                Map<String, Object> param = new HashMap<>(4);
+            if (SysConstant.INT_1 == algorithmDto.getAlgorithmType()) {
+                Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
                 param.put("algorithmId", algorithmDto.getAlgorithmId());
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
                 childList1.add(param);
 
             }
-            if (algorithmDto.getAlgorithmType() == 2) {
-                Map<String, Object> param = new HashMap<>(4);
+            if (SysConstant.INT_2 == algorithmDto.getAlgorithmType()) {
+                Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
                 param.put("algorithmId", algorithmDto.getAlgorithmId());
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
                 childList2.add(param);
             }
-            if (algorithmDto.getAlgorithmType() == 3) {
-                Map<String, Object> param = new HashMap<>(4);
+            if (SysConstant.INT_3 == algorithmDto.getAlgorithmType()) {
+                Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
                 param.put("algorithmId", algorithmDto.getAlgorithmId());
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
                 childList3.add(param);

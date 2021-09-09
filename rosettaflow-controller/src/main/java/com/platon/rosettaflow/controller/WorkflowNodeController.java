@@ -80,7 +80,7 @@ public class WorkflowNodeController {
     }
 
     @PostMapping("addNodeOutput")
-    @ApiOperation(value = "添加工作流节点依赖资源", notes = "添加工作流节点依赖资源")
+    @ApiOperation(value = "添加工作流节点输出", notes = "添加工作流节点输出")
     public ResponseVo<?> addNodeOutput(@RequestBody @Validated SaveNodeOutputListReq outputListReq) {
         List<WorkflowNodeOutput> workflowNodeOutputList =
                 BeanUtil.copyToList(outputListReq.getSaveNodeOutputReqList(), WorkflowNodeOutput.class);
@@ -97,7 +97,7 @@ public class WorkflowNodeController {
     }
 
     @PostMapping("saveNodeResource")
-    @ApiOperation(value = "保存工作流节点依赖资源", notes = "保存工作流节点依赖资源")
+    @ApiOperation(value = "保存工作流节点依赖资源环境", notes = "保存工作流节点依赖资源环境")
     public ResponseVo<?> addNodeResource(@RequestBody @Validated SaveNodeResourceReq saveResourceReq) {
         WorkflowNodeResource workflowNodeResource = BeanUtil.toBean(saveResourceReq, WorkflowNodeResource.class);
         workflowNodeService.saveWorkflowNodeResource(workflowNodeResource);

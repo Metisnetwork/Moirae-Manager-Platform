@@ -32,9 +32,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IWorkflowService workflowService;
 
     @Resource
-    private IAlgorithmService algorithmService;
-
-    @Resource
     private IWorkflowNodeCodeService workflowNodeCodeService;
 
     @Resource
