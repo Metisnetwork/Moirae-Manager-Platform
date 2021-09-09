@@ -11,6 +11,7 @@ import com.platon.rosettaflow.service.IJobService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -23,7 +24,7 @@ import java.util.Set;
  * @description 作业管理服务
  */
 @Slf4j
-//@Component
+@Component
 public class JobManager {
 
     static final String GROUP = "MOIRAE";
@@ -57,7 +58,6 @@ public class JobManager {
      * @param job job信息
      */
     public void startJob(Job job) {
-
         stopJob(job);
         Long workflowId = job.getWorkflowId();
 

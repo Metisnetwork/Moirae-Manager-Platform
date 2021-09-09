@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.service.Impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -48,6 +47,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         wrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue());
         wrapper.le(Job::getBeginTime, new Date(System.currentTimeMillis()));
         wrapper.ge(Job::getEndTime, new Date(System.currentTimeMillis()));
+        wrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
         wrapper.orderByAsc(Job::getId);
         return this.baseMapper.selectList(wrapper);
     }
@@ -57,7 +57,6 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         Page<JobDto> jobPage = new Page<>(current, size);
         return this.baseMapper.queryJobList(jobName, jobPage);
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,7 +101,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public void pause(Long id) {
         Job job = this.getById(id);
-        if(job.getJobStatus() == JobStatusEnum.RUNNING.getValue()){
+        if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue()) {
             redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
         }
     }
@@ -110,7 +109,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public void reStart(Long id) {
         Job job = this.getById(id);
-        if(job.getJobStatus() == JobStatusEnum.STOP.getValue()){
+        if (job.getJobStatus() == JobStatusEnum.STOP.getValue()) {
             redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
         }
     }
@@ -118,18 +117,17 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     /**
      * 检查入参合法性
      */
-    private void checkParam(JobDto jobDto){
+    private void checkParam(JobDto jobDto) {
         //校验开始时间 > 结束时间
-        if(!Objects.isNull(jobDto.getBeginTime()) && !Objects.isNull(jobDto.getEndTime()) && jobDto.getBeginTime().after(jobDto.getEndTime())){
+        if (!Objects.isNull(jobDto.getBeginTime()) && !Objects.isNull(jobDto.getEndTime()) && jobDto.getBeginTime().after(jobDto.getEndTime())) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_ERROR.getMsg());
         }
         //作业执行重复时,结束时间及重复次数合法性
-        if(jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()){
-            if(Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())){
+        if (jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()) {
+            if (Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEATINTERVAL_ERROR.getMsg());
             }
         }
     }
-
 
 }
