@@ -75,7 +75,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
         ApplyMetaDataAuthorityRequestDto applyDto = new ApplyMetaDataAuthorityRequestDto();
         applyDto.setUser(UserContext.get().getAddress());
-        applyDto.setUserType((int) UserContext.get().getUserType());
+        applyDto.setUserType((int) userMetaDataDto.getUserType());
 
         MetaDataAuthorityDto metaDataAuthorityDto = new MetaDataAuthorityDto();
         //元数据所属组织

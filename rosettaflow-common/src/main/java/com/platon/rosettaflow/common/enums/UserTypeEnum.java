@@ -17,11 +17,11 @@ public enum UserTypeEnum {
     /**
      * Alaya地址
      */
-    ATP(2),
+    ALAYA(2),
     /**
      * PlatON地址
      */
-    LAT(3);
+    PLATON(3);
 
     private final int value;
 

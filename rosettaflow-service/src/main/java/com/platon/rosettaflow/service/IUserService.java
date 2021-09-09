@@ -24,11 +24,11 @@ public interface IUserService extends IService<User> {
     /**
      * 生成用户token
      *
-     * @param address  用户钱包地址
-     * @param userType 用户类型
+     * @param address  用户钱包地址0x
+     * @param hrpAddress  hrp钱包地址
      * @return 用户信息
      */
-    UserDto generatorToken(String address, Byte userType);
+    UserDto generatorToken(String address, String hrpAddress);
 
     /**
      * 登出

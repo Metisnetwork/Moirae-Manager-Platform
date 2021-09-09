@@ -10,6 +10,7 @@ import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.LoginOutReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.service.IUserService;
+import com.platon.rosettaflow.utils.AddressChangeUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.user.NonceVo;
@@ -43,26 +44,24 @@ public class UserController {
     @GetMapping("getLoginNonce/{address}")
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
     public ResponseVo<NonceVo> getLoginNonce(@ApiParam(value = "用户钱包地址", required = true) @PathVariable String address) {
-        return ResponseVo.createSuccess(new NonceVo(userService.getLoginNonce(address)));
+        return ResponseVo.createSuccess(new NonceVo(userService.getLoginNonce(AddressChangeUtils.convert0XAddress(address))));
     }
 
     @PostMapping("login")
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
-
         userService.checkNonceValidity(loginInReq.getSignMessage(), loginInReq.getAddress());
-
         boolean flg;
         try {
             String signMessage = StrUtil.replace(loginInReq.getSignMessage(),"\\\"", "\"");
-            flg = WalletSignUtils.verifyTypedDataV4(signMessage, loginInReq.getSign(), loginInReq.getAddress());
+            flg = WalletSignUtils.verifyTypedDataV4(signMessage, loginInReq.getSign(), loginInReq.getHrpAddress());
         } catch (Exception e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         if (!flg) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
-        UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getUserType());
+        UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getHrpAddress());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 
@@ -86,5 +85,7 @@ public class UserController {
         List<Map<String, Object>> list = userService.queryAllUserNickName();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.utils;
 
+import cn.hutool.core.util.StrUtil;
 import com.platone.sdk.utlis.Bech32;
 import org.web3j.utils.Numeric;
 
@@ -183,6 +184,18 @@ public class AddressChangeUtils {
             throw new RuntimeException("Could not convert bits, invalid padding");
         }
         return out.toByteArray();
+    }
+
+    /**
+     *  hrp conver 0x adress
+     * @param hrpAddress : hrpAddress
+     * @return
+     */
+    public static String convert0XAddress(String hrpAddress){
+        if(!StrUtil.isNotBlank(hrpAddress)){
+            throw new RuntimeException("hrpAddress can not blank");
+        }
+        return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
     }
 
     /**

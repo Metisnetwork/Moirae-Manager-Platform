@@ -16,12 +16,6 @@ public class UserVo {
     @ApiModelProperty("用户名")
     private String userName;
 
-    @ApiModelProperty("用户钱包地址")
-    private String address;
-
-    @ApiModelProperty("用户类型")
-    private Byte userType;
-
     @ApiModelProperty("用户登录token")
     private String token;
 

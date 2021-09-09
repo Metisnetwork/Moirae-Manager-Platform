@@ -30,6 +30,11 @@ public class MetaDataAuthReq {
     @Range(min = 1, max = 2, message = "{metadata.auth.type.error}")
     private Byte authType;
 
+    @ApiModelProperty(value = "用户类型 0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址", required = true)
+    @NotNull(message = "{user.type.noBlank}")
+    @Range(min = 0, max = 3, message = "{user.type.range.error}")
+    private Byte userType;
+
     @ApiModelProperty(value = "授权次数，按次数时,此字段必输,当authType按时间方式时，authValue默认输入0", required = true, example = "100")
     @PositiveOrZero(message = "{metadata.auth.positive}")
     private Integer authValue;

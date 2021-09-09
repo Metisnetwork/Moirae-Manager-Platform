@@ -66,13 +66,13 @@ public class WalletSignUtils {
      *
      * @param jsonMessage json格式签名明文
      * @param signMsg     签名数据
-     * @param address     钱包地址
+     * @param address     hrp钱包地址
      * @return 是否成功标识
      */
     public static boolean verifyTypedDataV4(String jsonMessage, String signMsg, String address) throws IOException {
         StructuredDataEncoder dataEncoder = new StructuredDataEncoder(jsonMessage);
         Map<Integer, String> addresses = CryptoUtils.ecrecover(signMsg, dataEncoder.hashStructuredData());
-        return addresses.toString().contains("0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(address)).toLowerCase());
+        return addresses.toString().contains(AddressChangeUtils.convert0XAddress(address).toLowerCase());
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.req.user;
 
+import com.platon.rosettaflow.utils.AddressChangeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,11 +22,6 @@ public class LoginInReq {
 //    @Pattern(regexp = "^(lat|lax)\\w{36,42}$", message = "{user.address.format}")
     private String address;
 
-    @ApiModelProperty(value = "用户类型 0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址", required = true)
-    @NotNull(message = "{user.type.noBlank}")
-    @Range(min = 0, max = 3, message = "{user.type.range.error}")
-    private Byte userType;
-
     @ApiModelProperty(value = "签名明文(json格式字符串)", required = true,example = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"26e65a54b17e44b896a7f9a0353856d6\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}")
     @NotNull(message = "{user.sign.plaintext.notBlank}")
     private String signMessage;
@@ -33,6 +29,22 @@ public class LoginInReq {
     @ApiModelProperty(value = "签名", required = true, notes = "sign", example = "HPXfBL0ZYeSMt6GcG8h8zOlPtlA8+LIQvF1AhEq4YZQLNfsgujDFDCzCSr/4ayfw4USAffxxA9OL0xMCVgE5Eg4=")
     @NotBlank(message = "{user.sign.notBlank}")
     private String sign;
+
+    /**
+     * @return : 返回0x地址
+     */
+    public String getAddress(){
+        return AddressChangeUtils.convert0XAddress(address);
+    }
+
+    /**
+     * @return : 返回hrp地址
+     */
+    public String getHrpAddress(){
+        return address;
+    }
+
+
 
 
 
