@@ -276,6 +276,7 @@ CREATE TABLE `t_workflow` (
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
   `node_number` int(11) DEFAULT NULL COMMENT '节点数',
+  `user` varchar(64)  DEFAULT NULL COMMENT '发起任务的账户',
   `sign`  varchar(512) DEFAULT NULL COMMENT '发起任务的账户的签名',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未完成,1-已完成',
   `del_version` bigint(11) DEFAULT 0 COMMENT '版本标识，用于逻辑删除',

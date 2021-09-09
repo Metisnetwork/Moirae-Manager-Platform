@@ -119,12 +119,10 @@ public class WorkflowController {
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
         WorkflowDto workflowDto = new WorkflowDto();
-
         workflowDto.setId(startWorkflowReq.getWorkflowId());
         workflowDto.setStartNode(startWorkflowReq.getStartNode());
         workflowDto.setEndNode(startWorkflowReq.getEndNode());
         workflowService.start(workflowDto);
-        //TODO
         return ResponseVo.createSuccess();
     }
 

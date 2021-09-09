@@ -8,6 +8,7 @@
         <result column="workflow_name" jdbcType="VARCHAR" property="workflowName"/>
         <result column="workflow_desc" jdbcType="VARCHAR" property="workflowDesc"/>
         <result column="node_number" jdbcType="INTEGER" property="nodeNumber"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="sign" jdbcType="VARCHAR" property="sign"/>
         <result column="run_status" jdbcType="TINYINT" property="runStatus"/>
         <result column="del_version" jdbcType="BIGINT" property="delVersion"/>
@@ -22,6 +23,7 @@
         workflow_name,
         workflow_desc,
         node_number,
+        address,
         sign,
         run_status,
         del_version,

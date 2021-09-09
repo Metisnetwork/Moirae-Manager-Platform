@@ -14,17 +14,10 @@ import java.util.Locale;
  * @description
  */
 public class AddressChangeUtils {
-
-    public static final String HRP_LAT = "lat";
-    public static final String HRP_LAX = "lax";
-    public static final String HRP_PLA = "pla";
-    public static final String HRP_PLT = "plt";
-
     /**
      * The Bech32 character set for encoding.
      */
     private static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-
     /**
      * The Bech32 character set for decoding.
      */
@@ -187,15 +180,16 @@ public class AddressChangeUtils {
     }
 
     /**
-     *  hrp conver 0x adress
+     * hrp conver 0x adress
+     *
      * @param hrpAddress : hrpAddress
      * @return
      */
-    public static String convert0XAddress(String hrpAddress){
-        if(!StrUtil.isNotBlank(hrpAddress)){
+    public static String convert0XAddress(String hrpAddress) {
+        if (!StrUtil.isNotBlank(hrpAddress)) {
             throw new RuntimeException("hrpAddress can not blank");
         }
-        return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
+        return "0x" + DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
     }
 
     /**

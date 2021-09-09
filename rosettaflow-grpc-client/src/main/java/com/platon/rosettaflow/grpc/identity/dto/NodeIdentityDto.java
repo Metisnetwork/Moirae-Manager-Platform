@@ -21,4 +21,8 @@ public class NodeIdentityDto {
      * 组织的身份标识Id
      */
     private String identityId;
+    /**
+     * the status for organization(deleted/normal)
+     */
+    private Integer status;
 }
