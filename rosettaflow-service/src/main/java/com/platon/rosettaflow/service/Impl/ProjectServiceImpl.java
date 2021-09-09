@@ -112,7 +112,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
             }
             IPage<ProjectDto> page = new Page<>(current, size);
-            return this.baseMapper.queryProjectList(userId, projectName, page);
+            return this.baseMapper.queryProjectPageList(userId, projectName, page);
         } catch (Exception e) {
             log.error("queryProjectList--查询项目列表失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_PROJ_LIST_ERROR.getMsg());
