@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
+ * 添加工作流节点请求对象
  * @author hudenian
  * @date 2021/8/31
- * @description 添加工作流节点请求对象
  */
 @Data
 @ApiModel

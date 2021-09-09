@@ -22,7 +22,7 @@ public class SaveNodeCodeReq {
     @Positive(message = "{workflow.node.id.positive}")
     private Long workflowNodeId;
 
-    @ApiModelProperty(value = "算法编辑类型", required = true)
+    @ApiModelProperty(value = "编辑类型:1-sql, 2-noteBook", required = true)
     @NotNull(message = "{workflow.node.algorithm.type.notNull}")
     private Integer editType;
 

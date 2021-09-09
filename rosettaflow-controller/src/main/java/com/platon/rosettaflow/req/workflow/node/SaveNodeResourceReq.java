@@ -31,11 +31,11 @@ public class SaveNodeResourceReq {
     private Integer costCpu;
 
     @ApiModelProperty(value = "工作流节点资源gpu", required = true)
-    @NotBlank(message = "{node.cost.cpu.notNull}")
+    @NotNull(message = "{node.cost.cpu.notNull}")
     private Integer costGpu;
 
     @ApiModelProperty(value = "工作流节点资源带宽", required = true)
-    @NotBlank(message = "{node.cost.bandwidth.notNull}")
+    @NotNull(message = "{node.cost.bandwidth.notNull}")
     private Long costBandwidth;
 
     @ApiModelProperty(value = "工作流节点运行时长")
