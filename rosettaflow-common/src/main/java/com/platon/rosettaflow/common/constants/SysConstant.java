@@ -7,6 +7,14 @@ package com.platon.rosettaflow.common.constants;
 public class SysConstant {
 
     /**
+     * 数字常量
+     */
+    public static final int INT_1 = 1;
+    public static final int INT_2 = 2;
+    public static final int INT_3 = 3;
+    public static final int INT_4 = 3;
+
+    /**
      * 请求头token key值
      */
     public static final String HEADER_TOKEN_KEY = "Access-Token";

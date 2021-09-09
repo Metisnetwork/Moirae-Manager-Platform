@@ -38,7 +38,7 @@ public class SaveNodeResourceReq {
     @NotBlank(message = "{node.cost.bandwidth.notNull}")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "工作流节点运行时长", required = true)
+    @ApiModelProperty(value = "工作流节点运行时长")
     private Long runTime;
 
 }
