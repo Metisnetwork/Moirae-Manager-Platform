@@ -1,6 +1,9 @@
 package com.platon.rosettaflow.utils;
 
 import cn.hutool.core.util.StrUtil;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platone.sdk.utlis.Bech32;
 import org.web3j.utils.Numeric;
 
@@ -195,7 +198,12 @@ public class AddressChangeUtils {
         if(!StrUtil.isNotBlank(hrpAddress)){
             throw new RuntimeException("hrpAddress can not blank");
         }
-        return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
+        try{
+            return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
+        }catch (Exception e){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADDRESS_ERROR.getMsg());
+        }
+
     }
 
     /**

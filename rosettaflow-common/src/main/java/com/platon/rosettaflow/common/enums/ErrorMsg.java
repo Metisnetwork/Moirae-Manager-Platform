@@ -24,6 +24,12 @@ public enum ErrorMsg {
 
     USER_UN_LOGIN("用户未登录", "User un login"),
 
+    USER_ADDRESS_ERROR("用户地址有误", "User address error"),
+
+    USER_NAME_EXISTED("用户名称已存在", "User name already exist"),
+
+
+
     /**
      * 新增算法错误
      */
