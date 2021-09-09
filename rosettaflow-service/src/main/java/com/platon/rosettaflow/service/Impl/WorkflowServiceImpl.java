@@ -87,7 +87,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public List<Workflow> queryWorkFlowList(Long projectId) {
+    public List<Workflow> queryWorkFlowByProjectId(Long projectId) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getProjectId, projectId);
         queryWrapper.eq(Workflow::getStatus, 1);
@@ -109,7 +109,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
             // 算法对象
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
-            if (Objects.nonNull(algorithmDto)) {
+            if(Objects.nonNull(algorithmDto)) {
                 // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(workflowNodeCode)) {
@@ -167,7 +167,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = new Workflow();
         workflow.setId(id);
         workflow.setDelVersion(id);
-        workflow.setStatus((byte) 0);
+        workflow.setStatus((byte)0);
         this.updateById(workflow);
     }
 
@@ -179,7 +179,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
             // 查询原工作流节点
             List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
-            if (workflowNodeOldList == null || workflowNodeOldList.size() == 0) {
+            if(workflowNodeOldList == null || workflowNodeOldList.size() == 0) {
                 return;
             }
             // 保存为新工作流节点
@@ -201,10 +201,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    /**
-     * 将复制的工作流数据id置空，新增一条新的工作流数据
-     */
-    private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
+    /** 将复制的工作流数据id置空，新增一条新的工作流数据 */
+    private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc){
         Workflow originWorkflow = this.getById(originId);
         if (Objects.isNull(originWorkflow)) {
             log.error("Origin workflow not found by id:{}", originId);
@@ -229,7 +227,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         //截止节点必须
         if (orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
-            log.error("endNode is:{} can not more than workflow nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
+            log.error("endNode is:{} can not more than workflow nodeNumber:{}", workflowDto.getEndNode(),orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
 

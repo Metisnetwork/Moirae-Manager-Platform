@@ -99,7 +99,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Override
     public List<Workflow> queryRelatedWorkflowName(Long projectId) {
-        return workflowService.queryWorkFlowList(projectId);
+        return workflowService.queryWorkFlowByProjectId(projectId);
     }
 
     @Override

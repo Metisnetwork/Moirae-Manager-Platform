@@ -10,7 +10,6 @@ import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.service.utils.UserContext;
@@ -19,8 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 算法实现类
@@ -63,12 +61,12 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             Algorithm algorithm = new Algorithm();
             BeanUtils.copyProperties(algorithmDto, algorithm);
             // 算法id
-            algorithm.setId(algorithmDto.getId());
+            algorithm.setId(algorithmDto.getAlgorithmId());
             // 修改算法
             this.updateById(algorithm);
             // 修改算法代码
             AlgorithmCode algorithmCode = new AlgorithmCode();
-            algorithmCode.setAlgorithmId(algorithmDto.getId());
+            algorithmCode.setAlgorithmId(algorithmDto.getAlgorithmId());
             algorithmCode.setEditType(algorithmDto.getEditType());
             algorithmCode.setCalculateContractCode(algorithmDto.getAlgorithmCode());
             algorithmCodeService.updateAlgorithmCode(algorithmCode);
@@ -101,7 +99,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 //        if (userId == null ||  userId == 0L) {
 //            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_CACHE_LOST_ERROR.getMsg());
 //        }
-        List<AlgorithmDto> algorithmDtoList = algorithmMapper.queryAlgorithmList(1L, null);
+        List<AlgorithmDto> algorithmDtoList = algorithmMapper.queryAlgorithmList(null);
         // 造三个父类型节点
         List<Map<String, Object>> treeList = new ArrayList<>();
         Map<String, Object> param1 = new HashMap<>(4);

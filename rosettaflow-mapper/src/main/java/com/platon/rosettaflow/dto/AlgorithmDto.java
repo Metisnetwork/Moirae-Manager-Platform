@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.dto;
 
-
 import lombok.Data;
 
 /**
@@ -12,7 +11,7 @@ public class AlgorithmDto {
     /**
      * 算法id
      */
-    private Long id;
+    private Long algorithmId;
 
     /**
      * 算法名称
@@ -88,8 +87,5 @@ public class AlgorithmDto {
      * 算法代码
      */
     private String algorithmCode;
-
-
-
 
 }

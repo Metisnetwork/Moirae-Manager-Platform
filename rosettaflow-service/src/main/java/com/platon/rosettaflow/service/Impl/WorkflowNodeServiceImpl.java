@@ -139,53 +139,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             }
             for(WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
                 outputList.add(workflowNodeOutput.getId());
-    @Transactional(rollbackFor = Exception.class)
-    public void addWorkflowNode(WorkflowNode workflowNode) {
-        // 查看工作流是否存在
-        Workflow workflow = workflowService.getById(workflowNode.getWorkflowId());
-        if (Objects.isNull(workflow)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
-
-        /* 判断新增节点的上一节点是否存在 */
-        // 上一节点序号
-        int previous = workflowNode.getNodeStep() - 1;
-        // 当前节点为第一节点
-        if (previous <= 0) {
-            // 当前节点为第一节点，直接插入即可
-            this.save(workflowNode);
-            return;
-        }
-        // 当前节点不是第一节点，查询当前节点的上一节点
-        LambdaQueryWrapper<WorkflowNode> nodeWrapper = Wrappers.lambdaQuery();
-        nodeWrapper.eq(WorkflowNode::getWorkflowId, workflowNode.getWorkflowId());
-        nodeWrapper.eq(WorkflowNode::getNodeStep, previous);
-        WorkflowNode preWorkflowNode = this.getOne(nodeWrapper);
-        // 无上一节点，抛出异常
-        if (Objects.isNull(preWorkflowNode)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_EXIST.getMsg());
-        }
-        // 上一节点无后续节点，尾部直接插入即可
-        if (preWorkflowNode.getNextNodeStep() == null || preWorkflowNode.getNextNodeStep() == 0) {
-            this.save(workflowNode);
-            return;
-        }
-        // 上一节点有后续节点，需将插入节点位置的所有后续节点向后移一位
-        // 查询当前工作流中所有节点
-        List<WorkflowNode> workflowNodeList = getWorkflowNodeList(workflowNode.getWorkflowId());
-        for (WorkflowNode node : workflowNodeList) {
-            // 找出插入节点位及之后的所有节点，将后续所有节点依次后移1位
-            if (node.getNodeStep() >= workflowNode.getNodeStep()) {
-                // 修改节点和后续节点序号值
-                node.setNodeStep(node.getNodeStep() + 1);
-                if (node.getNextNodeStep() == null || node.getNextNodeStep() == 0) {
-                    // 最后一个节点，后续节点字段置空
-                    node.setNextNodeStep(null);
-                    this.updateById(node);
-                    continue;
-                }
-                node.setNextNodeStep(node.getNextNodeStep() + 1);
-                this.updateById(node);
             }
             // 物理删除节点代码
             workflowNodeCodeService.deleteByWorkflowNodeId(nodeId);
@@ -370,6 +323,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             workflowNode.setNextNodeStep(workflowNodeTemp.getNextNodeStep());
             //保存工作流节点
             this.save(workflowNode);
+
             //添加工作流节点代码
             workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
             //查询节点代码对应的算法列表

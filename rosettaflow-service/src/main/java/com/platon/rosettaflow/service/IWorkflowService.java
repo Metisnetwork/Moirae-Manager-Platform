@@ -6,6 +6,8 @@ import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 
+import java.util.List;
+
 /**
  * 工作流服务
  *
@@ -13,8 +15,9 @@ import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
  * @date 2021/8/16
  */
 public interface IWorkflowService extends IService<Workflow> {
+
     /**
-     * 获取工作流列表
+     * 获取工作流分页列表
      *
      * @param projectId    项目id
      * @param workflowName 项目名称
@@ -22,7 +25,15 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param size         条数
      * @return WorkflowDto
      */
-    IPage<WorkflowDto> queryWorkFlowList(Long projectId, String workflowName, Long current, Long size);
+    IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size);
+
+    /**
+     * 获取工作流列表（不分页）
+     *
+     * @param projectId 项目id
+     * @return Workflow 工作流
+     */
+    List<Workflow> queryWorkFlowByProjectId(Long projectId);
 
     /**
      * 获取工作流详情
@@ -36,7 +47,6 @@ public interface IWorkflowService extends IService<Workflow> {
      * 添加工作流
      *
      * @param workflow 工作流对象
-     * @return
      */
     void addWorkflow(Workflow workflow);
 
@@ -80,5 +90,4 @@ public interface IWorkflowService extends IService<Workflow> {
      * @return 工作流id
      */
     Long addWorkflowByTemplate(Long projectId, WorkflowTemp workflowTemp);
-
 }

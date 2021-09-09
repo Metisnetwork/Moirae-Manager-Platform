@@ -24,7 +24,7 @@ public interface AlgorithmMapper extends BaseMapper<Algorithm> {
      * 查询算法详情
      *
      * @param algorithmId 算法id
-     * @return
+     * @return 算法详情
      */
     AlgorithmDto queryAlgorithmDetails(Long algorithmId);
 

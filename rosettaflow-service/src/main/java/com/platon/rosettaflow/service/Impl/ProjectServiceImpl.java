@@ -105,7 +105,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public IPage<ProjectDto> queryProjectList(String projectName, Long current, Long size) {
+    public IPage<ProjectDto> queryProjectPageList(String projectName, Long current, Long size) {
         try {
             Long userId = UserContext.get().getId();
             if (userId == null || userId == 0) {
@@ -197,7 +197,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, Long current, Long size) {
+    public IPage<ProjMemberDto> queryProjMemberPageList(Long projectId, String userName, Long current, Long size) {
         IPage<ProjMemberDto> iPage = new Page<>(current, size);
         return this.baseMapper.queryProjMemberList(projectId, userName, iPage);
     }
