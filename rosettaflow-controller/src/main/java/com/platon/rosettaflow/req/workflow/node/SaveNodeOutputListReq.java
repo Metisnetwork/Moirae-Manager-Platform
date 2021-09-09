@@ -9,12 +9,12 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
- * 添加工作流节点输入请求参数
+ * 添加工作流节点输出请求参数
  * @author hudenian
  * @date 2021/8/31
  */
 @Data
-@ApiModel(value = "添加工作流节点输入请求参数")
+@ApiModel(value = "添加工作流节点输出请求参数")
 public class SaveNodeOutputListReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
@@ -22,7 +22,7 @@ public class SaveNodeOutputListReq {
     @Positive(message = "{workflow.node.id.positive}")
     private Long workflowNodeId;
 
-    @ApiModelProperty(value = "输入请求对象", required = true)
+    @ApiModelProperty(value = "输出请求对象", required = true)
     private List<SaveNodeOutputReq> saveNodeOutputReqList;
 
 }

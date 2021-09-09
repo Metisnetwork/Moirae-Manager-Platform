@@ -9,12 +9,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
- * 输入请求对象
+ * 输出请求对象
  * @author hudenian
  * @date 2021/8/31
  */
 @Data
-@ApiModel(value = "输入请求对象")
+@ApiModel(value = "输出请求对象")
 public class SaveNodeOutputReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
