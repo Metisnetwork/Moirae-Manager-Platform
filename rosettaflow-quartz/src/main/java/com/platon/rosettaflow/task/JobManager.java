@@ -3,8 +3,6 @@ package com.platon.rosettaflow.task;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.JobRepeatEnum;
 import com.platon.rosettaflow.common.enums.JobStatusEnum;
-import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.mapper.domain.Job;
 import com.platon.rosettaflow.quartz.job.PublishTaskJob;
 import com.platon.rosettaflow.service.IJobService;
@@ -79,7 +77,7 @@ public class JobManager {
         }
 
         Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(job.getId().toString())
+                .withIdentity(job.getId().toString(),GROUP)
                 .startAt(job.getBeginTime())
                 .endAt(job.getEndTime())
                 .withSchedule(simpleScheduleBuilder)
@@ -103,21 +101,20 @@ public class JobManager {
     private void stopJob(Job job) {
         try {
             Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(GROUP));
-            if (jobKeySet.contains(JobKey.jobKey(GROUP + GROUP_SUF + job.getId()))) {
+            if (jobKeySet.contains(JobKey.jobKey(job.getId().toString(), GROUP))) {
                 try {
                     //暂停触发器
-                    scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString()));
+                    scheduler.pauseTrigger(TriggerKey.triggerKey(job.getId().toString(), GROUP));
                     //移除触发器
-                    scheduler.unscheduleJob(TriggerKey.triggerKey(job.getId().toString()));
+                    scheduler.unscheduleJob(TriggerKey.triggerKey(job.getId().toString(), GROUP));
                     //删除Job
-                    scheduler.deleteJob(JobKey.jobKey(job.getId().toString()));
+                    scheduler.deleteJob(JobKey.jobKey(job.getId().toString(), GROUP));
                 } catch (SchedulerException e) {
-                    log.error("stop old job error,error msg is:{}", e.getMessage(), e);
+                    log.error("stop job error,error msg is:{}", e.getMessage(), e);
                 }
             }
         } catch (SchedulerException e) {
             log.error("获取正在执行的job失败:失败原因>>>>>>", e);
-            throw new BusinessException(RespCodeEnum.EXCEPTION);
         }
     }
 
