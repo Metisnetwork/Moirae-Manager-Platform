@@ -3,29 +3,29 @@ package com.platon.rosettaflow.common.enums;
 /**
  * @author hudenian
  * @date 2021/8/13
- * @description job处理状态
+ * @description 子作业节点运行状态
  */
-public enum JobStatusEnum {
+public enum SubJobNodeStatusEnum {
     /**
      * 未开始
      */
-    UN_START((byte) 0),
+    UN_RUN((byte) 0),
     /**
      * 运行中
      */
     RUNNING((byte) 1),
     /**
-     * 已停止
+     * 运行成功
      */
-    STOP((byte) 2),
+    RUN_SUCCESS((byte) 2),
     /**
-     * 已结束（超出运行结束时间，无法再重启）
+     * 运行失败
      */
-    FINISH((byte) 3);
+    RUN_FAIL((byte) 3);
 
     private final byte value;
 
-    JobStatusEnum(byte value) {
+    SubJobNodeStatusEnum(byte value) {
         this.value = value;
     }
 

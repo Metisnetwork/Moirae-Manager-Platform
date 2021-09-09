@@ -77,5 +77,9 @@ public class SysConstant {
      * 作业修改队列
      */
     public static final String JOB_EDIT_QUEUE = "JOB_ADD_LIST";
+    /**
+     * 作业暂停队列
+     */
+    public static final String JOB_PAUSE_QUEUE = "JOB_PAUSE_QUEUE";
 
 }

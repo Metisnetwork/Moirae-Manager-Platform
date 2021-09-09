@@ -15,7 +15,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class WorkflowDto extends Workflow {
 
-    /** 创建者 */
+    /**
+     * 创建者
+     */
     private String userName;
 
     /**
@@ -30,7 +32,11 @@ public class WorkflowDto extends Workflow {
     /**
      * 是否是job任务
      */
-    private boolean jobFlg;
+    private boolean jobFlg = false;
+    /**
+     * 作业id
+     */
+    private Long jobId;
 
     /**
      * 工作流节点列表
