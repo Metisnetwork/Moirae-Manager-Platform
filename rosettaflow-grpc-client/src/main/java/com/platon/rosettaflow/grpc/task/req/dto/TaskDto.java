@@ -51,12 +51,12 @@ public class TaskDto {
     private List<OrganizationIdentityInfoDto> taskResultReceiverDeclareDtoList;
 
     /**
-     * 任务的所需操作成本 (定义任务的大小)
+     *  任务需要花费的资源声明
      */
     private TaskResourceCostDeclareDto resourceCostDeclareDto;
 
     /**
-     * 算法代码（python代码）
+     * 计算合约代码
      */
     private String calculateContractCode;
     /**

@@ -82,6 +82,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(User::getAddress, address);
         User user = this.getOne(wrapper);
+        if(Objects.isNull(user)){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADDRESS_ERROR.getMsg());
+        }
         // 获取token的key
         String key = TokenServiceImpl.getTokenKey(user.getId());
         // 获取token
@@ -94,6 +97,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void updateNickName(String address, String nickName) {
+       LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(User::getUserName,nickName);
+        User user = this.getOne(queryWrapper);
+        if(!Objects.isNull(user)){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
+        }
+
         LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(User::getAddress, address);
         updateWrapper.set(User::getUserName, nickName);

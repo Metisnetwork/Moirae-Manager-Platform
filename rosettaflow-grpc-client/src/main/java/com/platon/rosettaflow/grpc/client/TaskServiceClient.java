@@ -63,7 +63,7 @@ public class TaskServiceClient {
 
             @Override
             public void onError(Throwable t) {
-                log.info("task {} process fail", taskDto.getTaskName());
+                log.error("task {} process fail", taskDto.getTaskName());
             }
 
             @Override
@@ -97,60 +97,18 @@ public class TaskServiceClient {
 
             // 任务Id
             taskDetailDto.setTaskId(getTaskDetailResponse.getInformation().getTaskId());
-
             // 任务名称
             taskDetailDto.setTaskName(getTaskDetailResponse.getInformation().getTaskName());
-
             // 任务发起方组织信息
             taskDetailDto.setOwner(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getOwner()));
-
             // 算法提供方组织信息 (目前就是和 任务发起方是同一个 ...)
             taskDetailDto.setAlgoSupplier(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getAlgoSupplier()));
-
             //数据提供方组织信息
-            List<TaskDataSupplierDto> dataSuppliers = new ArrayList<>();
-            TaskDataSupplierDto dataSupplierDto;
-            TaskDataSupplierShow dataSupplierShow;
-            OrganizationIdentityInfoDto supplier;
-            for (int j = 0; j < getTaskDetailResponse.getInformation().getDataSupplierCount(); j++) {
-                dataSupplierShow = getTaskDetailResponse.getInformation().getDataSupplier(j);
-                dataSupplierDto = new TaskDataSupplierDto();
-                dataSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(dataSupplierShow.getOrganization()));
-                dataSupplierDto.setMetaDataId(dataSupplierShow.getMetadataId());
-                dataSupplierDto.setMetaDataName(dataSupplierShow.getMetadataName());
-                dataSuppliers.add(dataSupplierDto);
-            }
-            taskDetailDto.setDataSuppliers(dataSuppliers);
-
-            // 算力提供方组织信息
-            List<TaskPowerSupplierDto> powerSuppliers = new ArrayList<>();
-            TaskPowerSupplierDto powerSupplierDto;
-            TaskPowerSupplierShow powerSupplierShow;
-            ResourceUsedDetailDto resourceUsedDetailDto;
-            for (int j = 0; j < getTaskDetailResponse.getInformation().getPowerSupplierCount(); j++) {
-                powerSupplierShow = getTaskDetailResponse.getInformation().getPowerSupplier(j);
-                powerSupplierDto = new TaskPowerSupplierDto();
-
-                resourceUsedDetailDto = new ResourceUsedDetailDto();
-                resourceUsedDetailDto.setTotalMem(powerSupplierShow.getPowerInfo().getTotalMem());
-                resourceUsedDetailDto.setTotalProcessor(powerSupplierShow.getPowerInfo().getTotalProcessor());
-                resourceUsedDetailDto.setTotalBandwidth(powerSupplierShow.getPowerInfo().getTotalBandwidth());
-                resourceUsedDetailDto.setTotalDisk(powerSupplierShow.getPowerInfo().getTotalDisk());
-                resourceUsedDetailDto.setUsedMem(powerSupplierShow.getPowerInfo().getUsedMem());
-                resourceUsedDetailDto.setUsedProcessor(powerSupplierShow.getPowerInfo().getUsedProcessor());
-                resourceUsedDetailDto.setUsedBandwidth(powerSupplierShow.getPowerInfo().getUsedBandwidth());
-                resourceUsedDetailDto.setUsedDisk(powerSupplierShow.getPowerInfo().getUsedDisk());
-
-                powerSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(powerSupplierShow.getOrganization()));
-                powerSupplierDto.setResourceUsedInfo(resourceUsedDetailDto);
-                powerSuppliers.add(powerSupplierDto);
-            }
-            taskDetailDto.setPowerSuppliers(powerSuppliers);
-
+            assemblyDataSuppliers(taskDetailDto, getTaskDetailResponse.getInformation());
+            //算力提供方信息
+            assemblyPowerSuppliers(taskDetailDto, getTaskDetailResponse.getInformation());
             // 任务结果方
             List<OrganizationIdentityInfoDto> receivers = new ArrayList<>();
-            TaskOrganization organization;
-            OrganizationIdentityInfoDto receiver;
             for (int j = 0; j < getTaskDetailResponse.getInformation().getReceiversCount(); j++) {
                 receivers.add(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getReceivers(i)));
             }
@@ -167,9 +125,9 @@ public class TaskServiceClient {
 
             //任务所需资源声明
             TaskResourceCostDeclareDto taskOperationCostDeclareDto = new TaskResourceCostDeclareDto();
-            taskOperationCostDeclareDto.setCostMem(getTaskDetailResponse.getInformation().getOperationCost().getMemory());
-            taskOperationCostDeclareDto.setCostProcessor(getTaskDetailResponse.getInformation().getOperationCost().getProcessor());
-            taskOperationCostDeclareDto.setCostBandwidth(getTaskDetailResponse.getInformation().getOperationCost().getBandwidth());
+            taskOperationCostDeclareDto.setMemory(getTaskDetailResponse.getInformation().getOperationCost().getMemory());
+            taskOperationCostDeclareDto.setProcessor(getTaskDetailResponse.getInformation().getOperationCost().getProcessor());
+            taskOperationCostDeclareDto.setBandwidth(getTaskDetailResponse.getInformation().getOperationCost().getBandwidth());
             taskOperationCostDeclareDto.setDuration(getTaskDetailResponse.getInformation().getOperationCost().getDuration());
             taskDetailDto.setOperationCost(taskOperationCostDeclareDto);
 
@@ -182,6 +140,59 @@ public class TaskServiceClient {
             taskDetailResponseDtoList.add(taskDetailResponseDto);
         }
         return taskDetailResponseDtoList;
+    }
+
+    /**
+     * 组装算力提供方响应数据
+     *
+     * @param taskDetailDto 响应数据对象
+     * @param information   底层返回结果信息
+     */
+    private void assemblyPowerSuppliers(TaskDetailDto taskDetailDto, TaskDetailShow information) {
+        List<TaskPowerSupplierDto> powerSuppliers = new ArrayList<>();
+        TaskPowerSupplierDto powerSupplierDto;
+        TaskPowerSupplierShow powerSupplierShow;
+        ResourceUsedDetailDto resourceUsedDetailDto;
+        for (int j = 0; j < information.getPowerSupplierCount(); j++) {
+            powerSupplierShow = information.getPowerSupplier(j);
+            powerSupplierDto = new TaskPowerSupplierDto();
+
+            resourceUsedDetailDto = new ResourceUsedDetailDto();
+            resourceUsedDetailDto.setTotalMem(powerSupplierShow.getPowerInfo().getTotalMem());
+            resourceUsedDetailDto.setTotalProcessor(powerSupplierShow.getPowerInfo().getTotalProcessor());
+            resourceUsedDetailDto.setTotalBandwidth(powerSupplierShow.getPowerInfo().getTotalBandwidth());
+            resourceUsedDetailDto.setTotalDisk(powerSupplierShow.getPowerInfo().getTotalDisk());
+            resourceUsedDetailDto.setUsedMem(powerSupplierShow.getPowerInfo().getUsedMem());
+            resourceUsedDetailDto.setUsedProcessor(powerSupplierShow.getPowerInfo().getUsedProcessor());
+            resourceUsedDetailDto.setUsedBandwidth(powerSupplierShow.getPowerInfo().getUsedBandwidth());
+            resourceUsedDetailDto.setUsedDisk(powerSupplierShow.getPowerInfo().getUsedDisk());
+
+            powerSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(powerSupplierShow.getOrganization()));
+            powerSupplierDto.setResourceUsedInfo(resourceUsedDetailDto);
+            powerSuppliers.add(powerSupplierDto);
+        }
+        taskDetailDto.setPowerSuppliers(powerSuppliers);
+    }
+
+    /**
+     * 组装数据提供方信息
+     *
+     * @param taskDetailDto 响应数据对象
+     * @param information   底层返回结果信息
+     */
+    private void assemblyDataSuppliers(TaskDetailDto taskDetailDto, TaskDetailShow information) {
+        List<TaskDataSupplierDto> dataSuppliers = new ArrayList<>();
+        TaskDataSupplierDto dataSupplierDto;
+        TaskDataSupplierShow dataSupplierShow;
+        for (int j = 0; j < information.getDataSupplierCount(); j++) {
+            dataSupplierShow = information.getDataSupplier(j);
+            dataSupplierDto = new TaskDataSupplierDto();
+            dataSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(dataSupplierShow.getOrganization()));
+            dataSupplierDto.setMetaDataId(dataSupplierShow.getMetadataId());
+            dataSupplierDto.setMetaDataName(dataSupplierShow.getMetadataName());
+            dataSuppliers.add(dataSupplierDto);
+        }
+        taskDetailDto.setDataSuppliers(dataSuppliers);
     }
 
     /**
@@ -239,8 +250,9 @@ public class TaskServiceClient {
             owner.setNodeName(taskEventListResponse.getTaskEventList(i).getOwner().getNodeName());
             owner.setNodeId(taskEventListResponse.getTaskEventList(i).getOwner().getNodeId());
             owner.setIdentityId(taskEventListResponse.getTaskEventList(i).getOwner().getIdentityId());
-
+            owner.setStatus(taskEventListResponse.getTaskEventList(i).getOwner().getStatusValue());
             taskEventShowDto.setOwner(owner);
+
             taskEventShowDto.setContent(taskEventListResponse.getTaskEventList(i).getContent());
             taskEventShowDto.setCreateAt(taskEventListResponse.getTaskEventList(i).getCreateAt());
             taskEventShowDtoList.add(taskEventShowDto);
@@ -320,9 +332,9 @@ public class TaskServiceClient {
 
         //任务所需资源声明
         TaskResourceCostDeclare resourceCostBuilder = TaskResourceCostDeclare.newBuilder()
-                .setMemory(taskDto.getResourceCostDeclareDto().getCostMem())
-                .setProcessor(taskDto.getResourceCostDeclareDto().getCostProcessor())
-                .setBandwidth(taskDto.getResourceCostDeclareDto().getCostBandwidth())
+                .setMemory(taskDto.getResourceCostDeclareDto().getMemory())
+                .setProcessor(taskDto.getResourceCostDeclareDto().getProcessor())
+                .setBandwidth(taskDto.getResourceCostDeclareDto().getBandwidth())
                 .setDuration(taskDto.getResourceCostDeclareDto().getDuration())
                 .build();
         publishTaskDeclareRequestBuilder.setOperationCost(resourceCostBuilder);

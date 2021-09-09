@@ -40,7 +40,7 @@ public class InitAlgorithm {
     @Resource
     private IAlgorithmVariableService algorithmVariableService;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         if (!sysConfig.isMasterNode()) {
             return;

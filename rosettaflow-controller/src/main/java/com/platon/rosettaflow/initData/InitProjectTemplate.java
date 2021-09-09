@@ -35,7 +35,7 @@ public class InitProjectTemplate {
     @Resource
     private IWorkflowNodeTempService workflowNodeTempService;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         if (!sysConfig.isMasterNode()) {
             return;

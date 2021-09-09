@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.req.user;
 
+import com.platon.rosettaflow.utils.AddressChangeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,4 +22,8 @@ public class UpdateNickReq {
     @ApiModelProperty(value = "昵称", required = true, example = "用户1")
     @NotBlank(message = "{user.nickname.notBlank}")
     private String nickName;
+
+    public String get0xAddress(){
+        return AddressChangeUtils.convert0XAddress(address);
+    }
 }
