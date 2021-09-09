@@ -68,14 +68,14 @@ public class UserController {
     @PostMapping("logout")
     @ApiOperation(value = "用户登出", notes = "用户登出")
     public ResponseVo<UserVo> logout(@RequestBody @Valid LoginOutReq loginOutReq) {
-        userService.logout(loginOutReq.getAddress());
+        userService.logout(loginOutReq.get0xAddress());
         return ResponseVo.create(RespCodeEnum.SUCCESS);
     }
 
     @PostMapping("updateNickName")
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public ResponseVo<UserVo> updateNickName(@RequestBody @Valid UpdateNickReq updateNickReq) {
-        userService.updateNickName(updateNickReq.getAddress(), updateNickReq.getNickName());
+        userService.updateNickName(updateNickReq.get0xAddress(), updateNickReq.getNickName());
         return ResponseVo.create(RespCodeEnum.SUCCESS);
     }
 

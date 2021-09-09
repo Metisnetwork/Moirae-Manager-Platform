@@ -1,6 +1,9 @@
 package com.platon.rosettaflow.utils;
 
 import cn.hutool.core.util.StrUtil;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platone.sdk.utlis.Bech32;
 import org.web3j.utils.Numeric;
 
@@ -14,10 +17,17 @@ import java.util.Locale;
  * @description
  */
 public class AddressChangeUtils {
+
+    public static final String HRP_LAT = "lat";
+    public static final String HRP_LAX = "lax";
+    public static final String HRP_PLA = "pla";
+    public static final String HRP_PLT = "plt";
+
     /**
      * The Bech32 character set for encoding.
      */
     private static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+
     /**
      * The Bech32 character set for decoding.
      */
@@ -180,16 +190,20 @@ public class AddressChangeUtils {
     }
 
     /**
-     * hrp conver 0x adress
-     *
+     *  hrp conver 0x adress
      * @param hrpAddress : hrpAddress
      * @return
      */
-    public static String convert0XAddress(String hrpAddress) {
-        if (!StrUtil.isNotBlank(hrpAddress)) {
+    public static String convert0XAddress(String hrpAddress){
+        if(!StrUtil.isNotBlank(hrpAddress)){
             throw new RuntimeException("hrpAddress can not blank");
         }
-        return "0x" + DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
+        try{
+            return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
+        }catch (Exception e){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADDRESS_ERROR.getMsg());
+        }
+
     }
 
     /**
