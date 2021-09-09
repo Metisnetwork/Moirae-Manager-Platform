@@ -1,11 +1,15 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.dto.AlgorithmDto;
+import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -32,6 +36,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IWorkflowService workflowService;
 
     @Resource
+    private IAlgorithmService algorithmService;
+
+    @Resource
     private IWorkflowNodeCodeService workflowNodeCodeService;
 
     @Resource
@@ -48,6 +55,47 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Resource
     private IWorkflowNodeResourceService workflowNodeResourceService;
+
+    @Override
+    public WorkflowDto queryNodeDetailsList(Long id) {
+        // 获取工作流
+        WorkflowDto workflowDto = BeanUtil.toBean(this.getById(id), WorkflowDto.class);
+        // 获取工作流节点列表
+        List<WorkflowNode> workflowNodeList = getWorkflowNodeList(id);
+        if (workflowNodeList == null || workflowNodeList.size() == 0) {
+            return workflowDto;
+        }
+        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
+        for (WorkflowNode workflowNode : workflowNodeList) {
+            // 工作流节点dto
+            WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
+            // 算法对象
+            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
+            if (Objects.nonNull(algorithmDto)) {
+                // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
+                WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
+                if (Objects.nonNull(workflowNodeCode)) {
+                    algorithmDto.setEditType(workflowNodeCode.getEditType());
+                    algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
+                    workflowNodeDto.setAlgorithmDto(algorithmDto);
+                }
+            }
+            //工作流节点输入列表
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+            workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
+            //工作流节点输出列表
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
+            workflowNodeDto.setWorkflowNodeOutputList(workflowNodeOutputList);
+            // 环境
+            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+            if (Objects.nonNull(workflowNodeResource)) {
+                workflowNodeDto.setWorkflowNodeResource(workflowNodeResource);
+            }
+            workflowNodeDtoList.add(workflowNodeDto);
+        }
+        workflowDto.setWorkflowNodeDtoList(workflowNodeDtoList);
+        return workflowDto;
+    }
 
     @Override
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
