@@ -20,7 +20,7 @@ public class WorkflowNodeReq {
     @ApiModelProperty(value = "工作流节点ID", required = true)
     @NotNull(message = "{workflow.node.id.notNull}")
     @Positive(message = "{workflow.node.id.positive}")
-    private Long workflowNodeId;
+    private Long id;
 
     @ApiModelProperty(value = "工作流当前节点名称", required = true)
     @NotBlank(message = "{workflow.node.name.NotBlank}")
