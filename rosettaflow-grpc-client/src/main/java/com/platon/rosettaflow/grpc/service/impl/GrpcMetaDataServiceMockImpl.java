@@ -40,7 +40,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
 
             MetaDataDetailDto metaDataDetailDto = new MetaDataDetailDto();
             MetaDataSummaryDto metaDataSummaryDto = new MetaDataSummaryDto();
-            metaDataSummaryDto.setMetaDataId("元数据的MetaDataId" + i);
+            metaDataSummaryDto.setMetaDataId("MetaDataId" + i);
             metaDataSummaryDto.setOriginId("OriginId" + i);
             metaDataSummaryDto.setTableName("TableName" + i);
             metaDataSummaryDto.setDesc("这是mock造的假数据" + i);

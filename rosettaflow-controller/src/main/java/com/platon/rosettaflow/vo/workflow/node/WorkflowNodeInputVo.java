@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.vo.workflow;
+package com.platon.rosettaflow.vo.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,12 +7,12 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * 工作流节点输入响应参数
  * @author hudenian
  * @date 2021/8/30
- * @description 功能描述
  */
 @Data
-@ApiModel
+@ApiModel(value = "工作流节点输入响应参数")
 public class WorkflowNodeInputVo {
 
     @ApiModelProperty(value = "工作流节点输入表主键ID")

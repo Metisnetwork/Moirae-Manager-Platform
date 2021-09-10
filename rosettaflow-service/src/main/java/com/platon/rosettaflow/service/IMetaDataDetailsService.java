@@ -19,7 +19,7 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
     void truncate();
 
     /**
-     * 根据元数据id获取元数据
+     * 根据元数据metaDataId获取元数据 columnList
      *
      * @param metaDataId 元数据id
      * @param current 元数据详情中列数据当前页

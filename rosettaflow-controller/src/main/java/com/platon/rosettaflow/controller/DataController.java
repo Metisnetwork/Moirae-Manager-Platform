@@ -49,7 +49,7 @@ public class DataController {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @GetMapping("list")
+    @GetMapping("pageList")
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
     public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
         IPage<MetaDataDto> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
@@ -75,7 +75,7 @@ public class DataController {
     @GetMapping("columnList")
     @ApiOperation(value = "获取元数据列分页列表", notes = "获取元数据列分页列表")
     public ResponseVo<PageVo<MetaDataColumnsVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
-        IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findById(metaDataDetailReq.getId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
+        IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findByMetaDataId(metaDataDetailReq.getMetaDataId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
         return convertToResponseVo(servicePage);
     }
 

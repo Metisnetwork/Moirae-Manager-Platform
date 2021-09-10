@@ -32,14 +32,11 @@ public class UserMetaDataVo {
     @ApiModelProperty(value = "资源所属组织中调度服务的 nodeId")
     private String nodeId;
 
-    @ApiModelProperty(value = "用户钱包地址")
-    private String address;
-
     @ApiModelProperty(value = "授权方式: 1-按时间, 2-按次数, 3-永久")
     private Byte authType;
 
     @ApiModelProperty(value = "授权值:按次数单位为（次）")
-    private Long authValue;
+    private Integer authValue;
 
     @ApiModelProperty(value = "授权开始时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)

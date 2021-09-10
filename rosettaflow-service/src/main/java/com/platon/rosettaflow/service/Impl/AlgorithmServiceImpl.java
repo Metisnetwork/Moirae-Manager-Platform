@@ -89,7 +89,6 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             log.error("queryAlgorithmDetails--查询算法详情失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.QUERY_ALG_DETAILS_ERROR.getMsg());
         }
-
     }
 
     @Override

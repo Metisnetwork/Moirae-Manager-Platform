@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.service.Impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,9 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowDto;
-import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
@@ -102,48 +99,16 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getProjectId, projectId);
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
+        queryWrapper.eq(Workflow::getRunStatus, 1);
         return this.list(queryWrapper);
     }
 
     @Override
-    public WorkflowDto queryWorkflowDetail(Long id) {
-        // 获取工作流
-        WorkflowDto workflowDto = BeanUtil.toBean(this.getById(id), WorkflowDto.class);
-        // 获取工作流节点列表
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(id);
-        if (workflowNodeList == null || workflowNodeList.size() == 0) {
-            return workflowDto;
-        }
-        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
-        for (WorkflowNode workflowNode : workflowNodeList) {
-            // 工作流节点dto
-            WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
-            // 算法对象
-            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
-            if (Objects.nonNull(algorithmDto)) {
-                // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
-                WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
-                if (Objects.nonNull(workflowNodeCode)) {
-                    algorithmDto.setEditType(workflowNodeCode.getEditType());
-                    algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
-                    workflowNodeDto.setAlgorithmDto(algorithmDto);
-                }
-            }
-            //工作流节点输入列表
-            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
-            workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
-            //工作流节点输出列表
-            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
-            workflowNodeDto.setWorkflowNodeOutputList(workflowNodeOutputList);
-            // 环境
-            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
-            if (Objects.nonNull(workflowNodeResource)) {
-                workflowNodeDto.setWorkflowNodeResource(workflowNodeResource);
-            }
-            workflowNodeDtoList.add(workflowNodeDto);
-        }
-        workflowDto.setWorkflowNodeDtoList(workflowNodeDtoList);
-        return workflowDto;
+    public Workflow queryWorkflowDetail(Long id) {
+        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Workflow::getId, id);
+        queryWrapper.eq(Workflow::getStatus, 1);
+        return this.getOne(queryWrapper);
     }
 
     @Override

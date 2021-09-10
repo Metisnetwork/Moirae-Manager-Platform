@@ -1,19 +1,16 @@
-package com.platon.rosettaflow.vo.workflow;
+package com.platon.rosettaflow.vo.workflow.node;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
+ * 工作流节点代码响应参数
  * @author hudenian
  * @date 2021/8/30
- * @description 功能描述
  */
 @Data
-@ApiModel
+@ApiModel(value = "工作流节点代码响应参数")
 public class WorkflowNodeCodeVo {
 
     @ApiModelProperty(value = "工作流节点代码表主键ID")

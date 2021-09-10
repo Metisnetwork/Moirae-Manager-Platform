@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.req.job;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -44,11 +45,11 @@ public class AddJobReq {
 
     @ApiModelProperty(value = "开始时间，格式：yyyy-MM-dd HH:mm:ss", required = true)
     @NotNull(message = "{job.beginTime.notNull}")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date beginTime;
 
     @ApiModelProperty(value = "结束时间，格式：yyyy-MM-dd HH:mm:ss;当是否重复为是时，才必选")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date endTime;
 
 }

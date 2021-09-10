@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.vo.workflow;
+package com.platon.rosettaflow.vo.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

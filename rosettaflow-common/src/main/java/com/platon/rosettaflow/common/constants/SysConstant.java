@@ -72,7 +72,7 @@ public class SysConstant {
             "swagger",
             "error",
             "api-docs",
-            "data/list",
+            "data/pageList",
             "data/detail",
             "data/columnList"
     };
