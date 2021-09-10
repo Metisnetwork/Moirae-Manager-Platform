@@ -31,6 +31,14 @@ public class GetMetaDataAuthorityDto {
      */
     private Integer auditMetaDataOption;
     /**
+     * 审核意见 (允许""字符)
+     */
+    private String auditSuggestion;
+    /**
+     * 对应数据授权信息中元数据的使用实况
+     */
+    private MetadataUsedQuoDto metadataUsedQuoDto;
+    /**
      * 发起授权申请的时间 (单位: ms)
      */
     private Long applyAt;

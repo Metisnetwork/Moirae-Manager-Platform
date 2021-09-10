@@ -10,9 +10,10 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetadataUsedQuoDto;
 import com.platon.rosettaflow.grpc.service.*;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -108,7 +109,7 @@ public class AuthServiceClient {
         GetMetaDataAuthorityDto getMetaDataAuthorityDto;
         MetaDataAuthorityDto metaDataAuthorityDto;
         NodeIdentityDto owner;
-        MetaDataUsageDto metaDataUsageDto;
+        MetaDataUsageRuleDto metaDataUsageRuleDto;
         for (int i = 0; i < getMetaDataAuthorityListResponse.getListCount(); i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
 
@@ -117,16 +118,21 @@ public class AuthServiceClient {
             owner.setNodeId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeId());
             owner.setIdentityId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getIdentityId());
 
-            metaDataUsageDto = new MetaDataUsageDto();
-            metaDataUsageDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getUsageTypeValue());
-            metaDataUsageDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getStartAt());
-            metaDataUsageDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getEndAt());
-            metaDataUsageDto.setTimes(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getTimes());
+            metaDataUsageRuleDto = new MetaDataUsageRuleDto();
+            metaDataUsageRuleDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getUsageTypeValue());
+            metaDataUsageRuleDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getStartAt());
+            metaDataUsageRuleDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getEndAt());
+            metaDataUsageRuleDto.setTimes(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getTimes());
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             metaDataAuthorityDto.setOwner(owner);
             metaDataAuthorityDto.setMetaDataId(getMetaDataAuthorityListResponse.getList(i).getAuth().getMetadataId());
-            metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageDto);
+            metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageRuleDto);
+
+            MetadataUsedQuoDto metadataUsedQuoDto = new MetadataUsedQuoDto();
+            metadataUsedQuoDto.setMetadataUsageType(getMetaDataAuthorityListResponse.getList(i).getUsedQuo().getUsageTypeValue());
+            metadataUsedQuoDto.setExpire(getMetaDataAuthorityListResponse.getList(i).getUsedQuo().getExpire());
+            metadataUsedQuoDto.setUsedTimes(getMetaDataAuthorityListResponse.getList(i).getUsedQuo().getUsedTimes());
 
             //元数据授权申请Id
             getMetaDataAuthorityDto.setMetaDataAuthId(getMetaDataAuthorityListResponse.getList(i).getMetadataAuthId());
@@ -138,6 +144,10 @@ public class AuthServiceClient {
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
             //审核结果:0-等待审核中 1-审核通过 2-审核拒绝
             getMetaDataAuthorityDto.setAuditMetaDataOption(getMetaDataAuthorityListResponse.getList(i).getAuditOptionValue());
+            //审核意见 (允许""字符)
+            getMetaDataAuthorityDto.setAuditSuggestion(getMetaDataAuthorityListResponse.getList(i).getAuditSuggestion());
+            //对应数据授权信息中元数据的使用实况
+            getMetaDataAuthorityDto.setMetadataUsedQuoDto(metadataUsedQuoDto);
             //发起授权申请的时间 (单位: ms)
             getMetaDataAuthorityDto.setApplyAt(getMetaDataAuthorityListResponse.getList(i).getApplyAt());
             //审核授权申请的时间 (单位: ms)

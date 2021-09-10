@@ -21,5 +21,5 @@ public class MetaDataAuthorityDto {
     /**
      * 元数据怎么使用
      */
-    private MetaDataUsageDto metaDataUsageDto;
+    private MetaDataUsageRuleDto metaDataUsageDto;
 }

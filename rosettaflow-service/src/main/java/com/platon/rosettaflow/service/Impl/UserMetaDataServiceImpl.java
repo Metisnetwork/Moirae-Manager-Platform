@@ -2,9 +2,7 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -19,7 +17,7 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.mapper.UserMetaDataMapper;
@@ -98,7 +96,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         metaDataAuthorityDto.setMetaDataId(metaData.getMetaDataId());
 
         //元数据怎么使用
-        MetaDataUsageDto metaDataUsageDto = new MetaDataUsageDto();
+        MetaDataUsageRuleDto metaDataUsageDto = new MetaDataUsageRuleDto();
         metaDataUsageDto.setUseType((int) userMetaDataDto.getAuthType());
         if (userMetaDataDto.getAuthType() == MetaDataUsageEnum.PERIOD.getValue()) {
             metaDataUsageDto.setStartAt(userMetaDataDto.getAuthBeginTime().getTime());

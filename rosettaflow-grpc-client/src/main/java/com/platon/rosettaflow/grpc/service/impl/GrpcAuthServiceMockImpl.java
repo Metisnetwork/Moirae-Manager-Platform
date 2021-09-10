@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.grpc.service.impl;
 
-import ch.qos.logback.core.util.ContextUtil;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
 import com.platon.rosettaflow.common.enums.UserTypeEnum;
@@ -9,7 +8,7 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
@@ -50,7 +49,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
         GetMetaDataAuthorityDto getMetaDataAuthorityDto;
         MetaDataAuthorityDto metaDataAuthorityDto;
         NodeIdentityDto nodeIdentityDto;
-        MetaDataUsageDto metaDataUsageDto;
+        MetaDataUsageRuleDto metaDataUsageDto;
 
         for (int i = 0; i < 10; i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
@@ -67,7 +66,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
             metaDataAuthorityDto.setMetaDataId("metaDataId" + i);
 
-            metaDataUsageDto = new MetaDataUsageDto();
+            metaDataUsageDto = new MetaDataUsageRuleDto();
             metaDataUsageDto.setUseType(MetaDataUsageEnum.TIMES.getValue());
             metaDataUsageDto.setStartAt(1629877270100L);
             metaDataUsageDto.setEndAt(1629877270100L);

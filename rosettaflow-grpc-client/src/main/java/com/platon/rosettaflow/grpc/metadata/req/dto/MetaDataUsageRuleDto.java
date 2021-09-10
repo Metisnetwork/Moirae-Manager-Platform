@@ -8,7 +8,7 @@ import lombok.Data;
  * @description 元数据怎么使用请求对象
  */
 @Data
-public class MetaDataUsageDto {
+public class MetaDataUsageRuleDto {
 
     /**
      * 元数据的使用方式 (0: 未定义; 1: 按照时间段来使用; 2: 按照次数来使用)
