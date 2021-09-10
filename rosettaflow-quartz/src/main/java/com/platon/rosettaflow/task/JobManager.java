@@ -26,7 +26,6 @@ import java.util.Set;
 public class JobManager {
 
     static final String GROUP = "MOIRAE";
-    static final String GROUP_SUF = ".";
 
     @Resource
     private Scheduler scheduler;

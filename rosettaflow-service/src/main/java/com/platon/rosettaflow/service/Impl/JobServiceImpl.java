@@ -81,6 +81,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
+        //如果作业现在执行则不能够修改
+        if(job.getJobStatus() == SubJobStatusEnum.RUNNING.getValue()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING.getMsg());
+        }
+
         checkParam(jobDto);
         //修改作业
         BeanCopierUtils.copy(jobDto, job);

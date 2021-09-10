@@ -113,6 +113,8 @@ public enum ErrorMsg {
 
     JOB_TIME_ERROR("作业时间错误", "Job time error"),
 
+    JOB_RUNNING("作业正在执行中不能修改", "Job is running can not modify"),
+
     JOB_TIME_REPEATINTERVAL_ERROR("作业执行重复时，作业时间及执行间隔时间错误", "job is repeated,the job time or repeat interval error"),
 
     METADATA_NOT_EXIST("元数据不存在", "Meta data not exist"),
