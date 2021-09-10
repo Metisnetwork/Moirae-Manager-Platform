@@ -24,11 +24,6 @@ public class WorkflowNodeDto extends WorkflowNode {
     private AlgorithmDto algorithmDto;
 
     /**
-     * 环境
-     */
-    private WorkflowNodeResource workflowNodeResource;
-
-    /**
      * 工作流节点输入列表
      */
     private List<WorkflowNodeInput> workflowNodeInputList;

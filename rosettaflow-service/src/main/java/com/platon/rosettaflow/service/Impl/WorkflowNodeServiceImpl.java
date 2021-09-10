@@ -57,13 +57,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IWorkflowNodeResourceService workflowNodeResourceService;
 
     @Override
-    public WorkflowDto queryNodeDetailsList(Long id) {
-        // 获取工作流
-        WorkflowDto workflowDto = BeanUtil.toBean(this.getById(id), WorkflowDto.class);
+    public List<WorkflowNodeDto> queryNodeDetailsList(Long id) {
         // 获取工作流节点列表
         List<WorkflowNode> workflowNodeList = getWorkflowNodeList(id);
         if (workflowNodeList == null || workflowNodeList.size() == 0) {
-            return workflowDto;
+            return new ArrayList<>();
         }
         List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
         for (WorkflowNode workflowNode : workflowNodeList) {
@@ -72,12 +70,21 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 算法对象
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
             if (Objects.nonNull(algorithmDto)) {
-                // 算法代码, 如果可查询出算法代码，表示算法代码已修改，否则算法代码没有变动
+                // 工作流节点算法代码, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(workflowNodeCode)) {
                     algorithmDto.setEditType(workflowNodeCode.getEditType());
                     algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
                     workflowNodeDto.setAlgorithmDto(algorithmDto);
+                }
+                // 工作流节点算法资源环境, 如果可查询出，表示已修改，否则没有变动
+                WorkflowNodeResource nodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+                if (Objects.nonNull(nodeResource)) {
+                    algorithmDto.setCostCpu(nodeResource.getCostCpu());
+                    algorithmDto.setCostGpu(nodeResource.getCostGpu());
+                    algorithmDto.setCostMem(nodeResource.getCostMem());
+                    algorithmDto.setCostBandwidth(nodeResource.getCostBandwidth());
+                    algorithmDto.setRunTime(nodeResource.getRunTime());
                 }
             }
             //工作流节点输入列表
@@ -86,15 +93,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             //工作流节点输出列表
             List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
             workflowNodeDto.setWorkflowNodeOutputList(workflowNodeOutputList);
-            // 环境
-            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
-            if (Objects.nonNull(workflowNodeResource)) {
-                workflowNodeDto.setWorkflowNodeResource(workflowNodeResource);
-            }
             workflowNodeDtoList.add(workflowNodeDto);
         }
-        workflowDto.setWorkflowNodeDtoList(workflowNodeDtoList);
-        return workflowDto;
+        return workflowNodeDtoList;
     }
 
     @Override

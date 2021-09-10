@@ -12,7 +12,7 @@
     <result column="support_os_system" jdbcType="VARCHAR" property="supportOsSystem" />
     <result column="algorithm_type" jdbcType="TINYINT" property="algorithmType" />
     <result column="cost_mem" jdbcType="BIGINT" property="costMem" />
-    <result column="cost_cpu" jdbcType="BIGINT" property="costCpu" />
+    <result column="cost_cpu" jdbcType="INTEGER" property="costCpu" />
     <result column="cost_gpu" jdbcType="INTEGER" property="costGpu" />
     <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth" />
     <result column="run_time" jdbcType="BIGINT" property="runTime" />

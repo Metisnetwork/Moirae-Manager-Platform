@@ -1,7 +1,7 @@
 package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.req.workflow.node.*;
@@ -37,13 +37,13 @@ public class WorkflowNodeController {
     @GetMapping(value = "queryNodeDetailsList/{id}")
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
     public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id) {
-        WorkflowDto workflowDto = workflowNodeService.queryNodeDetailsList(id);
-        return ResponseVo.createSuccess(convertToWorkflowVo(workflowDto));
+        List<WorkflowNodeDto> workflowNodeDtoList = workflowNodeService.queryNodeDetailsList(id);
+        return ResponseVo.createSuccess(convertToWorkflowVo(workflowNodeDtoList));
     }
+
     /** 转换响应参数 */
-    private NodeDetailsListVo convertToWorkflowVo(WorkflowDto workflowDto) {
-        NodeDetailsListVo nodeDetailsListVo = BeanUtil.toBean(workflowDto, NodeDetailsListVo.class);
-        List<WorkflowNodeDto> workflowNodeDtoList = workflowDto.getWorkflowNodeDtoList();
+    private NodeDetailsListVo convertToWorkflowVo( List<WorkflowNodeDto> workflowNodeDtoList) {
+        NodeDetailsListVo nodeDetailsListVo = new NodeDetailsListVo();
         List<WorkflowNodeVo> workflowNodeVoList = new ArrayList<>();
         if (workflowNodeDtoList != null && workflowNodeDtoList.size() > 0) {
             for(WorkflowNodeDto nodeDto: workflowNodeDtoList){
@@ -54,9 +54,9 @@ public class WorkflowNodeController {
                 // 输出参数转换
                 List<WorkflowNodeOutput> nodeOutputList = nodeDto.getWorkflowNodeOutputList();
                 workflowNodeVo.setWorkflowNodeOutputVoList(BeanUtil.copyToList(nodeOutputList, WorkflowNodeOutputVo.class));
-                // 节点资源转换
-                WorkflowNodeResource nodeResource = nodeDto.getWorkflowNodeResource();
-                workflowNodeVo.setWorkflowNodeResourceVo(BeanUtil.toBean(nodeResource, WorkflowNodeResourceVo.class));
+                // 节点算法转换
+                AlgorithmDto algorithmDto = nodeDto.getAlgorithmDto();
+                workflowNodeVo.setNodeAlgorithmVo(BeanUtil.toBean(algorithmDto, NodeAlgorithmVo.class));
                 workflowNodeVoList.add(workflowNodeVo);
             }
         }

@@ -61,7 +61,7 @@ public class AlgorithmDto {
     /**
      * 所需的核数 (单位: 个)
      */
-    private Long costCpu;
+    private Integer costCpu;
 
     /**
      * GPU核数(单位：核)

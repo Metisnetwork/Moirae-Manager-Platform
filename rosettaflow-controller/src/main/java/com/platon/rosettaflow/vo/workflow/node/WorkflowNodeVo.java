@@ -46,10 +46,7 @@ public class WorkflowNodeVo {
     private Byte status;
 
     @ApiModelProperty(value = "算法对象")
-    private WorkflowNodeCodeVo workflowNodeCodeVo;
-
-    @ApiModelProperty(value = "环境")
-    private WorkflowNodeResourceVo workflowNodeResourceVo;
+    private NodeAlgorithmVo nodeAlgorithmVo;
 
     @ApiModelProperty(value = "工作流节点输入列表")
     private List<WorkflowNodeInputVo> workflowNodeInputVoList;
