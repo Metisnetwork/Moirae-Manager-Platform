@@ -17,10 +17,10 @@ import javax.validation.constraints.Positive;
 @ApiModel
 public class WorkflowNodeReq {
 
-    @ApiModelProperty(value = "工作流ID", required = true)
+    @ApiModelProperty(value = "工作流节点ID", required = true)
     @NotNull(message = "{workflow.node.id.notNull}")
     @Positive(message = "{workflow.node.id.positive}")
-    private Long id;
+    private Long workflowNodeId;
 
     @ApiModelProperty(value = "工作流当前节点名称", required = true)
     @NotBlank(message = "{workflow.node.name.NotBlank}")
