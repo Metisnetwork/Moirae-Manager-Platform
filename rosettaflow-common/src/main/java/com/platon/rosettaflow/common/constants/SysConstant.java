@@ -73,8 +73,8 @@ public class SysConstant {
             "error",
             "api-docs",
             "data/pageList",
-            "data/detail",
-            "data/columnList"
+            "data/dataDetail",
+            "data/dataColumnList"
     };
 
     /**
