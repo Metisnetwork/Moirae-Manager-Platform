@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.utils;
+package com.platon.rosettaflow.common.utils;
 
 import java.math.BigInteger;
 
@@ -80,10 +80,10 @@ public class DataChangeUtils {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        BigInteger target = new BigInteger("59156244497053560910602546333004691942496130988411687282766345845500499323302");
-        System.out.println(target.toString(16));
-    }
+//    public static void main(String[] args) {
+//        BigInteger target = new BigInteger("59156244497053560910602546333004691942496130988411687282766345845500499323302");
+//        System.out.println(target.toString(16));
+//    }
 
     public static String binary(byte[] bytes, int radix) {
         return new BigInteger(1, bytes).toString(radix);// 这里的1代表正数

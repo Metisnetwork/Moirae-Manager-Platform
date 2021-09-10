@@ -15,14 +15,16 @@
         <result column="auth_status" jdbcType="TINYINT" property="authStatus"/>
         <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime"/>
         <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime"/>
+        <result column="expire" jdbcType="TINYINT" property="expire"/>
+        <result column="used_times" jdbcType="BIGINT" property="usedTimes"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, meta_data_id, identity_id, identity_name, node_id, address, auth_type, auth_value, 
-    auth_begin_time, auth_end_time, auth_status, apply_time, audit_time, `status`, create_time, 
-    update_time
+    auth_begin_time, auth_end_time, auth_status, apply_time, audit_time, expire, used_times, 
+    `status`, create_time, update_time
   </sql>
 
     <update id="truncate">
@@ -54,7 +56,26 @@
         u.address = #{address,jdbcType=VARCHAR}
         AND u.`status` = 1
         <if test="dataName != null and dataName != ''">
-        AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
+            AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
         </if>
+    </select>
+    <select id="getUserMetaDataByAddress" resultType="com.platon.rosettaflow.dto.UserMetaDataDto">
+        SELECT DISTINCT
+            umd.identity_id,
+            umd.identity_name
+        FROM
+            t_user_meta_data umd
+        INNER JOIN
+            t_user u
+        ON umd.address = u.address
+        WHERE
+            (umd.auth_type = 1 AND expire = 0)
+        OR (
+            umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value
+        )
+        AND
+            umd.status = '1'
+        AND
+            umd.address = #{address, jdbcType=VARCHAR}
     </select>
 </mapper>

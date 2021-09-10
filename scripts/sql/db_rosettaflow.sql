@@ -129,6 +129,8 @@ CREATE TABLE `t_user_meta_data` (
     `auth_status`  tinyint(4) DEFAULT NULL COMMENT '授权状态: 0-等待审核中, 1-审核通过, 2-审核拒绝',
     `apply_time` datetime DEFAULT NULL COMMENT '发起授权申请的时间',
     `audit_time` datetime DEFAULT NULL COMMENT '审核授权申请的时间',
+    `expire`  tinyint(4) DEFAULT NULL COMMENT '是否已过期（按时间时需要）: 0-未过期, 1-已过期',
+    `used_times` bigint(20) DEFAULT NULL COMMENT '已经使用的次数(按次数时有效)',
     `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

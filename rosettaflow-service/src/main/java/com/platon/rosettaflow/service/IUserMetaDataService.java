@@ -2,8 +2,12 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
+
+import java.util.List;
 
 /**
  * @author hudenian
@@ -32,4 +36,20 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @param userMetaDataDto 元数据授权申请对象
      */
     void auth(UserMetaDataDto userMetaDataDto);
+
+    /**
+     * 获取用户已授权机构列表
+     *
+     * @return 授权机构列表
+     */
+    List<UserMetaDataDto> getAllAuthOrganization();
+
+    /**
+     * 获取用户授权元数据列信息
+     *
+     * @param identityId 机构identityId
+     * @return 已授权表
+     */
+    List<MetaDataDto> getAllAuthTables(String identityId);
+
 }

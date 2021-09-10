@@ -1,13 +1,19 @@
 package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
+import com.platon.rosettaflow.dto.MetaDataDto;
+import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
@@ -27,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -70,7 +77,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             }
         } else {
             if (null == userMetaDataDto.getAuthEndTime() || null == userMetaDataDto.getAuthBeginTime() ||
-                DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0 || userMetaDataDto.getAuthEndTime().before(userMetaDataDto.getAuthBeginTime())) {
+                    DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0 || userMetaDataDto.getAuthEndTime().before(userMetaDataDto.getAuthBeginTime())) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
         }
@@ -93,7 +100,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         //元数据怎么使用
         MetaDataUsageDto metaDataUsageDto = new MetaDataUsageDto();
         metaDataUsageDto.setUseType((int) userMetaDataDto.getAuthType());
-        if(userMetaDataDto.getAuthType() == MetaDataUsageEnum.PERIOD.getValue()){
+        if (userMetaDataDto.getAuthType() == MetaDataUsageEnum.PERIOD.getValue()) {
             metaDataUsageDto.setStartAt(userMetaDataDto.getAuthBeginTime().getTime());
             metaDataUsageDto.setEndAt(userMetaDataDto.getAuthEndTime().getTime());
         }
@@ -107,5 +114,23 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
+    }
+
+    @Override
+    public List<UserMetaDataDto> getAllAuthOrganization() {
+        UserDto userDto = UserContext.get();
+        if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
+        }
+        String address = userDto.getAddress();
+        if(!StrUtil.startWith(userDto.getAddress(),AddressChangeUtils.HRP_ETH)){
+            address = AddressChangeUtils.convert0XAddress(address);
+        }
+        return this.baseMapper.getUserMetaDataByAddress(address);
+    }
+
+    @Override
+    public List<MetaDataDto> getAllAuthTables(String identityId) {
+        return metaDataService.getAllAuthTables(identityId);
     }
 }

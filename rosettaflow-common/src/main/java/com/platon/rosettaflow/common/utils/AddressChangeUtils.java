@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.utils;
+package com.platon.rosettaflow.common.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -22,6 +22,7 @@ public class AddressChangeUtils {
     public static final String HRP_LAX = "lax";
     public static final String HRP_PLA = "pla";
     public static final String HRP_PLT = "plt";
+    public static final String HRP_ETH = "0x";
 
     /**
      * The Bech32 character set for encoding.

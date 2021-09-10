@@ -1,6 +1,6 @@
 package com.platon.rosettaflow.req.user;
 
-import com.platon.rosettaflow.utils.AddressChangeUtils;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

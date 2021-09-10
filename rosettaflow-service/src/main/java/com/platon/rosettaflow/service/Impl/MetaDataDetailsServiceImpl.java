@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -46,6 +47,16 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
         LambdaQueryWrapper<MetaDataDetails> wrapper = getQueryWrapper(null, id);
         this.page(page, wrapper);
         return this.convertToPageDto(page);
+    }
+
+    @Override
+    public List<MetaDataDetailsDto> getAllAuthColumns(String metaDataId) {
+        LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaDataDetails::getMetaDataId, metaDataId);
+        wrapper.eq(MetaDataDetails::getStatus, StatusEnum.VALID.getValue());
+        wrapper.orderByAsc(MetaDataDetails::getColumnIndex);
+        List<MetaDataDetails> metaDataDetailsList = this.list(wrapper);
+        return BeanUtil.copyToList(metaDataDetailsList, MetaDataDetailsDto.class);
     }
 
     private LambdaQueryWrapper<MetaDataDetails> getQueryWrapper(String metaDataId, Long id) {

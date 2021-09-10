@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.mapper.domain.MetaData;
 
+import java.util.List;
+
 /**
  * @author hudenian
  * @date 2021/8/24
@@ -33,4 +35,12 @@ public interface IMetaDataService extends IService<MetaData> {
      * @return 元数据详情
      */
     MetaDataDto detail(Long id);
+
+    /**
+     * 根据identityId查询元数据列表
+     *
+     * @param identityId identityId
+     * @return 元数据列表
+     */
+    List<MetaDataDto> getAllAuthTables(String identityId);
 }

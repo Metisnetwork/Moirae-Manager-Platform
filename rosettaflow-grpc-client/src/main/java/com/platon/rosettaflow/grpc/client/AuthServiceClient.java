@@ -57,7 +57,7 @@ public class AuthServiceClient {
         metaDataAuthorityBuilder.setMetadataId(requestDto.getAuth().getMetaDataId());
 
         //3.3元数据怎么使用
-        MetadataUsage.Builder metaDataUsageBuilder = MetadataUsage.newBuilder();
+        MetadataUsageRule.Builder metaDataUsageBuilder = MetadataUsageRule.newBuilder();
         metaDataUsageBuilder.setUsageTypeValue(requestDto.getAuth().getMetaDataUsageDto().getUseType());
         if (requestDto.getAuth().getMetaDataUsageDto().getUseType() == MetaDataUsageEnum.PERIOD.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null || requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
@@ -70,8 +70,8 @@ public class AuthServiceClient {
         }
         metaDataUsageBuilder.setStartAt(requestDto.getAuth().getMetaDataUsageDto().getStartAt());
         metaDataUsageBuilder.setEndAt(requestDto.getAuth().getMetaDataUsageDto().getEndAt());
-        metaDataUsageBuilder.setTimes(requestDto.getAuth().getMetaDataUsageDto().getTimes().intValue());
-        metaDataAuthorityBuilder.setUsage(metaDataUsageBuilder);
+        metaDataUsageBuilder.setTimes(requestDto.getAuth().getMetaDataUsageDto().getTimes());
+        metaDataAuthorityBuilder.setUsageRule(metaDataUsageBuilder);
         applyMetaDataAuthorityRequest.setAuth(metaDataAuthorityBuilder.build());
 
         // 4.发起数据授权申请的账户的签名
@@ -83,7 +83,6 @@ public class AuthServiceClient {
             throw new BusinessException(applyMetaDataAuthorityResponse.getStatus(), applyMetaDataAuthorityResponse.getMsg());
         }
 
-        //TODO 国际化处理
         ApplyMetaDataAuthorityResponseDto applyMetaDataAuthorityResponseDto = new ApplyMetaDataAuthorityResponseDto();
         applyMetaDataAuthorityResponseDto.setStatus(applyMetaDataAuthorityResponse.getStatus());
         applyMetaDataAuthorityResponseDto.setMsg(applyMetaDataAuthorityResponse.getMsg());
@@ -119,10 +118,10 @@ public class AuthServiceClient {
             owner.setIdentityId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getIdentityId());
 
             metaDataUsageDto = new MetaDataUsageDto();
-            metaDataUsageDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getUsageTypeValue());
-            metaDataUsageDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getStartAt());
-            metaDataUsageDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getEndAt());
-            metaDataUsageDto.setTimes(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsage().getTimes());
+            metaDataUsageDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getUsageTypeValue());
+            metaDataUsageDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getStartAt());
+            metaDataUsageDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getEndAt());
+            metaDataUsageDto.setTimes(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getTimes());
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             metaDataAuthorityDto.setOwner(owner);
@@ -138,7 +137,7 @@ public class AuthServiceClient {
             //元数据使用授权信息
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
             //审核结果:0-等待审核中 1-审核通过 2-审核拒绝
-            getMetaDataAuthorityDto.setAuditMetaDataOption(getMetaDataAuthorityListResponse.getList(i).getAuditValue());
+            getMetaDataAuthorityDto.setAuditMetaDataOption(getMetaDataAuthorityListResponse.getList(i).getAuditOptionValue());
             //发起授权申请的时间 (单位: ms)
             getMetaDataAuthorityDto.setApplyAt(getMetaDataAuthorityListResponse.getList(i).getApplyAt());
             //审核授权申请的时间 (单位: ms)

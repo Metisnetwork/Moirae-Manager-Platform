@@ -23,30 +23,37 @@ public class UserMetaData implements Serializable {
      */
     @TableId(type = IdType.AUTO)
     private Long id;
+
     /**
      * 元数据id
      */
     private String metaDataId;
+
     /**
      * 资源所属组织的身份标识Id
      */
     private String identityId;
+
     /**
      * 资源所属组织名称
      */
     private String identityName;
+
     /**
      * 资源所属组织中调度服务的 nodeId
      */
     private String nodeId;
+
     /**
      * 用户钱包地址
      */
     private String address;
+
     /**
      * 授权方式: 1-按时间, 2-按次数, 3-永久
      */
     private Byte authType;
+
     /**
      * 授权值:按次数单位为（次）
      */
@@ -55,31 +62,48 @@ public class UserMetaData implements Serializable {
      * 授权开始时间
      */
     private Date authBeginTime;
+
     /**
      * 授权结束时间
      */
     private Date authEndTime;
+
     /**
      * 授权状态: 0-等待审核中, 1-审核通过, 2-审核拒绝
      */
     private Byte authStatus;
+
     /**
      * 发起授权申请的时间
      */
     private Date applyTime;
+
     /**
      * 审核授权申请的时间
      */
     private Date auditTime;
+
+    /**
+     * 是否已过期（按时间时需要）: 0-未过期, 1-已过期
+     */
+    private Byte expire;
+
+    /**
+     * 已经使用的次数(按次数时有效)
+     */
+    private Long usedTimes;
+
     /**
      * 状态: 0-无效，1- 有效
      */
     @TableField(value = "`status`")
     private Byte status;
+
     /**
      * 创建时间
      */
     private Date createTime;
+
     /**
      * 更新时间
      */
@@ -110,6 +134,8 @@ public class UserMetaData implements Serializable {
                 && (this.getAuthStatus() == null ? other.getAuthStatus() == null : this.getAuthStatus().equals(other.getAuthStatus()))
                 && (this.getApplyTime() == null ? other.getApplyTime() == null : this.getApplyTime().equals(other.getApplyTime()))
                 && (this.getAuditTime() == null ? other.getAuditTime() == null : this.getAuditTime().equals(other.getAuditTime()))
+                && (this.getExpire() == null ? other.getExpire() == null : this.getExpire().equals(other.getExpire()))
+                && (this.getUsedTimes() == null ? other.getUsedTimes() == null : this.getUsedTimes().equals(other.getUsedTimes()))
                 && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
                 && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
                 && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
@@ -132,6 +158,8 @@ public class UserMetaData implements Serializable {
         result = prime * result + ((getAuthStatus() == null) ? 0 : getAuthStatus().hashCode());
         result = prime * result + ((getApplyTime() == null) ? 0 : getApplyTime().hashCode());
         result = prime * result + ((getAuditTime() == null) ? 0 : getAuditTime().hashCode());
+        result = prime * result + ((getExpire() == null) ? 0 : getExpire().hashCode());
+        result = prime * result + ((getUsedTimes() == null) ? 0 : getUsedTimes().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
@@ -156,6 +184,8 @@ public class UserMetaData implements Serializable {
                 ", authStatus=" + authStatus +
                 ", applyTime=" + applyTime +
                 ", auditTime=" + auditTime +
+                ", expire=" + expire +
+                ", usedTimes=" + usedTimes +
                 ", status=" + status +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +

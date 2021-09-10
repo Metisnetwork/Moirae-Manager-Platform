@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 
 import java.util.List;
@@ -37,4 +38,11 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @return 元数据列详情列表
      */
     IPage<MetaDataDetailsDto> findById(Long id, Long current, Long size);
+
+    /**
+     * 获取用户授权元数据列详情列表
+     * @param metaDataId 元数据id
+     * @return 授权元数据列表
+     */
+    List<MetaDataDetailsDto> getAllAuthColumns(String metaDataId);
 }

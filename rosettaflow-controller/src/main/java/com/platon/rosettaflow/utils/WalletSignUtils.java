@@ -1,7 +1,7 @@
 package com.platon.rosettaflow.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.platone.sdk.utlis.Bech32;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.web3j.crypto.*;

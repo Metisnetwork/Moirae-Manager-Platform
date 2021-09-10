@@ -10,7 +10,7 @@ import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.LoginOutReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.service.IUserService;
-import com.platon.rosettaflow.utils.AddressChangeUtils;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.user.NonceVo;

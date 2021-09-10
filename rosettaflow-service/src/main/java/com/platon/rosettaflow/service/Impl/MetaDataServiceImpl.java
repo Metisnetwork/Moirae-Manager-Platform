@@ -62,6 +62,11 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         return metaDataDto;
     }
 
+    @Override
+    public List<MetaDataDto> getAllAuthTables(String identityId) {
+        return this.baseMapper.getAllAuthTables(identityId);
+    }
+
     IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<MetaDataDto> metaDataWithAuthList) {
         List<MetaDataDto> records = new ArrayList<>();
         Map<String,Byte> authMap = new HashMap<>(metaDataWithAuthList.size());

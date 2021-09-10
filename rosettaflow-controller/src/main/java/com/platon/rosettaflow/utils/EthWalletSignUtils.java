@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.utils;
 
+import com.platon.rosettaflow.common.utils.DataChangeUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.web3j.crypto.*;
 import org.web3j.utils.Assertions;

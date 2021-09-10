@@ -13,5 +13,4 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     runtimeOnly 'mysql:mysql-connector-java'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-    api "com.platone.client:core:0.1.6.0-SNAPSHOT"
 }

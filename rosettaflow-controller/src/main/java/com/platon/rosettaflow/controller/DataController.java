@@ -1,11 +1,14 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.req.data.MetaDataAuthReq;
+import com.platon.rosettaflow.req.data.MetaDataAuthTablesReq;
 import com.platon.rosettaflow.req.data.MetaDataDetailReq;
 import com.platon.rosettaflow.req.data.MetaDataReq;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
@@ -13,10 +16,8 @@ import com.platon.rosettaflow.service.IMetaDataService;
 import com.platon.rosettaflow.service.IUserMetaDataService;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
-import com.platon.rosettaflow.vo.data.MetaDataColumnsVo;
-import com.platon.rosettaflow.vo.data.MetaDataDetailVo;
-import com.platon.rosettaflow.vo.data.MetaDataVo;
-import com.platon.rosettaflow.vo.data.UserMetaDataVo;
+import com.platon.rosettaflow.vo.data.*;
+import com.platon.rosettaflow.vo.user.UserNicknameVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author hudenian
@@ -87,6 +89,28 @@ public class DataController {
         userMetaDataService.auth(userMetaDataDto);
         return ResponseVo.createSuccess();
     }
+
+    @GetMapping("getAllAuthOrganization")
+    @ApiOperation(value = "查询工作流输入组织", notes = "查询工作流输入组织")
+    public ResponseVo<List<UserMetaDataOrgVo>> getAllAuthOrganization() {
+        List<UserMetaDataDto> dtoList = userMetaDataService.getAllAuthOrganization();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, UserMetaDataOrgVo.class));
+    }
+
+    @GetMapping("getAllAuthTables")
+    @ApiOperation(value = "查询工作流输入表", notes = "查询工作流输入表")
+    public ResponseVo<List<MetaDataTablesVo>> getAllAuthTables(@Valid MetaDataAuthTablesReq metaDataAuthTablesReq) {
+        List<MetaDataDto> dtoList = userMetaDataService.getAllAuthTables(metaDataAuthTablesReq.getIdentityId());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataTablesVo.class));
+    }
+
+    @GetMapping("getAllAuthColumns/{metaDataId}")
+    @ApiOperation(value = "查询工作流输入字段", notes = "查询工作流输入字段")
+    public ResponseVo<List<MetaDataColumnsAuthVo>> getAllAuthColumns(@ApiParam(value = "元数据表ID", required = true) @PathVariable String metaDataId) {
+        List<MetaDataDetailsDto> dtoList = metaDataDetailsService.getAllAuthColumns(metaDataId);
+        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataColumnsAuthVo.class));
+    }
+
 
     private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {
         List<MetaDataVo> items = new ArrayList<>();
