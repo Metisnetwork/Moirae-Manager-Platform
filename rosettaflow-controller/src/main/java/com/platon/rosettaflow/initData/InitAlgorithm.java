@@ -77,7 +77,7 @@ public class InitAlgorithm {
                 algorithm.setSupportOsSystem(row.get(6));
                 algorithm.setAlgorithmType(Byte.valueOf(row.get(7)));
                 algorithm.setCostMem(Long.valueOf(row.get(8)));
-                algorithm.setCostCpu(Long.valueOf(row.get(9)));
+                algorithm.setCostCpu(Integer.valueOf(row.get(9)));
                 algorithm.setCostGpu(Integer.valueOf(row.get(10)));
                 algorithm.setCostBandwidth(Long.valueOf(row.get(11)));
                 algorithm.setRunTime(Long.valueOf(row.get(12)));

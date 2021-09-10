@@ -17,7 +17,7 @@ import java.util.List;
 @ApiModel(value = "添加工作流节点输出请求参数")
 public class SaveNodeOutputListReq {
 
-    @ApiModelProperty(value = "工作流ID", required = true)
+    @ApiModelProperty(value = "工作流节点ID", required = true)
     @NotNull(message = "{workflow.node.id.notNull}")
     @Positive(message = "{workflow.node.id.positive}")
     private Long workflowNodeId;

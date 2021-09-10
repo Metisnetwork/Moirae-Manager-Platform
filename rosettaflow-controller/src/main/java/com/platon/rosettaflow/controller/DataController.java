@@ -58,7 +58,7 @@ public class DataController {
         return convertToMetaDataVo(servicePage);
     }
 
-    @GetMapping(value = "detail/{id}")
+    @GetMapping(value = "dataDetail/{id}")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
     public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "元数据表ID", required = true) @PathVariable Long id) {
         MetaDataDto metaDataDto = metaDataService.detail(id);
@@ -74,7 +74,7 @@ public class DataController {
         return convertUserMetaDataToResponseVo(servicePage);
     }
 
-    @GetMapping("columnList")
+    @GetMapping("dataColumnList")
     @ApiOperation(value = "获取元数据列分页列表", notes = "获取元数据列分页列表")
     public ResponseVo<PageVo<MetaDataColumnsVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
         IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findByMetaDataId(metaDataDetailReq.getMetaDataId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());

@@ -2,6 +2,7 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param id 工作流id
      * @return 工作流详情
      */
-    WorkflowDto queryNodeDetailsList(Long id);
+    List<WorkflowNodeDto> queryNodeDetailsList(Long id);
 
     /**
      * 保存工作流节点

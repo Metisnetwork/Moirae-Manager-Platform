@@ -203,7 +203,7 @@ CREATE TABLE `t_algorithm` (
   `support_os_system` varchar(64) DEFAULT NULL COMMENT '支持操作系统,多个以","进行分隔',
   `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
   `cost_mem` bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
-  `cost_cpu` bigint(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+  `cost_cpu` int(11) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
   `cost_gpu` int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
   `cost_bandwidth` bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
   `run_time` bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',

@@ -30,7 +30,4 @@ public class WorkflowNodeVariableVo {
 
     @ApiModelProperty(value = "变量描述")
     private String varNodeDesc;
-
-    @ApiModelProperty(value = "状态: 0-无效，1- 有效")
-    private Byte status;
 }
