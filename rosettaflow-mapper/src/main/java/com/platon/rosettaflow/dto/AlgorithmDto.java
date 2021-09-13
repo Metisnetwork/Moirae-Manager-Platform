@@ -86,6 +86,6 @@ public class AlgorithmDto {
     /**
      * 算法代码
      */
-    private String algorithmCode;
+    private String calculateContractCode;
 
 }

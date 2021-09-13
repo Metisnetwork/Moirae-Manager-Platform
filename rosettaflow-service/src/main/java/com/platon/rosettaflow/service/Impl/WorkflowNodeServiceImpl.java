@@ -74,7 +74,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(workflowNodeCode)) {
                     algorithmDto.setEditType(workflowNodeCode.getEditType());
-                    algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
+                    algorithmDto.setCalculateContractCode(workflowNodeCode.getCalculateContractCode());
                 }
                 // 工作流节点算法资源环境, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeResource nodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
