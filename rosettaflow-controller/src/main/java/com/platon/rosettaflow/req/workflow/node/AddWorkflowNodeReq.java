@@ -23,7 +23,7 @@ public class AddWorkflowNodeReq {
     private Long workflowId;
 
     @ApiModelProperty(value = "算法ID", required = true)
-    @NotNull(message = "{algorithm id can not be empty}")
+    @NotNull(message = "{algorithm.id.notNull}")
     @Positive(message = "{algorithm.id.positive}")
     private Long algorithmId;
 

@@ -1,5 +1,7 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -210,7 +212,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
 
-        //所以此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
+        //此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
         grpcTaskService.asyncPublishTask(taskDto, publishTaskDeclareResponse -> {
 
@@ -219,6 +221,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 //更新作业
                 SubJob subJob = subJobService.getById(workflowDto.getJobId());
                 subJob.setEndTime(now());
+                //TODO CHECK
+                subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(),subJob.getEndTime(), DateUnit.MINUTE)));
                 //子作业节点信息
                 SubJobNode subJobNode = new SubJobNode();
                 subJobNode.setSubJobId(subJob.getId());
@@ -226,11 +230,23 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 subJobNode.setNodeStep(workflowNode.getNodeStep());
 
                 if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+
+                    subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
+
                     //如果是最后一个节点
                     if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
                         subJob.setSubJobStatus(SubJobStatusEnum.RUN_SUCCESS.getValue());
+                        subJobService.updateById(subJob);
+                        subJobNodeService.save(subJobNode);
+                    }else{
+                        subJob.setSubJobStatus(SubJobStatusEnum.RUNNING.getValue());
+                        subJobService.updateById(subJob);
+                        subJobNodeService.save(subJobNode);
+
+                        //当前工作流执行成功，继续执行下一个工作流节点
+                        workflowDto.setStartNode(workflowNode.getNextNodeStep());
+                        this.start(workflowDto);
                     }
-                    subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
                 } else {
                     subJob.setSubJobStatus(SubJobStatusEnum.RUN_FAIL.getValue());
                     subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_FAIL.getValue());
@@ -252,6 +268,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                         workflow.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
                     } else {
                         workflow.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());
+                        this.updateById(workflow);
+
                         //当前工作流执行成功，继续执行下一个节点工作流
                         workflowDto.setStartNode(workflowNode.getNextNodeStep());
                         this.start(workflowDto);

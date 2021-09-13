@@ -70,7 +70,7 @@ CREATE TABLE `t_login_log` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_meta_data`;
 CREATE TABLE `t_meta_data` (
-   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户数据表ID(自增长)',
+   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '元数据表ID(自增长)',
    `identity_id` varchar(128) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
    `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
    `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',

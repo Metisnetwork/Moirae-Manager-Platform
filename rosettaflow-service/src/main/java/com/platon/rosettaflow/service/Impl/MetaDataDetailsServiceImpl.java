@@ -72,16 +72,9 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
     }
 
     IPage<MetaDataDetailsDto> convertToPageDto(Page<?> page) {
-        List<MetaDataDetailsDto> records = new ArrayList<>();
-        page.getRecords().forEach(r -> {
-            MetaDataDetailsDto m = new MetaDataDetailsDto();
-            BeanCopierUtils.copy(r, m);
-            records.add(m);
-        });
-
         IPage<MetaDataDetailsDto> pageDto = new Page<>();
         pageDto.setCurrent(page.getCurrent());
-        pageDto.setRecords(records);
+        pageDto.setRecords(BeanUtil.copyToList(page.getRecords(),MetaDataDetailsDto.class));
         pageDto.setSize(page.getSize());
         pageDto.setTotal(page.getTotal());
         return pageDto;

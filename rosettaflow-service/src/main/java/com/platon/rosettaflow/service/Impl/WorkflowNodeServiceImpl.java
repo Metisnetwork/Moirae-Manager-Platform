@@ -8,7 +8,6 @@ import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
@@ -67,6 +66,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         for (WorkflowNode workflowNode : workflowNodeList) {
             // 工作流节点dto
             WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
+
             // 算法对象
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
             if (Objects.nonNull(algorithmDto)) {
@@ -99,6 +99,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
         if (workflowNodeList.size() == 0) {
             return;
@@ -123,10 +124,13 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     // 将最后一个节点步骤的下一节点步骤字段值置空
                     node.setNextNodeStep(null);
                 }
-                node.setStatus((byte)1);
+                node.setStatus((byte) 1);
                 nodeBatchList.add(node);
                 // 去掉idList中需要保存的节点id，保留需要物理删除的节点
                 idList.remove(nodeReq.getId());
+            } else {
+                log.error("workflow node id:{},nodeName:{},nodeStep:{},have not save,please save first", nodeReq.getId(), nodeReq.getNodeName(), nodeReq.getNodeStep());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_CACHE.getMsg());
             }
         }
         this.updateBatchById(nodeBatchList);
@@ -139,7 +143,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowService.updateById(workflow);
     }
 
-    /** 物理删除不需要保存的工作流节点 */
+    /**
+     * 物理删除不需要保存的工作流节点
+     */
     private void removeWorkflowNode(List<Long> nodeIdList) {
         if (nodeIdList == null || nodeIdList.size() == 0) {
             return;
@@ -179,11 +185,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
                 inputList.add(workflowNodeInput.getId());
             }
-            List<WorkflowNodeOutput> workflowNodeOutputList  = workflowNodeOutputService.getByWorkflowNodeId(nodeId);
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(nodeId);
             if (workflowNodeOutputList == null || workflowNodeOutputList.size() == 0) {
                 continue;
             }
-            for(WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
+            for (WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
                 outputList.add(workflowNodeOutput.getId());
             }
             // 物理删除节点代码
@@ -202,7 +208,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Transactional(rollbackFor = Exception.class)
     public Long addWorkflowNode(WorkflowNode workflowNode) {
         // 暂存数据，数据为失效状态
-        workflowNode.setStatus((byte)0);
+        workflowNode.setStatus((byte) 0);
         this.save(workflowNode);
         return workflowNode.getId();
     }

@@ -100,6 +100,7 @@ public enum ErrorMsg {
      */
     WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "workflow node not exist"),
     WORKFLOW_NODE_EXIST("工作流节点已存在", "workflow node exist"),
+    WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "workflow node not cache"),
     /**
      * 工作流节点代码不存在
      */
