@@ -32,6 +32,11 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     }
 
     @Override
+    public List<WorkflowNodeInput> queryWorkflowNodeRelatedData(List<Long> idList) {
+        return this.baseMapper.queryWorkflowNodeRelatedData(idList);
+    }
+
+    @Override
     public void deleteByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaQuery();
         delWrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);

@@ -22,7 +22,7 @@ public class SaveNodeInputListReq {
     @Positive(message = "{workflow.node.id.positive}")
     private Long workflowNodeId;
 
-    @ApiModelProperty(value = "输入请求对象")
+    @ApiModelProperty(value = "输入请求对象", required = true)
     private List<SaveNodeInputReq> saveNodeInputReqList;
 
 }

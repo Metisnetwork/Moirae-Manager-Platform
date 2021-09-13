@@ -75,7 +75,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 if (Objects.nonNull(workflowNodeCode)) {
                     algorithmDto.setEditType(workflowNodeCode.getEditType());
                     algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
-                    workflowNodeDto.setAlgorithmDto(algorithmDto);
                 }
                 // 工作流节点算法资源环境, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeResource nodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
@@ -87,6 +86,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     algorithmDto.setRunTime(nodeResource.getRunTime());
                 }
             }
+            workflowNodeDto.setAlgorithmDto(algorithmDto);
             //工作流节点输入列表
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
             workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
@@ -117,6 +117,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 // 需要保存的节点按序号保存排序，并保持数据为生效状态
                 WorkflowNode node = new WorkflowNode();
                 node.setId(nodeReq.getId());
+                node.setNodeName(nodeReq.getNodeName());
                 node.setNodeStep(nodeReq.getNodeStep());
                 node.setNextNodeStep(nodeReq.getNodeStep() + 1);
                 if (++count == workflowNodeList.size()) {
@@ -287,6 +288,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 物理删除
             workflowNodeInputService.removeByIds(idList);
         }
+        // 保存数据、表、字段
+//        List<Long> dataIdList = new ArrayList<>();
+//        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+//            dataIdList.add(Long.parseLong(workflowNodeInput.getDataColumnIds()));
+//        }
+//        List<WorkflowNodeInput> inputList = workflowNodeInputService.queryWorkflowNodeRelatedData(dataIdList);
         // 新增
         workflowNodeInputService.saveBatch(workflowNodeInputList);
     }
