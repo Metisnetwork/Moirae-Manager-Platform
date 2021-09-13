@@ -33,11 +33,4 @@ public interface IAlgorithmVariableService extends IService<AlgorithmVariable> {
      */
     void truncate();
 
-    /**
-     * 根据算法id获取所有的算法变量
-     *
-     * @param algorithmId 算法id
-     * @return 算法变量列表
-     */
-    List<AlgorithmVariable> listByAlgorithmId(Long algorithmId);
 }

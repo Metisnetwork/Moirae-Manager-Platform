@@ -42,10 +42,6 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     @Resource
     IAlgorithmService algorithmService;
     @Resource
-    IAlgorithmCodeService algorithmCodeService;
-    @Resource
-    IAlgorithmVariableService algorithmVariableService;
-    @Resource
     private IWorkflowTempService workflowTempService;
     @Resource
     private IWorkflowNodeTempService workflowNodeTempService;
@@ -100,6 +96,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     private List<WorkflowTemp> queryWorkflowTempList(Long projTempId) {
         LambdaQueryWrapper<WorkflowTemp> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(WorkflowTemp::getProjectTempId, projTempId);
+        queryWrapper.eq(WorkflowTemp::getStatus, StatusEnum.VALID.getValue());
         return workflowTempMapper.selectList(queryWrapper);
     }
 
@@ -109,6 +106,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     private List<WorkflowNodeTemp> queryWorkflowNodeTempList(Long workflowTempId) {
         LambdaQueryWrapper<WorkflowNodeTemp> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(WorkflowNodeTemp::getWorkflowTempId, workflowTempId);
+        queryWrapper.eq(WorkflowNodeTemp::getStatus, StatusEnum.VALID.getValue());
         return workflowNodeTempMapper.selectList(queryWrapper);
     }
 

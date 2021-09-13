@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeInputMapper;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.platon.rosettaflow.service.IWorkflowNodeInputService;
@@ -25,9 +26,14 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     public List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeInput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeInput::getStatus, 1);
+        wrapper.eq(WorkflowNodeInput::getStatus, StatusEnum.VALID.getValue());
         wrapper.orderByAsc(WorkflowNodeInput::getPartyId);
         return this.list(wrapper);
+    }
+
+    @Override
+    public List<WorkflowNodeInput> queryWorkflowNodeRelatedData(List<Long> idList) {
+        return this.baseMapper.queryWorkflowNodeRelatedData(idList);
     }
 
     @Override
@@ -41,7 +47,7 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
         LambdaUpdateWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaUpdate();
         delWrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
-        delWrapper.set(WorkflowNodeInput::getStatus, 0);
+        delWrapper.set(WorkflowNodeInput::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
 }

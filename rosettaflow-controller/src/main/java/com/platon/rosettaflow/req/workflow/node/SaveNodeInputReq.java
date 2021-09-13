@@ -30,21 +30,11 @@ public class SaveNodeInputReq {
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
 
-    @ApiModelProperty(value = "组织名称")
-    @NotBlank(message = "{node.identity.name.NotBlank}")
-    private String identityName;
-
     @ApiModelProperty(value = "数据表ID")
     private String dataTableId;
-
-    @ApiModelProperty(value = "数据表名称")
-    private String dataTableName;
 
     @ApiModelProperty(value = "数据字段ID,多个以‘,’分隔")
     @NotBlank(message = "{node.identity.name.NotBlank}")
     private String dataColumnIds;
-
-    @ApiModelProperty(value = "数据字段名称,多个以‘,’分隔")
-    private String dataColumnNames;
 
 }

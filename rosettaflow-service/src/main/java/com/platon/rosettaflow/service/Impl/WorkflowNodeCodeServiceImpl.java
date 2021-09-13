@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeCodeMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
@@ -31,16 +32,8 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
     public WorkflowNodeCode getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeCode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeCode::getStatus, 1);
+        wrapper.eq(WorkflowNodeCode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
-    }
-
-    @Override
-    public void deleteByWorkflowNodeId(Long workflowNodeId) {
-        LambdaQueryWrapper<WorkflowNodeCode> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
-        delWrapper.eq(WorkflowNodeCode::getStatus, 1);
-        this.remove(delWrapper);
     }
 
     @Override
@@ -56,10 +49,18 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
     }
 
     @Override
+    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+        LambdaQueryWrapper<WorkflowNodeCode> delWrapper = Wrappers.lambdaQuery();
+        delWrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
+        delWrapper.eq(WorkflowNodeCode::getStatus, StatusEnum.UN_VALID.getValue());
+        this.remove(delWrapper);
+    }
+
+    @Override
     public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
         LambdaUpdateWrapper<WorkflowNodeCode> delWrapper = Wrappers.lambdaUpdate();
         delWrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
-        delWrapper.set(WorkflowNodeCode::getStatus, 0);
+        delWrapper.set(WorkflowNodeCode::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
 }

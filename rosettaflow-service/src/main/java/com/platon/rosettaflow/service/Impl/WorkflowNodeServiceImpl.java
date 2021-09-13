@@ -6,8 +6,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
+import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
@@ -66,7 +68,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         for (WorkflowNode workflowNode : workflowNodeList) {
             // 工作流节点dto
             WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
-
             // 算法对象
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
             if (Objects.nonNull(algorithmDto)) {
@@ -118,6 +119,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 // 需要保存的节点按序号保存排序，并保持数据为生效状态
                 WorkflowNode node = new WorkflowNode();
                 node.setId(nodeReq.getId());
+                node.setNodeName(nodeReq.getNodeName());
                 node.setNodeStep(nodeReq.getNodeStep());
                 node.setNextNodeStep(nodeReq.getNodeStep() + 1);
                 if (++count == workflowNodeList.size()) {
@@ -143,9 +145,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowService.updateById(workflow);
     }
 
-    /**
-     * 物理删除不需要保存的工作流节点
-     */
+    /** 物理删除不需要保存的工作流节点 */
     private void removeWorkflowNode(List<Long> nodeIdList) {
         if (nodeIdList == null || nodeIdList.size() == 0) {
             return;
@@ -179,18 +179,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             Long nodeId = workflowNode.getId();
             nodeIdList.add(nodeId);
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(nodeId);
-            if (workflowNodeInputList == null || workflowNodeInputList.size() == 0) {
-                continue;
+            if (workflowNodeInputList != null && workflowNodeInputList.size() > 0) {
+                for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+                    inputList.add(workflowNodeInput.getId());
+                }
             }
-            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-                inputList.add(workflowNodeInput.getId());
-            }
-            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(nodeId);
-            if (workflowNodeOutputList == null || workflowNodeOutputList.size() == 0) {
-                continue;
-            }
-            for (WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
-                outputList.add(workflowNodeOutput.getId());
+            List<WorkflowNodeOutput> workflowNodeOutputList  = workflowNodeOutputService.getByWorkflowNodeId(nodeId);
+            if (workflowNodeOutputList != null && workflowNodeOutputList.size() > 0) {
+                for(WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
+                    outputList.add(workflowNodeOutput.getId());
+                }
             }
             // 物理删除节点代码
             workflowNodeCodeService.deleteByWorkflowNodeId(nodeId);
@@ -208,7 +206,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Transactional(rollbackFor = Exception.class)
     public Long addWorkflowNode(WorkflowNode workflowNode) {
         // 暂存数据，数据为失效状态
-        workflowNode.setStatus((byte) 0);
+        workflowNode.setStatus(StatusEnum.UN_VALID.getValue());
         this.save(workflowNode);
         return workflowNode.getId();
     }

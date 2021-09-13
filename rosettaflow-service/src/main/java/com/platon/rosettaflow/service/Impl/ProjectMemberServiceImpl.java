@@ -1,10 +1,9 @@
 package com.platon.rosettaflow.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.dto.ProjMemberDto;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.ProjectMemberMapper;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.service.IProjectMemberService;
@@ -27,7 +26,7 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     public List<ProjectMember> queryByProjectId(Long projectId) {
         LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(ProjectMember::getProjectId, projectId);
-        queryWrapper.eq(ProjectMember::getStatus, 1);
+        queryWrapper.eq(ProjectMember::getStatus, StatusEnum.VALID.getValue());
         return this.list(queryWrapper);
     }
 

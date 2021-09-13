@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
@@ -125,7 +126,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             LambdaQueryWrapper<Project> queryWrapper = Wrappers.lambdaQuery();
             queryWrapper.eq(Project::getId, id);
-            queryWrapper.eq(Project::getStatus, 1);
+            queryWrapper.eq(Project::getStatus, StatusEnum.VALID.getValue());
             return this.getOne(queryWrapper);
         } catch (Exception e) {
             log.error("queryProjectDetails--查询项目详情失败, 错误信息:{}", e.getMessage());

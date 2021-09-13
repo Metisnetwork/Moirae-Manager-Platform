@@ -23,4 +23,21 @@
     data_table_name, data_column_ids, data_column_names, data_file_id, party_id, `status`, 
     create_time, update_time
   </sql>
+  <!-- 查询工作流节点输入相关数据 -->
+  <select id="queryWorkflowNodeRelatedData" parameterType="java.util.List" resultMap="BaseResultMap">
+    select
+        a.identity_name as identityName,
+        a.data_name as dataTableName,
+        b.column_name as dataColumnNames
+    from
+         t_meta_data a, t_meta_data_details b
+    where 1=1
+        and a.status = '1'
+        and b.status = '1'
+        and a.meta_data_id = b.meta_data_id
+        and b.id in
+        <foreach item="item" collection="idList" separator="," open="(" close=")">
+            #{item.id, jdbcType=BIGINT}
+        </foreach>
+  </select>
 </mapper>
