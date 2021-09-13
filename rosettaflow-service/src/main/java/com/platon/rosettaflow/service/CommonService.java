@@ -3,6 +3,8 @@ package com.platon.rosettaflow.service;
 import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.dto.UserDto;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -66,4 +68,11 @@ public class CommonService {
         return UUID.randomUUID().toString().replace("-", "").toLowerCase();
     }
 
+    public UserDto getCurrentUser() {
+        UserDto currentUser = UserContext.get();
+        if (null == currentUser) {
+            throw new BusinessException(RespCodeEnum.UN_LOGIN);
+        }
+        return currentUser;
+    }
 }

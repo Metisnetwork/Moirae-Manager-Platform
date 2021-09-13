@@ -78,21 +78,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public void logout(String address) {
-        LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(User::getAddress, address);
-        User user = this.getOne(wrapper);
-        if(Objects.isNull(user)){
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADDRESS_ERROR.getMsg());
-        }
-        // 获取token的key
-        String key = TokenServiceImpl.getTokenKey(user.getId());
-        // 获取token
-        String token = (String) redisUtil.get(key);
-        // 删除缓存中的token
-        redisUtil.delete(key);
-        // 删除缓存中的用户信息
-        redisUtil.delete(TokenServiceImpl.getUserKey(token));
+    public void logout() {
+        UserDto userDto = commonService.getCurrentUser();
+        tokenService.removeToken(userDto.getToken());
     }
 
     @Override

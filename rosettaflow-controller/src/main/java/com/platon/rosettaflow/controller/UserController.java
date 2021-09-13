@@ -2,12 +2,12 @@ package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.req.user.LoginInReq;
-import com.platon.rosettaflow.req.user.LoginOutReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.service.IUserService;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +68,10 @@ public class UserController {
 
     @PostMapping("logout")
     @ApiOperation(value = "用户登出", notes = "用户登出")
-    public ResponseVo<UserVo> logout(@RequestBody @Valid LoginOutReq loginOutReq) {
-        userService.logout(loginOutReq.get0xAddress());
-        return ResponseVo.create(RespCodeEnum.SUCCESS);
+    public ResponseVo<?> logout(HttpServletResponse httpServletResponse) {
+        userService.logout();
+        httpServletResponse.setHeader(SysConstant.HEADER_TOKEN_KEY, "");
+        return ResponseVo.createSuccess();
     }
 
     @PostMapping("updateNickName")

@@ -24,18 +24,16 @@ public interface IUserService extends IService<User> {
     /**
      * 生成用户token
      *
-     * @param address  用户钱包地址0x
-     * @param hrpAddress  hrp钱包地址
+     * @param address    用户钱包地址0x
+     * @param hrpAddress hrp钱包地址
      * @return 用户信息
      */
     UserDto generatorToken(String address, String hrpAddress);
 
     /**
      * 登出
-     *
-     * @param address 钱包地址
      */
-    void logout(String address);
+    void logout();
 
     /**
      * 修改昵称
