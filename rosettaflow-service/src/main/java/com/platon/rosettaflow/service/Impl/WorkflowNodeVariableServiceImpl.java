@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeVariableMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeVariable;
@@ -26,7 +27,7 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     public List<WorkflowNodeVariable> getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeVariable> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeVariable::getStatus, 1);
+        wrapper.eq(WorkflowNodeVariable::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
 
@@ -40,7 +41,7 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
         LambdaUpdateWrapper<WorkflowNodeVariable> delWrapper = Wrappers.lambdaUpdate();
         delWrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
-        delWrapper.set(WorkflowNodeVariable::getStatus, 0);
+        delWrapper.set(WorkflowNodeVariable::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
 

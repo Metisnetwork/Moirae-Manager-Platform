@@ -1,9 +1,9 @@
 package com.platon.rosettaflow.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.AlgorithmVariableMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.platon.rosettaflow.service.IAlgorithmVariableService;
@@ -23,9 +23,10 @@ import java.util.List;
 public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableMapper, AlgorithmVariable> implements IAlgorithmVariableService {
     @Override
     public List<AlgorithmVariable> getByAlgorithmId(Long algorithmId) {
-        LambdaUpdateWrapper<AlgorithmVariable> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(AlgorithmVariable::getAlgorithmId, algorithmId);
-        return this.list(wrapper);
+        LambdaQueryWrapper<AlgorithmVariable> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(AlgorithmVariable::getAlgorithmId, algorithmId);
+        queryWrapper.eq(AlgorithmVariable::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
     }
 
     @Override
@@ -52,10 +53,4 @@ public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableM
         this.baseMapper.truncate();
     }
 
-    @Override
-    public List<AlgorithmVariable> listByAlgorithmId(Long algorithmId) {
-        LambdaQueryWrapper<AlgorithmVariable> algorithmVariableWrapper = Wrappers.lambdaQuery();
-        algorithmVariableWrapper.eq(AlgorithmVariable::getAlgorithmId, algorithmId);
-        return this.list(algorithmVariableWrapper);
-    }
 }

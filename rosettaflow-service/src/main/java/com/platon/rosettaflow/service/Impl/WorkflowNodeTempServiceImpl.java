@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeTempMapper;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
@@ -31,6 +32,7 @@ public class WorkflowNodeTempServiceImpl extends ServiceImpl<WorkflowNodeTempMap
     public List<WorkflowNodeTemp> getByWorkflowTempId(Long workflowTempId) {
         LambdaQueryWrapper<WorkflowNodeTemp> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeTemp::getWorkflowTempId, workflowTempId);
+        wrapper.eq(WorkflowNodeTemp::getStatus, StatusEnum.VALID.getValue());
         wrapper.orderByAsc(WorkflowNodeTemp::getId);
         return this.list(wrapper);
     }

@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.AlgorithmCodeMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
@@ -29,7 +30,8 @@ public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, A
     public void updateAlgorithmCode(AlgorithmCode algorithmCode) {
         LambdaUpdateWrapper<AlgorithmCode> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(AlgorithmCode::getAlgorithmId, algorithmCode.getAlgorithmId());
-        this.update(updateWrapper);
+        updateWrapper.eq(AlgorithmCode::getStatus, StatusEnum.VALID.getValue());
+        this.update(algorithmCode, updateWrapper);
 
     }
 
@@ -37,6 +39,7 @@ public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, A
     public AlgorithmCode getByAlgorithmId(Long algorithmId) {
         LambdaUpdateWrapper<AlgorithmCode> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(AlgorithmCode::getAlgorithmId, algorithmId);
+        wrapper.eq(AlgorithmCode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
