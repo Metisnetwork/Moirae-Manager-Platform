@@ -419,7 +419,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         for (WorkflowNodeInput input : workflowNodeInputList) {
             taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             taskOrganizationIdentityInfoDto.setPartyId(input.getPartyId());
-            taskOrganizationIdentityInfoDto.setNodeName(input.getIdentityName());
             taskOrganizationIdentityInfoDto.setNodeId(input.getNodeId());
             taskOrganizationIdentityInfoDto.setIdentityId(input.getIdentityId());
 
