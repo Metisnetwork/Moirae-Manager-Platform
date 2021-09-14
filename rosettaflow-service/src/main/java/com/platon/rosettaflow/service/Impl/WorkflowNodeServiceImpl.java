@@ -9,7 +9,6 @@ import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
@@ -75,8 +74,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(workflowNodeCode)) {
                     algorithmDto.setEditType(workflowNodeCode.getEditType());
-                    algorithmDto.setAlgorithmCode(workflowNodeCode.getCalculateContractCode());
-                    workflowNodeDto.setAlgorithmDto(algorithmDto);
+                    algorithmDto.setCalculateContractCode(workflowNodeCode.getCalculateContractCode());
                 }
                 // 工作流节点算法资源环境, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeResource nodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
@@ -88,6 +86,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     algorithmDto.setRunTime(nodeResource.getRunTime());
                 }
             }
+            workflowNodeDto.setAlgorithmDto(algorithmDto);
             //工作流节点输入列表
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
             workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
@@ -100,7 +99,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
         if (workflowNodeList.size() == 0) {
             return;
@@ -126,7 +124,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     // 将最后一个节点步骤的下一节点步骤字段值置空
                     node.setNextNodeStep(null);
                 }
-                node.setStatus((byte) 1);
+                node.setStatus((byte)1);
                 nodeBatchList.add(node);
                 // 去掉idList中需要保存的节点id，保留需要物理删除的节点
                 idList.remove(nodeReq.getId());
@@ -243,6 +241,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getId, workflowId);
         wrapper.eq(WorkflowNode::getNodeStep, nodeStep);
+        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         WorkflowNode workflowNode = this.getOne(wrapper);
         if (workflowNode == null) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
@@ -252,6 +251,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public List<WorkflowNode> getAllWorkflowNodeList(Long workflowId) {
+        // 查询所有节点（包含失效数据）
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         // 所有节点正序排序
@@ -263,7 +263,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public List<WorkflowNode> getWorkflowNodeList(Long workflowId) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
-        wrapper.eq(WorkflowNode::getStatus, 1);
+        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         // 所有节点正序排序
         wrapper.orderByAsc(WorkflowNode::getNodeStep);
         return this.list(wrapper);
@@ -273,7 +273,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public WorkflowNode getWorkflowNodeById(Long id) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getId, id);
-        wrapper.eq(WorkflowNode::getStatus, 1);
+        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
@@ -291,6 +291,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 物理删除
             workflowNodeInputService.removeByIds(idList);
         }
+        // 保存数据、表、字段
+//        List<Long> dataIdList = new ArrayList<>();
+//        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+//            dataIdList.add(Long.parseLong(workflowNodeInput.getDataColumnIds()));
+//        }
+//        List<WorkflowNodeInput> inputList = workflowNodeInputService.queryWorkflowNodeRelatedData(dataIdList);
         // 新增
         workflowNodeInputService.saveBatch(workflowNodeInputList);
     }
@@ -377,9 +383,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             //添加工作流节点代码
             workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
             //查询节点代码对应的算法列表
-            List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.listByAlgorithmId(workflowNodeTemp.getAlgorithmId());
-            //保存工作流输入变量
-            workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
+            List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNodeTemp.getAlgorithmId());
+           if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
+               //保存工作流输入变量
+               workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
+           }
         }
     }
 }

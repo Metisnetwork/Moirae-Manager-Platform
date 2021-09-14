@@ -37,10 +37,10 @@ public class NodeAlgorithmVo {
     @ApiModelProperty(value = "支持语言,多个以\",\"进行分隔")
     private String supportLanguage;
 
-    @ApiModelProperty(value = "编辑类型:1-sql, 2-noteBook")
+    @ApiModelProperty(value = "算法编辑类型:1-sql, 2-noteBook")
     private Byte editType;
 
-    @ApiModelProperty(value = "代码（计算合约）")
+    @ApiModelProperty(value = "算法代码（计算合约）")
     private String calculateContractCode;
 
     @ApiModelProperty(value = "数据分片合约")

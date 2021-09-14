@@ -64,7 +64,7 @@
         a.cost_bandwidth as costBandwidth,
         a.run_time as runTime,
         b.edit_type as editType,
-        b.calculate_contract_code as algorithmCode
+        b.calculate_contract_code as calculateContractCode
     from
         t_algorithm a, t_algorithm_code b
     where 1=1

@@ -46,7 +46,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             AlgorithmCode algorithmCode = new AlgorithmCode();
             algorithmCode.setAlgorithmId(algorithm.getId());
             algorithmCode.setEditType(algorithmDto.getEditType());
-            algorithmCode.setCalculateContractCode(algorithmDto.getAlgorithmCode());
+            algorithmCode.setCalculateContractCode(algorithmDto.getCalculateContractCode());
             algorithmCodeService.addAlgorithmCode(algorithmCode);
         } catch (Exception e) {
             log.error("addAlgorithm--新增算法失败, 错误信息:{}", e.getMessage());
@@ -67,13 +67,12 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             AlgorithmCode algorithmCode = new AlgorithmCode();
             algorithmCode.setAlgorithmId(algorithmDto.getAlgorithmId());
             algorithmCode.setEditType(algorithmDto.getEditType());
-            algorithmCode.setCalculateContractCode(algorithmDto.getAlgorithmCode());
+            algorithmCode.setCalculateContractCode(algorithmDto.getCalculateContractCode());
             algorithmCodeService.updateAlgorithmCode(algorithmCode);
         } catch (Exception e) {
             log.error("updateAlgorithm--修改算法失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.UPDATE_ALG_ERROR.getMsg());
         }
-
     }
 
     @Override
