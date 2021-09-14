@@ -66,7 +66,7 @@ public class UserController {
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 
-    @PostMapping("logout")
+    @GetMapping("logout")
     @ApiOperation(value = "用户登出", notes = "用户登出")
     public ResponseVo<?> logout(HttpServletResponse httpServletResponse) {
         userService.logout();
