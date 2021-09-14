@@ -57,6 +57,7 @@
         a.max_numbers as maxNumbers,
         a.min_numbers as minNumbers,
         a.support_language as supportLanguage,
+        a.support_os_system as supportOsSystem,
         a.algorithm_type as algorithmType,
         a.cost_mem as costMem,
         a.cost_cpu as costCpu,
