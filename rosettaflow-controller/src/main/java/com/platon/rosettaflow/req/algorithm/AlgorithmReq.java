@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  * @author houz
@@ -64,5 +65,15 @@ public class AlgorithmReq {
     @ApiModelProperty(value = "算法代码", example = "code")
     private String algorithmCode;
 
+    /** 保存时处理内存单位 */
+    public void setCostMem() {
+        BigDecimal bd = new BigDecimal(this.costMem);
+        this.costMem = bd.divide(BigDecimal.valueOf(1024 * 1024 * 1024)).longValue();
+    }
 
+    /** 保存时处理带宽单位 */
+    public void setCostBandwidth() {
+        BigDecimal bd = new BigDecimal(this.costBandwidth);
+        this.costBandwidth = bd.divide(BigDecimal.valueOf(1000 * 1000)).longValue();
+    }
 }

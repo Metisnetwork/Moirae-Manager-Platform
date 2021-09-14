@@ -2,6 +2,8 @@ package com.platon.rosettaflow.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author houz
  */

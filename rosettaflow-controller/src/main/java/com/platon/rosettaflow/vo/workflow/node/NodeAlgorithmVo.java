@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 工作流节点代码响应参数
  * @author hudenian
@@ -43,19 +45,33 @@ public class NodeAlgorithmVo {
     @ApiModelProperty(value = "算法代码（计算合约）")
     private String calculateContractCode;
 
-    @ApiModelProperty(value = "数据分片合约")
-    private String dataSplitContractCode;
-
     @ApiModelProperty(value = "所需的内存 (单位: byte)")
     private Long costMem;
 
     @ApiModelProperty(value = "所需的核数 (单位: 个)")
-    private Long costProcessor;
+    private Integer costCpu;
 
     @ApiModelProperty(value = "GPU核数(单位：核)")
     private Integer costGpu;
 
     @ApiModelProperty(value = "所需的带宽 (单位: bps)")
     private Long costBandwidth;
+
+
+    /** 展示时处理内存单位 */
+    public Long getCostMem() {
+        return new BigDecimal(this.costMem)
+                .divide(BigDecimal.valueOf(1024 * 1024 * 1024))
+                .setScale(0, BigDecimal.ROUND_UP)
+                .longValue();
+    }
+
+    /** 展示时处理带宽单位 */
+    public Long getCostBandwidth() {
+        return new BigDecimal(this.costBandwidth)
+                .divide(BigDecimal.valueOf(1000 * 1000))
+                .setScale(0, BigDecimal.ROUND_UP)
+                .longValue();
+    }
 
 }

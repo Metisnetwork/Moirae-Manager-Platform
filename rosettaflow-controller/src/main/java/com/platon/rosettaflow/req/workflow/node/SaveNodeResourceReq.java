@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.math.BigDecimal;
 
 /**
  * 添加工作流节点资源请求对象
@@ -40,5 +40,21 @@ public class SaveNodeResourceReq {
 
     @ApiModelProperty(value = "工作流节点运行时长")
     private Long runTime;
+
+    /** 保存时处理内存单位 */
+    public Long getCostMem() {
+        return new BigDecimal(this.costMem)
+                .multiply(BigDecimal.valueOf(1024 * 1024 * 1024))
+                .setScale(0, BigDecimal.ROUND_UP)
+                .longValue();
+    }
+
+    /** 保存时处理带宽单位 */
+    public Long getCostBandwidth() {
+        return new BigDecimal(this.costBandwidth)
+                .multiply(BigDecimal.valueOf(1000 * 1000))
+                .setScale(0, BigDecimal.ROUND_UP)
+                .longValue();
+    }
 
 }
