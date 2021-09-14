@@ -5,6 +5,7 @@ import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platone.sdk.utlis.Bech32;
+import org.web3j.crypto.WalletUtils;
 import org.web3j.utils.Numeric;
 
 import java.io.ByteArrayOutputStream;
@@ -198,6 +199,9 @@ public class AddressChangeUtils {
     public static String convert0XAddress(String hrpAddress){
         if(!StrUtil.isNotBlank(hrpAddress)){
             throw new RuntimeException("hrpAddress can not blank");
+        }
+        if(Numeric.containsHexPrefix(hrpAddress) && WalletUtils.isValidAddress(hrpAddress)){
+            return hrpAddress;
         }
         try{
             return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));

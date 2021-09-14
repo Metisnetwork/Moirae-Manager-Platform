@@ -93,14 +93,15 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "96597633efc04add9a9f8dfa49cca9f4";
+        String uuid = "d6a151c0703d47e6baa068700e8c5381";
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
 
         try {
             json = StrUtil.format(json, uuid);
             System.out.println("加密的json字符串为>>>" + json);
             Credentials credentials = Credentials.create("567762b8a66385de7bfc6fd96f5de618da1389b6974638c995c5e94a861b922b");
-            System.out.println(credentials.getAddress());
+            System.out.println("钱包hrp地址>>>" + credentials.getAddress());
+            System.out.println("钱包0x地址>>>" + AddressChangeUtils.convert0XAddress(credentials.getAddress()));
 
             System.out.println("签名结果>>>" + signTypedDataV4(json, credentials.getEcKeyPair()));
 
