@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 工作流节点服务实现类
@@ -201,12 +199,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Long addWorkflowNode(WorkflowNode workflowNode) {
+    public Map<String, Object> addWorkflowNode(WorkflowNode workflowNode) {
+        Map<String, Object> respMap = new HashMap<>(4);
         // 暂存数据，数据为失效状态
         workflowNode.setStatus(StatusEnum.UN_VALID.getValue());
         this.save(workflowNode);
-        return workflowNode.getId();
+        // 查询算法详情并返回
+        AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
+        respMap.put("workflowNodeId", workflowNode.getId());
+        respMap.put("algorithmDto", algorithmDto == null ? new AlgorithmDto() : algorithmDto);
+        return respMap;
     }
 
     @Override

@@ -13,11 +13,11 @@ import lombok.Data;
 @ApiModel(value = "工作流节点代码响应参数")
 public class NodeAlgorithmVo {
 
-    @ApiModelProperty(value = "工作流节点代码表主键ID")
-    private Long id;
-
     @ApiModelProperty(value = "工作流节点表主键ID")
     private Long workflowNodeId;
+
+    @ApiModelProperty(value = "算法id")
+    private Long algorithmId;
 
     @ApiModelProperty(value = "算法名称")
     private String algorithmName;

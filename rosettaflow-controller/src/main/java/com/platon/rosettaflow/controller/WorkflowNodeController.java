@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 工作流节点管理关接口
@@ -81,12 +82,12 @@ public class WorkflowNodeController {
 
     @PostMapping("add")
     @ApiOperation(value = "添加工作流节点", notes = "添加工作流节点")
-    public ResponseVo<AddWorkflowNodeVo> add(@RequestBody @Validated AddWorkflowNodeReq addNodeReq) {
+    public ResponseVo<NodeAlgorithmVo> add(@RequestBody @Validated AddWorkflowNodeReq addNodeReq) {
         WorkflowNode workflowNode = BeanUtil.toBean(addNodeReq, WorkflowNode.class);
-        Long workflowNodeId = workflowNodeService.addWorkflowNode(workflowNode);
-        AddWorkflowNodeVo addWorkflowNodeVo = new AddWorkflowNodeVo();
-        addWorkflowNodeVo.setWorkflowNodeId(workflowNodeId);
-        return ResponseVo.createSuccess(addWorkflowNodeVo);
+        Map<String, Object> respMap = workflowNodeService.addWorkflowNode(workflowNode);
+        NodeAlgorithmVo nodeAlgorithmVo = BeanUtil.toBean(respMap.get("algorithmDto"), NodeAlgorithmVo.class);
+        nodeAlgorithmVo.setWorkflowNodeId((Long) respMap.get("workflowNodeId"));
+        return ResponseVo.createSuccess(nodeAlgorithmVo);
     }
 
     @PostMapping("rename")

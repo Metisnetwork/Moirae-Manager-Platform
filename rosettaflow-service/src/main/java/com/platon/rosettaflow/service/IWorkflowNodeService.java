@@ -6,6 +6,7 @@ import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 工作流节点服务
@@ -43,7 +44,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param workflowNode 节点信息
      * @return Long
      */
-    Long addWorkflowNode(WorkflowNode workflowNode);
+    Map<String, Object> addWorkflowNode(WorkflowNode workflowNode);
 
     /**
      * 工作流节点重命名
