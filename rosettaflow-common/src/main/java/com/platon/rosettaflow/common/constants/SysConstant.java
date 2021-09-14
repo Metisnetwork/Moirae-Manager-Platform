@@ -67,8 +67,9 @@ public class SysConstant {
     /**
      * 不需要用户登录可以访问的接口
      */
-    public static final String[] LOGIN_URIS = {"user/login",
+    public static final String[] LOGIN_URIS = {
             "user/getLoginNonce",
+            "user/login",
             "swagger",
             "error",
             "api-docs",

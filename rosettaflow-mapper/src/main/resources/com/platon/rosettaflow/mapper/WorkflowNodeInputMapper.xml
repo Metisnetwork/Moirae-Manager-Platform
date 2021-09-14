@@ -6,12 +6,9 @@
     <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId" />
     <result column="data_type" jdbcType="TINYINT" property="dataType" />
     <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
-    <result column="identity_name" jdbcType="VARCHAR" property="identityName" />
     <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
     <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId" />
-    <result column="data_table_name" jdbcType="VARCHAR" property="dataTableName" />
     <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds" />
-    <result column="data_column_names" jdbcType="VARCHAR" property="dataColumnNames" />
     <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId" />
     <result column="party_id" jdbcType="VARCHAR" property="partyId" />
     <result column="status" jdbcType="TINYINT" property="status" />
@@ -19,25 +16,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, workflow_node_id, data_type, identity_id, identity_name, node_id, data_table_id, 
-    data_table_name, data_column_ids, data_column_names, data_file_id, party_id, `status`, 
-    create_time, update_time
+    id, workflow_node_id, data_type, identity_id, node_id, data_table_id,
+    data_column_id, data_file_id, party_id, `status`, create_time, update_time
   </sql>
-  <!-- 查询工作流节点输入相关数据 -->
-  <select id="queryWorkflowNodeRelatedData" parameterType="java.util.List" resultMap="BaseResultMap">
-    select
-        a.identity_name as identityName,
-        a.data_name as dataTableName,
-        b.column_name as dataColumnNames
-    from
-         t_meta_data a, t_meta_data_details b
-    where 1=1
-        and a.status = '1'
-        and b.status = '1'
-        and a.meta_data_id = b.meta_data_id
-        and b.id in
-        <foreach item="item" collection="idList" separator="," open="(" close=")">
-            #{item.id, jdbcType=BIGINT}
-        </foreach>
-  </select>
 </mapper>

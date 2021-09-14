@@ -281,7 +281,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public void saveWorkflowNodeInput(Long workflowNodeId, List<WorkflowNodeInput> workflowNodeInputList) {
         List<WorkflowNodeInput> nodeInputList =
                 workflowNodeInputService.getByWorkflowNodeId(workflowNodeId);
-
         // 如果已存在则全部删除，并新增
         if (nodeInputList != null && nodeInputList.size() > 0) {
             List<Long> idList = new ArrayList<>();
@@ -291,12 +290,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 物理删除
             workflowNodeInputService.removeByIds(idList);
         }
-        // 保存数据、表、字段
-//        List<Long> dataIdList = new ArrayList<>();
-//        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-//            dataIdList.add(Long.parseLong(workflowNodeInput.getDataColumnIds()));
-//        }
-//        List<WorkflowNodeInput> inputList = workflowNodeInputService.queryWorkflowNodeRelatedData(dataIdList);
         // 新增
         workflowNodeInputService.saveBatch(workflowNodeInputList);
     }
