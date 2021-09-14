@@ -6,7 +6,9 @@ package rpcapi;
 
 
 import "lib/common/base.proto";
+import "lib/common/data.proto";
 import "lib/types/resourcedata.proto";
+import "lib/api/task_rpc_api.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
