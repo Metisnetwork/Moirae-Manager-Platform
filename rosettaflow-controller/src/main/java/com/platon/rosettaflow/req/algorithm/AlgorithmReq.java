@@ -66,14 +66,18 @@ public class AlgorithmReq {
     private String algorithmCode;
 
     /** 保存时处理内存单位 */
-    public void setCostMem() {
-        BigDecimal bd = new BigDecimal(this.costMem);
-        this.costMem = bd.divide(BigDecimal.valueOf(1024 * 1024 * 1024)).longValue();
+    public Long getCostMem() {
+        return new BigDecimal(this.costMem)
+                .multiply(BigDecimal.valueOf(1024 * 1024 * 1024))
+                .setScale(0, BigDecimal.ROUND_UP)
+                .longValue();
     }
 
     /** 保存时处理带宽单位 */
-    public void setCostBandwidth() {
-        BigDecimal bd = new BigDecimal(this.costBandwidth);
-        this.costBandwidth = bd.divide(BigDecimal.valueOf(1000 * 1000)).longValue();
+    public Long getCostBandwidth() {
+        return new BigDecimal(this.costBandwidth)
+                .multiply(BigDecimal.valueOf(1000 * 1000))
+                .setScale(0, BigDecimal.ROUND_UP)
+                .longValue();
     }
 }
