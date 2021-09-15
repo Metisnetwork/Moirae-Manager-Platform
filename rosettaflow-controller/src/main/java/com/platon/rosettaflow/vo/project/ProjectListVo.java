@@ -20,6 +20,9 @@ public class ProjectListVo {
     @ApiModelProperty(value = "项目名称")
     private String projectName;
 
+    @ApiModelProperty(value = "项目描述")
+    private String projectDesc;
+
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 

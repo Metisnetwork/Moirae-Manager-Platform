@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.AlgorithmConstant;
 import com.platon.rosettaflow.common.constants.SysConstant;
+import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -96,13 +97,13 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         List<Map<String, Object>> treeList = new ArrayList<>(SysConstant.INT_4);
         Map<String, Object> param1 = new HashMap<>(SysConstant.INT_4);
         param1.put("algorithmId", SysConstant.INT_1);
-        param1.put("algorithmName", AlgorithmConstant.ALGORITHM_TYPE_1);
+        param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
         Map<String, Object> param2 = new HashMap<>(SysConstant.INT_4);
         param2.put("algorithmId", SysConstant.INT_2);
-        param2.put("algorithmName", AlgorithmConstant.ALGORITHM_TYPE_2);
+        param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
         Map<String, Object> param3 = new HashMap<>(SysConstant.INT_4);
         param3.put("algorithmId", SysConstant.INT_3);
-        param3.put("algorithmName", AlgorithmConstant.ALGORITHM_TYPE_3);
+        param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
         List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmList(null);
         if (algorithmDtoList == null || algorithmDtoList.size() == 0) {
             treeList.add(param1);

@@ -18,6 +18,7 @@
     select
         a.id as id,
         a.project_name as projectName,
+        a.project_desc as projectDesc,
         a.create_time as createTime,
         b.user_name as userName
     from

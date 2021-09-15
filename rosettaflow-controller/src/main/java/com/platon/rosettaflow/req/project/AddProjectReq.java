@@ -20,7 +20,6 @@ public class AddProjectReq {
     private String projectName;
 
     @ApiModelProperty(value = "项目描述", required = true)
-    @NotBlank(message = "{project.describe.notBlank}")
     private String projectDesc;
 
     @ApiModelProperty(value = "项目模板ID")
