@@ -1,5 +1,7 @@
 package com.platon.rosettaflow.vo.algorithm;
 
+import com.platon.rosettaflow.common.enums.AlgorithmCodeEditTypeEnum;
+import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -35,6 +37,9 @@ public class AlgDetailsVo {
     @ApiModelProperty(value = "算法所属大类:1-统计分析,2-特征工程,3-机器学习")
     private Byte algorithmType;
 
+    @ApiModelProperty(value = "算法所属大类:1-统计分析,2-特征工程,3-机器学习")
+    private String algorithmTypeDesc;
+
     @ApiModelProperty(value = "所需的内存 (单位: byte)")
     private Long costMem;
 
@@ -55,4 +60,5 @@ public class AlgDetailsVo {
 
     @ApiModelProperty(value = "算法代码")
     private String algorithmCode;
+
 }

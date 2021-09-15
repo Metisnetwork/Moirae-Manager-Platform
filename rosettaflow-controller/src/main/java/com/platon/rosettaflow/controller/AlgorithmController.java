@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.req.algorithm.AlgDetailsReq;
 import com.platon.rosettaflow.req.algorithm.AlgListReq;
@@ -62,7 +63,9 @@ public class AlgorithmController {
     @ApiOperation(value = "查询算法详情", notes = "查询算法详情")
     public ResponseVo<AlgDetailsVo> detail(@ApiParam(value = "算法表ID", required = true) @PathVariable Long id) {
         AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(id);
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class));
+        AlgDetailsVo algDetailsVo = BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class);
+        algDetailsVo.setAlgorithmTypeDesc(AlgorithmTypeEnum.getDesc(algorithmDto.getAlgorithmType()));
+        return ResponseVo.createSuccess(algDetailsVo);
     }
 
     @GetMapping("queryAlgorithmTreeList")
