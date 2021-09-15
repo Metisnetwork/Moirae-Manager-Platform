@@ -1,5 +1,7 @@
 package com.platon.rosettaflow.req.workflow.node;
 
+import com.platon.rosettaflow.common.constants.AlgorithmConstant;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -44,16 +46,17 @@ public class SaveNodeResourceReq {
     /** 保存时处理内存单位 */
     public Long getCostMem() {
         return new BigDecimal(this.costMem)
-                .multiply(BigDecimal.valueOf(1024 * 1024 * 1024))
-                .setScale(0, BigDecimal.ROUND_UP)
+                .multiply(BigDecimal.valueOf(AlgorithmConstant.INT_1024
+                        * AlgorithmConstant.INT_1024 * AlgorithmConstant.INT_1024))
+                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
                 .longValue();
     }
 
     /** 保存时处理带宽单位 */
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
-                .multiply(BigDecimal.valueOf(1000 * 1000))
-                .setScale(0, BigDecimal.ROUND_UP)
+                .multiply(BigDecimal.valueOf(AlgorithmConstant.INT_1000 * AlgorithmConstant.INT_1000))
+                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
                 .longValue();
     }
 

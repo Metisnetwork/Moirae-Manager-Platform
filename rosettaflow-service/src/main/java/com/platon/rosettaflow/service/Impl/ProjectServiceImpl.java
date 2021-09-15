@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.ProjectMemberRoleEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -66,12 +67,18 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             project.setProjectName(projectDto.getProjectName());
             project.setProjectDesc(projectDto.getProjectDesc());
             this.save(project);
+            // 默认当前用户为管理员
+            ProjectMember projectMember = new ProjectMember();
+            projectMember.setProjectId(project.getId());
+            projectMember.setUserId(userId);
+            projectMember.setRole(ProjectMemberRoleEnum.ADMIN.getRoleId());
+            addProjMember(projectMember);
 
-            //如果项目模板不为空，将项目模板中的工作流复制到当前项目
+            // 如果项目模板ID不为空，将项目模板中的工作流复制到当前项目
             if (null != projectDto.getProjectTempId() && projectDto.getProjectTempId() > 0) {
-                WorkflowTemp workflowTemp = workflowTempService.getById(projectDto.getProjectTempId());
+                WorkflowTemp workflowTemp = workflowTempService.getWorkflowTemplate(projectDto.getProjectTempId());
                 if (null != workflowTemp) {
-                    //添加工作流
+                    // 添加工作流
                     Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), workflowTemp);
 
                     //从工作流节点模板中复制所有工作流节点

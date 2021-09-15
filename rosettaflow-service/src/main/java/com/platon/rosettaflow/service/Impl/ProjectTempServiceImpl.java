@@ -80,7 +80,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         // 添加工作流模板
         long workflowTemplateId = workflowTempService.addWorkflowTemplate(projectTemplateId, workflow);
 
-        //添加工作流对应的节点模板
+        // 添加工作流对应的节点模板
         List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
         workflowNodeTempService.addWorkflowNodeList(workflowTemplateId, workflowNodeList);
     }

@@ -12,8 +12,9 @@ import java.util.Map;
 public interface UserMapper extends BaseMapper<User> {
 
     /**
-     * 查询所有用户昵称
+     * 查询所有用户昵称（不包含自己）
+     * @param curUserId
      * @return
      */
-    List<Map<String, Object>> queryAllUserNickname();
+    List<User> queryAllUserNickname(Long curUserId);
 }

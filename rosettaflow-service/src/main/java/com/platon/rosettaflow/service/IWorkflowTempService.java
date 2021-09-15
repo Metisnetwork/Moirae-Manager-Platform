@@ -23,4 +23,11 @@ public interface IWorkflowTempService extends IService<WorkflowTemp> {
      * @return 工作流模板id
      */
     Long addWorkflowTemplate(long projectTemplateId, Workflow workflow);
+
+    /**
+     * 查询工作流模板
+     * @param projectTempId 项目模板id
+     * @return 工作流模板
+     */
+    WorkflowTemp getWorkflowTemplate(long projectTempId);
 }

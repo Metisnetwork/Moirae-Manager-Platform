@@ -45,10 +45,9 @@ public interface IUserService extends IService<User> {
 
     /**
      * 查询所有用户昵称
-     *
-     * @return 所有用户昵称
+     * @return User
      */
-    List<Map<String, Object>> queryAllUserNickName();
+    List<User> queryAllUserNickName();
 
     /**
      * 获取登录nonce

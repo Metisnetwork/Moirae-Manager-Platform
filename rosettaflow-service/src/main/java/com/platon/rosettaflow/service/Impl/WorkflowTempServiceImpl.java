@@ -1,6 +1,9 @@
 package com.platon.rosettaflow.service.Impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowTempMapper;
 import com.platon.rosettaflow.mapper.domain.*;
@@ -32,5 +35,13 @@ public class WorkflowTempServiceImpl extends ServiceImpl<WorkflowTempMapper, Wor
         workflowTemp.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
         this.save(workflowTemp);
         return workflowTemp.getId();
+    }
+
+    @Override
+    public WorkflowTemp getWorkflowTemplate(long projectTempId) {
+        LambdaQueryWrapper<WorkflowTemp> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(WorkflowTemp::getProjectTempId, projectTempId);
+        queryWrapper.eq(WorkflowTemp::getStatus, StatusEnum.VALID.getValue());
+        return this.getOne(queryWrapper);
     }
 }

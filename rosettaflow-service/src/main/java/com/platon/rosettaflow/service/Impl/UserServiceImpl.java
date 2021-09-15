@@ -20,6 +20,7 @@ import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.service.CommonService;
 import com.platon.rosettaflow.service.ITokenService;
 import com.platon.rosettaflow.service.IUserService;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -99,8 +100,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public List<Map<String, Object>> queryAllUserNickName() {
-        return userMapper.queryAllUserNickname();
+    public List<User> queryAllUserNickName() {
+        Long curUserId = UserContext.get().getId();
+        if (curUserId == null || curUserId == 0L) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
+        }
+        return userMapper.queryAllUserNickname(curUserId);
     }
 
     @Override

@@ -13,14 +13,16 @@
     id, user_name, address, `status`, create_time, update_time
     </sql>
 
-    <!-- 查询所有用户昵称 -->
-    <select id="queryAllUserNickname" resultType="java.util.Map">
+    <!-- 查询所有用户昵称（不包含自己） -->
+    <select id="queryAllUserNickname" resultType="com.platon.rosettaflow.mapper.domain.User">
         select
             id as id,
             user_name as userName
         from
             t_user
-        where status = '1'
+        where 1=1
+            and status = '1'
+            and id != #{curUserId, jdbcType=BIGINT}
     </select>
 
 </mapper>

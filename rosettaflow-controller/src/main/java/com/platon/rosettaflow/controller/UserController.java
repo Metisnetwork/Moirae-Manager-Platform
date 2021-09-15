@@ -7,6 +7,7 @@ import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.UserDto;
+import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.service.IUserService;
@@ -82,9 +83,9 @@ public class UserController {
     }
 
     @GetMapping("queryAllUserNickname")
-    @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称")
+    @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称(不包含自己)")
     public ResponseVo<List<UserNicknameVo>> queryAllUserNickname() {
-        List<Map<String, Object>> list = userService.queryAllUserNickName();
+        List<User> list = userService.queryAllUserNickName();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
 
