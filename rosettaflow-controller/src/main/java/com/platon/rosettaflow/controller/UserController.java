@@ -83,7 +83,7 @@ public class UserController {
     }
 
     @GetMapping("queryAllUserNickname")
-    @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称(不包含自己)")
+    @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称")
     public ResponseVo<List<UserNicknameVo>> queryAllUserNickname() {
         List<User> list = userService.queryAllUserNickName();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
