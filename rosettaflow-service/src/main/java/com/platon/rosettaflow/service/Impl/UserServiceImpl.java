@@ -101,11 +101,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public List<User> queryAllUserNickName() {
-        Long curUserId = UserContext.get().getId();
-        if (curUserId == null || curUserId == 0L) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
-        }
-        return userMapper.queryAllUserNickname(curUserId);
+        return userMapper.queryAllUserNickname();
     }
 
     @Override
