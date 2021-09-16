@@ -34,7 +34,10 @@ public class TaskDto {
      * 任务发起者 组织信息
      */
     private OrganizationIdentityInfoDto sender;
-
+    /**
+     * 任务算法提供方 组织信息
+     */
+    private OrganizationIdentityInfoDto algoSupplier;
     /**
      * 任务的数据提供方, 包含发起者和参与方
      */

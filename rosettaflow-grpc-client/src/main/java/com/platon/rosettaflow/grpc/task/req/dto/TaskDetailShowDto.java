@@ -11,7 +11,7 @@ import java.util.List;
  * @description 任务详情
  */
 @Data
-public class TaskDetailDto {
+public class TaskDetailShowDto {
     /**
      * 任务Id
      */
@@ -21,9 +21,17 @@ public class TaskDetailDto {
      */
     private String taskName;
     /**
-     * 任务发起方
+     * 发起任务的用户的信息 (task是属于用户的)
      */
-    private OrganizationIdentityInfoDto owner;
+    private String user;
+    /**
+     * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+     */
+    private Integer userType;
+    /**
+     * 任务发起者 组织信息
+     */
+    private OrganizationIdentityInfoDto sender;
     /**
      * 算法提供方 (目前就是和 任务发起方是同一个 ...)
      */

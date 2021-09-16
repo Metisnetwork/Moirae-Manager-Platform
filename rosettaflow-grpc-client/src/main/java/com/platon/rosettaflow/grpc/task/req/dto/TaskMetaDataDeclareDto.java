@@ -15,9 +15,13 @@ public class TaskMetaDataDeclareDto {
      * 元数据id
      */
     private String metaDataId;
+    /**
+     * 该任务用来作为计算时数据表的索引列 (类比数据库中的id列意思)
+     */
+    private Integer keyColumn;
 
     /**
-     * 该任务使用原始数据的第几列
+     * 该任务用来参与计算的原始数据的第几列数组 (类比数据库中非id列意思)
      */
-    private List<Integer> columnIndexList;
+    private List<Integer> selectedColumns;
 }

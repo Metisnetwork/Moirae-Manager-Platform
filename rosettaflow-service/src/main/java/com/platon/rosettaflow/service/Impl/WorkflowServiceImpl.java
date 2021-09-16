@@ -342,6 +342,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskDto.setUserType(UserTypeEnum.checkUserType(address));
         //设置发起方
         taskDto.setSender(getSender());
+        //任务算法提供方 组织信息
+        taskDto.setAlgoSupplier(getAlgoSupplier(taskDto.getSender()));
         // 算力提供方 暂定三方
         taskDto.setPowerPartyIds(getPowerPartyIds());
         //数据提供方
@@ -443,12 +445,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
             taskMetaDataDeclareDto.setMetaDataId(input.getDataTableId());
 
-            List<Integer> columnIndexList = new ArrayList<>();
+            List<Integer> selectedColumns = new ArrayList<>();
             String[] columnIdsArr = input.getDataColumnIds().split(",");
-            for (String s : columnIdsArr) {
-                columnIndexList.add(Integer.valueOf(s.trim()));
+            if(columnIdsArr.length>0){
+                // TODO 索引列暂定选择列中的第一列
+                taskMetaDataDeclareDto.setKeyColumn(Integer.valueOf(columnIdsArr[0]));
             }
-            taskMetaDataDeclareDto.setColumnIndexList(columnIndexList);
+            for (String s : columnIdsArr) {
+                selectedColumns.add(Integer.valueOf(s.trim()));
+            }
+
+            taskMetaDataDeclareDto.setSelectedColumns(selectedColumns);
 
             taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
             taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(taskOrganizationIdentityInfoDto);
@@ -473,5 +480,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         sender.setNodeId(nodeIdentityDto.getNodeId());
         sender.setIdentityId(nodeIdentityDto.getIdentityId());
         return sender;
+    }
+
+    private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender){
+        OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
+        //发起方的默认设置成a1
+        algoSupplier.setIdentityId("a1");
+        sender.setNodeName(sender.getNodeName());
+        sender.setNodeId(sender.getNodeId());
+        sender.setIdentityId(sender.getIdentityId());
+        return algoSupplier;
     }
 }

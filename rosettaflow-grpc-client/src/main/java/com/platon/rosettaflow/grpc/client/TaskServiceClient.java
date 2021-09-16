@@ -88,19 +88,24 @@ public class TaskServiceClient {
 
         TaskDetailResponseDto taskDetailResponseDto;
         GetTaskDetailResponse getTaskDetailResponse;
-        TaskDetailDto taskDetailDto;
+        TaskDetailShowDto taskDetailDto;
         for (int i = 0; i < getTaskDetailListResponse.getTaskListCount(); i++) {
             getTaskDetailResponse = getTaskDetailListResponse.getTaskList(i);
             taskDetailResponseDto = new TaskDetailResponseDto();
             //任务详情
-            taskDetailDto = new TaskDetailDto();
+            taskDetailDto = new TaskDetailShowDto();
 
             // 任务Id
             taskDetailDto.setTaskId(getTaskDetailResponse.getInformation().getTaskId());
             // 任务名称
             taskDetailDto.setTaskName(getTaskDetailResponse.getInformation().getTaskName());
+            //发起任务的用户的信息 (task是属于用户的)
+            taskDetailDto.setUser(getTaskDetailResponse.getInformation().getUser());
+            //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+            taskDetailDto.setUserType(getTaskDetailResponse.getInformation().getUserTypeValue());
+
             // 任务发起方组织信息
-            taskDetailDto.setOwner(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getOwner()));
+            taskDetailDto.setSender(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getSender()));
             // 算法提供方组织信息 (目前就是和 任务发起方是同一个 ...)
             taskDetailDto.setAlgoSupplier(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getAlgoSupplier()));
             //数据提供方组织信息
@@ -148,13 +153,13 @@ public class TaskServiceClient {
      * @param taskDetailDto 响应数据对象
      * @param information   底层返回结果信息
      */
-    private void assemblyPowerSuppliers(TaskDetailDto taskDetailDto, TaskDetailShow information) {
+    private void assemblyPowerSuppliers(TaskDetailShowDto taskDetailDto, TaskDetailShow information) {
         List<TaskPowerSupplierDto> powerSuppliers = new ArrayList<>();
         TaskPowerSupplierDto powerSupplierDto;
         TaskPowerSupplierShow powerSupplierShow;
         ResourceUsedDetailDto resourceUsedDetailDto;
-        for (int j = 0; j < information.getPowerSupplierCount(); j++) {
-            powerSupplierShow = information.getPowerSupplier(j);
+        for (int j = 0; j < information.getPowerSuppliersCount(); j++) {
+            powerSupplierShow = information.getPowerSuppliers(j);
             powerSupplierDto = new TaskPowerSupplierDto();
 
             resourceUsedDetailDto = new ResourceUsedDetailDto();
@@ -180,12 +185,12 @@ public class TaskServiceClient {
      * @param taskDetailDto 响应数据对象
      * @param information   底层返回结果信息
      */
-    private void assemblyDataSuppliers(TaskDetailDto taskDetailDto, TaskDetailShow information) {
+    private void assemblyDataSuppliers(TaskDetailShowDto taskDetailDto, TaskDetailShow information) {
         List<TaskDataSupplierDto> dataSuppliers = new ArrayList<>();
         TaskDataSupplierDto dataSupplierDto;
         TaskDataSupplierShow dataSupplierShow;
-        for (int j = 0; j < information.getDataSupplierCount(); j++) {
-            dataSupplierShow = information.getDataSupplier(j);
+        for (int j = 0; j < information.getDataSuppliersCount(); j++) {
+            dataSupplierShow = information.getDataSuppliers(j);
             dataSupplierDto = new TaskDataSupplierDto();
             dataSupplierDto.setMemberInfo(getOrganizationIdentityInfoDto(dataSupplierShow.getOrganization()));
             dataSupplierDto.setMetaDataId(dataSupplierShow.getMetadataId());
@@ -283,6 +288,14 @@ public class TaskServiceClient {
                 .setIdentityId(taskDto.getSender().getIdentityId())
                 .build();
         publishTaskDeclareRequestBuilder.setSender(sender);
+        //任务算法提供方 组织信息
+        TaskOrganization algoSupplier = TaskOrganization.newBuilder()
+                .setPartyId(taskDto.getAlgoSupplier().getPartyId())
+                .setNodeName(taskDto.getAlgoSupplier().getNodeName())
+                .setNodeId(taskDto.getAlgoSupplier().getNodeId())
+                .setIdentityId(taskDto.getAlgoSupplier().getIdentityId())
+                .build();
+        publishTaskDeclareRequestBuilder.setAlgoSupplier(algoSupplier);
 
         // data_supplier
         TaskDataSupplierDeclareDto dataSupplierDeclareDto;
@@ -297,10 +310,11 @@ public class TaskServiceClient {
                     .build();
             //meta_data_info
             TaskMetadataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetadataDeclare.newBuilder();
-            for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().size(); j++) {
+            for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().size(); j++) {
                 taskMetaDataDeclareBuilder
                         .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
-                        .setColumnIndexList(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getColumnIndexList().get(j));
+                        .setKeyColumn(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getKeyColumn())
+                        .setSelectedColumns(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
             }
 
             TaskDataSupplierDeclare taskDataSupplierDeclare = TaskDataSupplierDeclare.newBuilder()
@@ -308,7 +322,7 @@ public class TaskServiceClient {
                     .setMetadataInfo(taskMetaDataDeclareBuilder.build())
                     .build();
 
-            publishTaskDeclareRequestBuilder.setDataSupplier(i, taskDataSupplierDeclare);
+            publishTaskDeclareRequestBuilder.setDataSuppliers(i, taskDataSupplierDeclare);
         }
 
         //power_party_ids

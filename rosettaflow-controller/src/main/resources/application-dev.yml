@@ -55,7 +55,7 @@ system:
 grpc:
   client:
     carrier-grpc-server:
-      address: 'static://192.168.10.146:4444'
+      address: 'static://10.10.8.177:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext

@@ -122,7 +122,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     // 将最后一个节点步骤的下一节点步骤字段值置空
                     node.setNextNodeStep(null);
                 }
-                node.setStatus((byte)1);
+                node.setStatus((byte) 1);
                 nodeBatchList.add(node);
                 // 去掉idList中需要保存的节点id，保留需要物理删除的节点
                 idList.remove(nodeReq.getId());
@@ -141,7 +141,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowService.updateById(workflow);
     }
 
-    /** 物理删除不需要保存的工作流节点 */
+    /**
+     * 物理删除不需要保存的工作流节点
+     */
     private void removeWorkflowNode(List<Long> nodeIdList) {
         if (nodeIdList == null || nodeIdList.size() == 0) {
             return;
@@ -180,9 +182,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     inputList.add(workflowNodeInput.getId());
                 }
             }
-            List<WorkflowNodeOutput> workflowNodeOutputList  = workflowNodeOutputService.getByWorkflowNodeId(nodeId);
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(nodeId);
             if (workflowNodeOutputList != null && workflowNodeOutputList.size() > 0) {
-                for(WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
+                for (WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
                     outputList.add(workflowNodeOutput.getId());
                 }
             }
@@ -241,11 +243,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer nodeStep) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getId, workflowId);
+        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         wrapper.eq(WorkflowNode::getNodeStep, nodeStep);
         wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         WorkflowNode workflowNode = this.getOne(wrapper);
         if (workflowNode == null) {
+            log.error("workflow node not found by workflowId:{},nodeStep:{}", workflowId, nodeStep);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
         return workflowNode;
@@ -379,10 +382,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
             //查询节点代码对应的算法列表
             List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNodeTemp.getAlgorithmId());
-           if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
-               //保存工作流输入变量
-               workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
-           }
+            if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
+                //保存工作流输入变量
+                workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
+            }
         }
     }
 }

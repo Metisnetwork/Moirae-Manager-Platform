@@ -78,7 +78,8 @@ public class SysConstant {
             "data/detail",
             "data/columnList",
             "algorithm/list",
-            "algorithm/details"
+            "algorithm/details",
+            "testGrpc"
     };
 
 
