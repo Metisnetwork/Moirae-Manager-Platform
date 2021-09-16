@@ -7,7 +7,9 @@ import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
+import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 import com.platon.rosettaflow.req.workflow.*;
+import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.PageVo;
@@ -39,6 +41,9 @@ public class WorkflowController {
 
     @Resource
     private IWorkflowService workflowService;
+
+    @Resource
+    private IWorkflowNodeService workflowNodeService;
 
     @Resource
     private GrpcTaskService grpcTaskService;
@@ -91,6 +96,11 @@ public class WorkflowController {
     @PostMapping("start")
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
+        //先保存工作流
+        List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(startWorkflowReq.getWorkflowNodeReqList(), WorkflowNode.class);
+        workflowNodeService.saveWorkflowNode(startWorkflowReq.getWorkflowId(), workflowNodeList);
+
+        //启动工作流
         WorkflowDto workflowDto = new WorkflowDto();
         workflowDto.setId(startWorkflowReq.getWorkflowId());
         workflowDto.setStartNode(startWorkflowReq.getStartNode());
