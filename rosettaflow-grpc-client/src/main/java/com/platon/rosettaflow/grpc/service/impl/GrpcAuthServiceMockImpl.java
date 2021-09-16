@@ -59,9 +59,9 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             nodeIdentityDto = new NodeIdentityDto();
-            nodeIdentityDto.setNodeName("节点"+ i+"名字" );
-            nodeIdentityDto.setNodeId("节点" + i+"的Id");
-            nodeIdentityDto.setIdentityId("节点"+i+"的identityId" );
+            nodeIdentityDto.setNodeName("节点" + i + "名字");
+            nodeIdentityDto.setNodeId("节点" + i + "的Id");
+            nodeIdentityDto.setIdentityId("节点" + i + "的identityId");
             metaDataAuthorityDto.setOwner(nodeIdentityDto);
 
             metaDataAuthorityDto.setMetaDataId("metaDataId" + i);
@@ -73,16 +73,15 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             metaDataUsageDto.setTimes(100 + i);
             metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageDto);
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
-            if(i == 0){
+            if (i == 0) {
                 getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_PASSED.getValue());
-            }else if(i == 1){
+            } else if (i == 1) {
                 getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_REFUSED.getValue());
-            }else if(i ==2){
+            } else if (i == 2) {
                 getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
-            }else{
+            } else {
                 getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
             }
-
 
             getMetaDataAuthorityDto.setApplyAt(1629877270100L);
             getMetaDataAuthorityDto.setAuditAt(1629877270100L);
@@ -93,6 +92,11 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
     @Override
     public NodeIdentityDto getNodeIdentity() {
-        return null;
+        NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
+        nodeIdentityDto.setNodeName("mockNodeName");
+        nodeIdentityDto.setNodeId("mockNodeId");
+        nodeIdentityDto.setIdentityId("mockIdentityId");
+        nodeIdentityDto.setStatus(1);
+        return nodeIdentityDto;
     }
 }

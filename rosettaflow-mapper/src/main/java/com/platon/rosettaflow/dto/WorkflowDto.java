@@ -43,4 +43,14 @@ public class WorkflowDto extends Workflow {
      */
     private List<WorkflowNodeDto> workflowNodeDtoList;
 
+    /**
+     * 发起任务的账户地址
+     */
+    private String address;
+
+    /**
+     * 发起任务的账户的签名
+     */
+    private String sign;
+
 }

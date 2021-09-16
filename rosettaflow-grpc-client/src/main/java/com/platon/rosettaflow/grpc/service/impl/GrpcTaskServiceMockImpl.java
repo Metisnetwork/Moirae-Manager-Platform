@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -31,7 +32,12 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
 
     @Override
     public void asyncPublishTask(TaskDto taskDto, Consumer<PublishTaskDeclareResponse> callback) {
-
+        PublishTaskDeclareResponse publishTaskDeclareResponse = PublishTaskDeclareResponse.newBuilder()
+                .setStatus(GrpcConstant.GRPC_SUCCESS_CODE)
+                .setTaskId(UUID.randomUUID().toString().replace("-", "").toLowerCase())
+                .setMsg("mocker 处理成功！")
+                .build();
+        callback.accept(publishTaskDeclareResponse);
     }
 
     @Override

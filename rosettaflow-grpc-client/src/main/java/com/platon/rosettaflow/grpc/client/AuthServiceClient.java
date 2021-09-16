@@ -172,9 +172,10 @@ public class AuthServiceClient {
         }
 
         NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
+        nodeIdentityDto.setNodeName(nodeIdentity.getOwner().getNodeName());
         nodeIdentityDto.setNodeId(nodeIdentity.getOwner().getNodeId());
         nodeIdentityDto.setIdentityId(nodeIdentity.getOwner().getIdentityId());
-
+        nodeIdentityDto.setStatus(nodeIdentity.getOwner().getStatusValue());
         return nodeIdentityDto;
     }
 }
