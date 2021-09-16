@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
+import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
@@ -209,6 +210,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         // 查询算法详情并返回
         AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
         respMap.put("workflowNodeId", workflowNode.getId());
+        // 节点运行状态默认为未开始0
+        respMap.put("runStatus", WorkflowRunStatusEnum.UN_RUN.getValue());
         respMap.put("algorithmDto", algorithmDto == null ? new AlgorithmDto() : algorithmDto);
         return respMap;
     }

@@ -35,6 +35,7 @@
         SELECT
             w.id as id,
             w.workflow_name as workflowName,
+            w.workflow_desc as workflowDesc,
             w.run_status as runStatus,
             w.create_time as createTime,
             (select user_name from t_user u where u.status = '1' and w.user_id = u.id) as userName

@@ -23,6 +23,9 @@ public class WorkflowVo {
     @ApiModelProperty(value = "工作流名称")
     private String workflowName;
 
+    @ApiModelProperty(value = "工作流描述")
+    private String workflowDesc;
+
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
