@@ -1,12 +1,9 @@
 package com.platon.rosettaflow.vo.workflow.node;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 /**
