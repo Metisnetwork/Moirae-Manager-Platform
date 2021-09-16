@@ -101,10 +101,7 @@ public class WorkflowController {
         workflowNodeService.saveWorkflowNode(startWorkflowReq.getWorkflowId(), workflowNodeList);
 
         //启动工作流
-        WorkflowDto workflowDto = new WorkflowDto();
-        workflowDto.setId(startWorkflowReq.getWorkflowId());
-        workflowDto.setStartNode(startWorkflowReq.getStartNode());
-        workflowDto.setEndNode(startWorkflowReq.getEndNode());
+        WorkflowDto workflowDto = BeanUtil.toBean(startWorkflowReq, WorkflowDto.class);
         workflowService.start(workflowDto);
         return ResponseVo.createSuccess();
     }
