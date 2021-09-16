@@ -21,7 +21,7 @@ public class NodeAlgorithmVo {
     private Long workflowNodeId;
 
     @ApiModelProperty(value = "工作流节点运行状态")
-    private Integer runStatus;
+    private Byte runStatus;
 
     @ApiModelProperty(value = "算法id")
     private Long algorithmId;

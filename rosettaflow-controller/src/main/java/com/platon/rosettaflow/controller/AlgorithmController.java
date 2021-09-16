@@ -3,7 +3,6 @@ package com.platon.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import com.platon.rosettaflow.dto.AlgorithmDto;
-import com.platon.rosettaflow.req.algorithm.AlgDetailsReq;
 import com.platon.rosettaflow.req.algorithm.AlgListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
