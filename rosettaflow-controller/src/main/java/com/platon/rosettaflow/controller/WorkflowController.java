@@ -97,11 +97,14 @@ public class WorkflowController {
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
         //先保存工作流
-        List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(startWorkflowReq.getWorkflowNodeReqList(), WorkflowNode.class);
-        workflowNodeService.saveWorkflowNode(startWorkflowReq.getWorkflowId(), workflowNodeList);
+        if(null !=startWorkflowReq.getWorkflowNodeReqList()){
+            List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(startWorkflowReq.getWorkflowNodeReqList(), WorkflowNode.class);
+            workflowNodeService.saveWorkflowNode(startWorkflowReq.getWorkflowId(), workflowNodeList);
+        }
 
         //启动工作流
         WorkflowDto workflowDto = BeanUtil.toBean(startWorkflowReq, WorkflowDto.class);
+        workflowDto.setId(startWorkflowReq.getWorkflowId());
         workflowService.start(workflowDto);
         return ResponseVo.createSuccess();
     }
