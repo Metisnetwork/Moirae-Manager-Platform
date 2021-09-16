@@ -87,6 +87,7 @@ public class WorkflowNodeController {
         Map<String, Object> respMap = workflowNodeService.addWorkflowNode(workflowNode);
         NodeAlgorithmVo nodeAlgorithmVo = BeanUtil.toBean(respMap.get("algorithmDto"), NodeAlgorithmVo.class);
         nodeAlgorithmVo.setWorkflowNodeId((Long) respMap.get("workflowNodeId"));
+        nodeAlgorithmVo.setRunStatus((Integer) respMap.get("runStatus"));
         return ResponseVo.createSuccess(nodeAlgorithmVo);
     }
 
