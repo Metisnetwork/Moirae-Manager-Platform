@@ -206,7 +206,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
         //截止节点不能超过工作流最大节点
-        if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
+        //如果截止节点为空，设置为工作流最后一个节点
+        if (null == workflowDto.getEndNode()) {
+            workflowDto.setEndNode(orgWorkflow.getNodeNumber());
+        } else if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
             log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
@@ -221,7 +224,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 SubJob subJob = subJobService.getById(workflowDto.getJobId());
                 subJob.setEndTime(now());
                 //TODO CHECK
-                subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(),subJob.getEndTime(), DateUnit.MINUTE)));
+                subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
                 //子作业节点信息
                 SubJobNode subJobNode = new SubJobNode();
                 subJobNode.setSubJobId(subJob.getId());
@@ -237,7 +240,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                         subJob.setSubJobStatus(SubJobStatusEnum.RUN_SUCCESS.getValue());
                         subJobService.updateById(subJob);
                         subJobNodeService.save(subJobNode);
-                    }else{
+                    } else {
                         subJob.setSubJobStatus(SubJobStatusEnum.RUNNING.getValue());
                         subJobService.updateById(subJob);
                         subJobNodeService.save(subJobNode);
@@ -447,7 +450,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
             List<Integer> selectedColumns = new ArrayList<>();
             String[] columnIdsArr = input.getDataColumnIds().split(",");
-            if(columnIdsArr.length>0){
+            if (columnIdsArr.length > 0) {
                 // TODO 索引列暂定选择列中的第一列
                 taskMetaDataDeclareDto.setKeyColumn(Integer.valueOf(columnIdsArr[0]));
             }
@@ -482,7 +485,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         return sender;
     }
 
-    private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender){
+    private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender) {
         OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
         //发起方的默认设置成a1
         algoSupplier.setIdentityId("a1");

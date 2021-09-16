@@ -7,7 +7,7 @@ package com.platon.rosettaflow.common.enums;
  */
 public enum WorkflowRunStatusEnum {
     /**
-     * 未开始
+     * 未运行
      */
     UN_RUN((byte) 0),
     /**
@@ -19,7 +19,7 @@ public enum WorkflowRunStatusEnum {
      */
     RUN_SUCCESS((byte) 2),
     /**
-     * 运行成功
+     * 运行失败
      */
     RUN_FAIL((byte) 3);
 
