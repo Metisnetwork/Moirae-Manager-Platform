@@ -90,20 +90,19 @@ public enum ErrorMsg {
      */
     WORKFLOW_END_NODE_OVERFLOW("截止节点不能大于工作流最大节点数", "EndNode can not more than workflow nodeNumber"),
     /**
-     * 工作流不存在
+     * 工作流
      */
     WORKFLOW_NOT_EXIST("工作流不存在", "workflow not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow not exist"),
     WORKFLOW_EXIST("工作流已存在", "workflow already exist"),
+    WORKFLOW_RUNNING_EXIST("工作流正在运行中！", "Workflow is running"),
     /**
-     * 工作流节点不存在
+     * 工作流节点
      */
     WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "workflow node not exist"),
     WORKFLOW_NODE_EXIST("工作流节点已存在", "workflow node exist"),
     WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "workflow node not cache"),
-    /**
-     * 工作流节点代码不存在
-     */
+    WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法！", "Only one algorithm is supported to run"),
     WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "workflow node code not exist"),
 
     JOB_ADD_ERROR("新增作业失败", "Add job error"),
