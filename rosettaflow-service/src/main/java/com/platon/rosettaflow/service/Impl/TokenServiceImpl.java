@@ -86,7 +86,7 @@ public class TokenServiceImpl implements ITokenService {
     }
 
     @Override
-    public boolean removeToken(@NotNull String token) {
+    public void removeToken(@NotNull String token) {
         String userKey = getUserKey(token);
         UserDto userDto = (UserDto) redisTemplate.opsForValue().get(userKey);
         if (userDto != null) {
@@ -94,7 +94,6 @@ public class TokenServiceImpl implements ITokenService {
             redisTemplate.delete(tokeKey);
             redisTemplate.delete(userKey);
         }
-        return true;
     }
 
     @Override

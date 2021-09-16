@@ -71,6 +71,7 @@ public class SysConstant {
     public static final String[] LOGIN_URIS = {
             "user/getLoginNonce",
             "user/login",
+            "user/logout",
             "swagger",
             "error",
             "api-docs",

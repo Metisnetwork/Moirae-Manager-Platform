@@ -80,8 +80,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void logout() {
-        UserDto userDto = commonService.getCurrentUser();
-        tokenService.removeToken(userDto.getToken());
+        try{
+            UserDto userDto = commonService.getCurrentUser();
+            tokenService.removeToken(userDto.getToken());
+        }catch (BusinessException e){
+            log.error("User not login not need to logout");
+        }
     }
 
     @Override

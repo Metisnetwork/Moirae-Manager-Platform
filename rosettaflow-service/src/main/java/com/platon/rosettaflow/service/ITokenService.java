@@ -37,9 +37,8 @@ public interface ITokenService {
      * 删除token
      *
      * @param token token
-     * @return boolean
      */
-    boolean removeToken(String token);
+    void removeToken(String token);
 
     /**
      * 刷新token

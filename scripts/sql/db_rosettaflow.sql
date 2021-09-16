@@ -130,7 +130,7 @@ CREATE TABLE `t_user_meta_data` (
     `apply_time` datetime DEFAULT NULL COMMENT '发起授权申请的时间',
     `audit_time` datetime DEFAULT NULL COMMENT '审核授权申请的时间',
     `expire`  tinyint(4) DEFAULT NULL COMMENT '是否已过期（按时间时需要）: 0-未过期, 1-已过期',
-    `used_times` bigint(20) DEFAULT NULL COMMENT '已经使用的次数(按次数时有效)',
+    `used_times` bigint(20) NOT NULL DEFAULT 0 COMMENT '已经使用的次数(按次数时有效)',
     `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

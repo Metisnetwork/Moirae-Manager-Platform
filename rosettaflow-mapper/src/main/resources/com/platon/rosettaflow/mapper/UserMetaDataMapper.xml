@@ -69,12 +69,14 @@
             t_user u
         ON umd.address = u.address
         WHERE
-            (umd.auth_type = 1 AND expire = 0)
+            ((umd.auth_type = 1 AND expire = 0)
         OR (
             umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value
-        )
+        ))
         AND
-            umd.status = '1'
+            umd.`status` = 1
+        AND
+            umd.auth_status=1
         AND
             umd.address = #{address, jdbcType=VARCHAR}
     </select>
