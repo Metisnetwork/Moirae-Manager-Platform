@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.*;
@@ -19,10 +18,7 @@ import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDataSupplierDeclareDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskMetaDataDeclareDto;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskResourceCostDeclareDto;
+import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -177,9 +173,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         } catch (Exception e) {
             log.error("copyWorkflow--复制工作流接口失败:{}", e.getMessage());
             if (e instanceof DuplicateKeyException) {
+                log.error("Workflow named:{} is exist", workflowName);
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
             }
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
+            throw e;
         }
     }
 
@@ -221,9 +218,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
         //保存用户和地址及签名
         LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getAddress,workflowDto.getAddress());
-        updateWrapper.set(Workflow::getSign,workflowDto.getSign());
-        updateWrapper.eq(Workflow::getId,workflowDto.getId());
+        updateWrapper.set(Workflow::getAddress, workflowDto.getAddress());
+        updateWrapper.set(Workflow::getSign, workflowDto.getSign());
+        updateWrapper.eq(Workflow::getId, workflowDto.getId());
         this.update(updateWrapper);
 
         //此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
@@ -315,6 +312,53 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         workflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
         this.save(workflow);
         return workflow.getId();
+    }
+
+    @Override
+    public void terminate(Long workflowId) {
+        Workflow workflow = this.getById(workflowId);
+        if (null == workflow) {
+            log.error("workflow not found by id:{}", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+        }
+        if (workflow.getRunStatus() != WorkflowRunStatusEnum.RUNNING.getValue()) {
+            log.error("workflow by id:{} is not running can not terminate", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_RUNNING.getMsg());
+        }
+
+        //获取工作流正在执行的节点进行终止，并更新整个工作流状态为停止
+        WorkflowNode workflowNode = workflowNodeService.getRunningNodeByWorkflowId(workflowId);
+        if (null == workflowNode) {
+            this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
+        } else {
+            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode);
+            TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
+
+            if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+                this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
+                workflowNodeService.updateRunStatusByWorkflowId(workflowId, workflowNode.getRunStatus(), WorkflowRunStatusEnum.UN_RUN.getValue());
+            } else {
+                log.error("Terminate workflow with id:{} fail", workflowId);
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
+            }
+        }
+    }
+
+    private TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, WorkflowNode workflowNode) {
+        TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
+        terminateTaskRequestDto.setUser(workflow.getAddress());
+        terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflow.getAddress()));
+        terminateTaskRequestDto.setTaskId(workflowNode.getTaskId());
+        terminateTaskRequestDto.setSign(workflow.getSign());
+        return terminateTaskRequestDto;
+    }
+
+    @Override
+    public void updateRunStatus(Long workflowId, Byte runStatus) {
+        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(Workflow::getRunStatus, WorkflowRunStatusEnum.UN_RUN.getValue());
+        updateWrapper.eq(Workflow::getId, workflowId);
+        this.update(updateWrapper);
     }
 
     /**

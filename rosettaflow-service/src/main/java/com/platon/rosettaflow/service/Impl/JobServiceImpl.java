@@ -130,7 +130,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         //作业执行重复时,结束时间及重复次数合法性
         if (jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()) {
             if (Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEATINTERVAL_ERROR.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEAT_INTERVAL_ERROR.getMsg());
             }
         }
     }

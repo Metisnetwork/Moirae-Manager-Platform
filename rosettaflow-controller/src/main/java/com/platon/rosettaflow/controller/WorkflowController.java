@@ -14,7 +14,9 @@ import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
-import com.platon.rosettaflow.vo.workflow.*;
+import com.platon.rosettaflow.vo.workflow.TaskEventVo;
+import com.platon.rosettaflow.vo.workflow.WorkflowDetailsVo;
+import com.platon.rosettaflow.vo.workflow.WorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,6 +32,7 @@ import java.util.List;
 
 /**
  * 工作流管理
+ *
  * @author admin
  * @date 2021/8/17
  */
@@ -97,7 +100,7 @@ public class WorkflowController {
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
         //先保存工作流
-        if(null !=startWorkflowReq.getWorkflowNodeReqList()){
+        if (null != startWorkflowReq.getWorkflowNodeReqList()) {
             List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(startWorkflowReq.getWorkflowNodeReqList(), WorkflowNode.class);
             workflowNodeService.saveWorkflowNode(startWorkflowReq.getWorkflowId(), workflowNodeList);
         }
@@ -127,5 +130,12 @@ public class WorkflowController {
             taskEventVoList.add(vo);
         }
         return ResponseVo.createSuccess(taskEventVoList);
+    }
+
+    @PostMapping("terminate")
+    @ApiOperation(value = "终止工作流", notes = "终止工作流")
+    public ResponseVo<?> terminate(@RequestBody @Validated TerminateWorkflowReq terminateWorkflowReq) {
+        workflowService.terminate(terminateWorkflowReq.getWorkflowId());
+        return ResponseVo.createSuccess();
     }
 }

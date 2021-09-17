@@ -29,6 +29,7 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 获取工作流详情
+     *
      * @param id 工作流id
      * @return 工作流详情
      */
@@ -89,4 +90,19 @@ public interface IWorkflowService extends IService<Workflow> {
      * @return 工作流id
      */
     Long addWorkflowByTemplate(Long projectId, WorkflowTemp workflowTemp);
+
+    /**
+     * 终止工作流
+     *
+     * @param workflowId 工作流id
+     */
+    void terminate(Long workflowId);
+
+    /**
+     * 更新工作流运行状态
+     *
+     * @param workflowId 工作流id
+     * @param runStatus  运行状态
+     */
+    void updateRunStatus(Long workflowId, Byte runStatus);
 }
