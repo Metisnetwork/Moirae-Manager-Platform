@@ -7,6 +7,7 @@ import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.req.workflow.node.*;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.workflow.WorkflowDetailsVo;
 import com.platon.rosettaflow.vo.workflow.node.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -137,6 +138,14 @@ public class WorkflowNodeController {
         WorkflowNodeResource workflowNodeResource = BeanUtil.toBean(saveResourceReq, WorkflowNodeResource.class);
         workflowNodeService.saveWorkflowNodeResource(workflowNodeResource);
         return ResponseVo.createSuccess();
+    }
+
+    @GetMapping(value = "getTaskResult/{taskId}")
+    @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
+    public ResponseVo<WorkflowNodeResultVo> detail(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
+        WorkflowNodeResultVo workflowNodeResultVo = new WorkflowNodeResultVo();
+        workflowNodeResultVo.setResult(taskId+"运行结果待开发");
+        return ResponseVo.createSuccess(workflowNodeResultVo);
     }
 
 }
