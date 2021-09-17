@@ -11,22 +11,33 @@ public enum AlgorithmTypeEnum {
     /**
      * 统计分析
      */
-    ALGORITHM_TYPE_1((byte) 1, "统计分析"),
+    ALGORITHM_TYPE_1((byte) 1, "统计分析", "统计分析(开发中)"),
     /**
      * 特征工程
      */
-    ALGORITHM_TYPE_2((byte) 2, "特征工程"),
+    ALGORITHM_TYPE_2((byte) 2, "特征工程", "特征工程(开发中)"),
     /**
      * 机器学习
      */
-    ALGORITHM_TYPE_3((byte) 3, "机器学习");
+    ALGORITHM_TYPE_3((byte) 3, "机器学习", "机器学习(开发中)");
 
     private final byte type;
+    private final String name;
     private final String desc;
 
-    AlgorithmTypeEnum(byte type, String desc) {
+    AlgorithmTypeEnum(byte type, String name, String desc) {
         this.type = type;
+        this.name = name;
         this.desc = desc;
+    }
+
+    public static String getName(byte type) {
+        for (AlgorithmTypeEnum e : values()) {
+            if (e.type == type) {
+                return e.getName();
+            }
+        }
+        return null;
     }
 
     public static String getDesc(byte type) {
@@ -36,6 +47,10 @@ public enum AlgorithmTypeEnum {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getDesc() {

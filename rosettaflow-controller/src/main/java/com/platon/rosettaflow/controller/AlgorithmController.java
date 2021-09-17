@@ -63,7 +63,7 @@ public class AlgorithmController {
     public ResponseVo<AlgDetailsVo> detail(@ApiParam(value = "算法表ID", required = true) @PathVariable Long id) {
         AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(id);
         AlgDetailsVo algDetailsVo = BeanUtil.copyProperties(algorithmDto, AlgDetailsVo.class);
-        algDetailsVo.setAlgorithmTypeDesc(AlgorithmTypeEnum.getDesc(algorithmDto.getAlgorithmType()));
+        algDetailsVo.setAlgorithmTypeDesc(AlgorithmTypeEnum.getName(algorithmDto.getAlgorithmType()));
         return ResponseVo.createSuccess(algDetailsVo);
     }
 

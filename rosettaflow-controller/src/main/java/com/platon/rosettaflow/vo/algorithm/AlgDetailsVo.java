@@ -1,7 +1,5 @@
 package com.platon.rosettaflow.vo.algorithm;
 
-import com.platon.rosettaflow.common.enums.AlgorithmCodeEditTypeEnum;
-import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -59,6 +57,6 @@ public class AlgDetailsVo {
     private String editType;
 
     @ApiModelProperty(value = "算法代码")
-    private String algorithmCode;
+    private String calculateContractCode;
 
 }

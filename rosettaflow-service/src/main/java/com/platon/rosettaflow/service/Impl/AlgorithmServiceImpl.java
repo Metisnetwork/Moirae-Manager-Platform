@@ -97,15 +97,18 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         List<Map<String, Object>> treeList = new ArrayList<>(SysConstant.INT_4);
         Map<String, Object> param1 = new HashMap<>(SysConstant.INT_4);
         param1.put("algorithmId", SysConstant.INT_1);
-        param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
+        param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getName());
         Map<String, Object> param2 = new HashMap<>(SysConstant.INT_4);
         param2.put("algorithmId", SysConstant.INT_2);
-        param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
+        param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getName());
         Map<String, Object> param3 = new HashMap<>(SysConstant.INT_4);
         param3.put("algorithmId", SysConstant.INT_3);
-        param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
+        param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getName());
         List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmList(null);
         if (algorithmDtoList == null || algorithmDtoList.size() == 0) {
+            param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
+            param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
+            param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
             treeList.add(param1);
             treeList.add(param2);
             treeList.add(param3);
@@ -135,6 +138,16 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
                 childList3.add(param);
             }
+        }
+        // 开发中的父节点，没有子节点算法
+        if (childList1.size() == 0) {
+            param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
+        }
+        if (childList2.size() == 0) {
+            param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
+        }
+        if (childList1.size() == 0) {
+            param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
         }
         param1.put("child", childList1);
         param2.put("child", childList2);

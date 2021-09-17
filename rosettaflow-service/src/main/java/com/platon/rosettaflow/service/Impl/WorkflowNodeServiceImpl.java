@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,6 +15,7 @@ import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
+import io.swagger.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,13 +103,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
         if (Objects.isNull(workflow)) {
+            log.info("saveWorkflowNode--工作流不存在:{}", JSON.toJSONString(workflowId));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
         if (WorkflowRunStatusEnum.RUNNING.getValue() == workflow.getRunStatus()) {
+            log.info("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
         // 第一期项目只允许保存一个节点
         if (workflowNodeList.size() > 1) {
+            log.info("saveWorkflowNode--工作流节点超出范围:{}", JSON.toJSONString(workflowNodeList));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_COUNT_CHECK.getMsg());
         }
         // 查询工作流节点，并获取所有节点的id
@@ -174,6 +179,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public void clearWorkflowNode(Long workflowId) {
         List<WorkflowNode> workflowNodeList = getAllWorkflowNodeList(workflowId);
+        if (workflowNodeList == null || workflowNodeList.size() == 0) {
+            return;
+        }
         // 工作流节点id集合
         List<Long> nodeIdList = new ArrayList<>();
         // 输入id集合
@@ -226,6 +234,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public void renameWorkflowNode(Long workflowNodeId, String nodeName) {
         WorkflowNode workflowNode = getWorkflowNodeById(workflowNodeId);
         if (null == workflowNode) {
+            log.info("renameWorkflowNode--工作流节点为空, workflowNodeId:{}, nodeName:{}", workflowNodeId, nodeName);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
         workflowNode.setNodeName(nodeName);

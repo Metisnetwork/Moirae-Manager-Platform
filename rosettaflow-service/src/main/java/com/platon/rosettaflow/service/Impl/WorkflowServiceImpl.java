@@ -120,6 +120,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflow.setUserId(UserContext.get().getId());
             this.save(workflow);
         } catch (DuplicateKeyException dke) {
+            log.info("addWorkflow--添加工作流接口失败:{}", dke.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
     }
@@ -136,6 +137,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflow.setWorkflowDesc(workflowDesc);
             this.updateById(workflow);
         } catch (DuplicateKeyException dke) {
+            log.info("editWorkflow--编辑工作流接口失败:{}", dke.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
     }
@@ -173,6 +175,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 algorithmVariableService.saveAlgorithmVariable(oldNode.getAlgorithmId(), newAlgorithmId);
             }
         } catch (Exception e) {
+            log.error("copyWorkflow--复制工作流接口失败:{}", e.getMessage());
             if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
             }
