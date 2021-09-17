@@ -1,7 +1,6 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
 
@@ -18,6 +17,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
 
     /**
      * 获取工作流节点详情列表
+     *
      * @param id 工作流id
      * @return 工作流详情
      */
@@ -105,7 +105,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     /**
      * 添加工作流节点输出数据
      *
-     * @param workflowNodeId 工作流节点id
+     * @param workflowNodeId         工作流节点id
      * @param workflowNodeOutputList 工作流节点输出列表
      */
     void saveWorkflowNodeOutput(Long workflowNodeId, List<WorkflowNodeOutput> workflowNodeOutputList);
@@ -127,7 +127,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     /**
      * 复制保存工作流节点
      *
-     * @param newWorkflowId 新工作流id
+     * @param newWorkflowId       新工作流id
      * @param workflowNodeOldList 旧工作流列表
      */
     void copySaveWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList);
@@ -139,4 +139,21 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param workflowNodeTempList 工作流模板节点列表
      */
     void addWorkflowNodeByTemplate(Long workflowId, List<WorkflowNodeTemp> workflowNodeTempList);
+
+    /**
+     * 获取正在运行的节点
+     *
+     * @param workflowId 工作流id
+     * @return 正在运行的节点
+     */
+    WorkflowNode getRunningNodeByWorkflowId(Long workflowId);
+
+    /**
+     * 更新工作流节点运行状态
+     *
+     * @param workflowId   工作流id
+     * @param oldRunStatus 旧的运行状态
+     * @param newRunStatus 新的运行状态
+     */
+    void updateRunStatusByWorkflowId(Long workflowId, Byte oldRunStatus, Byte newRunStatus);
 }

@@ -95,6 +95,8 @@ public enum ErrorMsg {
     WORKFLOW_NOT_EXIST("工作流不存在", "workflow not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow not exist"),
     WORKFLOW_EXIST("工作流已存在", "workflow already exist"),
+    WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
+    WORKFLOW_TERMINATE_NET_PROCESS_ERROR("工作流终止失败", "Workflow terminated fail"),
     /**
      * 工作流节点不存在
      */

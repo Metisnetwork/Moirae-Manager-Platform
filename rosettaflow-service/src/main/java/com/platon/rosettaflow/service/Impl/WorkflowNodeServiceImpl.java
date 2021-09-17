@@ -2,6 +2,7 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -390,5 +391,22 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
             }
         }
+    }
+
+    @Override
+    public WorkflowNode getRunningNodeByWorkflowId(Long workflowId) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
+        return this.getOne(wrapper);
+    }
+
+    @Override
+    public void updateRunStatusByWorkflowId(Long workflowId, Byte oldRunStatus, Byte newRunStatus) {
+        LambdaUpdateWrapper<WorkflowNode> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(WorkflowNode::getRunStatus,newRunStatus);
+        updateWrapper.eq(WorkflowNode::getRunStatus,oldRunStatus);
+        updateWrapper.eq(WorkflowNode::getWorkflowId,workflowId);
+        this.update(updateWrapper);
     }
 }
