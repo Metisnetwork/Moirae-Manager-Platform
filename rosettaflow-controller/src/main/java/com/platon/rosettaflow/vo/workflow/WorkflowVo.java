@@ -26,6 +26,9 @@ public class WorkflowVo {
     @ApiModelProperty(value = "工作流描述")
     private String workflowDesc;
 
+    @ApiModelProperty(value = "工作流运行状态(运行状态:0-未运行,1-运行中,2-运行成功，3-运行失败)")
+    private Byte runStatus;
+
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;

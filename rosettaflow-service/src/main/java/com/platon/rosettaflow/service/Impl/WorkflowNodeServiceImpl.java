@@ -100,8 +100,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
-        if (workflowNodeList.size() == 0) {
-            return;
+        Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        if (Objects.isNull(workflow)) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+        }
+        if (WorkflowRunStatusEnum.RUNNING.getValue() == workflow.getRunStatus()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
+        }
+        // 第一期项目只允许保存一个节点
+        if (workflowNodeList.size() > 1) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_COUNT_CHECK.getMsg());
         }
         // 查询工作流节点，并获取所有节点的id
         List<Long> idList = new ArrayList<>();
@@ -137,8 +145,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         // 将不需要保存的节点及所属数据物理删除
         removeWorkflowNode(idList);
         // 保存当前工作流节点数
-        Workflow workflow = new Workflow();
-        workflow.setId(workflowId);
         workflow.setNodeNumber(count);
         workflowService.updateById(workflow);
     }
