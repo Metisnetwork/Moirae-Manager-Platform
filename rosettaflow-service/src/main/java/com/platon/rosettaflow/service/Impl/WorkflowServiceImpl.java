@@ -399,7 +399,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
 
         //工作流节点资源表
-        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+        WorkflowNodeResource workflowNodeResource = getWorkflowNodeResource(workflowNode);
 
         TaskDto taskDto = new TaskDto();
 
@@ -434,6 +434,23 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskDto.setDesc(workflowNode.getNodeName());
 
         return taskDto;
+    }
+
+    private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
+        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+        if (null == workflowNodeResource) {
+            Algorithm algorithm = algorithmService.getById(workflowNode.getAlgorithmId());
+            if (null == algorithm) {
+                log.error("Can not find algorithm by id:{}", workflowNode.getAlgorithmId());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NOT_EXIST.getMsg());
+            }
+            workflowNodeResource = new WorkflowNodeResource();
+            workflowNodeResource.setCostMem(algorithm.getCostMem());
+            workflowNodeResource.setCostCpu(algorithm.getCostCpu());
+            workflowNodeResource.setCostBandwidth(algorithm.getCostBandwidth());
+            workflowNodeResource.setRunTime(algorithm.getRunTime());
+        }
+        return workflowNodeResource;
     }
 
     /**
