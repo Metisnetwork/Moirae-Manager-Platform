@@ -11,6 +11,7 @@ import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.SignMessageDto;
@@ -20,20 +21,18 @@ import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.service.CommonService;
 import com.platon.rosettaflow.service.ITokenService;
 import com.platon.rosettaflow.service.IUserService;
-import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
+ * 用户服务实现类
  * @author admin
  * @date 2021/8/16
- * @description 用户服务实现类
  */
 @Slf4j
 @Service
@@ -58,6 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public User getByAddress(String address) {
         LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(User::getAddress, address);
+        wrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
@@ -90,15 +90,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void updateNickName(String address, String nickName) {
-       LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(User::getUserName,nickName);
-        User user = this.getOne(queryWrapper);
+        User user = getByAddress(address);
         if(!Objects.isNull(user)){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
         }
-
         LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(User::getAddress, address);
+        updateWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
         updateWrapper.set(User::getUserName, nickName);
         this.update(updateWrapper);
     }

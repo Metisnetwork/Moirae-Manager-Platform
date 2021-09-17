@@ -10,6 +10,7 @@ import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
+import com.platon.rosettaflow.req.user.UserDetailsReq;
 import com.platon.rosettaflow.service.IUserService;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
@@ -80,6 +81,13 @@ public class UserController {
     public ResponseVo<?> updateNickName(@RequestBody @Valid UpdateNickReq updateNickReq) {
         userService.updateNickName(updateNickReq.get0xAddress(), updateNickReq.getNickName());
         return ResponseVo.create(RespCodeEnum.SUCCESS);
+    }
+
+    @PostMapping("queryUserDetails")
+    @ApiOperation(value = "查询用户详情", notes = "查询用户详情")
+    public ResponseVo<UserVo> queryUserDetails(@RequestBody @Valid UserDetailsReq userDetailsReq) {
+        User user = userService.getByAddress(userDetailsReq.getAddress());
+        return ResponseVo.createSuccess(BeanUtil.toBean(user, UserVo.class));
     }
 
     @GetMapping("queryAllUserNickname")

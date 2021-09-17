@@ -2,7 +2,6 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.common.constants.AlgorithmConstant;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -146,7 +145,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         if (childList2.size() == 0) {
             param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
         }
-        if (childList1.size() == 0) {
+        if (childList3.size() == 0) {
             param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
         }
         param1.put("child", childList1);
