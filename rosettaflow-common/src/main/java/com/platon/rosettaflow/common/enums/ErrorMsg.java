@@ -43,6 +43,7 @@ public enum ErrorMsg {
     ADD_ALG_ERROR("新增算法错误", "Add algorithm error"),
     UPDATE_ALG_ERROR("修改算法错误", "Update algorithm error"),
     QUERY_ALG_DETAILS_ERROR("查询算法详情错误", "Query algorithm details error"),
+    ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code not exist"),
 
     /**
      * 数据
