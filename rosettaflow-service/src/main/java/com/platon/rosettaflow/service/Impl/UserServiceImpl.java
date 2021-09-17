@@ -23,6 +23,7 @@ import com.platon.rosettaflow.service.ITokenService;
 import com.platon.rosettaflow.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -90,15 +91,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void updateNickName(String address, String nickName) {
-        User user = getByAddress(address);
-        if(!Objects.isNull(user)){
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
+        try {
+            LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
+            updateWrapper.eq(User::getAddress, address);
+            updateWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
+            updateWrapper.set(User::getUserName, nickName);
+            this.update(updateWrapper);
+        } catch (Exception e) {
+            log.error("updateNickName--修改用户昵称失败, 错误信息:{}", e.getMessage());
+            if (e instanceof DuplicateKeyException){
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
+            }
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MODIFY_USER_NAME_FAILED.getMsg());
         }
-        LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.eq(User::getAddress, address);
-        updateWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
-        updateWrapper.set(User::getUserName, nickName);
-        this.update(updateWrapper);
     }
 
     @Override

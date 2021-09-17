@@ -19,10 +19,11 @@ public enum ErrorMsg {
      * 用户
      */
     USER_NONCE_INVALID("nonce无效", "Nonce invalid"),
-    USER_SIGN_ERROR("签名错误", "Sign error"),
-    USER_UN_LOGIN("用户未登录", "User un login"),
-    USER_ADDRESS_ERROR("用户地址有误", "User address error"),
-    USER_NAME_EXISTED("用户名称已存在", "User name already exist"),
+    USER_SIGN_ERROR("签名错误", "Signature error"),
+    USER_UN_LOGIN("用户未登录", "User not logged in"),
+    USER_ADDRESS_ERROR("用户地址有误", "Wrong user address"),
+    MODIFY_USER_NAME_FAILED("用户名称修改失败", "User name modification failed"),
+    USER_NAME_EXISTED("用户名称已存在", "User name already exists"),
 
     /**
      * 项目
