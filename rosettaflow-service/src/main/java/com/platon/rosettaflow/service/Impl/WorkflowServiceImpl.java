@@ -373,9 +373,20 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workFlowId, currentNode);
 
         //获取工作流代码输入信息
+        String calculateContractCode;
+        String dataSplitContractCode;
         WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
-        if (workflowNodeCode == null) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_CODE_NOT_EXIST.getMsg());
+        if (null == workflowNodeCode) {
+            AlgorithmCode algorithmCode = algorithmCodeService.getByAlgorithmId(workflowNode.getAlgorithmId());
+            if (null == algorithmCode) {
+                log.error("Can not find algorithm code by id:{}", workflowNode.getAlgorithmId());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_CODE_NOT_EXIST.getMsg());
+            }
+            calculateContractCode = algorithmCode.getCalculateContractCode();
+            dataSplitContractCode = algorithmCode.getDataSplitContractCode();
+        } else {
+            calculateContractCode = workflowNodeCode.getCalculateContractCode();
+            dataSplitContractCode = workflowNodeCode.getDataSplitContractCode();
         }
 
         //获取工作流节点输入信息
@@ -412,9 +423,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 任务需要花费的资源声明
         taskDto.setResourceCostDeclareDto(getResourceCostDeclare(workflowNodeResource));
         //算法代码
-        taskDto.setCalculateContractCode(workflowNodeCode.getCalculateContractCode());
+        taskDto.setCalculateContractCode(calculateContractCode);
         //数据分片合约代码
-        taskDto.setDataSplitContractCode(workflowNodeCode.getDataSplitContractCode());
+        taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
         taskDto.setContractExtraParams(getContractExtraParams(workflowNodeVariableList));
         //发起任务的账户的签名
