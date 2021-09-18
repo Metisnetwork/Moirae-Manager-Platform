@@ -25,22 +25,22 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "项目模板相关接口")
-@RequestMapping(value = "project", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "projectTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProjectTempController {
 
     @Resource
     private IProjectTempService projectTempService;
 
-    @GetMapping("projectTempList")
+    @GetMapping("list")
     @ApiOperation(value = "查询项目模板列表", notes = "查询项目模板列表")
-    public ResponseVo<List<ProjTempListVo>> projectTempList() {
+    public ResponseVo<List<ProjTempListVo>> list() {
         List<ProjectTemp> list = projectTempService.projectTempList();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjTempListVo.class));
     }
 
-    @PostMapping("addProjectTemplate")
+    @PostMapping("add")
     @ApiOperation(value = "添加项目模板", notes = "添加项目模板")
-    public ResponseVo<?> addProjectTemplate(@RequestBody @Valid AddProjectTemplateReq dddProjectTemplateReq) {
+    public ResponseVo<?> add(@RequestBody @Valid AddProjectTemplateReq dddProjectTemplateReq) {
         projectTempService.addProjectTemplate(dddProjectTemplateReq.getId());
         return ResponseVo.createSuccess();
     }
