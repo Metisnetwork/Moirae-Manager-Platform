@@ -15,10 +15,10 @@ import java.util.Date;
 public class ProjMemberListVo {
 
     @ApiModelProperty(value = "项目成员id")
-    private String memberId;
+    private Long memberId;
 
     @ApiModelProperty(value = "用户ID")
-    private String userId;
+    private Long userId;
 
     @ApiModelProperty(value = "用户名称")
     private String userName;

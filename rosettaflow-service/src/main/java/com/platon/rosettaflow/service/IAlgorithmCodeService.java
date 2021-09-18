@@ -34,8 +34,9 @@ public interface IAlgorithmCodeService extends IService<AlgorithmCode> {
      * 复制保存算法代码
      * @param oldAlgorithmId 源算法id
      * @param newAlgorithmId 目的算法id
+     * @param oldNodeId 源节点id
      */
-    void copySaveAlgorithmCode(Long oldAlgorithmId,Long newAlgorithmId);
+    void copySaveAlgorithmCode(Long oldAlgorithmId,Long newAlgorithmId, Long oldNodeId);
     /**
      * 清空算法表
      */

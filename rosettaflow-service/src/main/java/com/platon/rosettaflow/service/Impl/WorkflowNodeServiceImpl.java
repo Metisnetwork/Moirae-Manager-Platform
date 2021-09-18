@@ -413,6 +413,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
+        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
@@ -422,6 +423,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         updateWrapper.set(WorkflowNode::getRunStatus,newRunStatus);
         updateWrapper.eq(WorkflowNode::getRunStatus,oldRunStatus);
         updateWrapper.eq(WorkflowNode::getWorkflowId,workflowId);
+        updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         this.update(updateWrapper);
     }
 }

@@ -106,7 +106,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public Workflow queryWorkflowDetail(Long id) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getId, id);
-        queryWrapper.eq(Workflow::getStatus, 1);
+        queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(queryWrapper);
     }
 
@@ -163,11 +163,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
             // 复制算法、算法代码、算法变量
             for (WorkflowNode oldNode : workflowNodeOldList) {
-                // 保存算法
+                // 复制算法
                 Long newAlgorithmId = algorithmService.copySaveAlgorithm(oldNode);
-                // 保存算法代码(参数：源算法id、目的算法id)
-                algorithmCodeService.copySaveAlgorithmCode(oldNode.getAlgorithmId(), newAlgorithmId);
-                // 保存算法变量(参数：源算法id、目的算法id)
+                // 复制算法代码(参数：源算法id、目的算法id)
+                algorithmCodeService.copySaveAlgorithmCode(oldNode.getAlgorithmId(), newAlgorithmId, oldNode.getId());
+                // 复制算法变量(参数：源算法id、目的算法id)
                 algorithmVariableService.saveAlgorithmVariable(oldNode.getAlgorithmId(), newAlgorithmId);
             }
         } catch (Exception e) {
@@ -184,7 +184,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 将复制的工作流数据id置空，新增一条新的工作流数据
      */
     private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
-        Workflow originWorkflow = this.getById(originId);
+        Workflow originWorkflow = this.queryWorkflowDetail(originId);
         if (Objects.isNull(originWorkflow)) {
             log.error("Origin workflow not found by id:{}", originId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ORIGIN_NOT_EXIST.getMsg());
@@ -303,9 +303,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public Long addWorkflowByTemplate(Long projectId, WorkflowTemp workflowTemp) {
+    public Long addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp) {
         Workflow workflow = new Workflow();
         workflow.setProjectId(projectId);
+        workflow.setUserId(userId);
         workflow.setWorkflowName(workflowTemp.getWorkflowName());
         workflow.setWorkflowDesc(workflowTemp.getWorkflowDesc());
         workflow.setNodeNumber(workflowTemp.getNodeNumber());

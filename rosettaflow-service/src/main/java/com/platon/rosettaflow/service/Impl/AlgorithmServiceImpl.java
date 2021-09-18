@@ -159,15 +159,12 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 
     @Override
     public Long copySaveAlgorithm(WorkflowNode oldNode) {
-        Algorithm oldAlgorithm = this.getById(oldNode.getId());
-        if (Objects.isNull(oldAlgorithm)) {
+        AlgorithmDto algorithmDto = this.queryAlgorithmDetails(oldNode.getAlgorithmId());
+        if (Objects.isNull(algorithmDto)) {
             return null;
         }
-        Algorithm newAlgorithm = BeanUtil.toBean(oldAlgorithm, Algorithm.class);
-        newAlgorithm.setId(null);
+        Algorithm newAlgorithm = BeanUtil.toBean(algorithmDto, Algorithm.class);
         newAlgorithm.setAuthor(UserContext.get() == null ? "" : UserContext.get().getUserName());
-        newAlgorithm.setCreateTime(null);
-        newAlgorithm.setUpdateTime(null);
         this.save(newAlgorithm);
         return newAlgorithm.getId();
     }

@@ -29,4 +29,7 @@ public class ProjectListVo {
     @ApiModelProperty(value = "用户名称(创建者)")
     private String userName;
 
+    @ApiModelProperty(value = "成员角色")
+    private Byte role;
+
 }

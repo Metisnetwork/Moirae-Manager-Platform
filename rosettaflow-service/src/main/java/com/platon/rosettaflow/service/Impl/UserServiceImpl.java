@@ -40,9 +40,6 @@ import java.util.Objects;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     @Resource
-    private UserMapper userMapper;
-
-    @Resource
     private ITokenService tokenService;
 
     @Resource
@@ -108,7 +105,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public List<User> queryAllUserNickName() {
-        return userMapper.queryAllUserNickname();
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
     }
 
     @Override

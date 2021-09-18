@@ -91,16 +91,16 @@ public class ProjectController {
 
     @PostMapping("addProjMember")
     @ApiOperation(value = "新增项目成员", notes = "新增项目成员")
-    public ResponseVo<?> addProjMember(@RequestBody @Valid ProjMemberReq projMemberReq) {
-        ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
+    public ResponseVo<?> addProjMember(@RequestBody @Valid AddMemberReq addMemberReq) {
+        ProjectMember projectMember = BeanUtil.toBean(addMemberReq, ProjectMember.class);
         projectService.addProjMember(projectMember);
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("updateProjMember")
     @ApiOperation(value = "修改项目成员", notes = "修改项目成员")
-    public ResponseVo<?> updateProjMember(@RequestBody @Valid ProjMemberReq projMemberReq) {
-        ProjectMember projectMember = BeanUtil.toBean(projMemberReq, ProjectMember.class);
+    public ResponseVo<?> updateProjMember(@RequestBody @Valid UpdateMemberReq updateMemberReq) {
+        ProjectMember projectMember = BeanUtil.toBean(updateMemberReq, ProjectMember.class);
         projectService.updateProjMember(projectMember);
         return ResponseVo.createSuccess();
     }

@@ -22,30 +22,30 @@ public enum ErrorMsg {
     USER_SIGN_ERROR("签名错误", "Signature error"),
     USER_UN_LOGIN("用户未登录", "User not logged in"),
     USER_ADDRESS_ERROR("用户地址有误", "Wrong user address"),
-    MODIFY_USER_NAME_FAILED("用户名称修改失败", "User name modification failed"),
-    USER_NAME_EXISTED("用户名称已存在", "User name already exists"),
+    MODIFY_USER_NAME_FAILED("昵称修改失败", "Nickname modification failed"),
+    USER_NAME_EXISTED("昵称已存在", "Nickname already exists"),
 
     /**
      * 项目
      */
-    ADD_PROJ_ERROR("新增项目错误", "Add project error"),
-    PROJECT_NAME_EXISTED("项目名称已存在", "Project name already exist"),
-    PROJECT_NOT_EXIST("项目不存在", "Project not exist"),
-    MEMBER_ROLE_EXISTED("成员角色已存在", "Member role already exist"),
-    UPDATE_PROJ_ERROR("修改项目错误", "Update project error"),
+    ADD_PROJ_ERROR("新增项目错误", "New project error"),
+    PROJECT_NAME_EXISTED("项目名称已存在", "Project name already exists"),
+    PROJECT_NOT_EXIST("项目不存在", "Project does not exist"),
+    MEMBER_ROLE_EXISTED("成员角色已存在", "Member role already exists"),
+    UPDATE_PROJ_ERROR("修改项目错误", "Modify project error"),
     QUERY_PROJ_LIST_ERROR("查询项目列表错误", "Query project list error"),
     QUERY_PROJ_DETAILS_ERROR("查询项目详情错误", "Query project details error"),
     ADD_PROJECT_TEMPLATE_ERROR("新增项目模板错误", "Add project template error"),
-    PROJECT_TEMPLATE_NAME_EXISTED("项目模板名称已存在", "Project template name already exist"),
+    PROJECT_TEMPLATE_NAME_EXISTED("项目模板名称已存在", "Project template name already exists"),
 
     /**
      * 算法
      */
-    ADD_ALG_ERROR("新增算法错误", "Add algorithm error"),
-    UPDATE_ALG_ERROR("修改算法错误", "Update algorithm error"),
+    ADD_ALG_ERROR("新增算法错误", "New algorithm error"),
+    UPDATE_ALG_ERROR("修改算法错误", "Modify algorithm error"),
     QUERY_ALG_DETAILS_ERROR("查询算法详情错误", "Query algorithm details error"),
-    ALG_NOT_EXIST("算法不存在", "Algorithm not exist"),
-    ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code not exist"),
+    ALG_NOT_EXIST("算法不存在", "Algorithm does not exist"),
+    ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code does not exist"),
 
     /**
      * 数据
@@ -58,17 +58,17 @@ public enum ErrorMsg {
     /**
      * 工作流
      */
-    WORKFLOW_NOT_EXIST("工作流不存在", "Workflow not exist"),
-    WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow not exist"),
-    WORKFLOW_EXIST("工作流已存在", "Workflow already exist"),
+    WORKFLOW_NOT_EXIST("工作流不存在", "Workflow does not exist"),
+    WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),
+    WORKFLOW_EXIST("工作流已存在", "Workflow already exists"),
     WORKFLOW_RUNNING_EXIST("工作流正在运行中", "Workflow is running"),
     WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
-    WORKFLOW_TERMINATE_NET_PROCESS_ERROR("工作流终止失败", "Workflow terminated fail"),
+    WORKFLOW_TERMINATE_NET_PROCESS_ERROR("工作流终止失败", "Workflow terminated failed"),
     WORKFLOW_END_NODE_OVERFLOW("截止节点不能大于工作流最大节点数", "EndNode can not more than workflow nodeNumber"),
-    WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "Workflow node not exist"),
-    WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "Workflow node not cache"),
-    WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported to run"),
-    WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "Workflow node code not exist"),
+    WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "Workflow node does not  exist"),
+    WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "Workflow node not cached"),
+    WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported"),
+    WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "Workflow node code does not exist"),
 
     /**
      * 作业
