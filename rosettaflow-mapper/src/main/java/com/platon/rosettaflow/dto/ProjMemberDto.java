@@ -14,7 +14,7 @@ public class ProjMemberDto {
     /**
      * 用户ID
      */
-    private String userId;
+    private Long userId;
 
     /**
      * 用户名称
@@ -24,7 +24,7 @@ public class ProjMemberDto {
     /**
      * 项目成员id
      */
-    private String memberId;
+    private Long memberId;
 
     /**
      * 用户角色

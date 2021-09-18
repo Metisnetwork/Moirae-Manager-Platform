@@ -11,9 +11,4 @@ import java.util.Map;
  */
 public interface UserMapper extends BaseMapper<User> {
 
-    /**
-     * 查询所有用户昵称
-     * @return
-     */
-    List<User> queryAllUserNickname();
 }

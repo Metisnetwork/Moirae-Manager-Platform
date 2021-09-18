@@ -16,7 +16,6 @@ import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
-import io.swagger.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

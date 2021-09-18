@@ -11,6 +11,6 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, project_id, user_id, `role`, del_version, `status`, create_time, update_time
+    id, project_id, user_id, `role`, `status`, create_time, update_time
   </sql>
 </mapper>

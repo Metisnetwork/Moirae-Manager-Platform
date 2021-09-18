@@ -79,7 +79,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 WorkflowTemp workflowTemp = workflowTempService.getWorkflowTemplate(projectDto.getProjectTempId());
                 if (null != workflowTemp) {
                     // 添加工作流
-                    Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), workflowTemp);
+                    Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), userId, workflowTemp);
 
                     //从工作流节点模板中复制所有工作流节点
                     List<WorkflowNodeTemp> workflowNodeTempList = workflowNodeTempService.getByWorkflowTempId(workflowTemp.getId());

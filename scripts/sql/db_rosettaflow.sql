@@ -289,7 +289,7 @@ CREATE TABLE `t_workflow` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY UK_FLOW_NAME (`project_id`, `workflow_name`),
+  UNIQUE KEY UK_FLOW_NAME (`project_id`, `workflow_name`, `status`, `del_version`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流表';
 

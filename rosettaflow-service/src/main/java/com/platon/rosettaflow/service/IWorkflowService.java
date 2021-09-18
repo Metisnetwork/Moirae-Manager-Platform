@@ -86,10 +86,11 @@ public interface IWorkflowService extends IService<Workflow> {
      * 根据项目id及工作流模板添加工作流
      *
      * @param projectId    项目id
+     * @param userId 用户id
      * @param workflowTemp 工作流模板
      * @return 工作流id
      */
-    Long addWorkflowByTemplate(Long projectId, WorkflowTemp workflowTemp);
+    Long addWorkflowByTemplate(Long projectId, Long userId,  WorkflowTemp workflowTemp);
 
     /**
      * 终止工作流

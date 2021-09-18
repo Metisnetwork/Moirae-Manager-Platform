@@ -38,11 +38,13 @@
             w.workflow_desc as workflowDesc,
             w.run_status as runStatus,
             w.create_time as createTime,
-            (select user_name from t_user u where u.status = '1' and w.user_id = u.id) as userName
+            u.user_name as userName
         FROM
-            t_workflow w
+            t_workflow w, t_user u
         WHERE 1=1
-            and w.status = '1'
+            and w.status = 1
+            and u.status = 1
+            and w.user_id = u.id
             and w.project_id = #{projectId, jdbcType=BIGINT}
             <if test="workflowName != null and workflowName != ''">
                 and w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
