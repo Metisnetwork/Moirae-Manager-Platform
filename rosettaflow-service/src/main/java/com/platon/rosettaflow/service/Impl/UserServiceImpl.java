@@ -68,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (user == null) {
             user = new User();
             // 用户昵称
-            user.setUserName(hrpAddress.substring(0, 12) + hrpAddress.substring(address.length() - 4));
+            user.setUserName(hrpAddress);
             // 钱包地址
             user.setAddress(address);
             this.save(user);
