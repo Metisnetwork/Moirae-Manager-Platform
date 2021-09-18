@@ -181,12 +181,11 @@ CREATE TABLE `t_project_member` (
   `project_id` bigint(20) NOT NULL COMMENT '项目id',
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
   `role` tinyint(4) DEFAULT NULL COMMENT '角色：1-管理员，2-编辑着, 3-查看着',
-  `del_version` bigint(11) DEFAULT 0 COMMENT '版本标识，用于逻辑删除',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_PROJ_USER_ID` (`project_id`, `user_id`, `status`, `del_version`),
+  UNIQUE KEY `UK_PROJ_USER_ID` (`project_id`, `user_id`),
   KEY (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目成员管理表';
 

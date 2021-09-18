@@ -37,7 +37,7 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
     }
 
     @Override
-    public Long addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId) {
+    public void addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId) {
         AlgorithmCode algorithmCode = algorithmCodeService.getByAlgorithmId(algorithmId);
         WorkflowNodeCode workflowNodeCode = new WorkflowNodeCode();
         workflowNodeCode.setWorkflowNodeId(workflowNodeId);
@@ -45,7 +45,6 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
         workflowNodeCode.setCalculateContractCode(algorithmCode.getCalculateContractCode());
         workflowNodeCode.setDataSplitContractCode(algorithmCode.getDataSplitContractCode());
         this.save(workflowNodeCode);
-        return workflowNodeCode.getId();
     }
 
     @Override

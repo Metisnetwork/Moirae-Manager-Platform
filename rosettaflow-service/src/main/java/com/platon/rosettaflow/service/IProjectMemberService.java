@@ -21,22 +21,4 @@ public interface IProjectMemberService extends IService<ProjectMember> {
      */
     List<ProjectMember> queryByProjectId(Long projectId);
 
-    /**
-     * 批量修改项目成员
-     *
-     * @param projMemberIdList 项目成员id
-     * @return
-     */
-    void updateBatchById(List<Long> projMemberIdList);
-
-//    /**
-//     * * 查询项目成员列表
-//     *
-//     * @param projectId 项目id
-//     * @param userName  用户昵称
-//     * @param iPage     分页
-//     * @return IPage
-//     */
-//    IPage<ProjMemberDto> queryProjMemberList(Long projectId, String userName, IPage<ProjMemberDto> iPage);
-
 }

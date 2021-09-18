@@ -149,8 +149,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
         // 根据项目id获取成员id
         List<Long> idList = getMemberIdByProjectId(id);
-        // 批量逻辑删除项目成员，并修改项目成员版本标识
-        projectMemberService.updateBatchById(idList);
+        // 批量物理删除项目成员
+        projectMemberService.removeByIds(idList);
     }
 
     /**
@@ -197,8 +197,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             for (ProjectMember projectMember : projectMemberList) {
                 memberIdsList.add(projectMember.getId());
             }
-            // 逻辑删除项目成员，并修改项目成员版本标识
-            projectMemberService.updateBatchById(memberIdsList);
+            // 物理删除项目成员
+            projectMemberService.removeByIds(memberIdsList);
         }
         // 逻辑删除项目信息，修改版本标识，解决逻辑删除唯一校验问题
         this.updateBatchById(updateDelVersionById(idsList));
@@ -231,16 +231,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProjMember(Long projMemberId) {
-        // 逻辑删除项目成员，修改项目成员版本标识
-        projectMemberService.updateBatchById(Collections.singletonList(projMemberId));
+        // 物理删除项目成员
+        projectMemberService.removeByIds(Collections.singletonList(projMemberId));
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProjMemberBatch(String projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
-        // 批量逻辑删除项目成员，并修改项目成员版本标识
-        projectMemberService.updateBatchById(idList);
+        // 批量物理删除项目成员
+        projectMemberService.removeByIds(idList);
     }
 
     /**

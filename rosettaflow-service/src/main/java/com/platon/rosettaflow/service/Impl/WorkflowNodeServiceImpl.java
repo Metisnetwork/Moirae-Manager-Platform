@@ -399,10 +399,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
             //添加工作流节点代码
             workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
-            //查询节点代码对应的算法列表
+            //查询算法变量列表
             List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNodeTemp.getAlgorithmId());
             if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
-                //保存工作流输入变量
+                // 保存工作流输入变量
                 workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
             }
         }
@@ -413,6 +413,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
+        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
@@ -422,6 +423,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         updateWrapper.set(WorkflowNode::getRunStatus,newRunStatus);
         updateWrapper.eq(WorkflowNode::getRunStatus,oldRunStatus);
         updateWrapper.eq(WorkflowNode::getWorkflowId,workflowId);
+        updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         this.update(updateWrapper);
     }
 }

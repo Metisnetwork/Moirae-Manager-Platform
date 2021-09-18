@@ -47,10 +47,9 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
 
     @Override
     public void addByAlgorithmVariableList(Long workflowNodeId, List<AlgorithmVariable> algorithmVariableList) {
-        WorkflowNodeVariable workflowNodeVariable;
         List<WorkflowNodeVariable> workflowNodeVariableList = new ArrayList<>();
         for (AlgorithmVariable algorithmVariable : algorithmVariableList) {
-            workflowNodeVariable = new WorkflowNodeVariable();
+            WorkflowNodeVariable workflowNodeVariable = new WorkflowNodeVariable();
             workflowNodeVariable.setWorkflowNodeId(workflowNodeId);
             workflowNodeVariable.setVarNodeType(algorithmVariable.getVarType());
             workflowNodeVariable.setVarNodeKey(algorithmVariable.getVarKey());

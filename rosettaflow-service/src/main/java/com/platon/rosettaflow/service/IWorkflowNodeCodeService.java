@@ -30,7 +30,7 @@ public interface IWorkflowNodeCodeService extends IService<WorkflowNodeCode> {
      * @param workflowNodeId 工作流节点id
      * @return 工作流节点代码表id
      */
-    Long addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId);
+    void addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId);
 
     /**
      * 逻辑删除工作流节点代码, 根据工作流节点id
