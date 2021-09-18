@@ -8,12 +8,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
- * 保存项目成员请求参数
+ * 修改项目成员请求参数
  * @author houz
  */
 @Data
-@ApiModel(value = "保存项目成员请求参数")
-public class ProjMemberReq {
+@ApiModel(value = "修改项目成员请求参数")
+public class UpdateMemberReq {
 
     @ApiModelProperty(value = "项目成员ID", required = true)
     @NotNull(message = "{project.member.id.notNull}")

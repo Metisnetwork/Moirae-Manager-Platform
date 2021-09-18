@@ -163,11 +163,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
             // 复制算法、算法代码、算法变量
             for (WorkflowNode oldNode : workflowNodeOldList) {
-                // 保存算法
+                // 复制算法
                 Long newAlgorithmId = algorithmService.copySaveAlgorithm(oldNode);
-                // 保存算法代码(参数：源算法id、目的算法id)
-                algorithmCodeService.copySaveAlgorithmCode(oldNode.getAlgorithmId(), newAlgorithmId);
-                // 保存算法变量(参数：源算法id、目的算法id)
+                // 复制算法代码(参数：源算法id、目的算法id)
+                algorithmCodeService.copySaveAlgorithmCode(oldNode.getAlgorithmId(), newAlgorithmId, oldNode.getId());
+                // 复制算法变量(参数：源算法id、目的算法id)
                 algorithmVariableService.saveAlgorithmVariable(oldNode.getAlgorithmId(), newAlgorithmId);
             }
         } catch (Exception e) {
