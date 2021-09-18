@@ -54,8 +54,8 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         //添加空白模板
         ProjectTemp emptyTemp = new ProjectTemp();
         emptyTemp.setId(0L);
-        emptyTemp.setProjectName("空白模板");
-        emptyTemp.setProjectDesc("空白模板");
+        emptyTemp.setProjectName("");
+        emptyTemp.setProjectDesc("");
         returnList.add(0, emptyTemp);
         return returnList;
     }
