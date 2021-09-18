@@ -152,7 +152,8 @@ CREATE TABLE `t_project` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_NAME` (`project_name`, `status`, `del_version`)
+  UNIQUE KEY `UK_NAME` (`project_name`, `status`, `del_version`),
+  KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目表';
 
 -- ----------------------------
@@ -185,7 +186,8 @@ CREATE TABLE `t_project_member` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_PROJ_USER_ID` (`project_id`, `user_id`, `role`, `status`, `del_version`)
+  UNIQUE KEY `UK_PROJ_USER_ID` (`project_id`, `user_id`, `status`, `del_version`),
+  KEY (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目成员管理表';
 
 -- ----------------------------
