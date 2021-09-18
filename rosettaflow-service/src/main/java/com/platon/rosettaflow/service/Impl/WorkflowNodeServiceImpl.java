@@ -398,13 +398,13 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             this.save(workflowNode);
 
             //添加工作流节点代码
-            workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
+//            workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
             //查询节点代码对应的算法列表
-            List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNodeTemp.getAlgorithmId());
-            if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
-                //保存工作流输入变量
-                workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
-            }
+//            List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNodeTemp.getAlgorithmId());
+//            if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
+//                //保存工作流输入变量
+//                workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
+//            }
         }
     }
 

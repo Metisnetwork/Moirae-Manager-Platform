@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.grpc.service;
 
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 
 import java.util.List;
 
@@ -12,25 +13,25 @@ import java.util.List;
 public interface GrpcMetaDataService {
 
     /**
-     * 查看单个元数据详情 (包含 列字段描述)
-     *
-     * @param identityId 组织的身份标识Id
-     * @param metaDataId 元数据Id
-     * @return 元数据详情响应体
-     */
-    MetaDataDetailResponseDto getMetaDataDetail(String identityId, String metaDataId);
-
-    /**
-     * 查看元数据详情列表
+     * 查看全网元数据列表
      *
      * @return 获取所有元数据列表
      */
     List<MetaDataDetailResponseDto> getMetaDataDetailList();
 
     /**
-     * 通过表的拥有者（owner）获取元数据详情
+     * 查看 本组织元数据列表
      *
-     * @return 获取所有元数据列表
+     * @return 本组织元数据列表
      */
-    List<MetaDataDetailResponseDto> getMetaDataDetailListByOwner(String identityId);
+    List<SelfMetaDataDetailResponseDto> getSelfMetadataDetailList();
+
+    /**
+     * 查询某 metadata 参与过的任务的taskId列表
+     *
+     * @param identityId 组织身份标识
+     * @param metadataId 元数据id
+     * @return 参与过的任务的taskId列表
+     */
+    List<String> getMetadataUsedTaskIdList(String identityId, String metadataId);
 }

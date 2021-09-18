@@ -3,8 +3,9 @@ package com.platon.rosettaflow.grpc.service.impl;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -16,17 +17,12 @@ import java.util.List;
 /**
  * @author hudenian
  * @date 2021/8/24
- * @description 功能描述
+ * @description 获取真实元数据信息mocker类
  */
 @Slf4j
 @Service
 @Profile({"dev", "local"})
 public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
-
-    @Override
-    public MetaDataDetailResponseDto getMetaDataDetail(String identityId, String metaDataId) {
-        return null;
-    }
 
     @Override
     public List<MetaDataDetailResponseDto> getMetaDataDetailList() {
@@ -47,7 +43,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
             metaDataSummaryDto.setFilePath("FilePath" + i);
 
             metaDataSummaryDto.setColumns(i);
-            metaDataSummaryDto.setSize((long)i+1000);
+            metaDataSummaryDto.setSize((long) i + 1000);
             metaDataSummaryDto.setFileType(1);
             metaDataSummaryDto.setHasTitle(true);
             metaDataSummaryDto.setIndustry("计算机");
@@ -77,7 +73,13 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
     }
 
     @Override
-    public List<MetaDataDetailResponseDto> getMetaDataDetailListByOwner(String identityId) {
+    public List<SelfMetaDataDetailResponseDto> getSelfMetadataDetailList() {
         return null;
     }
+
+    @Override
+    public List<String> getMetadataUsedTaskIdList(String identityId, String metadataId) {
+        return null;
+    }
+
 }

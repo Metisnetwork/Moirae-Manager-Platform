@@ -1,6 +1,7 @@
-package com.platon.rosettaflow.grpc.metadata.req.dto;
+package com.platon.rosettaflow.grpc.metadata.resp.dto;
 
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
+import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailDto;
 import lombok.Data;
 
 /**

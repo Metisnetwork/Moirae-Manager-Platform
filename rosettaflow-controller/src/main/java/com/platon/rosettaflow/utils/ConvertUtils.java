@@ -26,13 +26,14 @@ public class ConvertUtils {
 
     /**
      * 列表对象并行转换工具(性能好，会乱序)
-     * @param list1
-     * @param tClass
-     * @param <T>
-     * @return
+     *
+     * @param list1  源列表数据
+     * @param tClass 目标类
+     * @return 目标类列表
      */
-    public static <T> List<T> convertParallelToList(List list1, Class<T> tClass) {
-        List<T> list2 = new ArrayList();
+    @SuppressWarnings("unused")
+    public static <T> List<T> convertParallelToList(List<?> list1, Class<T> tClass) {
+        List<T> list2 = new ArrayList<>();
         list1.parallelStream().forEach(o1 -> {
             T target = ReflectUtil.newInstanceIfPossible(tClass);
             BeanUtils.copyProperties(o1, target);

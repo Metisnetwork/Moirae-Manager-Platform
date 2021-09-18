@@ -60,6 +60,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             Long userId = UserContext.get().getId();
             if (userId == null || userId == 0L) {
+                log.error("ProjectServiceImpl->addProject fail user un login");
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
             }
             Project project = new Project();

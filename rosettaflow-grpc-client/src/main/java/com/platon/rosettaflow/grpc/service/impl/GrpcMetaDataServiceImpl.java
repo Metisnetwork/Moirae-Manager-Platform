@@ -1,7 +1,8 @@
 package com.platon.rosettaflow.grpc.service.impl;
 
 import com.platon.rosettaflow.grpc.client.MetaDataServiceClient;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -24,17 +25,18 @@ public class GrpcMetaDataServiceImpl implements GrpcMetaDataService {
     private MetaDataServiceClient metaDataServiceClient;
 
     @Override
-    public MetaDataDetailResponseDto getMetaDataDetail(String identityId, String metaDataId) {
-        return metaDataServiceClient.getMetaDataDetail(identityId, metaDataId);
-    }
-
-    @Override
     public List<MetaDataDetailResponseDto> getMetaDataDetailList() {
         return metaDataServiceClient.getMetaDataDetailList();
     }
 
     @Override
-    public List<MetaDataDetailResponseDto> getMetaDataDetailListByOwner(String identityId) {
-        return metaDataServiceClient.getMetaDataDetailListByOwner(identityId);
+    public List<SelfMetaDataDetailResponseDto> getSelfMetadataDetailList() {
+        return metaDataServiceClient.getSelfMetadataDetailList();
     }
+
+    @Override
+    public List<String> getMetadataUsedTaskIdList(String identityId, String metadataId) {
+        return metaDataServiceClient.getMetadataUsedTaskIdList(identityId, metadataId);
+    }
+
 }

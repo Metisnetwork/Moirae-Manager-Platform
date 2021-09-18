@@ -36,17 +36,17 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
         return this.getOne(wrapper);
     }
 
-    @Override
-    public Long addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId) {
-        AlgorithmCode algorithmCode = algorithmCodeService.getByAlgorithmId(algorithmId);
-        WorkflowNodeCode workflowNodeCode = new WorkflowNodeCode();
-        workflowNodeCode.setWorkflowNodeId(workflowNodeId);
-        workflowNodeCode.setEditType(algorithmCode.getEditType());
-        workflowNodeCode.setCalculateContractCode(algorithmCode.getCalculateContractCode());
-        workflowNodeCode.setDataSplitContractCode(algorithmCode.getDataSplitContractCode());
-        this.save(workflowNodeCode);
-        return workflowNodeCode.getId();
-    }
+//    @Override
+//    public Long addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId) {
+//        AlgorithmCode algorithmCode = algorithmCodeService.getByAlgorithmId(algorithmId);
+//        WorkflowNodeCode workflowNodeCode = new WorkflowNodeCode();
+//        workflowNodeCode.setWorkflowNodeId(workflowNodeId);
+//        workflowNodeCode.setEditType(algorithmCode.getEditType());
+//        workflowNodeCode.setCalculateContractCode(algorithmCode.getCalculateContractCode());
+//        workflowNodeCode.setDataSplitContractCode(algorithmCode.getDataSplitContractCode());
+//        this.save(workflowNodeCode);
+//        return workflowNodeCode.getId();
+//    }
 
     @Override
     public void deleteByWorkflowNodeId(Long workflowNodeId) {

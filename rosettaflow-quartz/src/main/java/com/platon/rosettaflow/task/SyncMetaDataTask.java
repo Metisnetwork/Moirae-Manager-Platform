@@ -3,14 +3,13 @@ package com.platon.rosettaflow.task;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.platon.rosettaflow.mapper.domain.MetaData;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import com.platon.rosettaflow.service.IMetaDataService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

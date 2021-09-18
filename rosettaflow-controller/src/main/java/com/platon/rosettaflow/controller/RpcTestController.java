@@ -1,7 +1,7 @@
 package com.platon.rosettaflow.controller;
 
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataDetailResponseDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
