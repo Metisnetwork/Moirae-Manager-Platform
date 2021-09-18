@@ -20,7 +20,7 @@
         a.project_name as projectName,
         a.project_desc as projectDesc,
         a.create_time as createTime,
-        b.role as memberRole,
+        b.role as role,
         (select u.user_name from t_user u where u.status = 1 and u.id = a.user_id) as userName
     from
         t_project a, t_project_member b

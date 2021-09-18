@@ -30,6 +30,6 @@ public class ProjectListVo {
     private String userName;
 
     @ApiModelProperty(value = "成员角色")
-    private String memberRole;
+    private Byte role;
 
 }

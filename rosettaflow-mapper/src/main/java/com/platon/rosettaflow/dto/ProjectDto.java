@@ -24,7 +24,7 @@ public class ProjectDto {
     /**
      * 用户成员角色
      */
-    private String memberRole;
+    private Byte role;
 
     /**
      * 项目名称
