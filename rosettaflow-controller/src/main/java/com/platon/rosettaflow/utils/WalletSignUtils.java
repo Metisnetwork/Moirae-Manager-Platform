@@ -93,7 +93,7 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "d6a151c0703d47e6baa068700e8c5381";
+        String uuid = "44f7dc0005b041a4a9cbd41c68ab3756";
         //登录签名
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
         //启动工作流签名

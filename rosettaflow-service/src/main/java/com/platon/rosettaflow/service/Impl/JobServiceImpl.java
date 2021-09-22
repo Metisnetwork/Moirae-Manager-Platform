@@ -22,9 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author hudenian
@@ -41,6 +40,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Resource
     private IWorkflowService workflowService;
 
+
+
     @Override
     public List<Job> getAllUnfinishedJob() {
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
@@ -48,6 +49,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         wrapper.le(Job::getBeginTime, new Date(System.currentTimeMillis()));
         wrapper.ge(Job::getEndTime, new Date(System.currentTimeMillis()));
         wrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
+        wrapper.or().eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue());
         wrapper.orderByAsc(Job::getId);
         return this.baseMapper.selectList(wrapper);
     }
@@ -81,16 +83,23 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
-        //如果作业现在执行则不能够修改
-        if(job.getJobStatus() == SubJobStatusEnum.RUNNING.getValue()){
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING.getMsg());
+        //如果作业正在执行或者执行完成则不能够修改
+        if(job.getJobStatus() == JobStatusEnum.RUNNING.getValue() || job.getJobStatus() == JobStatusEnum.FINISH.getValue()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_OR_FINISH.getMsg());
         }
 
         checkParam(jobDto);
         //修改作业
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
-        if (!this.updateById(job)) {
+        job.setStatus(StatusEnum.VALID.getValue());
+        if(job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()){
+            job.setRepeatInterval(null);
+            job.setEndTime(null);
+            job.setStatus(StatusEnum.VALID.getValue());
+            job.setUpdateTime(new Date());
+        }
+        if (this.baseMapper.updateJobById(job) == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
         }
 
@@ -106,18 +115,23 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public void pause(Long id) {
         Job job = this.getById(id);
-        if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue()) {
-            redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
+        if (job.getJobStatus() != JobStatusEnum.RUNNING.getValue()) {
+            log.error("job is not running can not modify by jobId:{}" + job.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_RUNNING.getMsg());
         }
+        redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
     }
 
     @Override
     public void reStart(Long id) {
         Job job = this.getById(id);
-        if (job.getJobStatus() == JobStatusEnum.STOP.getValue()) {
-            redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
+        if (job.getJobStatus() != JobStatusEnum.STOP.getValue()) {
+            log.error("job is not stop can not modify by jobId:{}" + job.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_STOP.getMsg());
         }
+        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
     }
+
 
     /**
      * 检查入参合法性
@@ -131,6 +145,10 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         if (jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()) {
             if (Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEAT_INTERVAL_ERROR.getMsg());
+            }
+        } else {
+            if (!Objects.isNull(jobDto.getEndTime()) || !Objects.isNull(jobDto.getRepeatInterval())) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
             }
         }
     }

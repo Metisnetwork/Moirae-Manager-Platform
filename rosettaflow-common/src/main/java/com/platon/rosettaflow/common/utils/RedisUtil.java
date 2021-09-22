@@ -1,10 +1,12 @@
 package com.platon.rosettaflow.common.utils;
 
+import com.platon.rosettaflow.common.constants.SysConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -133,6 +135,22 @@ public class RedisUtil {
     @SuppressWarnings("all")
     public boolean delete(String key) {
         return redisTemplate.delete(key);
+    }
+
+    /**
+     * 普通批量删除
+     *
+     * @param keys 普通批量删除的键集合
+     * @return true / false
+     */
+    public boolean deleteBatch(List<String> keys){
+        List<Boolean> deleteStates = new ArrayList<>();
+        for (String key: keys) {
+             if(listSize(key) > 0){
+                 deleteStates.add(delete(key));
+             }
+        }
+        return !deleteStates.contains(false);
     }
 
     /**

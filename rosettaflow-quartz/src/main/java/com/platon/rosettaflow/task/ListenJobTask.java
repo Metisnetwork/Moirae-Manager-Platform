@@ -39,14 +39,16 @@ public class ListenJobTask {
         for (int i = 0; i < size; i++) {
             String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
             Job job = JSON.parseObject(jobJson, Job.class);
+            log.error("------redis message add queue jobId:" + job.getId());
             jobManager.startJob(job);
         }
 
         //获取修改job列表
         size = redisUtil.listSize(SysConstant.JOB_EDIT_QUEUE);
         for (int i = 0; i < size; i++) {
-            String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
+            String jobJson = redisUtil.listRightPop(SysConstant.JOB_EDIT_QUEUE);
             Job job = JSON.parseObject(jobJson, Job.class);
+            log.error("------redis message edit queue jobId:" + job.getId());
             jobManager.startJob(job);
         }
         //获取暂停ob列表
@@ -54,6 +56,7 @@ public class ListenJobTask {
         for (int i = 0; i < size; i++) {
             String jobJson = redisUtil.listRightPop(SysConstant.JOB_PAUSE_QUEUE);
             Job job = JSON.parseObject(jobJson, Job.class);
+            log.error("------redis message pause queue jobId:" + job.getId());
             jobManager.pauseJob(job);
         }
     }

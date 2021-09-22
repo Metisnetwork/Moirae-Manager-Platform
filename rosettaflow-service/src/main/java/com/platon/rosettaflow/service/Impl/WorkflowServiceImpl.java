@@ -98,6 +98,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public List<Workflow> queryWorkFlowByProjectId(Long projectId) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getProjectId, projectId);
+        queryWrapper.eq(Workflow::getRunStatus, WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         return this.list(queryWrapper);
     }

@@ -32,7 +32,7 @@
       tj.*,tw.workflow_name
     FROM
       t_job AS tj
-        LEFT JOIN t_workflow AS tw ON tj.workflow_id = tw.id
+      LEFT JOIN t_workflow AS tw ON tj.workflow_id = tw.id
     <where>
       AND tj.status = 1
       <if test="jobName != null and jobName != ''">
@@ -42,4 +42,22 @@
     ORDER BY
       tj.create_time DESC
   </select>
+
+
+
+  <update id="updateJobById" parameterType="com.platon.rosettaflow.mapper.domain.Job">
+    update t_job
+    set workflow_id = #{workflowId,jdbcType=INTEGER},
+        name= #{name,jdbcType=VARCHAR},
+        `desc` =  #{desc,jdbcType=VARCHAR},
+        repeat_flag = #{repeatFlag,jdbcType=INTEGER},
+        repeat_interval = #{repeatInterval,jdbcType=INTEGER},
+        begin_time = #{beginTime,jdbcType=TIMESTAMP},
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+        job_status = #{jobStatus,jdbcType=INTEGER},
+        `status` = #{status,jdbcType=INTEGER},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
 </mapper>

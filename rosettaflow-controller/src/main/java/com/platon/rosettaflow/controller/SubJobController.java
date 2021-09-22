@@ -46,11 +46,11 @@ public class SubJobController {
 
     @PostMapping("action")
     @ApiOperation(value = "操作作业", notes = "操作作业")
-    public ResponseVo<?> actionJob(@RequestBody @Valid ActionJobReq actionJobReq) {
-        if(actionJobReq.getActionType() == JobActionStatusEnum.PAUSE.getValue()){
-            subJobService.pause(actionJobReq.getId());
+    public ResponseVo<?> actionJob(@RequestBody @Valid ActionJobReq actionSubJobReq) {
+        if(actionSubJobReq.getActionType() == JobActionStatusEnum.PAUSE.getValue()){
+            subJobService.pause(actionSubJobReq.getId());
         } else {
-            subJobService.reStart(actionJobReq.getId());
+            subJobService.reStart(actionSubJobReq.getId());
         }
         return ResponseVo.createSuccess();
     }

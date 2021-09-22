@@ -1,8 +1,12 @@
 package com.platon.rosettaflow.task;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.platon.rosettaflow.common.constants.SysConfig;
-import com.platon.rosettaflow.common.enums.JobRepeatEnum;
-import com.platon.rosettaflow.common.enums.JobStatusEnum;
+import com.platon.rosettaflow.common.constants.SysConstant;
+import com.platon.rosettaflow.common.enums.*;
+import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.mapper.domain.Job;
 import com.platon.rosettaflow.quartz.job.PublishTaskJob;
 import com.platon.rosettaflow.service.IJobService;
@@ -13,8 +17,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
 
 /**
  * @author hudenian
@@ -36,12 +41,21 @@ public class JobManager {
     @Resource
     private IJobService jobService;
 
+    @Resource
+    private RedisUtil redisUtil;
+
     /**
      * 服务启动加载所有的job
      */
     @PostConstruct
     public void init() {
         if (sysConfig.isMasterNode()) {
+            //服务启动，清除缓存作业消息队列
+            boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
+            if(!isDelete){
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_CACHE_CLEAR_ERROR.getMsg());
+            }
+            //服务启动，启动所有未完成作业
             List<Job> jobList = jobService.getAllUnfinishedJob();
             for (Job job : jobList) {
                 startJob(job);
@@ -67,7 +81,6 @@ public class JobManager {
         SimpleScheduleBuilder simpleScheduleBuilder;
         if (JobRepeatEnum.NOREPEAT.getValue() == job.getRepeatFlag()) {
             simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-                    .withIntervalInMinutes(job.getRepeatInterval())
                     .withRepeatCount(1);
         } else {
             simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
@@ -127,5 +140,58 @@ public class JobManager {
         job.setJobStatus(JobStatusEnum.STOP.getValue());
         jobService.updateById(job);
 
+    }
+
+    /**
+     * 完成job
+     * @param job job信息
+     */
+    public void finishJob(Job job){
+        job.setJobStatus(JobStatusEnum.FINISH.getValue());
+        jobService.updateById(job);
+    }
+
+    /**
+     * 批量完成job
+     * @param jobList job集合信息
+     */
+    public void finishJobBatch(List<Job> jobList){
+        jobList.forEach(job ->
+            job.setJobStatus(JobStatusEnum.FINISH.getValue())
+        );
+        jobService.updateBatchById(jobList);
+    }
+
+
+
+
+    /**
+     * 批量结束job(定时任务也使用)
+     */
+    public void finishJobBatchWithTask(){
+        try{
+            //1、获取调度任务所有作业
+            List<Long> schedulerJobIdList = new ArrayList<>();
+            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(JobManager.GROUP));
+            jobKeySet.forEach(jobKey ->
+                    schedulerJobIdList.add(Long.valueOf(jobKey.getName()))
+            );
+            //2、获取所有状态为运行中作业
+            LambdaQueryWrapper<Job> jobQueryWrapper = Wrappers.lambdaQuery();
+            jobQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue());
+            jobQueryWrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
+            List<Job> jobList = jobService.list(jobQueryWrapper);
+            //3、筛选出状态为结束作业
+            List<Job> jobFinishList = jobList.stream().filter(job ->
+                    !schedulerJobIdList.contains(job.getId())
+            ).collect(Collectors.toList());
+            //4、批量更新作业状态
+            if(!jobFinishList.isEmpty()){
+                finishJobBatch(jobFinishList);
+            }
+
+        }catch (Exception e){
+            log.error("SyncJobStatusTask error {}", e.getMessage(),e);
+        }
     }
 }

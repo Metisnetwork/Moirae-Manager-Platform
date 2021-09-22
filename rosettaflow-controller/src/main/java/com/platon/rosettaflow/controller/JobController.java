@@ -12,6 +12,7 @@ import com.platon.rosettaflow.req.job.EditJobReq;
 import com.platon.rosettaflow.req.job.ListJobReq;
 import com.platon.rosettaflow.req.job.QueryWorkflowReq;
 import com.platon.rosettaflow.service.IJobService;
+import com.platon.rosettaflow.task.JobManager;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.job.JobVo;
@@ -40,11 +41,15 @@ public class JobController {
 
     @Resource
     private IJobService jobService;
+    @Resource
+    private JobManager jobManager;
 
 
     @PostMapping("list")
     @ApiOperation(value = "作业分页列表", notes = "作业分页列表")
     public ResponseVo<PageVo<JobVo>> listJob(@RequestBody @Valid ListJobReq listJobReq) {
+        //查询列表前，先检查批量更新作业状态
+        jobManager.finishJobBatchWithTask();
         IPage<JobDto> jobDtoIpage = jobService.list(listJobReq.getCurrent(), listJobReq.getSize(), listJobReq.getJobName());
         return convertToJobVo(jobDtoIpage);
     }
