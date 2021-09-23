@@ -44,12 +44,12 @@ public class LoginInterceptor implements HandlerInterceptor {
             return true;
         }
         boolean needToken = true;
-//        for (int i = 0; i < SysConstant.LOGIN_URIS.length; i++) {
-//            if (request.getRequestURI().contains(SysConstant.LOGIN_URIS[i])) {
-//                needToken = false;
-//                break;
-//            }
-//        }
+        for (int i = 0; i < SysConstant.LOGIN_URIS.length; i++) {
+            if (request.getRequestURI().contains(SysConstant.LOGIN_URIS[i])) {
+                needToken = false;
+                break;
+            }
+        }
 
         addRequestId();
 
@@ -61,24 +61,24 @@ public class LoginInterceptor implements HandlerInterceptor {
         String token = request.getHeader(SysConstant.HEADER_TOKEN_KEY);
         UserDto userDto;
 
-//        if (StrUtil.isNotEmpty(token)) {
-//            userDto = tokenService.getUserByToken(token);
-//            if (null != userDto) {
-//                UserContext.set(userDto);
-//                tokenService.refreshToken(token);
-//            } else {
-//                if (needToken) {
-//                    log.error("Invalid token: {}", token);
-//                    printResponse(response, RespCodeEnum.TOKEN_INVALID);
-//                    return false;
-//                }
-//            }
-//        } else {
-//            if (needToken) {
-//                printResponse(response, RespCodeEnum.UN_LOGIN);
-//                return false;
-//            }
-//        }
+        if (StrUtil.isNotEmpty(token)) {
+            userDto = tokenService.getUserByToken(token);
+            if (null != userDto) {
+                UserContext.set(userDto);
+                tokenService.refreshToken(token);
+            } else {
+                if (needToken) {
+                    log.error("Invalid token: {}", token);
+                    printResponse(response, RespCodeEnum.TOKEN_INVALID);
+                    return false;
+                }
+            }
+        } else {
+            if (needToken) {
+                printResponse(response, RespCodeEnum.UN_LOGIN);
+                return false;
+            }
+        }
         return true;
     }
 
