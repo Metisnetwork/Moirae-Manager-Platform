@@ -26,7 +26,7 @@ public class SyncUserDataAuthTask {
     /**
      * 多大数据更新一次数据库
      */
-    static final int BATCH_SIZE = 5;
+    static final int BATCH_SIZE = 500;
 
     @Resource
     private SysConfig sysConfig;
@@ -37,7 +37,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-//    @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
