@@ -64,4 +64,11 @@ public interface IUserService extends IService<User> {
      * @param address 用户地址
      */
     void checkNonceValidity(String nonce, String address);
+
+    /**
+     * 根据项目id查询所有可以使用的用户信息
+     * @param projectId 项目id
+     * @return 用户列表
+     */
+    List<User> queryUserByProjectId(Long projectId);
 }

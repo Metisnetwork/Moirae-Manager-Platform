@@ -143,4 +143,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         redisUtil.delete(redisKey);
     }
+
+    @Override
+    public List<User> queryUserByProjectId(Long projectId) {
+        return this.baseMapper.queryUserByProjectId(projectId);
+    }
 }

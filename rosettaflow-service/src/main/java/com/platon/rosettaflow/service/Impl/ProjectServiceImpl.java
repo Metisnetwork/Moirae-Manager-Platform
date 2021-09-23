@@ -12,14 +12,12 @@ import com.platon.rosettaflow.common.enums.ProjectMemberRoleEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
-import com.platon.rosettaflow.mapper.domain.Project;
-import com.platon.rosettaflow.mapper.domain.ProjectMember;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
-import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
+import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +60,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Resource
     private CommonService commonService;
+
+    @Resource
+    private IUserService userService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -298,6 +299,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 return null;
             }
         }
+    }
+
+    @Override
+    public List<User> queryAllUserNickName(Long projectId) {
+        return userService.queryUserByProjectId(projectId);
     }
 
     /**

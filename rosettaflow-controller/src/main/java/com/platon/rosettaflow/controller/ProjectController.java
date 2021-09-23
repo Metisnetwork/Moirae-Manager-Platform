@@ -6,6 +6,7 @@ import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
+import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.req.project.*;
 import com.platon.rosettaflow.service.IProjectService;
 import com.platon.rosettaflow.utils.ConvertUtils;
@@ -14,8 +15,10 @@ import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.project.ProjMemberListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjectListVo;
+import com.platon.rosettaflow.vo.user.UserNicknameVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,7 @@ import java.util.List;
 
 /**
  * 项目管理关接口
+ *
  * @author admin
  * @date 2021/8/16
  */
@@ -41,7 +45,7 @@ public class ProjectController {
     @GetMapping("queryProjectPageList")
     @ApiOperation(value = "查询项目列表", notes = "查询项目列表")
     public ResponseVo<PageVo<ProjectListVo>> queryProjectPageList(@Valid ProjListReq projListReq) {
-        IPage<ProjectDto> iPage  = projectService.queryProjectPageList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
+        IPage<ProjectDto> iPage = projectService.queryProjectPageList(projListReq.getProjectName(), projListReq.getCurrent(), projListReq.getSize());
         List<ProjectListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjectListVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));
     }
@@ -49,7 +53,7 @@ public class ProjectController {
     @GetMapping("queryProjectDetails")
     @ApiOperation(value = "查询项目详情", notes = "查询项目详情")
     public ResponseVo<ProjectDetailsVo> queryProjectDetails(@Valid ProjDetailsReq projDetailsReq) {
-        Project project  = projectService.queryProjectDetails(projDetailsReq.getId());
+        Project project = projectService.queryProjectDetails(projDetailsReq.getId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(project, ProjectDetailsVo.class));
     }
 
@@ -59,6 +63,7 @@ public class ProjectController {
         projectService.addProject(BeanUtil.copyProperties(addProjectReq, ProjectDto.class));
         return ResponseVo.createSuccess();
     }
+
     @PostMapping("updateProject")
     @ApiOperation(value = "修改项目", notes = "修改项目")
     public ResponseVo<?> updateProject(@RequestBody @Valid UpdateProjectReq updateProjectReq) {
@@ -83,7 +88,7 @@ public class ProjectController {
     @GetMapping("queryProjMemberPageList")
     @ApiOperation(value = "查询项目成员列表", notes = "查询项目成员列表")
     public ResponseVo<PageVo<ProjMemberListVo>> queryProjMemberList(@Valid ProjMemberListReq listReq) {
-        IPage<ProjMemberDto> iPage  = projectService.queryProjMemberPageList(listReq.getProjectId(),
+        IPage<ProjMemberDto> iPage = projectService.queryProjMemberPageList(listReq.getProjectId(),
                 listReq.getUserName(), listReq.getCurrent(), listReq.getSize());
         List<ProjMemberListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjMemberListVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));
@@ -117,6 +122,13 @@ public class ProjectController {
     public ResponseVo<?> deleteProjMemberBatch(@RequestBody @Valid DeleteMemberBatchReq deleteBatchReq) {
         projectService.deleteProjMemberBatch(deleteBatchReq.getProjMemberIds());
         return ResponseVo.createSuccess();
+    }
+
+    @GetMapping("queryAllUserNickname/{projectId}")
+    @ApiOperation(value = "查询当前项目可以筛选的用户", notes = "查询当前项目可以筛选的用户")
+    public ResponseVo<List<UserNicknameVo>> queryAllUserNickname(@ApiParam(value = "项目ID", required = true) @PathVariable Long projectId) {
+        List<User> list = projectService.queryAllUserNickName(projectId);
+        return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
 
 }
