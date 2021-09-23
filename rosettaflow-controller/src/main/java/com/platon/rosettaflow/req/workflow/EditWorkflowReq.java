@@ -15,7 +15,7 @@ import javax.validation.constraints.Positive;
  * @date 2021/8/27
  */
 @Data
-@ApiModel
+@ApiModel(value = "编辑工作流请求对象")
 public class EditWorkflowReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
