@@ -11,7 +11,7 @@
     </appender>
 
     <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>./logs/rosettaflow_console.log</File>
+        <File>./logs/rosettaflow.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>./logs/rosettaflow_console.%d{yyyy-MM-dd}.log</FileNamePattern>
             <maxHistory>30</maxHistory>

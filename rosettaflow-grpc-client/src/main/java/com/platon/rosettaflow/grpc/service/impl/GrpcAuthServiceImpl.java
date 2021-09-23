@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"test", "prod"})
+@Profile({"prod", "test"})
 public class GrpcAuthServiceImpl implements GrpcAuthService {
 
     @Resource
@@ -40,4 +40,11 @@ public class GrpcAuthServiceImpl implements GrpcAuthService {
     public NodeIdentityDto getNodeIdentity() {
         return authServiceClient.getNodeIdentity();
     }
+
+    @Override
+    public List<NodeIdentityDto> getIdentityList() {
+        return authServiceClient.getIdentityList();
+    }
+
+
 }

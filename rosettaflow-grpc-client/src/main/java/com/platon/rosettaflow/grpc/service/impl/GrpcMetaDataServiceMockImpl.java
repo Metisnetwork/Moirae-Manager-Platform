@@ -25,7 +25,7 @@ import java.util.List;
 public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
 
     @Override
-    public List<MetaDataDetailResponseDto> getMetaDataDetailList() {
+    public List<MetaDataDetailResponseDto> getTotalMetadataDetailList() {
         List<MetaDataDetailResponseDto> responseDtoList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             MetaDataDetailResponseDto metaData = new MetaDataDetailResponseDto();

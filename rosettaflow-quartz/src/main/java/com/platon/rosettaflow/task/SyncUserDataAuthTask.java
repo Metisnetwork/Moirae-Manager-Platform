@@ -3,7 +3,6 @@ package com.platon.rosettaflow.task;
 import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.MetaDataExpireStatusEnum;
-import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
@@ -38,7 +37,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-//    @Scheduled(fixedDelay = 3600000, initialDelay = 1000)
+//    @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
@@ -91,9 +90,8 @@ public class SyncUserDataAuthTask {
             userMetaData.setAuthStatus((byte) auditStatus);
             userMetaData.setApplyTime(DateUtil.date(authorityDto.getApplyAt()));
             userMetaData.setAuditTime(DateUtil.date(authorityDto.getAuditAt()));
-            userMetaData.setStatus(StatusEnum.VALID.getValue());
-            userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire()? MetaDataExpireStatusEnum.expire.getValue():MetaDataExpireStatusEnum.un_expire.getValue());
-            userMetaData.setUsedTimes((long)authorityDto.getMetadataUsedQuoDto().getUsedTimes());
+            userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire() ? MetaDataExpireStatusEnum.expire.getValue() : MetaDataExpireStatusEnum.un_expire.getValue());
+            userMetaData.setUsedTimes((long) authorityDto.getMetadataUsedQuoDto().getUsedTimes());
 
             userMetaDataList.add(userMetaData);
             ++userMetaDataSize;

@@ -45,4 +45,11 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @return 授权元数据列表
      */
     List<MetaDataDetailsDto> getAllAuthColumns(String metaDataId);
+
+    /**
+     * 批量插入列表
+     * @param metaDataDetailsList 插入列表集合
+     * @return 插入记录数
+     */
+    int batchInsert(List<MetaDataDetails> metaDataDetailsList);
 }

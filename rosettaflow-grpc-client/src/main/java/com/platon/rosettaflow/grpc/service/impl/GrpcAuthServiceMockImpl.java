@@ -99,4 +99,9 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
         nodeIdentityDto.setStatus(1);
         return nodeIdentityDto;
     }
+
+    @Override
+    public List<NodeIdentityDto> getIdentityList() {
+        return null;
+    }
 }

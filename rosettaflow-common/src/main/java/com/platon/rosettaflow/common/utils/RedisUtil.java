@@ -50,7 +50,13 @@ public class RedisUtil {
      */
     @SuppressWarnings("all")
     public long listSize(String key) {
-        return redisTemplate.opsForList().size(key);
+        long listSize = 0;
+        try{
+            listSize = redisTemplate.opsForList().size(key);
+        }catch (Exception e){
+            log.error("redisTemplate.opsForList().size({}) fail",key);
+        }
+        return listSize;
     }
 
     /**
@@ -90,7 +96,7 @@ public class RedisUtil {
         try {
             return redisTemplate.hasKey(key);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("RedisUtil->hasKey fail {}",e.getMessage(),e);
             return false;
         }
     }

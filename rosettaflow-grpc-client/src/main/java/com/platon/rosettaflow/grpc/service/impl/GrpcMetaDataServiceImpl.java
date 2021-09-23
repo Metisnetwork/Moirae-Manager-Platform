@@ -18,15 +18,15 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"test", "prod"})
+@Profile({"prod", "test"})
 public class GrpcMetaDataServiceImpl implements GrpcMetaDataService {
 
     @Resource
     private MetaDataServiceClient metaDataServiceClient;
 
     @Override
-    public List<MetaDataDetailResponseDto> getMetaDataDetailList() {
-        return metaDataServiceClient.getMetaDataDetailList();
+    public List<MetaDataDetailResponseDto> getTotalMetadataDetailList() {
+        return metaDataServiceClient.getTotalMetadataDetailList();
     }
 
     @Override

@@ -20,4 +20,68 @@
     <update id="truncate">
         TRUNCATE TABLE t_meta_data_details
     </update>
+
+    <insert id="batchInsert">
+        <foreach collection="metaDataDetailsList" item="metaDataDetails" separator=";">
+            insert into t_meta_data_details
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="metaDataDetails.metaDataId != null">
+                    meta_data_id,
+                </if>
+                <if test="metaDataDetails.columnIndex != null">
+                    column_index,
+                </if>
+                <if test="metaDataDetails.columnName != null">
+                    `column_name`,
+                </if>
+                <if test="metaDataDetails.columnType != null">
+                    column_type,
+                </if>
+                <if test="metaDataDetails.columnSize != null">
+                    column_size,
+                </if>
+                <if test="metaDataDetails.columnDesc != null">
+                    column_desc,
+                </if>
+                <if test="metaDataDetails.status != null">
+                    `status`,
+                </if>
+                <if test="metaDataDetails.createTime != null">
+                    create_time,
+                </if>
+                <if test="metaDataDetails.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="metaDataDetails.metaDataId != null">
+                    #{metaDataDetails.metaDataId,jdbcType=VARCHAR},
+                </if>
+                <if test="metaDataDetails.columnIndex != null">
+                    #{metaDataDetails.columnIndex,jdbcType=INTEGER},
+                </if>
+                <if test="metaDataDetails.columnName != null">
+                    #{metaDataDetails.columnName,jdbcType=VARCHAR},
+                </if>
+                <if test="metaDataDetails.columnType != null">
+                    #{metaDataDetails.columnType,jdbcType=VARCHAR},
+                </if>
+                <if test="metaDataDetails.columnSize != null">
+                    #{metaDataDetails.columnSize,jdbcType=BIGINT},
+                </if>
+                <if test="metaDataDetails.columnDesc != null">
+                    #{metaDataDetails.columnDesc,jdbcType=VARCHAR},
+                </if>
+                <if test="metaDataDetails.status != null">
+                    #{metaDataDetails.status,jdbcType=TINYINT},
+                </if>
+                <if test="metaDataDetails.createTime != null">
+                    #{metaDataDetails.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="metaDataDetails.updateTime != null">
+                    #{metaDataDetails.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
 </mapper>

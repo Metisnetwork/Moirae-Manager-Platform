@@ -31,4 +31,11 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
      * @return 元数据列表
      */
     List<MetaDataDto> getAllAuthTables(@Param("identityId") String identityId);
+
+    /**
+     * 批量插入元数据信息
+     * @param metaDataList 元数据列表
+     * @return 插入记录数
+     */
+    int batchInsert(@Param("metaDataList") List<MetaData> metaDataList);
 }

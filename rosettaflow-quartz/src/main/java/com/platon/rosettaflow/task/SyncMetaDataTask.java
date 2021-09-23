@@ -1,15 +1,17 @@
 package com.platon.rosettaflow.task;
 
 import com.platon.rosettaflow.common.constants.SysConfig;
-import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
+import com.platon.rosettaflow.mapper.MetaDataDetailsMapper;
+import com.platon.rosettaflow.mapper.MetaDataMapper;
 import com.platon.rosettaflow.mapper.domain.MetaData;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import com.platon.rosettaflow.service.IMetaDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,7 +29,7 @@ public class SyncMetaDataTask {
     /**
      * 多大数据更新一次数据库
      */
-    static final int BATCH_SIZE = 100;
+    static final int BATCH_SIZE = 500;
 
     @Resource
     private SysConfig sysConfig;
@@ -37,18 +39,19 @@ public class SyncMetaDataTask {
 
     @Resource
     private IMetaDataService metaDataService;
-
+    
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-//    @Scheduled(fixedDelay = 3600000, initialDelay = 1000)
+
+    @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
 
         log.info("元数据信息同步开始>>>>");
-        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getMetaDataDetailList();
+        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getTotalMetadataDetailList();
 
         //元数据同步成功，删除旧数据
         if (metaDataDetailResponseDtoList.size() > 0) {
@@ -79,17 +82,17 @@ public class SyncMetaDataTask {
             metaData.setFilePath(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFilePath());
             metaData.setRows(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getRows());
             metaData.setColumns(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getColumns());
-            metaData.setSize((long) metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getSize());
+            metaData.setSize(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getSize());
             metaData.setFileType(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFileType().byteValue());
             metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
             metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
             metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
-            metaData.setStatus(StatusEnum.VALID.getValue());
+
             //添加元数据简介
             newMetaDataList.add(metaData);
             ++metaDataSize;
             if (metaDataSize % BATCH_SIZE == 0) {
-                metaDataService.saveBatch(newMetaDataList);
+                metaDataService.batchInsert(newMetaDataList);
                 newMetaDataList.clear();
             }
 
@@ -102,22 +105,22 @@ public class SyncMetaDataTask {
                 metaDataDetail.setColumnType(metaDataColumnDetailDto.getType());
                 metaDataDetail.setColumnSize((long) metaDataColumnDetailDto.getSize());
                 metaDataDetail.setColumnDesc(metaDataColumnDetailDto.getComment());
-                metaDataDetail.setStatus(StatusEnum.VALID.getValue());
+
                 //添加元数据详情
                 newMetaDataDetailsList.add(metaDataDetail);
                 ++metaDataDetailSize;
                 if (metaDataDetailSize % BATCH_SIZE == 0) {
-                    metaDataDetailsService.saveBatch(newMetaDataDetailsList);
+                    metaDataDetailsService.batchInsert(newMetaDataDetailsList);
                     newMetaDataDetailsList.clear();
                 }
             }
         }
 
         if (newMetaDataList.size() > 0) {
-            metaDataService.saveBatch(newMetaDataList);
+            metaDataService.batchInsert(newMetaDataList);
         }
         if (newMetaDataDetailsList.size() > 0) {
-            metaDataDetailsService.saveBatch(newMetaDataDetailsList);
+            metaDataDetailsService.batchInsert(newMetaDataDetailsList);
         }
         log.info("元数据信息同步结束>>>>");
     }

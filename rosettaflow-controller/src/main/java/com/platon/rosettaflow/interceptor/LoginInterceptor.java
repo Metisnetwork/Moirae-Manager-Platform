@@ -53,7 +53,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         addRequestId();
 
-        LanguageContext.set(request.getHeader("Accept-Language"));
+        LanguageContext.set(request.getHeader("Accept-Language") == null ? SysConstant.ZH_CN : request.getHeader("Accept-Language"));
 
         log.info("Request Info: [Method = {}], [URI = {}], [Client-IP = {}], [userAgent = {}]", request.getMethod(),
                 request.getRequestURI(), IpUtils.getIpAddr(request), request.getHeader("user-agent"));

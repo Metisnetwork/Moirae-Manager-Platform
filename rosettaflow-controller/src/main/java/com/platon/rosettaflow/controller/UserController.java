@@ -6,13 +6,13 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.req.user.LoginInReq;
 import com.platon.rosettaflow.req.user.UpdateNickReq;
 import com.platon.rosettaflow.req.user.UserDetailsReq;
 import com.platon.rosettaflow.service.IUserService;
-import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.utils.WalletSignUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.user.NonceVo;
@@ -29,7 +29,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author admin
@@ -56,7 +55,7 @@ public class UserController {
         userService.checkNonceValidity(loginInReq.getSignMessage(), loginInReq.getAddress());
         boolean flg;
         try {
-            String signMessage = StrUtil.replace(loginInReq.getSignMessage(),"\\\"", "\"");
+            String signMessage = StrUtil.replace(loginInReq.getSignMessage(), "\\\"", "\"");
             flg = WalletSignUtils.verifyTypedDataV4(signMessage, loginInReq.getSign(), loginInReq.getHrpAddress());
         } catch (Exception e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
@@ -96,7 +95,5 @@ public class UserController {
         List<User> list = userService.queryAllUserNickName();
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
-
-
 
 }

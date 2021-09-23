@@ -27,10 +27,10 @@
     file_path, `rows`, `columns`, `size`, file_type, has_title, industry, data_status,
     `status`, create_time, update_time
   </sql>
+
     <update id="truncate">
         TRUNCATE TABLE t_meta_data
     </update>
-
 
     <resultMap id="BaseResultMap_With_Auth" type="com.platon.rosettaflow.dto.MetaDataDto" extends="BaseResultMap">
         <result column="auth_status" property="authStatus" jdbcType="TINYINT"/>
@@ -64,5 +64,123 @@
         AND md.`status` = 1
         AND umd.identity_id = #{identityId, jdbcType=VARCHAR}
     </select>
+
+    <insert id="batchInsert">
+        <foreach collection="metaDataList" item="metaData" separator=";">
+            insert into t_meta_data
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="metaData.identityId != null">
+                    identity_id,
+                </if>
+                <if test="metaData.identityName != null">
+                    identity_name,
+                </if>
+                <if test="metaData.nodeId != null">
+                    node_id,
+                </if>
+                <if test="metaData.metaDataId != null">
+                    meta_data_id,
+                </if>
+                <if test="metaData.fileId != null">
+                    file_id,
+                </if>
+                <if test="metaData.dataName != null">
+                    data_name,
+                </if>
+                <if test="metaData.dataDesc != null">
+                    data_desc,
+                </if>
+                <if test="metaData.filePath != null">
+                    file_path,
+                </if>
+                <if test="metaData.rows != null">
+                    `rows`,
+                </if>
+                <if test="metaData.columns != null">
+                    `columns`,
+                </if>
+                <if test="metaData.size != null">
+                    `size`,
+                </if>
+                <if test="metaData.fileType != null">
+                    file_type,
+                </if>
+                <if test="metaData.hasTitle != null">
+                    has_title,
+                </if>
+                <if test="metaData.industry != null">
+                    industry,
+                </if>
+                <if test="metaData.dataStatus != null">
+                    data_status,
+                </if>
+                <if test="metaData.status != null">
+                    `status`,
+                </if>
+                <if test="metaData.createTime != null">
+                    create_time,
+                </if>
+                <if test="metaData.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="metaData.identityId != null">
+                    #{metaData.identityId,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.identityName != null">
+                    #{metaData.identityName,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.nodeId != null">
+                    #{metaData.nodeId,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.metaDataId != null">
+                    #{metaData.metaDataId,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.fileId != null">
+                    #{metaData.fileId,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.dataName != null">
+                    #{metaData.dataName,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.dataDesc != null">
+                    #{metaData.dataDesc,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.filePath != null">
+                    #{metaData.filePath,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.rows != null">
+                    #{metaData.rows,jdbcType=INTEGER},
+                </if>
+                <if test="metaData.columns != null">
+                    #{metaData.columns,jdbcType=INTEGER},
+                </if>
+                <if test="metaData.size != null">
+                    #{metaData.size,jdbcType=BIGINT},
+                </if>
+                <if test="metaData.fileType != null">
+                    #{metaData.fileType,jdbcType=TINYINT},
+                </if>
+                <if test="metaData.hasTitle != null">
+                    #{metaData.hasTitle,jdbcType=TINYINT},
+                </if>
+                <if test="metaData.industry != null">
+                    #{metaData.industry,jdbcType=VARCHAR},
+                </if>
+                <if test="metaData.dataStatus != null">
+                    #{metaData.dataStatus,jdbcType=TINYINT},
+                </if>
+                <if test="metaData.status != null">
+                    #{metaData.status,jdbcType=TINYINT},
+                </if>
+                <if test="metaData.createTime != null">
+                    #{metaData.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="metaData.updateTime != null">
+                    #{metaData.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
 
 </mapper>

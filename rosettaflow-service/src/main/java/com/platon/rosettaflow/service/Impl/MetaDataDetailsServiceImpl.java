@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
-import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
 import com.platon.rosettaflow.mapper.MetaDataDetailsMapper;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
@@ -16,7 +15,6 @@ import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,6 +57,11 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
         return BeanUtil.copyToList(metaDataDetailsList, MetaDataDetailsDto.class);
     }
 
+    @Override
+    public int batchInsert(List<MetaDataDetails> metaDataDetailsList) {
+        return this.baseMapper.batchInsert(metaDataDetailsList);
+    }
+
     private LambdaQueryWrapper<MetaDataDetails> getQueryWrapper(String metaDataId, Long id) {
         LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaDataDetails::getStatus, StatusEnum.VALID.getValue());
@@ -74,7 +77,7 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
     IPage<MetaDataDetailsDto> convertToPageDto(Page<?> page) {
         IPage<MetaDataDetailsDto> pageDto = new Page<>();
         pageDto.setCurrent(page.getCurrent());
-        pageDto.setRecords(BeanUtil.copyToList(page.getRecords(),MetaDataDetailsDto.class));
+        pageDto.setRecords(BeanUtil.copyToList(page.getRecords(), MetaDataDetailsDto.class));
         pageDto.setSize(page.getSize());
         pageDto.setTotal(page.getTotal());
         return pageDto;

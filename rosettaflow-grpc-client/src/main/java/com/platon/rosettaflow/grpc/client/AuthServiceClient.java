@@ -178,4 +178,26 @@ public class AuthServiceClient {
         nodeIdentityDto.setStatus(nodeIdentity.getOwner().getStatusValue());
         return nodeIdentityDto;
     }
+
+    public List<NodeIdentityDto> getIdentityList() {
+        List<NodeIdentityDto> memberList = new ArrayList<>();
+
+        Empty empty = Empty.newBuilder().build();
+        GetIdentityListResponse getIdentityListResponse = authServiceBlockingStub.getIdentityList(empty);
+
+        if (getIdentityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            throw new BusinessException(getIdentityListResponse.getStatus(), getIdentityListResponse.getMsg());
+        }
+
+        NodeIdentityDto member;
+        for (int i = 0; i < getIdentityListResponse.getMemberListCount(); i++) {
+            member = new NodeIdentityDto();
+            member.setNodeName(getIdentityListResponse.getMemberList(i).getNodeName());
+            member.setNodeId(getIdentityListResponse.getMemberList(i).getNodeId());
+            member.setIdentityId(getIdentityListResponse.getMemberList(i).getIdentityId());
+            member.setStatus(getIdentityListResponse.getMemberList(i).getStatusValue());
+            memberList.add(member);
+        }
+        return memberList;
+    }
 }

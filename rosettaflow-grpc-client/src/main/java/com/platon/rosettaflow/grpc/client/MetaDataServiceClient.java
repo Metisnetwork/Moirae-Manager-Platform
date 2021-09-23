@@ -34,7 +34,7 @@ public class MetaDataServiceClient {
      *
      * @return 获取所有元数据列表
      */
-    public List<MetaDataDetailResponseDto> getMetaDataDetailList() {
+    public List<MetaDataDetailResponseDto> getTotalMetadataDetailList() {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = new ArrayList<>();
         Empty empty = Empty.newBuilder().build();
         GetTotalMetadataDetailListResponse totalMetadataDetailList = metaDataServiceBlockingStub.getTotalMetadataDetailList(empty);

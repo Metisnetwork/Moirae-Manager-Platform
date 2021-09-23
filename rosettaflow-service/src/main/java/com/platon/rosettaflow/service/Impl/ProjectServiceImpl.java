@@ -1,15 +1,18 @@
 package com.platon.rosettaflow.service.Impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.ProjectMemberRoleEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
@@ -54,6 +57,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Resource
     private IWorkflowNodeService workflowNodeService;
 
+    @Resource
+    private RedisUtil redisUtil;
+
+    @Resource
+    private CommonService commonService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addProject(ProjectDto projectDto) {
@@ -92,8 +101,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 }
             }
         } catch (Exception e) {
-            log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException){
+            log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage(), e);
+            if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
             }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJ_ERROR.getMsg());
@@ -102,6 +111,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public void updateProject(Project project) {
+        checkAdminPermission(project.getId());
         try {
             this.updateById(project);
         } catch (Exception e) {
@@ -146,6 +156,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProject(Long id) {
+        checkAdminPermission(id);
         // 逻辑删除项目信息,修改项目版本标识，解决逻辑删除唯一校验问题
         this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
         // 根据项目id获取成员id
@@ -185,10 +196,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteProjectBatch(String ids) {
         // 转换id类型
         List<Long> idsList = convertIdType(ids);
+        for (Long id : idsList) {
+            checkAdminPermission(id);
+        }
         // 删除项目成员
         LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(ProjectMember::getProjectId, idsList);
@@ -213,6 +227,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public void addProjMember(ProjectMember projectMember) {
+        if (null != projectMember.getProjectId()) {
+            checkAdminPermission(projectMember.getProjectId());
+        }
+
         try {
             projectMemberService.save(projectMember);
         } catch (DuplicateKeyException e) {
@@ -222,6 +240,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     public void updateProjMember(ProjectMember projectMember) {
+        ProjectMember oldMember = projectMemberService.getById(projectMember.getId());
+
+        //管理员只有一个时，不能更改管理员的角色
+        List<ProjectMember> projectMemberList = projectMemberService.getAdminList(oldMember.getProjectId());
+        if (projectMemberList.size() == 1 && projectMemberList.get(0).getRole() != projectMember.getRole().byteValue()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_must__ERROR.getMsg());
+        }
+
+        checkAdminPermission(oldMember.getProjectId());
+        deleteRedisRole(oldMember.getUserId(), oldMember.getProjectId());
+
         try {
             projectMemberService.updateById(projectMember);
         } catch (DuplicateKeyException e) {
@@ -232,16 +261,43 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProjMember(Long projMemberId) {
-        // 物理删除项目成员
-        projectMemberService.removeByIds(Collections.singletonList(projMemberId));
+        ProjectMember projectMember = projectMemberService.getById(projMemberId);
+        checkAdminPermission(projectMember.getProjectId());
+        deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
+        projectMemberService.removeById(projMemberId);
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteProjMemberBatch(String projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
-        // 批量物理删除项目成员
+        ProjectMember projectMember;
+        for (Long id : idList) {
+            projectMember = projectMemberService.getById(id);
+            checkAdminPermission(projectMember.getProjectId());
+            deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
+        }
         projectMemberService.removeByIds(idList);
+    }
+
+    @Override
+    public Byte getRoleByProjectId(Long projectId) {
+        Long userId = commonService.getCurrentUser().getId();
+        Object role = redisUtil.get(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
+        if (null != role) {
+            return ((Integer) role).byteValue();
+        } else {
+            LambdaQueryWrapper<ProjectMember> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(ProjectMember::getProjectId, projectId);
+            wrapper.eq(ProjectMember::getUserId, userId);
+            ProjectMember projectMember = projectMemberService.getOne(wrapper);
+            if (null != projectMember) {
+                redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId), projectMember.getRole());
+                return projectMember.getRole();
+            } else {
+                return null;
+            }
+        }
     }
 
     /**
@@ -250,5 +306,31 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private List<Long> convertIdType(String ids) {
         String[] idsArr = ids.split(",");
         return Arrays.stream(idsArr).map(id -> Long.parseLong(id.trim())).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据用户id及项目id删除缓存在redis中的角色信息
+     *
+     * @param userId    userId
+     * @param projectId projectId
+     */
+    private void deleteRedisRole(Long userId, Long projectId) {
+        Object key = redisUtil.get(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
+        if (null != key) {
+            redisUtil.delete(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
+        }
+    }
+
+    private void checkAdminPermission(Long projectId) {
+        Byte role = this.getRoleByProjectId(projectId);
+        if (null != role && ProjectMemberRoleEnum.ADMIN.getRoleId() != role) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_PERMISSION_ERROR.getMsg());
+        }
+    }
+
+    private void checkEditPermission(Long projectId) {
+        if (ProjectMemberRoleEnum.EDIT.getRoleId() != this.getRoleByProjectId(projectId)) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
+        }
     }
 }

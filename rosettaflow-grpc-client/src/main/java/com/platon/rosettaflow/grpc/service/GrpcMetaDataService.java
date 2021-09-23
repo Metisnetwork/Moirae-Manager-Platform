@@ -17,7 +17,7 @@ public interface GrpcMetaDataService {
      *
      * @return 获取所有元数据列表
      */
-    List<MetaDataDetailResponseDto> getMetaDataDetailList();
+    List<MetaDataDetailResponseDto> getTotalMetadataDetailList();
 
     /**
      * 查看 本组织元数据列表
@@ -34,4 +34,5 @@ public interface GrpcMetaDataService {
      * @return 参与过的任务的taskId列表
      */
     List<String> getMetadataUsedTaskIdList(String identityId, String metadataId);
+
 }

@@ -34,4 +34,11 @@ public interface GrpcAuthService {
      * @return 组织信息
      */
     NodeIdentityDto getNodeIdentity();
+
+    /**
+     * 查询全网组织的身份信息列表(已入网的)
+     *
+     * @return 全网组织的身份信息列表
+     */
+    List<NodeIdentityDto> getIdentityList();
 }

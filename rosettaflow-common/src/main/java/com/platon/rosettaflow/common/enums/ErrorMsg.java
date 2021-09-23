@@ -37,6 +37,9 @@ public enum ErrorMsg {
     QUERY_PROJ_DETAILS_ERROR("查询项目详情错误", "Query project details error"),
     ADD_PROJECT_TEMPLATE_ERROR("新增项目模板错误", "Add project template error"),
     PROJECT_TEMPLATE_NAME_EXISTED("项目模板名称已存在", "Project template name already exists"),
+    USER_ADMIN_PERMISSION_ERROR("您不是当前项目管理员", "You are not this project administrator"),
+    USER_NOT_PERMISSION_ERROR("您是项目查看者，暂无编辑权限", "You are a project viewer and have no editing rights"),
+    USER_ADMIN_must__ERROR("不能删除最后一个管理员", "Cannot delete the last administrator"),
 
     /**
      * 算法
@@ -89,10 +92,9 @@ public enum ErrorMsg {
     }
 
     public String getMsg() {
-        String lang = LanguageContext.get();
-        if (lang == null || lang.equals(SysConstant.ZH_CN)) {
-            return this.zh;
+        if (LanguageContext.get().equals(SysConstant.EN_US)) {
+            return this.en;
         }
-        return this.en;
+        return this.zh;
     }
 }

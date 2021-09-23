@@ -43,4 +43,11 @@ public interface IMetaDataService extends IService<MetaData> {
      * @return 元数据列表
      */
     List<MetaDataDto> getAllAuthTables(String identityId);
+
+    /**
+     * 批量更新数据
+     * @param metaDataList 批量插入列表
+     * @return 插入记录数
+     */
+    int batchInsert(List<MetaData> metaDataList);
 }
