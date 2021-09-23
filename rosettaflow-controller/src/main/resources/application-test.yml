@@ -50,6 +50,8 @@ system:
     nonceTimeOut: 300
     # 算法初始化文件
     algorithmFilepath: classpath:script/algorithm.csv
+    # 数据库数据批量更新
+    batchSize: 1000
 
 
 grpc:

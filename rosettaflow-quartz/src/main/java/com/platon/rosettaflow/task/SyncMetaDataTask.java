@@ -1,11 +1,10 @@
 package com.platon.rosettaflow.task;
 
+import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
-import com.platon.rosettaflow.mapper.MetaDataDetailsMapper;
-import com.platon.rosettaflow.mapper.MetaDataMapper;
 import com.platon.rosettaflow.mapper.domain.MetaData;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
@@ -13,6 +12,7 @@ import com.platon.rosettaflow.service.IMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -26,10 +26,6 @@ import java.util.List;
 @Slf4j
 @Component
 public class SyncMetaDataTask {
-    /**
-     * 多大数据更新一次数据库
-     */
-    static final int BATCH_SIZE = 500;
 
     @Resource
     private SysConfig sysConfig;
@@ -39,19 +35,20 @@ public class SyncMetaDataTask {
 
     @Resource
     private IMetaDataService metaDataService;
-    
+
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-
     @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
+    @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
 
         log.info("元数据信息同步开始>>>>");
-        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getTotalMetadataDetailList();
+        long begin;
+        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
 
         //元数据同步成功，删除旧数据
         if (metaDataDetailResponseDtoList.size() > 0) {
@@ -91,8 +88,11 @@ public class SyncMetaDataTask {
             //添加元数据简介
             newMetaDataList.add(metaData);
             ++metaDataSize;
-            if (metaDataSize % BATCH_SIZE == 0) {
+            if (metaDataSize % sysConfig.getBatchSize() == 0) {
+                begin = DateUtil.currentSeconds();
+                log.info("元数据更新{}条数据开始", sysConfig.getBatchSize());
                 metaDataService.batchInsert(newMetaDataList);
+                log.info("元数据更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
                 newMetaDataList.clear();
             }
 
@@ -109,18 +109,27 @@ public class SyncMetaDataTask {
                 //添加元数据详情
                 newMetaDataDetailsList.add(metaDataDetail);
                 ++metaDataDetailSize;
-                if (metaDataDetailSize % BATCH_SIZE == 0) {
+                if (metaDataDetailSize % sysConfig.getBatchSize() == 0) {
+                    begin = DateUtil.currentSeconds();
+                    log.info("元数据详情更新{}条数据开始", sysConfig.getBatchSize());
                     metaDataDetailsService.batchInsert(newMetaDataDetailsList);
+                    log.info("元数据详情更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
                     newMetaDataDetailsList.clear();
                 }
             }
         }
 
         if (newMetaDataList.size() > 0) {
+            begin = DateUtil.currentSeconds();
+            log.info("元数据更新{}条数据开始", newMetaDataList.size());
             metaDataService.batchInsert(newMetaDataList);
+            log.info("元数据更新{}条数据结束一共用时{}秒", newMetaDataList.size(), DateUtil.currentSeconds() - begin);
         }
         if (newMetaDataDetailsList.size() > 0) {
+            begin = DateUtil.currentSeconds();
+            log.info("元数据详情更新{}条数据开始", newMetaDataDetailsList.size());
             metaDataDetailsService.batchInsert(newMetaDataDetailsList);
+            log.info("元数据详情更新{}条数据结束一共用时{}秒", newMetaDataDetailsList.size(), DateUtil.currentSeconds() - begin);
         }
         log.info("元数据信息同步结束>>>>");
     }

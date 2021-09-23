@@ -25,13 +25,13 @@ public class GrpcMetaDataServiceImpl implements GrpcMetaDataService {
     private MetaDataServiceClient metaDataServiceClient;
 
     @Override
-    public List<MetaDataDetailResponseDto> getTotalMetadataDetailList() {
-        return metaDataServiceClient.getTotalMetadataDetailList();
+    public List<MetaDataDetailResponseDto> getGlobalMetadataDetailList() {
+        return metaDataServiceClient.getGlobalMetadataDetailList();
     }
 
     @Override
-    public List<SelfMetaDataDetailResponseDto> getSelfMetadataDetailList() {
-        return metaDataServiceClient.getSelfMetadataDetailList();
+    public List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList() {
+        return metaDataServiceClient.getLocalMetadataDetailList();
     }
 
     @Override

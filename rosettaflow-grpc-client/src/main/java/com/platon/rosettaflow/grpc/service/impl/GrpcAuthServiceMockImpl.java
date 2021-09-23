@@ -11,6 +11,7 @@ import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
+import com.platon.rosettaflow.grpc.metadata.resp.dto.MetadataUsedQuoDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -62,6 +63,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             nodeIdentityDto.setNodeName("节点" + i + "名字");
             nodeIdentityDto.setNodeId("节点" + i + "的Id");
             nodeIdentityDto.setIdentityId("节点" + i + "的identityId");
+            nodeIdentityDto.setIdentityId("节点" + i + "的identityId");
             metaDataAuthorityDto.setOwner(nodeIdentityDto);
 
             metaDataAuthorityDto.setMetaDataId("metaDataId" + i);
@@ -83,6 +85,12 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
                 getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
             }
 
+            MetadataUsedQuoDto metadataUsedQuoDto = new MetadataUsedQuoDto();
+            metadataUsedQuoDto.setMetadataUsageType(2);
+            metadataUsedQuoDto.setExpire(false);
+            metadataUsedQuoDto.setUsedTimes(100 + i);
+            //对应数据授权信息中元数据的使用实况
+            getMetaDataAuthorityDto.setMetadataUsedQuoDto(metadataUsedQuoDto);
             getMetaDataAuthorityDto.setApplyAt(1629877270100L);
             getMetaDataAuthorityDto.setAuditAt(1629877270100L);
             metaDataAuthorityDtoList.add(getMetaDataAuthorityDto);

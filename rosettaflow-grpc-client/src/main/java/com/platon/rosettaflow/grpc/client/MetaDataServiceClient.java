@@ -34,12 +34,12 @@ public class MetaDataServiceClient {
      *
      * @return 获取所有元数据列表
      */
-    public List<MetaDataDetailResponseDto> getTotalMetadataDetailList() {
+    public List<MetaDataDetailResponseDto> getGlobalMetadataDetailList() {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = new ArrayList<>();
         Empty empty = Empty.newBuilder().build();
-        GetTotalMetadataDetailListResponse totalMetadataDetailList = metaDataServiceBlockingStub.getTotalMetadataDetailList(empty);
+        GetGlobalMetadataDetailListResponse globalMetadataDetailList = metaDataServiceBlockingStub.getGlobalMetadataDetailList(empty);
 
-        processRespList(metaDataDetailResponseDtoList, totalMetadataDetailList);
+        processRespList(metaDataDetailResponseDtoList, globalMetadataDetailList);
 
         return metaDataDetailResponseDtoList;
     }
@@ -49,11 +49,11 @@ public class MetaDataServiceClient {
      *
      * @return 本组织元数据列表
      */
-    public List<SelfMetaDataDetailResponseDto> getSelfMetadataDetailList() {
+    public List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList() {
         List<SelfMetaDataDetailResponseDto> selfMetaDataDetailResponseDtoList = new ArrayList<>();
 
         Empty empty = Empty.newBuilder().build();
-        GetSelfMetadataDetailListResponse getSelfMetadataDetailListResponse = metaDataServiceBlockingStub.getSelfMetadataDetailList(empty);
+        GetLocalMetadataDetailListResponse getSelfMetadataDetailListResponse = metaDataServiceBlockingStub.getLocalMetadataDetailList(empty);
         if (getSelfMetadataDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(getSelfMetadataDetailListResponse.getStatus(), getSelfMetadataDetailListResponse.getMsg());
         }
@@ -90,7 +90,7 @@ public class MetaDataServiceClient {
         return taskIdList;
     }
 
-    private void processRespList(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, GetTotalMetadataDetailListResponse metaDataDetailListResponse) {
+    private void processRespList(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, GetGlobalMetadataDetailListResponse metaDataDetailListResponse) {
         if (metaDataDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(metaDataDetailListResponse.getStatus(), metaDataDetailListResponse.getMsg());
         }
@@ -103,7 +103,7 @@ public class MetaDataServiceClient {
         }
     }
 
-    private void convertToDto(GetTotalMetadataDetailResponse metaDataDetailResponse, MetaDataDetailResponseDto metaDataDetailResponseDto) {
+    private void convertToDto(GetGlobalMetadataDetailResponse metaDataDetailResponse, MetaDataDetailResponseDto metaDataDetailResponseDto) {
         //元数据的拥有者
         NodeIdentityDto nodeIdentityDto = assemblyOwner(metaDataDetailResponse.getOwner());
         metaDataDetailResponseDto.setOwner(nodeIdentityDto);
@@ -113,7 +113,7 @@ public class MetaDataServiceClient {
         metaDataDetailResponseDto.setMetaDataDetailDto(metaDataDetailShowDto);
     }
 
-    private void convertToDto(GetSelfMetadataDetailResponse metaDataDetailResponse, SelfMetaDataDetailResponseDto selfMetaDataDetailResponseDto) {
+    private void convertToDto(GetLocalMetadataDetailResponse metaDataDetailResponse, SelfMetaDataDetailResponseDto selfMetaDataDetailResponseDto) {
         //元数据的拥有者
         NodeIdentityDto nodeIdentityDto = assemblyOwner(metaDataDetailResponse.getOwner());
         selfMetaDataDetailResponseDto.setOwner(nodeIdentityDto);
@@ -123,7 +123,7 @@ public class MetaDataServiceClient {
         selfMetaDataDetailResponseDto.setMetaDataDetailDto(metaDataDetailShowDto);
 
         //是否为本组织本地元数据 (不对外的元数据, true: 是本组织元数据; false: 不是)
-        selfMetaDataDetailResponseDto.setIsLocal(metaDataDetailResponse.getIsLocal());
+        selfMetaDataDetailResponseDto.setIsLocal(metaDataDetailResponse.getIsInternal());
     }
 
     private NodeIdentityDto assemblyOwner(Organization owner) {

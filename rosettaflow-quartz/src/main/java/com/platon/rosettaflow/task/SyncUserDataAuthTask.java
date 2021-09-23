@@ -10,6 +10,7 @@ import com.platon.rosettaflow.service.IUserMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -23,10 +24,6 @@ import java.util.List;
 @Slf4j
 @Component
 public class SyncUserDataAuthTask {
-    /**
-     * 多大数据更新一次数据库
-     */
-    static final int BATCH_SIZE = 500;
 
     @Resource
     private SysConfig sysConfig;
@@ -38,12 +35,14 @@ public class SyncUserDataAuthTask {
     private IUserMetaDataService userMetaDataService;
 
     @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
+    @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
 
         log.info("用户申请授权元数据信息同步开始>>>>");
+        long begin;
         List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getMetaDataAuthorityList();
 
         //授权数据同步成功，删除旧数据
@@ -75,14 +74,12 @@ public class SyncUserDataAuthTask {
             //授权开始时间
             Long authBeginTime = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getStartAt();
             if (null != authBeginTime && authBeginTime > 0) {
-                //TODO 毫秒 需要底层联调确认
                 userMetaData.setAuthBeginTime(DateUtil.date(authBeginTime));
             }
 
             //授权结束时间
             Long authEndTime = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getEndAt();
             if (null != authEndTime && authEndTime > 0) {
-                //TODO 毫秒 需要底层联调确认
                 userMetaData.setAuthEndTime(DateUtil.date(authEndTime));
             }
 
@@ -95,13 +92,19 @@ public class SyncUserDataAuthTask {
 
             userMetaDataList.add(userMetaData);
             ++userMetaDataSize;
-            if (userMetaDataSize % BATCH_SIZE == 0) {
+            if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
+                begin = DateUtil.currentSeconds();
+                log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
                 userMetaDataService.saveBatch(userMetaDataList);
+                log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
                 userMetaDataList.clear();
             }
         }
         if (userMetaDataList.size() > 0) {
+            begin = DateUtil.currentSeconds();
+            log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
             userMetaDataService.saveBatch(userMetaDataList);
+            log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
         }
         log.info("用户申请授权元数据信息同步结束>>>>");
     }

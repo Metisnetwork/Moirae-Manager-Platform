@@ -17,14 +17,14 @@ public interface GrpcMetaDataService {
      *
      * @return 获取所有元数据列表
      */
-    List<MetaDataDetailResponseDto> getTotalMetadataDetailList();
+    List<MetaDataDetailResponseDto> getGlobalMetadataDetailList();
 
     /**
      * 查看 本组织元数据列表
      *
      * @return 本组织元数据列表
      */
-    List<SelfMetaDataDetailResponseDto> getSelfMetadataDetailList();
+    List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList();
 
     /**
      * 查询某 metadata 参与过的任务的taskId列表

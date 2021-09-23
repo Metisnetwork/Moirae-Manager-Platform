@@ -42,6 +42,7 @@ public class GetMetaDataAuthorityDto {
      * 发起授权申请的时间 (单位: ms)
      */
     private Long applyAt;
+
     /**
      * 审核授权申请的时间 (单位: ms)
      */

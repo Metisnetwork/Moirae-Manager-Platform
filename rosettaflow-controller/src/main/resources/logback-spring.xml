@@ -21,7 +21,7 @@
         </encoder>
     </appender>
 
-    <springProfile name="local | dev">
+    <springProfile name="local | dev | test">
         <root>
             <level value="INFO"/>
             <appender-ref ref="console"/>

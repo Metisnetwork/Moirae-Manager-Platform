@@ -58,11 +58,11 @@ public class RpcTestController {
         return ResponseVo.createSuccess(nodeIdentityDtoList.size()>10?nodeIdentityDtoList.subList(0,10):nodeIdentityDtoList);
     }
 
-    @GetMapping("getTotalMetadataDetailList")
+    @GetMapping("getGlobalMetadataDetailList")
     @ApiOperation(value = "grpc getTotalMetadataDetailList查看全网元数据列表", notes = "grpc getTotalMetadataDetailList查看全网元数据列表")
-    public ResponseVo<List<MetaDataDetailResponseDto>> getTotalMetadataDetailList() {
+    public ResponseVo<List<MetaDataDetailResponseDto>> getGlobalMetadataDetailList() {
         log.info("grpc getTotalMetadataDetailList查看全网元数据列表");
-        List<MetaDataDetailResponseDto> metaDataDetailList = grpcMetaDataService.getTotalMetadataDetailList();
+        List<MetaDataDetailResponseDto> metaDataDetailList = grpcMetaDataService.getGlobalMetadataDetailList();
         return ResponseVo.createSuccess(metaDataDetailList.size()>10?metaDataDetailList.subList(0,3):metaDataDetailList);
     }
 
