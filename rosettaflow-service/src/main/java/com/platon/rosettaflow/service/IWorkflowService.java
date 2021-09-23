@@ -60,11 +60,16 @@ public interface IWorkflowService extends IService<Workflow> {
     void editWorkflow(Long id, String workflowName, String workflowDesc);
 
     /**
-     * 删除工作流
-     *
+     * 逻辑删除工作流
      * @param id 工作流表id
      */
     void deleteWorkflow(Long id);
+
+    /**
+     * 批量逻辑删除工作流
+     * @param ids 多个工作流表id
+     */
+    void deleteWorkflowBatch(String ids);
 
     /**
      * 复制工作流

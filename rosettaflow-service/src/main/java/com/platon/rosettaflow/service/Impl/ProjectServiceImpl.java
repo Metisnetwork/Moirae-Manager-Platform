@@ -102,7 +102,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 }
             }
         } catch (Exception e) {
-            log.error("addProject--新增项目信息失败, 错误信息:{}", e.getMessage(), e);
+            log.error("addProject--新增项目信息失败, 错误信息:{}, 异常:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NAME_EXISTED.getMsg());
             }
@@ -127,10 +127,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public IPage<ProjectDto> queryProjectPageList(String projectName, Long current, Long size) {
         try {
-            Long userId = UserContext.get().getId();
-            if (userId == null || userId == 0) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
-            }
+            Long userId = commonService.getCurrentUser().getId();
             IPage<ProjectDto> page = new Page<>(current, size);
             return this.baseMapper.queryProjectPageList(userId, projectName, page);
         } catch (Exception e) {
@@ -158,12 +155,28 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProject(Long id) {
         checkAdminPermission(id);
-        // 逻辑删除项目信息,修改项目版本标识，解决逻辑删除唯一校验问题
-        this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
+        // 逻辑删除工作流
+        List<Workflow> workflowList = workflowService.queryWorkFlowByProjectId(id);
+        if (workflowList != null && workflowList.size() > 0) {
+            workflowList.parallelStream().forEach(workflow -> {
+                workflowService.deleteWorkflow(workflow.getId());
+                if (workflow.getNodeNumber() > 0) {
+                    // 物理删除工作流节点
+                    List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
+                    if (workflowNodeList != null && workflowNodeList.size() > 0) {
+                        workflowNodeList.parallelStream().forEach(workflowNode ->
+                            workflowNodeService.deleteWorkflowNode(workflowNode.getId()));
+                    }
+                }
+            });
+        }
         // 根据项目id获取成员id
         List<Long> idList = getMemberIdByProjectId(id);
         // 批量物理删除项目成员
         projectMemberService.removeByIds(idList);
+
+        // 逻辑删除项目信息,修改项目版本标识
+        this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
     }
 
     /**
@@ -185,7 +198,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private List<Project> updateDelVersionById(List<Long> idList) {
         List<Project> projectList = new ArrayList<>();
         if (idList != null && idList.size() > 0) {
-            idList.forEach(id -> {
+            idList.parallelStream().forEach(id -> {
                 Project project = new Project();
                 project.setId(id);
                 project.setDelVersion(id);
@@ -216,7 +229,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             // 物理删除项目成员
             projectMemberService.removeByIds(memberIdsList);
         }
-        // 逻辑删除项目信息，修改版本标识，解决逻辑删除唯一校验问题
+        // 逻辑删除项目信息，修改版本标识
         this.updateBatchById(updateDelVersionById(idsList));
     }
 
@@ -231,7 +244,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         if (null != projectMember.getProjectId()) {
             checkAdminPermission(projectMember.getProjectId());
         }
-
         try {
             projectMemberService.save(projectMember);
         } catch (DuplicateKeyException e) {
@@ -248,21 +260,24 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         if (projectMemberList.size() == 1 && projectMemberList.get(0).getRole() != projectMember.getRole().byteValue()) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_must__ERROR.getMsg());
         }
-
+        // 校验项目成员角色
         checkAdminPermission(oldMember.getProjectId());
+        // 删除旧的项目成员缓存
         deleteRedisRole(oldMember.getUserId(), oldMember.getProjectId());
-
         try {
             projectMemberService.updateById(projectMember);
         } catch (DuplicateKeyException e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
+        // 新增新的项目成员角色缓存
+        redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY,
+                projectMember.getUserId(), oldMember.getProjectId()), projectMember.getRole());
     }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProjMember(Long projMemberId) {
-        ProjectMember projectMember = projectMemberService.getById(projMemberId);
+        ProjectMember projectMember = projectMemberService.queryById(projMemberId);
         checkAdminPermission(projectMember.getProjectId());
         deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
         projectMemberService.removeById(projMemberId);
@@ -272,12 +287,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Transactional(rollbackFor = Exception.class)
     public void deleteProjMemberBatch(String projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
-        ProjectMember projectMember;
-        for (Long id : idList) {
-            projectMember = projectMemberService.getById(id);
+        idList.parallelStream().forEach(id -> {
+            ProjectMember projectMember = projectMemberService.queryById(id);
             checkAdminPermission(projectMember.getProjectId());
             deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
-        }
+        });
         projectMemberService.removeByIds(idList);
     }
 
@@ -288,10 +302,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         if (null != role) {
             return ((Integer) role).byteValue();
         } else {
-            LambdaQueryWrapper<ProjectMember> wrapper = Wrappers.lambdaQuery();
-            wrapper.eq(ProjectMember::getProjectId, projectId);
-            wrapper.eq(ProjectMember::getUserId, userId);
-            ProjectMember projectMember = projectMemberService.getOne(wrapper);
+            ProjectMember projectMember = projectMemberService.queryByProjectIdAndUserId(userId, projectId);
             if (null != projectMember) {
                 redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId), projectMember.getRole());
                 return projectMember.getRole();
@@ -301,6 +312,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
     }
 
+    /** 转换id类型 */
     @Override
     public List<User> queryAllUserNickName(Long projectId) {
         return userService.queryUserByProjectId(projectId);
@@ -310,8 +322,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      * 转换id类型
      */
     private List<Long> convertIdType(String ids) {
-        String[] idsArr = ids.split(",");
-        return Arrays.stream(idsArr).map(id -> Long.parseLong(id.trim())).collect(Collectors.toList());
+        return Arrays.stream(ids.split(",")).map(id ->
+                Long.parseLong(id.trim())).collect(Collectors.toList());
     }
 
     /**
@@ -329,14 +341,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     private void checkAdminPermission(Long projectId) {
         Byte role = this.getRoleByProjectId(projectId);
-        if (null != role && ProjectMemberRoleEnum.ADMIN.getRoleId() != role) {
+        if (null == role || ProjectMemberRoleEnum.ADMIN.getRoleId() != role) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_PERMISSION_ERROR.getMsg());
         }
     }
 
-    private void checkEditPermission(Long projectId) {
-        if (ProjectMemberRoleEnum.EDIT.getRoleId() != this.getRoleByProjectId(projectId)) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
-        }
-    }
 }

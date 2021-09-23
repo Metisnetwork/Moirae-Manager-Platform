@@ -22,7 +22,6 @@ import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
-import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.date.DateTime.now;
 
@@ -48,6 +48,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private CommonService commonService;
+
+    @Resource
+    private IProjectService projectService;
 
     @Resource
     private IAlgorithmService algorithmService;
@@ -108,27 +111,32 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getId, id);
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
-        return this.getOne(queryWrapper);
+        Workflow workflow = this.getOne(queryWrapper);
+        if (Objects.isNull(workflow)) {
+            log.error("workflow not found by id:{}", id);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+        }
+        return workflow;
     }
 
     @Override
     public void addWorkflow(Workflow workflow) {
         try {
-            workflow.setUserId(UserContext.get().getId());
+            // 校验是否有编辑权限
+            checkEditPermission(workflow.getProjectId());
+            workflow.setUserId(commonService.getCurrentUser().getId());
             this.save(workflow);
-        } catch (DuplicateKeyException dke) {
-            log.info("addWorkflow--添加工作流接口失败:{}", dke.getMessage());
+        } catch (DuplicateKeyException e) {
+            log.info("addWorkflow--添加工作流接口失败:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
     }
 
     @Override
     public void editWorkflow(Long id, String workflowName, String workflowDesc) {
-        Workflow workflow = this.getById(id);
-        if (Objects.isNull(workflow)) {
-            log.error("workflow not found by id:{}", id);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
+        Workflow workflow = this.queryWorkflowDetail(id);
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         try {
             workflow.setWorkflowName(workflowName);
             workflow.setWorkflowDesc(workflowDesc);
@@ -141,12 +149,43 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public void deleteWorkflow(Long id) {
+        Workflow workflow = this.queryWorkflowDetail(id);
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         // 逻辑删除工作流，并修改版本标识
-        Workflow workflow = new Workflow();
         workflow.setId(id);
         workflow.setDelVersion(id);
         workflow.setStatus((byte) 0);
         this.updateById(workflow);
+    }
+
+    @Override
+    public void deleteWorkflowBatch(String ids) {
+        if (ids.trim().length() == 0) {
+            return;
+        }
+        // 转换id类型
+        List<Long> idsList = convertIdType(ids);
+        if (idsList.size() > 0) {
+            List<Workflow> list = new ArrayList<>();
+            idsList.parallelStream().forEach(id -> {
+                Workflow workflow = this.queryWorkflowDetail(id);
+                // 校验是否有编辑权限
+                checkEditPermission(workflow.getProjectId());
+                // 逻辑删除工作流，并修改版本标识
+                workflow.setId(id);
+                workflow.setDelVersion(id);
+                workflow.setStatus((byte) 0);
+                list.add(workflow);
+            });
+            this.updateBatchById(list);
+        }
+    }
+
+    /** 转换id类型 */
+    private List<Long> convertIdType(String ids) {
+        return Arrays.stream(ids.split(",")).map(id ->
+                Long.parseLong(id.trim())).collect(Collectors.toList());
     }
 
     @Override
@@ -186,10 +225,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
         Workflow originWorkflow = this.queryWorkflowDetail(originId);
-        if (Objects.isNull(originWorkflow)) {
-            log.error("Origin workflow not found by id:{}", originId);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ORIGIN_NOT_EXIST.getMsg());
-        }
+        // 校验是否有编辑权限
+        checkEditPermission(originWorkflow.getProjectId());
         Workflow newWorkflow = new Workflow();
         newWorkflow.setProjectId(originWorkflow.getProjectId());
         newWorkflow.setUserId(originWorkflow.getUserId());
@@ -203,11 +240,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void start(WorkflowDto workflowDto) {
-        Workflow orgWorkflow = this.getById(workflowDto.getId());
-        if (orgWorkflow == null) {
-            log.error("workflow not found by id:{}", workflowDto.getId());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
+        Workflow orgWorkflow = this.queryWorkflowDetail(workflowDto.getId());
+        // 校验是否有编辑权限
+        checkEditPermission(orgWorkflow.getProjectId());
         //截止节点不能超过工作流最大节点
         //如果截止节点为空，设置为工作流最后一个节点
         if (null == workflowDto.getEndNode()) {
@@ -318,11 +353,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public void terminate(Long workflowId) {
-        Workflow workflow = this.getById(workflowId);
-        if (null == workflow) {
-            log.error("workflow not found by id:{}", workflowId);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
+        Workflow workflow = this.queryWorkflowDetail(workflowId);
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         if (workflow.getRunStatus() != WorkflowRunStatusEnum.RUNNING.getValue()) {
             log.error("workflow by id:{} is not running can not terminate", workflowId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_RUNNING.getMsg());
@@ -579,5 +612,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         sender.setNodeId(sender.getNodeId());
         sender.setIdentityId(sender.getIdentityId());
         return algoSupplier;
+    }
+
+    /** 校验是否有编辑权限  */
+    private void checkEditPermission(Long projectId) {
+        Byte role =  projectService.getRoleByProjectId(projectId);
+        if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
+        }
     }
 }

@@ -6,17 +6,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.common.enums.ErrorMsg;
-import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.enums.StatusEnum;
-import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
+import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
-import io.swagger.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +22,15 @@ import java.util.*;
 
 /**
  * 工作流节点服务实现类
- *
  * @author hudenian
  * @date 2021/8/31
  */
 @Slf4j
 @Service
 public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, WorkflowNode> implements IWorkflowNodeService {
+
+    @Resource
+    private IProjectService projectService;
 
     @Resource
     private IWorkflowService workflowService;
@@ -51,9 +49,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Resource
     private IWorkflowNodeVariableService workflowNodeVariableService;
-
-    @Resource
-    private IAlgorithmVariableService algorithmVariableService;
 
     @Resource
     private IWorkflowNodeResourceService workflowNodeResourceService;
@@ -103,6 +98,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         if (Objects.isNull(workflow)) {
             log.info("saveWorkflowNode--工作流不存在:{}", JSON.toJSONString(workflowId));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
@@ -179,6 +176,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public void clearWorkflowNode(Long workflowId) {
+        Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         List<WorkflowNode> workflowNodeList = getAllWorkflowNodeList(workflowId);
         if (workflowNodeList == null || workflowNodeList.size() == 0) {
             return;
@@ -218,6 +218,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public Map<String, Object> addWorkflowNode(WorkflowNode workflowNode) {
+        Workflow workflow = workflowService.queryWorkflowDetail(workflowNode.getWorkflowId());
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         Map<String, Object> respMap = new HashMap<>(4);
         // 暂存数据，数据为失效状态
         workflowNode.setStatus(StatusEnum.UN_VALID.getValue());
@@ -234,6 +237,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public void renameWorkflowNode(Long workflowNodeId, String nodeName) {
         WorkflowNode workflowNode = getWorkflowNodeById(workflowNodeId);
+        Workflow workflow = workflowService.queryWorkflowDetail(workflowNode.getWorkflowId());
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
         if (null == workflowNode) {
             log.info("renameWorkflowNode--工作流节点为空, workflowNodeId:{}, nodeName:{}", workflowNodeId, nodeName);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
@@ -425,5 +431,13 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         updateWrapper.eq(WorkflowNode::getWorkflowId,workflowId);
         updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         this.update(updateWrapper);
+    }
+
+    /** 校验是否有编辑权限  */
+    private void checkEditPermission(Long projectId) {
+        Byte role =  projectService.getRoleByProjectId(projectId);
+        if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
+        }
     }
 }

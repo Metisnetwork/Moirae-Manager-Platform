@@ -22,6 +22,14 @@ import java.util.List;
 public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, ProjectMember> implements IProjectMemberService {
 
     @Override
+    public ProjectMember queryById(Long id) {
+        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(ProjectMember::getId, id);
+        queryWrapper.eq(ProjectMember::getStatus, StatusEnum.VALID.getValue());
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
     public List<ProjectMember> queryByProjectId(Long projectId) {
         LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(ProjectMember::getProjectId, projectId);
@@ -30,10 +38,20 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     }
 
     @Override
+    public ProjectMember queryByProjectIdAndUserId(Long userId, Long projectId) {
+        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(ProjectMember::getProjectId, projectId);
+        queryWrapper.eq(ProjectMember::getUserId, userId);
+        queryWrapper.eq(ProjectMember::getStatus, StatusEnum.VALID.getValue());
+        return this.getOne(queryWrapper);
+    }
+
+    @Override
     public List<ProjectMember> getAdminList(Long projectId) {
         LambdaQueryWrapper<ProjectMember> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ProjectMember::getProjectId, projectId);
         wrapper.eq(ProjectMember::getRole, ProjectMemberRoleEnum.ADMIN.getRoleId());
+        wrapper.eq(ProjectMember::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
 }
