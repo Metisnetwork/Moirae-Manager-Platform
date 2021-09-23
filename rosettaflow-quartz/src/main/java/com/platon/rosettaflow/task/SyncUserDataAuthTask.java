@@ -3,6 +3,7 @@ package com.platon.rosettaflow.task;
 import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.MetaDataExpireStatusEnum;
+import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
@@ -64,7 +65,15 @@ public class SyncUserDataAuthTask {
             userMetaData.setIdentityName(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeName());
             userMetaData.setNodeId(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeId());
 
-            userMetaData.setAddress(authorityDto.getUser());
+            String address;
+            try {
+                address = AddressChangeUtils.convert0XAddress(authorityDto.getUser());
+                userMetaData.setAddress(address);
+            } catch (Exception e) {
+                log.error("钱包地址{}非法", authorityDto.getUser(), e);
+                userMetaData.setAddress(authorityDto.getUser());
+            }
+
             userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
             //授权次数
             Integer times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();

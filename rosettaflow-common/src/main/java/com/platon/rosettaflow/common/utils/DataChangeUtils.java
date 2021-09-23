@@ -1,7 +1,5 @@
 package com.platon.rosettaflow.common.utils;
 
-import java.math.BigInteger;
-
 /**
  * @author hudenian
  * @date 2021/9/1
@@ -49,29 +47,16 @@ public class DataChangeUtils {
     }
 
     /**
-     * 字节转十六进制
-     *
-     * @param b 需要进行转换的byte字节
-     * @return 转换后的Hex字符串
-     */
-    public static String byteToHex(byte b) {
-        String hex = Integer.toHexString(b & 0xFF);
-        if (hex.length() < 2) {
-            hex = "0" + hex;
-        }
-        return hex;
-    }
-
-    /**
      * 字节数组转16进制
      *
      * @param bytes 需要转换的byte数组
      * @return 转换后的Hex字符串
      */
+    @SuppressWarnings("all")
     public static String bytesToHex(byte[] bytes) {
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(bytes[i] & 0xFF);
+        for (byte aByte : bytes) {
+            String hex = Integer.toHexString(aByte & 0xFF);
             if (hex.length() < 2) {
                 sb.append(0);
             }
@@ -80,12 +65,4 @@ public class DataChangeUtils {
         return sb.toString();
     }
 
-//    public static void main(String[] args) {
-//        BigInteger target = new BigInteger("59156244497053560910602546333004691942496130988411687282766345845500499323302");
-//        System.out.println(target.toString(16));
-//    }
-
-    public static String binary(byte[] bytes, int radix) {
-        return new BigInteger(1, bytes).toString(radix);// 这里的1代表正数
-    }
 }

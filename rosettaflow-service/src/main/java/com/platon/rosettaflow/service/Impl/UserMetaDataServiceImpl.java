@@ -2,7 +2,9 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
@@ -121,7 +123,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
         }
         String address = userDto.getAddress();
-        if(!StrUtil.startWith(userDto.getAddress(),AddressChangeUtils.HRP_ETH)){
+        if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
             address = AddressChangeUtils.convert0XAddress(address);
         }
         return this.baseMapper.getUserMetaDataByAddress(address);
@@ -130,5 +132,12 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Override
     public List<MetaDataDto> getAllAuthTables(String identityId) {
         return metaDataService.getAllAuthTables(identityId);
+    }
+
+    @Override
+    public UserMetaData getByMetaDataId(String metaDataId) {
+        LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
+        return this.getOne(wrapper);
     }
 }

@@ -32,7 +32,7 @@ public class UserMetaDataVo {
     @ApiModelProperty(value = "资源所属组织中调度服务的 nodeId")
     private String nodeId;
 
-    @ApiModelProperty(value = "授权方式: 1-按时间, 2-按次数, 3-永久")
+    @ApiModelProperty(value = "授权方式:0-按次数/按时间, 1-按时间, 2-按次数, 3-永久")
     private Byte authType;
 
     @ApiModelProperty(value = "授权值:按次数单位为（次）")

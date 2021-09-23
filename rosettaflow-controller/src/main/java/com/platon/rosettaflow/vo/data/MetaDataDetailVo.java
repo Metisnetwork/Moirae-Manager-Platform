@@ -2,13 +2,11 @@ package com.platon.rosettaflow.vo.data;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.platon.rosettaflow.common.constants.SysConstant;
-import com.platon.rosettaflow.vo.PageVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author hudenian
@@ -78,6 +76,6 @@ public class MetaDataDetailVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date updateTime;
 
-//    @ApiModelProperty(value = "元数据列分页列表")
-//    private PageVo<MetaDataColumnsVo> metaDataColumnsVoPageVo;
+    @ApiModelProperty(value = "授权方式: 0-按次数/按时间,1-按时间, 2-按次数, 3-永久")
+    private Byte authType;
 }

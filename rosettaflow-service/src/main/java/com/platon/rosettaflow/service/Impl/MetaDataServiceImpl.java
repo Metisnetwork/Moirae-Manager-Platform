@@ -12,11 +12,14 @@ import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.mapper.MetaDataMapper;
 import com.platon.rosettaflow.mapper.domain.MetaData;
+import com.platon.rosettaflow.mapper.domain.UserMetaData;
 import com.platon.rosettaflow.service.IMetaDataService;
+import com.platon.rosettaflow.service.IUserMetaDataService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -27,6 +30,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> implements IMetaDataService {
+
+    @Resource
+    private IUserMetaDataService userMetaDataService;
 
     @Override
     public void truncate() {
@@ -45,20 +51,26 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         this.page(page, wrapper);
         //登录时，查询数据授权状态
         List<MetaDataDto> metaDataWithAuthList = new ArrayList<>();
-        if(!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())){
+        if (!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())) {
             metaDataWithAuthList.addAll(baseMapper.selectMetaDataWithAuth(UserContext.get().getAddress()));
         }
-        return this.convertToPageDto(page,metaDataWithAuthList);
+        return this.convertToPageDto(page, metaDataWithAuthList);
     }
 
     @Override
     public MetaDataDto detail(Long id) {
         MetaData metaData = this.getById(id);
-        if(Objects.isNull(metaData)){
+        if (Objects.isNull(metaData)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
+        UserMetaData userMetaData = userMetaDataService.getByMetaDataId(metaData.getMetaDataId());
+        if (null != userMetaData) {
+            metaDataDto.setAuthType(userMetaData.getAuthType());
+        }else{
+            metaDataDto.setAuthType((byte)MetaDataUsageEnum.USAGE_UNKNOWN.getValue());
+        }
         return metaDataDto;
     }
 
@@ -74,9 +86,9 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<MetaDataDto> metaDataWithAuthList) {
         List<MetaDataDto> records = new ArrayList<>();
-        Map<String,Byte> authMap = new HashMap<>(metaDataWithAuthList.size());
-        for (MetaDataDto dataAuth :metaDataWithAuthList) {
-            authMap.put(dataAuth.getMetaDataId(),dataAuth.getAuthStatus());
+        Map<String, Byte> authMap = new HashMap<>(metaDataWithAuthList.size());
+        for (MetaDataDto dataAuth : metaDataWithAuthList) {
+            authMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthStatus());
         }
         page.getRecords().forEach(r -> {
             MetaDataDto m = new MetaDataDto();

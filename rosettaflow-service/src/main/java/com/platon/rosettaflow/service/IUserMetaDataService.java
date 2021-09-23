@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
 
 import java.util.List;
@@ -52,4 +51,11 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      */
     List<MetaDataDto> getAllAuthTables(String identityId);
 
+    /**
+     * 根据metaDataId获取用户元数据
+     *
+     * @param metaDataId metaDataId
+     * @return 用户授权数据列表
+     */
+    UserMetaData getByMetaDataId(String metaDataId);
 }

@@ -1,15 +1,13 @@
 package com.platon.rosettaflow.common.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.platon.rosettaflow.common.enums.ErrorMsg;
-import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platone.sdk.utlis.Bech32;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.utils.Numeric;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -19,30 +17,12 @@ import java.util.Locale;
  */
 public class AddressChangeUtils {
 
-    public static final String HRP_LAT = "lat";
-    public static final String HRP_LAX = "lax";
-    public static final String HRP_PLA = "pla";
-    public static final String HRP_PLT = "plt";
     public static final String HRP_ETH = "0x";
 
     /**
      * The Bech32 character set for encoding.
      */
     private static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-
-    /**
-     * The Bech32 character set for decoding.
-     */
-    private static final byte[] CHARSET_REV = {
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            15, -1, 10, 17, 21, 20, 26, 30, 7, 5, -1, -1, -1, -1, -1, -1,
-            -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
-            1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1,
-            -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
-            1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1
-    };
 
     /**
      * Find the polynomial with value coefficients mod the generator as 30-bit.
@@ -74,6 +54,7 @@ public class AddressChangeUtils {
     /**
      * Expand a HRP for use in checksum computation.
      */
+    @SuppressWarnings("all")
     private static byte[] expandHrp(final String hrp) {
         int hrpLength = hrp.length();
         byte ret[] = new byte[hrpLength * 2 + 1];
@@ -84,17 +65,6 @@ public class AddressChangeUtils {
         }
         ret[hrpLength] = 0;
         return ret;
-    }
-
-    /**
-     * Verify a checksum.
-     */
-    private static boolean verifyChecksum(final String hrp, final byte[] values) {
-        byte[] hrpExpanded = expandHrp(hrp);
-        byte[] combined = new byte[hrpExpanded.length + values.length];
-        System.arraycopy(hrpExpanded, 0, combined, 0, hrpExpanded.length);
-        System.arraycopy(values, 0, combined, hrpExpanded.length, values.length);
-        return polymod(combined) == 1;
     }
 
     /**
@@ -116,13 +86,6 @@ public class AddressChangeUtils {
     /**
      * Encode a Bech32 string.
      */
-    public static String encode(final Bech32Data bech32) {
-        return encode(bech32.hrp, bech32.data);
-    }
-
-    /**
-     * Encode a Bech32 string.
-     */
     public static String encode(String hrp, final byte[] values) {
         hrp = hrp.toLowerCase(Locale.ROOT);
         byte[] checksum = createChecksum(hrp, values);
@@ -139,26 +102,6 @@ public class AddressChangeUtils {
     }
 
     /**
-     * Decode a Bech32 string.
-     */
-    public static Bech32Data decode(final String str) throws RuntimeException {
-        boolean lower = false, upper = false;
-
-        final int pos = str.lastIndexOf('1');
-        final int dataPartLength = str.length() - 1 - pos;
-        byte[] values = new byte[dataPartLength];
-        for (int i = 0; i < dataPartLength; ++i) {
-            char c = str.charAt(i + pos + 1);
-            values[i] = CHARSET_REV[c];
-        }
-        String hrp = str.substring(0, pos).toLowerCase(Locale.ROOT);
-        if (!verifyChecksum(hrp, values)) {
-            throw new RuntimeException();
-        }
-        return new Bech32Data(hrp, Arrays.copyOfRange(values, 0, values.length - 6));
-    }
-
-    /**
      * Helper for re-arranging bits into groups.
      */
     public static byte[] convertBits(final byte[] in, final int fromBits,
@@ -168,8 +111,8 @@ public class AddressChangeUtils {
         ByteArrayOutputStream out = new ByteArrayOutputStream(64);
         final int maxv = (1 << toBits) - 1;
         final int max_acc = (1 << (fromBits + toBits - 1)) - 1;
-        for (int i = 0; i < in.length; i++) {
-            int value = in[i] & 0xff;
+        for (byte b : in) {
+            int value = b & 0xff;
             if ((value >>> fromBits) != 0) {
                 throw new RuntimeException(
                         String.format("Input value '%X' exceeds '%d' bit size", value, fromBits));
@@ -192,23 +135,19 @@ public class AddressChangeUtils {
     }
 
     /**
-     *  hrp conver 0x adress
-     * @param hrpAddress : hrpAddress
-     * @return
+     * hrp Conversion to 0x address
+     *
+     * @param hrpAddress hrpAddress
+     * @return 0x address
      */
-    public static String convert0XAddress(String hrpAddress){
-        if(!StrUtil.isNotBlank(hrpAddress)){
+    public static String convert0XAddress(String hrpAddress) {
+        if (!StrUtil.isNotBlank(hrpAddress)) {
             throw new RuntimeException("hrpAddress can not blank");
         }
-        if(Numeric.containsHexPrefix(hrpAddress) && WalletUtils.isValidAddress(hrpAddress)){
+        if (Numeric.containsHexPrefix(hrpAddress) && WalletUtils.isValidAddress(hrpAddress)) {
             return hrpAddress;
         }
-        try{
-            return "0x"+DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
-        }catch (Exception e){
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADDRESS_ERROR.getMsg());
-        }
-
+        return "0x" + DataChangeUtils.bytesToHex(Bech32.addressDecode(hrpAddress));
     }
 
     /**
@@ -219,26 +158,15 @@ public class AddressChangeUtils {
         String latAddr = AddressChangeUtils.encode("lat", convertBits(Numeric.hexStringToByteArray(addr), 8, 5, true));
         System.out.println("lat地址为>>>" + latAddr);
         System.out.println(DataChangeUtils.bytesToHex(Bech32.addressDecode(latAddr)));
+        System.out.println(convert0XAddress("atp1qpagtcerpdwed2c4ar3hc738m2h98ecrt04c2x"));
 
-//
-//        List<String> addrList = new ArrayList<String>();
-//        addrList.add("0x1000000000000000000000000000000000000001");
-//        addrList.add("0x1000000000000000000000000000000000000002");
-//        addrList.add("0x1000000000000000000000000000000000000003");
-//        addrList.add("0x1000000000000000000000000000000000000004");
-//        addrList.add("0x1000000000000000000000000000000000000005");
-//        addrList.add("0x0000000000000000000000000000000000000001");
-//        addrList.stream().forEach(a ->
-//                System.out.println(a+"转换后的钱包地址>>>"+ PlatonAddressChangeUtil.encode("lax", convertBits(Numeric.hexStringToByteArray(a),8,5,true))));
-    }
-
-    public static class Bech32Data {
-        public final String hrp;
-        public final byte[] data;
-
-        private Bech32Data(final String hrp, final byte[] data) {
-            this.hrp = hrp;
-            this.data = data;
-        }
+        List<String> addrList = new ArrayList<>();
+        addrList.add("0x1000000000000000000000000000000000000001");
+        addrList.add("0x1000000000000000000000000000000000000002");
+        addrList.add("0x1000000000000000000000000000000000000003");
+        addrList.add("0x1000000000000000000000000000000000000004");
+        addrList.add("0x1000000000000000000000000000000000000005");
+        addrList.add("0x0000000000000000000000000000000000000001");
+        addrList.forEach(a -> System.out.println(a + "转换后的钱包地址>>>" + AddressChangeUtils.encode("lax", convertBits(Numeric.hexStringToByteArray(a), 8, 5, true))));
     }
 }
