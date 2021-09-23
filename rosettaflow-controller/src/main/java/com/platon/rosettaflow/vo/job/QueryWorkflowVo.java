@@ -17,9 +17,9 @@ import javax.validation.constraints.Positive;
 public class QueryWorkflowVo {
 
     @ApiModelProperty(value = "工作流ID")
-    private Long workflowId;
+    private Long id;
 
     @ApiModelProperty(value = "工作流名称")
-    private Long workflowName;
+    private String workflowName;
 
 }

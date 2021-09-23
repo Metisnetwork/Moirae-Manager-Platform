@@ -37,6 +37,7 @@ public enum ErrorMsg {
     QUERY_PROJ_DETAILS_ERROR("查询项目详情错误", "Query project details error"),
     ADD_PROJECT_TEMPLATE_ERROR("新增项目模板错误", "Add project template error"),
     PROJECT_TEMPLATE_NAME_EXISTED("项目模板名称已存在", "Project template name already exists"),
+    ALGORITHM_CODE_NOT_NOT_EXISTS("项目模板对应的工作流节点代码不存在", "Project template algorithm code not exists"),
     USER_ADMIN_PERMISSION_ERROR("您不是当前项目管理员", "You are not this project administrator"),
     USER_NOT_PERMISSION_ERROR("您是项目查看者，暂无编辑权限", "You are a project viewer and have no editing rights"),
     USER_ADMIN_must__ERROR("不能删除最后一个管理员", "Cannot delete the last administrator"),
@@ -49,6 +50,8 @@ public enum ErrorMsg {
     QUERY_ALG_DETAILS_ERROR("查询算法详情错误", "Query algorithm details error"),
     ALG_NOT_EXIST("算法不存在", "Algorithm does not exist"),
     ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code does not exist"),
+    ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation"),
+
 
     /**
      * 数据
@@ -80,8 +83,16 @@ public enum ErrorMsg {
     JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
     JOB_NOT_EXIST("原作业不存在", "Job not exist"),
     JOB_TIME_ERROR("作业时间错误", "Job time error"),
-    JOB_RUNNING("作业正在执行中不能修改", "Job is running can not modify"),
-    JOB_TIME_REPEAT_INTERVAL_ERROR("作业执行重复时，作业时间及执行间隔时间错误", "Job is repeated,the job time or repeat interval error");
+    JOB_RUNNING_OR_FINISH("作业正在执行或执行完成不能修改", "Job is running or finish can not modify"),
+    JOB_TIME_REPEAT_INTERVAL_ERROR("作业执行重复时，作业时间及执行间隔时间错误", "Job is repeated,the job time or repeat interval error"),
+    JOB_TIME_NO_REPEAT_INTERVAL_ERROR("作业执行不重复时，作业时间及执行间隔时间错误", "job is not repeated,the job time or repeat interval error"),
+    JOB_NOT_RUNNING("作业并未执行中不能修改", "Job is not running can not modify"),
+    JOB_NOT_STOP("作业并未停止中不能修改", "Job is not stop can not modify"),
+    JOB_RUNNING_CACHE_CLEAR_ERROR("作业执行缓存清理错误", "Job run cache clear error"),
+    SUB_JOB_NOT_RUNNING("子作业非运行状态中不能暂停", "Sub job is not running can not stop"),
+    SUB_JOB_NOT_STOP("子作业非暂停状态中不能重启", "Sub job is not stop can not start");
+
+
 
     private final String zh;
     private final String en;

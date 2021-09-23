@@ -92,14 +92,14 @@ public class SysConstant {
     /**
      * 作业添加队列
      */
-    public static final String JOB_ADD_QUEUE = "JOB_ADD_LIST";
+    public static final String JOB_ADD_QUEUE = "job_add_queue";
     /**
      * 作业修改队列
      */
-    public static final String JOB_EDIT_QUEUE = "JOB_ADD_LIST";
+    public static final String JOB_EDIT_QUEUE = "job_edit_queue";
     /**
      * 作业暂停队列
      */
-    public static final String JOB_PAUSE_QUEUE = "JOB_PAUSE_QUEUE";
+    public static final String JOB_PAUSE_QUEUE = "job_pause_queue";
 
 }

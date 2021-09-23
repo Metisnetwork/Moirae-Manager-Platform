@@ -1,11 +1,15 @@
 package com.platon.rosettaflow.quartz.job;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.platon.rosettaflow.common.enums.JobStatusEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.enums.SubJobStatusEnum;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.mapper.domain.SubJob;
 import com.platon.rosettaflow.mapper.domain.Workflow;
+import com.platon.rosettaflow.service.IJobService;
 import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +36,9 @@ public class PublishTaskJob implements Job {
     @Resource
     private ISubJobService subJobService;
 
+    @Resource
+    private IJobService jobService;
+
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
         Long workflowId = (Long) jobExecutionContext.getJobDetail().getJobDataMap().get("workflowId");
@@ -43,6 +50,12 @@ public class PublishTaskJob implements Job {
             log.error("workFlow can not find by workflow id:{}", workflowId);
             return;
         }
+
+        //记录作业
+        LambdaUpdateWrapper<com.platon.rosettaflow.mapper.domain.Job> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(com.platon.rosettaflow.mapper.domain.Job::getId, jobId);
+        updateWrapper.set(com.platon.rosettaflow.mapper.domain.Job::getJobStatus, JobStatusEnum.RUNNING.getValue());
+        jobService.update(updateWrapper);
 
         //记录子作业
         SubJob subJob = new SubJob();

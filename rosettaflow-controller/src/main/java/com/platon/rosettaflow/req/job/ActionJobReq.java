@@ -3,11 +3,9 @@ package com.platon.rosettaflow.req.job;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.Date;
 
 /**
  * @author juzix
@@ -24,7 +22,8 @@ public class ActionJobReq {
     private Long id;
 
     @ApiModelProperty(value = "操作作业类型: 1、暂停 2、重启", required = true)
-    @NotNull(message = "工作流ID不能为空")
+    @NotNull(message = "{job.actionType.notNull}")
+    @Range(min = 1, max = 2, message = "{job.actionType.type.error}")
     private Byte actionType;
 
 

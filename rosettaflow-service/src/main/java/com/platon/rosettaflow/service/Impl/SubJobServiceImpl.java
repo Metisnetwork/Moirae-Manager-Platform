@@ -2,21 +2,30 @@ package com.platon.rosettaflow.service.Impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
+import com.platon.rosettaflow.common.enums.SubJobStatusEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.SubJobDto;
 import com.platon.rosettaflow.mapper.SubJobMapper;
 import com.platon.rosettaflow.mapper.domain.SubJob;
 import com.platon.rosettaflow.service.ISubJobService;
+import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hudenian
@@ -27,6 +36,8 @@ import java.util.List;
 @Service
 public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> implements ISubJobService {
 
+    @Resource
+    private IWorkflowService workflowService;
 
     @Override
     public IPage<SubJobDto> sublist(Long current, Long size, String subJobId, Long jobId) {
@@ -43,11 +54,33 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
 
     @Override
     public void pause(Long id) {
-
+        SubJob subJob = this.getById(id);
+        if(Objects.isNull(subJob)){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
+        }
+        if(subJob.getSubJobStatus() != SubJobStatusEnum.RUNNING.getValue()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_RUNNING.getMsg());
+        }
+        //停止子作业
+        LambdaUpdateWrapper<SubJob> subJobUpdateWrapper = new LambdaUpdateWrapper();
+        subJobUpdateWrapper.set(SubJob::getSubJobStatus,SubJobStatusEnum.UN_RUN);
+        subJobUpdateWrapper.set(SubJob::getUpdateTime,new Date(System.currentTimeMillis()));
+        subJobUpdateWrapper.eq(SubJob::getId,id);
+        this.update(subJobUpdateWrapper);
+        //停止工作流
+        workflowService.terminate(subJob.getWorkflowId());
     }
 
     @Override
     public void reStart(Long id) {
+        SubJob subJob = this.getById(id);
+        if(Objects.isNull(subJob)){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
+        }
+        if(subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue() || subJob.getSubJobStatus() == SubJobStatusEnum.RUN_SUCCESS.getValue()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_STOP.getMsg());
+        }
+        //todo 启动工作流
 
     }
 

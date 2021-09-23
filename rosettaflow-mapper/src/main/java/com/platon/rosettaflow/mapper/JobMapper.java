@@ -19,4 +19,11 @@ public interface JobMapper extends BaseMapper<Job> {
      * @return : 作业列表
      */
     IPage<JobDto> queryJobList(@Param("jobName") String jobName, IPage<JobDto> page);
+
+    /**
+     *  修改作业根据作业id
+     * @param job : 作业信息
+     * @return :  作业修改成功与否
+     */
+    int updateJobById(Job job);
 }
