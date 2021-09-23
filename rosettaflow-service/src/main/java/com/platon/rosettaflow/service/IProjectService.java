@@ -6,6 +6,9 @@ import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
+import com.platon.rosettaflow.mapper.domain.User;
+
+import java.util.List;
 
 /**
  * @author admin
@@ -106,4 +109,11 @@ public interface IProjectService extends IService<Project> {
      */
     Byte getRoleByProjectId(Long projectId);
 
+    /**
+     * 查询所有用户昵称
+     *
+     * @param projectId 项目id
+     * @return 用户列表
+     */
+    List<User> queryAllUserNickName(Long projectId);
 }

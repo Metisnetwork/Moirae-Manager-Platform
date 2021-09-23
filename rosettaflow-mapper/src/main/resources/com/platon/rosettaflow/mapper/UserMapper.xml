@@ -12,5 +12,22 @@
     <sql id="Base_Column_List">
     id, user_name, address, `status`, create_time, update_time
     </sql>
-
+    <select id="queryUserByProjectId" resultType="com.platon.rosettaflow.mapper.domain.User">
+        SELECT
+            u.id,
+            u.user_name
+        FROM
+            t_user u
+        WHERE
+            u.`status` = 1
+        AND u.id NOT IN (
+            SELECT
+                pm.user_id
+            FROM
+                t_project_member pm
+            WHERE
+                pm.project_id = #{projectId, jdbcType=BIGINT}
+            AND pm.`status` = 1
+        )
+    </select>
 </mapper>
