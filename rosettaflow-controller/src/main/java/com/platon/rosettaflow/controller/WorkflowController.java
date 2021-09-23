@@ -89,6 +89,13 @@ public class WorkflowController {
         return ResponseVo.createSuccess();
     }
 
+    @PostMapping("deleteBatch/{ids}")
+    @ApiOperation(value = "删除工作流", notes = "删除工作流")
+    public ResponseVo<?> delete(@ApiParam(value = "工作流表ID", required = true) @PathVariable String ids) {
+        workflowService.deleteWorkflowBatch(ids);
+        return ResponseVo.createSuccess();
+    }
+
     @PostMapping("copy")
     @ApiOperation(value = "复制工作流", notes = "复制工作流")
     public ResponseVo<?> copy(@RequestBody @Validated CopyWorkflowReq copyReq) {
