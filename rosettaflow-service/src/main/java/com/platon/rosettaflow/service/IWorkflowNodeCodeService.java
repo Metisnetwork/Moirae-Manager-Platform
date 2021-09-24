@@ -2,6 +2,9 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
+
+import java.util.List;
 
 /**
  * @author hudenian
@@ -37,4 +40,12 @@ public interface IWorkflowNodeCodeService extends IService<WorkflowNodeCode> {
      * @param workflowNodeId 工作流节点id
      */
     void deleteLogicByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 复制工作流节点算法代码
+     * @param newNodeId 新节点id
+     * @param oldNodeId 旧节点id
+     * @return
+     */
+    WorkflowNodeCode copyWorkflowNodeCode(Long newNodeId, Long oldNodeId);
 }

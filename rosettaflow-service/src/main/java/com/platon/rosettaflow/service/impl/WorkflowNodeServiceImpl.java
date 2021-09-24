@@ -369,7 +369,13 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public void copySaveWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList) {
-        List<WorkflowNode> newNodeList = new ArrayList<>();
+        if (null == workflowNodeOldList || workflowNodeOldList.size() == 0) {
+            return;
+        }
+        List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
+        List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
+        List<WorkflowNodeCode> newNodeCodeList = new ArrayList<>();
+        List<WorkflowNodeResource> newNodeResourceList = new ArrayList<>();
         workflowNodeOldList.forEach(oldNode -> {
             WorkflowNode newNode = new WorkflowNode();
             newNode.setWorkflowId(newWorkflowId);
@@ -377,9 +383,40 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             newNode.setNodeName(oldNode.getNodeName());
             newNode.setNodeStep(oldNode.getNodeStep());
             newNode.setNextNodeStep(oldNode.getNextNodeStep());
-            newNodeList.add(newNode);
+            this.save(newNode);
+            // 复制节点输入数据
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.copyWorkflowNodeInput(newNode.getId(), oldNode.getId());
+            newNodeInputList.addAll(workflowNodeInputList);
+            // 复制节点输出数据
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.copyWorkflowNodeOutput(newNode.getId(), oldNode.getId());
+            newNodeOutputList.addAll(workflowNodeOutputList);
+            // 复制节点算法代码
+            WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.copyWorkflowNodeCode(newNode.getId(), oldNode.getId());
+            if (Objects.nonNull(workflowNodeCode)) {
+                newNodeCodeList.add(workflowNodeCode);
+            }
+            // 复制节点环境资源
+            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.copyWorkflowNodeResource(newNode.getId(), oldNode.getId());
+            if (Objects.nonNull(workflowNodeResource)) {
+                newNodeResourceList.add(workflowNodeResource);
+            }
         });
-        this.saveBatch(newNodeList);
+        // 保存节点输入数据
+        if (newNodeInputList.size() > 0) {
+            workflowNodeInputService.saveBatch(newNodeInputList);
+        }
+        // 保存节点输出数据
+        if (newNodeOutputList.size() > 0) {
+            workflowNodeOutputService.saveBatch(newNodeOutputList);
+        }
+        // 保存节点算法代码
+        if (newNodeCodeList.size() > 0) {
+            workflowNodeCodeService.saveBatch(newNodeCodeList);
+        }
+        // 保存节点环境资源
+        if (newNodeResourceList.size() > 0) {
+            workflowNodeResourceService.saveBatch(newNodeResourceList);
+        }
     }
 
     @Override
@@ -394,15 +431,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             workflowNode.setNextNodeStep(workflowNodeTemp.getNextNodeStep());
             //保存工作流节点
             this.save(workflowNode);
-
-            //添加工作流节点代码
-//            workflowNodeCodeService.addByAlgorithmIdAndWorkflowNodeId(workflowNodeTemp.getAlgorithmId(), workflowNode.getId());
-            //查询节点代码对应的算法列表
-//            List<AlgorithmVariable> algorithmVariableList = algorithmVariableService.getByAlgorithmId(workflowNodeTemp.getAlgorithmId());
-//            if (algorithmVariableList != null && algorithmVariableList.size() > 0) {
-//                //保存工作流输入变量
-//                workflowNodeVariableService.addByAlgorithmVariableList(workflowNode.getId(), algorithmVariableList);
-//            }
         }
     }
 

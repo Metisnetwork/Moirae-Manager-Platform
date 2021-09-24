@@ -7,9 +7,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeCodeMapper;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.platon.rosettaflow.service.IWorkflowNodeCodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 工作流代码服务实现类
@@ -43,5 +48,19 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
         delWrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
         delWrapper.set(WorkflowNodeCode::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
+    }
+
+    @Override
+    public WorkflowNodeCode copyWorkflowNodeCode(Long newNodeId, Long oldNodeId) {
+        WorkflowNodeCode oldNodeCode = this.getByWorkflowNodeId(oldNodeId);
+        if (Objects.isNull(oldNodeCode)) {
+            return null;
+        }
+        WorkflowNodeCode newNodeCode = new WorkflowNodeCode();
+        newNodeCode.setWorkflowNodeId(newNodeId);
+        newNodeCode.setEditType(oldNodeCode.getEditType());
+        newNodeCode.setCalculateContractCode(oldNodeCode.getCalculateContractCode());
+        newNodeCode.setDataSplitContractCode(oldNodeCode.getDataSplitContractCode());
+        return newNodeCode;
     }
 }

@@ -6,10 +6,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeResourceMapper;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.platon.rosettaflow.service.IWorkflowNodeResourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * @author hudenian
@@ -40,5 +43,20 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
         delWrapper.eq(WorkflowNodeResource::getWorkflowNodeId, workflowNodeId);
         delWrapper.set(WorkflowNodeResource::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
+    }
+
+    @Override
+    public WorkflowNodeResource copyWorkflowNodeResource(Long newNodeId, Long oldNodeId) {
+        WorkflowNodeResource oldNodeResource = this.getByWorkflowNodeId(oldNodeId);
+        if (Objects.isNull(oldNodeResource)) {
+            return null;
+        }
+        WorkflowNodeResource newNodeResource = new WorkflowNodeResource();
+        newNodeResource.setWorkflowNodeId(newNodeId);
+        newNodeResource.setCostMem(oldNodeResource.getCostMem());
+        newNodeResource.setCostCpu(oldNodeResource.getCostCpu());
+        newNodeResource.setCostGpu(oldNodeResource.getCostGpu());
+        newNodeResource.setCostBandwidth(oldNodeResource.getCostBandwidth());
+        return newNodeResource;
     }
 }

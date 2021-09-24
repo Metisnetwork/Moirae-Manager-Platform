@@ -198,9 +198,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
             // 查询原工作流节点
             List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
-            if (workflowNodeOldList == null || workflowNodeOldList.size() == 0) {
-                return;
-            }
             // 保存为新工作流节点
             workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
         } catch (Exception e) {

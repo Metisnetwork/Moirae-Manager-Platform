@@ -11,6 +11,7 @@ import com.platon.rosettaflow.service.IWorkflowNodeInputService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,4 +46,24 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
         delWrapper.set(WorkflowNodeInput::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
+
+    @Override
+    public List<WorkflowNodeInput> copyWorkflowNodeInput(Long newNodeId, Long oldNodeId) {
+        List<WorkflowNodeInput> oldNodeInputList = this.getByWorkflowNodeId(oldNodeId);
+        List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
+        if (oldNodeInputList.size() > 0) {
+            oldNodeInputList.forEach(oldNodeInput -> {
+                WorkflowNodeInput newNodeInput = new WorkflowNodeInput();
+                newNodeInput.setWorkflowNodeId(newNodeId);
+                newNodeInput.setDataType(oldNodeInput.getDataType());
+                newNodeInput.setIdentityId(oldNodeInput.getIdentityId());
+                newNodeInput.setDataTableId(oldNodeInput.getDataTableId());
+                newNodeInput.setDataColumnIds(oldNodeInput.getDataColumnIds());
+                newNodeInput.setDataFileId(oldNodeInput.getDataFileId());
+                newNodeInputList.add(newNodeInput);
+            });
+        }
+        return newNodeInputList;
+    }
+
 }

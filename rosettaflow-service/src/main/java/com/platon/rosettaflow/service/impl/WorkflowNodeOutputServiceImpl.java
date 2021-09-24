@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeOutputMapper;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
 import com.platon.rosettaflow.service.IWorkflowNodeOutputService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,5 +45,22 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
         delWrapper.eq(WorkflowNodeOutput::getWorkflowNodeId, workflowNodeId);
         delWrapper.set(WorkflowNodeOutput::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
+    }
+
+    @Override
+    public List<WorkflowNodeOutput> copyWorkflowNodeOutput(Long newNodeId, Long oldNodeId) {
+        List<WorkflowNodeOutput> oldNodeOutputList = this.getByWorkflowNodeId(oldNodeId);
+        List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
+        if (oldNodeOutputList.size() > 0) {
+            oldNodeOutputList.forEach(oldNodeOutput -> {
+                WorkflowNodeOutput newNodeOutput = new WorkflowNodeOutput();
+                newNodeOutput.setWorkflowNodeId(newNodeId);
+                newNodeOutput.setIdentityId(oldNodeOutput.getIdentityId());
+                newNodeOutput.setIdentityName(oldNodeOutput.getIdentityName());
+                newNodeOutput.setSavePartnerFlag(oldNodeOutput.getSavePartnerFlag());
+                newNodeOutputList.add(newNodeOutput);
+            });
+        }
+        return newNodeOutputList;
     }
 }
