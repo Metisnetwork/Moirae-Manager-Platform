@@ -3,7 +3,9 @@ package com.platon.rosettaflow.req.workflow;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
@@ -12,6 +14,8 @@ import javax.validation.constraints.NotBlank;
  * @author houz
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel(value = "批量删除工作流请求参数")
 public class DeleteBatchReq {
 

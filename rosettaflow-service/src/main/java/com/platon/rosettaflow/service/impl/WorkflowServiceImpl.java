@@ -168,7 +168,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<Long> idsList = convertIdType(ids);
         if (idsList.size() > 0) {
             List<Workflow> list = new ArrayList<>();
-            idsList.parallelStream().forEach(id -> {
+            idsList.stream().forEach(id -> {
                 Workflow workflow = this.queryWorkflowDetail(id);
                 // 校验是否有编辑权限
                 checkEditPermission(workflow.getProjectId());
@@ -203,22 +203,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             }
             // 保存为新工作流节点
             workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
-            // 复制算法、算法代码、算法变量
-            for (WorkflowNode oldNode : workflowNodeOldList) {
-                // 复制算法
-                Long newAlgorithmId = algorithmService.copySaveAlgorithm(oldNode);
-                // 复制算法代码(参数：源算法id、目的算法id)
-                algorithmCodeService.copySaveAlgorithmCode(oldNode.getAlgorithmId(), newAlgorithmId, oldNode.getId());
-                // 复制算法变量(参数：源算法id、目的算法id)
-                algorithmVariableService.saveAlgorithmVariable(oldNode.getAlgorithmId(), newAlgorithmId);
-            }
         } catch (Exception e) {
             log.error("copyWorkflow--复制工作流接口失败:{}", e.getMessage());
             if (e instanceof DuplicateKeyException) {
-                log.error("Workflow named:{} is exist", workflowName);
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
             }
-            throw e;
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_COPY_ERROR.getMsg());
         }
     }
 
