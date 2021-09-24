@@ -40,8 +40,8 @@ public class SubJobController {
     @PostMapping("list")
     @ApiOperation(value = "查询子作业分页列表", notes = "查询子作业分页列表")
     public ResponseVo<PageVo<SubJobVo>> listSubJob(@RequestBody @Valid ListSubJobReq listSubJobReq) {
-        IPage<SubJobDto> jobDtoIPage = subJobService.sublist(listSubJobReq.getCurrent(), listSubJobReq.getSize(), listSubJobReq.getSubJobId(), listSubJobReq.getJobId());
-        return convertToSubJobVo(jobDtoIPage);
+        IPage<SubJobDto> jobDtoPage = subJobService.sublist(listSubJobReq.getCurrent(), listSubJobReq.getSize(), listSubJobReq.getSubJobId(), listSubJobReq.getJobId());
+        return convertToSubJobVo(jobDtoPage);
     }
 
     @PostMapping("action")

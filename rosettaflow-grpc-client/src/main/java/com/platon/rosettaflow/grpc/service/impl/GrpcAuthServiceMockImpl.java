@@ -3,7 +3,6 @@ package com.platon.rosettaflow.grpc.service.impl;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
 import com.platon.rosettaflow.common.enums.UserTypeEnum;
-import com.platon.rosettaflow.grpc.client.MetaDataServiceClient;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +28,10 @@ import java.util.List;
 @Service
 @Profile({"dev", "local"})
 public class GrpcAuthServiceMockImpl implements GrpcAuthService {
-
-    @Resource
-    private MetaDataServiceClient metaDataServiceClient;
+    /**
+     * 数据记录记录数
+     */
+    static final int LEN = 10;
 
     @Override
     public ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto) {
@@ -52,12 +51,12 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
         NodeIdentityDto nodeIdentityDto;
         MetaDataUsageRuleDto metaDataUsageDto;
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < LEN; i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
             getMetaDataAuthorityDto.setMetaDataAuthId("MetaDataId" + i);
-            if(i % 2 == 0){
+            if (i % 2 == 0) {
                 getMetaDataAuthorityDto.setUser("0x5146e07c5157ea8ad00bb0c196e61671f4af85f0");
-            }else{
+            } else {
                 getMetaDataAuthorityDto.setUser("0x007a85e3230b5d96ab15e8e37c7a27daae53e703");
             }
 

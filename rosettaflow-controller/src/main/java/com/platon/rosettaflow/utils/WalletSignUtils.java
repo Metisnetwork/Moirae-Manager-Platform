@@ -28,9 +28,9 @@ public class WalletSignUtils {
      * @param ecKeyPair 密钥对
      * @return 签名值
      */
+    @SuppressWarnings("unused")
     public static String sign(String message, ECKeyPair ecKeyPair) {
         Sign.SignatureData signatureData = Sign.signMessage(message.getBytes(StandardCharsets.UTF_8), ecKeyPair);
-
         byte[] sigData = new byte[65];
         sigData[0] = signatureData.getV()[0];
         System.arraycopy(signatureData.getR(), 0, sigData, 1, 32);
@@ -46,6 +46,7 @@ public class WalletSignUtils {
      * @param address 签名人地址
      * @return 验证成功失败标识
      */
+    @SuppressWarnings("unused")
     public static boolean verifySign(String message, String signMsg, String address) {
         byte[] bs = Base64.decodeBase64(signMsg);
         Sign.SignatureData signatureData = new Sign.SignatureData(bs[0], Arrays.copyOfRange(bs, 1, 33), Arrays.copyOfRange(bs, 33, 65));
@@ -71,8 +72,8 @@ public class WalletSignUtils {
      */
     public static boolean verifyTypedDataV4(String jsonMessage, String signMsg, String address) throws IOException {
         StructuredDataEncoder dataEncoder = new StructuredDataEncoder(jsonMessage);
-        Map<Integer, String> addresses = CryptoUtils.ecrecover(signMsg, dataEncoder.hashStructuredData());
-        return addresses.toString().contains(AddressChangeUtils.convert0XAddress(address).toLowerCase());
+        Map<Integer, String> addresses = CryptoUtils.ecRecover(signMsg, dataEncoder.hashStructuredData());
+        return addresses.toString().contains(AddressChangeUtils.convert0xAddress(address).toLowerCase());
     }
 
     /**
@@ -104,7 +105,7 @@ public class WalletSignUtils {
             System.out.println("加密的json字符串为>>>" + json);
             Credentials credentials = Credentials.create("567762b8a66385de7bfc6fd96f5de618da1389b6974638c995c5e94a861b922b");
             System.out.println("钱包hrp地址>>>" + credentials.getAddress());
-            System.out.println("钱包0x地址>>>" + AddressChangeUtils.convert0XAddress(credentials.getAddress()));
+            System.out.println("钱包0x地址>>>" + AddressChangeUtils.convert0xAddress(credentials.getAddress()));
 
             System.out.println("签名结果>>>" + signTypedDataV4(json, credentials.getEcKeyPair()));
 

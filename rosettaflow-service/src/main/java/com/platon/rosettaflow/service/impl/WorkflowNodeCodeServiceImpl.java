@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -6,14 +6,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeCodeMapper;
-import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
-import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IWorkflowNodeCodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * 工作流代码服务实现类
@@ -25,9 +21,6 @@ import javax.annotation.Resource;
 @Service
 public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMapper, WorkflowNodeCode> implements IWorkflowNodeCodeService {
 
-    @Resource
-    private IAlgorithmCodeService algorithmCodeService;
-
     @Override
     public WorkflowNodeCode getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeCode> wrapper = Wrappers.lambdaQuery();
@@ -35,18 +28,6 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
         wrapper.eq(WorkflowNodeCode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
-
-//    @Override
-//    public Long addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId) {
-//        AlgorithmCode algorithmCode = algorithmCodeService.getByAlgorithmId(algorithmId);
-//        WorkflowNodeCode workflowNodeCode = new WorkflowNodeCode();
-//        workflowNodeCode.setWorkflowNodeId(workflowNodeId);
-//        workflowNodeCode.setEditType(algorithmCode.getEditType());
-//        workflowNodeCode.setCalculateContractCode(algorithmCode.getCalculateContractCode());
-//        workflowNodeCode.setDataSplitContractCode(algorithmCode.getDataSplitContractCode());
-//        this.save(workflowNodeCode);
-//        return workflowNodeCode.getId();
-//    }
 
     @Override
     public void deleteByWorkflowNodeId(Long workflowNodeId) {

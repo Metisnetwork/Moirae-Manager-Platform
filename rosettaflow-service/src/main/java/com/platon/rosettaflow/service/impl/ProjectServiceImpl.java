@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,7 +12,6 @@ import com.platon.rosettaflow.common.enums.ProjectMemberRoleEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;

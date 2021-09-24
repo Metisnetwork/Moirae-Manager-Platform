@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
@@ -100,10 +100,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        if (Objects.isNull(workflow)) {
-            log.info("saveWorkflowNode--工作流不存在:{}", JSON.toJSONString(workflowId));
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
-        }
         if (WorkflowRunStatusEnum.RUNNING.getValue() == workflow.getRunStatus()) {
             log.info("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
@@ -240,10 +236,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         Workflow workflow = workflowService.queryWorkflowDetail(workflowNode.getWorkflowId());
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        if (null == workflowNode) {
-            log.info("renameWorkflowNode--工作流节点为空, workflowNodeId:{}, nodeName:{}", workflowNodeId, nodeName);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
-        }
         workflowNode.setNodeName(nodeName);
         this.updateById(workflowNode);
     }

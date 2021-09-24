@@ -7,19 +7,23 @@ package com.platon.rosettaflow.common.utils;
  */
 public class DataChangeUtils {
 
+    static final String ADDRESS_0X_PRE = "0x";
+    static final int ODD = 2;
+
     /**
      * hex字符串转byte数组
      *
      * @param inHex 待转换的Hex字符串
      * @return 转换后的byte数组结果
      */
+    @SuppressWarnings("unused")
     public static byte[] hexToByteArray(String inHex) {
-        if (inHex.startsWith("0x")) {
+        if (inHex.toLowerCase().startsWith(ADDRESS_0X_PRE)) {
             inHex = inHex.substring(2);
         }
         int hexlen = inHex.length();
         byte[] result;
-        if (hexlen % 2 == 1) {
+        if (hexlen % ODD == 1) {
             //奇数
             hexlen++;
             result = new byte[(hexlen / 2)];
@@ -29,7 +33,7 @@ public class DataChangeUtils {
             result = new byte[(hexlen / 2)];
         }
         int j = 0;
-        for (int i = 0; i < hexlen; i += 2) {
+        for (int i = 0; i < hexlen; i += ODD) {
             result[j] = hexToByte(inHex.substring(i, i + 2));
             j++;
         }
@@ -57,7 +61,7 @@ public class DataChangeUtils {
         StringBuffer sb = new StringBuffer();
         for (byte aByte : bytes) {
             String hex = Integer.toHexString(aByte & 0xFF);
-            if (hex.length() < 2) {
+            if (hex.length() < ODD) {
                 sb.append(0);
             }
             sb.append(hex);

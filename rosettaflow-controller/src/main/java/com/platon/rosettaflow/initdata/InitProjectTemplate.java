@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.initData;
+package com.platon.rosettaflow.initdata;
 
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
@@ -11,7 +11,6 @@ import com.platon.rosettaflow.service.IWorkflowTempService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /**

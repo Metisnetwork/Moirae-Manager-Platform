@@ -19,6 +19,8 @@ public class AddressChangeUtils {
 
     public static final String HRP_ETH = "0x";
 
+    static final int V_6 = 6;
+
     /**
      * The Bech32 character set for encoding.
      */
@@ -27,11 +29,11 @@ public class AddressChangeUtils {
     /**
      * Find the polynomial with value coefficients mod the generator as 30-bit.
      */
-    private static int polymod(final byte[] values) {
+    private static int polyMod(final byte[] values) {
         int c = 1;
-        for (byte v_i : values) {
+        for (byte vi : values) {
             int c0 = (c >>> 25) & 0xff;
-            c = ((c & 0x1ffffff) << 5) ^ (v_i & 0xff);
+            c = ((c & 0x1ffffff) << 5) ^ (vi & 0xff);
             if ((c0 & 1) != 0) {
                 c ^= 0x3b6a57b2;
             }
@@ -75,9 +77,9 @@ public class AddressChangeUtils {
         byte[] enc = new byte[hrpExpanded.length + values.length + 6];
         System.arraycopy(hrpExpanded, 0, enc, 0, hrpExpanded.length);
         System.arraycopy(values, 0, enc, hrpExpanded.length, values.length);
-        int mod = polymod(enc) ^ 1;
+        int mod = polyMod(enc) ^ 1;
         byte[] ret = new byte[6];
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < V_6; ++i) {
             ret[i] = (byte) ((mod >>> (5 * (5 - i))) & 31);
         }
         return ret;
@@ -109,26 +111,26 @@ public class AddressChangeUtils {
         int acc = 0;
         int bits = 0;
         ByteArrayOutputStream out = new ByteArrayOutputStream(64);
-        final int maxv = (1 << toBits) - 1;
-        final int max_acc = (1 << (fromBits + toBits - 1)) - 1;
+        final int max = (1 << toBits) - 1;
+        final int maxAcc = (1 << (fromBits + toBits - 1)) - 1;
         for (byte b : in) {
             int value = b & 0xff;
             if ((value >>> fromBits) != 0) {
                 throw new RuntimeException(
                         String.format("Input value '%X' exceeds '%d' bit size", value, fromBits));
             }
-            acc = ((acc << fromBits) | value) & max_acc;
+            acc = ((acc << fromBits) | value) & maxAcc;
             bits += fromBits;
             while (bits >= toBits) {
                 bits -= toBits;
-                out.write((acc >>> bits) & maxv);
+                out.write((acc >>> bits) & max);
             }
         }
         if (pad) {
             if (bits > 0) {
-                out.write((acc << (toBits - bits)) & maxv);
+                out.write((acc << (toBits - bits)) & max);
             }
-        } else if (bits >= fromBits || ((acc << (toBits - bits)) & maxv) != 0) {
+        } else if (bits >= fromBits || ((acc << (toBits - bits)) & max) != 0) {
             throw new RuntimeException("Could not convert bits, invalid padding");
         }
         return out.toByteArray();
@@ -140,7 +142,7 @@ public class AddressChangeUtils {
      * @param hrpAddress hrpAddress
      * @return 0x address
      */
-    public static String convert0XAddress(String hrpAddress) {
+    public static String convert0xAddress(String hrpAddress) {
         if (!StrUtil.isNotBlank(hrpAddress)) {
             throw new RuntimeException("hrpAddress can not blank");
         }
@@ -158,7 +160,7 @@ public class AddressChangeUtils {
         String latAddr = AddressChangeUtils.encode("lat", convertBits(Numeric.hexStringToByteArray(addr), 8, 5, true));
         System.out.println("lat地址为>>>" + latAddr);
         System.out.println(DataChangeUtils.bytesToHex(Bech32.addressDecode(latAddr)));
-        System.out.println(convert0XAddress("atp1qpagtcerpdwed2c4ar3hc738m2h98ecrt04c2x"));
+        System.out.println(convert0xAddress("atp1qpagtcerpdwed2c4ar3hc738m2h98ecrt04c2x"));
 
         List<String> addrList = new ArrayList<>();
         addrList.add("0x1000000000000000000000000000000000000001");

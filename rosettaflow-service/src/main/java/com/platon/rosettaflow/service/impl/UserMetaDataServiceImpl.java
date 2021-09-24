@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -124,7 +124,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         }
         String address = userDto.getAddress();
         if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
-            address = AddressChangeUtils.convert0XAddress(address);
+            address = AddressChangeUtils.convert0xAddress(address);
         }
         return this.baseMapper.getUserMetaDataByAddress(address);
     }

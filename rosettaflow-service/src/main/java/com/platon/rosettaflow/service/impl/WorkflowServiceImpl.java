@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.service.Impl;
+package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
@@ -182,7 +182,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    /** 转换id类型 */
+    /**
+     * 转换id类型
+     */
     private List<Long> convertIdType(String ids) {
         return Arrays.stream(ids.split(",")).map(id ->
                 Long.parseLong(id.trim())).collect(Collectors.toList());
@@ -614,9 +616,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         return algoSupplier;
     }
 
-    /** 校验是否有编辑权限  */
+    /**
+     * 校验是否有编辑权限
+     */
     private void checkEditPermission(Long projectId) {
-        Byte role =  projectService.getRoleByProjectId(projectId);
+        Byte role = projectService.getRoleByProjectId(projectId);
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }

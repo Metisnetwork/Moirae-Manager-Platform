@@ -1,7 +1,9 @@
 package com.platon.rosettaflow.common.enums;
 
 /**
- * 文件类型枚举
+ * @author hudenian
+ * @date 2021/9/10
+ * @description 文件类型枚举
  */
 public enum FileTypeEnum {
 

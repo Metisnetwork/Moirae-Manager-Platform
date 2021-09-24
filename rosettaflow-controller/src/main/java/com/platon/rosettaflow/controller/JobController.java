@@ -44,8 +44,8 @@ public class JobController {
     public ResponseVo<PageVo<JobVo>> listJob(@RequestBody @Valid ListJobReq listJobReq) {
         //查询列表前，先检查批量更新作业状态
         jobManager.finishJobBatchWithTask();
-        IPage<JobDto> jobDtoIPage = jobService.list(listJobReq.getCurrent(), listJobReq.getSize(), listJobReq.getJobName());
-        return convertToJobVo(jobDtoIPage);
+        IPage<JobDto> jobDtoPage = jobService.list(listJobReq.getCurrent(), listJobReq.getSize(), listJobReq.getJobName());
+        return convertToJobVo(jobDtoPage);
     }
 
     @PostMapping("add")

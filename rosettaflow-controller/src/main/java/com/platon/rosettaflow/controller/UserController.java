@@ -46,7 +46,7 @@ public class UserController {
     @GetMapping("getLoginNonce/{address}")
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
     public ResponseVo<NonceVo> getLoginNonce(@ApiParam(value = "用户钱包地址", required = true) @PathVariable String address) {
-        return ResponseVo.createSuccess(new NonceVo(userService.getLoginNonce(AddressChangeUtils.convert0XAddress(address))));
+        return ResponseVo.createSuccess(new NonceVo(userService.getLoginNonce(AddressChangeUtils.convert0xAddress(address))));
     }
 
     @PostMapping("login")

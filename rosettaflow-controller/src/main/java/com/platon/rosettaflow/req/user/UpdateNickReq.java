@@ -24,6 +24,6 @@ public class UpdateNickReq {
     private String nickName;
 
     public String get0xAddress(){
-        return AddressChangeUtils.convert0XAddress(address);
+        return AddressChangeUtils.convert0xAddress(address);
     }
 }

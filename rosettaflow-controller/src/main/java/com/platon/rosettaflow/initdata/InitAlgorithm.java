@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.initData;
+package com.platon.rosettaflow.initdata;
 
 import cn.hutool.core.util.StrUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
@@ -12,7 +12,6 @@ import com.platon.rosettaflow.service.IAlgorithmVariableService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.InputStream;

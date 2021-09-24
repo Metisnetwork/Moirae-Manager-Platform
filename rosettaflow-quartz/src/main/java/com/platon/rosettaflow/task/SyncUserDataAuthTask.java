@@ -67,7 +67,7 @@ public class SyncUserDataAuthTask {
 
             String address;
             try {
-                address = AddressChangeUtils.convert0XAddress(authorityDto.getUser());
+                address = AddressChangeUtils.convert0xAddress(authorityDto.getUser());
                 userMetaData.setAddress(address);
             } catch (Exception e) {
                 log.error("钱包地址{}非法", authorityDto.getUser(), e);

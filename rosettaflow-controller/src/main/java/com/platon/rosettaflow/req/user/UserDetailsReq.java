@@ -20,6 +20,6 @@ public class UserDetailsReq {
     private String address;
 
     public String getAddress(){
-        return AddressChangeUtils.convert0XAddress(address);
+        return AddressChangeUtils.convert0xAddress(address);
     }
 }

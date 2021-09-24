@@ -19,14 +19,15 @@ import java.util.ArrayList;
  */
 public class MysqlDocGeneration {
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         String fileOutDir = "c:/";
         documentGeneration(fileOutDir);
-    }
+    }*/
 
     /**
      * mysql数据库文档生成
      */
+    @SuppressWarnings("unused")
     public static void documentGeneration(String fileOutDir) {
         //数据源
         HikariConfig hikariConfig = new HikariConfig();
@@ -54,14 +55,10 @@ public class MysqlDocGeneration {
 
         //忽略表
         ArrayList<String> ignoreTableName = new ArrayList<>();
-//        ignoreTableName.add("test_user");
-//        ignoreTableName.add("test_group");
         //忽略表前缀
         ArrayList<String> ignorePrefix = new ArrayList<>();
-//        ignorePrefix.add("test_");
         //忽略表后缀
         ArrayList<String> ignoreSuffix = new ArrayList<>();
-//        ignoreSuffix.add("_test");
         ProcessConfig processConfig = ProcessConfig.builder()
                 //指定生成逻辑、当存在指定表、指定表前缀、指定表后缀时，将生成指定表，其余表不生成、并跳过忽略表配置
                 //根据名称指定表生成

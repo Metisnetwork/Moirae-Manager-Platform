@@ -18,10 +18,9 @@ public class LoginInReq {
 
     @ApiModelProperty(value = "用户钱包地址", required = true, notes = "address", example = "501eb3eeb2a40e6f2ff6f481302435e6e8af3666")
     @NotBlank(message = "{user.address.notBlank}")
-//    @Pattern(regexp = "^(lat|lax)\\w{36,42}$", message = "{user.address.format}")
     private String address;
 
-    @ApiModelProperty(value = "签名明文(json格式字符串)", required = true,example = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"26e65a54b17e44b896a7f9a0353856d6\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}")
+    @ApiModelProperty(value = "签名明文(json格式字符串)", required = true, example = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"26e65a54b17e44b896a7f9a0353856d6\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}")
     @NotNull(message = "{user.sign.plaintext.notBlank}")
     private String signMessage;
 
@@ -32,19 +31,15 @@ public class LoginInReq {
     /**
      * @return : 返回0x地址
      */
-    public String getAddress(){
-        return AddressChangeUtils.convert0XAddress(address);
+    public String getAddress() {
+        return AddressChangeUtils.convert0xAddress(address);
     }
 
     /**
      * @return : 返回hrp地址
      */
-    public String getHrpAddress(){
+    public String getHrpAddress() {
         return address;
     }
-
-
-
-
 
 }

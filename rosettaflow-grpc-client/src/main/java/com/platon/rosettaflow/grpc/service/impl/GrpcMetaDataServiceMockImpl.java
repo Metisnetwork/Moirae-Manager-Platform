@@ -24,10 +24,20 @@ import java.util.List;
 @Profile({"dev", "local"})
 public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
 
+    /**
+     * 数据记录记录数
+     */
+    static final int LEN = 10;
+
+    /**
+     * 数据明细记录记录数
+     */
+    static final int LEN_DETAIL = 5;
+
     @Override
     public List<MetaDataDetailResponseDto> getGlobalMetadataDetailList() {
         List<MetaDataDetailResponseDto> responseDtoList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < LEN; i++) {
             MetaDataDetailResponseDto metaData = new MetaDataDetailResponseDto();
             NodeIdentityDto identityDto = new NodeIdentityDto();
             identityDto.setNodeName("hudenian" + i);
@@ -52,7 +62,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
             metaDataDetailDto.setMetaDataSummary(metaDataSummaryDto);
 
             List<MetaDataColumnDetailDto> metaDataColumnDetailDtoList = new ArrayList<>();
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j < LEN_DETAIL; j++) {
                 MetaDataColumnDetailDto metaDataColumnDetailDto = new MetaDataColumnDetailDto();
                 metaDataColumnDetailDto.setIndex(j);
                 metaDataColumnDetailDto.setName("name" + j);
