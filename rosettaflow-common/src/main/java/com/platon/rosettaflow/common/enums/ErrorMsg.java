@@ -66,6 +66,7 @@ public enum ErrorMsg {
      */
     WORKFLOW_NOT_EXIST("工作流不存在", "Workflow does not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),
+    WORKFLOW_COPY_ERROR("复制工作流失败", "Failed to copy workflow"),
     WORKFLOW_EXIST("工作流已存在", "Workflow already exists"),
     WORKFLOW_RUNNING_EXIST("工作流正在运行中", "Workflow is running"),
     WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
