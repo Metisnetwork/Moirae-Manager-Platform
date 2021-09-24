@@ -35,7 +35,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
+//    @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {

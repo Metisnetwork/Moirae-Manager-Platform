@@ -40,7 +40,7 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
+//    @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
