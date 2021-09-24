@@ -57,5 +57,5 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @param metaDataId metaDataId
      * @return 用户授权数据列表
      */
-    UserMetaData getByMetaDataId(String metaDataId);
+    UserMetaData getCurrentUserMetaDataByMetaDataId(String metaDataId);
 }

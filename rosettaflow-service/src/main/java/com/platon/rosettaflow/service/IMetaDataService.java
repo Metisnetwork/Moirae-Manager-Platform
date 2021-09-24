@@ -47,7 +47,6 @@ public interface IMetaDataService extends IService<MetaData> {
     /**
      * 批量更新数据
      * @param metaDataList 批量插入列表
-     * @return 插入记录数
      */
-    int batchInsert(List<MetaData> metaDataList);
+    void batchInsert(List<MetaData> metaDataList);
 }

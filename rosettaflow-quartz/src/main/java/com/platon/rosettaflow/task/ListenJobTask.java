@@ -29,7 +29,7 @@ public class ListenJobTask {
     @Resource
     private RedisUtil redisUtil;
 
-    @Scheduled(fixedDelay = 3000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 30*1000, initialDelay = 2000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;

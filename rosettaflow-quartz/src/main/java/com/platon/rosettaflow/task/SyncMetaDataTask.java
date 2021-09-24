@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
@@ -72,6 +73,10 @@ public class SyncMetaDataTask {
             metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
             metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
             metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
+            //元数据id为空不入库
+            if(StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())){
+                continue;
+            }
             metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
             metaData.setFileId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getOriginId());
             metaData.setDataName(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getTableName());

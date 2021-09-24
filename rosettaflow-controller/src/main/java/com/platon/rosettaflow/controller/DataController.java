@@ -59,9 +59,7 @@ public class DataController {
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
     public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "元数据表ID", required = true) @PathVariable Long id) {
         MetaDataDto metaDataDto = metaDataService.detail(id);
-        MetaDataDetailVo vo = new MetaDataDetailVo();
-        BeanCopierUtils.copy(metaDataDto, vo);
-        return ResponseVo.createSuccess(vo);
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(metaDataDto, MetaDataDetailVo.class));
     }
 
     @GetMapping("listByOwner")
@@ -110,49 +108,31 @@ public class DataController {
 
     private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {
         List<MetaDataVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(dto -> {
-            MetaDataVo vo = new MetaDataVo();
-            BeanCopierUtils.copy(dto, vo);
-            items.add(vo);
-        });
+        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataVo.class)));
 
         PageVo<MetaDataVo> pageVo = new PageVo<>();
-        pageVo.setCurrent(pageDto.getCurrent());
+        BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
-        pageVo.setSize(pageDto.getSize());
-        pageVo.setTotal(pageDto.getTotal());
         return ResponseVo.createSuccess(pageVo);
     }
 
     private ResponseVo<PageVo<UserMetaDataVo>> convertUserMetaDataToResponseVo(IPage<UserMetaDataDto> pageDto) {
         List<UserMetaDataVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(u -> {
-            UserMetaDataVo vo = new UserMetaDataVo();
-            BeanCopierUtils.copy(u, vo);
-            items.add(vo);
-        });
+        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, UserMetaDataVo.class)));
 
         PageVo<UserMetaDataVo> pageVo = new PageVo<>();
-        pageVo.setCurrent(pageDto.getCurrent());
+        BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
-        pageVo.setSize(pageDto.getSize());
-        pageVo.setTotal(pageDto.getTotal());
         return ResponseVo.createSuccess(pageVo);
     }
 
     private ResponseVo<PageVo<MetaDataColumnsVo>> convertToResponseVo(IPage<MetaDataDetailsDto> pageDto) {
         List<MetaDataColumnsVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(dto -> {
-            MetaDataColumnsVo vo = new MetaDataColumnsVo();
-            BeanCopierUtils.copy(dto, vo);
-            items.add(vo);
-        });
+        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataColumnsVo.class)));
 
         PageVo<MetaDataColumnsVo> pageVo = new PageVo<>();
-        pageVo.setCurrent(pageDto.getCurrent());
+        BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
-        pageVo.setSize(pageDto.getSize());
-        pageVo.setTotal(pageDto.getTotal());
         return ResponseVo.createSuccess(pageVo);
     }
 

@@ -135,9 +135,14 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public UserMetaData getByMetaDataId(String metaDataId) {
+    public UserMetaData getCurrentUserMetaDataByMetaDataId(String metaDataId) {
+        //用户没有登录不查询
+        if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
+            return null;
+        }
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
+        wrapper.eq(UserMetaData::getAddress,UserContext.get().getAddress());
         return this.getOne(wrapper);
     }
 }

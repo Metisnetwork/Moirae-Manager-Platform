@@ -65,11 +65,11 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         }
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
-        UserMetaData userMetaData = userMetaDataService.getByMetaDataId(metaData.getMetaDataId());
+        UserMetaData userMetaData = userMetaDataService.getCurrentUserMetaDataByMetaDataId(metaData.getMetaDataId());
         if (null != userMetaData) {
             metaDataDto.setAuthType(userMetaData.getAuthType());
-        }else{
-            metaDataDto.setAuthType((byte)MetaDataUsageEnum.USAGE_UNKNOWN.getValue());
+        } else {
+            metaDataDto.setAuthType((byte) MetaDataUsageEnum.USAGE_UNKNOWN.getValue());
         }
         return metaDataDto;
     }
@@ -80,8 +80,8 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public int batchInsert(List<MetaData> metaDataList) {
-        return this.baseMapper.batchInsert(metaDataList);
+    public void batchInsert(List<MetaData> metaDataList) {
+        this.baseMapper.batchInsert(metaDataList);
     }
 
     IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<MetaDataDto> metaDataWithAuthList) {
