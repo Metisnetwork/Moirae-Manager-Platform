@@ -59,9 +59,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IAlgorithmCodeService algorithmCodeService;
 
     @Resource
-    private IAlgorithmVariableService algorithmVariableService;
-
-    @Resource
     private IWorkflowNodeService workflowNodeService;
 
     @Resource
@@ -127,7 +124,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflow.setUserId(commonService.getCurrentUser().getId());
             this.save(workflow);
         } catch (DuplicateKeyException e) {
-            log.info("addWorkflow--添加工作流接口失败:{}", e.getMessage());
+            log.info("addWorkflow--添加工作流接口失败:{}", e.getMessage(), e);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
     }
@@ -142,7 +139,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflow.setWorkflowDesc(workflowDesc);
             this.updateById(workflow);
         } catch (DuplicateKeyException dke) {
-            log.info("editWorkflow--编辑工作流接口失败:{}", dke.getMessage());
+            log.info("editWorkflow--编辑工作流接口失败:{}", dke.getMessage(), dke);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
         }
     }
@@ -168,7 +165,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<Long> idsList = convertIdType(ids);
         if (idsList.size() > 0) {
             List<Workflow> list = new ArrayList<>();
-            idsList.stream().forEach(id -> {
+            idsList.forEach(id -> {
                 Workflow workflow = this.queryWorkflowDetail(id);
                 // 校验是否有编辑权限
                 checkEditPermission(workflow.getProjectId());
@@ -204,7 +201,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             // 保存为新工作流节点
             workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
         } catch (Exception e) {
-            log.error("copyWorkflow--复制工作流接口失败:{}", e.getMessage());
+            log.error("copyWorkflow--复制工作流接口失败:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
             }
@@ -245,13 +242,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
 
         //保存用户和地址及签名
-        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getAddress, workflowDto.getAddress());
-        updateWrapper.set(Workflow::getSign, workflowDto.getSign());
-        updateWrapper.eq(Workflow::getId, workflowDto.getId());
-        this.update(updateWrapper);
+        updateSign(workflowDto);
 
-        //此处先执行第一个节点，后继节点在定时任务中，待第一个节点执行成功后再执行
+        //此处先执行第一个节点，待第一个节点执行成功后再执行
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
         grpcTaskService.asyncPublishTask(taskDto, publishTaskDeclareResponse -> {
 
@@ -328,6 +321,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 this.updateById(workflow);
             }
         });
+    }
+
+    private void updateSign(WorkflowDto workflowDto) {
+        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(Workflow::getAddress, workflowDto.getAddress());
+        updateWrapper.set(Workflow::getSign, workflowDto.getSign());
+        updateWrapper.eq(Workflow::getId, workflowDto.getId());
+        this.update(updateWrapper);
     }
 
     @Override
@@ -438,7 +439,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //发起账户用户类型
         taskDto.setUserType(UserTypeEnum.checkUserType(address));
         //设置发起方
-        taskDto.setSender(getSender());
+        taskDto.setSender(getSender(workflowNodeInputList));
         //任务算法提供方 组织信息
         taskDto.setAlgoSupplier(getAlgoSupplier(taskDto.getSender()));
         // 算力提供方 暂定三方
@@ -583,9 +584,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 获取当前节点连接机构信息
      *
+     * @param workflowNodeInputList 任务输入信息列表
      * @return 机构信息
      */
-    private OrganizationIdentityInfoDto getSender() {
+    private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
+//        for (int i = 0; i < workflowNodeInputList.size(); i++) {
+//            workflowNodeInputList.get(i).gets
+//        }
         OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
         NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
         //发起方的默认设置成p0
