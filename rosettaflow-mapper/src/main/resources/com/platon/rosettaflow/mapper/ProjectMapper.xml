@@ -24,14 +24,17 @@
         (select u.user_name from t_user u where u.status = 1 and u.id = a.user_id) as userName
     from
         t_project a, t_project_member b
-    where 1=1
-        and a.status = 1
-        and b.status = 1
-        and a.id = b.project_id
-        and b.user_id = #{userId, jdbcType=BIGINT}
-      <if test="projectName != null and projectName != ''">
-          and a.project_name LIKE CONCAT('%', #{projectName, jdbcType=VARCHAR}, '%')
-      </if>
+    where
+        a.id = b.project_id
+    and
+        b.user_id = #{userId, jdbcType=BIGINT}
+    <if test="projectName != null and projectName != ''">
+        and a.project_name LIKE CONCAT('%', #{projectName, jdbcType=VARCHAR}, '%')
+    </if>
+    and
+      a.status = 1
+    and
+      b.status = 1
     order by a.create_time desc
   </select>
     <!-- 查询项目成员列表 -->
@@ -44,11 +47,14 @@
             b.user_name as userName
         from
             t_project_member a, t_user b
-        where 1=1
-            and a.status = 1
-            and b.status = 1
-            and a.user_id = b.id
-            and a.project_id = #{projectId, jdbcType=BIGINT}
+        where
+            a.status = 1
+        and
+            b.status = 1
+        and
+            a.user_id = b.id
+        and
+            a.project_id = #{projectId, jdbcType=BIGINT}
         <if test="userName != null and userName != ''">
             and b.user_name LIKE CONCAT('%', #{userName, jdbcType=VARCHAR}, '%')
         </if>

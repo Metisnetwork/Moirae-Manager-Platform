@@ -79,20 +79,13 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             metaDataUsageDto.setTimes(100 + i);
             metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageDto);
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
-            if (i == 0) {
-                getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_PASSED.getValue());
-            } else if (i == 1) {
-                getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_REFUSED.getValue());
-            } else if (i == 2) {
-                getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
-            } else {
-                getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
-            }
 
+            getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_PASSED.getValue());
+            
             MetadataUsedQuoDto metadataUsedQuoDto = new MetadataUsedQuoDto();
             metadataUsedQuoDto.setMetadataUsageType(2);
             metadataUsedQuoDto.setExpire(false);
-            metadataUsedQuoDto.setUsedTimes(100 + i);
+            metadataUsedQuoDto.setUsedTimes(1);
             //对应数据授权信息中元数据的使用实况
             getMetaDataAuthorityDto.setMetadataUsedQuoDto(metadataUsedQuoDto);
             getMetaDataAuthorityDto.setApplyAt(1629877270100L);

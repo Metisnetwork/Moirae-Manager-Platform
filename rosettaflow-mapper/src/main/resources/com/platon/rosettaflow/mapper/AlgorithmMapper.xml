@@ -68,11 +68,14 @@
         b.calculate_contract_code as calculateContractCode
     from
         t_algorithm a, t_algorithm_code b
-    where 1=1
-        and a.status = '1'
-        and b.status = '1'
-        and a.id = b.algorithm_id
-        and a.id = #{algorithmId, jdbcType=BIGINT}
+    where
+        a.status = '1'
+    and
+        b.status = '1'
+    and
+        a.id = b.algorithm_id
+    and
+        a.id = #{algorithmId, jdbcType=BIGINT}
   </select>
 
 </mapper>

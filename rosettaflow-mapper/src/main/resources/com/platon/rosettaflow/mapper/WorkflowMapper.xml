@@ -41,14 +41,17 @@
             u.user_name as userName
         FROM
             t_workflow w, t_user u
-        WHERE 1=1
-            and w.status = 1
-            and u.status = 1
-            and w.user_id = u.id
-            and w.project_id = #{projectId, jdbcType=BIGINT}
-            <if test="workflowName != null and workflowName != ''">
-                and w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
-            </if>
-            order by w.create_time desc
+        WHERE
+            w.user_id = u.id
+        and
+            w.project_id = #{projectId, jdbcType=BIGINT}
+        <if test="workflowName != null and workflowName != ''">
+            and w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
+        </if>
+        and
+            w.status = 1
+        and
+            u.status = 1
+        order by w.create_time desc
     </select>
 </mapper>

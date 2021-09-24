@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author admin
  * @date 2021/7/20
@@ -28,9 +26,8 @@ public class ControllerAdvice {
      * 系统异常
      */
     @ExceptionHandler(Exception.class)
-    public <T> ResponseVo<T> exceptionHandler(HttpServletRequest request, Exception e) {
+    public <T> ResponseVo<T> exceptionHandler(Exception e) {
         log.error("An exception occurred on the request.", e);
-
         return ResponseVo.create(RespCodeEnum.EXCEPTION);
     }
 
@@ -38,7 +35,7 @@ public class ControllerAdvice {
      * 业务异常
      */
     @ExceptionHandler(BusinessException.class)
-    public <T> ResponseVo<T> bizExceptionHandler(HttpServletRequest request, BusinessException e) {
+    public <T> ResponseVo<T> bizExceptionHandler(BusinessException e) {
         log.warn("A biz exception occurred on the request. Error message: " + e.getMsg());
 
         return ResponseVo.create(e.getCode(), e.getMsg());
@@ -48,9 +45,8 @@ public class ControllerAdvice {
      * 请求参数类型错误
      */
     @ExceptionHandler(TypeMismatchException.class)
-    public <T> ResponseVo<T> typeMismatchExceptionHandler(HttpServletRequest request, TypeMismatchException e) {
+    public <T> ResponseVo<T> typeMismatchExceptionHandler(TypeMismatchException e) {
         log.warn("Incorrect request parameter type.", e);
-
         return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR);
     }
 
@@ -58,25 +54,21 @@ public class ControllerAdvice {
      * 请求参数类型错误
      */
     @ExceptionHandler(BindException.class)
-    public <T> ResponseVo<T> bindExceptionExceptionHandler(HttpServletRequest request, BindException e) {
+    public <T> ResponseVo<T> bindExceptionExceptionHandler(BindException e) {
         log.warn("Incorrect request parameter type.", e);
-
         String errMsg = null;
         if (null != e.getBindingResult().getFieldError()) {
             errMsg = e.getBindingResult().getFieldError().getDefaultMessage();
         }
-        return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR.getCode(),
-                errMsg == null ? RespCodeEnum.PARAM_TYPE_ERROR.getMsg() : errMsg);
+        return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR.getCode(), errMsg == null ? RespCodeEnum.PARAM_TYPE_ERROR.getMsg() : errMsg);
     }
 
     /**
      * 请求方法不支持
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public <T> ResponseVo<T> httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request,
-                                                                           HttpRequestMethodNotSupportedException e) {
+    public <T> ResponseVo<T> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException e) {
         log.warn("Request method not supported.", e);
-
         return ResponseVo.create(RespCodeEnum.REQUEST_METHOD_ERROR);
     }
 
@@ -84,10 +76,8 @@ public class ControllerAdvice {
      * 请求参数格式错误
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public <T> ResponseVo<T> httpMessageNotReadableExceptionHandler(HttpServletRequest request,
-                                                                    HttpMessageNotReadableException e) {
+    public <T> ResponseVo<T> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException e) {
         log.warn("Incorrect format of request parameters.", e);
-
         return ResponseVo.create(RespCodeEnum.PARAM_FORMAT_ERROR);
     }
 
@@ -97,7 +87,6 @@ public class ControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public <T> ResponseVo<T> validateExceptionHandler(MethodArgumentNotValidException e) {
         log.warn("Request parameters validation failed.", e);
-
         String errMsg = null;
         if (null != e.getBindingResult().getFieldError()) {
             errMsg = e.getBindingResult().getFieldError().getDefaultMessage();
@@ -109,7 +98,7 @@ public class ControllerAdvice {
      * 上传文件大小超出限制
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public <T> ResponseVo<T> httpMessageNotReadableExceptionHandler(HttpServletRequest request, MaxUploadSizeExceededException e) {
+    public <T> ResponseVo<T> httpMessageNotReadableExceptionHandler(MaxUploadSizeExceededException e) {
         log.warn("File size out of limit.", e);
         return ResponseVo.create(RespCodeEnum.PARAM_ERROR.getCode(), RespCodeEnum.PARAM_ERROR.getMsg() + FILE_SIZE_OUT_LIMIT);
     }
