@@ -19,10 +19,10 @@ import java.util.ArrayList;
  */
 public class MysqlDocGeneration {
 
-    public static void main(String[] args) {
-        String fileOutDir = "c:/";
-        documentGeneration(fileOutDir);
-    }
+//    public static void main(String[] args) {
+//        String fileOutDir = "c:/";
+//        documentGeneration(fileOutDir);
+//    }
 
     /**
      * mysql数据库文档生成
