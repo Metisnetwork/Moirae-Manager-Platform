@@ -39,7 +39,7 @@ public interface IWorkflowService extends IService<Workflow> {
      * 获取工作流列表（不分页）
      *
      * @param projectId 项目id
-     * @return Workflow 工作流
+     * @return 工作流列表
      */
     List<Workflow> queryWorkFlowByProjectId(Long projectId);
 
@@ -61,12 +61,14 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 逻辑删除工作流
+     *
      * @param id 工作流表id
      */
     void deleteWorkflow(Long id);
 
     /**
      * 批量逻辑删除工作流
+     *
      * @param ids 多个工作流表id
      */
     void deleteWorkflowBatch(String ids);
@@ -91,11 +93,11 @@ public interface IWorkflowService extends IService<Workflow> {
      * 根据项目id及工作流模板添加工作流
      *
      * @param projectId    项目id
-     * @param userId 用户id
+     * @param userId       用户id
      * @param workflowTemp 工作流模板
      * @return 工作流id
      */
-    Long addWorkflowByTemplate(Long projectId, Long userId,  WorkflowTemp workflowTemp);
+    Long addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp);
 
     /**
      * 终止工作流

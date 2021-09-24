@@ -75,5 +75,7 @@ subprojects {
         testImplementation('org.springframework.boot:spring-boot-starter-test') {
             exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         }
+        implementation 'cn.smallbun.screw:screw-core:1.0.5'
+        implementation 'com.zaxxer:HikariCP:3.4.5'
     }
 }
