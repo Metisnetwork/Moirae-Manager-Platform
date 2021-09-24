@@ -30,4 +30,13 @@ public interface IWorkflowNodeOutputService extends IService<WorkflowNodeOutput>
      * @param workflowNodeId 工作流节点id
      */
     void deleteLogicByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 复制工作流节点输出数据
+     * @param newNodeId 新节点id
+     * @param oldNodeId 旧节点id
+     * @return
+     */
+    List<WorkflowNodeOutput> copyWorkflowNodeOutput(Long newNodeId, Long oldNodeId);
+
 }
