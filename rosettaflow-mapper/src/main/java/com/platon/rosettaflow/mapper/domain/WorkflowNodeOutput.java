@@ -38,7 +38,7 @@ public class WorkflowNodeOutput implements Serializable {
     /**
      * 是否发起方: 0-否,1-是
      */
-    private Byte savePartnerFlag;
+    private Byte senderFlag;
     /**
      * 任务里面定义的 (p0 -> pN 方 ...)
      */
@@ -89,7 +89,7 @@ public class WorkflowNodeOutput implements Serializable {
                 && (this.getWorkflowNodeId() == null ? other.getWorkflowNodeId() == null : this.getWorkflowNodeId().equals(other.getWorkflowNodeId()))
                 && (this.getIdentityId() == null ? other.getIdentityId() == null : this.getIdentityId().equals(other.getIdentityId()))
                 && (this.getIdentityName() == null ? other.getIdentityName() == null : this.getIdentityName().equals(other.getIdentityName()))
-                && (this.getSavePartnerFlag() == null ? other.getSavePartnerFlag() == null : this.getSavePartnerFlag().equals(other.getSavePartnerFlag()))
+                && (this.getSenderFlag() == null ? other.getSenderFlag() == null : this.getSenderFlag().equals(other.getSenderFlag()))
                 && (this.getPartyId() == null ? other.getPartyId() == null : this.getPartyId().equals(other.getPartyId()))
                 && (this.getNodeId() == null ? other.getNodeId() == null : this.getNodeId().equals(other.getNodeId()))
                 && (this.getStorePattern() == null ? other.getStorePattern() == null : this.getStorePattern().equals(other.getStorePattern()))
@@ -108,7 +108,7 @@ public class WorkflowNodeOutput implements Serializable {
         result = prime * result + ((getWorkflowNodeId() == null) ? 0 : getWorkflowNodeId().hashCode());
         result = prime * result + ((getIdentityId() == null) ? 0 : getIdentityId().hashCode());
         result = prime * result + ((getIdentityName() == null) ? 0 : getIdentityName().hashCode());
-        result = prime * result + ((getSavePartnerFlag() == null) ? 0 : getSavePartnerFlag().hashCode());
+        result = prime * result + ((getSenderFlag() == null) ? 0 : getSenderFlag().hashCode());
         result = prime * result + ((getPartyId() == null) ? 0 : getPartyId().hashCode());
         result = prime * result + ((getNodeId() == null) ? 0 : getNodeId().hashCode());
         result = prime * result + ((getStorePattern() == null) ? 0 : getStorePattern().hashCode());
@@ -129,7 +129,7 @@ public class WorkflowNodeOutput implements Serializable {
                 ", workflowNodeId=" + workflowNodeId +
                 ", identityId=" + identityId +
                 ", identityName=" + identityName +
-                ", savePartnerFlag=" + savePartnerFlag +
+                ", savePartnerFlag=" + senderFlag +
                 ", partyId=" + partyId +
                 ", nodeId=" + nodeId +
                 ", storePattern=" + storePattern +

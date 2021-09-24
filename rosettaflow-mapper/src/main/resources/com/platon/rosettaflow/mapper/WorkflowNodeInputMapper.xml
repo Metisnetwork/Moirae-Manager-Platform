@@ -10,6 +10,7 @@
     <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId" />
     <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds" />
     <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId" />
+    <result column="sender_flag" jdbcType="TINYINT" property="senderFlag"/>
     <result column="party_id" jdbcType="VARCHAR" property="partyId" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -17,6 +18,6 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, workflow_node_id, data_type, identity_id, node_id, data_table_id,
-    data_column_id, data_file_id, party_id, `status`, create_time, update_time
+    data_column_id, data_file_id,sender_flag, party_id, `status`, create_time, update_time
   </sql>
 </mapper>

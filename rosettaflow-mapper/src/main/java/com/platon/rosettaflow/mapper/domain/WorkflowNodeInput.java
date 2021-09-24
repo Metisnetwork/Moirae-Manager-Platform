@@ -52,6 +52,10 @@ public class WorkflowNodeInput implements Serializable {
      */
     private String dataFileId;
     /**
+     * 是否发起方: 0-否,1-是
+     */
+    private Byte senderFlag;
+    /**
      * 任务里面定义的 (p0 -> pN 方 ...)
      */
     private String partyId;

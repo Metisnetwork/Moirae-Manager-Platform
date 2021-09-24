@@ -6,7 +6,7 @@
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
         <result column="identity_name" jdbcType="VARCHAR" property="identityName"/>
-        <result column="save_partner_flag" jdbcType="TINYINT" property="savePartnerFlag"/>
+        <result column="sender_flag" jdbcType="TINYINT" property="senderFlag"/>
         <result column="party_id" jdbcType="VARCHAR" property="partyId"/>
         <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
         <result column="store_pattern" jdbcType="TINYINT" property="storePattern"/>
@@ -17,7 +17,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, workflow_node_id, identity_id, identity_name, save_partner_flag, party_id, node_id, 
+    id, workflow_node_id, identity_id, identity_name, sender_flag, party_id, node_id,
     store_pattern, store_path, output_content, `status`, create_time, update_time
   </sql>
 </mapper>
