@@ -3,14 +3,9 @@ package com.platon.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.common.enums.JobActionStatusEnum;
-import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.JobDto;
-import com.platon.rosettaflow.req.job.ActionJobReq;
 import com.platon.rosettaflow.mapper.domain.Workflow;
-import com.platon.rosettaflow.req.job.AddJobReq;
-import com.platon.rosettaflow.req.job.EditJobReq;
-import com.platon.rosettaflow.req.job.ListJobReq;
-import com.platon.rosettaflow.req.job.QueryWorkflowReq;
+import com.platon.rosettaflow.req.job.*;
 import com.platon.rosettaflow.service.IJobService;
 import com.platon.rosettaflow.task.JobManager;
 import com.platon.rosettaflow.vo.PageVo;
@@ -44,32 +39,26 @@ public class JobController {
     @Resource
     private JobManager jobManager;
 
-
     @PostMapping("list")
     @ApiOperation(value = "作业分页列表", notes = "作业分页列表")
     public ResponseVo<PageVo<JobVo>> listJob(@RequestBody @Valid ListJobReq listJobReq) {
         //查询列表前，先检查批量更新作业状态
         jobManager.finishJobBatchWithTask();
-        IPage<JobDto> jobDtoIpage = jobService.list(listJobReq.getCurrent(), listJobReq.getSize(), listJobReq.getJobName());
-        return convertToJobVo(jobDtoIpage);
+        IPage<JobDto> jobDtoIPage = jobService.list(listJobReq.getCurrent(), listJobReq.getSize(), listJobReq.getJobName());
+        return convertToJobVo(jobDtoIPage);
     }
-
 
     @PostMapping("add")
     @ApiOperation(value = "添加作业", notes = "添加作业")
     public ResponseVo<?> addJob(@RequestBody @Valid AddJobReq addJobReq) {
-        JobDto jobDto = new JobDto();
-        BeanCopierUtils.copy(addJobReq, jobDto);
-        jobService.add(jobDto);
+        jobService.add(BeanUtil.copyProperties(addJobReq, JobDto.class));
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("edit")
     @ApiOperation(value = "作业编辑", notes = "作业编辑")
     public ResponseVo<?> edit(@RequestBody @Valid EditJobReq editJobReq) {
-        JobDto jobDto = new JobDto();
-        BeanCopierUtils.copy(editJobReq, jobDto);
-        jobService.edit(jobDto);
+        jobService.edit(BeanUtil.copyProperties(editJobReq, JobDto.class));
         return ResponseVo.createSuccess();
     }
 
@@ -79,10 +68,11 @@ public class JobController {
         List<Workflow> workflowList = jobService.queryRelatedWorkflowName(queryWorkflowReq.getProjectId());
         return ResponseVo.createSuccess(BeanUtil.copyToList(workflowList, QueryWorkflowVo.class));
     }
+
     @PostMapping("action")
     @ApiOperation(value = "操作作业", notes = "操作作业")
     public ResponseVo<?> actionJob(@RequestBody @Valid ActionJobReq actionJobReq) {
-        if(actionJobReq.getActionType() == JobActionStatusEnum.PAUSE.getValue()){
+        if (actionJobReq.getActionType() == JobActionStatusEnum.PAUSE.getValue()) {
             jobService.pause(actionJobReq.getId());
         } else {
             jobService.reStart(actionJobReq.getId());
@@ -90,18 +80,10 @@ public class JobController {
         return ResponseVo.createSuccess();
     }
 
-
-
-
-
-
     private ResponseVo<PageVo<JobVo>> convertToJobVo(IPage<JobDto> pageDto) {
         List<JobVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(dto -> {
-            JobVo vo = new JobVo();
-            BeanCopierUtils.copy(dto, vo);
-            items.add(vo);
-        });
+        pageDto.getRecords().forEach(dto -> items.add(BeanUtil.copyProperties(dto, JobVo.class)));
+
         PageVo<JobVo> pageVo = new PageVo<>();
         pageVo.setCurrent(pageDto.getCurrent());
         pageVo.setItems(items);
@@ -109,7 +91,4 @@ public class JobController {
         pageVo.setTotal(pageDto.getTotal());
         return ResponseVo.createSuccess(pageVo);
     }
-
-
-
 }

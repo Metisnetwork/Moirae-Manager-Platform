@@ -62,7 +62,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_RUNNING.getMsg());
         }
         //停止子作业
-        LambdaUpdateWrapper<SubJob> subJobUpdateWrapper = new LambdaUpdateWrapper();
+        LambdaUpdateWrapper<SubJob> subJobUpdateWrapper = Wrappers.lambdaUpdate();
         subJobUpdateWrapper.set(SubJob::getSubJobStatus,SubJobStatusEnum.UN_RUN);
         subJobUpdateWrapper.set(SubJob::getUpdateTime,new Date(System.currentTimeMillis()));
         subJobUpdateWrapper.eq(SubJob::getId,id);

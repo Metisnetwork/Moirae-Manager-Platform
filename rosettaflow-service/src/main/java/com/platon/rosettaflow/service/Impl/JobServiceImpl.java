@@ -22,8 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hudenian
@@ -39,8 +40,6 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Resource
     private IWorkflowService workflowService;
-
-
 
     @Override
     public List<Job> getAllUnfinishedJob() {
@@ -84,7 +83,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
         //如果作业正在执行或者执行完成则不能够修改
-        if(job.getJobStatus() == JobStatusEnum.RUNNING.getValue() || job.getJobStatus() == JobStatusEnum.FINISH.getValue()){
+        if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue() || job.getJobStatus() == JobStatusEnum.FINISH.getValue()) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_OR_FINISH.getMsg());
         }
 
@@ -93,7 +92,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
         job.setStatus(StatusEnum.VALID.getValue());
-        if(job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()){
+        if (job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()) {
             job.setRepeatInterval(null);
             job.setEndTime(null);
             job.setStatus(StatusEnum.VALID.getValue());
@@ -116,7 +115,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     public void pause(Long id) {
         Job job = this.getById(id);
         if (job.getJobStatus() != JobStatusEnum.RUNNING.getValue()) {
-            log.error("job is not running can not modify by jobId:{}" + job.getId());
+            log.error("job is not running can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_RUNNING.getMsg());
         }
         redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
@@ -126,12 +125,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     public void reStart(Long id) {
         Job job = this.getById(id);
         if (job.getJobStatus() != JobStatusEnum.STOP.getValue()) {
-            log.error("job is not stop can not modify by jobId:{}" + job.getId());
+            log.error("job is not stop can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_STOP.getMsg());
         }
         redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
     }
-
 
     /**
      * 检查入参合法性
@@ -152,5 +150,4 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             }
         }
     }
-
 }

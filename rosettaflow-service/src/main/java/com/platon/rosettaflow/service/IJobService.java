@@ -21,13 +21,12 @@ public interface IJobService extends IService<Job> {
      */
     List<Job> getAllUnfinishedJob();
 
-
     /**
      * 获取作业分页列表
      *
-     * @param current  当前页
-     * @param size     每页大小
-     * @param jobName  作业名称
+     * @param current 当前页
+     * @param size    每页大小
+     * @param jobName 作业名称
      * @return 分页数据
      */
     IPage<JobDto> list(Long current, Long size, String jobName);
@@ -41,6 +40,7 @@ public interface IJobService extends IService<Job> {
 
     /**
      * 编辑作业
+     *
      * @param jobDto 编辑作业请求对象
      */
     void edit(JobDto jobDto);
@@ -51,16 +51,17 @@ public interface IJobService extends IService<Job> {
     List<Workflow> queryRelatedWorkflowName(Long projectId);
 
     /**
-     *  暂停作业
+     * 暂停作业
+     *
      * @param id 作业Id
      */
     void pause(Long id);
 
     /**
-     *  重启作业
+     * 重启作业
+     *
      * @param id 作业Id
      */
     void reStart(Long id);
-
 
 }
