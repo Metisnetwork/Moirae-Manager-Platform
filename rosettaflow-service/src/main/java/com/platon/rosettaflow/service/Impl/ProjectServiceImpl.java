@@ -341,7 +341,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     private void checkAdminPermission(Long projectId) {
         Byte role = this.getRoleByProjectId(projectId);
-        if (null == role || ProjectMemberRoleEnum.ADMIN.getRoleId() != role) {
+        if (null != role && ProjectMemberRoleEnum.ADMIN.getRoleId() != role) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_PERMISSION_ERROR.getMsg());
         }
     }
