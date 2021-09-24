@@ -168,7 +168,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<Long> idsList = convertIdType(ids);
         if (idsList.size() > 0) {
             List<Workflow> list = new ArrayList<>();
-            idsList.parallelStream().forEach(id -> {
+            idsList.stream().forEach(id -> {
                 Workflow workflow = this.queryWorkflowDetail(id);
                 // 校验是否有编辑权限
                 checkEditPermission(workflow.getProjectId());
