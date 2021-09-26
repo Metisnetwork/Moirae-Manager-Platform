@@ -7,7 +7,6 @@ import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.req.workflow.node.*;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.vo.ResponseVo;
-import com.platon.rosettaflow.vo.workflow.WorkflowDetailsVo;
 import com.platon.rosettaflow.vo.workflow.node.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +23,7 @@ import java.util.Map;
 
 /**
  * 工作流节点管理关接口
+ *
  * @author hudenian
  * @date 2021/8/31
  */
@@ -43,12 +43,14 @@ public class WorkflowNodeController {
         return ResponseVo.createSuccess(convertToWorkflowVo(workflowNodeDtoList));
     }
 
-    /** 转换响应参数 */
-    private NodeDetailsListVo convertToWorkflowVo( List<WorkflowNodeDto> workflowNodeDtoList) {
+    /**
+     * 转换响应参数
+     */
+    private NodeDetailsListVo convertToWorkflowVo(List<WorkflowNodeDto> workflowNodeDtoList) {
         NodeDetailsListVo nodeDetailsListVo = new NodeDetailsListVo();
         List<WorkflowNodeVo> workflowNodeVoList = new ArrayList<>();
         if (workflowNodeDtoList != null && workflowNodeDtoList.size() > 0) {
-            for(WorkflowNodeDto nodeDto: workflowNodeDtoList){
+            for (WorkflowNodeDto nodeDto : workflowNodeDtoList) {
                 WorkflowNodeVo workflowNodeVo = BeanUtil.toBean(nodeDto, WorkflowNodeVo.class);
                 // 输入参数转换
                 List<WorkflowNodeInput> nodeInputList = nodeDto.getWorkflowNodeInputList();
@@ -144,7 +146,7 @@ public class WorkflowNodeController {
     @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
     public ResponseVo<WorkflowNodeResultVo> detail(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
         WorkflowNodeResultVo workflowNodeResultVo = new WorkflowNodeResultVo();
-        workflowNodeResultVo.setResult(taskId+"运行结果待开发");
+        workflowNodeResultVo.setResult(taskId + "运行结果待开发");
         return ResponseVo.createSuccess(workflowNodeResultVo);
     }
 

@@ -1,0 +1,37 @@
+package com.platon.rosettaflow.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.mapper.domain.Organization;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author hudenian
+ * @date 2021/9/26
+ * @description 机构服务实现类
+ */
+public interface IOrganizationService extends IService<Organization> {
+    /**
+     * 批量插入机构信息
+     *
+     * @param organizationList 机构列表
+     */
+    void batchInsert(List<Organization> organizationList);
+
+    /**
+     * 根据identityId获取机构信息
+     *
+     * @param identityId identityId
+     * @return 机构信息
+     */
+    Organization getByIdentityId(String identityId);
+
+    /**
+     * 根据identityId列表获取对应机构集合
+     *
+     * @param identityArr identityId数组
+     * @return key:identityId value:organization
+     */
+    Map<String, Organization> getByIdentityIds(Object[] identityArr);
+}

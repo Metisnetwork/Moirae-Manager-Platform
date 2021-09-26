@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platon.rosettaflow.mapper.OrganizationMapper">
+    <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.Organization">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="node_name" jdbcType="VARCHAR" property="nodeName"/>
+        <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
+        <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, node_name, node_id, identity_id, `status`, create_time, update_time
+  </sql>
+
+    <insert id="batchInsert" >
+        <foreach collection="organizationList" item="metaData" separator=";">
+         replace into t_organization
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="nodeName != null">
+                node_name,
+            </if>
+            <if test="nodeId != null">
+                node_id,
+            </if>
+            <if test="identityId != null">
+                identity_id,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="nodeName != null">
+                #{nodeName,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeId != null">
+                #{nodeId,jdbcType=VARCHAR},
+            </if>
+            <if test="identityId != null">
+                #{identityId,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+        </foreach>
+    </insert>
+</mapper>

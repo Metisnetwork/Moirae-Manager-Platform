@@ -36,10 +36,6 @@ public class WorkflowNodeInput implements Serializable {
      */
     private String identityId;
     /**
-     * 资源所属组织中调度服务的 nodeId
-     */
-    private String nodeId;
-    /**
      * 数据表ID
      */
     private String dataTableId;

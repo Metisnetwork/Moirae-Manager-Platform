@@ -14,9 +14,7 @@ import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
-import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
-import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
@@ -28,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.date.DateTime.now;
@@ -80,13 +75,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private GrpcTaskService grpcTaskService;
 
     @Resource
-    private GrpcAuthService grpcAuthService;
-
-    @Resource
     private ISubJobService subJobService;
 
     @Resource
     private ISubJobNodeService subJobNodeService;
+
+    @Resource
+    private IOrganizationService organizationService;
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
@@ -426,6 +421,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //工作流节点资源表
         WorkflowNodeResource workflowNodeResource = getWorkflowNodeResource(workflowNode);
 
+        //获取参与机构列表
+        String[] identityIdArr = new String[workflowNodeInputList.size()];
+        for (int i = 0; i < workflowNodeInputList.size(); i++) {
+            identityIdArr[i] = workflowNodeInputList.get(i).getIdentityId();
+        }
+        Map<String, Organization> organizationMap = organizationService.getByIdentityIds(identityIdArr);
+
         TaskDto taskDto = new TaskDto();
 
         taskDto.setWorkFlowNodeId(workflowNode.getId());
@@ -442,9 +444,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 算力提供方 暂定三方
         taskDto.setPowerPartyIds(getPowerPartyIds());
         //数据提供方
-        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList));
+        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap));
         //任务结果接受者
-        taskDto.setTaskResultReceiverDeclareDtoList(getReceivers(workflowNodeOutputList));
+        taskDto.setTaskResultReceiverDeclareDtoList(getReceivers(workflowNodeOutputList, organizationMap));
         // 任务需要花费的资源声明
         taskDto.setResourceCostDeclareDto(getResourceCostDeclare(workflowNodeResource));
         //算法代码
@@ -513,14 +515,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param workflowNodeOutputList 工作流输入列表
      * @return 任务结果接收方列表
      */
-    private List<OrganizationIdentityInfoDto> getReceivers(List<WorkflowNodeOutput> workflowNodeOutputList) {
+    private List<OrganizationIdentityInfoDto> getReceivers(List<WorkflowNodeOutput> workflowNodeOutputList, Map<String, Organization> organizationMap) {
         List<OrganizationIdentityInfoDto> receiverList = new ArrayList<>();
         OrganizationIdentityInfoDto organizationIdentityInfoDto;
         for (WorkflowNodeOutput output : workflowNodeOutputList) {
             organizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             organizationIdentityInfoDto.setPartyId(output.getPartyId());
-            organizationIdentityInfoDto.setNodeName(output.getIdentityName());
-            organizationIdentityInfoDto.setNodeId(output.getNodeId());
+            organizationIdentityInfoDto.setNodeName(organizationMap.get(output.getIdentityId()).getNodeName());
+            organizationIdentityInfoDto.setNodeId(organizationMap.get(output.getIdentityId()).getNodeId());
             organizationIdentityInfoDto.setIdentityId(output.getIdentityId());
             receiverList.add(organizationIdentityInfoDto);
         }
@@ -542,7 +544,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param workflowNodeInputList 工作流节点信息
      * @return 数据提供方列表
      */
-    private List<TaskDataSupplierDeclareDto> getDataSupplierList(List<WorkflowNodeInput> workflowNodeInputList) {
+    private List<TaskDataSupplierDeclareDto> getDataSupplierList(List<WorkflowNodeInput> workflowNodeInputList, Map<String, Organization> organizationMap) {
         List<TaskDataSupplierDeclareDto> taskDataSupplierDeclareDtoList = new ArrayList<>();
         TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
 
@@ -551,7 +553,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         for (WorkflowNodeInput input : workflowNodeInputList) {
             taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             taskOrganizationIdentityInfoDto.setPartyId(input.getPartyId());
-            taskOrganizationIdentityInfoDto.setNodeId(input.getNodeId());
+            taskOrganizationIdentityInfoDto.setNodeId(organizationMap.get(input.getIdentityId()).getNodeId());
+            taskOrganizationIdentityInfoDto.setNodeName(organizationMap.get(input.getIdentityId()).getNodeName());
             taskOrganizationIdentityInfoDto.setIdentityId(input.getIdentityId());
 
             taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
@@ -588,11 +591,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
             if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
                 OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
-                NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
+                Organization organization = organizationService.getByIdentityId(workflowNodeInput.getIdentityId());
                 sender.setPartyId(workflowNodeInput.getPartyId());
-                sender.setNodeName(nodeIdentityDto.getNodeName());
-                sender.setNodeId(nodeIdentityDto.getNodeId());
-                sender.setIdentityId(nodeIdentityDto.getIdentityId());
+                sender.setNodeName(organization.getNodeName());
+                sender.setNodeId(organization.getNodeId());
+                sender.setIdentityId(workflowNodeInput.getIdentityId());
                 return sender;
             }
         }
@@ -601,11 +604,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender) {
         OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
-        //发起方的默认设置成a1
-        algoSupplier.setIdentityId("a1");
-        sender.setNodeName(sender.getNodeName());
-        sender.setNodeId(sender.getNodeId());
-        sender.setIdentityId(sender.getIdentityId());
+        algoSupplier.setPartyId(sender.getPartyId());
+        algoSupplier.setNodeName(sender.getNodeName());
+        algoSupplier.setNodeId(sender.getNodeId());
+        algoSupplier.setIdentityId(sender.getIdentityId());
         return algoSupplier;
     }
 

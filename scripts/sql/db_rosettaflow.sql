@@ -18,15 +18,15 @@ CREATE TABLE `t_user` (
 
 
 -- ----------------------------
--- Table structure for `t_org`
+-- Table structure for `t_organization`
 -- ----------------------------
-DROP TABLE IF EXISTS `t_org`;
-CREATE TABLE `t_org` (
+DROP TABLE IF EXISTS `t_organization`;
+CREATE TABLE `t_organization` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '组织表ID(自增长)',
-    `identity_id` varchar(128)  DEFAULT NULL COMMENT '组织的身份标识Id',
-    `identity_name` varchar(100)  DEFAULT NULL COMMENT '组织的身份名称',
+    `node_name` varchar(100)  DEFAULT NULL COMMENT '组织的身份名称',
     `node_id` varchar(256) DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
-    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '组织的身份标识Id',
+    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-未知，1- 正常， 2- 异常',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
@@ -357,7 +357,6 @@ CREATE TABLE `t_workflow_node_input` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `data_type` tinyint(4) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
-  `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
   `data_table_id` varchar(128) DEFAULT NULL COMMENT '数据表ID',
   `data_column_ids` varchar(128) DEFAULT NULL COMMENT '数据字段ID',
@@ -396,10 +395,8 @@ CREATE TABLE `t_workflow_node_output` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输出表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '协同方组织的身份标识Id',
-  `identity_name` varchar(64) DEFAULT NULL COMMENT '协同方组织名称',
-  `sender_flag` tinyint(4) DEFAULT NULL COMMENT '是否发起方: 0-否,1-是',
   `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
-  `node_id` varchar(256) DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
+  `sender_flag` tinyint(4) DEFAULT NULL COMMENT '是否发起方: 0-否,1-是',
   `store_pattern` tinyint(4) DEFAULT 1 COMMENT '存储形式: 1-明文，2:密文',
   `store_path` varchar(200) DEFAULT NULL COMMENT '存储路径',
   `output_content`  TEXT DEFAULT NULL COMMENT '输出内容',

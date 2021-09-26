@@ -10,6 +10,8 @@ import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
+import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
+import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.mapper.WorkflowNodeMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -22,6 +24,7 @@ import java.util.*;
 
 /**
  * 工作流节点服务实现类
+ *
  * @author hudenian
  * @date 2021/8/31
  */
@@ -52,6 +55,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Resource
     private IWorkflowNodeResourceService workflowNodeResourceService;
+
+    @Resource
+    private GrpcAuthService grpcAuthService;
+
+    @Resource
+    private IOrganizationService organizationService;
 
     @Override
     public List<WorkflowNodeDto> queryNodeDetailsList(Long id) {
@@ -312,6 +321,26 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 物理删除
             workflowNodeInputService.removeByIds(idList);
         }
+        //任务里面定义的 (p0 -> pN 方 ...)
+        for (int i = 0; i < workflowNodeInputList.size(); i++) {
+            workflowNodeInputList.get(i).setPartyId("p" + i);
+        }
+        //校验组织信息
+        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
+            List<Organization> organizationList = new ArrayList<>();
+            Organization org;
+            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
+                org = new Organization();
+                org.setNodeName(nodeIdentityDto.getNodeName());
+                org.setNodeId(nodeIdentityDto.getNodeId());
+                org.setIdentityId(nodeIdentityDto.getIdentityId());
+                org.setStatus(nodeIdentityDto.getStatus().byteValue());
+                organizationList.add(org);
+            }
+            organizationService.batchInsert(organizationList);
+        }
+
         // 新增
         workflowNodeInputService.saveBatch(workflowNodeInputList);
     }
@@ -446,16 +475,18 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public void updateRunStatusByWorkflowId(Long workflowId, Byte oldRunStatus, Byte newRunStatus) {
         LambdaUpdateWrapper<WorkflowNode> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(WorkflowNode::getRunStatus,newRunStatus);
-        updateWrapper.eq(WorkflowNode::getRunStatus,oldRunStatus);
-        updateWrapper.eq(WorkflowNode::getWorkflowId,workflowId);
+        updateWrapper.set(WorkflowNode::getRunStatus, newRunStatus);
+        updateWrapper.eq(WorkflowNode::getRunStatus, oldRunStatus);
+        updateWrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         this.update(updateWrapper);
     }
 
-    /** 校验是否有编辑权限  */
+    /**
+     * 校验是否有编辑权限
+     */
     private void checkEditPermission(Long projectId) {
-        Byte role =  projectService.getRoleByProjectId(projectId);
+        Byte role = projectService.getRoleByProjectId(projectId);
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
