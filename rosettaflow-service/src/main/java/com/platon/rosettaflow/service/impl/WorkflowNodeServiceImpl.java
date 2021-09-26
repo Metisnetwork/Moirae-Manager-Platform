@@ -17,6 +17,7 @@ import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -369,15 +370,15 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    public void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList) {
-        if (null == workflowNodeOldList || workflowNodeOldList.size() == 0) {
+    public void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList) {
+        if (null == oldNodeList || oldNodeList.size() == 0) {
             return;
         }
         List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
         List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
         List<WorkflowNodeCode> newNodeCodeList = new ArrayList<>();
         List<WorkflowNodeResource> newNodeResourceList = new ArrayList<>();
-        workflowNodeOldList.forEach(oldNode -> {
+        oldNodeList.forEach(oldNode -> {
             WorkflowNode newNode = new WorkflowNode();
             newNode.setWorkflowId(newWorkflowId);
             newNode.setAlgorithmId(oldNode.getAlgorithmId());
@@ -422,17 +423,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public void addWorkflowNodeByTemplate(Long workflowId, List<WorkflowNodeTemp> workflowNodeTempList) {
-        WorkflowNode workflowNode;
-        for (WorkflowNodeTemp workflowNodeTemp : workflowNodeTempList) {
-            workflowNode = new WorkflowNode();
-            workflowNode.setWorkflowId(workflowId);
-            workflowNode.setNodeName(workflowNodeTemp.getNodeName());
-            workflowNode.setAlgorithmId(workflowNodeTemp.getAlgorithmId());
-            workflowNode.setNodeStep(workflowNodeTemp.getNodeStep());
-            workflowNode.setNextNodeStep(workflowNodeTemp.getNextNodeStep());
-            //保存工作流节点
-            this.save(workflowNode);
-        }
+        List<WorkflowNode> oldNodeList = BeanUtil.copyToList(workflowNodeTempList, WorkflowNode.class);
+        saveCopyWorkflowNode(workflowId, oldNodeList);
     }
 
     @Override

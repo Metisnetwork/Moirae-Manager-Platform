@@ -15,7 +15,28 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, workflow_node_id, identity_id, party_id, sender_flag,
-    store_pattern, store_path, output_content, `status`, create_time, update_time
-  </sql>
+        id, workflow_node_id, identity_id, party_id, sender_flag,
+        store_pattern, store_path, output_content, `status`, create_time, update_time
+    </sql>
+    <select id="getByWorkflowNodeId" resultType="com.platon.rosettaflow.dto.WorkflowNodeOutputDto">
+        select
+            a.id as id,
+            a.workflow_node_id as workflowNodeId,
+            a.identity_id as identityId,
+            a.party_id as partyId,
+            a.sender_flag as senderFlag,
+            a.store_pattern as storePattern,
+            a.store_path as storePath,
+            a.output_content as outputContent,
+            b.node_name as identityName
+        from
+            t_workflow_node_output a, t_organization b
+        where 1=1
+            and a.status = 1
+            and b.status = 1
+            and a.identity_id = b.identity_id
+        order by a.party_id asc
+    </select>
+
+
 </mapper>

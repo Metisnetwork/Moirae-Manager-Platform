@@ -67,11 +67,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Transactional(rollbackFor = Exception.class)
     public void addProject(ProjectDto projectDto) {
         try {
-            Long userId = UserContext.get().getId();
-            if (userId == null || userId == 0L) {
-                log.error("ProjectServiceImpl->addProject fail user un login");
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
-            }
+            Long userId = commonService.getCurrentUser().getId();
             Project project = new Project();
             project.setUserId(userId);
             project.setProjectName(projectDto.getProjectName());

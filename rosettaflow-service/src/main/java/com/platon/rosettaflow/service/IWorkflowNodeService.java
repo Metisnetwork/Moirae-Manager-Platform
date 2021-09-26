@@ -128,9 +128,9 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * 复制保存工作流节点
      *
      * @param newWorkflowId       新工作流id
-     * @param workflowNodeOldList 旧工作流列表
+     * @param oldNodeList 旧工作流列表
      */
-    void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList);
+    void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList);
 
     /**
      * 根据工作流节点模板添加工作流
