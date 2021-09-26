@@ -22,6 +22,10 @@ public class SaveNodeOutputReq {
     @Positive(message = "{workflow.node.id.positive}")
     private Long workflowNodeId;
 
+    @ApiModelProperty(value = "是否发起方: 0-否, 1-是", required = true)
+    @NotNull(message = "{node.sender.flag.notNull}")
+    private Integer senderFlag;
+
     @ApiModelProperty(value = "组织的身份标识Id", required = true)
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
@@ -29,9 +33,6 @@ public class SaveNodeOutputReq {
     @ApiModelProperty(value = "组织名称")
     @NotBlank(message = "{node.identity.name.NotBlank}")
     private String identityName;
-
-    @ApiModelProperty(value = "是否发起方: 0-否,1-是(默认为1)")
-    private Integer savePartnerFlag;
 
     @ApiModelProperty(value = "存储形式: 1-明文，2:密文(默认为1)")
     private Integer storePattern;

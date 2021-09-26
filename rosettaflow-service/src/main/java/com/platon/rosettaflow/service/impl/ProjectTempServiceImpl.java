@@ -148,7 +148,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
      */
     private void saveWorkflowNode(Long workflowId, List<WorkflowNodeTemp> nodeTempList) {
         List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(nodeTempList, WorkflowNode.class);
-        workflowNodeService.copySaveWorkflowNode(workflowId, workflowNodeList);
+        workflowNodeService.saveCopyWorkflowNode(workflowId, workflowNodeList);
     }
 
     /**
