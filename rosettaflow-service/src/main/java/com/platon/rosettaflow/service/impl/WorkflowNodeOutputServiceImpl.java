@@ -24,11 +24,7 @@ import java.util.List;
 public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutputMapper, WorkflowNodeOutput> implements IWorkflowNodeOutputService {
     @Override
     public List<WorkflowNodeOutput> getByWorkflowNodeId(Long workflowNodeId) {
-        LambdaQueryWrapper<WorkflowNodeOutput> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNodeOutput::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeOutput::getStatus, StatusEnum.VALID.getValue());
-        wrapper.orderByAsc(WorkflowNodeOutput::getPartyId);
-        return this.list(wrapper);
+        return baseMapper.getByWorkflowNodeId(workflowNodeId);
     }
 
     @Override

@@ -5,11 +5,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * 功能描述
  * @author hudenian
  * @date 2021/8/30
- * @description 功能描述
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class WorkflowNodeOutputDto extends WorkflowNodeOutput {
+
+    /** 组织名称 */
+    private String identityName;
 }
