@@ -368,7 +368,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    public void copySaveWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList) {
+    public void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> workflowNodeOldList) {
         if (null == workflowNodeOldList || workflowNodeOldList.size() == 0) {
             return;
         }

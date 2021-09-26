@@ -191,14 +191,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Transactional(rollbackFor = RuntimeException.class)
     public void copyWorkflow(Long originId, String workflowName, String workflowDesc) {
         try {
-            // 将复制的工作流数据id置空，新增一条新的工作流数据
+            // 复制新增一条新的工作流数据
             Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
             // 查询原工作流节点
             List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
-            // 保存为新工作流节点
-            workflowNodeService.copySaveWorkflowNode(newWorkflowId, workflowNodeOldList);
+            // 保存复制的工作流节点及所属数据
+            workflowNodeService.saveCopyWorkflowNode(newWorkflowId, workflowNodeOldList);
         } catch (Exception e) {
-            log.error("copyWorkflow--复制工作流接口失败:{}", e.getMessage(), e);
+            log.error("copyWorkflow--复制工作流接口失败, 错误信息:{}, 异常:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXIST.getMsg());
             }
@@ -206,9 +206,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    /**
-     * 将复制的工作流数据id置空，新增一条新的工作流数据
-     */
+    /** 复制新增一条新的工作流数据 */
     private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
         Workflow originWorkflow = this.queryWorkflowDetail(originId);
         // 校验是否有编辑权限
