@@ -274,6 +274,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void saveWorkflowNodeInput(Long workflowNodeId, List<WorkflowNodeInput> workflowNodeInputList) {
+        String[] identityIdArr = new String[workflowNodeInputList.size()];
         List<WorkflowNodeInput> nodeInputList =
                 workflowNodeInputService.getByWorkflowNodeId(workflowNodeId);
         // 如果已存在则全部删除，并新增
@@ -283,24 +284,24 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 物理删除
             workflowNodeInputService.removeByIds(idList);
         }
+
         //任务里面定义的 (p0 -> pN 方 ...)
         for (int i = 0; i < workflowNodeInputList.size(); i++) {
             workflowNodeInputList.get(i).setPartyId("p" + i);
+            identityIdArr[i] = workflowNodeInputList.get(i).getIdentityId();
         }
-        //校验组织信息
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
-        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
-            List<Organization> organizationList = new ArrayList<>();
-            Organization org;
-            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
-                org = new Organization();
-                org.setNodeName(nodeIdentityDto.getNodeName());
-                org.setNodeId(nodeIdentityDto.getNodeId());
-                org.setIdentityId(nodeIdentityDto.getIdentityId());
-                org.setStatus(nodeIdentityDto.getStatus().byteValue());
-                organizationList.add(org);
+
+        List<Organization> organizationList = organizationService.getByIdentityIds(identityIdArr);
+        if (null == organizationList || organizationList.size() < identityIdArr.length) {
+            //校验组织信息
+            List<Organization> newOrganizationList = syncOrganization();
+            Set<String> identityIdSet = new HashSet<>();
+            newOrganizationList.forEach(o -> identityIdSet.add(o.getIdentityId()));
+            for (String identity : identityIdArr) {
+                if (!identityIdSet.contains(identity)) {
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
+                }
             }
-            organizationService.batchInsert(organizationList);
         }
 
         // 新增
@@ -453,5 +454,29 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
+    }
+
+    /**
+     * 同步组织信息
+     *
+     * @return 组织信息列表
+     */
+    private List<Organization> syncOrganization() {
+        List<Organization> organizationList = new ArrayList<>();
+        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
+
+            Organization org;
+            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
+                org = new Organization();
+                org.setNodeName(nodeIdentityDto.getNodeName());
+                org.setNodeId(nodeIdentityDto.getNodeId());
+                org.setIdentityId(nodeIdentityDto.getIdentityId());
+                org.setStatus(nodeIdentityDto.getStatus().byteValue());
+                organizationList.add(org);
+            }
+            organizationService.batchInsert(organizationList);
+        }
+        return organizationList;
     }
 }

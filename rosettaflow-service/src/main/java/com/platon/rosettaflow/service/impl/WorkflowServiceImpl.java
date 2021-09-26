@@ -201,7 +201,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    /** 复制新增一条新的工作流数据 */
+    /**
+     * 复制新增一条新的工作流数据
+     */
     private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
         Workflow originWorkflow = this.queryWorkflowDetail(originId);
         // 校验是否有编辑权限
@@ -424,7 +426,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         for (int i = 0; i < workflowNodeInputList.size(); i++) {
             identityIdArr[i] = workflowNodeInputList.get(i).getIdentityId();
         }
-        Map<String, Organization> organizationMap = organizationService.getByIdentityIds(identityIdArr);
+        Map<String, Organization> organizationMap = organizationService.getByIdentityIds(identityIdArr).stream().collect(Collectors.toMap(Organization::getIdentityId, organization -> organization));
 
         TaskDto taskDto = new TaskDto();
 
