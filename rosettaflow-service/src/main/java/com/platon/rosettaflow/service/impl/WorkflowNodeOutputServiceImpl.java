@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeOutputMapper;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
 import com.platon.rosettaflow.service.IWorkflowNodeOutputService;
 import lombok.extern.slf4j.Slf4j;

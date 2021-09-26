@@ -583,17 +583,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return 机构信息
      */
     private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
-//        for (int i = 0; i < workflowNodeInputList.size(); i++) {
-//            workflowNodeInputList.get(i).gets
-//        }
-        OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
-        NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
-        //发起方的默认设置成p0
-        sender.setPartyId("p0");
-        sender.setNodeName(nodeIdentityDto.getNodeName());
-        sender.setNodeId(nodeIdentityDto.getNodeId());
-        sender.setIdentityId(nodeIdentityDto.getIdentityId());
-        return sender;
+        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+            if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
+                OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
+                NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
+                sender.setPartyId(workflowNodeInput.getPartyId());
+                sender.setNodeName(nodeIdentityDto.getNodeName());
+                sender.setNodeId(nodeIdentityDto.getNodeId());
+                sender.setIdentityId(nodeIdentityDto.getIdentityId());
+                return sender;
+            }
+        }
+        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }
 
     private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender) {
