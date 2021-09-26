@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author hudenian
@@ -36,9 +34,9 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
     }
 
     @Override
-    public Map<String, Organization> getByIdentityIds(Object[] identityArr) {
+    public List<Organization> getByIdentityIds(Object[] identityArr) {
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getIdentityId, identityArr);
-        return this.list(wrapper).stream().collect(Collectors.toMap(Organization::getIdentityId, organization -> organization));
+        return this.list(wrapper);
     }
 }

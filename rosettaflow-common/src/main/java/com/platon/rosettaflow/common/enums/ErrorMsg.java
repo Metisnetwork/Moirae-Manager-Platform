@@ -52,7 +52,6 @@ public enum ErrorMsg {
     ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code does not exist"),
     ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation"),
 
-
     /**
      * 数据
      */
@@ -92,9 +91,12 @@ public enum ErrorMsg {
     JOB_NOT_STOP("作业并未停止中不能修改", "Job is not stop can not modify"),
     JOB_RUNNING_CACHE_CLEAR_ERROR("作业执行缓存清理错误", "Job run cache clear error"),
     SUB_JOB_NOT_RUNNING("子作业非运行状态中不能暂停", "Sub job is not running can not stop"),
-    SUB_JOB_NOT_STOP("子作业非暂停状态中不能重启", "Sub job is not stop can not start");
+    SUB_JOB_NOT_STOP("子作业非暂停状态中不能重启", "Sub job is not stop can not start"),
 
-
+    /**
+     * 机构
+     */
+    ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist");
 
     private final String zh;
     private final String en;

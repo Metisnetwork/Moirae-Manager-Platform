@@ -15,46 +15,46 @@
   </sql>
 
     <insert id="batchInsert" >
-        <foreach collection="organizationList" item="metaData" separator=";">
+        <foreach collection="organizationList" item="organization" separator=";">
          replace into t_organization
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="nodeName != null">
+            <if test="organization.nodeName != null">
                 node_name,
             </if>
-            <if test="nodeId != null">
+            <if test="organization.nodeId != null">
                 node_id,
             </if>
-            <if test="identityId != null">
+            <if test="organization.identityId != null">
                 identity_id,
             </if>
-            <if test="status != null">
+            <if test="organization.status != null">
                 `status`,
             </if>
-            <if test="createTime != null">
+            <if test="organization.createTime != null">
                 create_time,
             </if>
-            <if test="updateTime != null">
+            <if test="organization.updateTime != null">
                 update_time,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="nodeName != null">
-                #{nodeName,jdbcType=VARCHAR},
+            <if test="organization.nodeName != null">
+                #{organization.nodeName,jdbcType=VARCHAR},
             </if>
-            <if test="nodeId != null">
-                #{nodeId,jdbcType=VARCHAR},
+            <if test="organization.nodeId != null">
+                #{organization.nodeId,jdbcType=VARCHAR},
             </if>
-            <if test="identityId != null">
-                #{identityId,jdbcType=VARCHAR},
+            <if test="organization.identityId != null">
+                #{organization.identityId,jdbcType=VARCHAR},
             </if>
-            <if test="status != null">
-                #{status,jdbcType=TINYINT},
+            <if test="organization.status != null">
+                #{organization.status,jdbcType=TINYINT},
             </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
+            <if test="organization.createTime != null">
+                #{organization.createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="updateTime != null">
-                #{updateTime,jdbcType=TIMESTAMP},
+            <if test="organization.updateTime != null">
+                #{organization.updateTime,jdbcType=TIMESTAMP},
             </if>
         </trim>
         </foreach>

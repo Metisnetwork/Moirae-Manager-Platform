@@ -67,7 +67,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             nodeIdentityDto.setNodeName("节点" + i + "名字");
             nodeIdentityDto.setNodeId("节点" + i + "的Id");
             nodeIdentityDto.setIdentityId("节点" + i + "的identityId");
-            nodeIdentityDto.setIdentityId("节点" + i + "的identityId");
+            nodeIdentityDto.setStatus(1);
             metaDataAuthorityDto.setOwner(nodeIdentityDto);
 
             metaDataAuthorityDto.setMetaDataId("metaDataId" + i);
@@ -81,7 +81,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
 
             getMetaDataAuthorityDto.setAuditMetaDataOption((int) UserMetaDataAuditEnum.AUDIT_PASSED.getValue());
-            
+
             MetadataUsedQuoDto metadataUsedQuoDto = new MetadataUsedQuoDto();
             metadataUsedQuoDto.setMetadataUsageType(2);
             metadataUsedQuoDto.setExpire(false);
@@ -107,6 +107,16 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
 
     @Override
     public List<NodeIdentityDto> getIdentityList() {
-        return null;
+        List<NodeIdentityDto> nodeIdentityDtoList = new ArrayList<>();
+        NodeIdentityDto nodeIdentityDto;
+        for (int i = 0; i < LEN; i++) {
+            nodeIdentityDto = new NodeIdentityDto();
+            nodeIdentityDto.setNodeName("节点" + i + "名字");
+            nodeIdentityDto.setNodeId("节点" + i + "的Id");
+            nodeIdentityDto.setIdentityId("节点" + i + "的identityId");
+            nodeIdentityDto.setStatus(1);
+            nodeIdentityDtoList.add(nodeIdentityDto);
+        }
+        return nodeIdentityDtoList;
     }
 }

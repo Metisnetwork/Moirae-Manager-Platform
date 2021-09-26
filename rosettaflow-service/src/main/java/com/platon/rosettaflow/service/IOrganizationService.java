@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.mapper.domain.Organization;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author hudenian
@@ -31,7 +30,7 @@ public interface IOrganizationService extends IService<Organization> {
      * 根据identityId列表获取对应机构集合
      *
      * @param identityArr identityId数组
-     * @return key:identityId value:organization
+     * @return 组织列表
      */
-    Map<String, Organization> getByIdentityIds(Object[] identityArr);
+    List<Organization> getByIdentityIds(Object[] identityArr);
 }
