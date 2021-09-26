@@ -26,6 +26,10 @@ public class SaveNodeInputReq {
     @NotNull(message = "{node.data.type.notNull}")
     private Integer dataType;
 
+    @ApiModelProperty(value = "是否发起方: 0-否, 1-是", required = true)
+    @NotNull(message = "{node.sender.flag.notNull}")
+    private Integer senderFlag;
+
     @ApiModelProperty(value = "组织的身份标识Id", required = true)
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
