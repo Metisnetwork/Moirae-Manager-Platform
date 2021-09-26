@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 工作流节点服务实现类
@@ -291,9 +292,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             identityIdArr[i] = workflowNodeInputList.get(i).getIdentityId();
         }
 
+        //校验组织信息
         List<Organization> organizationList = organizationService.getByIdentityIds(identityIdArr);
-        if (null == organizationList || organizationList.size() < identityIdArr.length) {
-            //校验组织信息
+        if (null == organizationList || organizationList.size() != identityIdArr.length) {
             List<Organization> newOrganizationList = syncOrganization();
             Set<String> identityIdSet = new HashSet<>();
             newOrganizationList.forEach(o -> identityIdSet.add(o.getIdentityId()));
@@ -322,6 +323,13 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 物理删除
             workflowNodeOutputService.removeByIds(idList);
         }
+        //任务里面定义的 (p0 -> pN 方 ...) 与输入保持一致
+        List<WorkflowNodeInput> workflowNodeInputs = workflowNodeInputService.getByWorkflowNodeId(workflowNodeOutputList.get(0).getWorkflowNodeId());
+        Map<String, String> partyIdMap = workflowNodeInputs.stream().collect(Collectors.toMap(WorkflowNodeInput::getIdentityId, WorkflowNodeInput::getPartyId));
+        for (WorkflowNodeOutput workflowNodeOutput : workflowNodeOutputList) {
+            workflowNodeOutput.setPartyId(partyIdMap.get(workflowNodeOutput.getIdentityId()));
+        }
+
         // 新增
         workflowNodeOutputService.saveBatch(workflowNodeOutputList);
     }

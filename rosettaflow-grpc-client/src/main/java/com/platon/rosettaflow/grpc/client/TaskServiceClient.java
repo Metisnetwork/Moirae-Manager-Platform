@@ -63,7 +63,7 @@ public class TaskServiceClient {
 
             @Override
             public void onError(Throwable t) {
-                log.error("task {} process fail", taskDto.getTaskName());
+                log.error("task {} process fail,fail reason:{}", taskDto.getTaskName(), t.getMessage(), t);
             }
 
             @Override
@@ -308,13 +308,13 @@ public class TaskServiceClient {
                     .setNodeId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getNodeId())
                     .setIdentityId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getIdentityId())
                     .build();
+
             //meta_data_info
-            TaskMetadataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetadataDeclare.newBuilder();
+            TaskMetadataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetadataDeclare.newBuilder()
+                    .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
+                    .setKeyColumn(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getKeyColumn());
             for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().size(); j++) {
-                taskMetaDataDeclareBuilder
-                        .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
-                        .setKeyColumn(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getKeyColumn())
-                        .setSelectedColumns(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
+                taskMetaDataDeclareBuilder.setSelectedColumns(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
             }
 
             TaskDataSupplierDeclare taskDataSupplierDeclare = TaskDataSupplierDeclare.newBuilder()
