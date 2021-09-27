@@ -153,7 +153,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         List<Workflow> workflowList = workflowService.queryListByProjectId(
                 Collections.singletonList(id));
         if (null != workflowList && workflowList.size() > 0) {
-            workflowList.parallelStream().forEach(workflow ->
+            workflowList.forEach(workflow ->
                     workflowService.deleteWorkflow(workflow.getId()));
         }
         // 物理删除项目成员
@@ -173,7 +173,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         // 逻辑删除工作流
         List<Workflow> workflowList = workflowService.queryListByProjectId(idsList);
         if (null != workflowList && workflowList.size() > 0) {
-            workflowList.parallelStream().forEach(workflow -> workflowService.deleteWorkflow(workflow.getId()));
+            workflowList.forEach(
+                    workflow -> workflowService.deleteWorkflow(workflow.getId()));
         }
         // 物理删除项目成员
         projectMemberService.deleteMemberByProjectId(idsList);
@@ -252,7 +253,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Transactional(rollbackFor = Exception.class)
     public void deleteProjMemberBatch(String projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
-        idList.parallelStream().forEach(id -> {
+        idList.forEach(id -> {
             ProjectMember projectMember = projectMemberService.queryById(id);
             checkAdminPermission(projectMember.getProjectId());
             deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
