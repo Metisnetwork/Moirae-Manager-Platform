@@ -635,4 +635,21 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
     }
+
+    @Override
+    public Map<String, Object> getWorkflowStatusById(Long id) {
+        Map<String, Object> param = new HashMap<>(2);
+        Workflow workflow = queryWorkflowDetail(id);
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getAllWorkflowNodeList(id);
+        List<Map<String, Object>> nodeList = new ArrayList<>();
+        workflowNodeList.forEach(workflowNode -> {
+            Map<String, Object> map = new HashMap<>(2);
+            map.put("workflowNodeId", workflowNode.getId());
+            map.put("runStatus", workflowNode.getRunStatus());
+            nodeList.add(map);
+        });
+        param.put("runStatus", workflow.getRunStatus());
+        param.put("nodeList", nodeList);
+        return param;
+    }
 }
