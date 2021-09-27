@@ -54,4 +54,11 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
         wrapper.eq(ProjectMember::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
+
+    @Override
+    public void deleteMemberByProjectId(List<Long> projectId) {
+        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(ProjectMember::getProjectId, projectId);
+        this.remove(queryWrapper);
+    }
 }

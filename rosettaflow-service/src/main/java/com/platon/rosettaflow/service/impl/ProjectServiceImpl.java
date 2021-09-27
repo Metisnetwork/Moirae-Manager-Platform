@@ -18,7 +18,6 @@ import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
-import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -151,40 +150,35 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     public void deleteProject(Long id) {
         checkAdminPermission(id);
         // 逻辑删除工作流
-        List<Workflow> workflowList = workflowService.queryWorkFlowByProjectId(id);
-        if (workflowList != null && workflowList.size() > 0) {
-            workflowList.parallelStream().forEach(workflow -> {
-                workflowService.deleteWorkflow(workflow.getId());
-                if (workflow.getNodeNumber() > 0) {
-                    // 物理删除工作流节点
-                    List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
-                    if (workflowNodeList != null && workflowNodeList.size() > 0) {
-                        workflowNodeList.parallelStream().forEach(workflowNode ->
-                            workflowNodeService.deleteWorkflowNode(workflowNode.getId()));
-                    }
-                }
-            });
+        List<Workflow> workflowList = workflowService.queryListByProjectId(
+                Collections.singletonList(id));
+        if (null != workflowList && workflowList.size() > 0) {
+            workflowList.parallelStream().forEach(workflow ->
+                    workflowService.deleteWorkflow(workflow.getId()));
         }
-        // 根据项目id获取成员id
-        List<Long> idList = getMemberIdByProjectId(id);
-        // 批量物理删除项目成员
-        projectMemberService.removeByIds(idList);
-
+        // 物理删除项目成员
+        projectMemberService.deleteMemberByProjectId(Collections.singletonList(id));
         // 逻辑删除项目信息,修改项目版本标识
         this.updateBatchById(updateDelVersionById(Collections.singletonList(id)));
     }
 
-    /**
-     * 根据项目id获取成员id
-     */
-    private List<Long> getMemberIdByProjectId(Long projectId) {
-        List<ProjectMember> projectMemberList = projectMemberService.queryByProjectId(projectId);
-        if (projectMemberList == null || projectMemberList.size() == 0) {
-            return new ArrayList<>();
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteProjectBatch(String ids) {
+        // 转换id类型
+        List<Long> idsList = convertIdType(ids);
+        for (Long id : idsList) {
+            checkAdminPermission(id);
         }
-        List<Long> idList = new ArrayList<>();
-        projectMemberList.forEach(projectMember -> idList.add(projectMember.getId()));
-        return idList;
+        // 逻辑删除工作流
+        List<Workflow> workflowList = workflowService.queryListByProjectId(idsList);
+        if (null != workflowList && workflowList.size() > 0) {
+            workflowList.parallelStream().forEach(workflow -> workflowService.deleteWorkflow(workflow.getId()));
+        }
+        // 物理删除项目成员
+        projectMemberService.deleteMemberByProjectId(idsList);
+        // 逻辑删除项目信息，修改版本标识
+        this.updateBatchById(updateDelVersionById(idsList));
     }
 
     /**
@@ -202,30 +196,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             });
         }
         return projectList;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteProjectBatch(String ids) {
-        // 转换id类型
-        List<Long> idsList = convertIdType(ids);
-        for (Long id : idsList) {
-            checkAdminPermission(id);
-        }
-        // 删除项目成员
-        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.in(ProjectMember::getProjectId, idsList);
-        List<ProjectMember> projectMemberList = projectMemberService.getBaseMapper().selectList(queryWrapper);
-        List<Long> memberIdsList = new ArrayList<>();
-        if (projectMemberList != null && projectMemberList.size() > 0) {
-            for (ProjectMember projectMember : projectMemberList) {
-                memberIdsList.add(projectMember.getId());
-            }
-            // 物理删除项目成员
-            projectMemberService.removeByIds(memberIdsList);
-        }
-        // 逻辑删除项目信息，修改版本标识
-        this.updateBatchById(updateDelVersionById(idsList));
     }
 
     @Override

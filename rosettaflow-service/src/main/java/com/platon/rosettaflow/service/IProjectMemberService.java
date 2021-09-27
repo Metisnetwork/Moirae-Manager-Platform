@@ -39,4 +39,10 @@ public interface IProjectMemberService extends IService<ProjectMember> {
      * @return 管理员列表
      */
     List<ProjectMember> getAdminList(Long projectId);
+
+    /**
+     * 物理删除，根据项目id删除项目所属成员
+     * @param projectId
+     */
+    void deleteMemberByProjectId(List<Long> projectId);
 }
