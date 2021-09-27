@@ -58,4 +58,12 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @return 用户授权数据列表
      */
     UserMetaData getCurrentUserMetaDataByMetaDataId(String metaDataId);
+
+    /**
+     * 根据metaDataId获取用户元数据
+     *
+     * @param metaDataIdArr metaDataId数组
+     * @return 用户授权数据列表
+     */
+    List<UserMetaData> getCurrentUserMetaDataByMetaDataIdArr(Object[] metaDataIdArr);
 }

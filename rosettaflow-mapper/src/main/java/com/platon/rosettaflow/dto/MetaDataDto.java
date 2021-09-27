@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.dto;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.mapper.domain.MetaData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,10 +12,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MetaDataDto extends MetaData {
-
-    IPage<MetaDataDetailsDto> metaDataDetailsDtoPageList;
     /**
-     * 授权状态:-1未知(未发起过数据授权申请) 0-等待审核中, 1-审核通过, 2-审核拒绝
+     * 授权状态:0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表
      */
     private Byte authStatus;
     /**

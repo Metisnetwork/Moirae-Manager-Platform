@@ -20,6 +20,7 @@ import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
+import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -162,7 +163,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 逻辑删除工作流，并修改版本标识
         workflow.setId(id);
         workflow.setDelVersion(id);
-        workflow.setStatus((byte) 0);
+        workflow.setStatus(StatusEnum.UN_VALID.getValue());
         this.updateById(workflow);
     }
 
@@ -225,7 +226,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         checkEditPermission(originWorkflow.getProjectId());
         Workflow newWorkflow = new Workflow();
         newWorkflow.setProjectId(originWorkflow.getProjectId());
-        newWorkflow.setUserId(originWorkflow.getUserId());
+        newWorkflow.setUserId(UserContext.get().getId());
         newWorkflow.setWorkflowName(workflowName);
         newWorkflow.setWorkflowDesc(workflowDesc);
         newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());
@@ -248,7 +249,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
 
-        //保存用户和地址及签名
+        //保存用户和地址及签名并更新状态为运行中
         updateSign(workflowDto);
 
         //此处先执行第一个节点，待第一个节点执行成功后再执行
@@ -334,6 +335,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.set(Workflow::getAddress, workflowDto.getAddress());
         updateWrapper.set(Workflow::getSign, workflowDto.getSign());
+        updateWrapper.set(Workflow::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
         updateWrapper.eq(Workflow::getId, workflowDto.getId());
         this.update(updateWrapper);
     }

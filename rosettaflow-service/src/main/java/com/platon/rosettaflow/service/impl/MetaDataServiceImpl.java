@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author hudenian
@@ -50,9 +51,9 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         }
         this.page(page, wrapper);
         //登录时，查询数据授权状态
-        List<MetaDataDto> metaDataWithAuthList = new ArrayList<>();
+        List<UserMetaData> metaDataWithAuthList = new ArrayList<>();
         if (!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())) {
-            metaDataWithAuthList.addAll(baseMapper.selectMetaDataWithAuth(UserContext.get().getAddress()));
+            metaDataWithAuthList = userMetaDataService.getCurrentUserMetaDataByMetaDataIdArr(page.getRecords().stream().map(MetaData::getMetaDataId).distinct().toArray());
         }
         return this.convertToPageDto(page, metaDataWithAuthList);
     }
@@ -84,10 +85,10 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         this.baseMapper.batchInsert(metaDataList);
     }
 
-    IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<MetaDataDto> metaDataWithAuthList) {
+    IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<UserMetaData> metaDataWithAuthList) {
         List<MetaDataDto> records = new ArrayList<>();
         Map<String, Byte> authMap = new HashMap<>(metaDataWithAuthList.size());
-        for (MetaDataDto dataAuth : metaDataWithAuthList) {
+        for (UserMetaData dataAuth : metaDataWithAuthList) {
             authMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthStatus());
         }
         page.getRecords().forEach(r -> {

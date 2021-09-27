@@ -142,7 +142,15 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         }
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
-        wrapper.eq(UserMetaData::getAddress,UserContext.get().getAddress());
+        wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
         return this.getOne(wrapper);
+    }
+
+    @Override
+    public List<UserMetaData> getCurrentUserMetaDataByMetaDataIdArr(Object[] metaDataIdArr) {
+        LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(UserMetaData::getMetaDataId, metaDataIdArr);
+        wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
+        return this.list(wrapper);
     }
 }

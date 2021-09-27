@@ -85,7 +85,7 @@ CREATE TABLE `t_meta_data` (
    `file_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '源文件类型: 0-未知，1- CSV类型',
    `has_title` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否带标题,0表示不带，1表示带标题',
    `industry` varchar(20) DEFAULT NULL COMMENT '元数据所属行业',
-   `data_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '元数据的状态 (1- 还未发布的新表; 2- 已发布的表; 3- 已撤销的表)',
+   `data_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '元数据的状态 (0-未知; 1- 还未发布的新表; 2- 已发布的表; 3- 已撤销的表)',
    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
