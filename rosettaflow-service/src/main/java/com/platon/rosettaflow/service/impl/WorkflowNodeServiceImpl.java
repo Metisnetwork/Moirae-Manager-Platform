@@ -225,7 +225,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(propagation = Propagation.NESTED, rollbackFor = RuntimeException.class)
     public void deleteWorkflowNode(Long id) {
         removeNodeData(Collections.singletonList(id));
     }

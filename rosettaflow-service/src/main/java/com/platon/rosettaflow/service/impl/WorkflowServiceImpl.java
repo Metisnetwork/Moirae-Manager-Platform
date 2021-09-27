@@ -24,6 +24,7 @@ import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -91,6 +92,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    public List<Workflow> queryListByProjectId(List<Long> projectIdList) {
+        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
+        queryWrapper.in(Workflow::getProjectId, projectIdList);
+        return this.list(queryWrapper);
+    }
+
+    @Override
     public List<Workflow> queryWorkFlowByProjectId(Long projectId) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getProjectId, projectId);
@@ -141,10 +150,16 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    @Transactional(propagation = Propagation.NESTED, rollbackFor = RuntimeException.class)
     public void deleteWorkflow(Long id) {
         Workflow workflow = this.queryWorkflowDetail(id);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
+        // 物理删除工作流节点
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
+        if (workflowNodeList.size() > 0) {
+            workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(id));
+        }
         // 逻辑删除工作流，并修改版本标识
         workflow.setId(id);
         workflow.setDelVersion(id);
