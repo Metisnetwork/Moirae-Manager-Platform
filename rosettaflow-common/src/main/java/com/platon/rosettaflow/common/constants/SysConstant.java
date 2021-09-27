@@ -46,6 +46,11 @@ public class SysConstant {
     public static final String REDIS_TOKEN_PREFIX_KEY = "Token:";
 
     /**
+     * 用户非互踢模式时，token已登录用的用户数前缀
+     */
+    public static final String REDIS_TOKEN_BIND_PREFIX_KEY="token-bind:";
+
+    /**
      * 系统默认日期格式
      */
     public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";

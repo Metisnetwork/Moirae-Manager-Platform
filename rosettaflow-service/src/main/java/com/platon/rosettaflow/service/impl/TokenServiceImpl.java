@@ -54,6 +54,11 @@ public class TokenServiceImpl implements ITokenService {
         } else {
             token = generateToken();
         }
+        if (!sysConfig.isKickMode()) {
+            //记录此token登录的设备数
+            redisTemplate.opsForValue().increment(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
+            log.info("current user:{},login in {} device", userDto.getUserName(), redisTemplate.opsForValue().get(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token));
+        }
         saveTokenToRedis(userDto, key, token);
         return token;
     }
@@ -90,9 +95,23 @@ public class TokenServiceImpl implements ITokenService {
         String userKey = getUserKey(token);
         UserDto userDto = (UserDto) redisTemplate.opsForValue().get(userKey);
         if (userDto != null) {
-            String tokeKey = getTokenKey(userDto.getId());
-            redisTemplate.delete(tokeKey);
-            redisTemplate.delete(userKey);
+            //判断是否有多个设备登录，如果只有一台直接清redis，否则减少登录设备记录数
+            if (!sysConfig.isKickMode()) {
+                Object loginDeviceNum = redisTemplate.opsForValue().get(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
+                if (null != loginDeviceNum && (Integer) loginDeviceNum > 1) {
+                    redisTemplate.opsForValue().decrement(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
+                    log.info("current user:{},login in {} device", userDto.getUserName(), redisTemplate.opsForValue().get(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token));
+                } else {
+                    String tokeKey = getTokenKey(userDto.getId());
+                    redisTemplate.delete(tokeKey);
+                    redisTemplate.delete(userKey);
+                }
+            } else {
+                String tokeKey = getTokenKey(userDto.getId());
+                redisTemplate.delete(tokeKey);
+                redisTemplate.delete(userKey);
+            }
+
         }
     }
 
