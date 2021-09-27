@@ -68,7 +68,7 @@ public class MetaDataVo {
     @ApiModelProperty(value = "状态: 0-无效，1- 有效")
     private Byte status;
 
-    @ApiModelProperty(value = "授权状态: -1-未知(未申请数据授权), 0-等待审核中, 1-审核通过, 2-审核拒绝")
+    @ApiModelProperty(value = "授权状态:0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表")
     private Byte authStatus;
 
     @ApiModelProperty(value = "创建时间")
