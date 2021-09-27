@@ -35,6 +35,7 @@
             and a.status = 1
             and b.status = 1
             and a.identity_id = b.identity_id
+            and a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
         order by a.party_id asc
     </select>
 
