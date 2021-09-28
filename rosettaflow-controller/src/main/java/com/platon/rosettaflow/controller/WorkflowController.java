@@ -14,9 +14,11 @@ import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.PageVo;
 import com.platon.rosettaflow.vo.ResponseVo;
+import com.platon.rosettaflow.vo.workflow.GetStatusVo;
 import com.platon.rosettaflow.vo.workflow.TaskEventVo;
 import com.platon.rosettaflow.vo.workflow.WorkflowDetailsVo;
 import com.platon.rosettaflow.vo.workflow.WorkflowVo;
+import com.platon.rosettaflow.vo.workflow.node.GetNodeStatusVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,8 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 工作流管理
@@ -53,7 +54,7 @@ public class WorkflowController {
 
     @GetMapping("list")
     @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
-    public ResponseVo<PageVo<WorkflowVo>> list(@Valid ListWorkflowReq listReq) {
+    public ResponseVo<PageVo<WorkflowVo>> list(@Validated ListWorkflowReq listReq) {
         IPage<WorkflowDto> page = workflowService.queryWorkFlowPageList(listReq.getProjectId(),
                 listReq.getWorkflowName(), listReq.getCurrent(), listReq.getSize());
         List<WorkflowVo> items = BeanUtil.copyToList(page.getRecords(), WorkflowVo.class);
@@ -145,4 +146,20 @@ public class WorkflowController {
         workflowService.terminate(terminateWorkflowReq.getWorkflowId());
         return ResponseVo.createSuccess();
     }
+
+    @GetMapping("getWorkflowStatus")
+    @ApiOperation(value = "获取工作流状态", notes = "获取工作流状态")
+    public ResponseVo<GetStatusVo> getWorkflowStatus(@Validated GetStatusReq getStatusReq) {
+        Map<String,Object> map = workflowService.getWorkflowStatusById(getStatusReq.getId());
+        return ResponseVo.createSuccess(convertGetStatusVo(map));
+    }
+
+    /** 获取工作流运行状态返回参数转换 */
+    private GetStatusVo convertGetStatusVo(Map<String,Object> map) {
+        GetStatusVo getStatusVo = BeanUtil.toBean(map, GetStatusVo.class);
+        List<GetNodeStatusVo> getNodeStatusVoList = BeanUtil.copyToList((Collection<?>) map.get("nodeList"), GetNodeStatusVo.class);
+        getStatusVo.setGetNodeStatusVoList(getNodeStatusVoList);
+        return getStatusVo;
+    }
+
 }

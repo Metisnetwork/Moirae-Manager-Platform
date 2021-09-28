@@ -158,7 +158,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 物理删除工作流节点
         List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
         if (workflowNodeList.size() > 0) {
-            workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(id));
+            workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(node.getId()));
         }
         // 逻辑删除工作流，并修改版本标识
         workflow.setId(id);
@@ -168,18 +168,29 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void deleteWorkflowBatch(String ids) {
         if (ids.trim().length() == 0) {
             return;
         }
         // 转换id类型
         List<Long> idsList = convertIdType(ids);
+        List<Workflow> workflowList = this.listByIds(idsList);
+        if (workflowList.size() > 0) {
+            workflowList.forEach(workflow -> {
+                // 校验是否有编辑权限
+                checkEditPermission(workflow.getProjectId());
+                // 删除项目中的工作流相关数据
+                List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
+                if (workflowNodeList.size() > 0) {
+                    workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(node.getId()));
+                }
+            });
+        }
         if (idsList.size() > 0) {
             List<Workflow> list = new ArrayList<>();
             idsList.forEach(id -> {
-                Workflow workflow = this.queryWorkflowDetail(id);
-                // 校验是否有编辑权限
-                checkEditPermission(workflow.getProjectId());
+                Workflow workflow = new Workflow();
                 // 逻辑删除工作流，并修改版本标识
                 workflow.setId(id);
                 workflow.setDelVersion(id);
@@ -636,5 +647,22 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
+    }
+
+    @Override
+    public Map<String, Object> getWorkflowStatusById(Long id) {
+        Map<String, Object> param = new HashMap<>(2);
+        Workflow workflow = queryWorkflowDetail(id);
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getAllWorkflowNodeList(id);
+        List<Map<String, Object>> nodeList = new ArrayList<>();
+        workflowNodeList.forEach(workflowNode -> {
+            Map<String, Object> map = new HashMap<>(2);
+            map.put("workflowNodeId", workflowNode.getId());
+            map.put("runStatus", workflowNode.getRunStatus());
+            nodeList.add(map);
+        });
+        param.put("runStatus", workflow.getRunStatus());
+        param.put("nodeList", nodeList);
+        return param;
     }
 }

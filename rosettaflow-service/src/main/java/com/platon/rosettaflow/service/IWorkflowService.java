@@ -7,6 +7,7 @@ import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 工作流服务
@@ -119,4 +120,11 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param runStatus  运行状态
      */
     void updateRunStatus(Long workflowId, Byte runStatus);
+
+    /**
+     * 获取工作流状态
+     * @param id 工作流id
+     * @return  List
+     */
+    Map<String, Object> getWorkflowStatusById(Long id);
 }
