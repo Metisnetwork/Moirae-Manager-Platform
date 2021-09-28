@@ -10,7 +10,6 @@ import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 import com.platon.rosettaflow.req.workflow.*;
-import com.platon.rosettaflow.req.workflow.node.SaveWorkflowNodeReq;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.utils.ConvertUtils;
@@ -160,9 +159,9 @@ public class WorkflowController {
 
     @PostMapping("saveDetail")
     @ApiOperation(value = "工作流明细整体保存", notes = "工作流明细整体保存")
-    public ResponseVo<?> saveDetail(@RequestBody @Validated SaveWorkflowReq saveWorkflowReq) {
-        List<WorkflowNodeDto> workflowNodeDtoList = BeanUtil.copyToList(saveWorkflowReq.getWorkflowNodeReqList(), WorkflowNodeDto.class);
-        workflowService.saveDetail(saveWorkflowReq.getWorkflowId(),workflowNodeDtoList);
+    public ResponseVo<?> saveDetail(@RequestBody @Validated WorkflowDetailReq workflowDetailReq) {
+        List<WorkflowNodeDto> workflowNodeDtoList = BeanUtil.copyToList(workflowDetailReq.getWorkflowNodeReqList(), WorkflowNodeDto.class);
+        workflowService.saveDetail(workflowDetailReq.getWorkflowId(),workflowNodeDtoList);
         return ResponseVo.createSuccess();
     }
 

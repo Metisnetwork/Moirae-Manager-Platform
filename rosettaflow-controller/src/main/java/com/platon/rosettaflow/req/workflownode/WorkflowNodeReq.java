@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2021/9/28
  */
 @Data
-@ApiModel
+@ApiModel(value = "工作流详情请求对象")
 public class WorkflowNodeReq {
 
     @ApiModelProperty(value = "工作流节点ID")

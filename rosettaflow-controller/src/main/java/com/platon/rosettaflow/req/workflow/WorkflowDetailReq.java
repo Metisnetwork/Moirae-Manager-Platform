@@ -1,6 +1,6 @@
 package com.platon.rosettaflow.req.workflow;
 
-import com.platon.rosettaflow.req.workflow.node.WorkflowNodeReq;
+import com.platon.rosettaflow.req.workflownode.WorkflowNodeReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,15 +10,19 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
- * 保存工作流请求对象
+ * 保存工作流详情请求对象
+ *
  * @author hudenian
  * @date 2021/9/28
  */
 @Data
 @ApiModel
-public class SaveWorkflowReq {
+public class WorkflowDetailReq {
 
-    @ApiModelProperty(value = "工作流ID")
+
+    @ApiModelProperty(value = "工作流ID", required = true)
+    @NotNull(message = "{workflow.id.notNull}")
+    @Positive(message = "{workflow.id.positive}")
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流节点列表", required = true)
