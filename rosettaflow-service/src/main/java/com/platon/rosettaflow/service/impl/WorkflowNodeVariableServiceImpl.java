@@ -46,6 +46,11 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     }
 
     @Override
+    public void batchInsert(List<WorkflowNodeVariable> workflowNodeVariableList) {
+        this.baseMapper.batchInsert(workflowNodeVariableList);
+    }
+
+    @Override
     public void addByAlgorithmVariableList(Long workflowNodeId, List<AlgorithmVariable> algorithmVariableList) {
         List<WorkflowNodeVariable> workflowNodeVariableList = new ArrayList<>();
         for (AlgorithmVariable algorithmVariable : algorithmVariableList) {

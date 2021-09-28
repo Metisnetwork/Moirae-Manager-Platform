@@ -1,9 +1,6 @@
 package com.platon.rosettaflow.dto;
 
-import com.platon.rosettaflow.mapper.domain.WorkflowNode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
+import com.platon.rosettaflow.mapper.domain.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,4 +29,16 @@ public class WorkflowNodeDto extends WorkflowNode {
      * 工作流节点输出列表
      */
     private List<WorkflowNodeOutput> workflowNodeOutputList;
+    /**
+     * 工作流节点代码请求对象
+     */
+    private WorkflowNodeCode workflowNodeCode;
+    /**
+     * 工作流节点资源请求对象
+     */
+    private WorkflowNodeResource workflowNodeResource;
+    /**
+     * 工作流节点输入变量请求对象
+     */
+    private WorkflowNodeVariable workflowNodeVariable;
 }

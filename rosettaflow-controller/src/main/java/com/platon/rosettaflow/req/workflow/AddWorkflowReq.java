@@ -18,9 +18,9 @@ import javax.validation.constraints.Positive;
 @ApiModel
 public class AddWorkflowReq {
 
-    @ApiModelProperty(value = "工作流名称", required = true)
+    @ApiModelProperty(value = "项目id", required = true)
     @NotNull(message = "{project.id.notNull}")
-    @Positive(message = "{metadata.id.positive}")
+    @Positive(message = "{project.id.positive}")
     private Long projectId;
 
     @ApiModelProperty(value = "工作流名称", required = true)

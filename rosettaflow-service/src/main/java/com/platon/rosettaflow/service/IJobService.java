@@ -64,4 +64,11 @@ public interface IJobService extends IService<Job> {
      */
     void reStart(Long id);
 
+    /**
+     * 根据工作流id获取所有正在运行作业列表
+     *
+     * @param workflowId 工作流id
+     * @return 作业列表
+     */
+    List<Job> listRunJobByWorkflowId(Long workflowId);
 }

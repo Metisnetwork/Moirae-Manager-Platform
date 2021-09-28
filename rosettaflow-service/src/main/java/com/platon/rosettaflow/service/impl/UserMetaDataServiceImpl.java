@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.UserTypeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.dto.MetaDataDto;
@@ -83,8 +84,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         }
 
         ApplyMetaDataAuthorityRequestDto applyDto = new ApplyMetaDataAuthorityRequestDto();
-        applyDto.setUser(UserContext.get().getAddress());
-        applyDto.setUserType((int) userMetaDataDto.getUserType());
+        applyDto.setUser(userMetaDataDto.getAddress());
+        applyDto.setUserType(UserTypeEnum.checkUserType(userMetaDataDto.getAddress()));
 
         MetaDataAuthorityDto metaDataAuthorityDto = new MetaDataAuthorityDto();
         //元数据所属组织
@@ -119,7 +120,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Override
     public List<UserMetaDataDto> getAllAuthOrganization() {
         UserDto userDto = UserContext.get();
-        if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
+        if (Objects.isNull(userDto)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
         }
         String address = userDto.getAddress();

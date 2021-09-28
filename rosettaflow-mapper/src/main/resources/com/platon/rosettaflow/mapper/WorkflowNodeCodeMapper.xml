@@ -15,4 +15,55 @@
     id, workflow_node_id, edit_type, calculate_contract_code, data_split_contract_code, 
     `status`, create_time, update_time
   </sql>
+    <insert id="batchInsert">
+        <foreach collection="workflowNodeCodeList" item="c" separator=";">
+            insert into t_workflow_node_code
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="c.workflowNodeId != null">
+                    workflow_node_id,
+                </if>
+                <if test="c.editType != null">
+                    edit_type,
+                </if>
+                <if test="c.calculateContractCode != null">
+                    calculate_contract_code,
+                </if>
+                <if test="c.dataSplitContractCode != null">
+                    data_split_contract_code,
+                </if>
+                <if test="c.status != null">
+                    `status`,
+                </if>
+                <if test="c.createTime != null">
+                    create_time,
+                </if>
+                <if test="c.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="c.workflowNodeId != null">
+                    #{c.workflowNodeId,jdbcType=BIGINT},
+                </if>
+                <if test="c.editType != null">
+                    #{c.editType,jdbcType=TINYINT},
+                </if>
+                <if test="c.calculateContractCode != null">
+                    #{c.calculateContractCode,jdbcType=VARCHAR},
+                </if>
+                <if test="c.dataSplitContractCode != null">
+                    #{c.dataSplitContractCode,jdbcType=VARCHAR},
+                </if>
+                <if test="c.status != null">
+                    #{c.status,jdbcType=TINYINT},
+                </if>
+                <if test="c.createTime != null">
+                    #{c.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="c.updateTime != null">
+                    #{c.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
 </mapper>

@@ -47,4 +47,9 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
         }
         return newNodeOutputList;
     }
+
+    @Override
+    public void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList) {
+        this.baseMapper.batchInsert(workflowNodeOutputList);
+    }
 }

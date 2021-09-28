@@ -60,4 +60,9 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
         newNodeResource.setCostBandwidth(oldNodeResource.getCostBandwidth());
         return newNodeResource;
     }
+
+    @Override
+    public void batchInsert(List<WorkflowNodeResource> workflowNodeResourceList) {
+        this.baseMapper.batchInsert(workflowNodeResourceList);
+    }
 }

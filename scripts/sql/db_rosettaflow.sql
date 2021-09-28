@@ -356,7 +356,6 @@ DROP TABLE IF EXISTS `t_workflow_node_input`;
 CREATE TABLE `t_workflow_node_input` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表ID(自增长)',
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
-  `data_type` tinyint(4) DEFAULT NULL COMMENT '数据类型：1:结构化数据，2:非结构化数据',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
   `data_table_id` varchar(128) DEFAULT NULL COMMENT '数据表ID',
   `data_column_ids` varchar(128) DEFAULT NULL COMMENT '数据字段ID',

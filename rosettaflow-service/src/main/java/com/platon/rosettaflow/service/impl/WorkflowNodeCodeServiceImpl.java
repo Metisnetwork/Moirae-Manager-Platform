@@ -62,4 +62,9 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
         newNodeCode.setDataSplitContractCode(oldNodeCode.getDataSplitContractCode());
         return newNodeCode;
     }
+
+    @Override
+    public void batchInsert(List<WorkflowNodeCode> workflowNodeCodeList) {
+        this.baseMapper.batchInsert(workflowNodeCodeList);
+    }
 }

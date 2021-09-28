@@ -75,7 +75,7 @@ public enum ErrorMsg {
     WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "Workflow node not cached"),
     WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported"),
     WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "Workflow node code does not exist"),
-    WORKFLOW_NODE_SENDER_NOT_EXIST("工作流节点至少需要一个发起方", "Workflow node sender not exist"),
+    WORKFLOW_NODE_SENDER_NOT_EXIST("工作流节点需要一个发起方", "Workflow node need one sender"),
 
     /**
      * 作业

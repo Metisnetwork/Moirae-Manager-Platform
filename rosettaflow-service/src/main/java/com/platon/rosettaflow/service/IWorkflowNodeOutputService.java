@@ -34,4 +34,10 @@ public interface IWorkflowNodeOutputService extends IService<WorkflowNodeOutput>
      */
     List<WorkflowNodeOutput> copyWorkflowNodeOutput(Long newNodeId, Long oldNodeId);
 
+    /**
+     * 批量保存节点输出
+     *
+     * @param workflowNodeOutputList 节点输出列表
+     */
+    void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList);
 }

@@ -131,6 +131,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
     }
 
+    @Override
+    public List<Job> listRunJobByWorkflowId(Long workflowId) {
+        LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Job::getWorkflowId,workflowId);
+        wrapper.eq(Job::getJobStatus,JobStatusEnum.RUNNING.getValue());
+        return this.list(wrapper);
+    }
+
     /**
      * 检查入参合法性
      */

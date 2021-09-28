@@ -18,6 +18,75 @@
         id, workflow_node_id, identity_id, party_id, sender_flag,
         store_pattern, store_path, output_content, `status`, create_time, update_time
     </sql>
+    <insert id="batchInsert">
+        <foreach collection="workflowNodeOutputList" item="o" separator=";">
+            insert into t_workflow_node_output
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="o.workflowNodeId != null">
+                    workflow_node_id,
+                </if>
+                <if test="o.identityId != null">
+                    identity_id,
+                </if>
+                <if test="o.partyId != null">
+                    party_id,
+                </if>
+                <if test="o.senderFlag != null">
+                    sender_flag,
+                </if>
+                <if test="o.storePattern != null">
+                    store_pattern,
+                </if>
+                <if test="o.storePath != null">
+                    store_path,
+                </if>
+                <if test="o.outputContent != null">
+                    output_content,
+                </if>
+                <if test="o.status != null">
+                    `status`,
+                </if>
+                <if test="o.createTime != null">
+                    create_time,
+                </if>
+                <if test="o.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="o.workflowNodeId != null">
+                    #{o.workflowNodeId,jdbcType=BIGINT},
+                </if>
+                <if test="o.identityId != null">
+                    #{o.identityId,jdbcType=VARCHAR},
+                </if>
+                <if test="o.partyId != null">
+                    #{o.partyId,jdbcType=VARCHAR},
+                </if>
+                <if test="o.senderFlag != null">
+                    #{o.senderFlag,jdbcType=TINYINT},
+                </if>
+                <if test="o.storePattern != null">
+                    #{o.storePattern,jdbcType=TINYINT},
+                </if>
+                <if test="o.storePath != null">
+                    #{o.storePath,jdbcType=VARCHAR},
+                </if>
+                <if test="o.outputContent != null">
+                    #{o.outputContent,jdbcType=VARCHAR},
+                </if>
+                <if test="o.status != null">
+                    #{o.status,jdbcType=TINYINT},
+                </if>
+                <if test="o.createTime != null">
+                    #{o.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="o.updateTime != null">
+                    #{o.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
     <select id="getByWorkflowNodeId" resultType="com.platon.rosettaflow.dto.WorkflowNodeOutputDto">
         select
             a.id as id,
