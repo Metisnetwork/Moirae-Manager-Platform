@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author hudenian
@@ -53,7 +52,10 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         //登录时，查询数据授权状态
         List<UserMetaData> metaDataWithAuthList = new ArrayList<>();
         if (!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())) {
-            metaDataWithAuthList = userMetaDataService.getCurrentUserMetaDataByMetaDataIdArr(page.getRecords().stream().map(MetaData::getMetaDataId).distinct().toArray());
+            Object[] metaDataIdArr = page.getRecords().stream().map(MetaData::getMetaDataId).distinct().toArray();
+            if (metaDataIdArr.length > 0) {
+                metaDataWithAuthList = userMetaDataService.getCurrentUserMetaDataByMetaDataIdArr(metaDataIdArr);
+            }
         }
         return this.convertToPageDto(page, metaDataWithAuthList);
     }

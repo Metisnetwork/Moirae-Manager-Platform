@@ -10,17 +10,19 @@ import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
-import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
-import com.platon.rosettaflow.req.user.GrpcReq;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
+import com.platon.rosettaflow.mapper.domain.Workflow;
+import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -42,6 +44,9 @@ public class RpcTestController {
     @Resource
     private GrpcTaskService grpcTaskService;
 
+    @Resource
+    private IWorkflowService workflowService;
+
     @GetMapping("getNodeIdentity")
     @ApiOperation(value = "getNodeIdentity接口测试", notes = "查询自己组织的identity信息")
     public ResponseVo<NodeIdentityDto> getNodeIdentity() {
@@ -55,7 +60,7 @@ public class RpcTestController {
     public ResponseVo<List<NodeIdentityDto>> getIdentityList() {
         log.info("GetIdentityList接口测试");
         List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
-        return ResponseVo.createSuccess(nodeIdentityDtoList.size()>10?nodeIdentityDtoList.subList(0,10):nodeIdentityDtoList);
+        return ResponseVo.createSuccess(nodeIdentityDtoList.size() > 10 ? nodeIdentityDtoList.subList(0, 10) : nodeIdentityDtoList);
     }
 
     @GetMapping("getGlobalMetadataDetailList")
@@ -63,16 +68,15 @@ public class RpcTestController {
     public ResponseVo<List<MetaDataDetailResponseDto>> getGlobalMetadataDetailList() {
         log.info("grpc getTotalMetadataDetailList查看全网元数据列表");
         List<MetaDataDetailResponseDto> metaDataDetailList = grpcMetaDataService.getGlobalMetadataDetailList();
-        return ResponseVo.createSuccess(metaDataDetailList.size()>10?metaDataDetailList.subList(0,3):metaDataDetailList);
+        return ResponseVo.createSuccess(metaDataDetailList.size() > 10 ? metaDataDetailList.subList(0, 3) : metaDataDetailList);
     }
-
 
     @GetMapping("getMetadataAuthorityList")
     @ApiOperation(value = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表", notes = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表")
     public ResponseVo<List<GetMetaDataAuthorityDto>> getMetadataAuthorityList() {
         log.info("grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表");
         List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getMetaDataAuthorityList();
-        return ResponseVo.createSuccess(metaDataAuthorityDtoList.size()>10?metaDataAuthorityDtoList.subList(0,3):metaDataAuthorityDtoList);
+        return ResponseVo.createSuccess(metaDataAuthorityDtoList.size() > 10 ? metaDataAuthorityDtoList.subList(0, 3) : metaDataAuthorityDtoList);
     }
 
     @PostMapping("applyMetadataAuthority")
@@ -107,12 +111,13 @@ public class RpcTestController {
         return ResponseVo.createSuccess(applyMetaDataAuthorityResponseDto);
     }
 
-
-    @PostMapping("task")
+    @PostMapping("task/{workflowId}")
     @ApiOperation(value = "grpc task接口测试", notes = "grpc task接口测试")
-    public ResponseVo<List<TaskDetailResponseDto>> task() {
-        log.info("metadata接口测试");
-        List<TaskDetailResponseDto> taskDetailList = grpcTaskService.getTaskDetailList();
-        return ResponseVo.createSuccess(taskDetailList);
+    public ResponseVo<String> task(@ApiParam(value = "工作流表ID", required = true) @PathVariable Long workflowId) {
+        log.info("grpc task接口测试");
+        Workflow orgWorkflow = workflowService.getById(workflowId);
+        TaskDto taskDto = workflowService.assemblyTaskDto(orgWorkflow.getId(), 1, "0x501eb3eeb2a40e6f2ff6f481302435e6e8af3666", "sign");
+        PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = grpcTaskService.syncPublishTask(taskDto);
+        return ResponseVo.createSuccess(publishTaskDeclareResponseDto.getMsg());
     }
 }

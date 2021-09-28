@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 
@@ -139,5 +140,15 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param workflowNodeDtoList 工作流节点列表
      */
     void saveDetail(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
+
+    /**
+     * 组装发送任务对象
+     * @param workFlowId 工作流id
+     * @param currentNode 当前节点
+     * @param address 用户地址
+     * @param sign 用户签名
+     * @return 发送任务对象
+     */
+    TaskDto assemblyTaskDto(Long workFlowId, Integer currentNode, String address, String sign);
 
 }

@@ -421,6 +421,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param address     发起任务时的钱包地址
      * @return 发布任务请求对象
      */
+    @Override
     public TaskDto assemblyTaskDto(Long workFlowId, Integer currentNode, String address, String sign) {
         WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workFlowId, currentNode);
 
