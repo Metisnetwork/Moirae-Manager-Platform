@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
+import com.platon.rosettaflow.req.workflow.WorkflowDetailReq;
 import com.platon.rosettaflow.req.workflow.node.*;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.vo.ResponseVo;
@@ -68,6 +69,14 @@ public class WorkflowNodeController {
         return nodeDetailsListVo;
     }
 
+    @PostMapping("saveDetail")
+    @ApiOperation(value = "工作流明细整体保存", notes = "工作流明细整体保存")
+    public ResponseVo<?> saveDetail(@RequestBody @Validated WorkflowDetailReq workflowDetailReq) {
+        List<WorkflowNodeDto> workflowNodeDtoList = BeanUtil.copyToList(workflowDetailReq.getWorkflowNodeReqList(), WorkflowNodeDto.class);
+        workflowNodeService.saveWorkflowAllNodeData(workflowDetailReq.getWorkflowId(),workflowNodeDtoList);
+        return ResponseVo.createSuccess();
+    }
+
     @PostMapping("save")
     @ApiOperation(value = "保存工作流节点", notes = "保存工作流节点")
     public ResponseVo<?> save(@RequestBody @Validated SaveWorkflowNodeReq saveNodeReq) {
@@ -98,13 +107,6 @@ public class WorkflowNodeController {
     @ApiOperation(value = "工作流节点重命名", notes = "工作流节点重命名")
     public ResponseVo<?> rename(@RequestBody @Validated WorkflowNodeRenameReq renameReq) {
         workflowNodeService.renameWorkflowNode(renameReq.getWorkflowNodeId(), renameReq.getNodeName());
-        return ResponseVo.createSuccess();
-    }
-
-    @PostMapping("delete/{id}")
-    @ApiOperation(value = "删除工作流中的节点", notes = "删除工作流中的节点")
-    public ResponseVo<?> delete(@ApiParam(value = "工作流表ID", required = true) @PathVariable Long id) {
-        workflowNodeService.deleteWorkflowNode(id);
         return ResponseVo.createSuccess();
     }
 

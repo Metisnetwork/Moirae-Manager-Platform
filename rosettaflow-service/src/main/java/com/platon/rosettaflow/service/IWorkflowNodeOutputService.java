@@ -20,11 +20,10 @@ public interface IWorkflowNodeOutputService extends IService<WorkflowNodeOutput>
     List<WorkflowNodeOutput> getByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     * 物理删除工作流节点输出, 根据工作流节点id
-     *
-     * @param workflowNodeId 工作流节点id
+     * 物理批量删除工作流节点输出数据，根据节点id
+     * @param workflowNodeIdList 工作流节点id列表
      */
-    void deleteByWorkflowNodeId(Long workflowNodeId);
+    void deleteByWorkflowNodeId(List<Long> workflowNodeIdList);
 
     /**
      * 复制工作流节点输出数据

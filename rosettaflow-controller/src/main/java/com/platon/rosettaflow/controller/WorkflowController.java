@@ -157,14 +157,6 @@ public class WorkflowController {
         return ResponseVo.createSuccess(convertGetStatusVo(map));
     }
 
-    @PostMapping("saveDetail")
-    @ApiOperation(value = "工作流明细整体保存", notes = "工作流明细整体保存")
-    public ResponseVo<?> saveDetail(@RequestBody @Validated WorkflowDetailReq workflowDetailReq) {
-        List<WorkflowNodeDto> workflowNodeDtoList = BeanUtil.copyToList(workflowDetailReq.getWorkflowNodeReqList(), WorkflowNodeDto.class);
-        workflowService.saveDetail(workflowDetailReq.getWorkflowId(),workflowNodeDtoList);
-        return ResponseVo.createSuccess();
-    }
-
     /**
      * 获取工作流运行状态返回参数转换
      */

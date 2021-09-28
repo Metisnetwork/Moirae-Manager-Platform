@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,9 +34,9 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     }
 
     @Override
-    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
         LambdaQueryWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
+        delWrapper.in(WorkflowNodeInput::getWorkflowNodeId, workflowNodeIdList);
         this.remove(delWrapper);
     }
 

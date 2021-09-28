@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeVariableMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeVariable;
 import com.platon.rosettaflow.service.IWorkflowNodeVariableService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
+ * 工作流节点变量服务实现类
  * @author hudenian
  * @date 2021/8/18
- * @description 工作流节点变量服务实现类
  */
 @Slf4j
 @Service
@@ -32,9 +34,9 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     }
 
     @Override
-    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
         LambdaQueryWrapper<WorkflowNodeVariable> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
+        delWrapper.in(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeIdList);
         this.remove(delWrapper);
     }
     @Override
@@ -43,6 +45,26 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
         delWrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
         delWrapper.set(WorkflowNodeVariable::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
+    }
+
+    @Override
+    public List<WorkflowNodeVariable> copyWorkflowNodeVariable(Long newNodeId, Long oldNodeId) {
+        List<WorkflowNodeVariable> oldNodeVariableList = this.getByWorkflowNodeId(oldNodeId);
+        if (oldNodeVariableList.size() == 0) {
+            return null;
+        }
+        List<WorkflowNodeVariable> newNodeVariableList = new ArrayList<>();
+        oldNodeVariableList.forEach(oldNodeVariable -> {
+            WorkflowNodeVariable newNodeVariable = new WorkflowNodeVariable();
+            newNodeVariable.setWorkflowNodeId(newNodeId);
+            newNodeVariable.setVarNodeKey(oldNodeVariable.getVarNodeKey());
+            newNodeVariable.setVarNodeValue(oldNodeVariable.getVarNodeValue());
+            newNodeVariable.setVarNodeDesc(oldNodeVariable.getVarNodeDesc());
+            newNodeVariable.setVarNodeType(oldNodeVariable.getVarNodeType());
+            newNodeVariableList.add(newNodeVariable);
+        });
+
+        return newNodeVariableList;
     }
 
     @Override

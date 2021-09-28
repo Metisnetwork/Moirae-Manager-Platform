@@ -24,6 +24,14 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     List<WorkflowNodeDto> queryNodeDetailsList(Long id);
 
     /**
+     * 工作流节点明细保存
+     *
+     * @param workflowId          工作流id
+     * @param workflowNodeDtoList 工作流节点列表
+     */
+    void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
+
+    /**
      * 保存工作流节点
      *
      * @param workflowId       工作流id
@@ -53,13 +61,6 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param nodeName       工作流节点名称
      */
     void renameWorkflowNode(Long workflowNodeId, String nodeName);
-
-    /**
-     * 删除工作流中的节点
-     *
-     * @param id 工作流节点id
-     */
-    void deleteWorkflowNode(Long id);
 
     /**
      * 根据工作流id及节点序号获取工作流节点

@@ -85,6 +85,12 @@ public interface IWorkflowService extends IService<Workflow> {
     void deleteWorkflowBatch(String ids);
 
     /**
+     * 物理删除当前工作流所有节点数据
+     * @param id 工作流表id
+     */
+    void deleteWorkflowAllNodeData(Long id);
+
+    /**
      * 复制工作流
      *
      * @param originId     源工作流id

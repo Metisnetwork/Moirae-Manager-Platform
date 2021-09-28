@@ -2,6 +2,7 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeVariable;
 
 import java.util.List;
@@ -21,11 +22,10 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
     List<WorkflowNodeVariable> getByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     * 根据工作流节点id删除工作流节点变量
-     *
-     * @param workflowNodeId 工作流节点id
+     *物物理批量删除工作流节点输入变量，根据节点id
+     * @param workflowNodeIdList 工作流节点id列表
      */
-    void deleteByWorkflowNodeId(Long workflowNodeId);
+    void deleteByWorkflowNodeId(List<Long> workflowNodeIdList);
 
     /**
      * 根据算法变量添加工作流节点算法变量
@@ -41,6 +41,14 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
      * @param workflowNodeId 工作流节点id
      */
     void deleteLogicByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 复制工作流节点变量
+     * @param newNodeId 新节点id
+     * @param oldNodeId 旧节点id
+     * @return
+     */
+    List<WorkflowNodeVariable> copyWorkflowNodeVariable(Long newNodeId, Long oldNodeId);
 
     /**
      * 批量保存节点变量列表

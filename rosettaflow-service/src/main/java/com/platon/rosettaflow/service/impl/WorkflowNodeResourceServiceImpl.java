@@ -32,9 +32,9 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
     }
 
     @Override
-    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
         LambdaQueryWrapper<WorkflowNodeResource> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.eq(WorkflowNodeResource::getWorkflowNodeId, workflowNodeId);
+        delWrapper.in(WorkflowNodeResource::getWorkflowNodeId, workflowNodeIdList);
         this.remove(delWrapper);
     }
 
