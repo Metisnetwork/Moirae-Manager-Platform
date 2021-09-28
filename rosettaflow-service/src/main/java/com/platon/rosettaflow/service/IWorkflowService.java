@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 
@@ -30,6 +31,7 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 通过项目id查询工作流列表（不分页）
+     *
      * @param projectIdList 项目id列表
      * @return 工作流列表
      */
@@ -37,6 +39,7 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 获取运行中的工作流列表（不分页）
+     *
      * @param projectId 项目id
      * @return 工作流列表
      */
@@ -123,8 +126,18 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 获取工作流状态
+     *
      * @param id 工作流id
-     * @return  List
+     * @return List
      */
     Map<String, Object> getWorkflowStatusById(Long id);
+
+    /**
+     * 工作流节点明细保存
+     *
+     * @param workflowId          工作流id
+     * @param workflowNodeDtoList 工作流节点列表
+     */
+    void saveDetail(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
+
 }

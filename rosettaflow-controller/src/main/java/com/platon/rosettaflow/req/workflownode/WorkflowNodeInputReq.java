@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.req.workflow.node;
+package com.platon.rosettaflow.req.workflownode;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,20 +11,11 @@ import javax.validation.constraints.Positive;
 /**
  * 输入请求对象
  * @author hudenian
- * @date 2021/8/31
+ * @date 2021/9/28
  */
 @Data
-@ApiModel(value = "输入请求对象")
-public class SaveNodeInputReq {
-
-    @ApiModelProperty(value = "工作流节点ID", required = true)
-    @NotNull(message = "{workflow.node.id.notNull}")
-    @Positive(message = "{workflow.node.id.positive}")
-    private Long workflowNodeId;
-
-    @ApiModelProperty(value = "是否发起方: 0-否, 1-是", required = true)
-    @NotNull(message = "{node.sender.flag.notNull}")
-    private Integer senderFlag;
+@ApiModel(value = "工作流节点输入请求对象")
+public class WorkflowNodeInputReq {
 
     @ApiModelProperty(value = "组织的身份标识Id", required = true)
     @NotBlank(message = "{node.identity.id.NotBlank}")
@@ -36,5 +27,9 @@ public class SaveNodeInputReq {
     @ApiModelProperty(value = "数据字段ID,多个以‘,’分隔")
     @NotBlank(message = "{node.identity.name.NotBlank}")
     private String dataColumnIds;
+
+    @ApiModelProperty(value = "是否发起方: 0-否, 1-是", required = true)
+    @NotNull(message = "{node.sender.flag.notNull}")
+    private Integer senderFlag;
 
 }

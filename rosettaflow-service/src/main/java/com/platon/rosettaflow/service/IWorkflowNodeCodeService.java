@@ -2,7 +2,6 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
 
 import java.util.List;
 
@@ -28,24 +27,25 @@ public interface IWorkflowNodeCodeService extends IService<WorkflowNodeCode> {
     void deleteByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     * 根据算法id及工作流节点id添加工作流节点算法代码
-     * @param algorithmId 算法id
-     * @param workflowNodeId 工作流节点id
-     * @return 工作流节点代码表id
-     */
-//    Long addByAlgorithmIdAndWorkflowNodeId(Long algorithmId, Long workflowNodeId);
-
-    /**
      * 逻辑删除工作流节点代码, 根据工作流节点id
+     *
      * @param workflowNodeId 工作流节点id
      */
     void deleteLogicByWorkflowNodeId(Long workflowNodeId);
 
     /**
      * 复制工作流节点算法代码
+     *
      * @param newNodeId 新节点id
      * @param oldNodeId 旧节点id
-     * @return
+     * @return 节点代码
      */
     WorkflowNodeCode copyWorkflowNodeCode(Long newNodeId, Long oldNodeId);
+
+    /**
+     * 批量保存节点代码列表
+     *
+     * @param workflowNodeCodeList 节点代码列表
+     */
+    void batchInsert(List<WorkflowNodeCode> workflowNodeCodeList);
 }

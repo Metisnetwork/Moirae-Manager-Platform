@@ -37,7 +37,15 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
 
     /**
      * 逻辑删除工作流节点变量， 根据工作流节点id
+     *
      * @param workflowNodeId 工作流节点id
      */
     void deleteLogicByWorkflowNodeId(Long workflowNodeId);
+
+    /**
+     * 批量保存节点变量列表
+     *
+     * @param workflowNodeVariableList 节点变量列表
+     */
+    void batchInsert(List<WorkflowNodeVariable> workflowNodeVariableList);
 }

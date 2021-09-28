@@ -12,6 +12,7 @@ import com.platon.rosettaflow.service.IWorkflowNodeResourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -58,5 +59,10 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
         newNodeResource.setCostGpu(oldNodeResource.getCostGpu());
         newNodeResource.setCostBandwidth(oldNodeResource.getCostBandwidth());
         return newNodeResource;
+    }
+
+    @Override
+    public void batchInsert(List<WorkflowNodeResource> workflowNodeResourceList) {
+        this.baseMapper.batchInsert(workflowNodeResourceList);
     }
 }

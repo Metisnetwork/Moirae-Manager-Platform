@@ -55,7 +55,6 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
             oldNodeInputList.forEach(oldNodeInput -> {
                 WorkflowNodeInput newNodeInput = new WorkflowNodeInput();
                 newNodeInput.setWorkflowNodeId(newNodeId);
-                newNodeInput.setDataType(oldNodeInput.getDataType());
                 newNodeInput.setIdentityId(oldNodeInput.getIdentityId());
                 newNodeInput.setDataTableId(oldNodeInput.getDataTableId());
                 newNodeInput.setDataColumnIds(oldNodeInput.getDataColumnIds());
@@ -64,6 +63,11 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
             });
         }
         return newNodeInputList;
+    }
+
+    @Override
+    public void batchInsert(List<WorkflowNodeInput> workflowNodeInputList) {
+        this.baseMapper.batchInsert(workflowNodeInputList);
     }
 
 }
