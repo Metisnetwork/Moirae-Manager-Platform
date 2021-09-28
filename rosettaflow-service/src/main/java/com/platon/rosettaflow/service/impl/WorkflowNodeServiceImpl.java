@@ -43,6 +43,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IAlgorithmService algorithmService;
 
     @Resource
+    private IJobService jobService;
+
+    @Resource
     private IWorkflowNodeCodeService workflowNodeCodeService;
 
     @Resource
@@ -106,6 +109,100 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList) {
+        Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        if (null == workflow) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+        }
+        //判断当前工作流是否存在正在运行或者有加入正在运行的作业中，有则不让保存
+        if (workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
+        }
+        //判断正在运行的作业是否包含此工作流
+        List<Job> jobList = jobService.listRunJobByWorkflowId(workflowId);
+        if (null != jobList && jobList.size() > 0) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
+        }
+
+        // 删除当前工作流所有节点数据
+        workflowService.deleteWorkflowAllNodeData(workflowId);
+
+        //加入所有工作流新节点
+        List<WorkflowNodeInput> workflowNodeInputList = new ArrayList<>();
+        List<WorkflowNodeOutput> workflowNodeOutputList = new ArrayList<>();
+        List<WorkflowNodeCode> workflowNodeCodeList = new ArrayList<>();
+        List<WorkflowNodeResource> workflowNodeResourceList = new ArrayList<>();
+        List<WorkflowNodeVariable> workflowNodeVariableList = new ArrayList<>();
+
+        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
+            //保存工作流节点
+            WorkflowNode workflowNode = new WorkflowNode();
+            workflowNode.setWorkflowId(workflowId);
+            workflowNode.setNodeName(workflowNodeDto.getNodeName());
+            workflowNode.setAlgorithmId(workflowNodeDto.getAlgorithmId());
+            workflowNode.setNodeStep(workflowNodeDto.getNodeStep());
+            workflowNode.setNextNodeStep(workflowNodeDto.getNextNodeStep());
+            this.save(workflowNode);
+            //添加新的工作流节点输入
+            int senderNum = 0;
+            for (int i = 0; i < workflowNodeDto.getWorkflowNodeInputList().size(); i++) {
+                //添加节点输入
+                WorkflowNodeInput workflowNodeInput = new WorkflowNodeInput();
+                workflowNodeInput.setWorkflowNodeId(workflowNode.getId());
+                workflowNodeInput.setIdentityId(workflowNodeDto.getWorkflowNodeInputList().get(i).getIdentityId());
+                workflowNodeInput.setDataTableId(workflowNodeDto.getWorkflowNodeInputList().get(i).getDataTableId());
+                workflowNodeInput.setDataColumnIds(workflowNodeDto.getWorkflowNodeInputList().get(i).getDataColumnIds());
+                workflowNodeInput.setSenderFlag(workflowNodeDto.getWorkflowNodeInputList().get(i).getSenderFlag());
+                workflowNodeInput.setPartyId("p" + i);
+                workflowNodeInputList.add(workflowNodeInput);
+
+                //发起方默认保存
+                if (workflowNodeDto.getWorkflowNodeInputList().get(i).getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
+                    senderNum++;
+                    WorkflowNodeOutput workflowNodeOutput = new WorkflowNodeOutput();
+                    workflowNodeOutput.setWorkflowNodeId(workflowNode.getId());
+                    workflowNodeOutput.setIdentityId(workflowNodeDto.getWorkflowNodeInputList().get(i).getIdentityId());
+                    workflowNodeOutput.setPartyId("p" + i);
+                    workflowNodeOutput.setSenderFlag(workflowNodeDto.getWorkflowNodeInputList().get(i).getSenderFlag());
+                    workflowNodeOutputList.add(workflowNodeOutput);
+                }
+            }
+            if (senderNum != 1) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
+            }
+
+            //添加新的工作流节点输出
+            for (int i = 0; i < workflowNodeDto.getWorkflowNodeInputList().size(); i++) {
+                WorkflowNodeOutput workflowNodeOutput = new WorkflowNodeOutput();
+                workflowNodeOutput.setWorkflowNodeId(workflowNode.getId());
+                workflowNodeOutput.setIdentityId(workflowNodeDto.getWorkflowNodeInputList().get(i).getIdentityId());
+                workflowNodeOutput.setPartyId("p" + i + 1);
+                workflowNodeOutput.setSenderFlag(SenderFlagEnum.FALSE.getValue());
+                workflowNodeOutputList.add(workflowNodeOutput);
+            }
+            //添加新的工作流节点代码
+            if (null != workflowNodeDto.getWorkflowNodeCode()) {
+                workflowNodeDto.getWorkflowNodeCode().setWorkflowNodeId(workflowNode.getId());
+                workflowNodeCodeList.add(workflowNodeDto.getWorkflowNodeCode());
+            }
+            //添加新的工作流节点资源
+            if (null != workflowNodeDto.getWorkflowNodeResource()) {
+                workflowNodeDto.getWorkflowNodeResource().setWorkflowNodeId(workflowNode.getId());
+                workflowNodeResourceList.add(workflowNodeDto.getWorkflowNodeResource());
+            }
+            //添加新的工作流节点变量
+            if (null != workflowNodeDto.getWorkflowNodeVariable()) {
+                workflowNodeDto.getWorkflowNodeVariable().setWorkflowNodeId(workflowNode.getId());
+                workflowNodeVariableList.add(workflowNodeDto.getWorkflowNodeVariable());
+            }
+        }
+        // 保存节点相关数据
+        saveNodeData(workflowNodeInputList, workflowNodeOutputList, workflowNodeCodeList,
+                workflowNodeResourceList, workflowNodeVariableList);
+    }
+
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList) {
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
@@ -159,7 +256,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     /**
-     * 物理删除工作流节点
+     * 物理删除工作流节点（暂时保留，二期去掉此处代码）
      */
     private void removeNodeData(List<Long> nodeIdList) {
         if (nodeIdList.size() == 0) {
@@ -188,10 +285,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         if (workflowNodeList == null || workflowNodeList.size() == 0) {
             return;
         }
-        // 工作流节点id集合
-        List<Long> nodeIdList = new ArrayList<>();
-        workflowNodeList.forEach(workflowNode -> nodeIdList.add(workflowNode.getId()));
-        removeNodeData(nodeIdList);
+        // 物理删除当前工作流所有节点数据
+       workflowService.deleteWorkflowAllNodeData(workflowId);
     }
 
     @Override
@@ -220,12 +315,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         checkEditPermission(workflow.getProjectId());
         workflowNode.setNodeName(nodeName);
         this.updateById(workflowNode);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void deleteWorkflowNode(Long id) {
-        removeNodeData(Collections.singletonList(id));
     }
 
     @Override
@@ -304,7 +393,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
 
         // 新增
-        workflowNodeInputService.insertBatch(workflowNodeInputList);
+        workflowNodeInputService.batchInsert(workflowNodeInputList);
     }
 
     @Override
@@ -375,6 +464,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
         List<WorkflowNodeCode> newNodeCodeList = new ArrayList<>();
         List<WorkflowNodeResource> newNodeResourceList = new ArrayList<>();
+        List<WorkflowNodeVariable> newNodeVariableList = new ArrayList<>();
         oldNodeList.forEach(oldNode -> {
             WorkflowNode newNode = new WorkflowNode();
             newNode.setWorkflowId(newWorkflowId);
@@ -399,22 +489,43 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             if (Objects.nonNull(workflowNodeResource)) {
                 newNodeResourceList.add(workflowNodeResource);
             }
+            // 复制节点变量
+            List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.copyWorkflowNodeVariable(newNode.getId(), oldNode.getId());
+            if (Objects.nonNull(workflowNodeResource)) {
+                workflowNodeVariableList.addAll(workflowNodeVariableList);
+            }
         });
+        // 保存节点相关数据
+        saveNodeData(newNodeInputList, newNodeOutputList, newNodeCodeList,
+                newNodeResourceList, newNodeVariableList);
+    }
+
+    /** 保存节点相关数据 */
+    private void saveNodeData(List<WorkflowNodeInput> newNodeInputList,
+                              List<WorkflowNodeOutput> newNodeOutputList,
+                              List<WorkflowNodeCode> newNodeCodeList,
+                              List<WorkflowNodeResource> newNodeResourceList,
+                              List<WorkflowNodeVariable> newNodeVariableList
+                              ){
         // 保存节点输入数据
         if (newNodeInputList.size() > 0) {
-            workflowNodeInputService.saveBatch(newNodeInputList);
+            workflowNodeInputService.batchInsert(newNodeInputList);
         }
         // 保存节点输出数据
         if (newNodeOutputList.size() > 0) {
-            workflowNodeOutputService.saveBatch(newNodeOutputList);
+            workflowNodeOutputService.batchInsert(newNodeOutputList);
         }
         // 保存节点算法代码
         if (newNodeCodeList.size() > 0) {
-            workflowNodeCodeService.saveBatch(newNodeCodeList);
+            workflowNodeCodeService.batchInsert(newNodeCodeList);
         }
         // 保存节点环境资源
         if (newNodeResourceList.size() > 0) {
-            workflowNodeResourceService.saveBatch(newNodeResourceList);
+            workflowNodeResourceService.batchInsert(newNodeResourceList);
+        }
+        // 保存节点变量
+        if (newNodeVariableList.size() > 0) {
+            workflowNodeVariableService.batchInsert(newNodeVariableList);
         }
     }
 
