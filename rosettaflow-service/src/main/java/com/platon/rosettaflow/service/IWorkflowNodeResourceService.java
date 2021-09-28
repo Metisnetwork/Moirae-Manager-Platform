@@ -3,6 +3,9 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeCode;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.List;
 
 /**
  * @author hudenian
@@ -18,10 +21,10 @@ public interface IWorkflowNodeResourceService extends IService<WorkflowNodeResou
     WorkflowNodeResource getByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     * 物理删除工作流节点资源表, 根据工作流节点id
-     * @param workflowNodeId 工作流节点id
+     * 物物理批量删除工作流节点环境资源，根据节点id
+     * @param workflowNodeIdList 工作流节点id列表
      */
-    void deleteByWorkflowNodeId(Long workflowNodeId);
+    void deleteByWorkflowNodeId(List<Long> workflowNodeIdList);
 
     /**
      * 逻辑删除工作流节点资源表, 根据工作流节点id

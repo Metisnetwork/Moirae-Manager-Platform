@@ -165,18 +165,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         if (nodeIdList.size() == 0) {
             return;
         }
-        nodeIdList.forEach(nodeId -> {
-            // 物理删除节点输入
-            workflowNodeInputService.deleteByWorkflowNodeId(nodeId);
-            // 物理删除节点输出
-            workflowNodeOutputService.deleteByWorkflowNodeId(nodeId);
-            // 物理删除节点代码
-            workflowNodeCodeService.deleteByWorkflowNodeId(nodeId);
-            // 物理删除节点资源
-            workflowNodeResourceService.deleteByWorkflowNodeId(nodeId);
-            // 物理删除节点变量
-            workflowNodeVariableService.deleteByWorkflowNodeId(nodeId);
-        });
+        // 物理删除节点输入
+        workflowNodeInputService.deleteByWorkflowNodeId(nodeIdList);
+        // 物理删除节点输出
+        workflowNodeOutputService.deleteByWorkflowNodeId(nodeIdList);
+        // 物理删除节点代码
+        workflowNodeCodeService.deleteByWorkflowNodeId(nodeIdList);
+        // 物理删除节点资源
+        workflowNodeResourceService.deleteByWorkflowNodeId(nodeIdList);
+        // 物理删除节点变量
+        workflowNodeVariableService.deleteByWorkflowNodeId(nodeIdList);
         this.removeByIds(nodeIdList);
     }
 
@@ -306,7 +304,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
 
         // 新增
-        workflowNodeInputService.saveBatch(workflowNodeInputList);
+        workflowNodeInputService.insertBatch(workflowNodeInputList);
     }
 
     @Override

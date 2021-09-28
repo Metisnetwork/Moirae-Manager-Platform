@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 工作流节点变量服务实现类
  * @author hudenian
  * @date 2021/8/18
- * @description 工作流节点变量服务实现类
  */
 @Slf4j
 @Service
@@ -32,9 +32,9 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     }
 
     @Override
-    public void deleteByWorkflowNodeId(Long workflowNodeId) {
+    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
         LambdaQueryWrapper<WorkflowNodeVariable> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
+        delWrapper.in(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeIdList);
         this.remove(delWrapper);
     }
     @Override
