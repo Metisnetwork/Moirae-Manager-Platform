@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"dev", "local"})
+@Profile({"dev"})
 public class GrpcAuthServiceMockImpl implements GrpcAuthService {
     /**
      * 数据记录记录数

@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test"})
+@Profile({"prod", "test", "local"})
 public class GrpcAuthServiceImpl implements GrpcAuthService {
 
     @Resource

@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test"})
+@Profile({"prod", "test", "local"})
 public class GrpcTaskServiceImpl implements GrpcTaskService {
 
     @Resource

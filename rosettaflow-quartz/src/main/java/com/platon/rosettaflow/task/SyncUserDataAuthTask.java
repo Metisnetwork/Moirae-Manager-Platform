@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test"})
+@Profile({"prod", "test","local"})
 public class SyncUserDataAuthTask {
 
     @Resource
@@ -42,7 +42,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 200 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
