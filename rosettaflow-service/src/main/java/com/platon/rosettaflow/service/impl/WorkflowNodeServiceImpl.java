@@ -501,7 +501,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 复制节点变量
             List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.copyWorkflowNodeVariable(newNode.getId(), oldNode.getId());
             if (Objects.nonNull(workflowNodeResource)) {
-                workflowNodeVariableList.addAll(workflowNodeVariableList);
+                newNodeVariableList.addAll(workflowNodeVariableList);
             }
         });
         // 保存节点相关数据
