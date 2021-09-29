@@ -58,26 +58,26 @@
     <delete id="deleteWorkflowAllNodeData">
         DELETE from t_workflow_node where id in (
             select id from (
-                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}));
+                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}) t);
 
         DELETE from t_workflow_node_input where workflow_node_id in (
             select id from (
-                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}));
+                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}) t);
 
         DELETE from t_workflow_node_output where workflow_node_id in (
             select id from (
-                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}));
+                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}) t);
 
         DELETE from t_workflow_node_code where workflow_node_id in (
             select id from (
-                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}));
+                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}) t);
 
         DELETE from t_workflow_node_resource where workflow_node_id in (
             select id from (
-                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}));
+                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}) t);
 
         DELETE from t_workflow_node_variable where workflow_node_id in (
             select id from (
-                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}));
+                select id from t_workflow_node where workflow_id=#{workflowId, jdbcType=BIGINT}) t);
     </delete>
 </mapper>
