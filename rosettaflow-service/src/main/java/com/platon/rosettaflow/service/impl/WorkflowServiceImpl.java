@@ -255,7 +255,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public void start(WorkflowDto workflowDto) {
         Workflow orgWorkflow = this.queryWorkflowDetail(workflowDto.getId());
         // 校验是否有编辑权限
-        checkEditPermission(orgWorkflow.getProjectId());
+        if(!workflowDto.isJobFlg()){
+           checkEditPermission(orgWorkflow.getProjectId());
+        }
         //截止节点不能超过工作流最大节点
         //如果截止节点为空，设置为工作流最后一个节点
         if (null == workflowDto.getEndNode()) {
@@ -264,52 +266,48 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
-
         //保存用户和地址及签名并更新状态为运行中
-        updateSign(workflowDto);
+        if(!workflowDto.isJobFlg()){
+            updateSign(workflowDto);
+        }
 
         //此处先执行第一个节点，待第一个节点执行成功后再执行
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
         grpcTaskService.asyncPublishTask(taskDto, publishTaskDeclareResponse -> {
 
+            boolean isPublishSucess = publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
             WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
             if (workflowDto.isJobFlg()) {
-                //更新作业
+                //1.更新子作业
                 SubJob subJob = subJobService.getById(workflowDto.getJobId());
                 subJob.setEndTime(now());
-                //TODO CHECK
                 subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
-                //子作业节点信息
-                SubJobNode subJobNode = new SubJobNode();
-                subJobNode.setSubJobId(subJob.getId());
-                subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
-                subJobNode.setNodeStep(workflowNode.getNodeStep());
-
-                if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
-
-                    subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
-
-                    //如果是最后一个节点
-                    if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
-                        subJob.setSubJobStatus(SubJobStatusEnum.RUN_SUCCESS.getValue());
-                        subJobService.updateById(subJob);
-                        subJobNodeService.save(subJobNode);
-                    } else {
-                        subJob.setSubJobStatus(SubJobStatusEnum.RUNNING.getValue());
-                        subJobService.updateById(subJob);
-                        subJobNodeService.save(subJobNode);
-
-                        //当前工作流执行成功，继续执行下一个工作流节点
-                        workflowDto.setStartNode(workflowNode.getNextNodeStep());
-                        this.start(workflowDto);
-                    }
-                } else {
-                    subJob.setSubJobStatus(SubJobStatusEnum.RUN_FAIL.getValue());
-                    subJobNode.setRunStatus(SubJobNodeStatusEnum.RUN_FAIL.getValue());
+                subJob.setSubJobStatus(isPublishSucess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
+                //2.记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
+                SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(subJob.getId(),workflowDto.getStartNode());
+                SubJobNode subJobNode = !Objects.isNull(subJobNodeTemp) ? subJobNodeTemp : new SubJobNode();
+                if (Objects.isNull(subJobNodeTemp)) {
+                    subJobNode.setSubJobId(subJob.getId());
+                    subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
+                    subJobNode.setNodeStep(workflowNode.getNodeStep());
+                }
+                subJobNode.setRunStatus(isPublishSucess ? SubJobNodeStatusEnum.RUNNING.getValue() : SubJobNodeStatusEnum.RUN_FAIL.getValue());
+                subJobNode.setTaskId(isPublishSucess ? publishTaskDeclareResponse.getTaskId() : "");
+                subJobNode.setRunMsg(isPublishSucess ? publishTaskDeclareResponse.getMsg() : "");
+                //3.持久化数据
+                subJobService.updateById(subJob);
+                boolean isSuccess = Objects.isNull(subJobNodeTemp) ? subJobNodeService.save(subJobNode) : subJobNodeService.updateById(subJobNode);
+                if(!isSuccess){
+                    log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
                 }
 
-                subJobService.updateById(subJob);
-                subJobNodeService.save(subJobNode);
+                //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点
+                if(isPublishSucess && (null != workflowNode.getNextNodeStep() && workflowNode.getNextNodeStep() > 1)){
+                    workflowDto.setStartNode(workflowNode.getNextNodeStep());
+                    this.start(workflowDto);
+                }
+
             } else {
                 //更新工作流节点
                 Workflow workflow;
@@ -409,7 +407,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public void updateRunStatus(Long workflowId, Byte runStatus) {
         LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getRunStatus, WorkflowRunStatusEnum.UN_RUN.getValue());
+        updateWrapper.set(Workflow::getRunStatus, runStatus);
         updateWrapper.eq(Workflow::getId, workflowId);
         this.update(updateWrapper);
     }
@@ -632,6 +630,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 return sender;
             }
         }
+        log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:,{}" + workflowNodeInputList.toString());
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }
 

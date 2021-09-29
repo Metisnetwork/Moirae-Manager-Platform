@@ -238,7 +238,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                     // 将最后一个节点步骤的下一节点步骤字段值置空
                     node.setNextNodeStep(null);
                 }
-                node.setStatus((byte) 1);
+                node.setStatus(StatusEnum.VALID.getValue());
                 nodeBatchList.add(node);
                 // 去掉idList中需要保存的节点id，保留需要物理删除的节点
                 idList.remove(nodeReq.getId());
