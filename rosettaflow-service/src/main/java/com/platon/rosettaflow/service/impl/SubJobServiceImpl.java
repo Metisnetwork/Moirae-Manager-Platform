@@ -7,15 +7,20 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.platon.rosettaflow.common.enums.ErrorMsg;
-import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.enums.StatusEnum;
-import com.platon.rosettaflow.common.enums.SubJobStatusEnum;
+import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
 import com.platon.rosettaflow.dto.SubJobDto;
+import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.grpc.constant.GrpcConstant;
+import com.platon.rosettaflow.grpc.service.GrpcTaskService;
+import com.platon.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TerminateTaskRespDto;
 import com.platon.rosettaflow.mapper.SubJobMapper;
 import com.platon.rosettaflow.mapper.domain.SubJob;
+import com.platon.rosettaflow.mapper.domain.SubJobNode;
+import com.platon.rosettaflow.mapper.domain.Workflow;
+import com.platon.rosettaflow.service.ISubJobNodeService;
 import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +44,13 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
     @Resource
     private IWorkflowService workflowService;
 
+    @Resource
+    private GrpcTaskService grpcTaskService;
+
+    @Resource
+    private ISubJobNodeService subJobNodeService;
+
+
     @Override
     public IPage<SubJobDto> sublist(Long current, Long size, String subJobId, Long jobId) {
         Page<SubJob> page = new Page<>(current, size);
@@ -61,14 +73,16 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         if(subJob.getSubJobStatus() != SubJobStatusEnum.RUNNING.getValue()){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_RUNNING.getMsg());
         }
-        //停止子作业
-        LambdaUpdateWrapper<SubJob> subJobUpdateWrapper = Wrappers.lambdaUpdate();
-        subJobUpdateWrapper.set(SubJob::getSubJobStatus,SubJobStatusEnum.UN_RUN);
-        subJobUpdateWrapper.set(SubJob::getUpdateTime,new Date(System.currentTimeMillis()));
-        subJobUpdateWrapper.eq(SubJob::getId,id);
-        this.update(subJobUpdateWrapper);
-        //停止工作流
-        workflowService.terminate(subJob.getWorkflowId());
+        //暂停子作业
+        TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(subJob);
+        TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
+        if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+            this.updateJobStatus(subJob.getId(), SubJobStatusEnum.UN_RUN.getValue());
+            subJobNodeService.updateRunStatusByJobId(subJob.getId(), SubJobNodeStatusEnum.UN_RUN.getValue());
+        } else {
+            log.error("Terminate subJob with id:{} fail", subJob.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_TERMINATE_NET_PROCESS_ERROR.getMsg());
+        }
     }
 
     @Override
@@ -80,8 +94,47 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         if(subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue() || subJob.getSubJobStatus() == SubJobStatusEnum.RUN_SUCCESS.getValue()){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_STOP.getMsg());
         }
-        //todo 启动工作流
 
+        Workflow workFlow = workflowService.getById(subJob.getWorkflowId());
+        if (null == workFlow) {
+            log.error("workFlow can not find by workflow id:{}", subJob.getWorkflowId());
+            return;
+        }
+
+        //重启子作业
+        WorkflowDto startWorkflowDto = new WorkflowDto();
+        BeanCopierUtils.copy(workFlow, startWorkflowDto);
+        startWorkflowDto.setStartNode(1);
+        startWorkflowDto.setEndNode(workFlow.getNodeNumber());
+        startWorkflowDto.setJobFlg(true);
+        startWorkflowDto.setJobId(subJob.getId());
+        workflowService.start(startWorkflowDto);
+    }
+
+    @Override
+    public void updateJobStatus(Long subJobId, Byte subJobStatus) {
+        LambdaUpdateWrapper<SubJob> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(SubJob::getSubJobStatus, subJobStatus);
+        updateWrapper.set(SubJob::getUpdateTime, new Date(System.currentTimeMillis()));
+        updateWrapper.eq(SubJob::getId, subJobId);
+        this.update(updateWrapper);
+    }
+
+
+    /**
+     *  组装停止子作业请求参数
+     * @param subJob 子作业
+     */
+    public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(SubJob subJob){
+        Workflow workflow = workflowService.queryWorkflowDetail(subJob.getWorkflowId());
+        SubJobNode subJobNode = subJobNodeService.querySubJobNodeByJobId(subJob.getId());
+
+        TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
+        terminateTaskRequestDto.setUser(workflow.getAddress());
+        terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflow.getAddress()));
+        terminateTaskRequestDto.setSign(workflow.getSign());
+        terminateTaskRequestDto.setTaskId(subJobNode.getTaskId());
+        return terminateTaskRequestDto;
     }
 
     public IPage<SubJobDto> convertToPageDto(Page<SubJob> page){
