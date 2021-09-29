@@ -3,7 +3,6 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
-import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
@@ -86,6 +85,7 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 物理删除当前工作流所有节点数据
+     *
      * @param id 工作流表id
      */
     void deleteWorkflowAllNodeData(Long id);
@@ -140,21 +140,21 @@ public interface IWorkflowService extends IService<Workflow> {
     Map<String, Object> getWorkflowStatusById(Long id);
 
     /**
-     * 工作流节点明细保存
-     *
-     * @param workflowId          工作流id
-     * @param workflowNodeDtoList 工作流节点列表
-     */
-    void saveDetail(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
-
-    /**
      * 组装发送任务对象
-     * @param workFlowId 工作流id
+     *
+     * @param workFlowId  工作流id
      * @param currentNode 当前节点
-     * @param address 用户地址
-     * @param sign 用户签名
+     * @param address     用户地址
+     * @param sign        用户签名
      * @return 发送任务对象
      */
     TaskDto assemblyTaskDto(Long workFlowId, Integer currentNode, String address, String sign);
 
+    /**
+     * 更新工作流运行状态
+     *
+     * @param ids 工作流id
+     * @param runStatus  运行状态
+     */
+    void updateRunStatus(Object[] ids, Byte runStatus);
 }

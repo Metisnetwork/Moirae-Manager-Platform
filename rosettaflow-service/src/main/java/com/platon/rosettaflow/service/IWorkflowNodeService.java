@@ -135,8 +135,8 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     /**
      * 复制保存工作流节点
      *
-     * @param newWorkflowId       新工作流id
-     * @param oldNodeList 旧工作流列表
+     * @param newWorkflowId 新工作流id
+     * @param oldNodeList   旧工作流列表
      */
     void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList);
 
@@ -164,4 +164,20 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param newRunStatus 新的运行状态
      */
     void updateRunStatusByWorkflowId(Long workflowId, Byte oldRunStatus, Byte newRunStatus);
+
+    /**
+     * 获取所有运行中的节点
+     *
+     * @param beforeHour 开始前小时数
+     * @return 运行中节点列表
+     */
+    List<WorkflowNode> getRunningNode(int beforeHour);
+
+    /**
+     * 更新工作流节点运行状态
+     *
+     * @param ids       id数组
+     * @param runStatus 运行状态
+     */
+    void updateRunStatus(Object[] ids, Byte runStatus);
 }

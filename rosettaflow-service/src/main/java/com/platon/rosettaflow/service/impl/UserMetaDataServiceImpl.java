@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.UserTypeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
+import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
@@ -51,6 +53,9 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Resource
     private GrpcAuthService grpcAuthService;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Override
     public void truncate() {
@@ -115,6 +120,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
+        //数据授权申请成功后，记录redis中，开启用户元数据同步定时任务
+        redisUtil.set(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, true);
     }
 
     @Override

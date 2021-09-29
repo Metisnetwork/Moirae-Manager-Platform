@@ -6,6 +6,7 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.mapper.domain.Job;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ public class ListenJobTask {
     @Resource
     private RedisUtil redisUtil;
 
-    @Scheduled(fixedDelay = 30*1000, initialDelay = 15*1000)
+//    @Scheduled(fixedDelay = 30*1000, initialDelay = 15*1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;

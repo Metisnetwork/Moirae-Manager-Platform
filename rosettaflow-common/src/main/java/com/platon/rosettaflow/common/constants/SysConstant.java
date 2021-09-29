@@ -46,9 +46,14 @@ public class SysConstant {
     public static final String REDIS_TOKEN_PREFIX_KEY = "Token:";
 
     /**
+     * redis数据库 key值
+     */
+    public static final String REDIS_SYNC_USER_METADATA_PREFIX_KEY = "sync_user_metadata";
+
+    /**
      * 用户非互踢模式时，token已登录用的用户数前缀
      */
-    public static final String REDIS_TOKEN_BIND_PREFIX_KEY="token-bind:";
+    public static final String REDIS_TOKEN_BIND_PREFIX_KEY = "token-bind:";
 
     /**
      * 系统默认日期格式
@@ -92,7 +97,6 @@ public class SysConstant {
             "algorithm/details",
             "testGrpc"
     };
-
 
     /**
      * 作业添加队列

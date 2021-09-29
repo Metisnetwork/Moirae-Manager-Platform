@@ -497,6 +497,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         return taskDto;
     }
 
+    @Override
+    public void updateRunStatus(Object[] ids, Byte runStatus) {
+        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(Workflow::getRunStatus, runStatus);
+        updateWrapper.set(Workflow::getUpdateTime, now());
+        updateWrapper.in(Workflow::getId, ids);
+        this.update(updateWrapper);
+    }
+
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
         WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeResource) {

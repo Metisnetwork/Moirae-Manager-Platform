@@ -32,15 +32,12 @@ public class SaveNodeResourceReq {
     @NotNull(message = "{node.cost.cpu.notNull}")
     private Integer costCpu;
 
-    @ApiModelProperty(value = "工作流节点资源gpu", required = true)
-    @NotNull(message = "{node.cost.cpu.notNull}")
-    private Integer costGpu;
-
     @ApiModelProperty(value = "工作流节点资源带宽", required = true)
     @NotNull(message = "{node.cost.bandwidth.notNull}")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "工作流节点运行时长")
+    @ApiModelProperty(value = "工作流节点运行时长(需要转成毫秒)", required = true)
+    @NotNull(message = "{node.cost.runTime.notNull}")
     private Long runTime;
 
     /** 保存时处理内存单位 */

@@ -111,7 +111,7 @@ public class RpcTestController {
         return ResponseVo.createSuccess(applyMetaDataAuthorityResponseDto);
     }
 
-    @PostMapping("task/{workflowId}")
+    @GetMapping("task/{workflowId}")
     @ApiOperation(value = "grpc task接口测试", notes = "grpc task接口测试")
     public ResponseVo<String> task(@ApiParam(value = "工作流表ID", required = true) @PathVariable Long workflowId) {
         log.info("grpc task接口测试");

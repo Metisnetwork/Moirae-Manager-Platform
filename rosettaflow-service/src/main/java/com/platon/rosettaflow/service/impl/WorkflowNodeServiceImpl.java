@@ -1,6 +1,7 @@
 package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.hutool.core.date.DateTime.now;
 
 /**
  * 工作流节点服务实现类
@@ -292,7 +295,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             return;
         }
         // 物理删除当前工作流所有节点数据
-       workflowService.deleteWorkflowAllNodeData(workflowId);
+        workflowService.deleteWorkflowAllNodeData(workflowId);
     }
 
     @Override
@@ -506,13 +509,15 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 newNodeResourceList, newNodeVariableList);
     }
 
-    /** 保存节点相关数据 */
+    /**
+     * 保存节点相关数据
+     */
     private void saveNodeData(List<WorkflowNodeInput> newNodeInputList,
                               List<WorkflowNodeOutput> newNodeOutputList,
                               List<WorkflowNodeCode> newNodeCodeList,
                               List<WorkflowNodeResource> newNodeResourceList,
                               List<WorkflowNodeVariable> newNodeVariableList
-                              ){
+    ) {
         // 保存节点输入数据
         if (newNodeInputList.size() > 0) {
             workflowNodeInputService.batchInsert(newNodeInputList);
@@ -557,6 +562,24 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         updateWrapper.eq(WorkflowNode::getRunStatus, oldRunStatus);
         updateWrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public List<WorkflowNode> getRunningNode(int beforeHour) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
+        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
+        wrapper.ge(WorkflowNode::getUpdateTime, DateUtil.offsetHour(new Date(), beforeHour));
+        return this.list(wrapper);
+    }
+
+    @Override
+    public void updateRunStatus(Object[] ids, Byte runStatus) {
+        LambdaUpdateWrapper<WorkflowNode> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(WorkflowNode::getRunStatus, runStatus);
+        updateWrapper.set(WorkflowNode::getUpdateTime, now());
+        updateWrapper.in(WorkflowNode::getId, ids);
         this.update(updateWrapper);
     }
 
