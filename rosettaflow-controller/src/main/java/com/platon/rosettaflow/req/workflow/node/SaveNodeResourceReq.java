@@ -6,17 +6,22 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 /**
  * 添加工作流节点资源请求对象
- *
  * @author hudenian
- * @date 2021/9/28
+ * @date 2021/8/31
  */
 @Data
-@ApiModel(value = "工作流节点资源请求对象")
-public class WorkflowNodeResourceReq {
+@ApiModel(value = "添加工作流节点资源请求对象")
+public class SaveNodeResourceReq {
+
+    @ApiModelProperty(value = "工作流节点ID", required = true)
+    @NotNull(message = "{workflow.node.id.notNull}")
+    @Positive(message = "{workflow.node.id.positive}")
+    private Long workflowNodeId;
 
     @ApiModelProperty(value = "工作流节点资源内存", required = true)
     @NotNull(message = "{node.cost.memory.notNull}")
@@ -26,21 +31,15 @@ public class WorkflowNodeResourceReq {
     @NotNull(message = "{node.cost.cpu.notNull}")
     private Integer costCpu;
 
-    @ApiModelProperty(value = "工作流节点资源gpu", required = true)
-    @NotNull(message = "{node.cost.cpu.notNull}")
-    private Integer costGpu;
-
     @ApiModelProperty(value = "工作流节点资源带宽", required = true)
     @NotNull(message = "{node.cost.bandwidth.notNull}")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "工作流节点运行时长(单位：h)")
+    @ApiModelProperty(value = "工作流节点运行时长(单位：h)", required = true)
+    @NotNull(message = "{node.cost.runTime.notNull}")
     private Long runTime;
 
-    /**
-     * 保存时处理内存单位
-     */
-    @SuppressWarnings("unused")
+    /** 保存时处理内存单位 */
     public Long getCostMem() {
         return new BigDecimal(this.costMem)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_1024
@@ -49,10 +48,7 @@ public class WorkflowNodeResourceReq {
                 .longValue();
     }
 
-    /**
-     * 保存时处理带宽单位
-     */
-    @SuppressWarnings("unused")
+    /** 保存时处理带宽单位 */
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))

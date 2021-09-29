@@ -11,6 +11,7 @@ import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import com.platon.rosettaflow.service.IMetaDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@Profile({"prod", "test"})
 public class SyncMetaDataTask {
 
     @Resource
@@ -40,26 +42,23 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-//    @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
-
         log.info("元数据信息同步开始>>>>");
         long begin;
-        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
-
-        //元数据同步成功，删除旧数据
-        if (metaDataDetailResponseDtoList.size() > 0) {
-            //删除元数据
-            metaDataService.truncate();
-            //删除元数据详情
-            metaDataDetailsService.truncate();
-        } else {
+        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
+        try {
+            metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
+        } catch (Exception e) {
+            log.error("从net同步元数据失败,失败原因：{}", e.getMessage());
             return;
         }
+        //元数据同步成功，删除旧数据
+        delOldData(metaDataDetailResponseDtoList);
 
         List<MetaData> newMetaDataList = new ArrayList<>();
         List<MetaDataDetails> newMetaDataDetailsList = new ArrayList<>();
@@ -69,28 +68,8 @@ public class SyncMetaDataTask {
         int metaDataDetailSize = 0;
 
         for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-            metaData = new MetaData();
-            metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
-            metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
-            metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
-            //元数据id为空不入库
-            if(StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())){
-                continue;
-            }
-            metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
-            metaData.setFileId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getOriginId());
-            metaData.setDataName(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getTableName());
-            metaData.setDataDesc(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDesc());
-            metaData.setFilePath(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFilePath());
-            metaData.setRows(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getRows());
-            metaData.setColumns(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getColumns());
-            metaData.setSize(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getSize());
-            metaData.setFileType(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFileType().byteValue());
-            metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
-            metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
-            metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
-
             //添加元数据简介
+            metaData = getMetaData(metaDataDetailResponseDto);
             newMetaDataList.add(metaData);
             ++metaDataSize;
             if (metaDataSize % sysConfig.getBatchSize() == 0) {
@@ -103,13 +82,8 @@ public class SyncMetaDataTask {
 
             List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
             for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
-                metaDataDetail = new MetaDataDetails();
-                metaDataDetail.setMetaDataId(metaData.getMetaDataId());
-                metaDataDetail.setColumnIndex(metaDataColumnDetailDto.getIndex());
-                metaDataDetail.setColumnName(metaDataColumnDetailDto.getName());
-                metaDataDetail.setColumnType(metaDataColumnDetailDto.getType());
-                metaDataDetail.setColumnSize((long) metaDataColumnDetailDto.getSize());
-                metaDataDetail.setColumnDesc(metaDataColumnDetailDto.getComment());
+                assert metaData != null;
+                metaDataDetail = getMetaDataDetails(metaData, metaDataColumnDetailDto);
 
                 //添加元数据详情
                 newMetaDataDetailsList.add(metaDataDetail);
@@ -137,5 +111,51 @@ public class SyncMetaDataTask {
             log.info("元数据详情更新{}条数据结束一共用时{}秒", newMetaDataDetailsList.size(), DateUtil.currentSeconds() - begin);
         }
         log.info("元数据信息同步结束>>>>");
+    }
+
+    private MetaDataDetails getMetaDataDetails(MetaData metaData, MetaDataColumnDetailDto metaDataColumnDetailDto) {
+        MetaDataDetails metaDataDetail;
+        metaDataDetail = new MetaDataDetails();
+        metaDataDetail.setMetaDataId(metaData.getMetaDataId());
+        metaDataDetail.setColumnIndex(metaDataColumnDetailDto.getIndex());
+        metaDataDetail.setColumnName(metaDataColumnDetailDto.getName());
+        metaDataDetail.setColumnType(metaDataColumnDetailDto.getType());
+        metaDataDetail.setColumnSize((long) metaDataColumnDetailDto.getSize());
+        metaDataDetail.setColumnDesc(metaDataColumnDetailDto.getComment());
+        return metaDataDetail;
+    }
+
+    private MetaData getMetaData(MetaDataDetailResponseDto metaDataDetailResponseDto) {
+        MetaData metaData;
+        metaData = new MetaData();
+        metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
+        metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
+        metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
+        //元数据id为空不入库
+        if (StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())) {
+            return null;
+        }
+        metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
+        metaData.setFileId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getOriginId());
+        metaData.setDataName(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getTableName());
+        metaData.setDataDesc(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDesc());
+        metaData.setFilePath(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFilePath());
+        metaData.setRows(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getRows());
+        metaData.setColumns(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getColumns());
+        metaData.setSize(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getSize());
+        metaData.setFileType(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFileType().byteValue());
+        metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
+        metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
+        metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
+        return metaData;
+    }
+
+    private void delOldData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
+        if (metaDataDetailResponseDtoList.size() > 0) {
+            //删除元数据
+            metaDataService.truncate();
+            //删除元数据详情
+            metaDataDetailsService.truncate();
+        }
     }
 }

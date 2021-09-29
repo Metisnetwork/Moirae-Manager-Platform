@@ -29,6 +29,9 @@ public class ListenJobTask {
     @Resource
     private RedisUtil redisUtil;
 
+    /**
+     * 注意：测试时候当注释定时任务时，同步注释掉SyncJobStatusTask任务，否则可能出现数据状态不一致
+     */
     @Scheduled(fixedDelay = 30*1000, initialDelay = 15*1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
@@ -51,7 +54,7 @@ public class ListenJobTask {
             log.error("------redis message edit queue jobId:" + job.getId());
             jobManager.startJob(job);
         }
-        //获取暂停ob列表
+        //获取暂停job列表
         size = redisUtil.listSize(SysConstant.JOB_PAUSE_QUEUE);
         for (int i = 0; i < size; i++) {
             String jobJson = redisUtil.listRightPop(SysConstant.JOB_PAUSE_QUEUE);

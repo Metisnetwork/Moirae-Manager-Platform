@@ -73,6 +73,7 @@ public class PublishTaskJob implements Job {
         workflowDto.setStartNode(1);
         workflowDto.setEndNode(workFlow.getNodeNumber());
         workflowDto.setJobFlg(true);
+        workflowDto.setJobId(subJob.getId());
         workflowService.start(workflowDto);
         log.info("处理作业,作业id:{},工作流id:{},记录子作业表id:{},此工作流一共有{}个节点,当前运行第{}个节点", jobId, workflowId, subJob.getId(), workflowDto.getEndNode(), workflowDto.getStartNode());
     }

@@ -489,7 +489,7 @@ CREATE TABLE `t_sub_job_node` (
   `sub_job_id` bigint(20) DEFAULT NULL COMMENT '子作业表id',
   `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
   `node_step` int(11) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
-  `run_status` tinyint(4) DEFAULT NULL COMMENT '运行状态:0-运行失败, 1-运行成功',
+  `run_status` tinyint(4) DEFAULT NULL COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',
   `task_id` varchar(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
   `run_msg` varchar(256) DEFAULT NULL COMMENT '任务处理结果描述',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',

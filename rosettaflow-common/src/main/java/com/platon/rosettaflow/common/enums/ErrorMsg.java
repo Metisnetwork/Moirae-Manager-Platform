@@ -94,6 +94,9 @@ public enum ErrorMsg {
     JOB_RUNNING_CACHE_CLEAR_ERROR("作业执行缓存清理错误", "Job run cache clear error"),
     SUB_JOB_NOT_RUNNING("子作业非运行状态中不能暂停", "Sub job is not running can not stop"),
     SUB_JOB_NOT_STOP("子作业非暂停状态中不能重启", "Sub job is not stop can not start"),
+    SUB_JOB_TERMINATE_NET_PROCESS_ERROR("子作业终止失败", "sub job terminated failed"),
+    SUB_JOB_RESTART_FAILED_ERROR("子作业重启失败", "sub job restart failed"),
+
 
     /**
      * 机构

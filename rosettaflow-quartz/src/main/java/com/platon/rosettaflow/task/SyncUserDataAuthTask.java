@@ -2,13 +2,16 @@ package com.platon.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.MetaDataExpireStatusEnum;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
+import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
 import com.platon.rosettaflow.service.IUserMetaDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +23,18 @@ import java.util.List;
 /**
  * @author hudenian
  * @date 2021/8/25
- * @description 同步用户元数据授权列列表
+ * @description 同步用户元数据授权列列表（当用户对元数据做授权申请后，redis记录设置已申请，此定时任务判断有待申请记录就启动同步，否则不同步）
  */
 @Slf4j
 @Component
+@Profile({"prod", "test"})
 public class SyncUserDataAuthTask {
 
     @Resource
     private SysConfig sysConfig;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Resource
     private GrpcAuthService grpcAuthService;
@@ -35,16 +42,26 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-//    @Scheduled(fixedDelay = 7200 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 200 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
-
+        //如果用户没有申请过，则不同步
+        if (null == redisUtil.get(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY)) {
+            return;
+        }
         log.info("用户申请授权元数据信息同步开始>>>>");
         long begin;
-        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getMetaDataAuthorityList();
+
+        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
+        try {
+            metaDataAuthorityDtoList = grpcAuthService.getMetaDataAuthorityList();
+        } catch (Exception e) {
+            log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
+            return;
+        }
 
         //授权数据同步成功，删除旧数据
         if (metaDataAuthorityDtoList.size() > 0) {
@@ -59,45 +76,7 @@ public class SyncUserDataAuthTask {
         int userMetaDataSize = 0;
 
         for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
-            userMetaData = new UserMetaData();
-            userMetaData.setMetaDataId(authorityDto.getMetaDataAuthorityDto().getMetaDataId());
-            userMetaData.setIdentityId(authorityDto.getMetaDataAuthorityDto().getOwner().getIdentityId());
-            userMetaData.setIdentityName(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeName());
-            userMetaData.setNodeId(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeId());
-
-            String address;
-            try {
-                address = AddressChangeUtils.convert0xAddress(authorityDto.getUser());
-                userMetaData.setAddress(address);
-            } catch (Exception e) {
-                log.error("钱包地址{}非法", authorityDto.getUser(), e);
-                userMetaData.setAddress(authorityDto.getUser());
-            }
-
-            userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
-            //授权次数
-            Integer times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();
-            if (null != times && times > 0) {
-                userMetaData.setAuthValue(times);
-            }
-            //授权开始时间
-            Long authBeginTime = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getStartAt();
-            if (null != authBeginTime && authBeginTime > 0) {
-                userMetaData.setAuthBeginTime(DateUtil.date(authBeginTime));
-            }
-
-            //授权结束时间
-            Long authEndTime = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getEndAt();
-            if (null != authEndTime && authEndTime > 0) {
-                userMetaData.setAuthEndTime(DateUtil.date(authEndTime));
-            }
-
-            int auditStatus = authorityDto.getAuditMetaDataOption();
-            userMetaData.setAuthStatus((byte) auditStatus);
-            userMetaData.setApplyTime(DateUtil.date(authorityDto.getApplyAt()));
-            userMetaData.setAuditTime(DateUtil.date(authorityDto.getAuditAt()));
-            userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire() ? MetaDataExpireStatusEnum.expire.getValue() : MetaDataExpireStatusEnum.un_expire.getValue());
-            userMetaData.setUsedTimes((long) authorityDto.getMetadataUsedQuoDto().getUsedTimes());
+            userMetaData = getUserMetaData(authorityDto);
 
             userMetaDataList.add(userMetaData);
             ++userMetaDataSize;
@@ -116,5 +95,52 @@ public class SyncUserDataAuthTask {
             log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
         }
         log.info("用户申请授权元数据信息同步结束>>>>");
+
+        //清除redis中用户元数据同步标识
+        redisUtil.delete(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
+    }
+
+    private UserMetaData getUserMetaData(GetMetaDataAuthorityDto authorityDto) {
+        UserMetaData userMetaData;
+        userMetaData = new UserMetaData();
+        userMetaData.setMetaDataId(authorityDto.getMetaDataAuthorityDto().getMetaDataId());
+        userMetaData.setIdentityId(authorityDto.getMetaDataAuthorityDto().getOwner().getIdentityId());
+        userMetaData.setIdentityName(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeName());
+        userMetaData.setNodeId(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeId());
+
+        String address;
+        try {
+            address = AddressChangeUtils.convert0xAddress(authorityDto.getUser());
+            userMetaData.setAddress(address);
+        } catch (Exception e) {
+            log.error("钱包地址{}非法", authorityDto.getUser(), e);
+            userMetaData.setAddress(authorityDto.getUser());
+        }
+
+        userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
+        //授权次数
+        Integer times = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getTimes();
+        if (null != times && times > 0) {
+            userMetaData.setAuthValue(times);
+        }
+        //授权开始时间
+        Long authBeginTime = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getStartAt();
+        if (null != authBeginTime && authBeginTime > 0) {
+            userMetaData.setAuthBeginTime(DateUtil.date(authBeginTime));
+        }
+
+        //授权结束时间
+        Long authEndTime = authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getEndAt();
+        if (null != authEndTime && authEndTime > 0) {
+            userMetaData.setAuthEndTime(DateUtil.date(authEndTime));
+        }
+
+        int auditStatus = authorityDto.getAuditMetaDataOption();
+        userMetaData.setAuthStatus((byte) auditStatus);
+        userMetaData.setApplyTime(DateUtil.date(authorityDto.getApplyAt()));
+        userMetaData.setAuditTime(DateUtil.date(authorityDto.getAuditAt()));
+        userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire() ? MetaDataExpireStatusEnum.expire.getValue() : MetaDataExpireStatusEnum.un_expire.getValue());
+        userMetaData.setUsedTimes((long) authorityDto.getMetadataUsedQuoDto().getUsedTimes());
+        return userMetaData;
     }
 }

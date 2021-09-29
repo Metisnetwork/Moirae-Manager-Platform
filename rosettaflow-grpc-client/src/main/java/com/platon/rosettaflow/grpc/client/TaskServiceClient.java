@@ -314,7 +314,7 @@ public class TaskServiceClient {
                     .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
                     .setKeyColumn(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getKeyColumn());
             for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().size(); j++) {
-                taskMetaDataDeclareBuilder.setSelectedColumns(j, dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
+                taskMetaDataDeclareBuilder.addSelectedColumns(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
             }
 
             TaskDataSupplierDeclare taskDataSupplierDeclare = TaskDataSupplierDeclare.newBuilder()
@@ -322,12 +322,12 @@ public class TaskServiceClient {
                     .setMetadataInfo(taskMetaDataDeclareBuilder.build())
                     .build();
 
-            publishTaskDeclareRequestBuilder.setDataSuppliers(i, taskDataSupplierDeclare);
+            publishTaskDeclareRequestBuilder.addDataSuppliers(taskDataSupplierDeclare);
         }
 
         //power_party_ids
         for (int i = 0; i < taskDto.getPowerPartyIds().size(); i++) {
-            publishTaskDeclareRequestBuilder.setPowerPartyIds(i, taskDto.getPowerPartyIds().get(i));
+            publishTaskDeclareRequestBuilder.addPowerPartyIds(taskDto.getPowerPartyIds().get(i));
         }
 
         //receivers
@@ -341,7 +341,7 @@ public class TaskServiceClient {
                     .setNodeId(receiverDto.getNodeId())
                     .setIdentityId(receiverDto.getIdentityId())
                     .build();
-            publishTaskDeclareRequestBuilder.setReceivers(i, receiver);
+            publishTaskDeclareRequestBuilder.addReceivers(receiver);
         }
 
         //任务所需资源声明

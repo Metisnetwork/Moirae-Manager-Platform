@@ -49,7 +49,7 @@ public class JobManager {
      */
     @PostConstruct
     public void init() {
-        if (sysConfig.isMasterNode()) {
+        if (false) {
             //服务启动，清除缓存作业消息队列
             boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
             if(!isDelete){

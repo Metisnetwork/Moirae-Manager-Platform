@@ -64,14 +64,15 @@ public class AuthServiceClient {
             if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null || requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
             }
-        } else if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == MetaDataUsageEnum.TIMES.getValue()) {
+            metaDataUsageBuilder.setStartAt(requestDto.getAuth().getMetaDataUsageDto().getStartAt());
+            metaDataUsageBuilder.setEndAt(requestDto.getAuth().getMetaDataUsageDto().getEndAt());
+        } else if (requestDto.getAuth().getMetaDataUsageDto().getUseType() == MetaDataUsageEnum.TIMES.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getTimes() == null) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
             }
+            metaDataUsageBuilder.setTimes(requestDto.getAuth().getMetaDataUsageDto().getTimes());
         }
-        metaDataUsageBuilder.setStartAt(requestDto.getAuth().getMetaDataUsageDto().getStartAt());
-        metaDataUsageBuilder.setEndAt(requestDto.getAuth().getMetaDataUsageDto().getEndAt());
-        metaDataUsageBuilder.setTimes(requestDto.getAuth().getMetaDataUsageDto().getTimes());
+
         metaDataAuthorityBuilder.setUsageRule(metaDataUsageBuilder);
         applyMetaDataAuthorityRequest.setAuth(metaDataAuthorityBuilder.build());
 

@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.vo.workflow.node;
 
-import com.platon.rosettaflow.common.constants.AlgorithmConstant;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -56,18 +55,19 @@ public class NodeAlgorithmVo {
     @ApiModelProperty(value = "所需的核数 (单位: 个)")
     private Integer costCpu;
 
-    @ApiModelProperty(value = "GPU核数(单位：核)")
-    private Integer costGpu;
-
     @ApiModelProperty(value = "所需的带宽 (单位: bps)")
     private Long costBandwidth;
+
+    @ApiModelProperty(value = "所需的运行时长 (单位: h)")
+    private Long runTime;
+
 
 
     /** 展示时处理内存单位 */
     public Long getCostMem() {
         return new BigDecimal(this.costMem)
-                .divide(BigDecimal.valueOf(AlgorithmConstant.INT_1024
-                        * AlgorithmConstant.INT_1024 * AlgorithmConstant.INT_1024))
+                .divide(BigDecimal.valueOf(SysConstant.INT_1024
+                        * SysConstant.INT_1024 * SysConstant.INT_1024))
                 .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
                 .longValue();
     }
@@ -75,7 +75,15 @@ public class NodeAlgorithmVo {
     /** 展示时处理带宽单位 */
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
-                .divide(BigDecimal.valueOf(AlgorithmConstant.INT_1000 * AlgorithmConstant.INT_1000))
+                .divide(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
+                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .longValue();
+    }
+
+    /** 保存时最长运行时间单位处理 （换算为毫秒存库）*/
+    public Long getRunTime() {
+        return new BigDecimal(this.runTime)
+                .divide(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000))
                 .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
                 .longValue();
     }

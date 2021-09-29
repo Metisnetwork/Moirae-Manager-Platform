@@ -1,5 +1,7 @@
 package com.platon.rosettaflow.vo.job;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,9 +22,11 @@ public class SubJobVo {
     private Byte subJobStatus;
 
     @ApiModelProperty("开始时间")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date beginTime;
 
     @ApiModelProperty("结束时间")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date endTime;
 
     @ApiModelProperty("运行时长")
