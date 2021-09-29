@@ -15,6 +15,11 @@ public class SysConstant {
     public static final int INT_3 = 3;
     public static final int INT_4 = 3;
 
+    /** 换算单位 */
+    public static final int INT_1024 = 1024;
+    public static final int INT_1000 = 1000;
+    public static final int INT_3600 = 3600;
+
     /**
      * 请求头token key值
      */

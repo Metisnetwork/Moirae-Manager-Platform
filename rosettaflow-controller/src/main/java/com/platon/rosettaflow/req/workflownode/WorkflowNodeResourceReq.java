@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.req.workflownode;
 
-import com.platon.rosettaflow.common.constants.AlgorithmConstant;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,7 +34,7 @@ public class WorkflowNodeResourceReq {
     @NotNull(message = "{node.cost.bandwidth.notNull}")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "工作流节点运行时长")
+    @ApiModelProperty(value = "工作流节点运行时长(单位：h)")
     private Long runTime;
 
     /**
@@ -44,8 +43,8 @@ public class WorkflowNodeResourceReq {
     @SuppressWarnings("unused")
     public Long getCostMem() {
         return new BigDecimal(this.costMem)
-                .multiply(BigDecimal.valueOf(AlgorithmConstant.INT_1024
-                        * AlgorithmConstant.INT_1024 * AlgorithmConstant.INT_1024))
+                .multiply(BigDecimal.valueOf(SysConstant.INT_1024
+                        * SysConstant.INT_1024 * SysConstant.INT_1024))
                 .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
                 .longValue();
     }
@@ -56,7 +55,15 @@ public class WorkflowNodeResourceReq {
     @SuppressWarnings("unused")
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
-                .multiply(BigDecimal.valueOf(AlgorithmConstant.INT_1000 * AlgorithmConstant.INT_1000))
+                .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
+                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .longValue();
+    }
+
+    /** 保存时最长运行时间单位处理 （换算为毫秒存库）*/
+    public Long getRunTime() {
+        return new BigDecimal(this.runTime)
+                .multiply(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000))
                 .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
                 .longValue();
     }
