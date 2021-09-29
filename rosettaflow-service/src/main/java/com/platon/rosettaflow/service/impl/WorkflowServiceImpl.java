@@ -92,6 +92,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    public List<Workflow> queryListById(List<Long> idList) {
+        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(Workflow::getId, idList);
+        queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
+    }
+    @Override
     public List<Workflow> queryListByProjectId(List<Long> projectIdList) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
@@ -155,11 +162,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = this.queryWorkflowDetail(id);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        // 物理删除工作流节点
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
-        if (workflowNodeList.size() > 0) {
-            workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(node.getId()));
-        }
+        // 删除当前工作流所有节点数据
+        this.deleteWorkflowAllNodeData(id);
         // 逻辑删除工作流，并修改版本标识
         workflow.setId(id);
         workflow.setDelVersion(id);
@@ -175,23 +179,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         // 转换id类型
         List<Long> idsList = convertIdType(ids);
-        List<Workflow> workflowList = this.listByIds(idsList);
+        List<Workflow> workflowList = this.queryListById(idsList);
         if (workflowList.size() > 0) {
-            workflowList.forEach(workflow -> {
-                // 校验是否有编辑权限
-                checkEditPermission(workflow.getProjectId());
-                // 删除项目中的工作流相关数据
-                List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
-                if (workflowNodeList.size() > 0) {
-                    workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(node.getId()));
-                }
-            });
+            // 校验是否有编辑权限
+            workflowList.forEach(workflow -> this.checkEditPermission(workflow.getProjectId()));
+            // 并行删除工作流中所有节点数据
+            workflowList.parallelStream().forEach(workflow -> this.deleteWorkflowAllNodeData(workflow.getId()));
         }
+        // 逻辑删除工作流，并修改版本标识
         if (idsList.size() > 0) {
             List<Workflow> list = new ArrayList<>();
             idsList.forEach(id -> {
                 Workflow workflow = new Workflow();
-                // 逻辑删除工作流，并修改版本标识
                 workflow.setId(id);
                 workflow.setDelVersion(id);
                 workflow.setStatus((byte) 0);

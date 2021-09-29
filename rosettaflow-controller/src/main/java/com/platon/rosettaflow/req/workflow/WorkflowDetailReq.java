@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.req.workflow;
 
-import com.platon.rosettaflow.req.workflownode.WorkflowNodeReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

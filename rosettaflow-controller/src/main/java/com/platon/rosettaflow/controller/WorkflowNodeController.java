@@ -6,8 +6,8 @@ import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.req.workflow.WorkflowDetailReq;
 import com.platon.rosettaflow.req.workflow.node.*;
-import com.platon.rosettaflow.req.workflownode.WorkflowNodeReq;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
+import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.workflow.node.*;
 import io.swagger.annotations.Api;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -73,55 +72,10 @@ public class WorkflowNodeController {
 
     @PostMapping("save")
     @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
-    public ResponseVo<?> save(@RequestBody @Validated WorkflowDetailReq workflowDetailReq) {
-        List<WorkflowNodeDto> workflowNodeDtoList = convertSaveReq(workflowDetailReq.getWorkflowNodeReqList());
-        workflowNodeService.saveWorkflowAllNodeData(workflowDetailReq.getWorkflowId(),workflowNodeDtoList);
+    public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
+        List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(workflowAllNodeReq.getWorkflowNodeReqList());
+        workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList);
         return ResponseVo.createSuccess();
-    }
-
-    /** 转换保存请求参数 */
-    private List<WorkflowNodeDto> convertSaveReq(List<WorkflowNodeReq> workflowNodeReqList) {
-        if(workflowNodeReqList.size() == 0) {
-            return new ArrayList<>();
-        }
-        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
-        workflowNodeReqList.forEach(workflowNodeReq -> {
-            WorkflowNodeDto workflowNodeDto = new WorkflowNodeDto();
-            // 节点输入
-            if (workflowNodeReq.getWorkflowNodeInputReqList().size() > 0) {
-                workflowNodeDto.setWorkflowNodeInputList(BeanUtil.copyToList(
-                        workflowNodeReq.getWorkflowNodeInputReqList(), WorkflowNodeInput.class));
-            }
-            // 节点输出
-            if (workflowNodeReq.getWorkflowNodeOutputReqList().size() > 0) {
-                workflowNodeDto.setWorkflowNodeOutputList(BeanUtil.copyToList(
-                        workflowNodeReq.getWorkflowNodeOutputReqList(), WorkflowNodeOutput.class));
-            }
-            // 节点算法代码
-            if (Objects.nonNull(workflowNodeReq.getWorkflowNodeCodeReq())) {
-                workflowNodeDto.setWorkflowNodeCode(BeanUtil.toBean(
-                        workflowNodeReq.getWorkflowNodeCodeReq(), WorkflowNodeCode.class));
-            }
-            // 节点环境资源
-            if (Objects.nonNull(workflowNodeReq.getWorkflowNodeResourceReq())) {
-                workflowNodeDto.setWorkflowNodeResource(BeanUtil.toBean(
-                        workflowNodeReq.getWorkflowNodeResourceReq(), WorkflowNodeResource.class));
-            }
-            // 节点输入变量
-            if (workflowNodeReq.getWorkflowNodeVariableReqList().size() > 0) {
-                workflowNodeDto.setWorkflowNodeVariableList(BeanUtil.copyToList(
-                        workflowNodeReq.getWorkflowNodeVariableReqList(), WorkflowNodeVariable.class));
-            }
-            // 工作流id
-            workflowNodeDto.setWorkflowId(workflowNodeReq.getWorkflowId());
-            // 节点算法id
-            workflowNodeDto.setAlgorithmId(workflowNodeReq.getAlgorithmId());
-            // 节点名称
-            workflowNodeDto.setNodeName(workflowNodeReq.getNodeName());
-            // 节点步骤
-            workflowNodeDto.setNodeStep(workflowNodeReq.getNodeStep());
-        });
-        return workflowNodeDtoList;
     }
 
     @PostMapping("clear")

@@ -37,6 +37,7 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
     public List<Organization> getByIdentityIds(Object[] identityArr) {
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getIdentityId, identityArr);
+        wrapper.in(Organization::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
 }

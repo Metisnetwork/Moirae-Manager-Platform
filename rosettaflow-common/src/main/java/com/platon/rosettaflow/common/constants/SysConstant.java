@@ -16,6 +16,12 @@ public class SysConstant {
     public static final int INT_4 = 3;
 
     /**
+     * 字符串常量
+     */
+    public static final String STR_0 = "0";
+    public static final String STR_1 = "1";
+
+    /**
      * 请求头token key值
      */
     public static final String HEADER_TOKEN_KEY = "Access-Token";
