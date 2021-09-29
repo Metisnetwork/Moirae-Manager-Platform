@@ -113,7 +113,7 @@ public class WorkflowController {
         if (SysConstant.STR_1.equals(startWorkflowReq.getSaveFlag())) {
             List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(
                     startWorkflowReq.getWorkflowNodeReqList());
-            workflowNodeService.saveWorkflowAllNodeData(startWorkflowReq.getWorkflowId(), workflowNodeDtoList);
+            workflowNodeService.saveWorkflowAllNodeData(startWorkflowReq.getWorkflowId(), workflowNodeDtoList, Boolean.TRUE);
         }
 
         //启动工作流

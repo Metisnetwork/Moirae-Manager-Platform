@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
-import com.platon.rosettaflow.req.workflow.WorkflowDetailReq;
 import com.platon.rosettaflow.req.workflow.node.*;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.utils.ConvertUtils;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 工作流节点管理关接口
@@ -74,7 +72,7 @@ public class WorkflowNodeController {
     @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
     public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
         List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(workflowAllNodeReq.getWorkflowNodeReqList());
-        workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList);
+        workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList, Boolean.FALSE);
         return ResponseVo.createSuccess();
     }
 

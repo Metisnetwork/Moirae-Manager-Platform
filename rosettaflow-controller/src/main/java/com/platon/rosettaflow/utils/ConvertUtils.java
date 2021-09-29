@@ -51,7 +51,7 @@ public class ConvertUtils {
 
     /** 转换保存请求参数 */
     public static List<WorkflowNodeDto> convertSaveReq(List<WorkflowNodeReq> workflowNodeReqList) {
-        if(workflowNodeReqList.size() == 0) {
+        if(null == workflowNodeReqList || workflowNodeReqList.size() == 0) {
             return new ArrayList<>();
         }
         List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();

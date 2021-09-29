@@ -26,8 +26,9 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * 保存工作流所有节点数据
      * @param workflowId  工作流id
      * @param workflowNodeDtoList 工作流节点列表
+     * @param callFlag 是否是保存接口调用（保存节点调用时，无需校验输入输出数据）
      */
-    void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
+    void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList, boolean callFlag);
 
     /**
      * 清空工作流节点

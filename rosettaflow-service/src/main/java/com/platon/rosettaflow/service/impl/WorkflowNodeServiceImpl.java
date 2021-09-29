@@ -110,7 +110,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList) {
+    public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList, boolean callFlag) {
+        if (null == workflowNodeDtoList || workflowNodeDtoList.size() == 0) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
+        }
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
@@ -143,9 +146,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 保存工作流节点
             Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, count, workflowNodeDtoList.size());
             // 保存工作流节点输入
-            workflowNodeInputList = this.saveWorkflowNodeInput(workflowNodeId, workflowNodeDto);
+            workflowNodeInputList = this.saveWorkflowNodeInput(workflowNodeId, workflowNodeDto, callFlag);
             // 保存工作流节点输出
-            workflowNodeOutputList = this.saveWorkflowNodeOutput(workflowNodeId, workflowNodeDto, workflowNodeInputList);
+            workflowNodeOutputList = this.saveWorkflowNodeOutput(workflowNodeId, workflowNodeDto, workflowNodeInputList, callFlag);
             // 添加新的工作流节点代码
             if (Objects.nonNull(workflowNodeDto.getWorkflowNodeCode())) {
                 workflowNodeDto.getWorkflowNodeCode().setWorkflowNodeId(workflowNodeId);
@@ -182,10 +185,14 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     /** 保存工作流节点输入 */
-    private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
+    private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto, boolean callFlag) {
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
+        // 校验输入数据是否存在
         if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
+            if (callFlag) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
+            }
+            return new ArrayList<>();
         }
         String[] identityIdArr = new String[workflowNodeInputList.size()];
         // 校验组织信息
@@ -211,12 +218,15 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     /** 保存工作流节点输出数据 */
     private List<WorkflowNodeOutput> saveWorkflowNodeOutput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto,
-                                                            List<WorkflowNodeInput> workflowNodeInputList){
+                                                            List<WorkflowNodeInput> workflowNodeInputList, boolean callFlag){
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeDto.getWorkflowNodeOutputList();
         if (null == workflowNodeOutputList || workflowNodeOutputList.size() == 0) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
+            if (callFlag) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
+            }
+            return new ArrayList<>();
         }
-        //任务里面定义的 (p0 -> pN 方 ...) 与输入保持一致
+        // 任务里面定义的 (p0 -> pN 方 ...) 与输入保持一致
         Map<String, String> partyIdMap = workflowNodeInputList.stream().collect(
                 Collectors.toMap(WorkflowNodeInput::getIdentityId, WorkflowNodeInput::getPartyId));
         // 设置输出节点id和任务方
@@ -227,7 +237,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         return workflowNodeOutputList;
     }
 
-    /** 保存工作流节点输入变量*/
+    /** 保存工作流节点输入变量 */
     private List<WorkflowNodeVariable> saveWorkflowNodeVariable(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
         List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeDto.getWorkflowNodeVariableList();
         if (null == workflowNodeVariableList || workflowNodeVariableList.size() == 0) {
