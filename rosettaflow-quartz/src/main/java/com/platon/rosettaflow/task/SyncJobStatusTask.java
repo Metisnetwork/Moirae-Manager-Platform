@@ -18,7 +18,7 @@ public class SyncJobStatusTask {
     @Resource
     private JobManager jobManager;
 
-    //@Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 60 * 1000)
+    @Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 60 * 1000)
     public void run() {
         jobManager.finishJobBatchWithTask();
     }

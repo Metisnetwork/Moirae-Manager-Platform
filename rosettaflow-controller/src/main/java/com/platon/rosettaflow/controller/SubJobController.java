@@ -45,7 +45,7 @@ public class SubJobController {
     }
 
     @PostMapping("action")
-    @ApiOperation(value = "操作作业", notes = "操作作业")
+    @ApiOperation(value = "操作子作业", notes = "操作子作业")
     public ResponseVo<?> actionJob(@RequestBody @Valid ActionJobReq actionSubJobReq) {
         if (actionSubJobReq.getActionType() == JobActionStatusEnum.PAUSE.getValue()) {
             subJobService.pause(actionSubJobReq.getId());

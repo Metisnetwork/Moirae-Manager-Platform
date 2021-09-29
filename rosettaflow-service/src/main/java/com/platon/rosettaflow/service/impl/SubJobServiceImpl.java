@@ -73,7 +73,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         if(subJob.getSubJobStatus() != SubJobStatusEnum.RUNNING.getValue()){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_RUNNING.getMsg());
         }
-        //暂停子作业
+        //停止子作业
         TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(subJob);
         TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
         if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
