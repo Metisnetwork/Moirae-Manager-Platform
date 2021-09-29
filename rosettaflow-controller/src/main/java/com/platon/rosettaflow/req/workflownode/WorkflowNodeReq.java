@@ -19,9 +19,6 @@ import java.util.List;
 @ApiModel(value = "工作流详情请求对象")
 public class WorkflowNodeReq {
 
-    @ApiModelProperty(value = "工作流节点ID")
-    private Long id;
-
     @ApiModelProperty(value = "工作流ID")
     private Long workflowId;
 
@@ -39,9 +36,6 @@ public class WorkflowNodeReq {
     @Positive(message = "{workflow.node.step.positive}")
     private Integer nodeStep;
 
-    @ApiModelProperty(value = "下一个节点序号")
-    private Integer nextNodeStep;
-
     @ApiModelProperty(value = "输入请求列表", required = true)
     private List<WorkflowNodeInputReq> workflowNodeInputReqList;
 
@@ -55,7 +49,7 @@ public class WorkflowNodeReq {
     private WorkflowNodeResourceReq workflowNodeResourceReq;
 
     @ApiModelProperty(value = "工作流节点输入变量请求对象")
-    private WorkflowNodeVariableReq workflowNodeVariableReq;
+    private List<WorkflowNodeVariableReq> workflowNodeVariableReqList;
 
 
 }

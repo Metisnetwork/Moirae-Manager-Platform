@@ -7,9 +7,9 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
+ * 工作流节点数据对象
  * @author hudenian
  * @date 2021/8/30
- * @description 工作流节点数据对象
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -40,5 +40,5 @@ public class WorkflowNodeDto extends WorkflowNode {
     /**
      * 工作流节点输入变量请求对象
      */
-    private WorkflowNodeVariable workflowNodeVariable;
+    private List<WorkflowNodeVariable> workflowNodeVariableList;
 }
