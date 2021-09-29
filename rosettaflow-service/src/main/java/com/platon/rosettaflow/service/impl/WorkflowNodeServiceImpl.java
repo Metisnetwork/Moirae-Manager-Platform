@@ -255,6 +255,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowService.updateById(workflow);
     }
 
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void deleteWorkflowNode(Long id) {
+        removeNodeData(Collections.singletonList(id));
+    }
+
     /**
      * 物理删除工作流节点（暂时保留，二期去掉此处代码）
      */
