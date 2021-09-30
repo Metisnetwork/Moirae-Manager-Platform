@@ -356,7 +356,9 @@ public class TaskServiceClient {
         //  计算合约代码
         publishTaskDeclareRequestBuilder.setCalculateContractCode(taskDto.getCalculateContractCode());
         //  数据分片合约代码
-        publishTaskDeclareRequestBuilder.setDataSplitContractCode(taskDto.getDataSplitContractCode());
+        if(null !=taskDto.getDataSplitContractCode()){
+            publishTaskDeclareRequestBuilder.setDataSplitContractCode(taskDto.getDataSplitContractCode());
+        }
         //  合约调用的额外可变入参 (json 字符串, 根据算法来)
         publishTaskDeclareRequestBuilder.setContractExtraParams(taskDto.getContractExtraParams());
         //发起任务的账户的签名
