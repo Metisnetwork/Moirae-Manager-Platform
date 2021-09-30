@@ -169,6 +169,9 @@ public class AuthServiceClient {
             getMetaDataAuthorityDto.setApplyAt(getMetadataAuthorityListResponse.getList(i).getApplyAt());
             //审核授权申请的时间 (单位: ms)
             getMetaDataAuthorityDto.setAuditAt(getMetadataAuthorityListResponse.getList(i).getAuditAt());
+            //数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的>)
+            getMetaDataAuthorityDto.setMetadataAuthorityState(getMetadataAuthorityListResponse.getList(i).getStateValue());
+
 
             getMetaDataAuthorityDtoList.add(getMetaDataAuthorityDto);
         }
