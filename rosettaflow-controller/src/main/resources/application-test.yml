@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
-    url: jdbc:mysql://10.10.8.176:3306/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    url: jdbc:mysql://10.10.8.184:3306/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
