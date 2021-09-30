@@ -101,7 +101,7 @@ public class AuthServiceClient {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
 
         Empty empty = Empty.newBuilder().build();
-        GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getMetadataAuthorityList(empty);
+        GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getLocalMetadataAuthorityList(empty);
 
         if (getMetaDataAuthorityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(getMetaDataAuthorityListResponse.getStatus(), getMetaDataAuthorityListResponse.getMsg());
