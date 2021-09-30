@@ -22,7 +22,7 @@ public interface GrpcAuthService {
     ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto);
 
     /**
-     * 获取元数据列表
+     * 查询(本组织)的所有元数据的授权申请及审核结果详情列表
      *
      * @return 元数据列表
      */
@@ -41,4 +41,11 @@ public interface GrpcAuthService {
      * @return 全网组织的身份信息列表
      */
     List<NodeIdentityDto> getIdentityList();
+
+    /**
+     * 查询(全网)的所有元数据的授权申请及审核结果详情列表
+     *
+     * @return 授权申请及审核结果详情列表
+     */
+    List<GetMetaDataAuthorityDto> getMetadataAuthorityListByUser();
 }

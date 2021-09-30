@@ -609,7 +609,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 org.setNodeName(nodeIdentityDto.getNodeName());
                 org.setNodeId(nodeIdentityDto.getNodeId());
                 org.setIdentityId(nodeIdentityDto.getIdentityId());
-                org.setStatus(nodeIdentityDto.getStatus().byteValue());
                 organizationList.add(org);
             }
             organizationService.batchInsert(organizationList);

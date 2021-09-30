@@ -163,12 +163,12 @@ public class AddressChangeUtils {
         System.out.println(convert0xAddress("atp1qpagtcerpdwed2c4ar3hc738m2h98ecrt04c2x"));
 
         List<String> addrList = new ArrayList<>();
-        addrList.add("0x1000000000000000000000000000000000000001");
-        addrList.add("0x1000000000000000000000000000000000000002");
-        addrList.add("0x1000000000000000000000000000000000000003");
+        addrList.add("0x990a168ecee09b8b1abeff3e2b713924e7151f9b");
+        addrList.add("0x5146e07c5157ea8ad00bb0c196e61671f4af85f0");
+        addrList.add("0xc1cdaeecda5744bbe1a97ff3f311353f9455e2f0");
         addrList.add("0x1000000000000000000000000000000000000004");
         addrList.add("0x1000000000000000000000000000000000000005");
         addrList.add("0x0000000000000000000000000000000000000001");
-        addrList.forEach(a -> System.out.println(a + "转换后的钱包地址>>>" + AddressChangeUtils.encode("lax", convertBits(Numeric.hexStringToByteArray(a), 8, 5, true))));
+        addrList.forEach(a -> System.out.println(a + "转换后的钱包地址>>>" + AddressChangeUtils.encode("lat", convertBits(Numeric.hexStringToByteArray(a), 8, 5, true))));
     }
 }

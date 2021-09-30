@@ -67,7 +67,7 @@
 
     <insert id="batchInsert">
         <foreach collection="metaDataList" item="metaData" separator=";">
-            insert into t_meta_data
+            replace into t_meta_data
             <trim prefix="(" suffix=")" suffixOverrides=",">
                 <if test="metaData.identityId != null">
                     identity_id,
