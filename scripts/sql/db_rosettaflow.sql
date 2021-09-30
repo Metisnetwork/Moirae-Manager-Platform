@@ -89,7 +89,8 @@ CREATE TABLE `t_meta_data` (
    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-   PRIMARY KEY (`id`)
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `UK_META_DATA_ID` (`meta_data_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COMMENT='元数据表';
 
 -- ----------------------------
@@ -108,7 +109,7 @@ CREATE TABLE `t_meta_data_details` (
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY (`meta_data_id`)
+    UNIQUE KEY `UK_META_DATA_COLUMN_ID` (`meta_data_id`,`column_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='元数据列详情表';
 
 -- ----------------------------
