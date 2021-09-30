@@ -122,22 +122,24 @@ CREATE TABLE `t_user_meta_data` (
     `identity_id` varchar(128) DEFAULT NULL COMMENT '资源所属组织的身份标识Id',
     `identity_name` varchar(64) DEFAULT NULL COMMENT '资源所属组织名称',
     `node_id` varchar(256) DEFAULT NULL COMMENT '资源所属组织中调度服务的 nodeId',
-    `address` varchar(64)  NOT NULL COMMENT '用户钱包地址',
-    `auth_type`  tinyint(4) DEFAULT NULL COMMENT '授权方式: 1-按时间, 2-按次数, 3-永久',
+    `address` varchar(64) NOT NULL COMMENT '用户钱包地址',
+    `auth_type` tinyint(4) DEFAULT NULL COMMENT '授权方式: 1-按时间, 2-按次数, 3-永久',
     `auth_value` bigint(20) DEFAULT NULL COMMENT '授权值:按次数单位为（次）',
     `auth_begin_time` datetime DEFAULT NULL COMMENT '授权开始时间',
     `auth_end_time` datetime DEFAULT NULL COMMENT '授权结束时间',
-    `auth_status`  tinyint(4) DEFAULT NULL COMMENT '授权状态: 0-等待审核中, 1-审核通过, 2-审核拒绝',
+    `auth_status` tinyint(4) DEFAULT NULL COMMENT '授权状态: 0-等待审核中, 1-审核通过, 2-审核拒绝',
+    `audit_suggestion` varchar(256) DEFAULT NULL COMMENT '审核意见 ',
     `apply_time` datetime DEFAULT NULL COMMENT '发起授权申请的时间',
     `audit_time` datetime DEFAULT NULL COMMENT '审核授权申请的时间',
-    `expire`  tinyint(4) DEFAULT NULL COMMENT '是否已过期（按时间时需要）: 0-未过期, 1-已过期',
-    `used_times` bigint(20) NOT NULL DEFAULT 0 COMMENT '已经使用的次数(按次数时有效)',
-    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+    `auth_metadata_state` tinyint(4) DEFAULT NULL COMMENT '数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)',
+    `expire` tinyint(4) DEFAULT NULL COMMENT '是否已过期（按时间时需要）: 0-未过期, 1-已过期',
+    `used_times` bigint(20) DEFAULT '0' COMMENT '已经使用的次数(按次数时有效)',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY (`meta_data_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户元数据授权表';
+    KEY `meta_data_id` (`meta_data_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COMMENT='用户元数据授权表';
 
 -- ----------------------------
 -- Table structure for `t_project`
