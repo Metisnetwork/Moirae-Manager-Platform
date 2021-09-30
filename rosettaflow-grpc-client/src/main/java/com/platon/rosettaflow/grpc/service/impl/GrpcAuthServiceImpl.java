@@ -46,5 +46,9 @@ public class GrpcAuthServiceImpl implements GrpcAuthService {
         return authServiceClient.getIdentityList();
     }
 
+    @Override
+    public List<GetMetaDataAuthorityDto> getMetadataAuthorityListByUser() {
+        return authServiceClient.getMetadataAuthorityListByUser();
+    }
 
 }

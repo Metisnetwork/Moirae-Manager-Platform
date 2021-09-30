@@ -58,7 +58,7 @@ public class SyncMetaDataTask {
             return;
         }
         //元数据同步成功，删除旧数据
-        delOldData(metaDataDetailResponseDtoList);
+//        delOldData(metaDataDetailResponseDtoList);
 
         List<MetaData> newMetaDataList = new ArrayList<>();
         List<MetaDataDetails> newMetaDataDetailsList = new ArrayList<>();

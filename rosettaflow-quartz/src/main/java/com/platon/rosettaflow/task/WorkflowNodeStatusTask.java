@@ -50,13 +50,13 @@ public class WorkflowNodeStatusTask {
         if (!sysConfig.isMasterNode()) {
             return;
         }
-        log.info("同步更新工作流节点中待确认任务开始>>>>");
 
         List<WorkflowNode> workflowNodeList = workflowNodeService.getRunningNode(BEFORE_HOUR);
         //如果没有需要同步的数据则不进行同步
         if (workflowNodeList.size() == 0) {
             return;
         }
+        log.info("同步更新工作流节点中待确认任务开始>>>>");
         Map<String, WorkflowNode> workflowNodeMap = workflowNodeList.stream().collect(Collectors.toMap(WorkflowNode::getTaskId, workflowNode -> workflowNode));
         //工作流需要更新为成功的列表
         List<Long> workflowSuccessIds = new ArrayList<>();

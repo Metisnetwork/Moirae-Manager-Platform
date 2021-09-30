@@ -93,7 +93,7 @@ public class AuthServiceClient {
     }
 
     /**
-     * 获取数据授权申请列表
+     * 查询(本组织)的所有元数据的授权申请及审核结果详情列表
      *
      * @return 获取数据授权申请列表
      */
@@ -102,57 +102,73 @@ public class AuthServiceClient {
 
         Empty empty = Empty.newBuilder().build();
         GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getLocalMetadataAuthorityList(empty);
+        return getGetMetaDataAuthorityDtos(getMetaDataAuthorityDtoList, getMetaDataAuthorityListResponse);
+    }
 
-        if (getMetaDataAuthorityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            throw new BusinessException(getMetaDataAuthorityListResponse.getStatus(), getMetaDataAuthorityListResponse.getMsg());
+    /**
+     * 查询(全网)的所有元数据的授权申请及审核结果详情列表
+     *
+     * @return 授权申请及审核结果详情列表
+     */
+    public List<GetMetaDataAuthorityDto> getMetadataAuthorityListByUser() {
+        List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
+
+        Empty empty = Empty.newBuilder().build();
+        GetMetadataAuthorityListResponse getMetadataAuthorityListResponse = authServiceBlockingStub.getGlobalMetadataAuthorityList(empty);
+        return getGetMetaDataAuthorityDtos(getMetaDataAuthorityDtoList, getMetadataAuthorityListResponse);
+    }
+
+    private List<GetMetaDataAuthorityDto> getGetMetaDataAuthorityDtos(List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList, GetMetadataAuthorityListResponse getMetadataAuthorityListResponse) {
+        if (getMetadataAuthorityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            throw new BusinessException(getMetadataAuthorityListResponse.getStatus(), getMetadataAuthorityListResponse.getMsg());
         }
 
         GetMetaDataAuthorityDto getMetaDataAuthorityDto;
         MetaDataAuthorityDto metaDataAuthorityDto;
         NodeIdentityDto owner;
         MetaDataUsageRuleDto metaDataUsageRuleDto;
-        for (int i = 0; i < getMetaDataAuthorityListResponse.getListCount(); i++) {
+        for (int i = 0; i < getMetadataAuthorityListResponse.getListCount(); i++) {
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
 
             owner = new NodeIdentityDto();
-            owner.setNodeName(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeName());
-            owner.setNodeId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeId());
-            owner.setIdentityId(getMetaDataAuthorityListResponse.getList(i).getAuth().getOwner().getIdentityId());
+            owner.setNodeName(getMetadataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeName());
+            owner.setNodeId(getMetadataAuthorityListResponse.getList(i).getAuth().getOwner().getNodeId());
+            owner.setIdentityId(getMetadataAuthorityListResponse.getList(i).getAuth().getOwner().getIdentityId());
 
             metaDataUsageRuleDto = new MetaDataUsageRuleDto();
-            metaDataUsageRuleDto.setUseType(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getUsageTypeValue());
-            metaDataUsageRuleDto.setStartAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getStartAt());
-            metaDataUsageRuleDto.setEndAt(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getEndAt());
-            metaDataUsageRuleDto.setTimes(getMetaDataAuthorityListResponse.getList(i).getAuth().getUsageRule().getTimes());
+            metaDataUsageRuleDto.setUseType(getMetadataAuthorityListResponse.getList(i).getAuth().getUsageRule().getUsageTypeValue());
+            metaDataUsageRuleDto.setStartAt(getMetadataAuthorityListResponse.getList(i).getAuth().getUsageRule().getStartAt());
+            metaDataUsageRuleDto.setEndAt(getMetadataAuthorityListResponse.getList(i).getAuth().getUsageRule().getEndAt());
+            metaDataUsageRuleDto.setTimes(getMetadataAuthorityListResponse.getList(i).getAuth().getUsageRule().getTimes());
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             metaDataAuthorityDto.setOwner(owner);
-            metaDataAuthorityDto.setMetaDataId(getMetaDataAuthorityListResponse.getList(i).getAuth().getMetadataId());
+            metaDataAuthorityDto.setMetaDataId(getMetadataAuthorityListResponse.getList(i).getAuth().getMetadataId());
             metaDataAuthorityDto.setMetaDataUsageDto(metaDataUsageRuleDto);
 
             MetadataUsedQuoDto metadataUsedQuoDto = new MetadataUsedQuoDto();
-            metadataUsedQuoDto.setMetadataUsageType(getMetaDataAuthorityListResponse.getList(i).getUsedQuo().getUsageTypeValue());
-            metadataUsedQuoDto.setExpire(getMetaDataAuthorityListResponse.getList(i).getUsedQuo().getExpire());
-            metadataUsedQuoDto.setUsedTimes(getMetaDataAuthorityListResponse.getList(i).getUsedQuo().getUsedTimes());
+            metadataUsedQuoDto.setMetadataUsageType(getMetadataAuthorityListResponse.getList(i).getUsedQuo().getUsageTypeValue());
+            metadataUsedQuoDto.setExpire(getMetadataAuthorityListResponse.getList(i).getUsedQuo().getExpire());
+            metadataUsedQuoDto.setUsedTimes(getMetadataAuthorityListResponse.getList(i).getUsedQuo().getUsedTimes());
 
             //元数据授权申请Id
-            getMetaDataAuthorityDto.setMetaDataAuthId(getMetaDataAuthorityListResponse.getList(i).getMetadataAuthId());
+            getMetaDataAuthorityDto.setMetaDataAuthId(getMetadataAuthorityListResponse.getList(i).getMetadataAuthId());
             //发起任务的用户的信息 (task是属于用户的)
-            getMetaDataAuthorityDto.setUser(getMetaDataAuthorityListResponse.getList(i).getUser());
+            getMetaDataAuthorityDto.setUser(getMetadataAuthorityListResponse.getList(i).getUser());
             //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
-            getMetaDataAuthorityDto.setUserType((getMetaDataAuthorityListResponse.getList(i).getUserTypeValue()));
+            getMetaDataAuthorityDto.setUserType((getMetadataAuthorityListResponse.getList(i).getUserTypeValue()));
             //元数据使用授权信息
             getMetaDataAuthorityDto.setMetaDataAuthorityDto(metaDataAuthorityDto);
             //审核结果:0-等待审核中 1-审核通过 2-审核拒绝
-            getMetaDataAuthorityDto.setAuditMetaDataOption(getMetaDataAuthorityListResponse.getList(i).getAuditOptionValue());
+            getMetaDataAuthorityDto.setAuditMetaDataOption(getMetadataAuthorityListResponse.getList(i).getAuditOptionValue());
             //审核意见 (允许""字符)
-            getMetaDataAuthorityDto.setAuditSuggestion(getMetaDataAuthorityListResponse.getList(i).getAuditSuggestion());
+            getMetaDataAuthorityDto.setAuditSuggestion(getMetadataAuthorityListResponse.getList(i).getAuditSuggestion());
             //对应数据授权信息中元数据的使用实况
             getMetaDataAuthorityDto.setMetadataUsedQuoDto(metadataUsedQuoDto);
             //发起授权申请的时间 (单位: ms)
-            getMetaDataAuthorityDto.setApplyAt(getMetaDataAuthorityListResponse.getList(i).getApplyAt());
+            getMetaDataAuthorityDto.setApplyAt(getMetadataAuthorityListResponse.getList(i).getApplyAt());
             //审核授权申请的时间 (单位: ms)
-            getMetaDataAuthorityDto.setAuditAt(getMetaDataAuthorityListResponse.getList(i).getAuditAt());
+            getMetaDataAuthorityDto.setAuditAt(getMetadataAuthorityListResponse.getList(i).getAuditAt());
 
             getMetaDataAuthorityDtoList.add(getMetaDataAuthorityDto);
         }

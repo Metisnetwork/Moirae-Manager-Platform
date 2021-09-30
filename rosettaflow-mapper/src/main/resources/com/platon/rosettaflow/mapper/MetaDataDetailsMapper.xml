@@ -23,7 +23,7 @@
 
     <insert id="batchInsert">
         <foreach collection="metaDataDetailsList" item="metaDataDetails" separator=";">
-            insert into t_meta_data_details
+            replace into t_meta_data_details
             <trim prefix="(" suffix=")" suffixOverrides=",">
                 <if test="metaDataDetails.metaDataId != null">
                     meta_data_id,
