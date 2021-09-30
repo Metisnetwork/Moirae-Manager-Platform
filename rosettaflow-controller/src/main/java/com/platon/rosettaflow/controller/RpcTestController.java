@@ -68,15 +68,15 @@ public class RpcTestController {
     public ResponseVo<List<MetaDataDetailResponseDto>> getGlobalMetadataDetailList() {
         log.info("grpc getTotalMetadataDetailList查看全网元数据列表");
         List<MetaDataDetailResponseDto> metaDataDetailList = grpcMetaDataService.getGlobalMetadataDetailList();
-        return ResponseVo.createSuccess(metaDataDetailList.size() > 10 ? metaDataDetailList.subList(0, 3) : metaDataDetailList);
+        return ResponseVo.createSuccess(metaDataDetailList.size() > 10 ? metaDataDetailList.subList(0, 8) : metaDataDetailList);
     }
 
     @GetMapping("getMetadataAuthorityList")
     @ApiOperation(value = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表", notes = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表")
     public ResponseVo<List<GetMetaDataAuthorityDto>> getMetadataAuthorityList() {
         log.info("grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表");
-        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getMetaDataAuthorityList();
-        return ResponseVo.createSuccess(metaDataAuthorityDtoList.size() > 10 ? metaDataAuthorityDtoList.subList(0, 3) : metaDataAuthorityDtoList);
+        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getMetadataAuthorityListByUser();
+        return ResponseVo.createSuccess(metaDataAuthorityDtoList.size() > 10 ? metaDataAuthorityDtoList.subList(0, 8) : metaDataAuthorityDtoList);
     }
 
     @PostMapping("applyMetadataAuthority")
