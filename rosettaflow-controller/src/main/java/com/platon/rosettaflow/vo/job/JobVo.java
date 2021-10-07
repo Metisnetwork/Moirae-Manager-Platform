@@ -21,15 +21,32 @@ public class JobVo {
     @ApiModelProperty("作业名称")
     private String name;
 
+    @ApiModelProperty("作业描述")
+    private String desc;
+
     @ApiModelProperty("工作流id")
     private Long workflowId;
 
     @ApiModelProperty("工作流名称")
     private String workflowName;
 
+    @ApiModelProperty("是否重复：0-否,1-是")
+    private Byte repeatFlag;
+
+    @ApiModelProperty("重复间隔，单位分钟")
+    private Integer repeatInterval;
+
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
+
+    @ApiModelProperty("开始时间")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
+    private Date beginTime;
+
+    @ApiModelProperty("结束时间")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
+    private Date endTime;
 
     @ApiModelProperty("状态: 0-未开始，1-运行中，2-已停止，3-已结束")
     private Byte jobStatus;
