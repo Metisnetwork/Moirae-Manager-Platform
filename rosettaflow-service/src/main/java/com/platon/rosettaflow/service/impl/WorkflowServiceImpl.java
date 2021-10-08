@@ -266,7 +266,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
-        //保存用户和地址及签名并更新状态为运行中
+        //保存用户和地址及签名并更新工作流状态为运行中
         if(!workflowDto.isJobFlg()){
             updateSign(workflowDto);
         }
@@ -275,7 +275,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
         grpcTaskService.asyncPublishTask(taskDto, publishTaskDeclareResponse -> {
 
-            boolean isPublishSucess = publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
+            boolean isPublishSucess = (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE);
             WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
             if (workflowDto.isJobFlg()) {
                 //1.更新子作业
@@ -301,46 +301,23 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                     log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
                     throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
                 }
-
-                //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点
-                if(isPublishSucess && (null != workflowNode.getNextNodeStep() && workflowNode.getNextNodeStep() > 1)){
-                    workflowDto.setStartNode(workflowNode.getNextNodeStep());
-                    this.start(workflowDto);
-                }
-
             } else {
-                //更新工作流节点
-                Workflow workflow;
-                if (publishTaskDeclareResponse.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
-                    //处理成功
-                    workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId());
-                    workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
-
-                    //更新整个工作流信息:如果是最后一个节点，整个工作流更新成处理成功，否则更新成处理中
-                    workflow = this.getById(workflowNode.getWorkflowId());
-                    if (null == workflowNode.getNextNodeStep() || workflowNode.getNextNodeStep() < 1) {
-                        workflow.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
-                    } else {
-                        workflow.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());
-                        this.updateById(workflow);
-
-                        //当前工作流执行成功，继续执行下一个节点工作流
-                        workflowDto.setStartNode(workflowNode.getNextNodeStep());
-                        this.start(workflowDto);
-                    }
-                } else {
-                    //处理失败
-                    workflowNode.setTaskId(publishTaskDeclareResponse.getTaskId() != null ? publishTaskDeclareResponse.getTaskId() : "");
-                    workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
-
-                    //更新整个工作流信息:处理失败
-                    workflow = this.getById(workflowNode.getWorkflowId());
-                    workflow.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
-                }
+                //1.更新工作流
+                Workflow workflow = this.getById(workflowNode.getWorkflowId());
+                workflow.setRunStatus(isPublishSucess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                //2.更新工作流节点
+                workflowNode.setTaskId(isPublishSucess ? publishTaskDeclareResponse.getTaskId() : "");
+                workflowNode.setRunStatus(isPublishSucess? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
                 workflowNode.setRunMsg(publishTaskDeclareResponse.getMsg());
+                //3.持久化数据
                 workflowNodeService.updateById(workflowNode);
-
                 this.updateById(workflow);
+
+            }
+            //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点
+            if(isPublishSucess && (null != workflowNode.getNextNodeStep() && workflowNode.getNextNodeStep() > 1)){
+                workflowDto.setStartNode(workflowNode.getNextNodeStep());
+                this.start(workflowDto);
             }
         });
     }
@@ -640,7 +617,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 return sender;
             }
         }
-        log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:,{}" + workflowNodeInputList.toString());
+        log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }
 

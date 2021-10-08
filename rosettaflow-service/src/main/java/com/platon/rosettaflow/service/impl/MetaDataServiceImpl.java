@@ -89,14 +89,17 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     IPage<MetaDataDto> convertToPageDto(Page<MetaData> page, List<UserMetaData> metaDataWithAuthList) {
         List<MetaDataDto> records = new ArrayList<>();
-        Map<String, Byte> authMap = new HashMap<>(metaDataWithAuthList.size());
+        Map<String, Byte> authStatusMap = new HashMap<>(metaDataWithAuthList.size());
+        Map<String, Byte> authMetaValidMap = new HashMap<>(metaDataWithAuthList.size());
         for (UserMetaData dataAuth : metaDataWithAuthList) {
-            authMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthStatus());
+            authStatusMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthStatus());
+            authMetaValidMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthMetadataState());
         }
         page.getRecords().forEach(r -> {
             MetaDataDto m = new MetaDataDto();
             BeanCopierUtils.copy(r, m);
-            m.setAuthStatus(authMap.containsKey(r.getMetaDataId()) ? authMap.get(r.getMetaDataId()) : UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
+            m.setAuthStatus(authStatusMap.containsKey(r.getMetaDataId()) ? authStatusMap.get(r.getMetaDataId()) : UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
+            m.setAuthMetadataState(authMetaValidMap.containsKey(r.getMetaDataId()) ? authMetaValidMap.get(r.getMetaDataId()) : UserMetaDataAuthorithStateEnum.UNKNOWN.getValue());
             records.add(m);
         });
 

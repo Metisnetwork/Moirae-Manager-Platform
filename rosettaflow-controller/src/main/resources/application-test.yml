@@ -58,7 +58,8 @@ system:
 grpc:
   client:
     carrier-grpc-server:
-      address: 'static://192.168.21.11:8801'
+      # address: 'static://192.168.21.11:8801'
+      address: 'static://192.168.21.198:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext

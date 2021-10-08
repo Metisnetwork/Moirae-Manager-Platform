@@ -62,7 +62,7 @@ public class WorkflowNodeStatusTask {
         List<Long> workflowSuccessIds = new ArrayList<>();
         //工作流需要更新为失败的列表
         List<Long> workflowFailIds = new ArrayList<>();
-        //工作流节点需要更新为失败的列表
+        //工作流节点需要更新为成功的列表
         List<Long> workflowNodeSuccessIds = new ArrayList<>();
         //工作流节点需要更新为失败的列表
         List<Long> workflowNodeFailIds = new ArrayList<>();

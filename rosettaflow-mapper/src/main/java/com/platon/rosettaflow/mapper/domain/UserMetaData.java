@@ -84,6 +84,16 @@ public class UserMetaData implements Serializable {
     private Date auditTime;
 
     /**
+     * 数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)
+     */
+    private Byte authMetadataState;
+
+    /**
+     * 审核意见
+     */
+    private String auditSuggestion;
+
+    /**
      * 是否已过期（按时间时需要）: 0-未过期, 1-已过期
      */
     private Byte expire;
@@ -92,6 +102,7 @@ public class UserMetaData implements Serializable {
      * 已经使用的次数(按次数时有效)
      */
     private Long usedTimes;
+
 
     /**
      * 状态: 0-无效，1- 有效
@@ -108,6 +119,8 @@ public class UserMetaData implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+
 
     @Override
     public boolean equals(Object that) {
@@ -134,6 +147,8 @@ public class UserMetaData implements Serializable {
                 && (this.getAuthStatus() == null ? other.getAuthStatus() == null : this.getAuthStatus().equals(other.getAuthStatus()))
                 && (this.getApplyTime() == null ? other.getApplyTime() == null : this.getApplyTime().equals(other.getApplyTime()))
                 && (this.getAuditTime() == null ? other.getAuditTime() == null : this.getAuditTime().equals(other.getAuditTime()))
+                && (this.getAuthMetadataState() == null ? other.getAuthMetadataState() == null : this.getAuthMetadataState().equals(other.getAuthMetadataState()))
+                && (this.getAuditSuggestion() == null ? other.getAuditSuggestion() == null : this.getAuditSuggestion().equals(other.getAuditSuggestion()))
                 && (this.getExpire() == null ? other.getExpire() == null : this.getExpire().equals(other.getExpire()))
                 && (this.getUsedTimes() == null ? other.getUsedTimes() == null : this.getUsedTimes().equals(other.getUsedTimes()))
                 && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
@@ -158,6 +173,8 @@ public class UserMetaData implements Serializable {
         result = prime * result + ((getAuthStatus() == null) ? 0 : getAuthStatus().hashCode());
         result = prime * result + ((getApplyTime() == null) ? 0 : getApplyTime().hashCode());
         result = prime * result + ((getAuditTime() == null) ? 0 : getAuditTime().hashCode());
+        result = prime * result + ((getAuthMetadataState() == null) ? 0 : getAuthMetadataState().hashCode());
+        result = prime * result + ((getAuditSuggestion() == null) ? 0 : getAuditSuggestion().hashCode());
         result = prime * result + ((getExpire() == null) ? 0 : getExpire().hashCode());
         result = prime * result + ((getUsedTimes() == null) ? 0 : getUsedTimes().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
@@ -184,6 +201,8 @@ public class UserMetaData implements Serializable {
                 ", authStatus=" + authStatus +
                 ", applyTime=" + applyTime +
                 ", auditTime=" + auditTime +
+                ", authMetadataState=" + authMetadataState +
+                ", auditSuggestion=" + auditSuggestion +
                 ", expire=" + expire +
                 ", usedTimes=" + usedTimes +
                 ", status=" + status +

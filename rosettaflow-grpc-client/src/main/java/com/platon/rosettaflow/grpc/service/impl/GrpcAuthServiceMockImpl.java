@@ -2,6 +2,7 @@ package com.platon.rosettaflow.grpc.service.impl;
 
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.UserMetaDataAuditEnum;
+import com.platon.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
 import com.platon.rosettaflow.common.enums.UserTypeEnum;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
@@ -90,6 +91,8 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
             getMetaDataAuthorityDto.setMetadataUsedQuoDto(metadataUsedQuoDto);
             getMetaDataAuthorityDto.setApplyAt(1629877270100L);
             getMetaDataAuthorityDto.setAuditAt(1629877270100L);
+            getMetaDataAuthorityDto.setAuditSuggestion("审核意见");
+            getMetaDataAuthorityDto.setMetadataAuthorityState((int)UserMetaDataAuthorithStateEnum.RELEASED.getValue());
             metaDataAuthorityDtoList.add(getMetaDataAuthorityDto);
         }
         return metaDataAuthorityDtoList;
