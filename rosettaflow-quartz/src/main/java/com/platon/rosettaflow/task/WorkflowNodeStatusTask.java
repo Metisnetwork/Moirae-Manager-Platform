@@ -31,7 +31,7 @@ public class WorkflowNodeStatusTask {
     /**
      * 查询 当前时间之前5小时的正在运行的数据
      */
-    private static final int BEFORE_HOUR = 5;
+    private static final int BEFORE_HOUR = -5;
 
     @Resource
     private SysConfig sysConfig;
@@ -106,5 +106,7 @@ public class WorkflowNodeStatusTask {
         if (workflowNodeFailIds.size() > 0) {
             workflowNodeService.updateRunStatus(workflowNodeFailIds.toArray(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
         }
+        log.info("同步更新工作流节点中待确认任务结束>>>>");
+
     }
 }
