@@ -10,7 +10,9 @@ import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.service.IWorkflowService;
@@ -110,6 +112,25 @@ public class RpcTestController {
         ApplyMetaDataAuthorityResponseDto applyMetaDataAuthorityResponseDto = grpcAuthService.applyMetaDataAuthority(requestDto);
         return ResponseVo.createSuccess(applyMetaDataAuthorityResponseDto);
     }
+
+
+    @GetMapping("task/getTaskDetailList")
+    @ApiOperation(value = "grpc GetTaskDetailList查看本组织参与过的全部任务详情列表", notes = "grpc GetTaskDetailList查看本组织参与过的全部任务详情列表")
+    public ResponseVo<List<TaskDetailResponseDto>> getTaskDetailList() {
+        log.info("grpc GetTaskDetailList查看本组织参与过的全部任务详情列表");
+        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getTaskDetailList();
+        return ResponseVo.createSuccess(metaDataAuthorityDtoList);
+    }
+
+
+    @GetMapping("task/getTaskEventListById{taskId}")
+    @ApiOperation(value = "grpc getTaskEventListById查询任务事件根据任务id", notes = "grpc getTaskEventListById查询任务事件根据任务id")
+    public ResponseVo<List<TaskEventDto>> getTaskEventListById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
+        log.info("grpc getTaskEventListById查询任务事件根据任务id");
+        List<TaskEventDto> taskEventDtoList = grpcTaskService.getTaskEventList(taskId);
+        return ResponseVo.createSuccess(taskEventDtoList);
+    }
+
 
     @GetMapping("task/{workflowId}")
     @ApiOperation(value = "grpc task接口测试", notes = "grpc task接口测试")
