@@ -1,7 +1,10 @@
 package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.platon.rosettaflow.dto.SubJobNodeDto;
 import com.platon.rosettaflow.mapper.domain.SubJobNode;
+
+import java.util.List;
 
 /**
  * @author hudenian
@@ -33,4 +36,21 @@ public interface ISubJobNodeService extends IService<SubJobNode> {
      * @return SubJobNode 子作业节点
      */
     SubJobNode querySubJobNodeByJobIdAndNodeStep(Long subJobId,Integer nodeStep);
+
+
+    /**
+     * 获取所有子工作流运行中的节点
+     *
+     * @return 运行中节点列表
+     */
+    List<SubJobNodeDto> getRunningNodeWithWorkIdAndNodeNum();
+
+
+    /**
+     * 批量修改子作业节点状态
+     *
+     * @param ids 子作业ids
+     * @param runStatus  运行状态
+     */
+    void updateRunStatus(Object[] ids, Byte runStatus);
 }
