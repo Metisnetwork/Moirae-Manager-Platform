@@ -8,7 +8,7 @@ package com.platon.rosettaflow.common.enums;
 public enum UserMetaDataAuditEnum {
 
     /**
-     * 未知
+     * 未知(1.未登录故获取不到元数据状态 2.用户未申请使用元数据)
      */
     AUDIT_UNKNOWN((byte) -1),
     /**

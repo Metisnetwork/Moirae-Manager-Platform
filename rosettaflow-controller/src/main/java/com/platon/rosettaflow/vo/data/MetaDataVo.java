@@ -68,8 +68,11 @@ public class MetaDataVo {
     @ApiModelProperty(value = "状态: 0-无效，1- 有效")
     private Byte status;
 
-    @ApiModelProperty(value = "授权状态:0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表")
+    @ApiModelProperty(value = "授权状态: -1-未知(1.未登录故获取不到授权状态 2.用户未申请使用元数据),0-等待审核中, 1-审核通过, 2-审核拒绝")
     private Byte authStatus;
+
+    @ApiModelProperty(value = "数据授权信息有效性状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)")
+    private Byte authMetadataState;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)

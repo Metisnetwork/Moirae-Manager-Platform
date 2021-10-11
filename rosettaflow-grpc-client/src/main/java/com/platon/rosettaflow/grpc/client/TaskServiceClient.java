@@ -115,7 +115,7 @@ public class TaskServiceClient {
             // 任务结果方
             List<OrganizationIdentityInfoDto> receivers = new ArrayList<>();
             for (int j = 0; j < getTaskDetailResponse.getInformation().getReceiversCount(); j++) {
-                receivers.add(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getReceivers(i)));
+                receivers.add(getOrganizationIdentityInfoDto(getTaskDetailResponse.getInformation().getReceivers(j)));
             }
             taskDetailDto.setReceivers(receivers);
 
