@@ -44,14 +44,14 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 3 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
         //test begin 模拟用户申请数据授权
-//        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY,"0x990a168ecee09b8b1abeff3e2b713924e7151f9bmetadata:0x6ada026b4219b186ea7c7c60bb350615419e87c7ff7104ec4f95cd81c96793d7",null);
+        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY,"0x990a168ecee09b8b1abeff3e2b713924e7151f9bmetadata:0x6ada026b4219b186ea7c7c60bb350615419e87c7ff7104ec4f95cd81c96793d7",null);
         //test end
 
         //如果用户没有申请过元数据，则跳过

@@ -2,30 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.rosettaflow.mapper.UserMetaDataMapper">
     <resultMap id="BaseResultMap" type="com.platon.rosettaflow.mapper.domain.UserMetaData">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="meta_data_id" jdbcType="VARCHAR" property="metaDataId"/>
-        <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
-        <result column="identity_name" jdbcType="VARCHAR" property="identityName"/>
-        <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
-        <result column="address" jdbcType="VARCHAR" property="address"/>
-        <result column="auth_type" jdbcType="TINYINT" property="authType"/>
-        <result column="auth_value" jdbcType="BIGINT" property="authValue"/>
-        <result column="auth_begin_time" jdbcType="TIMESTAMP" property="authBeginTime"/>
-        <result column="auth_end_time" jdbcType="TIMESTAMP" property="authEndTime"/>
-        <result column="auth_status" jdbcType="TINYINT" property="authStatus"/>
-        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime"/>
-        <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime"/>
-        <result column="expire" jdbcType="TINYINT" property="expire"/>
-        <result column="used_times" jdbcType="BIGINT" property="usedTimes"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="meta_data_id" jdbcType="VARCHAR" property="metaDataId" />
+        <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
+        <result column="identity_name" jdbcType="VARCHAR" property="identityName" />
+        <result column="node_id" jdbcType="VARCHAR" property="nodeId" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="auth_type" jdbcType="TINYINT" property="authType" />
+        <result column="auth_value" jdbcType="BIGINT" property="authValue" />
+        <result column="auth_begin_time" jdbcType="TIMESTAMP" property="authBeginTime" />
+        <result column="auth_end_time" jdbcType="TIMESTAMP" property="authEndTime" />
+        <result column="auth_status" jdbcType="TINYINT" property="authStatus" />
+        <result column="audit_suggestion" jdbcType="VARCHAR" property="auditSuggestion" />
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+        <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+        <result column="auth_metadata_state" jdbcType="TINYINT" property="authMetadataState" />
+        <result column="expire" jdbcType="TINYINT" property="expire" />
+        <result column="used_times" jdbcType="BIGINT" property="usedTimes" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     </resultMap>
     <sql id="Base_Column_List">
-        id
-        , meta_data_id, identity_id, identity_name, node_id, address, auth_type, auth_value,
-    auth_begin_time, auth_end_time, auth_status, apply_time, audit_time, expire, used_times, 
-    `status`, create_time, update_time
+        id, meta_data_id, identity_id, identity_name, node_id, address, auth_type, auth_value,
+        auth_begin_time, auth_end_time, auth_status, audit_suggestion, apply_time, audit_time,
+        auth_metadata_state, expire, used_times, `status`, create_time, update_time
     </sql>
 
     <update id="truncate">
@@ -110,11 +111,17 @@
                 <if test="userMetaData.authStatus != null">
                     auth_status,
                 </if>
+                <if test="userMetaData.auditSuggestion != null">
+                    audit_suggestion,
+                </if>
                 <if test="userMetaData.applyTime != null">
                     apply_time,
                 </if>
                 <if test="userMetaData.auditTime != null">
                     audit_time,
+                </if>
+                <if test="userMetaData.authMetadataState != null">
+                    auth_metadata_state,
                 </if>
                 <if test="userMetaData.expire != null">
                     expire,
@@ -163,11 +170,17 @@
                 <if test="userMetaData.authStatus != null">
                     #{userMetaData.authStatus,jdbcType=TINYINT},
                 </if>
+                <if test="userMetaData.auditSuggestion != null">
+                    #{userMetaData.auditSuggestion,jdbcType=VARCHAR},
+                </if>
                 <if test="userMetaData.applyTime != null">
                     #{userMetaData.applyTime,jdbcType=TIMESTAMP},
                 </if>
                 <if test="userMetaData.auditTime != null">
                     #{userMetaData.auditTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.authMetadataState != null">
+                    #{userMetaData.authMetadataState,jdbcType=TINYINT},
                 </if>
                 <if test="userMetaData.expire != null">
                     #{userMetaData.expire,jdbcType=TINYINT},

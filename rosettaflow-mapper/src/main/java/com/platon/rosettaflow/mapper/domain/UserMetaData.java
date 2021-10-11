@@ -74,6 +74,11 @@ public class UserMetaData implements Serializable {
     private Byte authStatus;
 
     /**
+     * 审核意见
+     */
+    private String auditSuggestion;
+
+    /**
      * 发起授权申请的时间
      */
     private Date applyTime;
@@ -87,11 +92,6 @@ public class UserMetaData implements Serializable {
      * 数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)
      */
     private Byte authMetadataState;
-
-    /**
-     * 审核意见
-     */
-    private String auditSuggestion;
 
     /**
      * 是否已过期（按时间时需要）: 0-未过期, 1-已过期
