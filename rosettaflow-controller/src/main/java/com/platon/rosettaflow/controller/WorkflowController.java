@@ -3,13 +3,15 @@ package com.platon.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
-import com.platon.rosettaflow.mapper.domain.Workflow;
-import com.platon.rosettaflow.mapper.domain.WorkflowNode;
+import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.req.workflow.*;
+import com.platon.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
+import com.platon.rosettaflow.req.workflow.node.WorkflowNodeReq;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.utils.ConvertUtils;
@@ -29,10 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 工作流管理
@@ -111,9 +110,10 @@ public class WorkflowController {
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
         //先保存工作流
-        if (null != startWorkflowReq.getWorkflowNodeReqList()) {
-            List<WorkflowNode> workflowNodeList = BeanUtil.copyToList(startWorkflowReq.getWorkflowNodeReqList(), WorkflowNode.class);
-            workflowNodeService.saveWorkflowNode(startWorkflowReq.getWorkflowId(), workflowNodeList);
+        if (SysConstant.STR_1.equals(startWorkflowReq.getSaveFlag())) {
+            List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(
+                    startWorkflowReq.getWorkflowNodeReqList());
+            workflowNodeService.saveWorkflowAllNodeData(startWorkflowReq.getWorkflowId(), workflowNodeDtoList, Boolean.TRUE);
         }
 
         //启动工作流
