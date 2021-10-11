@@ -124,7 +124,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
     }
 
     @Override
-    public List<GetMetaDataAuthorityDto> getMetadataAuthorityListByUser() {
+    public List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList() {
         return null;
     }
 }

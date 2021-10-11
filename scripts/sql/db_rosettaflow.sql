@@ -138,7 +138,7 @@ CREATE TABLE `t_user_meta_data` (
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY `meta_data_id` (`meta_data_id`)
+    UNIQUE KEY `UK_USER_META_DATA_ID` (`meta_data_id`,`address`,`auth_metadata_state`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COMMENT='用户元数据授权表';
 
 -- ----------------------------

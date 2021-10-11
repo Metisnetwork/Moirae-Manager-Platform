@@ -102,7 +102,7 @@ public class AuthServiceClient {
 
         Empty empty = Empty.newBuilder().build();
         GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getLocalMetadataAuthorityList(empty);
-        return getGetMetaDataAuthorityDtos(getMetaDataAuthorityDtoList, getMetaDataAuthorityListResponse);
+        return getGetMetaDataAuthorityDtoList(getMetaDataAuthorityDtoList, getMetaDataAuthorityListResponse);
     }
 
     /**
@@ -110,15 +110,15 @@ public class AuthServiceClient {
      *
      * @return 授权申请及审核结果详情列表
      */
-    public List<GetMetaDataAuthorityDto> getMetadataAuthorityListByUser() {
+    public List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList() {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
 
         Empty empty = Empty.newBuilder().build();
         GetMetadataAuthorityListResponse getMetadataAuthorityListResponse = authServiceBlockingStub.getGlobalMetadataAuthorityList(empty);
-        return getGetMetaDataAuthorityDtos(getMetaDataAuthorityDtoList, getMetadataAuthorityListResponse);
+        return getGetMetaDataAuthorityDtoList(getMetaDataAuthorityDtoList, getMetadataAuthorityListResponse);
     }
 
-    private List<GetMetaDataAuthorityDto> getGetMetaDataAuthorityDtos(List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList, GetMetadataAuthorityListResponse getMetadataAuthorityListResponse) {
+    private List<GetMetaDataAuthorityDto> getGetMetaDataAuthorityDtoList(List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList, GetMetadataAuthorityListResponse getMetadataAuthorityListResponse) {
         if (getMetadataAuthorityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             throw new BusinessException(getMetadataAuthorityListResponse.getStatus(), getMetadataAuthorityListResponse.getMsg());
         }

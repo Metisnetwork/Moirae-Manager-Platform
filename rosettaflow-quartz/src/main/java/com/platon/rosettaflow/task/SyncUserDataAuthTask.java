@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hudenian
@@ -27,7 +29,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test","local"})
+@Profile({"prod", "test", "local"})
 public class SyncUserDataAuthTask {
 
     @Resource
@@ -48,56 +50,83 @@ public class SyncUserDataAuthTask {
         if (!sysConfig.isMasterNode()) {
             return;
         }
-        //如果用户没有申请过，则不同步
-        if (null == redisUtil.get(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY)) {
+        //test begin 模拟用户申请数据授权
+//        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY,"0x990a168ecee09b8b1abeff3e2b713924e7151f9bmetadata:0x6ada026b4219b186ea7c7c60bb350615419e87c7ff7104ec4f95cd81c96793d7",null);
+        //test end
+
+        //如果用户没有申请过元数据，则跳过
+        long applyNum = redisUtil.listSize(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
+        if (applyNum < 1) {
             return;
         }
-        log.info("用户申请授权元数据信息同步开始>>>>");
-        long begin;
-
-        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
+        //所有需要同步的元数据
+        Set<String> userMetaDataIdSet = new HashSet<>();
+        //net中还未查询到的元数据
+        Set<String> userMetaDataIdNetNoExistSet = new HashSet<>();
         try {
-            metaDataAuthorityDtoList = grpcAuthService.getMetadataAuthorityListByUser();
-        } catch (Exception e) {
-            log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
-            return;
-        }
+            log.info("用户申请授权元数据信息同步开始>>>>");
+            long begin;
+            List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
+            try {
+                metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+            } catch (Exception e) {
+                log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
+                return;
+            }
+            //查看需要同步数据是否已存在
+            for (int i = 0; i < applyNum; i++) {
+                String userMetaDataId = redisUtil.listRightPop(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
+                userMetaDataIdSet.add(userMetaDataId);
+                userMetaDataIdNetNoExistSet.add(userMetaDataId);
+            }
+            //判断是否有需要同步数据
+            boolean syncFlg = false;
+            for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
+                String resultUserMetaDataId = AddressChangeUtils.convert0xAddress(authorityDto.getUser()) + authorityDto.getMetaDataAuthorityDto().getMetaDataId();
+                if (userMetaDataIdSet.contains(resultUserMetaDataId)) {
+                    syncFlg = true;
+                    userMetaDataIdNetNoExistSet.remove(resultUserMetaDataId);
+                }
+            }
+            if (!syncFlg) {
+                return;
+            }
+            List<UserMetaData> userMetaDataList = new ArrayList<>();
+            UserMetaData userMetaData;
+            int userMetaDataSize = 0;
 
-        //授权数据同步成功，删除旧数据
-        if (metaDataAuthorityDtoList.size() > 0) {
-            //删除原来授权数据
-            userMetaDataService.truncate();
-        } else {
-            return;
-        }
+            for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
+                userMetaData = getUserMetaData(authorityDto);
 
-        List<UserMetaData> userMetaDataList = new ArrayList<>();
-        UserMetaData userMetaData;
-        int userMetaDataSize = 0;
-
-        for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
-            userMetaData = getUserMetaData(authorityDto);
-
-            userMetaDataList.add(userMetaData);
-            ++userMetaDataSize;
-            if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
+                userMetaDataList.add(userMetaData);
+                ++userMetaDataSize;
+                if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
+                    begin = DateUtil.currentSeconds();
+                    log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
+                    userMetaDataService.batchInsert(userMetaDataList);
+                    log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
+                    userMetaDataList.clear();
+                }
+            }
+            if (userMetaDataList.size() > 0) {
                 begin = DateUtil.currentSeconds();
                 log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
-                userMetaDataService.saveBatch(userMetaDataList);
+                userMetaDataService.batchInsert(userMetaDataList);
                 log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
-                userMetaDataList.clear();
+            }
+            log.info("用户申请授权元数据信息同步结束>>>>");
+
+            //未同步数据放回redis
+            for (String value : userMetaDataIdNetNoExistSet) {
+                redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, value, null);
+            }
+        } catch (Exception e) {
+            log.error("用户申请授权元数据信息同步失败，失败原因>>>>{}", e.getMessage(), e);
+            //未同步数据放回redis
+            for (String value : userMetaDataIdSet) {
+                redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, value, null);
             }
         }
-        if (userMetaDataList.size() > 0) {
-            begin = DateUtil.currentSeconds();
-            log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
-            userMetaDataService.saveBatch(userMetaDataList);
-            log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
-        }
-        log.info("用户申请授权元数据信息同步结束>>>>");
-
-        //清除redis中用户元数据同步标识
-        redisUtil.delete(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
     }
 
     private UserMetaData getUserMetaData(GetMetaDataAuthorityDto authorityDto) {

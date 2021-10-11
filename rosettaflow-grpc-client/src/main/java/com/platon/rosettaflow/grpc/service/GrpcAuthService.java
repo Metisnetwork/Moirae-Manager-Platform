@@ -47,5 +47,5 @@ public interface GrpcAuthService {
      *
      * @return 授权申请及审核结果详情列表
      */
-    List<GetMetaDataAuthorityDto> getMetadataAuthorityListByUser();
+    List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList();
 }

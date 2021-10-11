@@ -22,14 +22,15 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, meta_data_id, identity_id, identity_name, node_id, address, auth_type, auth_value, 
+        id
+        , meta_data_id, identity_id, identity_name, node_id, address, auth_type, auth_value,
     auth_begin_time, auth_end_time, auth_status, apply_time, audit_time, expire, used_times, 
     `status`, create_time, update_time
-  </sql>
+    </sql>
 
     <update id="truncate">
         TRUNCATE TABLE t_user_meta_data
-  </update>
+    </update>
     <select id="listByOwner" resultType="com.platon.rosettaflow.dto.UserMetaDataDto">
         SELECT
         u.id,
@@ -60,24 +61,130 @@
         </if>
     </select>
     <select id="getUserMetaDataByAddress" resultType="com.platon.rosettaflow.dto.UserMetaDataDto">
-        SELECT DISTINCT
-            umd.identity_id,
-            umd.identity_name
-        FROM
-            t_user_meta_data umd
-        INNER JOIN
-            t_user u
-        ON umd.address = u.address
-        WHERE
-            ((umd.auth_type = 1 AND expire = 0)
-        OR (
-            umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value
-        ))
-        AND
-            umd.`status` = 1
-        AND
-            umd.auth_status=1
-        AND
-            umd.address = #{address, jdbcType=VARCHAR}
+        SELECT DISTINCT umd.identity_id,
+                        umd.identity_name
+        FROM t_user_meta_data umd
+                 INNER JOIN
+             t_user u
+             ON umd.address = u.address
+        WHERE ((umd.auth_type = 1 AND expire = 0)
+            OR (
+                   umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value
+                   ))
+          AND umd.`status` = 1
+          AND umd.auth_status = 1
+          AND umd.address = #{address, jdbcType=VARCHAR}
     </select>
+
+    <insert id="batchInsert">
+        <foreach collection="userMetaDataList" item="userMetaData" separator=";">
+            replace into t_user_meta_data
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="userMetaData.metaDataId != null">
+                    meta_data_id,
+                </if>
+                <if test="userMetaData.identityId != null">
+                    identity_id,
+                </if>
+                <if test="userMetaData.identityName != null">
+                    identity_name,
+                </if>
+                <if test="userMetaData.nodeId != null">
+                    node_id,
+                </if>
+                <if test="userMetaData.address != null">
+                    address,
+                </if>
+                <if test="userMetaData.authType != null">
+                    auth_type,
+                </if>
+                <if test="userMetaData.authValue != null">
+                    auth_value,
+                </if>
+                <if test="userMetaData.authBeginTime != null">
+                    auth_begin_time,
+                </if>
+                <if test="userMetaData.authEndTime != null">
+                    auth_end_time,
+                </if>
+                <if test="userMetaData.authStatus != null">
+                    auth_status,
+                </if>
+                <if test="userMetaData.applyTime != null">
+                    apply_time,
+                </if>
+                <if test="userMetaData.auditTime != null">
+                    audit_time,
+                </if>
+                <if test="userMetaData.expire != null">
+                    expire,
+                </if>
+                <if test="userMetaData.usedTimes != null">
+                    used_times,
+                </if>
+                <if test="userMetaData.status != null">
+                    `status`,
+                </if>
+                <if test="userMetaData.createTime != null">
+                    create_time,
+                </if>
+                <if test="userMetaData.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="userMetaData.metaDataId != null">
+                    #{userMetaData.metaDataId,jdbcType=VARCHAR},
+                </if>
+                <if test="userMetaData.identityId != null">
+                    #{userMetaData.identityId,jdbcType=VARCHAR},
+                </if>
+                <if test="userMetaData.identityName != null">
+                    #{userMetaData.identityName,jdbcType=VARCHAR},
+                </if>
+                <if test="userMetaData.nodeId != null">
+                    #{userMetaData.nodeId,jdbcType=VARCHAR},
+                </if>
+                <if test="userMetaData.address != null">
+                    #{userMetaData.address,jdbcType=VARCHAR},
+                </if>
+                <if test="userMetaData.authType != null">
+                    #{userMetaData.authType,jdbcType=TINYINT},
+                </if>
+                <if test="userMetaData.authValue != null">
+                    #{userMetaData.authValue,jdbcType=BIGINT},
+                </if>
+                <if test="userMetaData.authBeginTime != null">
+                    #{userMetaData.authBeginTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.authEndTime != null">
+                    #{userMetaData.authEndTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.authStatus != null">
+                    #{userMetaData.authStatus,jdbcType=TINYINT},
+                </if>
+                <if test="userMetaData.applyTime != null">
+                    #{userMetaData.applyTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.auditTime != null">
+                    #{userMetaData.auditTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.expire != null">
+                    #{userMetaData.expire,jdbcType=TINYINT},
+                </if>
+                <if test="userMetaData.usedTimes != null">
+                    #{userMetaData.usedTimes,jdbcType=BIGINT},
+                </if>
+                <if test="userMetaData.status != null">
+                    #{userMetaData.status,jdbcType=TINYINT},
+                </if>
+                <if test="userMetaData.createTime != null">
+                    #{userMetaData.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.updateTime != null">
+                    #{userMetaData.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
 </mapper>

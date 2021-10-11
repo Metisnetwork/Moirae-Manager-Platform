@@ -52,5 +52,9 @@ public class WorkflowDto extends Workflow {
      * 发起任务的账户的签名
      */
     private String sign;
+    /**
+     * 工作流正在执行的taskId
+     */
+    private String taskId;
 
 }

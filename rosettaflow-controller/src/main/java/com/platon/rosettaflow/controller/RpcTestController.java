@@ -77,7 +77,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表", notes = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表")
     public ResponseVo<List<GetMetaDataAuthorityDto>> getMetadataAuthorityList() {
         log.info("grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表");
-        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getMetadataAuthorityListByUser();
+        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
         return ResponseVo.createSuccess(metaDataAuthorityDtoList.size() > 10 ? metaDataAuthorityDtoList.subList(0, 8) : metaDataAuthorityDtoList);
     }
 

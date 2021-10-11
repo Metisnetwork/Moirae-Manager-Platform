@@ -117,8 +117,8 @@ public class SysConstant {
     public static final String JOB_PAUSE_QUEUE = "job_pause_queue";
 
     /**
-     * 待处理任务队列
+     * 待处理工作流前缀
      */
-    public static final String JOB_TASK_QUEUE = "job_task_queue";
+    public static final String REDIS_WORKFLOW_PREFIX_KEY = "workflowDto:";
 
 }

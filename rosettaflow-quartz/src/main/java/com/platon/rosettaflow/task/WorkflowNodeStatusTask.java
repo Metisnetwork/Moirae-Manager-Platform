@@ -1,8 +1,13 @@
 package com.platon.rosettaflow.task;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.platon.rosettaflow.common.constants.SysConfig;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
+import com.platon.rosettaflow.common.utils.RedisUtil;
+import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
@@ -26,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test","local"})
+@Profile({"prod", "test", "local"})
 public class WorkflowNodeStatusTask {
     /**
      * 查询 当前时间之前5小时的正在运行的数据
@@ -44,6 +49,9 @@ public class WorkflowNodeStatusTask {
 
     @Resource
     private IWorkflowService workflowService;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     public void run() {
@@ -79,6 +87,13 @@ public class WorkflowNodeStatusTask {
                     //如果是最后一个节点，需要更新整个工作流的状态为成功
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
                         workflowSuccessIds.add(node.getWorkflowId());
+                    } else {
+                        //如果有下一个节点，则启动下一个节点
+                        Object workflowDtoJson = redisUtil.get(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
+                        if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
+                            WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
+                            workflowService.start(workflowDto);
+                        }
                     }
                     workflowNodeSuccessIds.add(node.getId());
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {

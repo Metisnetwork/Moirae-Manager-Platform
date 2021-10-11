@@ -122,7 +122,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
         //数据授权申请成功后，记录redis中，开启用户元数据同步定时任务
-        redisUtil.set(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, true);
+        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, applyDto.getUser()+applyDto.getAuth().getMetaDataId(),null);
     }
 
     @Override
@@ -161,5 +161,10 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         wrapper.in(UserMetaData::getMetaDataId, metaDataIdArr);
         wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
         return this.list(wrapper);
+    }
+
+    @Override
+    public int batchInsert(List<UserMetaData> userMetaDataList) {
+        return this.baseMapper.batchInsert(userMetaDataList);
     }
 }
