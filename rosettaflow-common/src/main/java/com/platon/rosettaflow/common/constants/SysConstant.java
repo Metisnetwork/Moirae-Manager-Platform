@@ -116,4 +116,9 @@ public class SysConstant {
      */
     public static final String JOB_PAUSE_QUEUE = "job_pause_queue";
 
+    /**
+     * 待处理任务队列
+     */
+    public static final String JOB_TASK_QUEUE = "job_task_queue";
+
 }
