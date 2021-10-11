@@ -2,6 +2,7 @@ package com.platon.rosettaflow.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,8 +15,12 @@ import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.JobDto;
 import com.platon.rosettaflow.mapper.JobMapper;
 import com.platon.rosettaflow.mapper.domain.Job;
+import com.platon.rosettaflow.mapper.domain.SubJob;
+import com.platon.rosettaflow.mapper.domain.SubJobNode;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.service.IJobService;
+import com.platon.rosettaflow.service.ISubJobNodeService;
+import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +30,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import static cn.hutool.core.date.DateTime.now;
 
 /**
  * @author hudenian
@@ -40,6 +46,12 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Resource
     private IWorkflowService workflowService;
+
+    @Resource
+    private ISubJobService subJobService;
+
+    @Resource
+    private ISubJobNodeService subJobNodeService;
 
     @Override
     public List<Job> getAllUnfinishedJob() {
@@ -57,6 +69,15 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     public IPage<JobDto> list(Long current, Long size, String jobName) {
         Page<JobDto> jobPage = new Page<>(current, size);
         return this.baseMapper.queryJobList(jobName, jobPage);
+    }
+
+    @Override
+    public void updateBatchStatus(Object[] ids, Byte status) {
+        LambdaUpdateWrapper<Job> updateJobWrapper = Wrappers.lambdaUpdate();
+        updateJobWrapper.set(Job::getStatus,status);
+        updateJobWrapper.set(Job::getUpdateTime,now());
+        updateJobWrapper.in(Job::getId, ids);
+        this.update(updateJobWrapper);
     }
 
     @Override
@@ -137,6 +158,37 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         wrapper.eq(Job::getWorkflowId,workflowId);
         wrapper.eq(Job::getJobStatus,JobStatusEnum.RUNNING.getValue());
         return this.list(wrapper);
+    }
+
+    @Override
+    public void deleteBatchJob(List<Long> ids) {
+        List<Job> jobs = this.listByIds(ids);
+        if(jobs.isEmpty() || ids.size() != jobs.size()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
+        }
+        //检查作业是否存在运行中
+        boolean isExistRunningJob = jobs.stream().anyMatch(job -> job.getJobStatus() == JobStatusEnum.RUNNING.getValue());
+        if(isExistRunningJob){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_DELETE.getMsg());
+        }
+        //检查子作业是否存在运行中
+        List<SubJob> subJobList = subJobService.queryBatchSubJobListByJobId(ids);
+        Object[] subJobArrayIds = subJobList.stream().map(SubJob::getId).toArray();
+        boolean isExistRunningSubJob = subJobList.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
+        if(isExistRunningSubJob){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+        }
+       //检查子作业节点是否存在运行中节点
+        List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(subJobArrayIds);
+        Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
+        boolean isExistRunningSubJobNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobNodeStatusEnum.RUNNING.getValue());
+        if(isExistRunningSubJobNode){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
+        }
+        //批量更新作业、子作业、子作业节点有效状态
+        this.updateBatchStatus(ids.toArray(), StatusEnum.UN_VALID.getValue());
+        subJobService.updateBatchStatus(subJobArrayIds, StatusEnum.UN_VALID.getValue());
+        subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
     }
 
     /**

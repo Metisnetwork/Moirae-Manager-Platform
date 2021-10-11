@@ -20,13 +20,37 @@ public interface ISubJobNodeService extends IService<SubJobNode> {
      */
     void updateRunStatusByJobId(Long subJobId, Byte runStatus);
 
+    /**
+     * 批量修改子作业节点状态
+     *
+     * @param ids 子作业ids
+     * @param runStatus  运行状态
+     */
+    void updateRunStatus(Object[] ids, Byte runStatus);
+
+
+    /**
+     * 批量修改子作业节点有效状态
+     *
+     * @param ids 子作业ids
+     * @param status  有效状态
+     */
+    void updateBatchStatus(Object[] ids, Byte status);
+
 
     /**
      * 获取查询子作业节点信息
      * @param subJobId 子作业id
-     * @return SubJobNode 子作业节点
+     * @return List<SubJobNode> 子作业节点集合
      */
-    SubJobNode querySubJobNodeByJobId(Long subJobId);
+    List<SubJobNode> querySubJobNodeListBySubJobId(Long subJobId);
+
+    /**
+     * 批量查询子作业节点信息
+     * @param subJobId 子作业id集合
+     * @return SubJobNode 子作业节点集合
+     */
+    List<SubJobNode> queryBatchSubJobListNodeByJobId(Object[] subJobId);
 
 
     /**
@@ -46,11 +70,5 @@ public interface ISubJobNodeService extends IService<SubJobNode> {
     List<SubJobNodeDto> getRunningNodeWithWorkIdAndNodeNum();
 
 
-    /**
-     * 批量修改子作业节点状态
-     *
-     * @param ids 子作业ids
-     * @param runStatus  运行状态
-     */
-    void updateRunStatus(Object[] ids, Byte runStatus);
+
 }
