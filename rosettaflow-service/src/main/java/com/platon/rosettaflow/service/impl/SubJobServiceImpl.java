@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static cn.hutool.core.date.DateTime.now;
+
 /**
  * @author hudenian
  * @date 2021/8/27
@@ -117,6 +119,15 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         updateWrapper.set(SubJob::getSubJobStatus, subJobStatus);
         updateWrapper.set(SubJob::getUpdateTime, new Date(System.currentTimeMillis()));
         updateWrapper.eq(SubJob::getId, subJobId);
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public void updateRunStatus(Object[] ids, Byte runStatus) {
+        LambdaUpdateWrapper<SubJob> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(SubJob::getSubJobStatus, runStatus);
+        updateWrapper.set(SubJob::getUpdateTime, now());
+        updateWrapper.in(SubJob::getId, ids);
         this.update(updateWrapper);
     }
 

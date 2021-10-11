@@ -41,4 +41,12 @@ public interface ISubJobService extends IService<SubJob> {
      * @param runStatus 子作业状态
      */
     void updateJobStatus(Long subJobId, Byte runStatus);
+
+    /**
+     * 批量修改子作业状态
+     *
+     * @param ids 子作业ids
+     * @param runStatus  运行状态
+     */
+    void updateRunStatus(Object[] ids, Byte runStatus);
 }
