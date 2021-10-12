@@ -20,7 +20,7 @@ spring:
       idle-timeout: 600000
   redis:
     host: localhost
-    port: 7379
+    port: 6379
     password:
     timeout: 5000
     lettuce:
