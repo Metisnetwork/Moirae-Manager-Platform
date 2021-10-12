@@ -1,5 +1,6 @@
-package com.platon.rosettaflow.req.workflow.node;
+package com.platon.rosettaflow.req.workflow;
 
+import com.platon.rosettaflow.req.workflownode.WorkflowNodeReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Data
 @ApiModel
-public class WorkflowAllNodeReq {
+public class WorkflowDetailReq {
 
 
     @ApiModelProperty(value = "工作流ID", required = true)

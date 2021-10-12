@@ -1,8 +1,13 @@
-package com.platon.rosettaflow.req.workflow.node;
+package com.platon.rosettaflow.req.workflownode;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import java.util.List;
 
 /**
  * 工作流节点变量请求对象

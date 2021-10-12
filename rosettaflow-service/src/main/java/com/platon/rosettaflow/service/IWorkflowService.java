@@ -30,13 +30,6 @@ public interface IWorkflowService extends IService<Workflow> {
     IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size);
 
     /**
-     * 查询工作流列表，通过工作流id集合
-     * @param idList
-     * @return
-     */
-    List<Workflow> queryListById(List<Long> idList);
-
-    /**
      * 通过项目id查询工作流列表（不分页）
      *
      * @param projectIdList 项目id列表
