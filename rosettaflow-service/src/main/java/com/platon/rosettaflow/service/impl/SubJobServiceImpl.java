@@ -114,7 +114,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         startWorkflowDto.setStartNode(1);
         startWorkflowDto.setEndNode(workFlow.getNodeNumber());
         startWorkflowDto.setJobFlg(true);
-        startWorkflowDto.setJobId(subJob.getId());
+        startWorkflowDto.setSubJobId(subJob.getId());
         workflowService.start(startWorkflowDto);
     }
 

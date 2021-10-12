@@ -278,36 +278,44 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             updateSign(workflowDto);
         }
 
-        //此处先执行第一个节点，待第一个节点执行成功后再执行
+        /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
-        PublishTaskDeclareResponseDto respDto = grpcTaskService.syncPublishTask(taskDto);
-        boolean isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
-
+        //当为作业时，记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
         if (workflowDto.isJobFlg()) {
-            //1.更新子作业
-            SubJob subJob = subJobService.getById(workflowDto.getJobId());
-            subJob.setEndTime(now());
-            subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
-            subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
-            //2.记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
-            SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(subJob.getId(), workflowDto.getStartNode());
+            SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
             SubJobNode subJobNode = !Objects.isNull(subJobNodeTemp) ? subJobNodeTemp : new SubJobNode();
             if (Objects.isNull(subJobNodeTemp)) {
-                subJobNode.setSubJobId(subJob.getId());
+                subJobNode.setSubJobId(workflowDto.getSubJobId());
                 subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
                 subJobNode.setNodeStep(workflowNode.getNodeStep());
             }
-            subJobNode.setRunStatus(isPublishSuccess ? SubJobNodeStatusEnum.RUNNING.getValue() : SubJobNodeStatusEnum.RUN_FAIL.getValue());
-            subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
-            subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
-            //3.持久化数据
-            subJobService.updateById(subJob);
+            subJobNode.setRunStatus(SubJobNodeStatusEnum.RUNNING.getValue());
+            subJobNode.setTaskId("");
+            subJobNode.setRunMsg("");
+            subJobNode.setUpdateTime(now());
             boolean isSuccess = Objects.isNull(subJobNodeTemp) ? subJobNodeService.save(subJobNode) : subJobNodeService.updateById(subJobNode);
             if (!isSuccess) {
                 log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
             }
+        }
+        PublishTaskDeclareResponseDto respDto = grpcTaskService.syncPublishTask(taskDto);
+        boolean isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
+        if (workflowDto.isJobFlg()) {
+            //1.更新子作业
+            SubJob subJob = subJobService.getById(workflowDto.getSubJobId());
+            subJob.setEndTime(now());
+            subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
+            subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
+            //2.更新子作业节点信息
+            SubJobNode subJobNode = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(subJob.getId(), workflowDto.getStartNode());
+            subJobNode.setRunStatus(isPublishSuccess ? SubJobNodeStatusEnum.RUNNING.getValue() : SubJobNodeStatusEnum.RUN_FAIL.getValue());
+            subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
+            subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
+            //3.持久化数据
+            subJobService.updateById(subJob);
+            subJobNodeService.updateById(subJobNode);
         } else {
             //1.更新工作流
             Workflow workflow = this.getById(workflowNode.getWorkflowId());
