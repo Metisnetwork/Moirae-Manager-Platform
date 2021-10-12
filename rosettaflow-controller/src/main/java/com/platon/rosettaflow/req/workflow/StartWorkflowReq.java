@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.req.workflow;
 
+import com.platon.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
 import com.platon.rosettaflow.req.workflow.node.WorkflowNodeReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,9 +25,6 @@ public class StartWorkflowReq {
     @Positive(message = "{workflow.id.positive}")
     private Long workflowId;
 
-    @ApiModelProperty(value = "工作流节点列表", required = true)
-    List<WorkflowNodeReq> workflowNodeReqList;
-
     @ApiModelProperty(value = "起始节点", required = true)
     @NotNull(message = "{workflow.startNode.notNull}")
     @Positive(message = "{workflow.startNode.positive}")
@@ -44,5 +42,12 @@ public class StartWorkflowReq {
     @ApiModelProperty(value = "发起任务的账户的签名", required = true)
     @NotBlank(message = "{user.sign.notBlank}")
     private String sign;
+
+    @ApiModelProperty(value = "是否需要保存（0：不需要，1：需要）", required = true)
+    @NotBlank(message = "{node.save.flag.NotBlank}")
+    private String saveFlag;
+
+    @ApiModelProperty(value = "工作流所有节点列表")
+    List<WorkflowNodeReq> workflowNodeReqList;
 
 }

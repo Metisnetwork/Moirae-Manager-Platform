@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.req.workflownode;
+package com.platon.rosettaflow.req.workflow.node;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,7 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 /**
  * 输出请求对象
@@ -26,5 +25,9 @@ public class WorkflowNodeOutputReq {
 
     @ApiModelProperty(value = "存储路径")
     private String storePath;
+
+    @ApiModelProperty(value = "是否发起方: 0-否, 1-是", required = true)
+    @NotNull(message = "{node.sender.flag.notNull}")
+    private Integer senderFlag;
 
 }
