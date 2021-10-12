@@ -113,7 +113,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList, boolean callFlag) {
+    public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList) {
         if (null == workflowNodeDtoList || workflowNodeDtoList.size() == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
@@ -149,9 +149,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 保存工作流节点
             Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, count, workflowNodeDtoList.size());
             // 保存工作流节点输入
-            workflowNodeInputList = this.saveWorkflowNodeInput(workflowNodeId, workflowNodeDto, callFlag);
+            workflowNodeInputList = this.saveWorkflowNodeInput(workflowNodeId, workflowNodeDto);
             // 保存工作流节点输出
-            workflowNodeOutputList = this.saveWorkflowNodeOutput(workflowNodeId, workflowNodeDto, workflowNodeInputList, callFlag);
+            workflowNodeOutputList = this.saveWorkflowNodeOutput(workflowNodeId, workflowNodeDto, workflowNodeInputList);
             // 添加新的工作流节点代码
             if (Objects.nonNull(workflowNodeDto.getWorkflowNodeCode())) {
                 workflowNodeDto.getWorkflowNodeCode().setWorkflowNodeId(workflowNodeId);
@@ -188,15 +188,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     /** 保存工作流节点输入 */
-    private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto, boolean callFlag) {
+    private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
-        // 校验输入数据是否存在
-        if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
-            if (callFlag) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
-            }
-            return new ArrayList<>();
-        }
         String[] identityIdArr = new String[workflowNodeInputList.size()];
         // 校验组织信息
         List<Organization> organizationList = organizationService.getByIdentityIds(identityIdArr);
@@ -221,14 +214,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     /** 保存工作流节点输出数据 */
     private List<WorkflowNodeOutput> saveWorkflowNodeOutput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto,
-                                                            List<WorkflowNodeInput> workflowNodeInputList, boolean callFlag){
+                                                            List<WorkflowNodeInput> workflowNodeInputList){
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeDto.getWorkflowNodeOutputList();
-        if (null == workflowNodeOutputList || workflowNodeOutputList.size() == 0) {
-            if (callFlag) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
-            }
-            return new ArrayList<>();
-        }
         // 任务里面定义的 (p0 -> pN 方 ...) 与输入保持一致
         Map<String, String> partyIdMap = workflowNodeInputList.stream().collect(
                 Collectors.toMap(WorkflowNodeInput::getIdentityId, WorkflowNodeInput::getPartyId));

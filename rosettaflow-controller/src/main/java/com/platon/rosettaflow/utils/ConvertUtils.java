@@ -3,12 +3,13 @@ package com.platon.rosettaflow.utils;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.platon.rosettaflow.dto.AlgorithmDto;
+import com.platon.rosettaflow.common.enums.ErrorMsg;
+import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.req.workflow.node.WorkflowNodeReq;
 import com.platon.rosettaflow.vo.PageVo;
-import com.platon.rosettaflow.vo.workflow.node.*;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -49,21 +50,23 @@ public class ConvertUtils {
         return list2;
     }
 
-    /** 转换保存请求参数 */
-    public static List<WorkflowNodeDto> convertSaveReq(List<WorkflowNodeReq> workflowNodeReqList) {
+    /** 转换保存请求参数 (是否是保存接口调用（checkFlag:保存节点调用时，无需校验输入输出数据）)*/
+    public static List<WorkflowNodeDto> convertSaveReq(List<WorkflowNodeReq> workflowNodeReqList, boolean checkFlag) {
         if(null == workflowNodeReqList || workflowNodeReqList.size() == 0) {
             return new ArrayList<>();
         }
         List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
-        workflowNodeReqList.forEach(workflowNodeReq -> {
+        for (WorkflowNodeReq workflowNodeReq : workflowNodeReqList) {
             WorkflowNodeDto workflowNodeDto = new WorkflowNodeDto();
             // 节点输入
-            if (workflowNodeReq.getWorkflowNodeInputReqList().size() > 0) {
+            if (workflowNodeReq.getWorkflowNodeInputReqList() != null
+                    && workflowNodeReq.getWorkflowNodeInputReqList().size() > 0) {
                 workflowNodeDto.setWorkflowNodeInputList(BeanUtil.copyToList(
                         workflowNodeReq.getWorkflowNodeInputReqList(), WorkflowNodeInput.class));
             }
             // 节点输出
-            if (workflowNodeReq.getWorkflowNodeOutputReqList().size() > 0) {
+            if (workflowNodeReq.getWorkflowNodeOutputReqList() != null
+                    && workflowNodeReq.getWorkflowNodeOutputReqList().size() > 0) {
                 workflowNodeDto.setWorkflowNodeOutputList(BeanUtil.copyToList(
                         workflowNodeReq.getWorkflowNodeOutputReqList(), WorkflowNodeOutput.class));
             }
@@ -78,7 +81,8 @@ public class ConvertUtils {
                         workflowNodeReq.getWorkflowNodeResourceReq(), WorkflowNodeResource.class));
             }
             // 节点输入变量
-            if (workflowNodeReq.getWorkflowNodeVariableReqList().size() > 0) {
+            if (workflowNodeReq.getWorkflowNodeVariableReqList() != null
+                    && workflowNodeReq.getWorkflowNodeVariableReqList().size() > 0) {
                 workflowNodeDto.setWorkflowNodeVariableList(BeanUtil.copyToList(
                         workflowNodeReq.getWorkflowNodeVariableReqList(), WorkflowNodeVariable.class));
             }
@@ -90,8 +94,30 @@ public class ConvertUtils {
             workflowNodeDto.setNodeName(workflowNodeReq.getNodeName());
             // 节点步骤
             workflowNodeDto.setNodeStep(workflowNodeReq.getNodeStep());
-        });
+            if (checkFlag) {
+                checkNodeParam(workflowNodeDto);
+            }
+            workflowNodeDtoList.add(workflowNodeDto);
+        }
         return workflowNodeDtoList;
+    }
+
+    /** 校验工作流节点配置参数 */
+    private static void checkNodeParam(WorkflowNodeDto workflowNodeDto) {
+        if (workflowNodeDto.getWorkflowNodeInputList().size() == 0) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
+        }
+
+        if (workflowNodeDto.getWorkflowNodeOutputList().size() == 0) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
+        }
+
+        if (workflowNodeDto.getWorkflowNodeCode() == null) {
+
+        }
+        if (workflowNodeDto.getWorkflowNodeResource() == null) {
+
+        }
     }
 
 }

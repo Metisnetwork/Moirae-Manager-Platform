@@ -8,10 +8,8 @@ import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
-import com.platon.rosettaflow.mapper.domain.*;
+import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.req.workflow.*;
-import com.platon.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
-import com.platon.rosettaflow.req.workflow.node.WorkflowNodeReq;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import com.platon.rosettaflow.utils.ConvertUtils;
@@ -31,7 +29,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 工作流管理
@@ -112,8 +113,8 @@ public class WorkflowController {
         //先保存工作流
         if (SysConstant.STR_1.equals(startWorkflowReq.getSaveFlag())) {
             List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(
-                    startWorkflowReq.getWorkflowNodeReqList());
-            workflowNodeService.saveWorkflowAllNodeData(startWorkflowReq.getWorkflowId(), workflowNodeDtoList, Boolean.TRUE);
+                    startWorkflowReq.getWorkflowNodeReqList(), Boolean.TRUE);
+            workflowNodeService.saveWorkflowAllNodeData(startWorkflowReq.getWorkflowId(), workflowNodeDtoList);
         }
 
         //启动工作流

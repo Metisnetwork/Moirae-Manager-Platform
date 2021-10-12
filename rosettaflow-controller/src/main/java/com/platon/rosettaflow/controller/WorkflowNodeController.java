@@ -3,8 +3,10 @@ package com.platon.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
-import com.platon.rosettaflow.mapper.domain.*;
-import com.platon.rosettaflow.req.workflow.node.*;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
+import com.platon.rosettaflow.req.workflow.node.ClearWorkflowNodeReq;
+import com.platon.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
@@ -71,8 +73,8 @@ public class WorkflowNodeController {
     @PostMapping("save")
     @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
     public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
-        List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(workflowAllNodeReq.getWorkflowNodeReqList());
-        workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList, Boolean.FALSE);
+        List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(workflowAllNodeReq.getWorkflowNodeReqList(), Boolean.FALSE);
+        workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList);
         return ResponseVo.createSuccess();
     }
 
