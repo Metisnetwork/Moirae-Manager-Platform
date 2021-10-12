@@ -5,6 +5,7 @@ import com.google.protobuf.Empty;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
@@ -128,6 +129,11 @@ public class AuthServiceClient {
         NodeIdentityDto owner;
         MetaDataUsageRuleDto metaDataUsageRuleDto;
         for (int i = 0; i < getMetadataAuthorityListResponse.getListCount(); i++) {
+            //过滤掉授权信息状态未知的数据
+            if (getMetadataAuthorityListResponse.getList(i).getStateValue() == UserMetaDataAuthorithStateEnum.UNKNOWN.getValue()) {
+                continue;
+            }
+
             getMetaDataAuthorityDto = new GetMetaDataAuthorityDto();
 
             owner = new NodeIdentityDto();

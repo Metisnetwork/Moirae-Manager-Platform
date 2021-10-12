@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
-import com.platon.rosettaflow.common.enums.ErrorMsg;
-import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
-import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.enums.UserTypeEnum;
+import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
@@ -152,6 +149,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
         wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
+        wrapper.eq(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         return this.getOne(wrapper);
     }
 
