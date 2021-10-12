@@ -74,7 +74,7 @@ public class WorkflowNodeController {
     @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
     public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
         List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(
-                workflowAllNodeReq.getWorkflowNodeReqList(), Boolean.TRUE);
+                workflowAllNodeReq.getWorkflowNodeReqList(), Boolean.FALSE);
         workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList);
         return ResponseVo.createSuccess();
     }
