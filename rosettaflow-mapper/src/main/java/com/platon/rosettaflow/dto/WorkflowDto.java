@@ -34,9 +34,9 @@ public class WorkflowDto extends Workflow {
      */
     private boolean jobFlg = false;
     /**
-     * 作业id
+     * 子作业id(主键)
      */
-    private Long jobId;
+    private Long subJobId;
 
     /**
      * 工作流节点列表
