@@ -15,15 +15,16 @@ public interface ISubJobNodeService extends IService<SubJobNode> {
 
     /**
      *  修改子作业节点运行状态
-     * @param subJobId 子作业id
+     * @param id 子作业节点主键id
      * @param runStatus 运行状态
+     * @return boolean 更新是否成功
      */
-    void updateRunStatusByJobId(Long subJobId, Byte runStatus);
+    boolean updateRunStatus(Long id, Byte runStatus);
 
     /**
      * 批量修改子作业节点状态
      *
-     * @param ids 子作业ids
+     * @param ids 子作业节点i主键ds
      * @param runStatus  运行状态
      */
     void updateRunStatus(Object[] ids, Byte runStatus);
