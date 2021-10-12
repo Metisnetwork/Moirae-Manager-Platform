@@ -191,6 +191,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
         String[] identityIdArr = new String[workflowNodeInputList.size()];
+        //任务里面定义的 (p0 -> pN 方 ...)
+        for (int i = 0; i < workflowNodeInputList.size(); i++) {
+            workflowNodeInputList.get(i).setPartyId("p" + i);
+            identityIdArr[i] = workflowNodeInputList.get(i).getIdentityId();
+        }
         // 校验组织信息
         List<Organization> organizationList = organizationService.getByIdentityIds(identityIdArr);
         if (null == organizationList || organizationList.size() != identityIdArr.length) {
