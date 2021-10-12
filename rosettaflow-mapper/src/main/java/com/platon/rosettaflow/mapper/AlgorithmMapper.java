@@ -21,6 +21,12 @@ public interface AlgorithmMapper extends BaseMapper<Algorithm> {
     List<AlgorithmDto> queryAlgorithmList(@Param(value = "algorithmName") String algorithmName);
 
     /**
+     * 查询算法树列表
+     * @return 算法列表
+     */
+    List<AlgorithmDto> queryAlgorithmTreeList();
+
+    /**
      * 查询算法详情
      *
      * @param algorithmId 算法id

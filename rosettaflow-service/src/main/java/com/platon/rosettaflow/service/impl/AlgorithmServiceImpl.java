@@ -103,7 +103,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         Map<String, Object> param3 = new HashMap<>(SysConstant.INT_4);
         param3.put("algorithmId", SysConstant.INT_3);
         param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getName());
-        List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmList(null);
+        List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmTreeList();
         if (algorithmDtoList == null || algorithmDtoList.size() == 0) {
             param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
             param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
@@ -122,6 +122,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
                 Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
                 param.put("algorithmId", algorithmDto.getAlgorithmId());
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
+                param.put("algorithmDto", algorithmDto);
                 childList1.add(param);
 
             }
@@ -129,12 +130,14 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
                 Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
                 param.put("algorithmId", algorithmDto.getAlgorithmId());
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
+                param.put("algorithmDto", algorithmDto);
                 childList2.add(param);
             }
             if (SysConstant.INT_3 == algorithmDto.getAlgorithmType()) {
                 Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
                 param.put("algorithmId", algorithmDto.getAlgorithmId());
                 param.put("algorithmName", algorithmDto.getAlgorithmName());
+                param.put("algorithmDto", algorithmDto);
                 childList3.add(param);
             }
         }

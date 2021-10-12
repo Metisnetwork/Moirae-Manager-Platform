@@ -7,8 +7,7 @@ import com.platon.rosettaflow.req.algorithm.AlgListReq;
 import com.platon.rosettaflow.req.algorithm.AlgorithmReq;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.vo.ResponseVo;
-import com.platon.rosettaflow.vo.algorithm.AlgDetailsVo;
-import com.platon.rosettaflow.vo.algorithm.AlgorithmListVo;
+import com.platon.rosettaflow.vo.algorithm.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,10 +69,34 @@ public class AlgorithmController {
 
     @GetMapping("queryAlgorithmTreeList")
     @ApiOperation(value = "查询算法树列表", notes = "查询算法树列表")
-    public ResponseVo<List<Map<String, Object>>> queryAlgorithmTreeList() {
+    public ResponseVo<AlgTreeListVo> queryAlgorithmTreeList() {
         List<Map<String, Object>> listVo = algorithmService.queryAlgorithmTreeList();
-        return ResponseVo.createSuccess(listVo);
+        AlgTreeListVo algTreeListVo = this.convertAlgTreeList(listVo);
+        return ResponseVo.createSuccess(algTreeListVo);
+    }
 
+    /** 查询算法树响应参数转换 */
+    private AlgTreeListVo convertAlgTreeList(List<Map<String, Object>> listVo){
+        AlgTreeListVo algTreeListVo = new AlgTreeListVo();
+        List<AlgTreeVo> algTreeVoList = new ArrayList<>();
+        for (Map<String, Object> map : listVo) {
+            AlgTreeVo algTreeVo = BeanUtil.toBean(map, AlgTreeVo.class);
+            List<Map<String, Object>> childList = (List)map.get("child");
+            if (null == childList || childList.size() == 0) {
+                continue;
+            }
+            List<AlgChildTreeVo> algDetailsVoList = new ArrayList<>();
+            childList.forEach(param -> {
+                AlgChildTreeVo algChildTreeVo = BeanUtil.toBean(param, AlgChildTreeVo.class);
+                AlgDetailsVo algDetailsVo = BeanUtil.toBean(param.get("algorithmDto"), AlgDetailsVo.class);
+                algChildTreeVo.setAlgDetailsVo(algDetailsVo);
+                algDetailsVoList.add(algChildTreeVo);
+            });
+            algTreeVo.setChild(algDetailsVoList);
+            algTreeVoList.add(algTreeVo);
+        }
+        algTreeListVo.setAlgTreeVoList(algTreeVoList);
+        return algTreeListVo;
     }
 
 }
