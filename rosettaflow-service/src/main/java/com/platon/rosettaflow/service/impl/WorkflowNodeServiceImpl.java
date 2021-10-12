@@ -190,6 +190,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     /** 保存工作流节点输入 */
     private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
+        if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
+            return new ArrayList<>();
+        }
         String[] identityIdArr = new String[workflowNodeInputList.size()];
         //任务里面定义的 (p0 -> pN 方 ...)
         for (int i = 0; i < workflowNodeInputList.size(); i++) {
@@ -221,6 +224,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private List<WorkflowNodeOutput> saveWorkflowNodeOutput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto,
                                                             List<WorkflowNodeInput> workflowNodeInputList){
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeDto.getWorkflowNodeOutputList();
+        if (null == workflowNodeOutputList || workflowNodeOutputList.size() == 0) {
+            return new ArrayList<>();
+        }
         // 任务里面定义的 (p0 -> pN 方 ...) 与输入保持一致
         Map<String, String> partyIdMap = workflowNodeInputList.stream().collect(
                 Collectors.toMap(WorkflowNodeInput::getIdentityId, WorkflowNodeInput::getPartyId));
