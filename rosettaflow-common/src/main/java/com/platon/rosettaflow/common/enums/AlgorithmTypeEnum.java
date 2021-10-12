@@ -11,15 +11,15 @@ public enum AlgorithmTypeEnum {
     /**
      * 统计分析
      */
-    ALGORITHM_TYPE_1((byte) 1, "统计分析", "统计分析(开发中)"),
+    ALGORITHM_TYPE_1((byte) 1, "统计分析", "统计分析"),
     /**
      * 特征工程
      */
-    ALGORITHM_TYPE_2((byte) 2, "特征工程", "特征工程(开发中)"),
+    ALGORITHM_TYPE_2((byte) 2, "特征工程", "特征工程"),
     /**
      * 机器学习
      */
-    ALGORITHM_TYPE_3((byte) 3, "机器学习", "机器学习(开发中)");
+    ALGORITHM_TYPE_3((byte) 3, "机器学习", "机器学习");
 
     private final byte type;
     private final String name;

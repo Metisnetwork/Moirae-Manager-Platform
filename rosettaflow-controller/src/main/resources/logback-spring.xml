@@ -11,7 +11,7 @@
     </appender>
 
     <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>./logs/rosettaflow.log</File>
+        <File>./logs/moirae.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>./logs/rosettaflow_console.%d{yyyy-MM-dd}.log</FileNamePattern>
             <maxHistory>30</maxHistory>
@@ -28,7 +28,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="test | uat | prod">
+    <springProfile name="dev | test | uat | prod">
         <root>
             <level value="INFO"/>
             <appender-ref ref="fileAppender"/>
