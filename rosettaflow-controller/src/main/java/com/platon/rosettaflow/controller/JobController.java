@@ -14,6 +14,7 @@ import com.platon.rosettaflow.vo.job.JobVo;
 import com.platon.rosettaflow.vo.job.QueryWorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +78,13 @@ public class JobController {
         } else {
             jobService.reStart(actionJobReq.getId());
         }
+        return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("deleteBatch")
+    @ApiOperation(value = "批量删除作业", notes = "批量删除作业")
+    public ResponseVo<?> actionJob(@ApiParam(value = "作业id集合", required = true) List<Long> ids) {
+        jobService.deleteBatchJob(ids);
         return ResponseVo.createSuccess();
     }
 

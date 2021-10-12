@@ -36,10 +36,17 @@ public class SubJobNodeServiceImpl extends ServiceImpl<SubJobNodeMapper, SubJobN
     }
 
     @Override
-    public SubJobNode querySubJobNodeByJobId(Long subJobId) {
+    public List<SubJobNode> querySubJobNodeListBySubJobId(Long subJobId) {
         LambdaQueryWrapper<SubJobNode> querySubJobNode = Wrappers.lambdaQuery();
         querySubJobNode.eq(SubJobNode::getSubJobId, subJobId);
-        return this.getOne(querySubJobNode);
+        return this.list(querySubJobNode);
+    }
+
+    @Override
+    public List<SubJobNode> queryBatchSubJobListNodeByJobId(Object[] subJobIds) {
+        LambdaQueryWrapper<SubJobNode> querySubJobNode = Wrappers.lambdaQuery();
+        querySubJobNode.in(SubJobNode::getSubJobId, subJobIds);
+        return this.list(querySubJobNode);
     }
 
     @Override
@@ -59,6 +66,15 @@ public class SubJobNodeServiceImpl extends ServiceImpl<SubJobNodeMapper, SubJobN
     public void updateRunStatus(Object[] ids, Byte runStatus) {
         LambdaUpdateWrapper<SubJobNode> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.set(SubJobNode::getRunStatus, runStatus);
+        updateWrapper.set(SubJobNode::getUpdateTime, now());
+        updateWrapper.in(SubJobNode::getId, ids);
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public void updateBatchStatus(Object[] ids, Byte status) {
+        LambdaUpdateWrapper<SubJobNode> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(SubJobNode::getStatus, status);
         updateWrapper.set(SubJobNode::getUpdateTime, now());
         updateWrapper.in(SubJobNode::getId, ids);
         this.update(updateWrapper);

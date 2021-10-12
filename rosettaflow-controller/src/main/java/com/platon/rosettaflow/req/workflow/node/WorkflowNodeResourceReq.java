@@ -1,4 +1,4 @@
-package com.platon.rosettaflow.req.workflownode;
+package com.platon.rosettaflow.req.workflow.node;
 
 import com.platon.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;

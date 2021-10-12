@@ -27,11 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
+import java.util.*;
+import java.util.stream.Collectors;
 import static cn.hutool.core.date.DateTime.now;
 
 /**
@@ -67,6 +64,13 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
     }
 
     @Override
+    public List<SubJob> queryBatchSubJobListByJobId(List<Long> jobIds) {
+        LambdaQueryWrapper<SubJob> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(SubJob::getJobId, jobIds);
+        return this.list(queryWrapper);
+    }
+
+    @Override
     public void pause(Long id) {
         SubJob subJob = this.getById(id);
         if(Objects.isNull(subJob)){
@@ -76,6 +80,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_RUNNING.getMsg());
         }
         //停止子作业
+        // todo...此处停止子作业有问题，待处理
         TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(subJob);
         TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
         if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
@@ -131,6 +136,67 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         this.update(updateWrapper);
     }
 
+    @Override
+    public void updateBatchStatus(Object[] ids, Byte status) {
+        LambdaUpdateWrapper<SubJob> updateSubJobWrapper = Wrappers.lambdaUpdate();
+        updateSubJobWrapper.set(SubJob::getStatus,status);
+        updateSubJobWrapper.set(SubJob::getUpdateTime,now());
+        updateSubJobWrapper.in(SubJob::getId, ids);
+        this.update(updateSubJobWrapper);
+    }
+
+    @Override
+    public void deleteSubJobById(Long id) {
+        SubJob subJob = this.getById(id);
+        if(Objects.isNull(subJob)){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_EXIST.getMsg());
+        }
+        if(subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+        }
+        //子作业节点是否存在运行中节点
+        List<SubJobNode> subJobNodeList = subJobNodeService.querySubJobNodeListBySubJobId(subJob.getId());
+        boolean isRunningNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobStatusEnum.RUNNING.getValue());
+        if(isRunningNode){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+        }
+        //更新子作业状态
+        subJob.setStatus(StatusEnum.UN_VALID.getValue());
+        subJob.setUpdateTime(new Date());
+        this.updateById(subJob);
+        //更新子作业节点状态
+        Object[] subJobNodeArrayIds = subJobNodeList.stream().map(subJobNode -> subJobNode.getId()).collect(Collectors.toList()).toArray();
+        subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
+    }
+
+    @Override
+    public void deleteBatchSubJob(List<Long> ids) {
+         List<SubJob> subJobs = this.listByIds(ids);
+         if(subJobs.isEmpty() || ids.size() != subJobs.size()){
+             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_ID_NOT_EXIST.getMsg());
+         }
+         //子作业运行中
+         boolean isExistRunning = subJobs.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
+         if(isExistRunning){
+             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+         }
+         //子作业节点是否存在运行中节点
+        List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(ids.toArray());
+        boolean isRunningNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobStatusEnum.RUNNING.getValue());
+        if(isRunningNode){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+        }
+        //批量更新子作业状态
+        LambdaUpdateWrapper<SubJob> updateSubJobWrapper = Wrappers.lambdaUpdate();
+        updateSubJobWrapper.set(SubJob::getStatus,StatusEnum.UN_VALID.getValue());
+        updateSubJobWrapper.set(SubJob::getUpdateTime,now());
+        updateSubJobWrapper.in(SubJob::getId, ids);
+        this.update(updateSubJobWrapper);
+        //批量更新子作业节点状态
+        Object[] subJobNodeArrayIds = subJobNodeList.stream().map(subJobNode -> subJobNode.getId()).collect(Collectors.toList()).toArray();
+        subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
+    }
+
 
     /**
      *  组装停止子作业请求参数
@@ -138,8 +204,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
      */
     public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(SubJob subJob){
         Workflow workflow = workflowService.queryWorkflowDetail(subJob.getWorkflowId());
-        SubJobNode subJobNode = subJobNodeService.querySubJobNodeByJobId(subJob.getId());
-
+        SubJobNode subJobNode = subJobNodeService.querySubJobNodeListBySubJobId(subJob.getId()).get(0);
         TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
         terminateTaskRequestDto.setUser(workflow.getAddress());
         terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflow.getAddress()));

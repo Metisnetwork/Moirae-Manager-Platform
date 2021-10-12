@@ -12,12 +12,10 @@ import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.job.SubJobVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -54,6 +52,24 @@ public class SubJobController {
         }
         return ResponseVo.createSuccess();
     }
+
+    /*@PostMapping("delete/{id}")
+    @ApiOperation(value = "删除子作业", notes = "删除子作业")
+    public ResponseVo<?> actionJob(@ApiParam(value = "子作业id", required = true) @PathVariable Long id) {
+        subJobService.deleteSubJobById(id);
+        return ResponseVo.createSuccess();
+    }*/
+
+    @PostMapping("deleteBatch")
+    @ApiOperation(value = "批量删除子作业", notes = "批量删除子作业")
+    public ResponseVo<?> actionJob(@ApiParam(value = "子作业id集合", required = true) List<Long> ids) {
+        subJobService.deleteBatchSubJob(ids);
+        return ResponseVo.createSuccess();
+    }
+
+
+
+
 
     private ResponseVo<PageVo<SubJobVo>> convertToSubJobVo(IPage<SubJobDto> pageDto) {
         List<SubJobVo> items = new ArrayList<>();

@@ -32,6 +32,14 @@ public interface IJobService extends IService<Job> {
     IPage<JobDto> list(Long current, Long size, String jobName);
 
     /**
+     * 批量修改作业有效状态
+     *
+     * @param ids 作业ids
+     * @param status  有效状态
+     */
+    void updateBatchStatus(Object[] ids, Byte status);
+
+    /**
      * 添加作业
      *
      * @param jobDto 添加作业请求对象
@@ -47,6 +55,9 @@ public interface IJobService extends IService<Job> {
 
     /**
      * 查询关联工作流
+     *
+     * @param projectId 项目id
+     * @return  List<Workflow> 工作流集合
      */
     List<Workflow> queryRelatedWorkflowName(Long projectId);
 
@@ -71,4 +82,12 @@ public interface IJobService extends IService<Job> {
      * @return 作业列表
      */
     List<Job> listRunJobByWorkflowId(Long workflowId);
+
+    /**
+     *  批量删除作业
+     * @param ids 作业ids集合
+     */
+    void deleteBatchJob(List<Long> ids);
+
+
 }
