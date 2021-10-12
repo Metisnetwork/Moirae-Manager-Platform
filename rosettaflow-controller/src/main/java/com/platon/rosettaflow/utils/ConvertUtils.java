@@ -94,6 +94,7 @@ public class ConvertUtils {
             workflowNodeDto.setNodeName(workflowNodeReq.getNodeName());
             // 节点步骤
             workflowNodeDto.setNodeStep(workflowNodeReq.getNodeStep());
+            // 校验工作流节点配置参数
             if (checkFlag) {
                 checkNodeParam(workflowNodeDto);
             }
@@ -102,21 +103,19 @@ public class ConvertUtils {
         return workflowNodeDtoList;
     }
 
-    /** 校验工作流节点配置参数 */
+    /** 校验工作流节点配置参数(是否是保存接口调用（checkFlag:保存节点调用时，无需校验输入输出数据）) */
     private static void checkNodeParam(WorkflowNodeDto workflowNodeDto) {
-        if (workflowNodeDto.getWorkflowNodeInputList().size() == 0) {
+        if (null == workflowNodeDto.getWorkflowNodeInputList() || workflowNodeDto.getWorkflowNodeInputList().size() == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
         }
-
-        if (workflowNodeDto.getWorkflowNodeOutputList().size() == 0) {
+        if (null == workflowNodeDto.getWorkflowNodeOutputList() || workflowNodeDto.getWorkflowNodeOutputList().size() == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
         }
-
-        if (workflowNodeDto.getWorkflowNodeCode() == null) {
-
+        if (Objects.isNull(workflowNodeDto.getWorkflowNodeCode())) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_CODE_NOT_EXIST.getMsg());
         }
-        if (workflowNodeDto.getWorkflowNodeResource() == null) {
-
+        if (Objects.isNull(workflowNodeDto.getWorkflowNodeResource())) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_RESOURCE_EXIST.getMsg());
         }
     }
 
