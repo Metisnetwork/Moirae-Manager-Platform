@@ -100,6 +100,7 @@ public enum ErrorMsg {
     SUB_JOB_NOT_DELETE("子作业运行中不能删除", "Sub job is running can not delete"),
     SUB_JOB_ID_NOT_EXIST("子作业id不存在", "Sub job not exist"),
     SUB_JOB_NODE_NOT_DELETE("子作业节点运行中不能删除", "Sub job node is running can not delete"),
+    SUB_JOB_NODE_UPDATE_FAIL("子作业节点更新失败", "Sub job node update fail"),
 
 
     /**

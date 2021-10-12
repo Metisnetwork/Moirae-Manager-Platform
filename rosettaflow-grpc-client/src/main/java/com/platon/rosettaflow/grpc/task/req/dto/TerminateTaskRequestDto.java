@@ -25,4 +25,18 @@ public class TerminateTaskRequestDto {
      * 发起任务的账户的签名
      */
     private String sign;
+
+    //------------------  节点信息  -------------------------
+    /**
+     * 节点主键id
+     */
+    private Long nodeId;
+    /**
+     * 节点在工作流中序号,从1开始
+     */
+    private Integer nodeStep;
+    /**
+     * 运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败
+     */
+    private Byte nodeRunStatus;
 }
