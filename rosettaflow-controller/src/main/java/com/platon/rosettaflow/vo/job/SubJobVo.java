@@ -29,7 +29,7 @@ public class SubJobVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date endTime;
 
-    @ApiModelProperty("运行时长")
+    @ApiModelProperty("运行时长(秒单位)")
     private String runTime;
 
     @ApiModelProperty("工作流id")

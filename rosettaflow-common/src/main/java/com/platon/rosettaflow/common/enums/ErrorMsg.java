@@ -76,6 +76,8 @@ public enum ErrorMsg {
     WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported"),
     WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "Workflow node code does not exist"),
     WORKFLOW_NODE_SENDER_NOT_EXIST("工作流节点需要一个发起方", "Workflow node need one sender"),
+    WORKFLOW_NODE_PUBLISH_FAIL("工作流节点发布失败", "Workflow node publish fail"),
+
 
     /**
      * 作业
@@ -101,7 +103,6 @@ public enum ErrorMsg {
     SUB_JOB_ID_NOT_EXIST("子作业id不存在", "Sub job not exist"),
     SUB_JOB_NODE_NOT_DELETE("子作业节点运行中不能删除", "Sub job node is running can not delete"),
     SUB_JOB_NODE_UPDATE_FAIL("子作业节点更新失败", "Sub job node update fail"),
-    SUB_JOB_NODE_PUBLISH_FAIL("子作业节点发布失败", "Sub job node publish fail"),
 
 
     /**

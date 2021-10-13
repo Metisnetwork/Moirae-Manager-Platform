@@ -287,13 +287,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             respDto = grpcTaskService.syncPublishTask(taskDto);
             isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
         }catch (Exception e){
-            log.error("publish task fail, task name {}, work flow nodeId {}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
+            log.error("publish task fail, task name:{}, work flow nodeId:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
             if (workflowDto.isJobFlg()) {
                 updateSubJobInfo(workflowDto, isPublishSuccess);
                 updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
                 return;
             } else {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_PUBLISH_FAIL.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_PUBLISH_FAIL.getMsg());
             }
         }
         if (workflowDto.isJobFlg()) {
@@ -494,7 +494,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private void updateSubJobInfo(WorkflowDto workflowDto, boolean isPublishSuccess){
         SubJob subJob = subJobService.getById(workflowDto.getSubJobId());
         subJob.setEndTime(now());
-        subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
+        subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.SECOND)));
         subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
         subJobService.updateById(subJob);
     }
