@@ -162,6 +162,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Override
     public void deleteBatchJob(List<Long> ids) {
+        if(ids.isEmpty()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
+        }
         List<Job> jobs = this.listByIds(ids);
         if(jobs.isEmpty() || ids.size() != jobs.size()){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());

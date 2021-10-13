@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.common.enums.JobActionStatusEnum;
 import com.platon.rosettaflow.dto.SubJobDto;
 import com.platon.rosettaflow.req.job.ActionJobReq;
+import com.platon.rosettaflow.req.job.DeleteBatchSubJobReq;
 import com.platon.rosettaflow.req.job.ListSubJobReq;
 import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.vo.PageVo;
@@ -62,8 +63,8 @@ public class SubJobController {
 
     @PostMapping("deleteBatch")
     @ApiOperation(value = "批量删除子作业", notes = "批量删除子作业")
-    public ResponseVo<?> actionJob(@ApiParam(value = "子作业id集合", required = true) List<Long> ids) {
-        subJobService.deleteBatchSubJob(ids);
+    public ResponseVo<?> actionJob(@RequestBody @Valid DeleteBatchSubJobReq idsReq) {
+        subJobService.deleteBatchSubJob(idsReq.getSubJobIds());
         return ResponseVo.createSuccess();
     }
 

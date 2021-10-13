@@ -171,6 +171,9 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
 
     @Override
     public void deleteBatchSubJob(List<Long> ids) {
+        if(ids.isEmpty()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
+        }
          List<SubJob> subJobs = this.listByIds(ids);
          if(subJobs.isEmpty() || ids.size() != subJobs.size()){
              throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_ID_NOT_EXIST.getMsg());
