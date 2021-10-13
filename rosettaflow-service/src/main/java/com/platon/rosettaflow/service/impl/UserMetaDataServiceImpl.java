@@ -118,8 +118,6 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
-        //数据授权申请成功后，记录redis中，开启用户元数据同步定时任务
-        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, applyDto.getUser()+applyDto.getAuth().getMetaDataId(),null);
     }
 
     @Override
