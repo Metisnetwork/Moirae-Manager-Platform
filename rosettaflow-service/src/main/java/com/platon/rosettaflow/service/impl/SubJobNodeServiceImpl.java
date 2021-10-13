@@ -27,11 +27,20 @@ public class SubJobNodeServiceImpl extends ServiceImpl<SubJobNodeMapper, SubJobN
 
 
     @Override
-    public void updateRunStatusByJobId(Long subJobId, Byte runStatus) {
+    public boolean updateRunStatus(Long id, Byte runStatus) {
         LambdaUpdateWrapper<SubJobNode> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.set(SubJobNode::getRunStatus, runStatus);
         updateWrapper.set(SubJobNode::getUpdateTime, new Date(System.currentTimeMillis()));
-        updateWrapper.eq(SubJobNode::getSubJobId, subJobId);
+        updateWrapper.eq(SubJobNode::getId, id);
+        return this.update(updateWrapper);
+    }
+
+    @Override
+    public void updateRunStatus(Object[] ids, Byte runStatus) {
+        LambdaUpdateWrapper<SubJobNode> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(SubJobNode::getRunStatus, runStatus);
+        updateWrapper.set(SubJobNode::getUpdateTime, now());
+        updateWrapper.in(SubJobNode::getId, ids);
         this.update(updateWrapper);
     }
 
@@ -62,14 +71,6 @@ public class SubJobNodeServiceImpl extends ServiceImpl<SubJobNodeMapper, SubJobN
         return this.baseMapper.getRunningNodeWithWorkIdAndNodeNum();
     }
 
-    @Override
-    public void updateRunStatus(Object[] ids, Byte runStatus) {
-        LambdaUpdateWrapper<SubJobNode> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(SubJobNode::getRunStatus, runStatus);
-        updateWrapper.set(SubJobNode::getUpdateTime, now());
-        updateWrapper.in(SubJobNode::getId, ids);
-        this.update(updateWrapper);
-    }
 
     @Override
     public void updateBatchStatus(Object[] ids, Byte status) {

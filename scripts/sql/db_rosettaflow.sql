@@ -131,7 +131,7 @@ CREATE TABLE `t_user_meta_data` (
     `audit_suggestion` varchar(256) DEFAULT NULL COMMENT '审核意见 ',
     `apply_time` datetime DEFAULT NULL COMMENT '发起授权申请的时间',
     `audit_time` datetime DEFAULT NULL COMMENT '审核授权申请的时间',
-    `auth_metadata_state` tinyint(4) DEFAULT NULL COMMENT '数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)',
+    `auth_metadata_state` tinyint(4) DEFAULT '0' COMMENT '数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)',
     `expire` tinyint(4) DEFAULT NULL COMMENT '是否已过期（按时间时需要）: 0-未过期, 1-已过期',
     `used_times` bigint(20) DEFAULT '0' COMMENT '已经使用的次数(按次数时有效)',
     `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
@@ -284,7 +284,7 @@ CREATE TABLE `t_workflow` (
   `workflow_name` varchar(64) DEFAULT NULL COMMENT '工作流名称',
   `workflow_desc`  varchar(128) DEFAULT NULL COMMENT '工作流描述',
   `node_number` int(11) DEFAULT NULL COMMENT '节点数',
-  `user` varchar(64)  DEFAULT NULL COMMENT '发起任务的账户',
+  `address` varchar(64) DEFAULT NULL COMMENT '发起任务的账户',
   `sign`  varchar(512) DEFAULT NULL COMMENT '发起任务的账户的签名',
   `run_status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未运行,1-运行中,2-运行成功，3-运行失败',
   `del_version` bigint(11) DEFAULT 0 COMMENT '版本标识，用于逻辑删除',
@@ -331,7 +331,7 @@ CREATE TABLE `t_workflow_node` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  KEY `flow_alg_id` (`workflow_id`, `algorithm_id`)
+  UNIQUE KEY UK_NODE_STEP (`workflow_id`, `node_step`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工作流节点表';
 
 -- ----------------------------

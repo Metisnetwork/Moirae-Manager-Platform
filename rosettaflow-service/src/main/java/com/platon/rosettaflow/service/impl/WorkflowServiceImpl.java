@@ -277,36 +277,29 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             updateSign(workflowDto);
         }
 
-        //此处先执行第一个节点，待第一个节点执行成功后再执行
+        /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
-        PublishTaskDeclareResponseDto respDto = grpcTaskService.syncPublishTask(taskDto);
-        boolean isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
-
+        PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
+        boolean isPublishSuccess = false;
+        try{
+            respDto = grpcTaskService.syncPublishTask(taskDto);
+            isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
+        }catch (Exception e){
+            log.error("publish task fail, task name {}, work flow nodeId {}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
+            if (workflowDto.isJobFlg()) {
+                updateSubJobInfo(workflowDto, isPublishSuccess);
+                updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
+                return;
+            } else {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_PUBLISH_FAIL.getMsg());
+            }
+        }
         if (workflowDto.isJobFlg()) {
             //1.更新子作业
-            SubJob subJob = subJobService.getById(workflowDto.getJobId());
-            subJob.setEndTime(now());
-            subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
-            subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
-            //2.记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
-            SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(subJob.getId(), workflowDto.getStartNode());
-            SubJobNode subJobNode = !Objects.isNull(subJobNodeTemp) ? subJobNodeTemp : new SubJobNode();
-            if (Objects.isNull(subJobNodeTemp)) {
-                subJobNode.setSubJobId(subJob.getId());
-                subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
-                subJobNode.setNodeStep(workflowNode.getNodeStep());
-            }
-            subJobNode.setRunStatus(isPublishSuccess ? SubJobNodeStatusEnum.RUNNING.getValue() : SubJobNodeStatusEnum.RUN_FAIL.getValue());
-            subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
-            subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
-            //3.持久化数据
-            subJobService.updateById(subJob);
-            boolean isSuccess = Objects.isNull(subJobNodeTemp) ? subJobNodeService.save(subJobNode) : subJobNodeService.updateById(subJobNode);
-            if (!isSuccess) {
-                log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
-            }
+            updateSubJobInfo(workflowDto, isPublishSuccess);
+            //2.更新子作业节点信息
+            updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
         } else {
             //1.更新工作流
             Workflow workflow = this.getById(workflowNode.getWorkflowId());
@@ -329,6 +322,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             redisUtil.set(SysConstant.REDIS_WORKFLOW_PREFIX_KEY+workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
         }
     }
+
+
 
     private void updateSign(WorkflowDto workflowDto) {
         LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
@@ -488,6 +483,48 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         updateWrapper.in(Workflow::getId, ids);
         this.update(updateWrapper);
     }
+
+
+    /**
+     * 更新子作业
+     * @param workflowDto 工作流请求信息
+     * @param isPublishSuccess 节点是否发布成功
+     */
+    private void updateSubJobInfo(WorkflowDto workflowDto, boolean isPublishSuccess){
+        SubJob subJob = subJobService.getById(workflowDto.getSubJobId());
+        subJob.setEndTime(now());
+        subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
+        subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
+        subJobService.updateById(subJob);
+    }
+
+    /**
+     * 记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
+     * @param workflowDto 工作流请求信息
+     * @param workflowNode 工作流节点
+     * @param isPublishSuccess 节点是否发布成功
+     * @param respDto           发布响应结果
+     */
+    private void updateSubJobNodeInfo(WorkflowDto workflowDto, WorkflowNode workflowNode, boolean isPublishSuccess, PublishTaskDeclareResponseDto respDto){
+        SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
+        SubJobNode subJobNode = !Objects.isNull(subJobNodeTemp) ? subJobNodeTemp : new SubJobNode();
+        if (Objects.isNull(subJobNodeTemp)) {
+            subJobNode.setSubJobId(workflowDto.getSubJobId());
+            subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
+            subJobNode.setNodeStep(workflowNode.getNodeStep());
+        }
+        subJobNode.setRunStatus(isPublishSuccess ? SubJobNodeStatusEnum.RUNNING.getValue() : SubJobNodeStatusEnum.RUN_FAIL.getValue());
+        subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
+        subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
+        subJobNode.setUpdateTime(now());
+        boolean isSuccess = Objects.isNull(subJobNodeTemp) ? subJobNodeService.save(subJobNode) : subJobNodeService.updateById(subJobNode);
+        if (!isSuccess) {
+            log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
+        }
+    }
+
+
 
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
         WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());

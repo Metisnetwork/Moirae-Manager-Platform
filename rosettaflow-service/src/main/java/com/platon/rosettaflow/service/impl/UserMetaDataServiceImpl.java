@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
-import com.platon.rosettaflow.common.enums.ErrorMsg;
-import com.platon.rosettaflow.common.enums.MetaDataUsageEnum;
-import com.platon.rosettaflow.common.enums.RespCodeEnum;
-import com.platon.rosettaflow.common.enums.UserTypeEnum;
+import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
@@ -121,8 +118,6 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
-        //数据授权申请成功后，记录redis中，开启用户元数据同步定时任务
-        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, applyDto.getUser()+applyDto.getAuth().getMetaDataId(),null);
     }
 
     @Override
@@ -152,6 +147,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
         wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
+        wrapper.eq(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         return this.getOne(wrapper);
     }
 

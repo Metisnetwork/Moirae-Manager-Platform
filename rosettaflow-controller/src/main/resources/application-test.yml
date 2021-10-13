@@ -19,9 +19,9 @@ spring:
       max-lifetime: 1800000
       idle-timeout: 600000
   redis:
-    host: 10.10.8.176
-    port: 6379
-    password:
+    cluster:
+      nodes: 10.10.8.175:6371,10.10.8.175:6372,10.10.8.175:6373,10.10.8.176:6374,10.10.8.176:6375,10.10.8.176:6376
+    password: 123456
     timeout: 5000
     lettuce:
       pool:
