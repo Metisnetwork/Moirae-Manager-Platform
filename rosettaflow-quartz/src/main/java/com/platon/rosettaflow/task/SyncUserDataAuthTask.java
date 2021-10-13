@@ -45,7 +45,7 @@ public class SyncUserDataAuthTask {
     private IUserMetaDataService userMetaDataService;
 
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 2 * 1000)
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
@@ -56,6 +56,7 @@ public class SyncUserDataAuthTask {
 
         //如果用户没有申请过元数据，则跳过
         long applyNum = redisUtil.listSize(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
+        log.info("有{}条用户申请授权元数据信息同步开始>>>>>>", applyNum);
         if (applyNum < 1) {
             return;
         }
@@ -69,6 +70,9 @@ public class SyncUserDataAuthTask {
             List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
             try {
                 metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+                if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
+                    return;
+                }
             } catch (Exception e) {
                 log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
                 return;

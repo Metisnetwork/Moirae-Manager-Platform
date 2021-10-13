@@ -20,7 +20,7 @@ spring:
       idle-timeout: 600000
   redis:
     host: localhost
-    port: 6379
+    port: 7379
     password:
     timeout: 5000
     lettuce:
@@ -59,7 +59,7 @@ grpc:
   client:
     carrier-grpc-server:
       # address: 'static://192.168.21.11:8801'
-      address: 'static://192.168.21.198:8801'
+      address: 'static://192.168.120.158:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
