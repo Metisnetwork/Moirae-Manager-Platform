@@ -2,7 +2,6 @@ package com.platon.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
-import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.MetaDataExpireStatusEnum;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
@@ -18,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author hudenian
@@ -36,61 +33,32 @@ public class SyncUserDataAuthTask {
     private SysConfig sysConfig;
 
     @Resource
-    private RedisUtil redisUtil;
-
-    @Resource
     private GrpcAuthService grpcAuthService;
 
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 2 * 1000)
-    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 2 * 1000)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
-        //test begin 模拟用户申请数据授权
-//        redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY,"0x990a168ecee09b8b1abeff3e2b713924e7151f9bmetadata:0x6ada026b4219b186ea7c7c60bb350615419e87c7ff7104ec4f95cd81c96793d7",null);
-        //test end
 
-        //如果用户没有申请过元数据，则跳过
-        long applyNum = redisUtil.listSize(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
-        if (applyNum < 1) {
-            return;
-        }
-        //所有需要同步的元数据
-        Set<String> userMetaDataIdSet = new HashSet<>();
-        //net中还未查询到的元数据
-        Set<String> userMetaDataIdNetNoExistSet = new HashSet<>();
         try {
             log.info("用户申请授权元数据信息同步开始>>>>");
             long begin;
             List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
             try {
                 metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+                if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
+                    return;
+                }
             } catch (Exception e) {
                 log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
                 return;
             }
-            //查看需要同步数据是否已存在
-            for (int i = 0; i < applyNum; i++) {
-                String userMetaDataId = redisUtil.listRightPop(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY);
-                userMetaDataIdSet.add(userMetaDataId);
-                userMetaDataIdNetNoExistSet.add(userMetaDataId);
-            }
-            //判断是否有需要同步数据
-            boolean syncFlg = false;
-            for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
-                String resultUserMetaDataId = AddressChangeUtils.convert0xAddress(authorityDto.getUser()) + authorityDto.getMetaDataAuthorityDto().getMetaDataId();
-                if (userMetaDataIdSet.contains(resultUserMetaDataId)) {
-                    syncFlg = true;
-                    userMetaDataIdNetNoExistSet.remove(resultUserMetaDataId);
-                }
-            }
-            if (!syncFlg) {
-                return;
-            }
+
             List<UserMetaData> userMetaDataList = new ArrayList<>();
             UserMetaData userMetaData;
             int userMetaDataSize = 0;
@@ -115,17 +83,9 @@ public class SyncUserDataAuthTask {
                 log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
             }
             log.info("用户申请授权元数据信息同步结束>>>>");
-
-            //未同步数据放回redis
-            for (String value : userMetaDataIdNetNoExistSet) {
-                redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, value, null);
-            }
         } catch (Exception e) {
             log.error("用户申请授权元数据信息同步失败，失败原因>>>>{}", e.getMessage(), e);
-            //未同步数据放回redis
-            for (String value : userMetaDataIdSet) {
-                redisUtil.listLeftPush(SysConstant.REDIS_SYNC_USER_METADATA_PREFIX_KEY, value, null);
-            }
+
         }
     }
 

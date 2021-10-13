@@ -28,7 +28,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="dev | test | uat | prod">
+    <springProfile name="dev | test | uat | prod | local">
         <root>
             <level value="INFO"/>
             <appender-ref ref="fileAppender"/>
