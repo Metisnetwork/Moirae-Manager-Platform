@@ -49,7 +49,7 @@ public interface IAlgorithmService extends IService<Algorithm> {
     /**
      * 复制保存算法
      * @param oldNode 源算法信息
-     * @return
+     * @return 新算法id
      */
     Long copySaveAlgorithm(WorkflowNode oldNode);
 

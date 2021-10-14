@@ -76,6 +76,7 @@ public class AlgorithmController {
     }
 
     /** 查询算法树响应参数转换 */
+    @SuppressWarnings("all")
     private AlgTreeListVo convertAlgTreeList(List<Map<String, Object>> listVo){
         AlgTreeListVo algTreeListVo = new AlgTreeListVo();
         List<AlgTreeVo> algTreeVoList = new ArrayList<>();

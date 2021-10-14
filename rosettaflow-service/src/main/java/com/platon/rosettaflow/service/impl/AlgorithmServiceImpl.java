@@ -94,20 +94,17 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     public List<Map<String, Object>> queryAlgorithmTreeList() {
         // 造三个父类型节点
         List<Map<String, Object>> treeList = new ArrayList<>(SysConstant.INT_4);
-        Map<String, Object> param1 = new HashMap<>(SysConstant.INT_4);
+        Map<String, Object> param1 = new HashMap<>(SysConstant.INT_2);
         param1.put("algorithmId", SysConstant.INT_1);
         param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getName());
-        Map<String, Object> param2 = new HashMap<>(SysConstant.INT_4);
+        Map<String, Object> param2 = new HashMap<>(SysConstant.INT_2);
         param2.put("algorithmId", SysConstant.INT_2);
         param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getName());
-        Map<String, Object> param3 = new HashMap<>(SysConstant.INT_4);
+        Map<String, Object> param3 = new HashMap<>(SysConstant.INT_2);
         param3.put("algorithmId", SysConstant.INT_3);
         param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getName());
         List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmTreeList();
         if (algorithmDtoList == null || algorithmDtoList.size() == 0) {
-            param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
-            param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
-            param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
             treeList.add(param1);
             treeList.add(param2);
             treeList.add(param3);
@@ -118,39 +115,22 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         List<Map<String, Object>> childList2 = new ArrayList<>(SysConstant.INT_3);
         List<Map<String, Object>> childList3 = new ArrayList<>(SysConstant.INT_3);
         for (AlgorithmDto algorithmDto : algorithmDtoList) {
-            if (SysConstant.INT_1 == algorithmDto.getAlgorithmType()) {
-                Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
-                param.put("algorithmId", algorithmDto.getAlgorithmId());
-                param.put("algorithmName", algorithmDto.getAlgorithmName());
-                param.put("algorithmDto", algorithmDto);
-                childList1.add(param);
+            Map<String, Object> param = new HashMap<>(SysConstant.INT_3);
+            param.put("algorithmId", algorithmDto.getAlgorithmId());
+            param.put("algorithmName", algorithmDto.getAlgorithmName());
+            param.put("algorithmDto", algorithmDto);
 
+            if (SysConstant.INT_1 == algorithmDto.getAlgorithmType()) {
+                childList1.add(param);
             }
             if (SysConstant.INT_2 == algorithmDto.getAlgorithmType()) {
-                Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
-                param.put("algorithmId", algorithmDto.getAlgorithmId());
-                param.put("algorithmName", algorithmDto.getAlgorithmName());
-                param.put("algorithmDto", algorithmDto);
                 childList2.add(param);
             }
             if (SysConstant.INT_3 == algorithmDto.getAlgorithmType()) {
-                Map<String, Object> param = new HashMap<>(SysConstant.INT_4);
-                param.put("algorithmId", algorithmDto.getAlgorithmId());
-                param.put("algorithmName", algorithmDto.getAlgorithmName());
-                param.put("algorithmDto", algorithmDto);
                 childList3.add(param);
             }
         }
-        // 开发中的父节点，没有子节点算法
-        if (childList1.size() == 0) {
-            param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getDesc());
-        }
-        if (childList2.size() == 0) {
-            param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getDesc());
-        }
-        if (childList3.size() == 0) {
-            param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getDesc());
-        }
+
         param1.put("child", childList1);
         param2.put("child", childList2);
         param3.put("child", childList3);

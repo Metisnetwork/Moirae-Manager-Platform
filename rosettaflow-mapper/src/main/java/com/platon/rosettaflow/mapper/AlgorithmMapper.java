@@ -22,6 +22,7 @@ public interface AlgorithmMapper extends BaseMapper<Algorithm> {
 
     /**
      * 查询算法树列表
+     *
      * @return 算法列表
      */
     List<AlgorithmDto> queryAlgorithmTreeList();
@@ -34,5 +35,8 @@ public interface AlgorithmMapper extends BaseMapper<Algorithm> {
      */
     AlgorithmDto queryAlgorithmDetails(Long algorithmId);
 
+    /**
+     * 清空算法表
+     */
     void truncate();
 }
