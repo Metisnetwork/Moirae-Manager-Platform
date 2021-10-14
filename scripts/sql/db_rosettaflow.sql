@@ -273,6 +273,23 @@ CREATE TABLE `t_algorithm_variable` (
   KEY (`algorithm_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法变量表';
 
+
+-- ----------------------------
+-- Table structure for `t_algorithm_variable_struct`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_algorithm_variable_struct`;
+CREATE TABLE `t_algorithm_variable_struct` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法变量模板结构表ID(自增长)',
+    `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法表id',
+    `struct` varchar(1024) NOT NULL COMMENT '模板json格式结构',
+    `desc` varchar(128) DEFAULT NULL COMMENT '模板描述',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY (`algorithm_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法变量模板结构表';
+
 -- ----------------------------
 -- Table structure for `t_workflow`
 -- ----------------------------

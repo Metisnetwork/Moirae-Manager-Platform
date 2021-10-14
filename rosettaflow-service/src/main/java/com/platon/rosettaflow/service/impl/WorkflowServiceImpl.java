@@ -90,6 +90,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IOrganizationService organizationService;
 
     @Resource
+    private IAlgorithmVariableStructService algorithmVariableStructService;
+
+    @Resource
     private RedisUtil redisUtil;
 
     @Override
@@ -281,15 +284,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
-        boolean isPublishSuccess = false;
-        try{
+        boolean isPublishSuccess;
+        try {
             respDto = grpcTaskService.syncPublishTask(taskDto);
             isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
-        }catch (Exception e){
-            log.error("publish task fail, task name {}, work flow nodeId {}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
+        } catch (Exception e) {
+            log.error("publish task fail, task name:{}, work flow nodeId:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
             if (workflowDto.isJobFlg()) {
-                updateSubJobInfo(workflowDto, isPublishSuccess);
-                updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
+                updateSubJobInfo(workflowDto, false);
+                updateSubJobNodeInfo(workflowDto, workflowNode, false, respDto);
                 return;
             } else {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_PUBLISH_FAIL.getMsg());
@@ -466,7 +469,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
-        taskDto.setContractExtraParams(getContractExtraParams(workflowNodeVariableList));
+        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowNodeVariableList, taskDto));
         //发起任务的账户的签名
         taskDto.setSign(sign);
         //任务描述 (非必须)
@@ -546,15 +549,19 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 合约调用的额外可变入参
      *
+     * @param algorithmId              算法id
      * @param workflowNodeVariableList 合约的可变参数列表
      * @return 额外可变入参
      */
-    private String getContractExtraParams(List<WorkflowNodeVariable> workflowNodeVariableList) {
-        JSONObject jsonObject = JSONUtil.createObj();
-        for (WorkflowNodeVariable variable : workflowNodeVariableList) {
-            jsonObject.set(variable.getVarNodeKey(), variable.getVarNodeValue());
+    private String getContractExtraParams(Long algorithmId, List<WorkflowNodeVariable> workflowNodeVariableList, TaskDto taskDto) {
+        AlgorithmVariableStruct jsonStruct = algorithmVariableStructService.getByAlgorithmId(algorithmId);
+        if(null ==jsonStruct){
+            return null;
+        }else{
+            // 把可变参数进行替换
+            log.info("jsonStruct.getStruct() is:{}", jsonStruct.getStruct());
+            return jsonStruct.getStruct();
         }
-        return jsonObject.toString();
     }
 
     /**
