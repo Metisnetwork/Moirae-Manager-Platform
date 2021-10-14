@@ -1,5 +1,7 @@
 package com.platon.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
@@ -137,7 +139,9 @@ public class RpcTestController {
     public ResponseVo<String> task(@ApiParam(value = "工作流表ID", required = true) @PathVariable Long workflowId) {
         log.info("grpc task接口测试");
         Workflow orgWorkflow = workflowService.getById(workflowId);
-        TaskDto taskDto = workflowService.assemblyTaskDto(orgWorkflow.getId(), 1, "0x501eb3eeb2a40e6f2ff6f481302435e6e8af3666", "sign");
+        WorkflowDto workflowDto = new WorkflowDto();
+        BeanUtil.copyProperties(orgWorkflow, workflowDto);
+        TaskDto taskDto = workflowService.assemblyTaskDto(workflowDto);
         PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = grpcTaskService.syncPublishTask(taskDto);
         return ResponseVo.createSuccess(publishTaskDeclareResponseDto.getMsg());
     }

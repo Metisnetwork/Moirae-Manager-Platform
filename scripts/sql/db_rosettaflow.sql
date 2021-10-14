@@ -526,12 +526,33 @@ CREATE TABLE `t_sub_job_node` (
 DROP TABLE IF EXISTS `t_task_event`;
 CREATE TABLE `t_task_event` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务表ID(自增长)',
-  `task_id` varchar(256) NOT NULL COMMENT '任务ID,hash',
+  `task_id` varchar(256) NOT NULL COMMENT '任务ID',
   `type` varchar(20) NOT NULL COMMENT '事件类型',
   `identity_id` varchar(128) NOT NULL COMMENT '产生事件的组织身份ID',
   `event_time` datetime NOT NULL COMMENT '产生事件的时间',
   `content` varchar(512) NOT NULL COMMENT '事件内容',
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务事件表';
+
+-- ----------------------------
+-- Table structure for `t_task_result`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_task_result`;
+CREATE TABLE `t_task_result` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务运行结果表ID(自增长)',
+  `task_id` varchar(256) NOT NULL COMMENT '任务ID',
+  `file_name` varchar(128) NOT NULL COMMENT '任务结果文件的名称',
+  `metadata_id` varchar(128) NOT NULL COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
+  `origin_id` varchar(128) NOT NULL COMMENT '任务结果文件的原始文件Id',
+  `file_path` varchar(256) NOT NULL COMMENT '任务结果文件的完整相对路径名',
+  `ip` varchar(32) NOT NULL COMMENT '任务结果文件所在的 数据服务内网ip',
+  `port` varchar(8) NOT NULL COMMENT '任务结果文件所在的 数据服务内网port',
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY UK_TASK_RESULT (`task_id`, `metadata_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务运行结果表';

@@ -31,8 +31,8 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 查询工作流列表，通过工作流id集合
-     * @param idList
-     * @return
+     * @param idList 工作流id列表
+     * @return 工作流列表
      */
     List<Workflow> queryListById(List<Long> idList);
 
@@ -149,13 +149,10 @@ public interface IWorkflowService extends IService<Workflow> {
     /**
      * 组装发送任务对象
      *
-     * @param workFlowId  工作流id
-     * @param currentNode 当前节点
-     * @param address     用户地址
-     * @param sign        用户签名
+     * @param workflowDto 工作流节点参数信息
      * @return 发送任务对象
      */
-    TaskDto assemblyTaskDto(Long workFlowId, Integer currentNode, String address, String sign);
+    TaskDto assemblyTaskDto(WorkflowDto workflowDto);
 
     /**
      * 更新工作流运行状态
