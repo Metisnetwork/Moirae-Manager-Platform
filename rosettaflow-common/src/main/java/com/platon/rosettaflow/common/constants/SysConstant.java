@@ -123,6 +123,11 @@ public class SysConstant {
     /**
      * 待处理工作流前缀
      */
-    public static final String REDIS_WORKFLOW_PREFIX_KEY = "workflowDto:";
+    public static final String REDIS_WORKFLOW_PREFIX_KEY = "workflowDtoTask:";
+
+    /**
+     * 待处理作业节点前缀
+     */
+    public static final String REDIS_SUB_JOB_PREFIX_KEY = "subJobDtoTask:";
 
 }
