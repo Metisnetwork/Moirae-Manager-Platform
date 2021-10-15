@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
@@ -19,7 +18,6 @@ import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.platon.rosettaflow.grpc.service.GrpcSysService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
-import com.platon.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.platon.rosettaflow.mapper.WorkflowMapper;
@@ -92,9 +90,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private IAlgorithmVariableStructService algorithmVariableStructService;
-
-    @Resource
-    private GrpcSysService grpcSysService;
 
     @Resource
     private ITaskResultService taskResultService;
@@ -429,13 +424,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
 
         //如果不是第一个节点，调用net,获取前一个节点的计算结果
-        GetTaskResultFileSummaryResponseDto responseDto = null;
+        TaskResult preTaskResult = null;
         if (workflowDto.getStartNode() > 1) {
-            responseDto = grpcSysService.getTaskResultFileSummary(workflowDto.getPreTaskId());
-            if (null == responseDto) {
+            preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
+            if (null == preTaskResult) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
-            }else{
-                taskResultService.saveOrUpdate(BeanUtil.copyProperties(responseDto,TaskResult.class));
             }
         }
 
@@ -468,7 +461,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //发起账户用户类型
         taskDto.setUserType(UserTypeEnum.checkUserType(workflowDto.getAddress()));
         //设置发起方
-        taskDto.setSender(getSender(workflowNodeInputList,responseDto));
+        taskDto.setSender(getSender(workflowNodeInputList,preTaskResult));
         //任务算法提供方 组织信息
         taskDto.setAlgoSupplier(getAlgoSupplier(taskDto.getSender()));
         // 算力提供方 暂定三方
@@ -674,7 +667,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param preTaskResult 上一个任务执行结果
      * @return 机构信息
      */
-    private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList,GetTaskResultFileSummaryResponseDto preTaskResult) {
+    private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList, TaskResult preTaskResult) {
         for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
             if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
                 OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();

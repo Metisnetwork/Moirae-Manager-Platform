@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.task;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.rosettaflow.common.constants.SysConfig;
@@ -8,9 +9,13 @@ import com.platon.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.WorkflowDto;
+import com.platon.rosettaflow.grpc.service.GrpcSysService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
+import com.platon.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
+import com.platon.rosettaflow.mapper.domain.TaskResult;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
+import com.platon.rosettaflow.service.ITaskResultService;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +58,12 @@ public class WorkflowNodeStatusTask {
     @Resource
     private RedisUtil redisUtil;
 
+    @Resource
+    private GrpcSysService grpcSysService;
+
+    @Resource
+    private ITaskResultService taskResultService;
+
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     public void run() {
         if (!sysConfig.isMasterNode()) {
@@ -74,9 +85,16 @@ public class WorkflowNodeStatusTask {
         List<Long> workflowNodeSuccessIds = new ArrayList<>();
         //工作流节点需要更新为失败的列表
         List<Long> workflowNodeFailIds = new ArrayList<>();
+        //待更新任务结果数据集(当前组织参与的待保存任务结果文件摘要列表)
+        List<TaskResult> saveTaskResultList = new ArrayList<>();
+
 
         //获取所的任务详情
         List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
+        //获取当前节点所有任务结果
+        List<GetTaskResultFileSummaryResponseDto> allTaskResultResponseDtoList = grpcSysService.getTaskResultFileSummaryList();
+        Map<String, GetTaskResultFileSummaryResponseDto> taskResultMap = allTaskResultResponseDtoList.stream().collect(Collectors.toMap(GetTaskResultFileSummaryResponseDto::getTaskId, taskResult -> taskResult));
+
         String taskId;
         WorkflowNode node;
         for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
@@ -96,6 +114,11 @@ public class WorkflowNodeStatusTask {
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
+                    //待保存任务结果数据
+                    if(taskResultMap.containsKey(taskId)){
+                        TaskResult taskResult = BeanUtil.copyProperties(taskResultMap.get(taskId), TaskResult.class);
+                        saveTaskResultList.add(taskResult);
+                    }
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个工作流的状态为失败
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
@@ -105,6 +128,7 @@ public class WorkflowNodeStatusTask {
                 }
             }
         }
+
         //更新工作流成功记录
         if (workflowSuccessIds.size() > 0) {
             workflowService.updateRunStatus(workflowSuccessIds.toArray(), WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
@@ -120,6 +144,10 @@ public class WorkflowNodeStatusTask {
         //更新工作流节点失败记录
         if (workflowNodeFailIds.size() > 0) {
             workflowNodeService.updateRunStatus(workflowNodeFailIds.toArray(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
+        }
+        //更新任务结果记录
+        if(saveTaskResultList.size() > 0){
+            taskResultService.saveBatch(saveTaskResultList);
         }
         log.info("同步更新工作流节点中待确认任务结束>>>>");
 
