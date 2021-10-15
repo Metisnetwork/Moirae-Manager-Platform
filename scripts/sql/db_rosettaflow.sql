@@ -193,6 +193,21 @@ CREATE TABLE `t_project_member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目成员管理表';
 
 -- ----------------------------
+-- Table structure for `t_algorithm_type`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_algorithm_type`;
+CREATE TABLE `t_algorithm_type` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
+    `algorithm_type_name` varchar(30) DEFAULT NULL COMMENT '算法名称',
+    `algorithm_type_desc` varchar(200) DEFAULT NULL COMMENT '算法描述',
+    `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
+    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1-有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法大类表';
+
+-- ----------------------------
 -- Table structure for `t_algorithm`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm`;

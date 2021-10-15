@@ -51,6 +51,7 @@ public enum ErrorMsg {
     ALG_NOT_EXIST("算法不存在", "Algorithm does not exist"),
     ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code does not exist"),
     ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation"),
+    ALG_TYPE_NOT_EXIST("算法大类不存在", "Algorithm type does not exist"),
 
     /**
      * 数据

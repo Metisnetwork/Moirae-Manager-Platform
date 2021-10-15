@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.req.workflow;
 
-import com.platon.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
 import com.platon.rosettaflow.req.workflow.node.WorkflowNodeReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

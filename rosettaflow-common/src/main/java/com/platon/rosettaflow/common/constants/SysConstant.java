@@ -10,10 +10,8 @@ public class SysConstant {
      * 数字常量
      */
     public static final int INT_0 = 0;
-    public static final int INT_1 = 1;
     public static final int INT_2 = 2;
     public static final int INT_3 = 3;
-    public static final int INT_4 = 3;
 
     /** 换算单位 */
     public static final int INT_1024 = 1024;

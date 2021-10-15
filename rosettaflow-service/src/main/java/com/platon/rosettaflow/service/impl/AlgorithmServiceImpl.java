@@ -3,7 +3,6 @@ package com.platon.rosettaflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
-import com.platon.rosettaflow.common.enums.AlgorithmTypeEnum;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -11,9 +10,11 @@ import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.mapper.AlgorithmMapper;
 import com.platon.rosettaflow.mapper.domain.Algorithm;
 import com.platon.rosettaflow.mapper.domain.AlgorithmCode;
+import com.platon.rosettaflow.mapper.domain.AlgorithmType;
 import com.platon.rosettaflow.mapper.domain.WorkflowNode;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
+import com.platon.rosettaflow.service.IAlgorithmTypeService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,9 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 
     @Resource
     IAlgorithmCodeService algorithmCodeService;
+
+    @Resource
+    IAlgorithmTypeService algorithmTypeService;
 
     @Override
     public void addAlgorithm(AlgorithmDto algorithmDto) {
@@ -92,51 +96,37 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
 
     @Override
     public List<Map<String, Object>> queryAlgorithmTreeList() {
-        // 造三个父类型节点
-        List<Map<String, Object>> treeList = new ArrayList<>(SysConstant.INT_4);
-        Map<String, Object> param1 = new HashMap<>(SysConstant.INT_2);
-        param1.put("algorithmId", SysConstant.INT_1);
-        param1.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_1.getName());
-        Map<String, Object> param2 = new HashMap<>(SysConstant.INT_2);
-        param2.put("algorithmId", SysConstant.INT_2);
-        param2.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_2.getName());
-        Map<String, Object> param3 = new HashMap<>(SysConstant.INT_2);
-        param3.put("algorithmId", SysConstant.INT_3);
-        param3.put("algorithmName", AlgorithmTypeEnum.ALGORITHM_TYPE_3.getName());
-        List<AlgorithmDto> algorithmDtoList = this.baseMapper.queryAlgorithmTreeList();
-        if (algorithmDtoList == null || algorithmDtoList.size() == 0) {
-            treeList.add(param1);
-            treeList.add(param2);
-            treeList.add(param3);
-            return treeList;
+        List<Map<String, Object>> treeList = new ArrayList<>();
+        // 获取算法大类
+        List<AlgorithmType> algorithmTypeList = algorithmTypeService.list();
+        List<AlgorithmDto> algorithmDtoList;
+        if (null != algorithmTypeList && algorithmTypeList.size() > 0) {
+            algorithmDtoList = this.baseMapper.queryAlgorithmTreeList();
+        } else {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_TYPE_NOT_EXIST.getMsg());
         }
-        // 处理子节点
-        List<Map<String, Object>> childList1 = new ArrayList<>(SysConstant.INT_3);
-        List<Map<String, Object>> childList2 = new ArrayList<>(SysConstant.INT_3);
-        List<Map<String, Object>> childList3 = new ArrayList<>(SysConstant.INT_3);
-        for (AlgorithmDto algorithmDto : algorithmDtoList) {
-            Map<String, Object> param = new HashMap<>(SysConstant.INT_3);
-            param.put("algorithmId", algorithmDto.getAlgorithmId());
-            param.put("algorithmName", algorithmDto.getAlgorithmName());
-            param.put("algorithmDto", algorithmDto);
+        for (AlgorithmType type : algorithmTypeList) {
+            Map<String, Object> param = new HashMap<>(SysConstant.INT_2);
+            param.put("algorithmId", type.getAlgorithmType());
+            param.put("algorithmName", type.getAlgorithmTypeName());
 
-            if (SysConstant.INT_1 == algorithmDto.getAlgorithmType()) {
-                childList1.add(param);
+            List<Map<String, Object>> childList = new ArrayList<>(SysConstant.INT_3);
+            Iterator<AlgorithmDto> it = algorithmDtoList.iterator();
+            AlgorithmDto algorithmDto;
+            while (it.hasNext()) {
+                algorithmDto = it.next();
+                if (algorithmDto.getAlgorithmType() == type.getAlgorithmType().byteValue()) {
+                    Map<String, Object> param1 = new HashMap<>(SysConstant.INT_3);
+                    param1.put("algorithmId", algorithmDto.getAlgorithmId());
+                    param1.put("algorithmName", algorithmDto.getAlgorithmName());
+                    param1.put("algorithmDto", algorithmDto);
+                    childList.add(param1);
+                    it.remove();
+                }
             }
-            if (SysConstant.INT_2 == algorithmDto.getAlgorithmType()) {
-                childList2.add(param);
-            }
-            if (SysConstant.INT_3 == algorithmDto.getAlgorithmType()) {
-                childList3.add(param);
-            }
+            param.put("child", childList);
+            treeList.add(param);
         }
-
-        param1.put("child", childList1);
-        param2.put("child", childList2);
-        param3.put("child", childList3);
-        treeList.add(param1);
-        treeList.add(param2);
-        treeList.add(param3);
         return treeList;
     }
 
