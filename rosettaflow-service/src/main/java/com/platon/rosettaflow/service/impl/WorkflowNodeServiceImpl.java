@@ -170,8 +170,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 workflowNodeResourceList, workflowNodeVariableList);
     }
 
-    /** 保存工作流节点 */
-    private Long saveWorkflowNode(Long workflowId, WorkflowNodeDto workflowNodeDto, int count, int listSize){
+    /**
+     * 保存工作流节点
+     */
+    private Long saveWorkflowNode(Long workflowId, WorkflowNodeDto workflowNodeDto, int count, int listSize) {
         //保存工作流节点
         WorkflowNode workflowNode = new WorkflowNode();
         workflowNode.setWorkflowId(workflowId);
@@ -187,7 +189,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         return workflowNode.getId();
     }
 
-    /** 保存工作流节点输入 */
+    /**
+     * 保存工作流节点输入
+     */
     private List<WorkflowNodeInput> saveWorkflowNodeInput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
         if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
@@ -212,7 +216,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             }
         }
         // 添加新的工作流节点输入
-        for (int i =0; i < workflowNodeInputList.size(); i++) {
+        for (int i = 0; i < workflowNodeInputList.size(); i++) {
             WorkflowNodeInput workflowNodeInput = workflowNodeInputList.get(i);
             workflowNodeInput.setWorkflowNodeId(workflowNodeId);
             workflowNodeInput.setPartyId("p" + i);
@@ -220,9 +224,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         return workflowNodeInputList;
     }
 
-    /** 保存工作流节点输出数据 */
+    /**
+     * 保存工作流节点输出数据
+     */
     private List<WorkflowNodeOutput> saveWorkflowNodeOutput(Long workflowNodeId, WorkflowNodeDto workflowNodeDto,
-                                                            List<WorkflowNodeInput> workflowNodeInputList){
+                                                            List<WorkflowNodeInput> workflowNodeInputList) {
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeDto.getWorkflowNodeOutputList();
         if (null == workflowNodeOutputList || workflowNodeOutputList.size() == 0) {
             return new ArrayList<>();
@@ -238,7 +244,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         return workflowNodeOutputList;
     }
 
-    /** 保存工作流节点输入变量 */
+    /**
+     * 保存工作流节点输入变量
+     */
     private List<WorkflowNodeVariable> saveWorkflowNodeVariable(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
         List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeDto.getWorkflowNodeVariableList();
         if (null == workflowNodeVariableList || workflowNodeVariableList.size() == 0) {
@@ -356,7 +364,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                               List<WorkflowNodeOutput> newNodeOutputList,
                               List<WorkflowNodeCode> newNodeCodeList,
                               List<WorkflowNodeResource> newNodeResourceList,
-                              List<WorkflowNodeVariable> newNodeVariableList){
+                              List<WorkflowNodeVariable> newNodeVariableList) {
         // 保存节点输入数据
         if (newNodeInputList.size() > 0) {
             workflowNodeInputService.batchInsert(newNodeInputList);

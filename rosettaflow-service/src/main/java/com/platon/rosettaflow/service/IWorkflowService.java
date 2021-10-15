@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 
@@ -31,6 +32,7 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 查询工作流列表，通过工作流id集合
+     *
      * @param idList 工作流id列表
      * @return 工作流列表
      */
@@ -157,8 +159,18 @@ public interface IWorkflowService extends IService<Workflow> {
     /**
      * 更新工作流运行状态
      *
-     * @param ids 工作流id
-     * @param runStatus  运行状态
+     * @param ids       工作流id
+     * @param runStatus 运行状态
      */
     void updateRunStatus(Object[] ids, Byte runStatus);
+
+    /**
+     * 组装发送终止任务请求对象
+     *
+     * @param workflow 工作流信息
+     * @param taskId   任务节点taskId
+     * @return 发送终止任务请求对象
+     */
+    TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, String taskId);
+
 }

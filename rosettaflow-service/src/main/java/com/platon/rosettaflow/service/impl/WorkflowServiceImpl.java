@@ -367,7 +367,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (null == workflowNode) {
             this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
         } else {
-            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode);
+            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode.getTaskId());
             TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
 
             if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
@@ -380,11 +380,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    private TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, WorkflowNode workflowNode) {
+    @Override
+    public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, String taskId) {
         TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
         terminateTaskRequestDto.setUser(workflow.getAddress());
         terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflow.getAddress()));
-        terminateTaskRequestDto.setTaskId(workflowNode.getTaskId());
+        terminateTaskRequestDto.setTaskId(taskId);
         terminateTaskRequestDto.setSign(workflow.getSign());
         return terminateTaskRequestDto;
     }

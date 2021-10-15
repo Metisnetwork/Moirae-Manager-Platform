@@ -10,6 +10,8 @@ import com.platon.rosettaflow.service.ITaskResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author hudenian
  * @date 2021/10/14
@@ -26,4 +28,11 @@ public class TaskResultServiceImpl extends ServiceImpl<TaskResultMapper, TaskRes
         queryWrapper.eq(TaskResult::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(queryWrapper);
     }
+
+    @Override
+    public void batchInsert(List<TaskResult> taskResultList) {
+        this.baseMapper.batchInsert(taskResultList);
+    }
+
+
 }

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -65,11 +66,11 @@ public class WorkflowNodeStatusTask {
     private ITaskResultService taskResultService;
 
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void run() {
         if (!sysConfig.isMasterNode()) {
             return;
         }
-
         List<WorkflowNode> workflowNodeList = workflowNodeService.getRunningNode(BEFORE_HOUR);
         //如果没有需要同步的数据则不进行同步
         if (workflowNodeList.size() == 0) {
@@ -87,7 +88,6 @@ public class WorkflowNodeStatusTask {
         List<Long> workflowNodeFailIds = new ArrayList<>();
         //待更新任务结果数据集(当前组织参与的待保存任务结果文件摘要列表)
         List<TaskResult> saveTaskResultList = new ArrayList<>();
-
 
         //获取所的任务详情
         List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
@@ -115,7 +115,7 @@ public class WorkflowNodeStatusTask {
                     }
                     workflowNodeSuccessIds.add(node.getId());
                     //待保存任务结果数据
-                    if(taskResultMap.containsKey(taskId)){
+                    if (taskResultMap.containsKey(taskId)) {
                         TaskResult taskResult = BeanUtil.copyProperties(taskResultMap.get(taskId), TaskResult.class);
                         saveTaskResultList.add(taskResult);
                     }
@@ -146,8 +146,8 @@ public class WorkflowNodeStatusTask {
             workflowNodeService.updateRunStatus(workflowNodeFailIds.toArray(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
         }
         //更新任务结果记录
-        if(saveTaskResultList.size() > 0){
-            taskResultService.saveBatch(saveTaskResultList);
+        if (saveTaskResultList.size() > 0) {
+            taskResultService.batchInsert(saveTaskResultList);
         }
         log.info("同步更新工作流节点中待确认任务结束>>>>");
 
