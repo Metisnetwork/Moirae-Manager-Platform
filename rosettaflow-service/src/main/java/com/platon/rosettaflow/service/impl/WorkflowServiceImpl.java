@@ -16,7 +16,6 @@ import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
-import com.platon.rosettaflow.grpc.service.GrpcSysService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.*;
 import com.platon.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
@@ -462,7 +461,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //发起账户用户类型
         taskDto.setUserType(UserTypeEnum.checkUserType(workflowDto.getAddress()));
         //设置发起方
-        taskDto.setSender(getSender(workflowNodeInputList,preTaskResult));
+        taskDto.setSender(getSender(workflowNodeInputList, preTaskResult));
         //任务算法提供方 组织信息
         taskDto.setAlgoSupplier(getAlgoSupplier(taskDto.getSender()));
         // 算力提供方 暂定三方
@@ -665,7 +664,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 获取当前节点连接机构信息
      *
      * @param workflowNodeInputList 任务输入信息列表
-     * @param preTaskResult 上一个任务执行结果
+     * @param preTaskResult         上一个任务执行结果
      * @return 机构信息
      */
     private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList, TaskResult preTaskResult) {

@@ -111,12 +111,6 @@ public class ConvertUtils {
         if (null == workflowNodeDto.getWorkflowNodeOutputList() || workflowNodeDto.getWorkflowNodeOutputList().size() == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
         }
-        if (Objects.isNull(workflowNodeDto.getWorkflowNodeCode())) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_CODE_NOT_EXIST.getMsg());
-        }
-        if (Objects.isNull(workflowNodeDto.getWorkflowNodeResource())) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_RESOURCE_EXIST.getMsg());
-        }
     }
 
 }

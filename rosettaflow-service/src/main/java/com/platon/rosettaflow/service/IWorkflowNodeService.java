@@ -2,7 +2,8 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
-import com.platon.rosettaflow.mapper.domain.*;
+import com.platon.rosettaflow.mapper.domain.WorkflowNode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
 
 import java.util.List;
 
@@ -24,7 +25,8 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
 
     /**
      * 保存工作流所有节点数据
-     * @param workflowId  工作流id
+     *
+     * @param workflowId          工作流id
      * @param workflowNodeDtoList 工作流节点列表
      */
     void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
@@ -60,14 +62,6 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @return 工作流节点列表
      */
     List<WorkflowNode> getWorkflowNodeList(Long workflowId);
-
-    /**
-     * 根据id查询工作流节点
-     *
-     * @param id 工作流主键id
-     * @return 工作流节点列表
-     */
-    WorkflowNode getWorkflowNodeById(Long id);
 
     /**
      * 复制保存工作流节点
