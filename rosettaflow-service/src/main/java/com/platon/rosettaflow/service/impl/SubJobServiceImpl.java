@@ -77,14 +77,14 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         if(subJob.getSubJobStatus() != SubJobStatusEnum.RUNNING.getValue()){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_RUNNING.getMsg());
         }
-        //停止子作业节点(按节点顺序触发停止)
+        //停止运行中子作业节点(按节点顺序触发停止)
         List<TerminateTaskRequestDto> terminateTaskRequestDtoList = assemblyTerminateTaskRequestDto(subJob);
         terminateTaskRequestDtoList.stream().sorted(Comparator.comparing(TerminateTaskRequestDto::getNodeStep)).forEach(terminateTaskRequestDto -> {
             byte nodeRunStatus = terminateTaskRequestDto.getNodeRunStatus();
-            Long subJobNodeId = terminateTaskRequestDto.getNodeId();
-            boolean isSuccess = (nodeRunStatus == SubJobNodeStatusEnum.RUNNING.getValue()) ? terminateTask(terminateTaskRequestDto) : subJobNodeService.updateRunStatus(subJobNodeId, SubJobNodeStatusEnum.UN_RUN.getValue());
-            if(!isSuccess){
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_UPDATE_FAIL.getMsg());
+            if(nodeRunStatus == SubJobNodeStatusEnum.RUNNING.getValue()){
+                if(!terminateTask(terminateTaskRequestDto)){
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_UPDATE_FAIL.getMsg());
+                }
             }
         });
         //停止子作业

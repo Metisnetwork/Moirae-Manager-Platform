@@ -3,10 +3,12 @@ package com.platon.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
+import com.platon.rosettaflow.mapper.domain.TaskResult;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeOutput;
 import com.platon.rosettaflow.req.workflow.node.ClearWorkflowNodeReq;
 import com.platon.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
+import com.platon.rosettaflow.service.ITaskResultService;
 import com.platon.rosettaflow.service.IWorkflowNodeService;
 import com.platon.rosettaflow.utils.ConvertUtils;
 import com.platon.rosettaflow.vo.ResponseVo;
@@ -37,6 +39,9 @@ public class WorkflowNodeController {
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
+
+    @Resource
+    private ITaskResultService taskResultService;
 
     @GetMapping(value = "queryNodeDetailsList/{id}")
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
@@ -88,10 +93,9 @@ public class WorkflowNodeController {
 
     @GetMapping(value = "getTaskResult/{taskId}")
     @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
-    public ResponseVo<WorkflowNodeResultVo> detail(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
-        WorkflowNodeResultVo workflowNodeResultVo = new WorkflowNodeResultVo();
-        workflowNodeResultVo.setResult(taskId + "运行结果待开发");
-        return ResponseVo.createSuccess(workflowNodeResultVo);
+    public ResponseVo<WorkflowNodeTaskResultVo> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
+        TaskResult taskResult = taskResultService.queryTaskResultByTaskId(taskId);
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(taskResult,WorkflowNodeTaskResultVo.class));
     }
 
 }
