@@ -38,54 +38,56 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
+    @Resource
+    private RedisUtil redisUtil;
+
     @Scheduled(fixedDelay = 60 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     public void run() {
-        if (!sysConfig.isMasterNode()) {
-            return;
-        }
-
         try {
-            log.info("用户申请授权元数据信息同步开始>>>>");
-            long begin;
-            List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
-            try {
-                metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-                if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
+            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
+                log.info("用户申请授权元数据信息同步开始>>>>");
+                long begin;
+                List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
+                try {
+                    metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+                    if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
                     return;
                 }
-            } catch (Exception e) {
-                log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
-                return;
-            }
 
-            List<UserMetaData> userMetaDataList = new ArrayList<>();
-            UserMetaData userMetaData;
-            int userMetaDataSize = 0;
+                List<UserMetaData> userMetaDataList = new ArrayList<>();
+                UserMetaData userMetaData;
+                int userMetaDataSize = 0;
 
-            for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
-                userMetaData = getUserMetaData(authorityDto);
+                for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
+                    userMetaData = getUserMetaData(authorityDto);
 
-                userMetaDataList.add(userMetaData);
-                ++userMetaDataSize;
-                if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
+                    userMetaDataList.add(userMetaData);
+                    ++userMetaDataSize;
+                    if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
+                        begin = DateUtil.currentSeconds();
+                        log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
+                        userMetaDataService.batchInsert(userMetaDataList);
+                        log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
+                        userMetaDataList.clear();
+                    }
+                }
+                if (userMetaDataList.size() > 0) {
                     begin = DateUtil.currentSeconds();
                     log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
                     userMetaDataService.batchInsert(userMetaDataList);
                     log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
-                    userMetaDataList.clear();
                 }
+                log.info("用户申请授权元数据信息同步结束>>>>");
             }
-            if (userMetaDataList.size() > 0) {
-                begin = DateUtil.currentSeconds();
-                log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
-                userMetaDataService.batchInsert(userMetaDataList);
-                log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
-            }
-            log.info("用户申请授权元数据信息同步结束>>>>");
         } catch (Exception e) {
-            log.error("用户申请授权元数据信息同步失败，失败原因>>>>{}", e.getMessage(), e);
-
+            log.error("同步用户元数据授权列列表失败，失败原因：{}", e.getMessage(), e);
+        } finally {
+            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
         }
     }
 

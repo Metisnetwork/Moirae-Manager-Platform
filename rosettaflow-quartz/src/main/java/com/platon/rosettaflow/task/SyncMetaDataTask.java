@@ -3,6 +3,7 @@ package com.platon.rosettaflow.task;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
+import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test","local"})
+@Profile({"prod", "test", "local"})
 public class SyncMetaDataTask {
 
     @Resource
@@ -42,75 +43,81 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
+    @Resource
+    private RedisUtil redisUtil;
+
     @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
-        if (!sysConfig.isMasterNode()) {
-            return;
-        }
-        log.info("元数据信息同步开始>>>>");
-        long begin;
-        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
         try {
-            metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
-        } catch (Exception e) {
-            log.error("从net同步元数据失败,失败原因：{}", e.getMessage());
-            return;
-        }
-        //元数据同步成功，删除旧数据
-//        delOldData(metaDataDetailResponseDtoList);
-
-        List<MetaData> newMetaDataList = new ArrayList<>();
-        List<MetaDataDetails> newMetaDataDetailsList = new ArrayList<>();
-        MetaData metaData;
-        MetaDataDetails metaDataDetail;
-        int metaDataSize = 0;
-        int metaDataDetailSize = 0;
-
-        for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-            //添加元数据简介
-            metaData = getMetaData(metaDataDetailResponseDto);
-            newMetaDataList.add(metaData);
-            ++metaDataSize;
-            if (metaDataSize % sysConfig.getBatchSize() == 0) {
-                begin = DateUtil.currentSeconds();
-                log.info("元数据更新{}条数据开始", sysConfig.getBatchSize());
-                metaDataService.batchInsert(newMetaDataList);
-                log.info("元数据更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
-                newMetaDataList.clear();
-            }
-
-            List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
-            for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
-                assert metaData != null;
-                metaDataDetail = getMetaDataDetails(metaData, metaDataColumnDetailDto);
-
-                //添加元数据详情
-                newMetaDataDetailsList.add(metaDataDetail);
-                ++metaDataDetailSize;
-                if (metaDataDetailSize % sysConfig.getBatchSize() == 0) {
-                    begin = DateUtil.currentSeconds();
-                    log.info("元数据详情更新{}条数据开始", sysConfig.getBatchSize());
-                    metaDataDetailsService.batchInsert(newMetaDataDetailsList);
-                    log.info("元数据详情更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
-                    newMetaDataDetailsList.clear();
+            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
+                log.info("元数据信息同步开始>>>>");
+                long begin;
+                List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
+                try {
+                    metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
+                } catch (Exception e) {
+                    log.error("从net同步元数据失败,失败原因：{}", e.getMessage());
+                    return;
                 }
-            }
-        }
 
-        if (newMetaDataList.size() > 0) {
-            begin = DateUtil.currentSeconds();
-            log.info("元数据更新{}条数据开始", newMetaDataList.size());
-            metaDataService.batchInsert(newMetaDataList);
-            log.info("元数据更新{}条数据结束一共用时{}秒", newMetaDataList.size(), DateUtil.currentSeconds() - begin);
+                List<MetaData> newMetaDataList = new ArrayList<>();
+                List<MetaDataDetails> newMetaDataDetailsList = new ArrayList<>();
+                MetaData metaData;
+                MetaDataDetails metaDataDetail;
+                int metaDataSize = 0;
+                int metaDataDetailSize = 0;
+
+                for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
+                    //添加元数据简介
+                    metaData = getMetaData(metaDataDetailResponseDto);
+                    newMetaDataList.add(metaData);
+                    ++metaDataSize;
+                    if (metaDataSize % sysConfig.getBatchSize() == 0) {
+                        begin = DateUtil.currentSeconds();
+                        log.info("元数据更新{}条数据开始", sysConfig.getBatchSize());
+                        metaDataService.batchInsert(newMetaDataList);
+                        log.info("元数据更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
+                        newMetaDataList.clear();
+                    }
+
+                    List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
+                    for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
+                        assert metaData != null;
+                        metaDataDetail = getMetaDataDetails(metaData, metaDataColumnDetailDto);
+
+                        //添加元数据详情
+                        newMetaDataDetailsList.add(metaDataDetail);
+                        ++metaDataDetailSize;
+                        if (metaDataDetailSize % sysConfig.getBatchSize() == 0) {
+                            begin = DateUtil.currentSeconds();
+                            log.info("元数据详情更新{}条数据开始", sysConfig.getBatchSize());
+                            metaDataDetailsService.batchInsert(newMetaDataDetailsList);
+                            log.info("元数据详情更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
+                            newMetaDataDetailsList.clear();
+                        }
+                    }
+                }
+
+                if (newMetaDataList.size() > 0) {
+                    begin = DateUtil.currentSeconds();
+                    log.info("元数据更新{}条数据开始", newMetaDataList.size());
+                    metaDataService.batchInsert(newMetaDataList);
+                    log.info("元数据更新{}条数据结束一共用时{}秒", newMetaDataList.size(), DateUtil.currentSeconds() - begin);
+                }
+                if (newMetaDataDetailsList.size() > 0) {
+                    begin = DateUtil.currentSeconds();
+                    log.info("元数据详情更新{}条数据开始", newMetaDataDetailsList.size());
+                    metaDataDetailsService.batchInsert(newMetaDataDetailsList);
+                    log.info("元数据详情更新{}条数据结束一共用时{}秒", newMetaDataDetailsList.size(), DateUtil.currentSeconds() - begin);
+                }
+                log.info("元数据信息同步结束>>>>");
+            }
+        } catch (Exception e) {
+            log.error("同步元数据定时任务失败，失败原因：{}", e.getMessage(), e);
+        } finally {
+            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
         }
-        if (newMetaDataDetailsList.size() > 0) {
-            begin = DateUtil.currentSeconds();
-            log.info("元数据详情更新{}条数据开始", newMetaDataDetailsList.size());
-            metaDataDetailsService.batchInsert(newMetaDataDetailsList);
-            log.info("元数据详情更新{}条数据结束一共用时{}秒", newMetaDataDetailsList.size(), DateUtil.currentSeconds() - begin);
-        }
-        log.info("元数据信息同步结束>>>>");
     }
 
     private MetaDataDetails getMetaDataDetails(MetaData metaData, MetaDataColumnDetailDto metaDataColumnDetailDto) {

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test","local"})
+@Profile({"prod", "test", "local"})
 public class SyncSubJobNodeStatusTask {
 
     @Resource
@@ -68,89 +68,93 @@ public class SyncSubJobNodeStatusTask {
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     public void run() {
-        if (!sysConfig.isMasterNode()) {
-            return;
-        }
-        List<SubJobNodeDto> subJobNodeDtoList = subJobNodeService.getRunningNodeWithWorkIdAndNodeNum();
-        //如果没有需要同步的数据则不进行同步
-        if (subJobNodeDtoList.size() == 0) {
-            return;
-        }
-        log.info("同步更新子作业节点运行中任务开始>>>>");
-        Map<String, SubJobNodeDto> subJobNodeMap = subJobNodeDtoList.stream().collect(Collectors.toMap(SubJobNodeDto::getTaskId, subJobNodeDto -> subJobNodeDto));
-        //子作业需要更新为成功的列表
-        List<Long> subJobSuccessIds = new ArrayList<>();
-        //子作业需要更新为失败的列表
-        List<Long> subJobFailIds = new ArrayList<>();
-        //子作业节点需要更新为成功的列表
-        List<Long> subJobNodeSuccessIds = new ArrayList<>();
-        //子作业节点需要更新为失败的列表
-        List<Long> subJobNodeFailIds = new ArrayList<>();
-        //待更新任务结果数据集(当前组织参与的待保存任务结果文件摘要列表)
-        List<TaskResult> saveTaskResultList = new ArrayList<>();
+        try {
+            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
+                List<SubJobNodeDto> subJobNodeDtoList = subJobNodeService.getRunningNodeWithWorkIdAndNodeNum();
+                //如果没有需要同步的数据则不进行同步
+                if (subJobNodeDtoList.size() == 0) {
+                    return;
+                }
+                log.info("同步更新子作业节点运行中任务开始>>>>");
+                Map<String, SubJobNodeDto> subJobNodeMap = subJobNodeDtoList.stream().collect(Collectors.toMap(SubJobNodeDto::getTaskId, subJobNodeDto -> subJobNodeDto));
+                //子作业需要更新为成功的列表
+                List<Long> subJobSuccessIds = new ArrayList<>();
+                //子作业需要更新为失败的列表
+                List<Long> subJobFailIds = new ArrayList<>();
+                //子作业节点需要更新为成功的列表
+                List<Long> subJobNodeSuccessIds = new ArrayList<>();
+                //子作业节点需要更新为失败的列表
+                List<Long> subJobNodeFailIds = new ArrayList<>();
+                //待更新任务结果数据集(当前组织参与的待保存任务结果文件摘要列表)
+                List<TaskResult> saveTaskResultList = new ArrayList<>();
 
 
-        //获取所有任务详情
-        List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
-        //获取当前节点所有任务结果
-        List<GetTaskResultFileSummaryResponseDto> allTaskResultResponseDtoList = grpcSysService.getTaskResultFileSummaryList();
-        Map<String, GetTaskResultFileSummaryResponseDto> taskResultMap = allTaskResultResponseDtoList.stream().collect(Collectors.toMap(GetTaskResultFileSummaryResponseDto::getTaskId, taskResult -> taskResult));
+                //获取所有任务详情
+                List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
+                //获取当前节点所有任务结果
+                List<GetTaskResultFileSummaryResponseDto> allTaskResultResponseDtoList = grpcSysService.getTaskResultFileSummaryList();
+                Map<String, GetTaskResultFileSummaryResponseDto> taskResultMap = allTaskResultResponseDtoList.stream().collect(Collectors.toMap(GetTaskResultFileSummaryResponseDto::getTaskId, taskResult -> taskResult));
 
-        String taskId;
-        SubJobNodeDto node;
-        for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
-            taskId = taskDetailResponseDto.getInformation().getTaskId();
-            int state = taskDetailResponseDto.getInformation().getState();
-            if (subJobNodeMap.containsKey(taskId)) {
-                node = subJobNodeMap.get(taskId);
-                if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
-                    //如果是最后一个节点，需要更新整个子作业状态成功
-                    if (node.getNodeStep().equals(node.getNodeNumber())) {
-                        subJobSuccessIds.add(node.getSubJobId());
-                    } else {
-                        //如果有下一个节点，则启动下一个节点
-                        Object workflowDtoJson = redisUtil.get(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
-                        if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
-                            WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
-                            workflowService.start(workflowDto);
+                String taskId;
+                SubJobNodeDto node;
+                for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
+                    taskId = taskDetailResponseDto.getInformation().getTaskId();
+                    int state = taskDetailResponseDto.getInformation().getState();
+                    if (subJobNodeMap.containsKey(taskId)) {
+                        node = subJobNodeMap.get(taskId);
+                        if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
+                            //如果是最后一个节点，需要更新整个子作业状态成功
+                            if (node.getNodeStep().equals(node.getNodeNumber())) {
+                                subJobSuccessIds.add(node.getSubJobId());
+                            } else {
+                                //如果有下一个节点，则启动下一个节点
+                                Object workflowDtoJson = redisUtil.get(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
+                                if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
+                                    WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
+                                    workflowService.start(workflowDto);
+                                }
+                            }
+                            subJobNodeSuccessIds.add(node.getId());
+                            //待保存任务结果数据
+                            if (taskResultMap.containsKey(taskId)) {
+                                TaskResult taskResult = BeanUtil.copyProperties(taskResultMap.get(taskId), TaskResult.class);
+                                saveTaskResultList.add(taskResult);
+                            }
+                        } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
+                            //如果是最后一个节点，需要更新整个子作业状态失败
+                            if (node.getNodeStep().equals(node.getNodeNumber())) {
+                                subJobFailIds.add(node.getSubJobId());
+                            }
+                            subJobNodeFailIds.add(node.getId());
                         }
                     }
-                    subJobNodeSuccessIds.add(node.getId());
-                    //待保存任务结果数据
-                    if(taskResultMap.containsKey(taskId)){
-                        TaskResult taskResult = BeanUtil.copyProperties(taskResultMap.get(taskId), TaskResult.class);
-                        saveTaskResultList.add(taskResult);
-                    }
-                } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
-                    //如果是最后一个节点，需要更新整个子作业状态失败
-                    if (node.getNodeStep().equals(node.getNodeNumber())) {
-                        subJobFailIds.add(node.getSubJobId());
-                    }
-                    subJobNodeFailIds.add(node.getId());
                 }
+                //更新子作业成功记录
+                if (subJobSuccessIds.size() > 0) {
+                    subJobService.updateRunStatus(subJobSuccessIds.toArray(), SubJobStatusEnum.RUN_SUCCESS.getValue());
+                }
+                //更新子作业失败记录
+                if (subJobFailIds.size() > 0) {
+                    subJobService.updateRunStatus(subJobFailIds.toArray(), SubJobStatusEnum.RUN_FAIL.getValue());
+                }
+                //更新子作业节点节点成功记录
+                if (subJobNodeSuccessIds.size() > 0) {
+                    subJobNodeService.updateRunStatus(subJobNodeSuccessIds.toArray(), SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
+                }
+                //更新子作业节点失败记录
+                if (subJobNodeFailIds.size() > 0) {
+                    subJobNodeService.updateRunStatus(subJobNodeFailIds.toArray(), SubJobNodeStatusEnum.RUN_FAIL.getValue());
+                }
+                //更新任务结果记录
+                if (saveTaskResultList.size() > 0) {
+                    taskResultService.batchInsert(saveTaskResultList);
+                }
+                log.info("同步更新子作业节点运行中任务结束>>>>");
             }
+        } catch (Exception e) {
+            log.error("同步更新子作业节点中运行中的任务失败，失败原因：{}", e.getMessage(), e);
+        } finally {
+            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
         }
-        //更新子作业成功记录
-        if (subJobSuccessIds.size() > 0) {
-            subJobService.updateRunStatus(subJobSuccessIds.toArray(), SubJobStatusEnum.RUN_SUCCESS.getValue());
-        }
-        //更新子作业失败记录
-        if (subJobFailIds.size() > 0) {
-            subJobService.updateRunStatus(subJobFailIds.toArray(), SubJobStatusEnum.RUN_FAIL.getValue());
-        }
-        //更新子作业节点节点成功记录
-        if (subJobNodeSuccessIds.size() > 0) {
-            subJobNodeService.updateRunStatus(subJobNodeSuccessIds.toArray(), SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
-        }
-        //更新子作业节点失败记录
-        if (subJobNodeFailIds.size() > 0) {
-            subJobNodeService.updateRunStatus(subJobNodeFailIds.toArray(), SubJobNodeStatusEnum.RUN_FAIL.getValue());
-        }
-        //更新任务结果记录
-        if(saveTaskResultList.size() > 0){
-            taskResultService.batchInsert(saveTaskResultList);
-        }
-        log.info("同步更新子作业节点运行中任务结束>>>>");
-
     }
 }
