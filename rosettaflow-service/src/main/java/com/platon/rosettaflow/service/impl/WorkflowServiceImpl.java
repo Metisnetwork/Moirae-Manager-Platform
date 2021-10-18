@@ -269,45 +269,51 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (!workflowDto.isJobFlg() && workflowDto.getStartNode() == 1) {
             checkEditPermission(orgWorkflow.getProjectId());
         }
-        //截止节点不能超过工作流最大节点
-        //如果截止节点为空，设置为工作流最后一个节点
+        // 如果截止节点为空，设置为工作流最后一个节点
         if (null == workflowDto.getEndNode()) {
             workflowDto.setEndNode(orgWorkflow.getNodeNumber());
-        } else if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
+        }
+        // 截止节点不能超过工作流最大节点
+        if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
             log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
-        //保存用户和地址及签名并更新工作流状态为运行中
+        // 保存用户和地址及签名并更新工作流状态为运行中
         if (!workflowDto.isJobFlg()) {
-            updateSign(workflowDto);
+            this.updateSign(workflowDto);
         }
 
         /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
-        TaskDto taskDto = assemblyTaskDto(workflowDto);
-        WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
+        // 组装发布任务请求对象
+        TaskDto taskDto = this.assemblyTaskDto(workflowDto);
+        WorkflowNode workflowNode = workflowNodeService.getWorkflowNodeById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
-        boolean isPublishSuccess;
+        boolean isPublishSuccess = false;
         try {
             respDto = grpcTaskService.syncPublishTask(taskDto);
-            isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
+            if (GrpcConstant.GRPC_SUCCESS_CODE == respDto.getStatus()) {
+                isPublishSuccess = true;
+            }
         } catch (Exception e) {
             log.error("publish task fail, task name:{}, work flow nodeId:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
             if (workflowDto.isJobFlg()) {
-                updateSubJobInfo(workflowDto, false);
-                updateSubJobNodeInfo(workflowDto, workflowNode, false, respDto);
+                // 更新子作业
+                this.updateSubJobInfo(workflowDto, false);
+                // 更新子作业节点信息
+                this.updateSubJobNodeInfo(workflowDto, workflowNode, false, respDto);
                 return;
             } else {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_PUBLISH_FAIL.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_RUNNING_FAIL.getMsg());
             }
         }
         if (workflowDto.isJobFlg()) {
             //1.更新子作业
-            updateSubJobInfo(workflowDto, isPublishSuccess);
+            this.updateSubJobInfo(workflowDto, isPublishSuccess);
             //2.更新子作业节点信息
-            updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
+            this.updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
         } else {
             //1.更新工作流
-            Workflow workflow = this.getById(workflowNode.getWorkflowId());
+            Workflow workflow = this.queryWorkflowDetail(workflowNode.getWorkflowId());
             workflow.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
             //2.更新工作流节点
             workflowNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
@@ -318,7 +324,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             this.updateById(workflow);
 
         }
-        //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点,放在redis队列中待下次处理
+        //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点,放在redis中待下次处理
         boolean hasNext = workflowNode.getNextNodeStep() != null && workflowNode.getNextNodeStep() > 1;
         if (isPublishSuccess && hasNext) {
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
@@ -513,16 +519,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     /**
      * 记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
-     *
      * @param workflowDto      工作流请求信息
      * @param workflowNode     工作流节点
      * @param isPublishSuccess 节点是否发布成功
      * @param respDto          发布响应结果
      */
     private void updateSubJobNodeInfo(WorkflowDto workflowDto, WorkflowNode workflowNode, boolean isPublishSuccess, PublishTaskDeclareResponseDto respDto) {
-        SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
-        SubJobNode subJobNode = !Objects.isNull(subJobNodeTemp) ? subJobNodeTemp : new SubJobNode();
-        if (Objects.isNull(subJobNodeTemp)) {
+        SubJobNode subJobNode = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
+        if (Objects.isNull(subJobNode)) {
+            subJobNode = new SubJobNode();
             subJobNode.setSubJobId(workflowDto.getSubJobId());
             subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
             subJobNode.setNodeStep(workflowNode.getNodeStep());
@@ -531,9 +536,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
         subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
         subJobNode.setUpdateTime(now());
-        boolean isSuccess = Objects.isNull(subJobNodeTemp) ? subJobNodeService.save(subJobNode) : subJobNodeService.updateById(subJobNode);
+        boolean isSuccess = subJobNodeService.saveOrUpdate(subJobNode);
         if (!isSuccess) {
-            log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
+            log.error("start sub job fail, is save sub job node. subJobNode:{}", JSON.toJSONString(subJobNode));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
         }
     }
