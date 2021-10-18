@@ -640,19 +640,19 @@ public class RedisUtil {
         return true;
     }
 
-    public boolean lock(String key,String value) {
-        Boolean flag = redisTemplate.opsForValue().setIfAbsent(key,value);
+    public boolean lock(String key, String value) {
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(key, value);
         if (null == flag || !flag) {
-            log.error("申请锁key:{},value:{}失败", key,value);
+            log.error("申请锁key:{},value:{}失败", key, value);
             return false;
         }
         return true;
     }
 
     public void unLock(String key, String value) {
-        String script = "if redis.call('get', KEYS[1]) == KEYS[2] then return redis.call('del', KEYS[1]) else return 0 end";
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
         RedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
-        Long result = redisTemplate.execute(redisScript, Arrays.asList(key, value));
+        Long result = redisTemplate.execute(redisScript, Collections.singletonList(key), value);
         if (null == result || result == 0) {
             log.error("释放锁key:{},value:{}失败，该锁不存在或锁已过期", key, value);
         }
