@@ -3,7 +3,6 @@ package com.platon.rosettaflow.task;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
@@ -43,9 +42,6 @@ public class WorkflowNodeStatusTask {
      * 查询 当前时间之前5小时的正在运行的数据
      */
     private static final int BEFORE_HOUR = -5;
-
-    @Resource
-    private SysConfig sysConfig;
 
     @Resource
     private GrpcTaskService grpcTaskService;
@@ -90,10 +86,6 @@ public class WorkflowNodeStatusTask {
 
                 //获取所的任务详情
                 List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
-                //获取当前节点所有任务结果
-                List<GetTaskResultFileSummaryResponseDto> allTaskResultResponseDtoList = grpcSysService.getTaskResultFileSummaryList();
-                Map<String, GetTaskResultFileSummaryResponseDto> taskResultMap = allTaskResultResponseDtoList.stream().collect(Collectors.toMap(GetTaskResultFileSummaryResponseDto::getTaskId, taskResult -> taskResult));
-
                 String taskId;
                 WorkflowNode node;
                 for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
@@ -113,11 +105,9 @@ public class WorkflowNodeStatusTask {
                                 }
                             }
                             workflowNodeSuccessIds.add(node.getId());
-                            //待保存任务结果数据
-                            if (taskResultMap.containsKey(taskId)) {
-                                TaskResult taskResult = BeanUtil.copyProperties(taskResultMap.get(taskId), TaskResult.class);
-                                saveTaskResultList.add(taskResult);
-                            }
+                            //获取待保存任务结果数据
+                            GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                            saveTaskResultList.add(BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class));
                         } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                             //如果是最后一个节点，需要更新整个工作流的状态为失败
                             if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {

@@ -19,7 +19,12 @@ import java.util.List;
 public class GrpcSysServiceMockImpl implements GrpcSysService {
     @Override
     public GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(String taskId) {
-        return null;
+        GetTaskResultFileSummaryResponseDto responseDto = new GetTaskResultFileSummaryResponseDto();
+        responseDto.setTaskId(taskId);
+        responseDto.setFileName("mockFileName");
+        responseDto.setFilePath("/mockFilePath");
+        responseDto.setMetadataId("mockMetaDataId");
+        return responseDto;
     }
 
     @Override
