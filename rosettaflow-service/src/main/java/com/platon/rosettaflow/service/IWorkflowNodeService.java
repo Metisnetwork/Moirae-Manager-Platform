@@ -111,4 +111,12 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param runStatus 运行状态
      */
     void updateRunStatus(Object[] ids, Byte runStatus);
+
+    /**
+     * 根据id查询工作流节点
+     *
+     * @param id 工作流主键id
+     * @return 工作流节点
+     */
+    WorkflowNode getWorkflowNodeById(Long id);
 }
