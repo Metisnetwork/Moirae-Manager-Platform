@@ -2,7 +2,6 @@ package com.platon.rosettaflow.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -17,7 +16,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -36,9 +38,6 @@ public class JobManager {
     private Scheduler scheduler;
 
     @Resource
-    private SysConfig sysConfig;
-
-    @Resource
     private IJobService jobService;
 
     @Resource
@@ -49,17 +48,23 @@ public class JobManager {
      */
     @PostConstruct
     public void init() {
-        if (false) {
-            //服务启动，清除缓存作业消息队列
-            boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
-            if(!isDelete){
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_CACHE_CLEAR_ERROR.getMsg());
+        try {
+            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
+                //服务启动，清除缓存作业消息队列
+                boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
+                if (!isDelete) {
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_CACHE_CLEAR_ERROR.getMsg());
+                }
+                //服务启动，启动所有未完成作业
+                List<Job> jobList = jobService.getAllUnfinishedJob();
+                for (Job job : jobList) {
+                    startJob(job);
+                }
             }
-            //服务启动，启动所有未完成作业
-            List<Job> jobList = jobService.getAllUnfinishedJob();
-            for (Job job : jobList) {
-                startJob(job);
-            }
+        } catch (BusinessException e) {
+            log.error("服务启动加载所有的job失败，失败原因：{}", e.getMessage(), e);
+        } finally {
+            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
         }
     }
 
@@ -89,7 +94,7 @@ public class JobManager {
         }
 
         Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(job.getId().toString(),GROUP)
+                .withIdentity(job.getId().toString(), GROUP)
                 .startAt(job.getBeginTime())
                 .endAt(job.getEndTime())
                 .withSchedule(simpleScheduleBuilder)
@@ -144,32 +149,32 @@ public class JobManager {
 
     /**
      * 完成job
+     *
      * @param job job信息
      */
-    public void finishJob(Job job){
+    public void finishJob(Job job) {
         job.setJobStatus(JobStatusEnum.FINISH.getValue());
         jobService.updateById(job);
     }
 
     /**
      * 批量完成job
+     *
      * @param jobList job集合信息
      */
-    public void finishJobBatch(List<Job> jobList){
+    public void finishJobBatch(List<Job> jobList) {
         jobList.forEach(job ->
-            job.setJobStatus(JobStatusEnum.FINISH.getValue())
+                job.setJobStatus(JobStatusEnum.FINISH.getValue())
         );
         jobService.updateBatchById(jobList);
     }
 
 
-
-
     /**
      * 批量结束job(定时任务也使用)
      */
-    public void finishJobBatchWithTask(){
-        try{
+    public void finishJobBatchWithTask() {
+        try {
             //1、获取调度任务所有作业
             List<Long> schedulerJobIdList = new ArrayList<>();
             Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(JobManager.GROUP));
@@ -186,12 +191,12 @@ public class JobManager {
                     !schedulerJobIdList.contains(job.getId())
             ).collect(Collectors.toList());
             //4、批量更新作业状态
-            if(!jobFinishList.isEmpty()){
+            if (!jobFinishList.isEmpty()) {
                 finishJobBatch(jobFinishList);
             }
 
-        }catch (Exception e){
-            log.error("SyncJobStatusTask error {}", e.getMessage(),e);
+        } catch (Exception e) {
+            log.error("SyncJobStatusTask error {}", e.getMessage(), e);
         }
     }
 }

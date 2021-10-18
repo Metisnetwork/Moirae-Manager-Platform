@@ -1,7 +1,6 @@
 package com.platon.rosettaflow.task;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.mapper.domain.Job;
@@ -21,9 +20,6 @@ import javax.annotation.Resource;
 public class ListenJobTask {
 
     @Resource
-    private SysConfig sysConfig;
-
-    @Resource
     private JobManager jobManager;
 
     @Resource
@@ -32,35 +28,40 @@ public class ListenJobTask {
     /**
      * 注意：测试时候当注释定时任务时，同步注释掉SyncJobStatusTask任务，否则可能出现数据状态不一致
      */
-    @Scheduled(fixedDelay = 30*1000, initialDelay = 15*1000)
+    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 15 * 1000)
     public void run() {
-        if (!sysConfig.isMasterNode()) {
-            return;
-        }
-        //获取新增job列表
-        long size = redisUtil.listSize(SysConstant.JOB_ADD_QUEUE);
-        for (int i = 0; i < size; i++) {
-            String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
-            Job job = JSON.parseObject(jobJson, Job.class);
-            log.error("------redis message add queue jobId:" + job.getId());
-            jobManager.startJob(job);
-        }
+        try {
+            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
+                //获取新增job列表
+                long size = redisUtil.listSize(SysConstant.JOB_ADD_QUEUE);
+                for (int i = 0; i < size; i++) {
+                    String jobJson = redisUtil.listRightPop(SysConstant.JOB_ADD_QUEUE);
+                    Job job = JSON.parseObject(jobJson, Job.class);
+                    log.error("------redis message add queue jobId:" + job.getId());
+                    jobManager.startJob(job);
+                }
 
-        //获取修改job列表
-        size = redisUtil.listSize(SysConstant.JOB_EDIT_QUEUE);
-        for (int i = 0; i < size; i++) {
-            String jobJson = redisUtil.listRightPop(SysConstant.JOB_EDIT_QUEUE);
-            Job job = JSON.parseObject(jobJson, Job.class);
-            log.error("------redis message edit queue jobId:" + job.getId());
-            jobManager.startJob(job);
-        }
-        //获取暂停job列表
-        size = redisUtil.listSize(SysConstant.JOB_PAUSE_QUEUE);
-        for (int i = 0; i < size; i++) {
-            String jobJson = redisUtil.listRightPop(SysConstant.JOB_PAUSE_QUEUE);
-            Job job = JSON.parseObject(jobJson, Job.class);
-            log.error("------redis message pause queue jobId:" + job.getId());
-            jobManager.pauseJob(job);
+                //获取修改job列表
+                size = redisUtil.listSize(SysConstant.JOB_EDIT_QUEUE);
+                for (int i = 0; i < size; i++) {
+                    String jobJson = redisUtil.listRightPop(SysConstant.JOB_EDIT_QUEUE);
+                    Job job = JSON.parseObject(jobJson, Job.class);
+                    log.error("------redis message edit queue jobId:" + job.getId());
+                    jobManager.startJob(job);
+                }
+                //获取暂停job列表
+                size = redisUtil.listSize(SysConstant.JOB_PAUSE_QUEUE);
+                for (int i = 0; i < size; i++) {
+                    String jobJson = redisUtil.listRightPop(SysConstant.JOB_PAUSE_QUEUE);
+                    Job job = JSON.parseObject(jobJson, Job.class);
+                    log.error("------redis message pause queue jobId:" + job.getId());
+                    jobManager.pauseJob(job);
+                }
+            }
+        } catch (Exception e) {
+            log.error("监听redis中的新增及修改job任务，并根据任务创建quartz来管理作业失败，失败原因：{}", e.getMessage(), e);
+        } finally {
+            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
         }
     }
 }

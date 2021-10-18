@@ -468,13 +468,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //发起账户用户类型
         taskDto.setUserType(UserTypeEnum.checkUserType(workflowDto.getAddress()));
         //设置发起方
-        taskDto.setSender(getSender(workflowNodeInputList,preTaskResult));
+        taskDto.setSender(getSender(workflowNodeInputList));
         //任务算法提供方 组织信息
         taskDto.setAlgoSupplier(getAlgoSupplier(taskDto.getSender()));
         // 算力提供方 暂定三方
         taskDto.setPowerPartyIds(getPowerPartyIds());
         //数据提供方
-        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap));
+        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap, preTaskResult));
         //任务结果接受者
         taskDto.setTaskResultReceiverDeclareDtoList(getReceivers(workflowNodeOutputList, organizationMap));
         // 任务需要花费的资源声明
@@ -484,7 +484,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
-        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowNodeVariableList, taskDto));
+        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowNodeVariableList, taskDto, preTaskResult));
         //发起任务的账户的签名
         taskDto.setSign(workflowDto.getSign());
         //任务描述 (非必须)
@@ -568,7 +568,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param workflowNodeVariableList 合约的可变参数列表
      * @return 额外可变入参
      */
-    private String getContractExtraParams(Long algorithmId, List<WorkflowNodeVariable> workflowNodeVariableList, TaskDto taskDto) {
+    private String getContractExtraParams(Long algorithmId, List<WorkflowNodeVariable> workflowNodeVariableList, TaskDto taskDto,TaskResult preTaskResult) {
         AlgorithmVariableStruct jsonStruct = algorithmVariableStructService.getByAlgorithmId(algorithmId);
         if (null == jsonStruct) {
             return null;
@@ -627,9 +627,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 获取算力提供方
      *
      * @param workflowNodeInputList 工作流节点信息
+     * @param organizationMap       组织信息
+     * @param preTaskResult         上一个任务执行结果
      * @return 数据提供方列表
      */
-    private List<TaskDataSupplierDeclareDto> getDataSupplierList(List<WorkflowNodeInput> workflowNodeInputList, Map<String, Organization> organizationMap) {
+    private List<TaskDataSupplierDeclareDto> getDataSupplierList(List<WorkflowNodeInput> workflowNodeInputList, Map<String, Organization> organizationMap, TaskResult preTaskResult) {
         List<TaskDataSupplierDeclareDto> taskDataSupplierDeclareDtoList = new ArrayList<>();
         TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
 
@@ -662,7 +664,21 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
 
             taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
+
+            //TODO 如果有上一个节点的模型，需要做为输入传给底层
+            /*if(null != preTaskResult && SenderFlagEnum.TRUE.getValue() ==input.getSenderFlag()){
+                taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
+                taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(taskOrganizationIdentityInfoDto);
+
+                taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
+                taskMetaDataDeclareDto.setMetaDataId(preTaskResult.getFilePath());
+                taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
+                taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
+            }*/
         }
+
+        //模型提供方
+
         return taskDataSupplierDeclareDtoList;
     }
 
@@ -670,10 +686,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 获取当前节点连接机构信息
      *
      * @param workflowNodeInputList 任务输入信息列表
-     * @param preTaskResult 上一个任务执行结果
      * @return 机构信息
      */
-    private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList, TaskResult preTaskResult) {
+    private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
         for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
             if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
                 OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
@@ -685,6 +700,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 return sender;
             }
         }
+
         log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }
