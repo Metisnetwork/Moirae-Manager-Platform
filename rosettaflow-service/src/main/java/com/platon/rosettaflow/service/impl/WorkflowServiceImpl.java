@@ -329,7 +329,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (isPublishSuccess && hasNext) {
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
             workflowDto.setTaskId(workflowNode.getTaskId());
-//            this.start(workflowDto);
             String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
             redisUtil.set(taskKey + workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
         }

@@ -119,7 +119,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        //判断当前工作流是否存在正在运行或者有加入正在运行的作业中，有则不让保存
+        // 判断当前工作流是否存在正在运行或者有加入正在运行的作业中，有则不让保存
         if (workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue()) {
             log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
@@ -209,7 +209,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 }
             }
         }
-        return dto.getWorkflowNodeInputList();
+        return dto.getWorkflowNodeInputList() == null ? new ArrayList<>() : dto.getWorkflowNodeInputList();
     }
 
     /**
@@ -224,7 +224,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 outputList.get(i).setWorkflowNodeId(workflowNodeId);
             }
         }
-        return outputList;
+        return outputList == null ? new ArrayList<>() : outputList;
     }
 
     /**
