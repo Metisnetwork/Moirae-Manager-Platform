@@ -286,7 +286,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
         // 组装发布任务请求对象
         TaskDto taskDto = this.assemblyTaskDto(workflowDto);
-        WorkflowNode workflowNode = workflowNodeService.getWorkflowNodeById(taskDto.getWorkFlowNodeId());
+        WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
         boolean isPublishSuccess = false;
         try {
