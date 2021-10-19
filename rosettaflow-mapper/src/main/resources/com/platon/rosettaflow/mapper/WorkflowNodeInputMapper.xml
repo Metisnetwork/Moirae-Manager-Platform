@@ -6,6 +6,8 @@
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
         <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId"/>
+        <result column="key_column" jdbcType="INTEGER" property="keyColumn" />
+        <result column="dependent_variable" jdbcType="VARCHAR" property="dependentVariable" />
         <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds"/>
         <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId"/>
         <result column="sender_flag" jdbcType="TINYINT" property="senderFlag"/>
@@ -30,6 +32,12 @@
                 </if>
                 <if test="i.dataTableId != null">
                     data_table_id,
+                </if>
+                <if test="i.keyColumn != null">
+                    key_column,
+                </if>
+                <if test="i.dependentVariable != null">
+                    dependent_variable,
                 </if>
                 <if test="i.dataColumnIds != null">
                     data_column_ids,
@@ -62,6 +70,12 @@
                 </if>
                 <if test="i.dataTableId != null">
                     #{i.dataTableId,jdbcType=VARCHAR},
+                </if>
+                <if test="i.keyColumn != null">
+                    #{i.keyColumn,jdbcType=INTEGER},
+                </if>
+                <if test="i.dependentVariable != null">
+                    #{i.dependentVariable,jdbcType=VARCHAR},
                 </if>
                 <if test="i.dataColumnIds != null">
                     #{i.dataColumnIds,jdbcType=VARCHAR},

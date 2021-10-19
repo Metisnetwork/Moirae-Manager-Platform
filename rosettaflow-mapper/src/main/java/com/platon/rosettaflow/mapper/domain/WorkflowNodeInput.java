@@ -36,6 +36,14 @@ public class WorkflowNodeInput implements Serializable {
      */
     private String dataTableId;
     /**
+     * ID列(列索引)
+     */
+    private Integer keyColumn;
+    /**
+     * 因变量(标签)
+     */
+    private String dependentVariable;
+    /**
      * 数据字段ID
      */
     private String dataColumnIds;

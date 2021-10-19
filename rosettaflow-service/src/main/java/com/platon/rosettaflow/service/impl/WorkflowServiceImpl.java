@@ -483,7 +483,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
-        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowNodeVariableList, taskDto, preTaskResult));
+        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowNodeVariableList, taskDto, preTaskResult, workflowNodeInputList));
         //发起任务的账户的签名
         taskDto.setSign(workflowDto.getSign());
         //任务描述 (非必须)
@@ -518,6 +518,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     /**
      * 记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
+     *
      * @param workflowDto      工作流请求信息
      * @param workflowNode     工作流节点
      * @param isPublishSuccess 节点是否发布成功
@@ -567,7 +568,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param workflowNodeVariableList 合约的可变参数列表
      * @return 额外可变入参
      */
-    private String getContractExtraParams(Long algorithmId, List<WorkflowNodeVariable> workflowNodeVariableList, TaskDto taskDto,TaskResult preTaskResult) {
+    private String getContractExtraParams(Long algorithmId, List<WorkflowNodeVariable> workflowNodeVariableList, TaskDto taskDto, TaskResult preTaskResult, List<WorkflowNodeInput> workflowNodeInputList) {
         AlgorithmVariableStruct jsonStruct = algorithmVariableStructService.getByAlgorithmId(algorithmId);
         if (null == jsonStruct) {
             return null;
@@ -648,9 +649,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
             List<Integer> selectedColumns = new ArrayList<>();
             String[] columnIdsArr = input.getDataColumnIds().split(",");
-            if (columnIdsArr.length > 0) {
-                // TODO 索引列暂定选择列中的第一列
-                taskMetaDataDeclareDto.setKeyColumn(Integer.valueOf(columnIdsArr[0]));
+
+
+            if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
+                taskMetaDataDeclareDto.setKeyColumn(input.getKeyColumn());
             }
             for (String s : columnIdsArr) {
                 selectedColumns.add(Integer.valueOf(s.trim()));
