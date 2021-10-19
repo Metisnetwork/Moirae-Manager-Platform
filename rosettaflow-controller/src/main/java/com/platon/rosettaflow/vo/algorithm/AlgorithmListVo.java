@@ -13,7 +13,7 @@ import lombok.Data;
 public class AlgorithmListVo {
 
     @ApiModelProperty(value = "算法ID")
-    private String algorithmId;
+    private Long algorithmId;
 
     @ApiModelProperty(value = "算法名称")
     private String algorithmName;
@@ -22,6 +22,6 @@ public class AlgorithmListVo {
     private String algorithmDesc;
 
     @ApiModelProperty(value = "算法类型")
-    private String algorithmType;
+    private Byte algorithmType;
 
 }

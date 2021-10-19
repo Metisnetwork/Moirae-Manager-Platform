@@ -51,6 +51,8 @@ public enum ErrorMsg {
     ALG_NOT_EXIST("算法不存在", "Algorithm does not exist"),
     ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code does not exist"),
     ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation"),
+    ALG_TYPE_NOT_EXIST("算法大类不存在", "Algorithm type does not exist"),
+    ALG_VARIABLE_STRUCT_ERROR("算法变量可变参数json结构错误", "Algorithm variable variable parameter json structure error"),
 
     /**
      * 数据
@@ -71,13 +73,16 @@ public enum ErrorMsg {
     WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
     WORKFLOW_TERMINATE_NET_PROCESS_ERROR("工作流终止失败", "Workflow terminated failed"),
     WORKFLOW_END_NODE_OVERFLOW("截止节点不能大于工作流最大节点数", "EndNode can not more than workflow nodeNumber"),
-    WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "Workflow node does not  exist"),
+    WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "Workflow node does not exist"),
     WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "Workflow node not cached"),
     WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported"),
-    WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码不存在", "Workflow node code does not exist"),
     WORKFLOW_NODE_SENDER_NOT_EXIST("工作流节点需要一个发起方", "Workflow node need one sender"),
-    WORKFLOW_NODE_PUBLISH_FAIL("工作流节点发布失败", "Workflow node publish fail"),
-
+    WORKFLOW_NODE_NOT_INPUT_EXIST("工作流节点输入未配置", "Workflow node input is not configured"),
+    WORKFLOW_NODE_NOT_OUTPUT_EXIST("工作流节点输出未配置", "Workflow node output is not configured"),
+    WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码未配置", "Workflow node code is not configured"),
+    WORKFLOW_NODE_NOT_RESOURCE_EXIST("工作流节点环境未配置", "Workflow node environment is not configured"),
+    WORKFLOW_PRE_TASK_RESULT_NOT_EXIST("工作流前一个节点运行节点获取失败", "Workflow pre task result not exist"),
+    WORKFLOW_NODE_RUNNING_FAIL("工作流节点运行失败!", "The workflow node failed to run!"),
 
     /**
      * 作业
@@ -85,6 +90,7 @@ public enum ErrorMsg {
     JOB_ADD_ERROR("新增作业失败", "Add job error"),
     JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
     JOB_NOT_EXIST("原作业不存在", "Job not exist"),
+    JOB_ID_NOT_EXIST("作业id不存在", "Job id not exist"),
     JOB_TIME_ERROR("作业时间错误", "Job time error"),
     JOB_RUNNING_OR_FINISH("作业正在执行或执行完成不能修改", "Job is running or finish can not modify"),
     JOB_TIME_REPEAT_INTERVAL_ERROR("作业执行重复时，作业时间及执行间隔时间错误", "Job is repeated,the job time or repeat interval error"),
@@ -103,6 +109,7 @@ public enum ErrorMsg {
     SUB_JOB_ID_NOT_EXIST("子作业id不存在", "Sub job not exist"),
     SUB_JOB_NODE_NOT_DELETE("子作业节点运行中不能删除", "Sub job node is running can not delete"),
     SUB_JOB_NODE_UPDATE_FAIL("子作业节点更新失败", "Sub job node update fail"),
+    SUB_JOB_NODE_PUBLISH_FAIL("子作业节点发布失败", "Sub job node publish fail"),
 
 
     /**

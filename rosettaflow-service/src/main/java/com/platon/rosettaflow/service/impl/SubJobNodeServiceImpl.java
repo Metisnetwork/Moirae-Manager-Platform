@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.dto.SubJobNodeDto;
 import com.platon.rosettaflow.mapper.SubJobNodeMapper;
 import com.platon.rosettaflow.mapper.domain.SubJobNode;
@@ -63,6 +64,7 @@ public class SubJobNodeServiceImpl extends ServiceImpl<SubJobNodeMapper, SubJobN
         LambdaQueryWrapper<SubJobNode> querySubJobNode = Wrappers.lambdaQuery();
         querySubJobNode.eq(SubJobNode::getSubJobId, subJobId);
         querySubJobNode.eq(SubJobNode::getNodeStep, nodeStep);
+        querySubJobNode.eq(SubJobNode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(querySubJobNode);
     }
 

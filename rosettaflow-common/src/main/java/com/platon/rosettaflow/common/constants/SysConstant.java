@@ -10,15 +10,19 @@ public class SysConstant {
      * 数字常量
      */
     public static final int INT_0 = 0;
-    public static final int INT_1 = 1;
     public static final int INT_2 = 2;
     public static final int INT_3 = 3;
-    public static final int INT_4 = 3;
 
     /** 换算单位 */
     public static final int INT_1024 = 1024;
     public static final int INT_1000 = 1000;
     public static final int INT_3600 = 3600;
+
+    /**
+     * 启动工作流前是否需要整体保存：0-否，1-是
+     */
+    public static final String STR_0 = "0";
+    public static final String STR_1 = "1";
 
     /**
      * 请求头token key值
@@ -119,6 +123,11 @@ public class SysConstant {
     /**
      * 待处理工作流前缀
      */
-    public static final String REDIS_WORKFLOW_PREFIX_KEY = "workflowDto:";
+    public static final String REDIS_WORKFLOW_PREFIX_KEY = "workflowDtoTask:";
+
+    /**
+     * 待处理作业节点前缀
+     */
+    public static final String REDIS_SUB_JOB_PREFIX_KEY = "subJobDtoTask:";
 
 }

@@ -193,6 +193,21 @@ CREATE TABLE `t_project_member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='项目成员管理表';
 
 -- ----------------------------
+-- Table structure for `t_algorithm_type`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_algorithm_type`;
+CREATE TABLE `t_algorithm_type` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
+    `algorithm_type_name` varchar(30) DEFAULT NULL COMMENT '算法名称',
+    `algorithm_type_desc` varchar(200) DEFAULT NULL COMMENT '算法描述',
+    `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
+    `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1-有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法大类表';
+
+-- ----------------------------
 -- Table structure for `t_algorithm`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm`;
@@ -272,6 +287,23 @@ CREATE TABLE `t_algorithm_variable` (
   PRIMARY KEY (`id`),
   KEY (`algorithm_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法变量表';
+
+
+-- ----------------------------
+-- Table structure for `t_algorithm_variable_struct`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_algorithm_variable_struct`;
+CREATE TABLE `t_algorithm_variable_struct` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法变量模板结构表ID(自增长)',
+    `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法表id',
+    `struct` varchar(1024) NOT NULL COMMENT '模板json格式结构',
+    `desc` varchar(128) DEFAULT NULL COMMENT '模板描述',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY (`algorithm_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法变量模板结构表';
 
 -- ----------------------------
 -- Table structure for `t_workflow`
@@ -361,7 +393,9 @@ CREATE TABLE `t_workflow_node_input` (
   `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
   `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
   `data_table_id` varchar(128) DEFAULT NULL COMMENT '数据表ID',
-  `data_column_ids` varchar(128) DEFAULT NULL COMMENT '数据字段ID',
+  `key_column` int(11) DEFAULT NULL COMMENT 'ID列(列索引)',
+  `dependent_variable` varchar(32) DEFAULT NULL COMMENT '因变量(标签)',
+  `data_column_ids` varchar(128) DEFAULT NULL COMMENT '数据字段ID索引',
   `data_file_id` varchar(128) DEFAULT NULL COMMENT '数据文件id',
   `sender_flag` tinyint(4) DEFAULT NULL COMMENT '是否发起方: 0-否,1-是',
   `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
@@ -509,12 +543,33 @@ CREATE TABLE `t_sub_job_node` (
 DROP TABLE IF EXISTS `t_task_event`;
 CREATE TABLE `t_task_event` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务表ID(自增长)',
-  `task_id` varchar(256) NOT NULL COMMENT '任务ID,hash',
+  `task_id` varchar(256) NOT NULL COMMENT '任务ID',
   `type` varchar(20) NOT NULL COMMENT '事件类型',
   `identity_id` varchar(128) NOT NULL COMMENT '产生事件的组织身份ID',
   `event_time` datetime NOT NULL COMMENT '产生事件的时间',
   `content` varchar(512) NOT NULL COMMENT '事件内容',
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务事件表';
+
+-- ----------------------------
+-- Table structure for `t_task_result`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_task_result`;
+CREATE TABLE `t_task_result` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务运行结果表ID(自增长)',
+  `task_id` varchar(256) NOT NULL COMMENT '任务ID',
+  `file_name` varchar(128) NOT NULL COMMENT '任务结果文件的名称',
+  `metadata_id` varchar(128) NOT NULL COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
+  `origin_id` varchar(128) NOT NULL COMMENT '任务结果文件的原始文件Id',
+  `file_path` varchar(256) NOT NULL COMMENT '任务结果文件的完整相对路径名',
+  `ip` varchar(32) NOT NULL COMMENT '任务结果文件所在的 数据服务内网ip',
+  `port` varchar(8) NOT NULL COMMENT '任务结果文件所在的 数据服务内网port',
+  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY UK_TASK_RESULT (`task_id`, `metadata_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务运行结果表';

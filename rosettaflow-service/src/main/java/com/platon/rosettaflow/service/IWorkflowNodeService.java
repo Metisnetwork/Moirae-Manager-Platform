@@ -2,10 +2,10 @@ package com.platon.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
-import com.platon.rosettaflow.mapper.domain.*;
+import com.platon.rosettaflow.mapper.domain.WorkflowNode;
+import com.platon.rosettaflow.mapper.domain.WorkflowNodeTemp;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 工作流节点服务
@@ -24,7 +24,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     List<WorkflowNodeDto> queryNodeDetailsList(Long id);
 
     /**
-     * 工作流节点明细保存
+     * 保存工作流所有节点数据
      *
      * @param workflowId          工作流id
      * @param workflowNodeDtoList 工作流节点列表
@@ -32,42 +32,11 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
 
     /**
-     * 保存工作流节点
-     *
-     * @param workflowId       工作流id
-     * @param workflowNodeList 工作流节点信息列表
-     */
-    void saveWorkflowNode(Long workflowId, List<WorkflowNode> workflowNodeList);
-
-    /**
      * 清空工作流节点
      *
      * @param workflowId 工作流id
      */
     void clearWorkflowNode(Long workflowId);
-
-    /**
-     * 添加工作流节点
-     *
-     * @param workflowNode 节点信息
-     * @return Long
-     */
-    Map<String, Object> addWorkflowNode(WorkflowNode workflowNode);
-
-    /**
-     * 工作流节点重命名
-     *
-     * @param workflowNodeId 工作流节点id
-     * @param nodeName       工作流节点名称
-     */
-    void renameWorkflowNode(Long workflowNodeId, String nodeName);
-
-    /**
-     * 删除工作流中的节点
-     *
-     * @param id 工作流节点id
-     */
-    void deleteWorkflowNode(Long id);
 
     /**
      * 根据工作流id及节点序号获取工作流节点
@@ -93,44 +62,6 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @return 工作流节点列表
      */
     List<WorkflowNode> getWorkflowNodeList(Long workflowId);
-
-    /**
-     * 根据id查询工作流节点
-     *
-     * @param id 工作流主键id
-     * @return 工作流节点列表
-     */
-    WorkflowNode getWorkflowNodeById(Long id);
-
-    /**
-     * 添加工作流节点输入数据
-     *
-     * @param workflowNodeId        工作流节点
-     * @param workflowNodeInputList 节点输入list
-     */
-    void saveWorkflowNodeInput(Long workflowNodeId, List<WorkflowNodeInput> workflowNodeInputList);
-
-    /**
-     * 添加工作流节点输出数据
-     *
-     * @param workflowNodeId         工作流节点id
-     * @param workflowNodeOutputList 工作流节点输出列表
-     */
-    void saveWorkflowNodeOutput(Long workflowNodeId, List<WorkflowNodeOutput> workflowNodeOutputList);
-
-    /**
-     * 添加工作流节点代码
-     *
-     * @param workflowNodeCode 工作流节点代码
-     */
-    void saveWorkflowNodeCode(WorkflowNodeCode workflowNodeCode);
-
-    /**
-     * 添加工作流节点资源
-     *
-     * @param workflowNodeResource 工作流节点资源
-     */
-    void saveWorkflowNodeResource(WorkflowNodeResource workflowNodeResource);
 
     /**
      * 复制保存工作流节点
@@ -180,4 +111,12 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param runStatus 运行状态
      */
     void updateRunStatus(Object[] ids, Byte runStatus);
+
+    /**
+     * 根据id查询工作流节点
+     *
+     * @param id 工作流主键id
+     * @return 工作流节点
+     */
+    WorkflowNode getWorkflowNodeById(Long id);
 }

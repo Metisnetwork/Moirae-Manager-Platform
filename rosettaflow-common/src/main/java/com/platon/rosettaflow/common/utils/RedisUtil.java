@@ -1,15 +1,14 @@
 package com.platon.rosettaflow.common.utils;
 
-import com.platon.rosettaflow.common.constants.SysConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,10 +52,10 @@ public class RedisUtil {
     @SuppressWarnings("all")
     public long listSize(String key) {
         long listSize = 0;
-        try{
+        try {
             listSize = redisTemplate.opsForList().size(key);
-        }catch (Exception e){
-            log.error("redisTemplate.opsForList().size({}) fail",key);
+        } catch (Exception e) {
+            log.error("redisTemplate.opsForList().size({}) fail", key);
         }
         return listSize;
     }
@@ -98,7 +97,7 @@ public class RedisUtil {
         try {
             return redisTemplate.hasKey(key);
         } catch (Exception e) {
-            log.error("RedisUtil->hasKey fail {}",e.getMessage(),e);
+            log.error("RedisUtil->hasKey fail {}", e.getMessage(), e);
             return false;
         }
     }
@@ -149,12 +148,12 @@ public class RedisUtil {
      * @param keys 普通批量删除的键集合
      * @return true / false
      */
-    public boolean deleteBatch(List<String> keys){
+    public boolean deleteBatch(List<String> keys) {
         List<Boolean> deleteStates = new ArrayList<>();
-        for (String key: keys) {
-             if(listSize(key) > 0){
-                 deleteStates.add(delete(key));
-             }
+        for (String key : keys) {
+            if (listSize(key) > 0) {
+                deleteStates.add(delete(key));
+            }
         }
         return !deleteStates.contains(false);
     }
@@ -631,5 +630,54 @@ public class RedisUtil {
             return 0;
         }
     }
+
+    public boolean lock(String key, String value, int expireTime, TimeUnit timeUnit) {
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(key, value, expireTime, timeUnit);
+        if (null == flag || !flag) {
+            log.error("申请锁key:{},value:{}失败", key, value);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean lock(String key, String value) {
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(key, value);
+        if (null == flag || !flag) {
+            log.error("申请锁key:{},value:{}失败", key, value);
+            return false;
+        }
+        return true;
+    }
+
+    public void unLock(String key, String value) {
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        RedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
+        Long result = redisTemplate.execute(redisScript, Collections.singletonList(key), value);
+        if (null == result || result == 0) {
+            log.error("释放锁key:{},value:{}失败，该锁不存在或锁已过期", key, value);
+        }
+        log.info("释放锁key:{},value:{}成功", key, value);
+    }
+
+    /**
+     * 获取当前的设备cpu序列号
+     *
+     * @return cpu序列号
+     */
+    public static String getProcessor() {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"wmic", "cpu", "get", "ProcessorId"});
+            process.getOutputStream().close();
+            Scanner sc = new Scanner(process.getInputStream());
+            String property = sc.next();
+            String serial = sc.next();
+            log.info(property + ": " + serial);
+            return serial;
+        } catch (IOException e) {
+            log.error("get current equipment cpu serial number fail,reason:{}", e.getMessage(), e);
+            return "";
+        }
+    }
+
 
 }

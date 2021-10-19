@@ -27,7 +27,11 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
 
     @Override
     public PublishTaskDeclareResponseDto syncPublishTask(TaskDto taskDto) {
-        return null;
+        PublishTaskDeclareResponseDto responseDto = new PublishTaskDeclareResponseDto();
+        responseDto.setTaskId(UUID.randomUUID().toString().replace("-", "").toLowerCase());
+        responseDto.setMsg("mocker 处理成功！");
+        responseDto.setStatus(GrpcConstant.GRPC_SUCCESS_CODE);
+        return responseDto;
     }
 
     @Override

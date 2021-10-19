@@ -83,8 +83,8 @@ public class JobController {
 
     @PostMapping("deleteBatch")
     @ApiOperation(value = "批量删除作业", notes = "批量删除作业")
-    public ResponseVo<?> actionJob(@ApiParam(value = "作业id集合", required = true) List<Long> ids) {
-        jobService.deleteBatchJob(ids);
+    public ResponseVo<?> actionJob(@RequestBody @Valid DeleteBatchJobReq deleteBatchJobReq) {
+        jobService.deleteBatchJob(deleteBatchJobReq.getJobIds());
         return ResponseVo.createSuccess();
     }
 

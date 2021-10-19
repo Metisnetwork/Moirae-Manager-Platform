@@ -2,9 +2,8 @@ package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.JsonUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
@@ -90,12 +90,26 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IOrganizationService organizationService;
 
     @Resource
+    private IAlgorithmVariableStructService algorithmVariableStructService;
+
+    @Resource
+    private ITaskResultService taskResultService;
+
+    @Resource
     private RedisUtil redisUtil;
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
         return this.baseMapper.queryWorkFlowPageList(projectId, workflowName, page);
+    }
+
+    @Override
+    public List<Workflow> queryListById(List<Long> idList) {
+        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(Workflow::getId, idList);
+        queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
     }
 
     @Override
@@ -162,11 +176,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = this.queryWorkflowDetail(id);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        // 物理删除工作流节点
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
-        if (workflowNodeList.size() > 0) {
-            workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(node.getId()));
-        }
+        // 删除当前工作流所有节点数据
+        this.deleteWorkflowAllNodeData(id);
         // 逻辑删除工作流，并修改版本标识
         workflow.setId(id);
         workflow.setDelVersion(id);
@@ -182,23 +193,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         // 转换id类型
         List<Long> idsList = convertIdType(ids);
-        List<Workflow> workflowList = this.listByIds(idsList);
+        List<Workflow> workflowList = this.queryListById(idsList);
         if (workflowList.size() > 0) {
-            workflowList.forEach(workflow -> {
-                // 校验是否有编辑权限
-                checkEditPermission(workflow.getProjectId());
-                // 删除项目中的工作流相关数据
-                List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflow.getId());
-                if (workflowNodeList.size() > 0) {
-                    workflowNodeList.parallelStream().forEach(node -> workflowNodeService.deleteWorkflowNode(node.getId()));
-                }
-            });
+            // 校验是否有编辑权限
+            workflowList.forEach(workflow -> this.checkEditPermission(workflow.getProjectId()));
+            // 并行删除工作流中所有节点数据
+            workflowList.parallelStream().forEach(workflow -> this.deleteWorkflowAllNodeData(workflow.getId()));
         }
+        // 逻辑删除工作流，并修改版本标识
         if (idsList.size() > 0) {
             List<Workflow> list = new ArrayList<>();
             idsList.forEach(id -> {
                 Workflow workflow = new Workflow();
-                // 逻辑删除工作流，并修改版本标识
                 workflow.setId(id);
                 workflow.setDelVersion(id);
                 workflow.setStatus((byte) 0);
@@ -261,49 +267,55 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Transactional(rollbackFor = RuntimeException.class)
     public void start(WorkflowDto workflowDto) {
         Workflow orgWorkflow = this.queryWorkflowDetail(workflowDto.getId());
-        // 校验是否有编辑权限
-        if (!workflowDto.isJobFlg()) {
+        // 校验是否有编辑权限:非作业且启动第一个节点才进行校验
+        if (!workflowDto.isJobFlg() && workflowDto.getStartNode() == 1) {
             checkEditPermission(orgWorkflow.getProjectId());
         }
-        //截止节点不能超过工作流最大节点
-        //如果截止节点为空，设置为工作流最后一个节点
+        // 如果截止节点为空，设置为工作流最后一个节点
         if (null == workflowDto.getEndNode()) {
             workflowDto.setEndNode(orgWorkflow.getNodeNumber());
-        } else if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
+        }
+        // 截止节点不能超过工作流最大节点
+        if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
             log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
-        //保存用户和地址及签名并更新工作流状态为运行中
+        // 保存用户和地址及签名并更新工作流状态为运行中
         if (!workflowDto.isJobFlg()) {
-            updateSign(workflowDto);
+            this.updateSign(workflowDto);
         }
 
         /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
-        TaskDto taskDto = assemblyTaskDto(orgWorkflow.getId(), workflowDto.getStartNode(), workflowDto.getAddress(), workflowDto.getSign());
+        // 组装发布任务请求对象
+        TaskDto taskDto = this.assemblyTaskDto(workflowDto);
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
         boolean isPublishSuccess = false;
-        try{
+        try {
             respDto = grpcTaskService.syncPublishTask(taskDto);
-            isPublishSuccess = respDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE;
-        }catch (Exception e){
+            if (GrpcConstant.GRPC_SUCCESS_CODE == respDto.getStatus()) {
+                isPublishSuccess = true;
+            }
+        } catch (Exception e) {
             log.error("publish task fail, task name:{}, work flow nodeId:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
             if (workflowDto.isJobFlg()) {
-                updateSubJobInfo(workflowDto, isPublishSuccess);
-                updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
+                // 更新子作业
+                this.updateSubJobInfo(workflowDto, false);
+                // 更新子作业节点信息
+                this.updateSubJobNodeInfo(workflowDto, workflowNode, false, respDto);
                 return;
             } else {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_PUBLISH_FAIL.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_RUNNING_FAIL.getMsg());
             }
         }
         if (workflowDto.isJobFlg()) {
             //1.更新子作业
-            updateSubJobInfo(workflowDto, isPublishSuccess);
+            this.updateSubJobInfo(workflowDto, isPublishSuccess);
             //2.更新子作业节点信息
-            updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
+            this.updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
         } else {
             //1.更新工作流
-            Workflow workflow = this.getById(workflowNode.getWorkflowId());
+            Workflow workflow = this.queryWorkflowDetail(workflowNode.getWorkflowId());
             workflow.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
             //2.更新工作流节点
             workflowNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
@@ -314,16 +326,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             this.updateById(workflow);
 
         }
-        //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点,放在redis队列中待下次处理
+        //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点,放在redis中待下次处理
         boolean hasNext = workflowNode.getNextNodeStep() != null && workflowNode.getNextNodeStep() > 1;
         if (isPublishSuccess && hasNext) {
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
             workflowDto.setTaskId(workflowNode.getTaskId());
-//            this.start(workflowDto);
-            redisUtil.set(SysConstant.REDIS_WORKFLOW_PREFIX_KEY+workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
+            String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
+            redisUtil.set(taskKey + workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
         }
     }
-
 
 
     private void updateSign(WorkflowDto workflowDto) {
@@ -363,7 +374,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (null == workflowNode) {
             this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
         } else {
-            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode);
+            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode.getTaskId());
             TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
 
             if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
@@ -376,11 +387,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-    private TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, WorkflowNode workflowNode) {
+    @Override
+    public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, String taskId) {
         TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
         terminateTaskRequestDto.setUser(workflow.getAddress());
         terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflow.getAddress()));
-        terminateTaskRequestDto.setTaskId(workflowNode.getTaskId());
+        terminateTaskRequestDto.setTaskId(taskId);
         terminateTaskRequestDto.setSign(workflow.getSign());
         return terminateTaskRequestDto;
     }
@@ -396,14 +408,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 组装发布任务请求对象
      *
-     * @param workFlowId  工作流id
-     * @param currentNode 工作流节点序号
-     * @param address     发起任务时的钱包地址
-     * @return 发布任务请求对象
+     * @param workflowDto 工作流节点参数信息
      */
     @Override
-    public TaskDto assemblyTaskDto(Long workFlowId, Integer currentNode, String address, String sign) {
-        WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workFlowId, currentNode);
+    public TaskDto assemblyTaskDto(WorkflowDto workflowDto) {
+        WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(), workflowDto.getStartNode());
 
         //获取工作流代码输入信息
         String calculateContractCode;
@@ -422,6 +431,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             dataSplitContractCode = workflowNodeCode.getDataSplitContractCode();
         }
 
+        //如果不是第一个节点，调用net,获取前一个节点的计算结果
+        TaskResult preTaskResult = null;
+        if (workflowDto.getStartNode() > 1) {
+            preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
+            if (null == preTaskResult) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
+            }
+        }
+
         //获取工作流节点输入信息
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
 
@@ -429,7 +447,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
 
         //获取工作流节点自变量及因变量
-        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
+//        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
 
         //工作流节点资源表
         WorkflowNodeResource workflowNodeResource = getWorkflowNodeResource(workflowNode);
@@ -447,9 +465,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //任务名称
         taskDto.setTaskName(commonService.generateTaskName(workflowNode.getId()));
         //发起任务用户
-        taskDto.setUser(address);
+        taskDto.setUser(workflowDto.getAddress());
         //发起账户用户类型
-        taskDto.setUserType(UserTypeEnum.checkUserType(address));
+        taskDto.setUserType(UserTypeEnum.checkUserType(workflowDto.getAddress()));
         //设置发起方
         taskDto.setSender(getSender(workflowNodeInputList));
         //任务算法提供方 组织信息
@@ -457,7 +475,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 算力提供方 暂定三方
         taskDto.setPowerPartyIds(getPowerPartyIds());
         //数据提供方
-        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap));
+        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap, preTaskResult));
         //任务结果接受者
         taskDto.setTaskResultReceiverDeclareDtoList(getReceivers(workflowNodeOutputList, organizationMap));
         // 任务需要花费的资源声明
@@ -467,9 +485,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
-        taskDto.setContractExtraParams(getContractExtraParams(workflowNodeVariableList));
+        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), preTaskResult, workflowNodeInputList));
         //发起任务的账户的签名
-        taskDto.setSign(sign);
+        taskDto.setSign(workflowDto.getSign());
         //任务描述 (非必须)
         taskDto.setDesc(workflowNode.getNodeName());
 
@@ -488,28 +506,30 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     /**
      * 更新子作业
-     * @param workflowDto 工作流请求信息
+     *
+     * @param workflowDto      工作流请求信息
      * @param isPublishSuccess 节点是否发布成功
      */
-    private void updateSubJobInfo(WorkflowDto workflowDto, boolean isPublishSuccess){
+    private void updateSubJobInfo(WorkflowDto workflowDto, boolean isPublishSuccess) {
         SubJob subJob = subJobService.getById(workflowDto.getSubJobId());
         subJob.setEndTime(now());
-        subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.SECOND)));
+        subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
         subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
         subJobService.updateById(subJob);
     }
 
     /**
      * 记录子作业节点信息，存在则更新(子作业重启)，不存在则保存
-     * @param workflowDto 工作流请求信息
-     * @param workflowNode 工作流节点
+     *
+     * @param workflowDto      工作流请求信息
+     * @param workflowNode     工作流节点
      * @param isPublishSuccess 节点是否发布成功
-     * @param respDto           发布响应结果
+     * @param respDto          发布响应结果
      */
-    private void updateSubJobNodeInfo(WorkflowDto workflowDto, WorkflowNode workflowNode, boolean isPublishSuccess, PublishTaskDeclareResponseDto respDto){
-        SubJobNode subJobNodeTemp = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
-        SubJobNode subJobNode = !Objects.isNull(subJobNodeTemp) ? subJobNodeTemp : new SubJobNode();
-        if (Objects.isNull(subJobNodeTemp)) {
+    private void updateSubJobNodeInfo(WorkflowDto workflowDto, WorkflowNode workflowNode, boolean isPublishSuccess, PublishTaskDeclareResponseDto respDto) {
+        SubJobNode subJobNode = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
+        if (Objects.isNull(subJobNode)) {
+            subJobNode = new SubJobNode();
             subJobNode.setSubJobId(workflowDto.getSubJobId());
             subJobNode.setAlgorithmId(workflowNode.getAlgorithmId());
             subJobNode.setNodeStep(workflowNode.getNodeStep());
@@ -518,13 +538,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
         subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
         subJobNode.setUpdateTime(now());
-        boolean isSuccess = Objects.isNull(subJobNodeTemp) ? subJobNodeService.save(subJobNode) : subJobNodeService.updateById(subJobNode);
+        boolean isSuccess = subJobNodeService.saveOrUpdate(subJobNode);
         if (!isSuccess) {
-            log.error("start sub job fail, is save sub job node:{}, sub job node id:{}", Objects.isNull(subJobNodeTemp), subJobNode.getId());
+            log.error("start sub job fail, is save sub job node. subJobNode:{}", JSON.toJSONString(subJobNode));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
         }
     }
-
 
 
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
@@ -547,15 +566,34 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 合约调用的额外可变入参
      *
-     * @param workflowNodeVariableList 合约的可变参数列表
+     * @param algorithmId 算法id
      * @return 额外可变入参
      */
-    private String getContractExtraParams(List<WorkflowNodeVariable> workflowNodeVariableList) {
-        JSONObject jsonObject = JSONUtil.createObj();
-        for (WorkflowNodeVariable variable : workflowNodeVariableList) {
-            jsonObject.set(variable.getVarNodeKey(), variable.getVarNodeValue());
+    private String getContractExtraParams(Long algorithmId, TaskResult preTaskResult, List<WorkflowNodeInput> workflowNodeInputList) {
+        AlgorithmVariableStruct jsonStruct = algorithmVariableStructService.getByAlgorithmId(algorithmId);
+        if (null == jsonStruct) {
+            return null;
+        } else {
+            // 把可变参数进行替换
+            log.info("jsonStruct.getStruct() is:{}", jsonStruct.getStruct());
+            if (!JsonUtils.isJson(jsonStruct.getStruct())) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
+            }
+            JSONObject jsonObject = JSON.parseObject(jsonStruct.getStruct());
+            //逻辑训练动态参数[因变量(标签)]
+            if (jsonObject.containsKey("label_column")) {
+                for (WorkflowNodeInput input : workflowNodeInputList) {
+                    if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
+                        jsonObject.put("label_column", input.getDependentVariable());
+                    }
+                }
+            }
+            //逻辑回归动态参数[模型所在的路径，需填绝对路径]
+            if (jsonObject.containsKey("model_path")) {
+                jsonObject.put("model_path", preTaskResult.getFilePath());
+            }
+            return jsonStruct.getStruct();
         }
-        return jsonObject.toString();
     }
 
     /**
@@ -606,9 +644,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 获取算力提供方
      *
      * @param workflowNodeInputList 工作流节点信息
+     * @param organizationMap       组织信息
+     * @param preTaskResult         上一个任务执行结果
      * @return 数据提供方列表
      */
-    private List<TaskDataSupplierDeclareDto> getDataSupplierList(List<WorkflowNodeInput> workflowNodeInputList, Map<String, Organization> organizationMap) {
+    private List<TaskDataSupplierDeclareDto> getDataSupplierList(List<WorkflowNodeInput> workflowNodeInputList, Map<String, Organization> organizationMap, TaskResult preTaskResult) {
         List<TaskDataSupplierDeclareDto> taskDataSupplierDeclareDtoList = new ArrayList<>();
         TaskDataSupplierDeclareDto taskDataSupplierDeclareDto;
 
@@ -626,9 +666,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
             List<Integer> selectedColumns = new ArrayList<>();
             String[] columnIdsArr = input.getDataColumnIds().split(",");
-            if (columnIdsArr.length > 0) {
-                // TODO 索引列暂定选择列中的第一列
-                taskMetaDataDeclareDto.setKeyColumn(Integer.valueOf(columnIdsArr[0]));
+
+
+            if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
+                taskMetaDataDeclareDto.setKeyColumn(input.getKeyColumn());
             }
             for (String s : columnIdsArr) {
                 selectedColumns.add(Integer.valueOf(s.trim()));
@@ -641,7 +682,21 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
 
             taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
+
+            //TODO 如果有上一个节点的模型，需要做为输入传给底层
+            /*if(null != preTaskResult && SenderFlagEnum.TRUE.getValue() ==input.getSenderFlag()){
+                taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
+                taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(taskOrganizationIdentityInfoDto);
+
+                taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
+                taskMetaDataDeclareDto.setMetaDataId(preTaskResult.getFilePath());
+                taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
+                taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
+            }*/
         }
+
+        //模型提供方
+
         return taskDataSupplierDeclareDtoList;
     }
 
@@ -663,6 +718,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 return sender;
             }
         }
+
         log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }

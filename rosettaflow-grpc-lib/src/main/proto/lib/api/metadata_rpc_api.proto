@@ -25,104 +25,102 @@ import "google/protobuf/empty.proto";
 
 // (全网) 单个元数据详情 resp
 message GetGlobalMetadataDetailResponse {
-    api.protobuf.Organization owner = 1;              // 元数据的拥有者
-    types.MetadataDetail      information = 2;        // 元文件详情主体
+  api.protobuf.Organization owner = 1;              // 元数据的拥有者
+  types.MetadataDetail      information = 2;        // 元文件详情主体
 }
 
 // 查看 全网元数据列表  resp
 message GetGlobalMetadataDetailListResponse {
-    int32                                     status = 1;                      // 响应码
-    string                                    msg = 2;                         // 错误信息
-    repeated GetGlobalMetadataDetailResponse  metadata_list = 3;               // 元数据列表
+  int32                                     status = 1;                      // 响应码
+  string                                    msg = 2;                         // 错误信息
+  repeated GetGlobalMetadataDetailResponse  metadata_list = 3;               // 元数据列表
 }
 
 // (本组织) 单个元数据详情 resp
 message GetLocalMetadataDetailResponse {
-    api.protobuf.Organization owner = 1;                  // 元数据的拥有者
-    types.MetadataDetail      information = 2;            // 元文件详情主体
-    bool                      is_internal = 3;            // 是否为本组织内部元数据 (不对外的元数据, true: 是内部元数据; false: 不是)
+  api.protobuf.Organization owner = 1;                  // 元数据的拥有者
+  types.MetadataDetail      information = 2;            // 元文件详情主体
+  bool                      is_internal = 3;            // 是否为本组织内部元数据 (不对外的元数据, true: 是内部元数据; false: 不是)
 }
 
 // 查看 本组织元数据列表  resp
 message GetLocalMetadataDetailListResponse {
-    int32                                     status = 1;                      // 响应码
-    string                                    msg = 2;                         // 错误信息
-    repeated GetLocalMetadataDetailResponse   metadata_list = 3;               // 元数据列表
+  int32                                     status = 1;                      // 响应码
+  string                                    msg = 2;                         // 错误信息
+  repeated GetLocalMetadataDetailResponse   metadata_list = 3;               // 元数据列表
 }
 
 
 // 数据上架 req
 message PublishMetadataRequest {
-    types.MetadataDetail information = 1;             // 元数据详情
+  types.MetadataDetail information = 1;             // 元数据详情
 }
 // 数据上架 resp
 message PublishMetadataResponse {
-    int32  status = 1;                         // 响应码
-    string msg = 2;                            // 错误信息
-    string metadata_id = 3;                    // 元数据id
+  int32  status = 1;                         // 响应码
+  string msg = 2;                            // 错误信息
+  string metadata_id = 3;                    // 元数据id
 }
 
 // 数据下架 req
 message RevokeMetadataRequest {
-    string metadata_id = 1;
+  string metadata_id = 1;
 }
 
 // 查询某 metadata 参与过的任务的taskId列表 req
 message GetMetadataUsedTaskIdListRequest {
-    string      identity_id = 1;            // 组织的身份标识 (可选, 传""则查询当前组织的元数据)
-    string      metadata_id = 2;            // 元数据id
+  string      identity_id = 1;            // 组织的身份标识 (可选, 传""则查询当前组织的元数据)
+  string      metadata_id = 2;            // 元数据id
 }
 
 // 查询某 metadata 参与过的任务的taskId列表 resp
 message GetMetadataUsedTaskIdListResponse {
-    int32                       status = 1;           // 响应码
-    string                      msg = 2;              // 错误信息
-    repeated string             task_ids = 3;         // 任务Id
+  int32                       status = 1;           // 响应码
+  string                      msg = 2;              // 错误信息
+  repeated string             task_ids = 3;         // 任务Id
 }
 
 // ## 元数据 相关接口
 service MetadataService {
 
-    // 查看全网元数据列表
-    rpc GetGlobalMetadataDetailList (google.protobuf.Empty) returns (GetGlobalMetadataDetailListResponse) {
-        option (google.api.http) = {
-            post: "/carrier/v1/metadata/globalList"
-            body: "*"
-        };
-    }
+  // 查看 全网元数据列表
+  rpc GetGlobalMetadataDetailList (google.protobuf.Empty) returns (GetGlobalMetadataDetailListResponse) {
+    option (google.api.http) = {
+      get: "/carrier/v1/metadata/globalList"
+    };
+  }
 
-    // 查看 本组织元数据列表
-    rpc GetLocalMetadataDetailList (google.protobuf.Empty) returns (GetLocalMetadataDetailListResponse) {
-        option (google.api.http) = {
-            post: "/carrier/v1/metadata/localList"
-            body: "*"
-        };
-    }
+  // 查看 本组织元数据列表
+  rpc GetLocalMetadataDetailList (google.protobuf.Empty) returns (GetLocalMetadataDetailListResponse) {
+    option (google.api.http) = {
+      get: "/carrier/v1/metadata/localList"
+    };
+  }
 
-    // 发布元数据  (新增和编辑 都是发布新的元数据) <底层根据 原始数据Id -- OriginId 来关联 新的MetaDataId>
-    rpc PublishMetadata (PublishMetadataRequest) returns (PublishMetadataResponse) {
-        option (google.api.http) = {
-            post: "/carrier/v1/metadata/publish"
-            body: "*"
-        };
-    }
-    // 撤销元数据 (从底层网络撤销)
-    rpc RevokeMetadata (RevokeMetadataRequest) returns (api.protobuf.SimpleResponse) {
-        option (google.api.http) = {
-            post: "/carrier/v1/metadata/revoke"
-            body: "*"
-        };
-    }
+  // 发布元数据  (新增和编辑 都是发布新的元数据) <底层根据 原始数据Id -- OriginId 来关联 新的MetaDataId>
+  rpc PublishMetadata (PublishMetadataRequest) returns (PublishMetadataResponse) {
+    option (google.api.http) = {
+      post: "/carrier/v1/metadata/publish"
+      body: "*"
+    };
+  }
+  // 撤销元数据 (从底层网络撤销)
+  rpc RevokeMetadata (RevokeMetadataRequest) returns (api.protobuf.SimpleResponse) {
+    option (google.api.http) = {
+      post: "/carrier/v1/metadata/revoke"
+      body: "*"
+    };
+  }
 
-    // V 2.0 新增
-    // 查询某 metadata 参与过的任务的taskId列表
-    rpc GetMetadataUsedTaskIdList (GetMetadataUsedTaskIdListRequest) returns (GetMetadataUsedTaskIdListResponse) {
-        option (google.api.http) = {
-            post: "/carrier/v1/metadata/usedTaskIdList"
-            body: "*"
-        };
-    }
+  // V 2.0 新增
+  // 查询某 metadata 参与过的任务的taskId列表
+  rpc GetMetadataUsedTaskIdList (GetMetadataUsedTaskIdListRequest) returns (GetMetadataUsedTaskIdListResponse) {
+    option (google.api.http) = {
+      post: "/carrier/v1/metadata/usedTaskIdList"
+      body: "*"
+    };
+  }
 
-    // 分页拉取摘要列表
-    // 分页拉取详情列表
+  // 分页拉取摘要列表
+  // 分页拉取详情列表
 }

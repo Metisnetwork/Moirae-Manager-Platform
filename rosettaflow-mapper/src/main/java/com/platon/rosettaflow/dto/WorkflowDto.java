@@ -56,5 +56,9 @@ public class WorkflowDto extends Workflow {
      * 工作流正在执行的taskId
      */
     private String taskId;
+    /**
+     * 工作流前一个节点执行的taskId
+     */
+    private String preTaskId;
 
 }
