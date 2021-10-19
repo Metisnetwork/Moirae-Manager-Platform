@@ -3,6 +3,7 @@ package com.platon.rosettaflow.service.impl;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
+import com.platon.rosettaflow.common.utils.JsonUtils;
 import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
@@ -445,7 +447,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
 
         //获取工作流节点自变量及因变量
-        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
+//        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
 
         //工作流节点资源表
         WorkflowNodeResource workflowNodeResource = getWorkflowNodeResource(workflowNode);
@@ -483,7 +485,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
-        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowNodeVariableList, taskDto, preTaskResult, workflowNodeInputList));
+        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), preTaskResult, workflowNodeInputList));
         //发起任务的账户的签名
         taskDto.setSign(workflowDto.getSign());
         //任务描述 (非必须)
@@ -564,17 +566,32 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 合约调用的额外可变入参
      *
-     * @param algorithmId              算法id
-     * @param workflowNodeVariableList 合约的可变参数列表
+     * @param algorithmId 算法id
      * @return 额外可变入参
      */
-    private String getContractExtraParams(Long algorithmId, List<WorkflowNodeVariable> workflowNodeVariableList, TaskDto taskDto, TaskResult preTaskResult, List<WorkflowNodeInput> workflowNodeInputList) {
+    private String getContractExtraParams(Long algorithmId, TaskResult preTaskResult, List<WorkflowNodeInput> workflowNodeInputList) {
         AlgorithmVariableStruct jsonStruct = algorithmVariableStructService.getByAlgorithmId(algorithmId);
         if (null == jsonStruct) {
             return null;
         } else {
             // 把可变参数进行替换
             log.info("jsonStruct.getStruct() is:{}", jsonStruct.getStruct());
+            if (!JsonUtils.isJson(jsonStruct.getStruct())) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
+            }
+            JSONObject jsonObject = JSON.parseObject(jsonStruct.getStruct());
+            //逻辑训练动态参数[因变量(标签)]
+            if (jsonObject.containsKey("label_column")) {
+                for (WorkflowNodeInput input : workflowNodeInputList) {
+                    if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
+                        jsonObject.put("label_column", input.getDependentVariable());
+                    }
+                }
+            }
+            //逻辑回归动态参数[模型所在的路径，需填绝对路径]
+            if (jsonObject.containsKey("model_path")) {
+                jsonObject.put("model_path", preTaskResult.getFilePath());
+            }
             return jsonStruct.getStruct();
         }
     }
