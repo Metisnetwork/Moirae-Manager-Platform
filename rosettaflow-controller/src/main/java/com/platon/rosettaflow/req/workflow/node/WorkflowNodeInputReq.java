@@ -24,12 +24,12 @@ public class WorkflowNodeInputReq {
     private String dataTableId;
 
     @ApiModelProperty(value = "ID列(列索引)")
-    @NotBlank(message = "{node.identity.name.id.column}")
-    private Integer keyColumn;
+    @NotNull(message = "{node.identity.name.id.column}")
+    private Long keyColumn;
 
     @ApiModelProperty(value = "因变量（标签）")
-    @NotBlank(message = "{node.identity.dependent.variable.column}")
-    private String dependentVariable;
+    @NotNull(message = "{node.identity.dependent.variable.column}")
+    private Long dependentVariable;
 
     @ApiModelProperty(value = "数据字段ID,多个以‘,’分隔")
     @NotBlank(message = "{node.identity.name.NotBlank}")

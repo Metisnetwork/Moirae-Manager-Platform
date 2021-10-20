@@ -6,8 +6,8 @@
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
         <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId"/>
-        <result column="key_column" jdbcType="INTEGER" property="keyColumn" />
-        <result column="dependent_variable" jdbcType="VARCHAR" property="dependentVariable" />
+        <result column="key_column" jdbcType="BIGINT" property="keyColumn" />
+        <result column="dependent_variable" jdbcType="BIGINT" property="dependentVariable" />
         <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds"/>
         <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId"/>
         <result column="sender_flag" jdbcType="TINYINT" property="senderFlag"/>
@@ -72,10 +72,10 @@
                     #{i.dataTableId,jdbcType=VARCHAR},
                 </if>
                 <if test="i.keyColumn != null">
-                    #{i.keyColumn,jdbcType=INTEGER},
+                    #{i.keyColumn,jdbcType=BIGINT},
                 </if>
                 <if test="i.dependentVariable != null">
-                    #{i.dependentVariable,jdbcType=VARCHAR},
+                    #{i.dependentVariable,jdbcType=BIGINT},
                 </if>
                 <if test="i.dataColumnIds != null">
                     #{i.dataColumnIds,jdbcType=VARCHAR},

@@ -54,6 +54,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IProjectService projectService;
 
     @Resource
+    private IMetaDataDetailsService metaDataDetailsService;
+
+    @Resource
     private IAlgorithmService algorithmService;
 
     @Resource
@@ -584,7 +587,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             if (jsonObject.containsKey("label_column")) {
                 for (WorkflowNodeInput input : workflowNodeInputList) {
                     if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
-                        jsonObject.put("label_column", input.getDependentVariable());
+                        jsonObject.put("label_column",
+                                metaDataDetailsService.getColumnIndexById(input.getDependentVariable()).getColumnName());
                     }
                 }
             }
@@ -669,7 +673,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
 
             if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
-                taskMetaDataDeclareDto.setKeyColumn(input.getKeyColumn());
+                taskMetaDataDeclareDto.setKeyColumn(
+                        metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
             }
             for (String s : columnIdsArr) {
                 selectedColumns.add(Integer.valueOf(s.trim()));

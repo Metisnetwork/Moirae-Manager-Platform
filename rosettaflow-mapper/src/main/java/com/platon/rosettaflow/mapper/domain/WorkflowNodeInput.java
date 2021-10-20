@@ -38,11 +38,11 @@ public class WorkflowNodeInput implements Serializable {
     /**
      * ID列(列索引)
      */
-    private Integer keyColumn;
+    private Long keyColumn;
     /**
      * 因变量(标签)
      */
-    private String dependentVariable;
+    private Long dependentVariable;
     /**
      * 数据字段ID
      */

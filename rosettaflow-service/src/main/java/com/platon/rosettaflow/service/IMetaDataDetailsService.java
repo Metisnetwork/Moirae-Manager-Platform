@@ -3,7 +3,6 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.MetaDataDetailsDto;
-import com.platon.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 
 import java.util.List;
@@ -52,4 +51,11 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @return 插入记录数
      */
     int batchInsert(List<MetaDataDetails> metaDataDetailsList);
+
+    /**
+     * 根据元数据列id获取元数据列详情
+     * @param id 元数据列id
+     * @return 元数据列详情
+     */
+    MetaDataDetails getColumnIndexById(Long id);
 }
