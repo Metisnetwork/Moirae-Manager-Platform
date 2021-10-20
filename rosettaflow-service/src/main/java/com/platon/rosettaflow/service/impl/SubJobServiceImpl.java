@@ -162,7 +162,8 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         }
         //更新子作业状态
         subJob.setStatus(StatusEnum.UN_VALID.getValue());
-        subJob.setUpdateTime(new Date());
+        // 数据库默认自动更新updateTime
+//        subJob.setUpdateTime(new Date());
         this.updateById(subJob);
         //更新子作业节点状态
         Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
