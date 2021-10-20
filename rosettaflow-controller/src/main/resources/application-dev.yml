@@ -63,7 +63,7 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 
-单Redis节点模式
+#单Redis节点模式
 redisson:
   singleServerConfig:
     address: 10.10.8.182:6379
