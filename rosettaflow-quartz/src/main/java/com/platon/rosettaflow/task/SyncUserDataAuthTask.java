@@ -4,11 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.enums.MetaDataExpireStatusEnum;
 import com.platon.rosettaflow.common.utils.AddressChangeUtils;
-import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
 import com.platon.rosettaflow.service.IUserMetaDataService;
+import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,57 +38,47 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Resource
-    private RedisUtil redisUtil;
-
     @Scheduled(fixedDelay = 60 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
+    @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
+        log.info("用户申请授权元数据信息同步开始>>>>");
+        long begin;
+        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
         try {
-            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
-                log.info("用户申请授权元数据信息同步开始>>>>");
-                long begin;
-                List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
-                try {
-                    metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-                    if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
-                        return;
-                    }
-                } catch (Exception e) {
-                    log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
-                    return;
-                }
-
-                List<UserMetaData> userMetaDataList = new ArrayList<>();
-                UserMetaData userMetaData;
-                int userMetaDataSize = 0;
-
-                for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
-                    userMetaData = getUserMetaData(authorityDto);
-
-                    userMetaDataList.add(userMetaData);
-                    ++userMetaDataSize;
-                    if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
-                        begin = DateUtil.currentSeconds();
-                        log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
-                        userMetaDataService.batchInsert(userMetaDataList);
-                        log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
-                        userMetaDataList.clear();
-                    }
-                }
-                if (userMetaDataList.size() > 0) {
-                    begin = DateUtil.currentSeconds();
-                    log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
-                    userMetaDataService.batchInsert(userMetaDataList);
-                    log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
-                }
-                log.info("用户申请授权元数据信息同步结束>>>>");
+            metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+            if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
+                return;
             }
         } catch (Exception e) {
-            log.error("同步用户元数据授权列列表失败，失败原因：{}", e.getMessage(), e);
-        } finally {
-            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
+            log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
+            return;
         }
+
+        List<UserMetaData> userMetaDataList = new ArrayList<>();
+        UserMetaData userMetaData;
+        int userMetaDataSize = 0;
+
+        for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
+            userMetaData = getUserMetaData(authorityDto);
+
+            userMetaDataList.add(userMetaData);
+            ++userMetaDataSize;
+            if (userMetaDataSize % sysConfig.getBatchSize() == 0) {
+                begin = DateUtil.currentSeconds();
+                log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
+                userMetaDataService.batchInsert(userMetaDataList);
+                log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
+                userMetaDataList.clear();
+            }
+        }
+        if (userMetaDataList.size() > 0) {
+            begin = DateUtil.currentSeconds();
+            log.info("用户申请授权元数据据更新{}条数据开始", userMetaDataSize);
+            userMetaDataService.batchInsert(userMetaDataList);
+            log.info("用户申请授权元数据据更新{}条数据结束一共用时{}秒", userMetaDataSize, DateUtil.currentSeconds() - begin);
+        }
+        log.info("用户申请授权元数据信息同步结束>>>>");
     }
 
     private UserMetaData getUserMetaData(GetMetaDataAuthorityDto authorityDto) {

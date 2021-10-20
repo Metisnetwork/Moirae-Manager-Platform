@@ -18,17 +18,6 @@ spring:
       connection-timeout: 3000
       max-lifetime: 1800000
       idle-timeout: 600000
-  redis:
-    host: localhost
-    port: 7379
-    password:
-    timeout: 5000
-    lettuce:
-      pool:
-        max-active: 200
-        max-idle: 10
-        min-idle: 0
-        max-wait: -1
   task:
     scheduling:
       pool:
@@ -47,8 +36,8 @@ system:
     kickMode: false
     # 是否是主服务: true-主服务,false-从服务
     masterNode: true
-    # nonce存放时间，单位：秒
-    nonceTimeOut: 300
+    # nonce存放时间，单位：毫秒
+    nonceTimeOut: 300000
     # 算法初始化文件
     algorithmFilepath: classpath:script/algorithm.csv
     # 数据库数据批量更新
@@ -63,3 +52,20 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
+#单Redis节点模式
+redisson:
+  singleServerConfig:
+    address: 127.0.0.1:7379
+
+#集群模式
+#redisson:
+#  model: CLUSTER
+#  password: 123456
+#  multiple-server-config:
+#    node-addresses[0]: 10.10.8.175:6371
+#    node-addresses[1]: 10.10.8.175:6372
+#    node-addresses[2]: 10.10.8.175:6373
+#    node-addresses[3]: 10.10.8.176:6374
+#    node-addresses[4]: 10.10.8.176:6375
+#    node-addresses[5]: 10.10.8.176:6376

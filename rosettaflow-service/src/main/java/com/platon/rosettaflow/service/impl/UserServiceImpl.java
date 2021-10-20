@@ -13,7 +13,6 @@ import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.SignMessageDto;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.UserMapper;
@@ -21,6 +20,7 @@ import com.platon.rosettaflow.mapper.domain.User;
 import com.platon.rosettaflow.service.CommonService;
 import com.platon.rosettaflow.service.ITokenService;
 import com.platon.rosettaflow.service.IUserService;
+import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -32,6 +32,7 @@ import java.util.Objects;
 
 /**
  * 用户服务实现类
+ *
  * @author admin
  * @date 2021/8/16
  */
@@ -43,7 +44,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private ITokenService tokenService;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedissonObject redissonObject;
 
     @Resource
     private SysConfig sysConfig;
@@ -78,10 +79,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void logout() {
-        try{
+        try {
             UserDto userDto = commonService.getCurrentUser();
             tokenService.removeToken(userDto.getToken());
-        }catch (BusinessException e){
+        } catch (BusinessException e) {
             log.error("User not login not need to logout");
         }
     }
@@ -96,7 +97,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             this.update(updateWrapper);
         } catch (Exception e) {
             log.error("updateNickName--修改用户昵称失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException){
+            if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
             }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MODIFY_USER_NAME_FAILED.getMsg());
@@ -113,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public String getLoginNonce(String address) {
         String nonce = commonService.generateUuid();
-        redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce), nonce, sysConfig.getNonceTimeOut());
+        redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce), nonce, sysConfig.getNonceTimeOut());
         return nonce;
     }
 
@@ -138,10 +139,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         String redisKey = StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce);
 
-        if (!redisUtil.hasKey(redisKey)) {
+        if (!redissonObject.delete(redisKey)) {
             throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
         }
-        redisUtil.delete(redisKey);
     }
 
     @Override

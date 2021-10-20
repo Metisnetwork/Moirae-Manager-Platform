@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "system.config")
 public class SysConfig {
-    private long loginTimeOut = 1800000;
+    private long loginTimeOut = 1800000000;
     private boolean kickMode = true;
     private boolean masterNode = false;
-    private long nonceTimeOut = 5 * 60;
+    private long nonceTimeOut = 5 * 60 * 1000;
     private String algorithmFilepath = "classpath:script/algorithm.csv";
     private long batchSize = 500;
 }

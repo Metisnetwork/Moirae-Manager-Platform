@@ -12,12 +12,12 @@ import com.platon.rosettaflow.common.enums.ProjectMemberRoleEnum;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
+import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private IWorkflowNodeService workflowNodeService;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedissonObject redissonObject;
 
     @Resource
     private CommonService commonService;
@@ -236,7 +236,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
         // 新增新的项目成员角色缓存
-        redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY,
+        redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY,
                 projectMember.getUserId(), oldMember.getProjectId()), projectMember.getRole());
     }
 
@@ -264,13 +264,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public Byte getRoleByProjectId(Long projectId) {
         Long userId = commonService.getCurrentUser().getId();
-        Object role = redisUtil.get(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
+        Object role = redissonObject.getValue(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
         if (null != role) {
             return ((Integer) role).byteValue();
         } else {
             ProjectMember projectMember = projectMemberService.queryByProjectIdAndUserId(userId, projectId);
             if (null != projectMember) {
-                redisUtil.set(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId), projectMember.getRole());
+                redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId), projectMember.getRole());
                 return projectMember.getRole();
             } else {
                 return null;
@@ -278,7 +278,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
     }
 
-    /** 转换id类型 */
+    /**
+     * 转换id类型
+     */
     @Override
     public List<User> queryAllUserNickName(Long projectId) {
         return userService.queryUserByProjectId(projectId);
@@ -299,9 +301,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      * @param projectId projectId
      */
     private void deleteRedisRole(Long userId, Long projectId) {
-        Object key = redisUtil.get(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
+        Object key = redissonObject.getValue(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
         if (null != key) {
-            redisUtil.delete(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
+            redissonObject.delete(StrUtil.format(SysConstant.REDIS_USER_PROJECT_ROLE_KEY, userId, projectId));
         }
     }
 

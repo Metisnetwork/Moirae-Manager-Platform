@@ -5,8 +5,10 @@ import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.service.ITokenService;
+import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,7 +28,10 @@ public class TokenServiceImpl implements ITokenService {
     private SysConfig sysConfig;
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedissonObject redissonObject;
+
+    @Resource
+    private RedissonClient redissonClient;
 
     public static String getTokenKey(Long id) {
         return SysConstant.REDIS_TOKEN_PREFIX_KEY + id;
@@ -44,11 +49,11 @@ public class TokenServiceImpl implements ITokenService {
     @Override
     public String setToken(@NotNull UserDto userDto) {
         String key = getTokenKey(userDto.getId());
-        String token = (String) redisTemplate.opsForValue().get(key);
+        String token = redissonObject.getValue(key);
         if (StrUtil.isNotEmpty(token)) {
             if (sysConfig.isKickMode()) {
-                redisTemplate.delete(key);
-                redisTemplate.delete(getUserKey(token));
+                redissonObject.delete(key);
+                redissonObject.delete(getUserKey(token));
                 token = generateToken();
             }
         } else {
@@ -56,8 +61,7 @@ public class TokenServiceImpl implements ITokenService {
         }
         if (!sysConfig.isKickMode()) {
             //记录此token登录的设备数
-            redisTemplate.opsForValue().increment(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
-            log.info("current user:{},login in {} device", userDto.getUserName(), redisTemplate.opsForValue().get(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token));
+            log.info("current user:{},login in {} device", userDto.getUserName(), redissonClient.getAtomicLong(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token).incrementAndGet());
         }
         saveTokenToRedis(userDto, key, token);
         return token;
@@ -65,16 +69,16 @@ public class TokenServiceImpl implements ITokenService {
 
     private void saveTokenToRedis(@NotNull UserDto userDto, String key, String token) {
         userDto.setToken(token);
-        redisTemplate.opsForValue().set(key, token, sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
+        redissonObject.setValue(key, token, sysConfig.getLoginTimeOut());
 
         String userKey = getUserKey(token);
-        redisTemplate.opsForValue().set(userKey, userDto, sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
+        redissonObject.setValue(userKey, userDto, sysConfig.getLoginTimeOut());
     }
 
     @Override
     public String getToken(@NotNull UserDto userDto) {
         String key = getTokenKey(userDto.getId());
-        String token = (String) redisTemplate.opsForValue().get(key);
+        String token = redissonObject.getValue(key);
         if (StrUtil.isNotEmpty(token)) {
             return token;
         }
@@ -83,7 +87,7 @@ public class TokenServiceImpl implements ITokenService {
 
     @Override
     public UserDto getUserByToken(@NotNull String token) {
-        UserDto userDto = (UserDto) redisTemplate.opsForValue().get(getUserKey(token));
+        UserDto userDto = redissonObject.getValue(getUserKey(token));
         if (userDto == null) {
             log.warn("Can not find user by token: {}.", token);
         }
@@ -93,23 +97,22 @@ public class TokenServiceImpl implements ITokenService {
     @Override
     public void removeToken(@NotNull String token) {
         String userKey = getUserKey(token);
-        UserDto userDto = (UserDto) redisTemplate.opsForValue().get(userKey);
+        UserDto userDto = redissonObject.getValue(userKey);
         if (userDto != null) {
             //判断是否有多个设备登录，如果只有一台直接清redis，否则减少登录设备记录数
             if (!sysConfig.isKickMode()) {
-                Object loginDeviceNum = redisTemplate.opsForValue().get(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
+                Object loginDeviceNum = redissonObject.getValue(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
                 if (null != loginDeviceNum && (Integer) loginDeviceNum > 1) {
-                    redisTemplate.opsForValue().decrement(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token);
-                    log.info("current user:{},login in {} device", userDto.getUserName(), redisTemplate.opsForValue().get(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token));
+                    log.info("current user:{},login in {} device", userDto.getUserName(), redissonClient.getAtomicLong(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token).decrementAndGet());
                 } else {
                     String tokeKey = getTokenKey(userDto.getId());
-                    redisTemplate.delete(tokeKey);
-                    redisTemplate.delete(userKey);
+                    redissonObject.delete(tokeKey);
+                    redissonObject.delete(userKey);
                 }
             } else {
                 String tokeKey = getTokenKey(userDto.getId());
-                redisTemplate.delete(tokeKey);
-                redisTemplate.delete(userKey);
+                redissonObject.delete(tokeKey);
+                redissonObject.delete(userKey);
             }
 
         }
@@ -118,11 +121,11 @@ public class TokenServiceImpl implements ITokenService {
     @Override
     public boolean refreshToken(@NotNull String token) {
         String userKey = getUserKey(token);
-        UserDto userDto = (UserDto) redisTemplate.opsForValue().get(userKey);
+        UserDto userDto = redissonObject.getValue(userKey);
         if (userDto != null) {
             String tokeKey = getTokenKey(userDto.getId());
-            redisTemplate.expire(tokeKey, sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
-            redisTemplate.expire(userKey, sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
+            redissonObject.getBucket(tokeKey).expire(sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
+            redissonObject.getBucket(userKey).expire(sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
         }
         return true;
     }
@@ -130,10 +133,10 @@ public class TokenServiceImpl implements ITokenService {
     @Override
     public boolean removeTokenById(@NotNull Long id) {
         String tokenKey = getTokenKey(id);
-        String token = (String) redisTemplate.opsForValue().get(tokenKey);
+        String token = redissonObject.getValue(tokenKey);
         if (token != null) {
-            redisTemplate.delete(tokenKey);
-            redisTemplate.delete(getUserKey(token));
+            redissonObject.delete(tokenKey);
+            redissonObject.delete(getUserKey(token));
         }
         return true;
     }
@@ -146,7 +149,7 @@ public class TokenServiceImpl implements ITokenService {
             return false;
         } else {
             String userKey = getUserKey(token);
-            redisTemplate.opsForValue().set(userKey, userDto, sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
+            redissonObject.setValue(userKey, userDto, sysConfig.getLoginTimeOut());
             return true;
         }
     }
