@@ -32,6 +32,13 @@ public interface IJobService extends IService<Job> {
     IPage<JobDto> list(Long current, Long size, String jobName);
 
     /**
+     * 获取有效状态的job
+     * @param id 作业id
+     * @return job 作业对象
+     */
+    Job getValidJobById(Long id);
+
+    /**
      * 批量修改作业有效状态
      *
      * @param ids 作业ids

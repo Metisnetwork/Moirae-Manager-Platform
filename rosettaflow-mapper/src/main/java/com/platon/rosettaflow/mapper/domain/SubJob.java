@@ -40,7 +40,7 @@ public class SubJob implements Serializable {
      */
     private Date endTime;
     /**
-     * 运行时长
+     * 运行时长(秒单位)
      */
     private String runTime;
     /**

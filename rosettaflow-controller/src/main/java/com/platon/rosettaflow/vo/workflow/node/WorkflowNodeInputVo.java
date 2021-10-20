@@ -33,6 +33,12 @@ public class WorkflowNodeInputVo {
     @ApiModelProperty(value = "数据字段ID,多个以”,“分隔")
     private String dataColumnIds;
 
+    @ApiModelProperty(value = "ID列(列索引)")
+    private Integer keyColumn;
+
+    @ApiModelProperty(value = "因变量（标签）")
+    private String dependentVariable;
+
     @ApiModelProperty(value = "工作流节点变量列表")
     private List<WorkflowNodeVariableVo> workflowNodeVariableVoList;
 

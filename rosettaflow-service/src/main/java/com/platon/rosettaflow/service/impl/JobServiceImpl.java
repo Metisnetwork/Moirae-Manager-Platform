@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -53,12 +54,12 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public List<Job> getAllUnfinishedJob() {
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue());
-        wrapper.le(Job::getBeginTime, new Date(System.currentTimeMillis()));
-        wrapper.ge(Job::getEndTime, new Date(System.currentTimeMillis()));
-        wrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
-        wrapper.or().eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue());
-        wrapper.orderByAsc(Job::getId);
+        wrapper.and(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue())
+                    .le(Job::getBeginTime, new Date(System.currentTimeMillis()))
+                    .ge(Job::getEndTime, new Date(System.currentTimeMillis()))
+                    .eq(Job::getStatus, StatusEnum.VALID.getValue()))
+               .or(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue()))
+               .orderByAsc(Job::getId);
         return this.baseMapper.selectList(wrapper);
     }
 
@@ -69,10 +70,18 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
+    public Job getValidJobById(Long id) {
+        LambdaQueryWrapper<Job> jobLambdaQueryWrapper = Wrappers.lambdaQuery();
+        jobLambdaQueryWrapper.eq(Job::getId, id);
+        jobLambdaQueryWrapper.eq(Job::getStatus,StatusEnum.VALID.getValue());
+        return this.getOne(jobLambdaQueryWrapper);
+    }
+
+    @Override
     public void updateBatchStatus(Object[] ids, Byte status) {
         LambdaUpdateWrapper<Job> updateJobWrapper = Wrappers.lambdaUpdate();
-        updateJobWrapper.set(Job::getStatus, status);
-        updateJobWrapper.set(Job::getUpdateTime, now());
+        updateJobWrapper.set(Job::getStatus,status);
+        updateJobWrapper.set(Job::getUpdateTime,now());
         updateJobWrapper.in(Job::getId, ids);
         this.update(updateJobWrapper);
     }
@@ -97,7 +106,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Override
     public void edit(JobDto jobDto) {
-        Job job = this.getById(jobDto.getId());
+        Job jobOriginal = new Job();
+        Job job = this.getValidJobById(jobDto.getId());
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
@@ -108,6 +118,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
         checkParam(jobDto);
         //修改作业
+        BeanCopierUtils.copy(job, jobOriginal);
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
         job.setStatus(StatusEnum.VALID.getValue());
