@@ -24,43 +24,6 @@ public class RedisUtil {
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * 将 value 插入键为 key 的 list 中，并设置时间
-     *
-     * @param key   键
-     * @param value 值
-     * @param time  时间
-     */
-    @SuppressWarnings("unused")
-    public void listLeftPush(String key, String value, Long time) {
-        redisTemplate.opsForList().leftPush(key, value);
-        if (null != time && time > 0) {
-            expire(key, time);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public String listRightPop(String key) {
-        return (String) redisTemplate.opsForList().rightPop(key);
-    }
-
-    /**
-     * 获取 list缓存的长度
-     *
-     * @param key 键
-     * @return 长度
-     */
-    @SuppressWarnings("all")
-    public long listSize(String key) {
-        long listSize = 0;
-        try {
-            listSize = redisTemplate.opsForList().size(key);
-        } catch (Exception e) {
-            log.error("redisTemplate.opsForList().size({}) fail", key);
-        }
-        return listSize;
-    }
-
-    /**
      * 指定缓存失效时间
      *
      * @param key  key  键
@@ -476,6 +439,45 @@ public class RedisUtil {
 //    ============================== List ==============================
 
     /**
+     * 将 value 插入键为 key 的 list 中，并设置时间
+     *
+     * @param key   键
+     * @param value 值
+     * @param time  时间
+     */
+    @SuppressWarnings("unused")
+    public void listLeftPush(String key, String value, Long time) {
+        redisTemplate.opsForList().leftPush(key, value);
+        if (null != time && time > 0) {
+            expire(key, time);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public String listRightPop(String key) {
+        return (String) redisTemplate.opsForList().rightPop(key);
+    }
+
+    /**
+     * 获取 list缓存的长度
+     *
+     * @param key 键
+     * @return 长度
+     */
+    @SuppressWarnings("all")
+    public long listSize(String key) {
+        long listSize = 0;
+        try {
+            listSize = redisTemplate.opsForList().size(key);
+        } catch (Exception e) {
+            log.error("redisTemplate.opsForList().size({}) fail", key);
+        }
+        return listSize;
+    }
+
+
+
+    /**
      * 获取 list缓存的内容
      *
      * @param key   键
@@ -630,6 +632,7 @@ public class RedisUtil {
             return 0;
         }
     }
+
 
     public boolean lock(String key, String value, int expireTime, TimeUnit timeUnit) {
         Boolean flag = redisTemplate.opsForValue().setIfAbsent(key, value, expireTime, timeUnit);

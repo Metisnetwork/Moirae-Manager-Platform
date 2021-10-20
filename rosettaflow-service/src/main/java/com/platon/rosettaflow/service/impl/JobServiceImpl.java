@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -72,6 +73,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
+    public Job getValidJobById(Long id) {
+        LambdaQueryWrapper<Job> jobLambdaQueryWrapper = Wrappers.lambdaQuery();
+        jobLambdaQueryWrapper.eq(Job::getId, id);
+        jobLambdaQueryWrapper.eq(Job::getStatus,StatusEnum.VALID.getValue());
+        return this.getOne(jobLambdaQueryWrapper);
+    }
+
+    @Override
     public void updateBatchStatus(Object[] ids, Byte status) {
         LambdaUpdateWrapper<Job> updateJobWrapper = Wrappers.lambdaUpdate();
         updateJobWrapper.set(Job::getStatus,status);
@@ -99,8 +108,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Override
     public void edit(JobDto jobDto) {
-        // job数据好像有失效状态，查询时最好加一下status字段过滤
-        Job job = this.getById(jobDto.getId());
+        Job jobOriginal = new Job();
+        Job job = this.getValidJobById(jobDto.getId());
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
@@ -111,22 +120,19 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
         checkParam(jobDto);
         //修改作业
+        BeanCopierUtils.copy(job, jobOriginal);
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
-        // 数据库默认status为1
-//        job.setStatus(StatusEnum.VALID.getValue());
         if (job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()) {
             job.setRepeatInterval(null);
             job.setEndTime(null);
-//            job.setStatus(StatusEnum.VALID.getValue());
-//            // 数据库默认自动更新updateTime
-//            job.setUpdateTime(new Date());
-        }
-        if (this.baseMapper.updateJobById(job) == 0) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
         }
 
-        //将作业保存至redis待后续处理
+        if (!this.updateById(job)) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
+        }
+        //将作业保存至redis待后续处理,保存前预检查队列中是否已存在job
+        preCheckRedis(jobOriginal);
         redisUtil.listLeftPush(SysConstant.JOB_EDIT_QUEUE, JSON.toJSONString(job), null);
     }
 
@@ -215,5 +221,22 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
             }
         }
+    }
+
+
+    /**
+     * 检查队列redis中是否存在重复job，如果存在则先删除
+     */
+    private void preCheckRedis(Job jobOriginal){
+        List<String> jobQueueKeys = Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE);
+        jobQueueKeys.forEach(key -> {
+            List<Object> jobQueueAll = redisUtil.lGet(key, 0 ,-1);
+            jobQueueAll.forEach(jobObj -> {
+                Job jobD = JSON.parseObject(jobObj.toString(),Job.class);
+                if(jobD.getId().equals(jobOriginal.getId())){
+                    redisUtil.lRemove(key, 0, JSON.toJSONString(jobOriginal));
+                }
+            });
+        });
     }
 }
