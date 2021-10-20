@@ -5,13 +5,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
-import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.mapper.domain.Job;
 import com.platon.rosettaflow.quartz.job.PublishTaskJob;
 import com.platon.rosettaflow.service.IJobService;
+import com.zengtengpeng.annotation.Lock;
+import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -41,30 +43,23 @@ public class JobManager {
     private IJobService jobService;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedissonClient redissonClient;
 
     /**
      * 服务启动加载所有的job
      */
     @PostConstruct
+    @Lock(keys = "JobManager")
     public void init() {
-        try {
-            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
-                //服务启动，清除缓存作业消息队列
-                boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
-                if (!isDelete) {
-                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_CACHE_CLEAR_ERROR.getMsg());
-                }
-                //服务启动，启动所有未完成作业
-                List<Job> jobList = jobService.getAllUnfinishedJob();
-                for (Job job : jobList) {
-                    startJob(job);
-                }
-            }
-        } catch (BusinessException e) {
-            log.error("服务启动加载所有的job失败，失败原因：{}", e.getMessage(), e);
-        } finally {
-            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
+        //服务启动，清除缓存作业消息队列
+        /*boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
+        if (!isDelete) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_CACHE_CLEAR_ERROR.getMsg());
+        }*/
+        //服务启动，启动所有未完成作业
+        List<Job> jobList = jobService.getAllUnfinishedJob();
+        for (Job job : jobList) {
+            startJob(job);
         }
     }
 

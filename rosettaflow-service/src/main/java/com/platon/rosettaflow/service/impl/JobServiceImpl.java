@@ -11,7 +11,6 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.BeanCopierUtils;
-import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.JobDto;
 import com.platon.rosettaflow.mapper.JobMapper;
 import com.platon.rosettaflow.mapper.domain.Job;
@@ -22,9 +21,11 @@ import com.platon.rosettaflow.service.IJobService;
 import com.platon.rosettaflow.service.ISubJobNodeService;
 import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
+import com.zengtengpeng.annotation.MQPublish;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
@@ -40,9 +41,6 @@ import static cn.hutool.core.date.DateTime.now;
 @Slf4j
 @Service
 public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobService {
-
-    @Resource
-    private RedisUtil redisUtil;
 
     @Resource
     private IWorkflowService workflowService;
@@ -72,6 +70,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
+    public Job getValidJobById(Long id) {
+        LambdaQueryWrapper<Job> jobLambdaQueryWrapper = Wrappers.lambdaQuery();
+        jobLambdaQueryWrapper.eq(Job::getId, id);
+        jobLambdaQueryWrapper.eq(Job::getStatus,StatusEnum.VALID.getValue());
+        return this.getOne(jobLambdaQueryWrapper);
+    }
+
+    @Override
     public void updateBatchStatus(Object[] ids, Byte status) {
         LambdaUpdateWrapper<Job> updateJobWrapper = Wrappers.lambdaUpdate();
         updateJobWrapper.set(Job::getStatus,status);
@@ -94,13 +100,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
 
         //将作业保存至redis待后续处理
-        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
+        addJobPublish(job);
+//        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
     }
 
     @Override
     public void edit(JobDto jobDto) {
-        // job数据好像有失效状态，查询时最好加一下status字段过滤
-        Job job = this.getById(jobDto.getId());
+        Job jobOriginal = new Job();
+        Job job = this.getValidJobById(jobDto.getId());
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
@@ -111,23 +118,23 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
         checkParam(jobDto);
         //修改作业
+        BeanCopierUtils.copy(job, jobOriginal);
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
-        // 数据库默认status为1
-//        job.setStatus(StatusEnum.VALID.getValue());
+        job.setStatus(StatusEnum.VALID.getValue());
         if (job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()) {
             job.setRepeatInterval(null);
             job.setEndTime(null);
-//            job.setStatus(StatusEnum.VALID.getValue());
-//            // 数据库默认自动更新updateTime
-//            job.setUpdateTime(new Date());
+            job.setStatus(StatusEnum.VALID.getValue());
+            job.setUpdateTime(new Date());
         }
         if (this.baseMapper.updateJobById(job) == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
         }
 
         //将作业保存至redis待后续处理
-        redisUtil.listLeftPush(SysConstant.JOB_EDIT_QUEUE, JSON.toJSONString(job), null);
+        editJobPublish(job);
+//        redisUtil.listLeftPush(SysConstant.JOB_EDIT_QUEUE, JSON.toJSONString(job), null);
     }
 
     @Override
@@ -142,7 +149,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             log.error("job is not running can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_RUNNING.getMsg());
         }
-        redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
+//        redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
+        pauseJobPublish(job);
     }
 
     @Override
@@ -152,43 +160,44 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             log.error("job is not stop can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_STOP.getMsg());
         }
-        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
+//        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
+        addJobPublish(job);
     }
 
     @Override
     public List<Job> listRunJobByWorkflowId(Long workflowId) {
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Job::getWorkflowId,workflowId);
-        wrapper.eq(Job::getJobStatus,JobStatusEnum.RUNNING.getValue());
+        wrapper.eq(Job::getWorkflowId, workflowId);
+        wrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue());
         return this.list(wrapper);
     }
 
     @Override
     public void deleteBatchJob(List<Long> ids) {
-        if(ids.isEmpty()){
+        if (ids.isEmpty()) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
         }
         List<Job> jobs = this.listByIds(ids);
-        if(jobs.isEmpty() || ids.size() != jobs.size()){
+        if (jobs.isEmpty() || ids.size() != jobs.size()) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
         //检查作业是否存在运行中
         boolean isExistRunningJob = jobs.stream().anyMatch(job -> job.getJobStatus() == JobStatusEnum.RUNNING.getValue());
-        if(isExistRunningJob){
+        if (isExistRunningJob) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_DELETE.getMsg());
         }
         //检查子作业是否存在运行中
         List<SubJob> subJobList = subJobService.queryBatchSubJobListByJobId(ids);
         Object[] subJobArrayIds = subJobList.stream().map(SubJob::getId).toArray();
         boolean isExistRunningSubJob = subJobList.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
-        if(isExistRunningSubJob){
+        if (isExistRunningSubJob) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
         }
-       //检查子作业节点是否存在运行中节点
+        //检查子作业节点是否存在运行中节点
         List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(subJobArrayIds);
         Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
         boolean isExistRunningSubJobNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobNodeStatusEnum.RUNNING.getValue());
-        if(isExistRunningSubJobNode){
+        if (isExistRunningSubJobNode) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
         }
         //批量更新作业、子作业、子作业节点有效状态
@@ -215,5 +224,24 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
             }
         }
+    }
+
+
+    @MQPublish(name = SysConstant.JOB_ADD_QUEUE)
+    @SuppressWarnings("all")
+    public Job addJobPublish(Job job) {
+        return job;
+    }
+
+    @MQPublish(name = SysConstant.JOB_EDIT_QUEUE)
+    @SuppressWarnings("all")
+    public Job editJobPublish(Job job) {
+        return job;
+    }
+
+    @MQPublish(name = SysConstant.JOB_PAUSE_QUEUE)
+    @SuppressWarnings("all")
+    public Job pauseJobPublish(Job job) {
+        return job;
     }
 }

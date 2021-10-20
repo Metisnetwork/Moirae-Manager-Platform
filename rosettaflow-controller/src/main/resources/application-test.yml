@@ -18,17 +18,17 @@ spring:
       connection-timeout: 3000
       max-lifetime: 1800000
       idle-timeout: 600000
-  redis:
-    cluster:
-      nodes: 10.10.8.175:6371,10.10.8.175:6372,10.10.8.175:6373,10.10.8.176:6374,10.10.8.176:6375,10.10.8.176:6376
-    password: 123456
-    timeout: 5000
-    lettuce:
-      pool:
-        max-active: 200
-        max-idle: 10
-        min-idle: 0
-        max-wait: -1
+#  redis:
+#    cluster:
+#      nodes: 10.10.8.175:6371,10.10.8.175:6372,10.10.8.175:6373,10.10.8.176:6374,10.10.8.176:6375,10.10.8.176:6376
+#    password: 123456
+#    timeout: 5000
+#    lettuce:
+#      pool:
+#        max-active: 200
+#        max-idle: 10
+#        min-idle: 0
+#        max-wait: -1
   task:
     scheduling:
       pool:
@@ -63,3 +63,14 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+#集群模式
+redisson:
+  model: CLUSTER
+  password: 123456
+  multiple-server-config:
+    node-addresses[0]: 10.10.8.175:6371
+    node-addresses[1]: 10.10.8.175:6372
+    node-addresses[2]: 10.10.8.175:6373
+    node-addresses[3]: 10.10.8.176:6374
+    node-addresses[4]: 10.10.8.176:6375
+    node-addresses[5]: 10.10.8.176:6376

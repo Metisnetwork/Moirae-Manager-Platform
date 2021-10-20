@@ -14,7 +14,6 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.common.utils.JsonUtils;
-import com.platon.rosettaflow.common.utils.RedisUtil;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.constant.GrpcConstant;
 import com.platon.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
@@ -25,6 +24,7 @@ import com.platon.rosettaflow.mapper.WorkflowMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
 import com.platon.rosettaflow.service.utils.UserContext;
+import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -78,9 +78,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IWorkflowNodeResourceService workflowNodeResourceService;
 
     @Resource
-    private IWorkflowNodeVariableService workflowNodeVariableService;
-
-    @Resource
     private GrpcTaskService grpcTaskService;
 
     @Resource
@@ -99,7 +96,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private ITaskResultService taskResultService;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedissonObject redissonObject;
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
@@ -335,7 +332,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
             workflowDto.setTaskId(workflowNode.getTaskId());
             String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
-            redisUtil.set(taskKey + workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
+            redissonObject.setValue(taskKey + workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
         }
     }
 

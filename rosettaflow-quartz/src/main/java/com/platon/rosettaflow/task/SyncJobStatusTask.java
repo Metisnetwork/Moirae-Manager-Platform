@@ -1,6 +1,6 @@
 package com.platon.rosettaflow.task;
 
-import com.platon.rosettaflow.common.utils.RedisUtil;
+import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,20 +19,10 @@ public class SyncJobStatusTask {
     @Resource
     private JobManager jobManager;
 
-    @Resource
-    private RedisUtil redisUtil;
-
     @Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 60 * 1000)
+    @Lock(keys = "SyncJobStatusTask")
     public void run() {
-        try {
-            if (redisUtil.lock(this.getClass().getSimpleName(), this.getClass().getSimpleName())) {
-                jobManager.finishJobBatchWithTask();
-            }
-        } catch (Exception e) {
-            log.error("同步更新t_job表作业状态失败，失败原因：{}", e.getMessage(), e);
-        } finally {
-            redisUtil.unLock(this.getClass().getSimpleName(), this.getClass().getSimpleName());
-        }
+        jobManager.finishJobBatchWithTask();
 
     }
 

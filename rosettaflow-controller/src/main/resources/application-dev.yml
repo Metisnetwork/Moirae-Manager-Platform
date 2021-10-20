@@ -18,17 +18,17 @@ spring:
       connection-timeout: 3000
       max-lifetime: 1800000
       idle-timeout: 600000
-  redis:
-    host: 10.10.8.182
-    port: 6379
-    password:
-    timeout: 5000
-    lettuce:
-      pool:
-        max-active: 200
-        max-idle: 10
-        min-idle: 0
-        max-wait: -1
+#  redis:
+#    host: 10.10.8.182
+#    port: 6379
+#    password:
+#    timeout: 5000
+#    lettuce:
+#      pool:
+#        max-active: 200
+#        max-idle: 10
+#        min-idle: 0
+#        max-wait: -1
   task:
     scheduling:
       pool:
@@ -62,3 +62,9 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
+单Redis节点模式
+redisson:
+  singleServerConfig:
+    address: 10.10.8.182:6379
+
