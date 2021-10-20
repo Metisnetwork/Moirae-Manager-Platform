@@ -99,6 +99,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Override
     public void edit(JobDto jobDto) {
+        // job数据好像有失效状态，查询时最好加一下status字段过滤
         Job job = this.getById(jobDto.getId());
         if (null == job) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
@@ -112,12 +113,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         //修改作业
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
-        job.setStatus(StatusEnum.VALID.getValue());
+        // 数据库默认status为1
+//        job.setStatus(StatusEnum.VALID.getValue());
         if (job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()) {
             job.setRepeatInterval(null);
             job.setEndTime(null);
-            job.setStatus(StatusEnum.VALID.getValue());
-            job.setUpdateTime(new Date());
+//            job.setStatus(StatusEnum.VALID.getValue());
+//            // 数据库默认自动更新updateTime
+//            job.setUpdateTime(new Date());
         }
         if (this.baseMapper.updateJobById(job) == 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
