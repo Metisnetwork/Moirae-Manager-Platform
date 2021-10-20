@@ -30,6 +30,8 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+
 import static cn.hutool.core.date.DateTime.now;
 
 /**
@@ -56,12 +58,12 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public List<Job> getAllUnfinishedJob() {
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue());
-        wrapper.le(Job::getBeginTime, new Date(System.currentTimeMillis()));
-        wrapper.ge(Job::getEndTime, new Date(System.currentTimeMillis()));
-        wrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
-        wrapper.or().eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue());
-        wrapper.orderByAsc(Job::getId);
+        wrapper.and(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue())
+                    .le(Job::getBeginTime, new Date(System.currentTimeMillis()))
+                    .ge(Job::getEndTime, new Date(System.currentTimeMillis()))
+                    .eq(Job::getStatus, StatusEnum.VALID.getValue()))
+               .or(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue()))
+               .orderByAsc(Job::getId);
         return this.baseMapper.selectList(wrapper);
     }
 
