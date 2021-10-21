@@ -150,8 +150,16 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         List<WorkflowNodeCode> workflowNodeCodeList = new ArrayList<>();
         List<WorkflowNodeResource> workflowNodeResourceList = new ArrayList<>();
         List<WorkflowNodeVariable> workflowNodeVariableList = new ArrayList<>();
+        // 节点记数
         int count = 0;
+        // 算法集合
+        Set<Long> algorithmIdSet = new HashSet<>();
         for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
+            // 判断是否添加相同的算法
+            if (algorithmIdSet.contains(workflowNodeDto.getAlgorithmId())) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
+            }
+            algorithmIdSet.add(workflowNodeDto.getAlgorithmId());
             // 保存工作流节点
             Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, count, workflowNodeDtoList.size());
             // 拼装工作流节点输入
