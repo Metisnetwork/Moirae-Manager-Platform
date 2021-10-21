@@ -143,9 +143,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 保存工作流节点
             Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, count, workflowNodeDtoList.size());
             // 拼装工作流节点输入
-            workflowNodeInputList = this.assemblyNodeInput(workflowNodeId, workflowNodeDto);
+            workflowNodeInputList.addAll(this.assemblyNodeInput(workflowNodeId, workflowNodeDto));
             // 拼装工作流节点输出
-            workflowNodeOutputList = this.assemblyNodeOutput(workflowNodeId, workflowNodeDto);
+            workflowNodeOutputList.addAll(this.assemblyNodeOutput(workflowNodeId, workflowNodeDto));
             // 添加新的工作流节点代码
             if (Objects.nonNull(workflowNodeDto.getWorkflowNodeCode())) {
                 workflowNodeDto.getWorkflowNodeCode().setWorkflowNodeId(workflowNodeId);
@@ -157,11 +157,14 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 workflowNodeResourceList.add(workflowNodeDto.getWorkflowNodeResource());
             }
             // 添加新的工作流节点变量
-            workflowNodeVariableList = this.saveWorkflowNodeVariable(workflowNodeId, workflowNodeDto);
+            workflowNodeVariableList.addAll(this.saveWorkflowNodeVariable(workflowNodeId, workflowNodeDto));
         }
         // 保存节点相关数据
         this.saveNodeData(workflowNodeInputList, workflowNodeOutputList, workflowNodeCodeList,
                 workflowNodeResourceList, workflowNodeVariableList);
+        // 更新工作流节点数量
+        workflow.setNodeNumber(workflowNodeDtoList.size());
+        workflowService.updateById(workflow);
     }
 
     /**
