@@ -75,13 +75,16 @@ public class AlgorithmController {
         return ResponseVo.createSuccess(algTreeListVo);
     }
 
-    /** 查询算法树响应参数转换 */
-    private AlgTreeListVo convertAlgTreeList(List<Map<String, Object>> listVo){
+    /**
+     * 查询算法树响应参数转换
+     */
+    @SuppressWarnings("unchecked")
+    private AlgTreeListVo convertAlgTreeList(List<Map<String, Object>> listVo) {
         AlgTreeListVo algTreeListVo = new AlgTreeListVo();
         List<AlgTreeVo> algTreeVoList = new ArrayList<>();
         for (Map<String, Object> map : listVo) {
             AlgTreeVo algTreeVo = BeanUtil.toBean(map, AlgTreeVo.class);
-            List<Map<String, Object>> childList = (List)map.get("child");
+            List<Map<String, Object>> childList = (List<Map<String, Object>>) map.get("child");
             if (null == childList || childList.size() == 0) {
                 algTreeVoList.add(algTreeVo);
                 continue;

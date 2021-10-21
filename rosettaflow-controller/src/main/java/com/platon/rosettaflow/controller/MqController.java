@@ -4,7 +4,6 @@ import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.JobStatusEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.domain.Job;
-import com.zengtengpeng.operation.RedissonCollection;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +28,6 @@ public class MqController {
 
     @Resource
     private RedissonClient redissonClient;
-
-    @Resource
-    private RedissonCollection redissonCollection;
 
     @PostMapping("publishMsg")
     @ApiOperation(value = "往mq队列存放一个消息", notes = "往mq队列存放一个消息")
@@ -58,10 +54,4 @@ public class MqController {
         }
         return job;
     }
-
-    public void test1(CharSequence charSequence, String o, Object object) {
-        System.out.println("收到消息mq队列消息" + o);
-        System.out.println("收到消息mq队列消息" + object);
-    }
-
 }

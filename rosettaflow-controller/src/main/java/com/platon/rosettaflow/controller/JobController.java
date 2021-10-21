@@ -14,7 +14,6 @@ import com.platon.rosettaflow.vo.job.JobVo;
 import com.platon.rosettaflow.vo.job.QueryWorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
