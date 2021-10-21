@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.controller;
 
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.JobStatusEnum;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.domain.Job;
@@ -34,7 +35,6 @@ public class MqController {
 
     @PostMapping("publishMsg")
     @ApiOperation(value = "往mq队列存放一个消息", notes = "往mq队列存放一个消息")
-//    @MQPublish(name = SysConstant.JOB_ADD_QUEUE)
     public Job publishMsg() {
 
         log.info("往mq队列存放一个消息");
@@ -51,10 +51,14 @@ public class MqController {
         job.setStatus(StatusEnum.VALID.getValue());
         job.setCreateTime(new Date());
         job.setUpdateTime(new Date());
+        try {
+            redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).put(job);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
         return job;
     }
 
-    //    @MQListener(name = "test")
     public void test1(CharSequence charSequence, String o, Object object) {
         System.out.println("收到消息mq队列消息" + o);
         System.out.println("收到消息mq队列消息" + object);
