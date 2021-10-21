@@ -1,14 +1,12 @@
 -- ----------------------------
 -- init t_project_temp
 -- ----------------------------
-INSERT INTO `t_project_temp` VALUES ('1', '逻辑回归训练', '逻辑回归训练模板', '1', now(), now());
-INSERT INTO `t_project_temp` VALUES ('2', '逻辑回归预测', '逻辑回归预测模板', '1', now(), now());
+INSERT INTO `t_project_temp` VALUES ('1', '协同营销', '协同营销模板', '1', now(), now());
 
 -- ----------------------------
 -- init t_workflow_temp
 -- ----------------------------
-INSERT INTO `t_workflow_temp` VALUES ('1', '1', '逻辑回归训练对应工作流', '逻辑回归训练对应工作流', '1', '0', '1', now(), now());
-INSERT INTO `t_workflow_temp` VALUES ('2', '2', '逻辑回归预测对应工作流', '逻辑回归预测对应工作流', '1', '0', '1', now(), now());
+INSERT INTO `t_workflow_temp` VALUES ('1', '1', '协同营销对应工作流', '协同营销对应工作流', '1', '0', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm
@@ -25,7 +23,7 @@ INSERT INTO `t_algorithm_code` VALUES ('2', '2', '2', '# coding:utf-8\n\nimport 
 -- init t_workflow_node_temp
 -- ----------------------------
 INSERT INTO `t_workflow_node_temp` VALUES ('1', '1', '1', '逻辑回归预测', '1', null, '0', '1', now(), now());
-INSERT INTO `t_workflow_node_temp` VALUES ('2', '2', '2', '逻辑回归训练', '1', null, '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('2', '2', '2', '逻辑回归训练', '2', null, '0', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm_variable_struct

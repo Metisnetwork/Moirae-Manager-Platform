@@ -114,6 +114,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Transactional(rollbackFor = Exception.class)
     public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList) {
         if (null == workflowNodeDtoList || workflowNodeDtoList.size() == 0) {
+            log.error("saveWorkflowAllNodeData--工作流节点信息workflowNodeDtoList不能为空");
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
@@ -127,6 +128,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         // 判断正在运行的作业是否包含此工作流
         List<Job> jobList = jobService.listRunJobByWorkflowId(workflowId);
         if (null != jobList && jobList.size() > 0) {
+            log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
         // 删除当前工作流所有节点数据
@@ -204,6 +206,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 newOrganizationList.forEach(o -> identityIdSet.add(o.getIdentityId()));
                 for (String identity : identityIdArr) {
                     if (!identityIdSet.contains(identity)) {
+                        log.error("AssemblyNodeInput->前端输入的机构信息identity:{}未找到", identity);
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
                     }
                 }
@@ -411,6 +414,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private void checkEditPermission(Long projectId) {
         Byte role = projectService.getRoleByProjectId(projectId);
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
+            log.error("Current not permission to edit current project");
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
     }
