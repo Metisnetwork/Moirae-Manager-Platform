@@ -91,11 +91,21 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 // 工作流节点算法资源环境, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeResource nodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(nodeResource)) {
-                    algorithmDto.setCostCpu(nodeResource.getCostCpu());
-                    algorithmDto.setCostGpu(nodeResource.getCostGpu());
-                    algorithmDto.setCostMem(nodeResource.getCostMem());
-                    algorithmDto.setCostBandwidth(nodeResource.getCostBandwidth());
-                    algorithmDto.setRunTime(nodeResource.getRunTime());
+                    if (null != nodeResource.getCostCpu()) {
+                        algorithmDto.setCostCpu(nodeResource.getCostCpu());
+                    }
+                    if (null != nodeResource.getCostGpu()) {
+                        algorithmDto.setCostGpu(nodeResource.getCostGpu());
+                    }
+                    if (null != nodeResource.getCostMem()) {
+                        algorithmDto.setCostMem(nodeResource.getCostMem());
+                    }
+                    if (null != nodeResource.getCostBandwidth()) {
+                        algorithmDto.setCostBandwidth(nodeResource.getCostBandwidth());
+                    }
+                    if (null != nodeResource.getRunTime()) {
+                        algorithmDto.setRunTime(nodeResource.getRunTime());
+                    }
                 }
             }
             workflowNodeDto.setAlgorithmDto(algorithmDto);

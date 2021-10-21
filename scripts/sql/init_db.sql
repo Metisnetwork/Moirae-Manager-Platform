@@ -22,8 +22,8 @@ INSERT INTO `t_algorithm_code` VALUES ('2', '2', '2', '# coding:utf-8\n\nimport 
 -- ----------------------------
 -- init t_workflow_node_temp
 -- ----------------------------
-INSERT INTO `t_workflow_node_temp` VALUES ('1', '1', '1', '逻辑回归预测', '1', null, '0', '1', now(), now());
-INSERT INTO `t_workflow_node_temp` VALUES ('2', '2', '2', '逻辑回归训练', '2', null, '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('1', '1', '1', '逻辑回归训练', '1', '2', '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('2', '1', '2', '逻辑回归预测', '2', null, '0', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm_variable_struct
