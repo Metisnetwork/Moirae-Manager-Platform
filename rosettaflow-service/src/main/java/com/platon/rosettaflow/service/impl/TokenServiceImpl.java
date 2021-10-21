@@ -7,7 +7,6 @@ import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.service.ITokenService;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 

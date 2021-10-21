@@ -5,7 +5,6 @@ import com.platon.rosettaflow.dto.UserDto;
 import com.platon.rosettaflow.mapper.domain.User;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author admin
@@ -45,6 +44,7 @@ public interface IUserService extends IService<User> {
 
     /**
      * 查询所有用户昵称
+     *
      * @return User
      */
     List<User> queryAllUserNickName();
@@ -67,6 +67,7 @@ public interface IUserService extends IService<User> {
 
     /**
      * 根据项目id查询所有可以使用的用户信息
+     *
      * @param projectId 项目id
      * @return 用户列表
      */

@@ -89,6 +89,7 @@ public enum ErrorMsg {
      */
     JOB_ADD_ERROR("新增作业失败", "Add job error"),
     JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
+    JOB_PAUSE_ERROR("作业暂停失败", "Job modify error"),
     JOB_NOT_EXIST("原作业不存在", "Job not exist"),
     JOB_ID_NOT_EXIST("作业id不存在", "Job id not exist"),
     JOB_TIME_ERROR("作业时间错误", "Job time error"),

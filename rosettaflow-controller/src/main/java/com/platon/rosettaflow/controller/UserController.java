@@ -58,9 +58,11 @@ public class UserController {
             String signMessage = StrUtil.replace(loginInReq.getSignMessage(), "\\\"", "\"");
             flg = WalletSignUtils.verifyTypedDataV4(signMessage, loginInReq.getSign(), loginInReq.getHrpAddress());
         } catch (Exception e) {
+            log.error("User login signature error,error msg:{}", e.getMessage(), e);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         if (!flg) {
+            log.error("User login signature error");
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getHrpAddress());
