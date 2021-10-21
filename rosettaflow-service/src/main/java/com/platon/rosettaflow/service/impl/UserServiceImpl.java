@@ -83,7 +83,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             UserDto userDto = commonService.getCurrentUser();
             tokenService.removeToken(userDto.getToken());
         } catch (BusinessException e) {
-            log.error("User not login not need to logout");
+            log.info("User not login not need to logout");
         }
     }
 
@@ -127,19 +127,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             signMessageDto = objectMapper.readValue(signMessage, SignMessageDto.class);
         } catch (Exception e) {
+            log.error(ErrorMsg.PARAM_ERROR.getMsg(), e);
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
         if (Objects.isNull(signMessageDto.getMessage()) || StrUtil.isEmpty(signMessageDto.getMessage().getKey())) {
+            log.error(ErrorMsg.PARAM_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
         String nonce = signMessageDto.getMessage().getKey();
         if (StrUtil.isEmpty(nonce)) {
+            log.error("Nonce is empty!");
             throw new BusinessException(RespCodeEnum.PARAM_ERROR, ErrorMsg.PARAM_ERROR.getMsg());
         }
 
         String redisKey = StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce);
 
         if (!redissonObject.delete(redisKey)) {
+            log.error("Delete old user nonce fail!");
             throw new BusinessException(RespCodeEnum.NONCE_INVALID, ErrorMsg.USER_NONCE_INVALID.getMsg());
         }
     }

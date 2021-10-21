@@ -223,23 +223,4 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             }
         }
     }
-
-
-  /*  @MQPublish(name = SysConstant.JOB_ADD_QUEUE)
-    @SuppressWarnings("all")
-    public Job addJobPublish(Job job) {
-        return job;
-    }
-
-    @MQPublish(name = SysConstant.JOB_EDIT_QUEUE)
-    @SuppressWarnings("all")
-    public Job editJobPublish(Job job) {
-        return job;
-    }
-
-    @MQPublish(name = SysConstant.JOB_PAUSE_QUEUE)
-    @SuppressWarnings("all")
-    public Job pauseJobPublish(Job job) {
-        return job;
-    }*/
 }

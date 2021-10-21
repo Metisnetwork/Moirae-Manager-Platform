@@ -43,6 +43,7 @@ public class CommonService {
     public UserDto getCurrentUser() {
         UserDto currentUser = UserContext.get();
         if (null == currentUser) {
+            log.error(RespCodeEnum.UN_LOGIN.getMsg());
             throw new BusinessException(RespCodeEnum.UN_LOGIN);
         }
         return currentUser;

@@ -58,6 +58,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public IPage<UserMetaDataDto> list(Long current, Long size, String dataName) {
         Page<UserMetaData> page = new Page<>(current, size);
         if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
+            log.error(ErrorMsg.USER_UN_LOGIN.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
         }
         return this.baseMapper.listByOwner(page, UserContext.get().getAddress(), dataName);
@@ -67,15 +68,18 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public void auth(UserMetaDataDto userMetaDataDto) {
         MetaData metaData = metaDataService.getById(userMetaDataDto.getId());
         if (null == metaData) {
+            log.error(ErrorMsg.METADATA_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
         if (userMetaDataDto.getAuthType() == MetaDataUsageEnum.TIMES.getValue()) {
             if (null == userMetaDataDto.getAuthValue() || userMetaDataDto.getAuthValue() < 1) {
+                log.error(ErrorMsg.METADATA_AUTH_TIMES_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIMES_ERROR.getMsg());
             }
         } else {
             if (null == userMetaDataDto.getAuthEndTime() || null == userMetaDataDto.getAuthBeginTime() ||
                     DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0 || userMetaDataDto.getAuthEndTime().before(userMetaDataDto.getAuthBeginTime())) {
+                log.error(ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
         }
@@ -110,6 +114,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
         ApplyMetaDataAuthorityResponseDto responseDto = grpcAuthService.applyMetaDataAuthority(applyDto);
         if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.info("元数据授权申请,net处理失败，失败原因：{}", responseDto.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
@@ -119,6 +124,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public List<UserMetaDataDto> getAllAuthOrganization() {
         UserDto userDto = UserContext.get();
         if (Objects.isNull(userDto)) {
+            log.error(ErrorMsg.USER_UN_LOGIN.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
         }
         String address = userDto.getAddress();
