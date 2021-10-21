@@ -2,6 +2,7 @@ package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -674,7 +675,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                         metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
             }
             for (String s : columnIdsArr) {
-                selectedColumns.add(Integer.valueOf(s.trim()));
+                if (StrUtil.isNotBlank(s)) {
+                    selectedColumns.add(Integer.valueOf(s.trim()));
+                }
             }
 
             taskMetaDataDeclareDto.setSelectedColumns(selectedColumns);
