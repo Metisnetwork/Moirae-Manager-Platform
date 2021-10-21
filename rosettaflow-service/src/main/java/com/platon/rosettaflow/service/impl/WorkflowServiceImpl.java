@@ -575,12 +575,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (null == jsonStruct) {
             return null;
         } else {
+            String struct = jsonStruct.getStruct();
             // 把可变参数进行替换
-            log.info("jsonStruct.getStruct() is:{}", jsonStruct.getStruct());
-            if (!JsonUtils.isJson(jsonStruct.getStruct())) {
+            log.info("jsonStruct.getStruct() is:{}", struct);
+            if (!JsonUtils.isJson(struct)) {
+                log.error("WorkflowServiceImpl->getContractExtraParams,{}",ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
             }
-            JSONObject jsonObject = JSON.parseObject(jsonStruct.getStruct());
+            JSONObject jsonObject = JSON.parseObject(struct);
             //逻辑训练动态参数[因变量(标签)]
             if (jsonObject.containsKey("label_column")) {
                 for (WorkflowNodeInput input : workflowNodeInputList) {

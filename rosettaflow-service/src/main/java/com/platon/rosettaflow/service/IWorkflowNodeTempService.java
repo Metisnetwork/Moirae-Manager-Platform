@@ -21,6 +21,7 @@ public interface IWorkflowNodeTempService extends IService<WorkflowNodeTemp> {
      * 根据工作流模板id获取工作流节点列表
      *
      * @param workflowTempId 工作流模板id
+     * @return 工作流节点模板列表
      */
     List<WorkflowNodeTemp> getByWorkflowTempId(Long workflowTempId);
 
