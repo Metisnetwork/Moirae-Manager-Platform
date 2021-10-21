@@ -64,27 +64,33 @@ public class AlgDetailsVo {
 
     /** 展示时处理内存单位 */
     public Long getCostMem() {
+        if (null == this.costMem || this.costMem == 0) {
+            return 0L;
+        }
         return new BigDecimal(this.costMem)
                 .divide(BigDecimal.valueOf(SysConstant.INT_1024
-                        * SysConstant.INT_1024 * SysConstant.INT_1024))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
-                .longValue();
+                        * SysConstant.INT_1024 * SysConstant.INT_1024),
+                        SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
     }
 
     /** 展示时处理带宽单位 */
     public Long getCostBandwidth() {
+        if (null == this.costBandwidth || this.costBandwidth == 0) {
+            return 0L;
+        }
         return new BigDecimal(this.costBandwidth)
-                .divide(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
-                .longValue();
+                .divide(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000),
+                        SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
     }
 
     /** 保存时最长运行时间单位处理 （换算为毫秒存库）*/
     public Long getRunTime() {
+        if (null == this.runTime || this.runTime == 0) {
+            return 0L;
+        }
         return new BigDecimal(this.runTime)
-                .divide(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
-                .longValue();
+                .divide(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000),
+                        SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
     }
 
 }
