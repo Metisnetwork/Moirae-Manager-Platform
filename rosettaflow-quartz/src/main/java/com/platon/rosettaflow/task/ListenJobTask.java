@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author hudenian
@@ -30,51 +29,45 @@ public class ListenJobTask {
     /**
      * 注意：测试时候当注释定时任务时，同步注释掉SyncJobStatusTask任务，否则可能出现数据状态不一致
      */
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 11 * 1000)
+    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 11 * 1000)
     @Lock(keys = "ListenJobTask-add-queue")
     @SuppressWarnings("InfiniteLoopStatement")
     public void listenAddJob() {
         while (true) {
             try {
-                Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).poll(30, TimeUnit.SECONDS);
-                if (null != job) {
-                    log.info("------redis message add queue jobId:" + job.getId());
-                    jobManager.startJob(job);
-                }
+                Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).take();
+                log.info("------redis message add queue jobId:" + job.getId());
+                jobManager.startJob(job);
             } catch (InterruptedException e) {
                 log.error("从redis JOB_ADD_QUEUE队列中获取添加作业失败，失败原因：{}", e.getMessage(), e);
             }
         }
     }
 
-    @Scheduled(fixedDelay = 70 * 1000, initialDelay = 11 * 1000)
+    @Scheduled(fixedDelay = 60 * 70 * 1000, initialDelay = 11 * 1000)
     @Lock(keys = "ListenJobTask-edit-queue")
     @SuppressWarnings("InfiniteLoopStatement")
     public void listenEditJob() {
         while (true) {
             try {
-                Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_EDIT_QUEUE).poll(30, TimeUnit.SECONDS);
-                if (null != job) {
-                    log.info("------redis message add queue jobId:" + job.getId());
-                    jobManager.startJob(job);
-                }
+                Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_EDIT_QUEUE).take();
+                log.info("------redis message edit queue jobId:" + job.getId());
+                jobManager.startJob(job);
             } catch (InterruptedException e) {
                 log.error("从redis JOB_EDIT_QUEUE队列中获取添加作业失败，失败原因：{}", e.getMessage(), e);
             }
         }
     }
 
-    @Scheduled(fixedDelay = 80 * 1000, initialDelay = 11 * 1000)
+    @Scheduled(fixedDelay = 60 * 80 * 1000, initialDelay = 11 * 1000)
     @Lock(keys = "ListenJobTask-pause-queue")
     @SuppressWarnings("InfiniteLoopStatement")
     public void listenPauseJob() {
         while (true) {
             try {
-                Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_PAUSE_QUEUE).poll(30, TimeUnit.SECONDS);
-                if (null != job) {
-                    log.info("------redis message add queue jobId:" + job.getId());
-                    jobManager.pauseJob(job);
-                }
+                Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_PAUSE_QUEUE).take();
+                log.info("------redis message add queue jobId:" + job.getId());
+                jobManager.pauseJob(job);
             } catch (InterruptedException e) {
                 log.error("从redis JOB_PAUSE_QUEUE队列中获取添加作业失败，失败原因：{}", e.getMessage(), e);
             }

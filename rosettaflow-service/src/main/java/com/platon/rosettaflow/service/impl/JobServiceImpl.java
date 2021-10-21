@@ -89,7 +89,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void add(JobDto jobDto) {
         checkParam(jobDto);
         //保存作业
@@ -98,22 +98,31 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
 
         if (!this.save(job)) {
+            log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_ADD_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ADD_ERROR.getMsg());
         }
 
         //将作业保存至redis待后续处理
-        redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).add(job);
+        try {
+            redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).put(job);
+        } catch (InterruptedException e) {
+            log.error("Job add to redis fail,fail reason:{}", e.getMessage(), e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ADD_ERROR.getMsg());
+        }
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void edit(JobDto jobDto) {
         Job jobOriginal = new Job();
         Job job = this.getValidJobById(jobDto.getId());
         if (null == job) {
+            log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
         //如果作业正在执行或者执行完成则不能够修改
         if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue() || job.getJobStatus() == JobStatusEnum.FINISH.getValue()) {
+            log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_RUNNING_OR_FINISH.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_OR_FINISH.getMsg());
         }
 
@@ -130,11 +139,17 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             job.setUpdateTime(new Date());
         }
         if (this.baseMapper.updateJobById(job) == 0) {
+            log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_EDIT_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
         }
 
         //将作业保存至redis待后续处理
-        redissonClient.getBlockingQueue(SysConstant.JOB_EDIT_QUEUE).add(job);
+        try {
+            redissonClient.getBlockingQueue(SysConstant.JOB_EDIT_QUEUE).put(job);
+        } catch (InterruptedException e) {
+            log.error("Edit->Job add to redis fail,fail reason:{}", e.getMessage(), e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
+        }
     }
 
     @Override
@@ -143,23 +158,37 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void pause(Long id) {
         Job job = this.getById(id);
         if (job.getJobStatus() != JobStatusEnum.RUNNING.getValue()) {
             log.error("job is not running can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_RUNNING.getMsg());
         }
-        redissonClient.getBlockingQueue(SysConstant.JOB_PAUSE_QUEUE).add(job);
+
+        try {
+            redissonClient.getBlockingQueue(SysConstant.JOB_PAUSE_QUEUE).put(job);
+        } catch (InterruptedException e) {
+            log.error("Pause->Job add to redis fail,fail reason:{}", e.getMessage(), e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_PAUSE_ERROR.getMsg());
+        }
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void reStart(Long id) {
         Job job = this.getById(id);
         if (job.getJobStatus() != JobStatusEnum.STOP.getValue()) {
             log.error("job is not stop can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_STOP.getMsg());
         }
-        redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).add(job);
+
+        try {
+            redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).put(job);
+        } catch (InterruptedException e) {
+            log.error("ReStart->Job add to redis fail,fail reason:{}", e.getMessage(), e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ADD_ERROR.getMsg());
+        }
     }
 
     @Override
@@ -173,15 +202,18 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public void deleteBatchJob(List<Long> ids) {
         if (ids.isEmpty()) {
+            log.error(ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
         }
         List<Job> jobs = this.listByIds(ids);
         if (jobs.isEmpty() || ids.size() != jobs.size()) {
+            log.error(ErrorMsg.JOB_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
         //检查作业是否存在运行中
         boolean isExistRunningJob = jobs.stream().anyMatch(job -> job.getJobStatus() == JobStatusEnum.RUNNING.getValue());
         if (isExistRunningJob) {
+            log.error(ErrorMsg.JOB_NOT_DELETE.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_DELETE.getMsg());
         }
         //检查子作业是否存在运行中
@@ -189,6 +221,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         Object[] subJobArrayIds = subJobList.stream().map(SubJob::getId).toArray();
         boolean isExistRunningSubJob = subJobList.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
         if (isExistRunningSubJob) {
+            log.error(ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
         }
         //检查子作业节点是否存在运行中节点
@@ -196,6 +229,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
         boolean isExistRunningSubJobNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobNodeStatusEnum.RUNNING.getValue());
         if (isExistRunningSubJobNode) {
+            log.error(ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
         }
         //批量更新作业、子作业、子作业节点有效状态
@@ -210,15 +244,18 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     private void checkParam(JobDto jobDto) {
         //校验开始时间 > 结束时间
         if (!Objects.isNull(jobDto.getBeginTime()) && !Objects.isNull(jobDto.getEndTime()) && jobDto.getBeginTime().after(jobDto.getEndTime())) {
+            log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_TIME_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_ERROR.getMsg());
         }
         //作业执行重复时,结束时间及重复次数合法性
         if (jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()) {
             if (Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())) {
+                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_TIME_REPEAT_INTERVAL_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEAT_INTERVAL_ERROR.getMsg());
             }
         } else {
             if (!Objects.isNull(jobDto.getEndTime()) || !Objects.isNull(jobDto.getRepeatInterval())) {
+                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
             }
         }
