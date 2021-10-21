@@ -35,6 +35,9 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
     @Override
     public List<WorkflowNodeOutput> copyWorkflowNodeOutput(Long newNodeId, Long oldNodeId) {
         List<WorkflowNodeOutput> oldNodeOutputList = this.getByWorkflowNodeId(oldNodeId);
+        if (null == oldNodeOutputList || oldNodeOutputList.size() == 0) {
+            return new ArrayList<>();
+        }
         List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
         if (oldNodeOutputList.size() > 0) {
             oldNodeOutputList.forEach(oldNodeOutput -> {

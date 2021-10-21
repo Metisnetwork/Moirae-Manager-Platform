@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -51,6 +50,9 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     @Override
     public List<WorkflowNodeInput> copyWorkflowNodeInput(Long newNodeId, Long oldNodeId) {
         List<WorkflowNodeInput> oldNodeInputList = this.getByWorkflowNodeId(oldNodeId);
+        if (null == oldNodeInputList || oldNodeInputList.size() == 0) {
+            return new ArrayList<>();
+        }
         List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
         if (oldNodeInputList.size() > 0) {
             oldNodeInputList.forEach(oldNodeInput -> {

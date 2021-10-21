@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.WorkflowNodeVariableMapper;
 import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
-import com.platon.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeVariable;
 import com.platon.rosettaflow.service.IWorkflowNodeVariableService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 工作流节点变量服务实现类
@@ -50,8 +48,8 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     @Override
     public List<WorkflowNodeVariable> copyWorkflowNodeVariable(Long newNodeId, Long oldNodeId) {
         List<WorkflowNodeVariable> oldNodeVariableList = this.getByWorkflowNodeId(oldNodeId);
-        if (oldNodeVariableList.size() == 0) {
-            return null;
+        if (null == oldNodeVariableList || oldNodeVariableList.size() == 0) {
+            return new ArrayList<>();
         }
         List<WorkflowNodeVariable> newNodeVariableList = new ArrayList<>();
         oldNodeVariableList.forEach(oldNodeVariable -> {
