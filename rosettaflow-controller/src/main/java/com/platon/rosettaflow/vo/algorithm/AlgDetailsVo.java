@@ -83,7 +83,7 @@ public class AlgDetailsVo {
                         SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
     }
 
-    /** 保存时最长运行时间单位处理 （换算为毫秒存库）*/
+    /** 展示时最长运行时间单位处理 */
     public Long getRunTime() {
         if (null == this.runTime || this.runTime == 0) {
             return 0L;
