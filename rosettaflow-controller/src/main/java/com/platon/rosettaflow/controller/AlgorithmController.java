@@ -76,7 +76,6 @@ public class AlgorithmController {
     }
 
     /** 查询算法树响应参数转换 */
-    @SuppressWarnings("all")
     private AlgTreeListVo convertAlgTreeList(List<Map<String, Object>> listVo){
         AlgTreeListVo algTreeListVo = new AlgTreeListVo();
         List<AlgTreeVo> algTreeVoList = new ArrayList<>();
@@ -84,6 +83,7 @@ public class AlgorithmController {
             AlgTreeVo algTreeVo = BeanUtil.toBean(map, AlgTreeVo.class);
             List<Map<String, Object>> childList = (List)map.get("child");
             if (null == childList || childList.size() == 0) {
+                algTreeVoList.add(algTreeVo);
                 continue;
             }
             List<AlgChildTreeVo> algDetailsVoList = new ArrayList<>();
