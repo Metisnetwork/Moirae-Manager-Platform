@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement
 @MapperScan(basePackages = {"com.platon.rosettaflow.mapper"})
-@EnableMQ
+//@EnableMQ
 public class RosettaFlowApplication {
     public static void main(String[] args) {
         SpringApplication.run(RosettaFlowApplication.class, args);
