@@ -8,6 +8,7 @@ import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
 import com.platon.rosettaflow.service.IProjectTempService;
 import com.platon.rosettaflow.service.IWorkflowNodeTempService;
 import com.platon.rosettaflow.service.IWorkflowTempService;
+import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +36,8 @@ public class InitProjectTemplate {
     private IWorkflowNodeTempService workflowNodeTempService;
 
 //    @PostConstruct
+    @Lock(keys = "InitProjectTemplate")
     public void init() {
-        if (!sysConfig.isMasterNode()) {
-            return;
-        }
         //清空原项目模板
         projectTempService.truncate();
         //清空工作流模板

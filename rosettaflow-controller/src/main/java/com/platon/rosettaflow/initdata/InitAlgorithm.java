@@ -9,6 +9,7 @@ import com.platon.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.platon.rosettaflow.service.IAlgorithmCodeService;
 import com.platon.rosettaflow.service.IAlgorithmService;
 import com.platon.rosettaflow.service.IAlgorithmVariableService;
+import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -40,10 +41,8 @@ public class InitAlgorithm {
     private IAlgorithmVariableService algorithmVariableService;
 
 //    @PostConstruct
+    @Lock(keys = "InitAlgorithm")
     public void init() {
-        if (!sysConfig.isMasterNode()) {
-            return;
-        }
         //清除旧数据
         algorithmService.truncate();
         algorithmCodeService.truncate();

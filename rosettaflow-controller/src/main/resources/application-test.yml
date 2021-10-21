@@ -18,17 +18,6 @@ spring:
       connection-timeout: 3000
       max-lifetime: 1800000
       idle-timeout: 600000
-#  redis:
-#    cluster:
-#      nodes: 10.10.8.175:6371,10.10.8.175:6372,10.10.8.175:6373,10.10.8.176:6374,10.10.8.176:6375,10.10.8.176:6376
-#    password: 123456
-#    timeout: 5000
-#    lettuce:
-#      pool:
-#        max-active: 200
-#        max-idle: 10
-#        min-idle: 0
-#        max-wait: -1
   task:
     scheduling:
       pool:
@@ -45,15 +34,12 @@ system:
     loginTimeOut: 18000000000
     # 登录互踢模式： true-是,false-否
     kickMode: false
-    # 是否是主服务: true-主服务,false-从服务
-    masterNode: true
     # nonce存放时间，单位：秒
     nonceTimeOut: 300
     # 算法初始化文件
     algorithmFilepath: classpath:script/algorithm.csv
     # 数据库数据批量更新
     batchSize: 1000
-
 
 grpc:
   client:

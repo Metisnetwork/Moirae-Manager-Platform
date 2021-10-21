@@ -43,7 +43,6 @@ system:
     # 数据库数据批量更新
     batchSize: 1000
 
-
 grpc:
   client:
     carrier-grpc-server:

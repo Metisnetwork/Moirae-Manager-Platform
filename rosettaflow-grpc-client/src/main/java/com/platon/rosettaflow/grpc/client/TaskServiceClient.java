@@ -258,6 +258,7 @@ public class TaskServiceClient {
             owner.setStatus(taskEventListResponse.getTaskEventList(i).getOwner().getStatusValue());
             taskEventShowDto.setOwner(owner);
 
+            taskEventShowDto.setPartyId(taskEventListResponse.getTaskEventList(i).getPartyId());
             taskEventShowDto.setContent(taskEventListResponse.getTaskEventList(i).getContent());
             taskEventShowDto.setCreateAt(taskEventListResponse.getTaskEventList(i).getCreateAt());
             taskEventShowDtoList.add(taskEventShowDto);
@@ -356,7 +357,7 @@ public class TaskServiceClient {
         //  计算合约代码
         publishTaskDeclareRequestBuilder.setCalculateContractCode(taskDto.getCalculateContractCode());
         //  数据分片合约代码
-        if(null !=taskDto.getDataSplitContractCode()){
+        if (null != taskDto.getDataSplitContractCode()) {
             publishTaskDeclareRequestBuilder.setDataSplitContractCode(taskDto.getDataSplitContractCode());
         }
         //  合约调用的额外可变入参 (json 字符串, 根据算法来)

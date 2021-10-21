@@ -18,18 +18,6 @@ spring:
       connection-timeout: 3000
       max-lifetime: 1800000
       idle-timeout: 600000
-  redis:
-    cluster:
-      nodes: xxxx.xxxx.xxxx.xxxx:6379
-    password: ENC(xxxxxxxxxxxx)
-    port: 6379
-    timeout: 3000
-    lettuce:
-      pool:
-        max-active: 200
-        max-idle: 10
-        min-idle: 0
-        max-wait: -1
 
 # 系统参数配置
 system:
@@ -44,7 +32,6 @@ system:
     algorithmFilepath: classpath:script/algorithm.csv
     # 数据库数据批量更新
     batchSize: 1000
-
 
 grpc:
   client:

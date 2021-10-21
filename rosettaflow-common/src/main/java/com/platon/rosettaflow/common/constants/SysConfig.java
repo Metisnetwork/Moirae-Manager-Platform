@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class SysConfig {
     private long loginTimeOut = 1800000000;
     private boolean kickMode = true;
-    private boolean masterNode = false;
     private long nonceTimeOut = 5 * 60 * 1000;
     private String algorithmFilepath = "classpath:script/algorithm.csv";
     private long batchSize = 500;

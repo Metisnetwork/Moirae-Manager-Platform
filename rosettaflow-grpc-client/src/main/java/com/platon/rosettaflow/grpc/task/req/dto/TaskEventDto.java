@@ -23,6 +23,10 @@ public class TaskEventDto {
      */
     private NodeIdentityDto owner;
     /**
+     * 产生事件的partyId (单个组织可以担任任务的多个party, 区分是哪一方产生的event)
+     */
+    private String partyId;
+    /**
      * 事件内容
      */
     private String content;
