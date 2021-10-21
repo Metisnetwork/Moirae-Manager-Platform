@@ -61,6 +61,10 @@ public class SyncUserDataAuthTask {
 
         for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
             userMetaData = getUserMetaData(authorityDto);
+            //如果钱包地址不合法，此条数据过滤旧不入库
+            if (null == userMetaData) {
+                continue;
+            }
 
             userMetaDataList.add(userMetaData);
             ++userMetaDataSize;
@@ -96,6 +100,7 @@ public class SyncUserDataAuthTask {
         } catch (Exception e) {
             log.error("钱包地址{}非法", authorityDto.getUser(), e);
             userMetaData.setAddress(authorityDto.getUser());
+            return null;
         }
 
         userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());

@@ -1,6 +1,5 @@
 package com.platon.rosettaflow.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,8 +20,8 @@ import com.platon.rosettaflow.service.IJobService;
 import com.platon.rosettaflow.service.ISubJobNodeService;
 import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
-import com.zengtengpeng.annotation.MQPublish;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,15 +50,18 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Resource
     private ISubJobNodeService subJobNodeService;
 
+    @Resource
+    private RedissonClient redissonClient;
+
     @Override
     public List<Job> getAllUnfinishedJob() {
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
         wrapper.and(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue())
-                    .le(Job::getBeginTime, new Date(System.currentTimeMillis()))
-                    .ge(Job::getEndTime, new Date(System.currentTimeMillis()))
-                    .eq(Job::getStatus, StatusEnum.VALID.getValue()))
-               .or(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue()))
-               .orderByAsc(Job::getId);
+                        .le(Job::getBeginTime, new Date(System.currentTimeMillis()))
+                        .ge(Job::getEndTime, new Date(System.currentTimeMillis()))
+                        .eq(Job::getStatus, StatusEnum.VALID.getValue()))
+                .or(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue()))
+                .orderByAsc(Job::getId);
         return this.baseMapper.selectList(wrapper);
     }
 
@@ -73,15 +75,15 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     public Job getValidJobById(Long id) {
         LambdaQueryWrapper<Job> jobLambdaQueryWrapper = Wrappers.lambdaQuery();
         jobLambdaQueryWrapper.eq(Job::getId, id);
-        jobLambdaQueryWrapper.eq(Job::getStatus,StatusEnum.VALID.getValue());
+        jobLambdaQueryWrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(jobLambdaQueryWrapper);
     }
 
     @Override
     public void updateBatchStatus(Object[] ids, Byte status) {
         LambdaUpdateWrapper<Job> updateJobWrapper = Wrappers.lambdaUpdate();
-        updateJobWrapper.set(Job::getStatus,status);
-        updateJobWrapper.set(Job::getUpdateTime,now());
+        updateJobWrapper.set(Job::getStatus, status);
+        updateJobWrapper.set(Job::getUpdateTime, now());
         updateJobWrapper.in(Job::getId, ids);
         this.update(updateJobWrapper);
     }
@@ -100,8 +102,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
 
         //将作业保存至redis待后续处理
-        addJobPublish(job);
-//        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
+        redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).add(job);
     }
 
     @Override
@@ -133,8 +134,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
 
         //将作业保存至redis待后续处理
-        editJobPublish(job);
-//        redisUtil.listLeftPush(SysConstant.JOB_EDIT_QUEUE, JSON.toJSONString(job), null);
+        redissonClient.getBlockingQueue(SysConstant.JOB_EDIT_QUEUE).add(job);
     }
 
     @Override
@@ -149,8 +149,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             log.error("job is not running can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_RUNNING.getMsg());
         }
-//        redisUtil.listLeftPush(SysConstant.JOB_PAUSE_QUEUE, JSON.toJSONString(job), null);
-        pauseJobPublish(job);
+        redissonClient.getBlockingQueue(SysConstant.JOB_PAUSE_QUEUE).add(job);
     }
 
     @Override
@@ -160,8 +159,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             log.error("job is not stop can not modify by jobId:{}", job.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_STOP.getMsg());
         }
-//        redisUtil.listLeftPush(SysConstant.JOB_ADD_QUEUE, JSON.toJSONString(job), null);
-        addJobPublish(job);
+        redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).add(job);
     }
 
     @Override
@@ -227,7 +225,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
 
-    @MQPublish(name = SysConstant.JOB_ADD_QUEUE)
+  /*  @MQPublish(name = SysConstant.JOB_ADD_QUEUE)
     @SuppressWarnings("all")
     public Job addJobPublish(Job job) {
         return job;
@@ -243,5 +241,5 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @SuppressWarnings("all")
     public Job pauseJobPublish(Job job) {
         return job;
-    }
+    }*/
 }

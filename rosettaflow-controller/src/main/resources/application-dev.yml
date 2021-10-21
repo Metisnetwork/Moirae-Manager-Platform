@@ -32,7 +32,7 @@ spring:
   task:
     scheduling:
       pool:
-        size: 5
+        size: 10
       thread-name-prefix: RosettaFlow-Task-
 mybatis-plus:
   configuration:
