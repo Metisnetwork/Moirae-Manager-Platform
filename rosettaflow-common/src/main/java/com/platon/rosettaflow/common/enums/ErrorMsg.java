@@ -53,6 +53,7 @@ public enum ErrorMsg {
     ALGORITHM_AUTH_NOT_EXIST("用户算法授权信息不存在或者授权已失效", "Algorithm auth not exist or invalidation"),
     ALG_TYPE_NOT_EXIST("算法大类不存在", "Algorithm type does not exist"),
     ALG_VARIABLE_STRUCT_ERROR("算法变量可变参数json结构错误", "Algorithm variable variable parameter json structure error"),
+    ALG_REPEAT_ERROR("一个工作流中，不能存在重复的算法！", "There can be no duplicate algorithms in a workflow"),
 
     /**
      * 数据
