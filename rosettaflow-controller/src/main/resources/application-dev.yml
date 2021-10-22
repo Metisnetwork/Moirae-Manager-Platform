@@ -4,10 +4,6 @@ server:
     context-path: /rosettaflow
     encoding:
       charset: UTF-8
-  session:
-    cookie:
-      http-only: true
-      secure: true
 
 spring:
   datasource:
