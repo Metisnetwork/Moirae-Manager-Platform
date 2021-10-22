@@ -153,6 +153,28 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
+    public void editBasicInfo(JobDto jobDto) {
+        Job job = this.getValidJobById(jobDto.getId());
+        if (null == job) {
+            log.error("Job does not exist edit failed, jobId:{}->,{}", jobDto.getId(), ErrorMsg.JOB_NOT_EXIST.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
+        }
+        //如果作业正在执行不能够修改
+        if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue() ) {
+            log.error("Job is running edit failed, jobId:{}->,{}", jobDto.getId(), ErrorMsg.JOB_NOT_EDIT.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EDIT.getMsg());
+        }
+        LambdaUpdateWrapper<Job> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(Job::getId, jobDto.getId());
+        updateWrapper.set(Job::getName, jobDto.getName());
+        updateWrapper.set(Job::getDesc, jobDto.getDesc());
+        if(!this.update(updateWrapper)) {
+            log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_EDIT_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
+        }
+    }
+
+    @Override
     public List<Workflow> queryRelatedWorkflowName(Long projectId) {
         return workflowService.queryWorkFlowByProjectId(projectId);
     }

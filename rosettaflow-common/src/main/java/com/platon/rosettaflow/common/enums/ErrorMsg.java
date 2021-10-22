@@ -103,6 +103,7 @@ public enum ErrorMsg {
     JOB_NOT_RUNNING("作业并未执行中不能修改", "Job is not running can not modify"),
     JOB_NOT_STOP("作业并未停止中不能修改", "Job is not stop can not modify"),
     JOB_NOT_DELETE("作业运行中不能删除", "Job is running can not delete"),
+    JOB_NOT_EDIT("作业运行中不能修改", "Job is running can not modify"),
     JOB_RUNNING_CACHE_CLEAR_ERROR("作业执行缓存清理错误", "Job run cache clear error"),
 
     SUB_JOB_NOT_EXIST("子作业不存在", "Sub job not exist"),

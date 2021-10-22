@@ -62,6 +62,14 @@ public class JobController {
         return ResponseVo.createSuccess();
     }
 
+
+    @PostMapping("editBasicInfo")
+    @ApiOperation(value = "作业编辑基本信息", notes = "作业编辑基本信息")
+    public ResponseVo<?> editBasicInfo(@RequestBody @Valid EditJobBasicInfoReq editJobBasicInfoReq) {
+        jobService.editBasicInfo(BeanUtil.copyProperties(editJobBasicInfoReq, JobDto.class));
+        return ResponseVo.createSuccess();
+    }
+
     @GetMapping("queryRelatedWorkflowName")
     @ApiOperation(value = "查询关联工作流名称", notes = "查询关联工作流名称")
     public ResponseVo<List<QueryWorkflowVo>> queryRelatedWorkflowName(@Valid QueryWorkflowReq queryWorkflowReq) {

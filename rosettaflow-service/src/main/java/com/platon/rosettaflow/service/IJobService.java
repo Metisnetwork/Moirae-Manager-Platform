@@ -61,6 +61,13 @@ public interface IJobService extends IService<Job> {
     void edit(JobDto jobDto);
 
     /**
+     * 编辑作业基本信息
+     *
+     * @param jobDto 编辑作业请求对象
+     */
+    void editBasicInfo(JobDto jobDto);
+
+    /**
      * 查询关联工作流
      *
      * @param projectId 项目id
