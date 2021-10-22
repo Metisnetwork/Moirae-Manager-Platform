@@ -272,7 +272,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        List<WorkflowNode> workflowNodeList = getAllWorkflowNodeList(workflowId);
+        List<WorkflowNode> workflowNodeList = this.getWorkflowNodeList(workflowId);
         if (Objects.isNull(workflowNodeList)|| workflowNodeList.isEmpty()) {
             log.error("Workflow node does not exist, workflowId:{}", workflowId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
@@ -299,16 +299,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
         return workflowNode;
-    }
-
-    @Override
-    public List<WorkflowNode> getAllWorkflowNodeList(Long workflowId) {
-        // 查询所有节点（包含失效数据）
-        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
-        // 所有节点正序排序
-        wrapper.orderByAsc(WorkflowNode::getNodeStep);
-        return this.list(wrapper);
     }
 
     @Override
