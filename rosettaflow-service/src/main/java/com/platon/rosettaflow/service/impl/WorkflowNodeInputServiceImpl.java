@@ -54,17 +54,15 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
             return new ArrayList<>();
         }
         List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
-        if (oldNodeInputList.size() > 0) {
-            oldNodeInputList.forEach(oldNodeInput -> {
-                WorkflowNodeInput newNodeInput = new WorkflowNodeInput();
-                newNodeInput.setWorkflowNodeId(newNodeId);
-                newNodeInput.setIdentityId(oldNodeInput.getIdentityId());
-                newNodeInput.setDataTableId(oldNodeInput.getDataTableId());
-                newNodeInput.setDataColumnIds(oldNodeInput.getDataColumnIds());
-                newNodeInput.setDataFileId(oldNodeInput.getDataFileId());
-                newNodeInputList.add(newNodeInput);
-            });
-        }
+        oldNodeInputList.forEach(oldNodeInput -> {
+            WorkflowNodeInput newNodeInput = new WorkflowNodeInput();
+            newNodeInput.setWorkflowNodeId(newNodeId);
+            newNodeInput.setIdentityId(oldNodeInput.getIdentityId());
+            newNodeInput.setDataTableId(oldNodeInput.getDataTableId());
+            newNodeInput.setDataColumnIds(oldNodeInput.getDataColumnIds());
+            newNodeInput.setDataFileId(oldNodeInput.getDataFileId());
+            newNodeInputList.add(newNodeInput);
+        });
         return newNodeInputList;
     }
 
