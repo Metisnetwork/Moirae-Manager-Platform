@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.dto.WorkflowNodeDto;
-import com.platon.rosettaflow.grpc.service.GrpcTaskService;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.req.workflow.*;
@@ -51,9 +50,6 @@ public class WorkflowController {
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
-
-    @Resource
-    private GrpcTaskService grpcTaskService;
 
     @GetMapping("list")
     @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
@@ -124,22 +120,24 @@ public class WorkflowController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("getLog/{taskId}")
+    @PostMapping("getLog/{workflowId}")
     @ApiOperation(value = "获取运行日志", notes = "获取运行日志")
-    public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
-        List<TaskEventDto> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
+    public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "workflowId", required = true) @PathVariable Long workflowId) {
+        List<TaskEventDto> taskEventShowDtoList = workflowService.getTaskEventList(workflowId);
         List<TaskEventVo> taskEventVoList = new ArrayList<>();
         TaskEventVo vo;
-        for (TaskEventDto taskEventDto : taskEventShowDtoList) {
-            vo = new TaskEventVo();
-            vo.setType(taskEventDto.getType());
-            vo.setTaskId(taskEventDto.getTaskId());
-            vo.setName(taskEventDto.getOwner().getNodeName());
-            vo.setNodeId(taskEventDto.getOwner().getNodeId());
-            vo.setIdentityId(taskEventDto.getOwner().getIdentityId());
-            vo.setContent(taskEventDto.getContent());
-            vo.setCreateAt(DateUtil.date(taskEventDto.getCreateAt()));
-            taskEventVoList.add(vo);
+        if (taskEventShowDtoList.size() > 0) {
+            for (TaskEventDto taskEventDto : taskEventShowDtoList) {
+                vo = new TaskEventVo();
+                vo.setType(taskEventDto.getType());
+                vo.setTaskId(taskEventDto.getTaskId());
+                vo.setName(taskEventDto.getOwner().getNodeName());
+                vo.setNodeId(taskEventDto.getOwner().getNodeId());
+                vo.setIdentityId(taskEventDto.getOwner().getIdentityId());
+                vo.setContent(taskEventDto.getContent());
+                vo.setCreateAt(DateUtil.date(taskEventDto.getCreateAt()));
+                taskEventVoList.add(vo);
+            }
         }
         return ResponseVo.createSuccess(taskEventVoList);
     }

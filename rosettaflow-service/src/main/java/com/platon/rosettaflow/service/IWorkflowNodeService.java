@@ -48,14 +48,6 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer startNode);
 
     /**
-     * 根据工作流id获取所有工作流节点列表（查询所有数据）
-     *
-     * @param workflowId 工作流主键id
-     * @return 工作流节点列表
-     */
-    List<WorkflowNode> getAllWorkflowNodeList(Long workflowId);
-
-    /**
      * 根据工作流id获取工作流节点列表（只查询生效的数据）
      *
      * @param workflowId 工作流主键id

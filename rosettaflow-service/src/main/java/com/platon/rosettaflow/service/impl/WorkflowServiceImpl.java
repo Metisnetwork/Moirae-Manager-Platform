@@ -362,6 +362,19 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    public List<TaskEventDto> getTaskEventList(Long workflowId) {
+        List<TaskEventDto> dtoList = new ArrayList<>();
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflowId);
+        if (null != workflowNodeList && workflowNodeList.size() > 0) {
+            for (WorkflowNode workflowNode : workflowNodeList) {
+                List<TaskEventDto> taskEventShowDtoList = grpcTaskService.getTaskEventList(workflowNode.getTaskId());
+                dtoList.addAll(taskEventShowDtoList);
+            }
+        }
+        return dtoList;
+    }
+
+    @Override
     public void terminate(Long workflowId) {
         Workflow workflow = this.queryWorkflowDetail(workflowId);
         // 校验是否有编辑权限
@@ -757,7 +770,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public Map<String, Object> getWorkflowStatusById(Long id) {
         Map<String, Object> param = new HashMap<>(2);
         Workflow workflow = queryWorkflowDetail(id);
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getAllWorkflowNodeList(id);
+        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(id);
         List<Map<String, Object>> nodeList = new ArrayList<>();
         workflowNodeList.forEach(workflowNode -> {
             Map<String, Object> map = new HashMap<>(2);

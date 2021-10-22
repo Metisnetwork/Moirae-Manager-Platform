@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.WorkflowDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
+import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import com.platon.rosettaflow.mapper.domain.WorkflowTemp;
@@ -110,10 +111,16 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 启动工作流
-     *
      * @param workflowDto 启动工作流请求对象
      */
     void start(WorkflowDto workflowDto);
+
+    /**
+     * 获取运行日志
+     * @param workflowId
+     * @return 运行日志
+     */
+    List<TaskEventDto> getTaskEventList(Long workflowId);
 
     /**
      * 根据项目id及工作流模板添加工作流
