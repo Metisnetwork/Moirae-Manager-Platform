@@ -111,13 +111,15 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 启动工作流
+     *
      * @param workflowDto 启动工作流请求对象
      */
     void start(WorkflowDto workflowDto);
 
     /**
      * 获取运行日志
-     * @param workflowId
+     *
+     * @param workflowId 工作流id
      * @return 运行日志
      */
     List<TaskEventDto> getTaskEventList(Long workflowId);

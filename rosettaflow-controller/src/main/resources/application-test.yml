@@ -22,7 +22,7 @@ spring:
     scheduling:
       pool:
         size: 10
-      thread-name-prefix: RosettaFlow-Task-
+      thread-name-prefix: Moirae-Task-
 mybatis-plus:
   configuration:
     call-setters-on-nulls: true

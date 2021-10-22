@@ -470,12 +470,4 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
-
-    @Override
-    public List<String> getTaskIds(Long workflowId) {
-        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getId, workflowId);
-        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
-        return null;
-    }
 }

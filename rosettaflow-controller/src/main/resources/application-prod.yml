@@ -18,6 +18,11 @@ spring:
       connection-timeout: 3000
       max-lifetime: 1800000
       idle-timeout: 600000
+  task:
+    scheduling:
+      pool:
+        size: 10
+      thread-name-prefix: Moirae-Task-
 
 # 系统参数配置
 system:
