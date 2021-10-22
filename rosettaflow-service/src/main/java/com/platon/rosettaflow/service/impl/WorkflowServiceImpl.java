@@ -288,6 +288,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
         // 组装发布任务请求对象
         TaskDto taskDto = this.assemblyTaskDto(workflowDto);
+        log.info("开始启动工作流任务workflowId:{},任务名称：{}",taskDto.getWorkFlowNodeId(),taskDto.getTaskName());
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
         boolean isPublishSuccess = false;
@@ -296,6 +297,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             if (GrpcConstant.GRPC_SUCCESS_CODE == respDto.getStatus()) {
                 isPublishSuccess = true;
             }
+            log.info("工作流id:{},任务名称：{},rosettanet收到处理任务，返回的taskId：{}",taskDto.getWorkFlowNodeId(),taskDto.getTaskName(),respDto.getTaskId());
         } catch (Exception e) {
             log.error("publish task fail, task name:{}, work flow nodeId:{},error msg:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId(),e.getMessage(),e);
             if (workflowDto.isJobFlg()) {

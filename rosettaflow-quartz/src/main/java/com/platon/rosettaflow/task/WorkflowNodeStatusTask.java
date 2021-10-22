@@ -93,6 +93,7 @@ public class WorkflowNodeStatusTask {
             taskId = taskDetailResponseDto.getInformation().getTaskId();
             if (workflowNodeMap.containsKey(taskId)) {
                 node = workflowNodeMap.get(taskId);
+                log.info("工作流id:{},任务名称：{},taskId:{},rosettanet处理成功！", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     //如果是最后一个节点，需要更新整个工作流的状态为成功
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {

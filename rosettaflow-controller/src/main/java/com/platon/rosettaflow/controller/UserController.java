@@ -52,6 +52,7 @@ public class UserController {
     @PostMapping("login")
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
+        log.info("用户登录钱包地址:{},发起登录操作", loginInReq.getAddress());
         userService.checkNonceValidity(loginInReq.getSignMessage(), loginInReq.getAddress());
         boolean flg;
         try {
@@ -66,6 +67,7 @@ public class UserController {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getHrpAddress());
+        log.info("用户登录钱包地址:{},登录登录成功！", loginInReq.getAddress());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
     }
 
