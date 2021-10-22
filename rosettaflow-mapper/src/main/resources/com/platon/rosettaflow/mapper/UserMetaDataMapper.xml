@@ -79,7 +79,7 @@
 
     <insert id="batchInsert">
         <foreach collection="userMetaDataList" item="userMetaData" separator=";">
-            replace into t_user_meta_data
+            insert ignore into t_user_meta_data
             <trim prefix="(" suffix=")" suffixOverrides=",">
                 <if test="userMetaData.metaDataId != null">
                     meta_data_id,
