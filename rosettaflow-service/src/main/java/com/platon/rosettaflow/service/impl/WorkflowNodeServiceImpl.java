@@ -156,6 +156,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
             // 判断是否添加相同的算法
             if (algorithmIdSet.contains(workflowNodeDto.getAlgorithmId())) {
+                log.error("saveWorkflowNode--判断是否添加相同的算法--workflowNodeDto:{}", JSON.toJSONString(workflowNodeDto));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
             }
             algorithmIdSet.add(workflowNodeDto.getAlgorithmId());

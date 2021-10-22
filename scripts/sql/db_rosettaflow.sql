@@ -226,6 +226,7 @@ CREATE TABLE `t_algorithm` (
   `cost_gpu` int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
   `cost_bandwidth` bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
   `run_time` bigint(20) NOT NULL DEFAULT 3600000 COMMENT '所需的运行时长,默认1小时 (单位: ms)',
+  `store_pattern` tinyint(4) DEFAULT 1 COMMENT '输出存储形式: 1-明文，2:密文',
   `public_Flag` tinyint(4) NOT NULL DEFAULT 1 COMMENT '是否是公有算法: 0-否，1-是',
   `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1-有效',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

@@ -1,13 +1,12 @@
 package com.platon.rosettaflow.mapper.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * t_algorithm
@@ -86,6 +85,11 @@ public class Algorithm implements Serializable {
      * 所需的运行时长 (单位: ms)
      */
     private Long runTime;
+
+    /**
+     * 所需的运行时长 (单位: ms)
+     */
+    private Byte storePattern;
 
     /**
      * 是否是共有算法
