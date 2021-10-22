@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
-
 import static cn.hutool.core.date.DateTime.now;
 
 /**
@@ -267,11 +266,22 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Transactional(rollbackFor = RuntimeException.class)
     public void clearWorkflowNode(Long workflowId) {
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        if (Objects.isNull(workflow)) {
+            log.error("Workflow does not exist, workflowId:{}", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+        }
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
         List<WorkflowNode> workflowNodeList = getAllWorkflowNodeList(workflowId);
-        if (workflowNodeList == null || workflowNodeList.size() == 0) {
-            return;
+        if (Objects.isNull(workflowNodeList)|| workflowNodeList.isEmpty()) {
+            log.error("Workflow node does not exist, workflowId:{}", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
+        }
+        // 校验工作流状态是否运行中
+        boolean isExistNodeRunning = workflowNodeList.stream().anyMatch(workflowNode -> workflowNode.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue());
+        if(workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue() || isExistNodeRunning){
+            log.error("Workflow runStatus is running or workflow node exist runStatus is running,can not clear, workflowId:{}", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_CLEAR.getMsg());
         }
         // 物理删除当前工作流所有节点数据
         workflowService.deleteWorkflowAllNodeData(workflowId);
