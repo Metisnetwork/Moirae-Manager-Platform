@@ -297,7 +297,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 isPublishSuccess = true;
             }
         } catch (Exception e) {
-            log.error("publish task fail, task name:{}, work flow nodeId:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
+            log.error("publish task fail, task name:{}, work flow nodeId:{},error msg:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId(),e.getMessage(),e);
             if (workflowDto.isJobFlg()) {
                 // 更新子作业
                 this.updateSubJobInfo(workflowDto, false);

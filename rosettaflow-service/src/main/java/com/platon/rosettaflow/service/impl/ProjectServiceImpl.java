@@ -213,6 +213,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             projectMemberService.save(projectMember);
         } catch (DuplicateKeyException e) {
+            log.error("AddProjMember fail,reason:{}", e.getMessage(), e);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
     }
@@ -233,6 +234,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         try {
             projectMemberService.updateById(projectMember);
         } catch (DuplicateKeyException e) {
+            log.error("UpdateProjMember fail,reason:{}", e.getMessage(), e);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MEMBER_ROLE_EXISTED.getMsg());
         }
         // 新增新的项目成员角色缓存
@@ -310,6 +312,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private void checkAdminPermission(Long projectId) {
         Byte role = this.getRoleByProjectId(projectId);
         if (null != role && ProjectMemberRoleEnum.ADMIN.getRoleId() != role) {
+            log.error("checkAdminPermission fail,reason:{}", ErrorMsg.USER_ADMIN_PERMISSION_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_PERMISSION_ERROR.getMsg());
         }
     }

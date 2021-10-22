@@ -39,15 +39,13 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
             return new ArrayList<>();
         }
         List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
-        if (oldNodeOutputList.size() > 0) {
-            oldNodeOutputList.forEach(oldNodeOutput -> {
-                WorkflowNodeOutput newNodeOutput = new WorkflowNodeOutput();
-                newNodeOutput.setWorkflowNodeId(newNodeId);
-                newNodeOutput.setIdentityId(oldNodeOutput.getIdentityId());
-                newNodeOutput.setSenderFlag(oldNodeOutput.getSenderFlag());
-                newNodeOutputList.add(newNodeOutput);
-            });
-        }
+        oldNodeOutputList.forEach(oldNodeOutput -> {
+            WorkflowNodeOutput newNodeOutput = new WorkflowNodeOutput();
+            newNodeOutput.setWorkflowNodeId(newNodeId);
+            newNodeOutput.setIdentityId(oldNodeOutput.getIdentityId());
+            newNodeOutput.setSenderFlag(oldNodeOutput.getSenderFlag());
+            newNodeOutputList.add(newNodeOutput);
+        });
         return newNodeOutputList;
     }
 
