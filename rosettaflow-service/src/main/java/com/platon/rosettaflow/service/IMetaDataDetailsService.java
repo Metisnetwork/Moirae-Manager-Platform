@@ -22,8 +22,8 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * 根据元数据metaDataId获取元数据 columnList
      *
      * @param metaDataId 元数据id
-     * @param current 元数据详情中列数据当前页
-     * @param size    元数据详情中列数据每页大小
+     * @param current    元数据详情中列数据当前页
+     * @param size       元数据详情中列数据每页大小
      * @return 元数据列详情列表
      */
     IPage<MetaDataDetailsDto> findByMetaDataId(String metaDataId, Long current, Long size);
@@ -31,7 +31,7 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
     /**
      * 根据id获取元数据详情
      *
-     * @param id 元数据详情表id
+     * @param id      元数据详情表id
      * @param current 元数据详情中列数据当前页
      * @param size    元数据详情中列数据每页大小
      * @return 元数据列详情列表
@@ -40,6 +40,7 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
 
     /**
      * 获取用户授权元数据列详情列表
+     *
      * @param metaDataId 元数据id
      * @return 授权元数据列表
      */
@@ -47,6 +48,7 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
 
     /**
      * 批量插入列表
+     *
      * @param metaDataDetailsList 插入列表集合
      * @return 插入记录数
      */
@@ -54,8 +56,17 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
 
     /**
      * 根据元数据列id获取元数据列详情
+     *
      * @param id 元数据列id
      * @return 元数据列详情
      */
     MetaDataDetails getColumnIndexById(Long id);
+
+    /**
+     * 根据t_meta_data_details表id数组查询所有的索引列信息
+     *
+     * @param columnIdsArr id数组
+     * @return 索引列集合
+     */
+    List<Integer> getColumnIndexByIds(Object[] columnIdsArr);
 }

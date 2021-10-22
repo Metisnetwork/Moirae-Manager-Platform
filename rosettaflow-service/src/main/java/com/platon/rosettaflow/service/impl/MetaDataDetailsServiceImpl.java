@@ -15,6 +15,7 @@ import com.platon.rosettaflow.service.IMetaDataDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,6 +70,15 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
         wrapper.eq(MetaDataDetails::getStatus, StatusEnum.VALID.getValue());
         MetaDataDetails mtaDataDetails = this.getOne(wrapper);
         return mtaDataDetails == null ? new MetaDataDetails() : mtaDataDetails;
+    }
+
+    @Override
+    public List<Integer> getColumnIndexByIds(Object[] columnIdsArr) {
+        List<Integer> columnIndexList = new ArrayList<>();
+        LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(MetaDataDetails::getId, columnIdsArr);
+        this.list(wrapper).forEach(m -> columnIndexList.add(m.getColumnIndex()));
+        return columnIndexList;
     }
 
     private LambdaQueryWrapper<MetaDataDetails> getQueryWrapper(String metaDataId, Long id) {

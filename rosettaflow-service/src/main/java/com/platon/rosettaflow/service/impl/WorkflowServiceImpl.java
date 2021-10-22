@@ -2,7 +2,6 @@ package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -298,7 +297,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 isPublishSuccess = true;
             }
         } catch (Exception e) {
-            log.error("publish task fail, task name:{}, work flow nodeId:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId());
+            log.error("publish task fail, task name:{}, work flow nodeId:{},error msg:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId(),e.getMessage(),e);
             if (workflowDto.isJobFlg()) {
                 // 更新子作业
                 this.updateSubJobInfo(workflowDto, false);
@@ -437,17 +436,22 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (workflowDto.getStartNode() > 1) {
             preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
             if (null == preTaskResult) {
+                log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
             }
         }
 
         //获取工作流节点输入信息
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+        if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
+            log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
+        }
 
         //获取工作流节点输出信息
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
 
-        //获取工作流节点自变量及因变量
+        //获取工作流节点自变量及因变量(这期没有些功能)
 //        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
 
         //工作流节点资源表
@@ -504,7 +508,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         this.update(updateWrapper);
     }
 
-
     /**
      * 更新子作业
      *
@@ -546,7 +549,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
         WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeResource) {
@@ -579,7 +581,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             // 把可变参数进行替换
             log.info("jsonStruct.getStruct() is:{}", struct);
             if (!JsonUtils.isJson(struct)) {
-                log.error("WorkflowServiceImpl->getContractExtraParams,{}",ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
+                log.error("WorkflowServiceImpl->getContractExtraParams,{}", ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
             }
             JSONObject jsonObject = JSON.parseObject(struct);
@@ -668,19 +670,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
             taskMetaDataDeclareDto.setMetaDataId(input.getDataTableId());
 
-            List<Integer> selectedColumns = new ArrayList<>();
             String[] columnIdsArr = input.getDataColumnIds().split(",");
-
+            if (columnIdsArr.length < 1) {
+                log.error("WorkflowServiceImpl->getDataSupplierList 获取当前工作流节点索引列不存在");
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_INDEX_COLUMN_NOT_EXIST.getMsg());
+            }
+            List<Integer> columnIndexList = metaDataDetailsService.getColumnIndexByIds(columnIdsArr);
 
             if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
                 taskMetaDataDeclareDto.setKeyColumn(
                         metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
             }
-            for (String s : columnIdsArr) {
-                if (StrUtil.isNotBlank(s)) {
-                    selectedColumns.add(Integer.valueOf(s.trim()));
-                }
-            }
+            List<Integer> selectedColumns = new ArrayList<>(columnIndexList);
 
             taskMetaDataDeclareDto.setSelectedColumns(selectedColumns);
 
@@ -745,6 +746,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private void checkEditPermission(Long projectId) {
         Byte role = projectService.getRoleByProjectId(projectId);
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
+            log.error("checkEditPermission error:{}", ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
     }

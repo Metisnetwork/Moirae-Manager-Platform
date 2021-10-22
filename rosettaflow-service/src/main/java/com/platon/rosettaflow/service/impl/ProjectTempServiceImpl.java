@@ -66,11 +66,13 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
 
         Workflow workflow = workflowService.getById(workflowId);
         if (null == workflow) {
+            log.error("addProjectTemplate fail,reason:{}", ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
 
         Project project = projectService.getById(workflow.getProjectId());
         if (null == project) {
+            log.error("addProjectTemplate fail,reason:{}", ErrorMsg.PROJECT_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_NOT_EXIST.getMsg());
         }
 
@@ -123,6 +125,7 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         try {
             this.save(projectTemp);
         } catch (Exception e) {
+            log.error("addProjectTemplate fail,reason:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.PROJECT_TEMPLATE_NAME_EXISTED.getMsg());
             }

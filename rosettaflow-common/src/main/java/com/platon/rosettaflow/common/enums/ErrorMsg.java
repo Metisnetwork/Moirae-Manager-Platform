@@ -74,6 +74,7 @@ public enum ErrorMsg {
     WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
     WORKFLOW_TERMINATE_NET_PROCESS_ERROR("工作流终止失败", "Workflow terminated failed"),
     WORKFLOW_END_NODE_OVERFLOW("截止节点不能大于工作流最大节点数", "EndNode can not more than workflow nodeNumber"),
+    WORKFLOW_NOT_CLEAR("工作流不能清空，存在正在运行的工作流", "Workflow can not clear,workflow is running"),
     WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "Workflow node does not exist"),
     WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "Workflow node not cached"),
     WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported"),
@@ -84,6 +85,8 @@ public enum ErrorMsg {
     WORKFLOW_NODE_NOT_RESOURCE_EXIST("工作流节点环境未配置", "Workflow node environment is not configured"),
     WORKFLOW_PRE_TASK_RESULT_NOT_EXIST("工作流前一个节点运行节点获取失败", "Workflow pre task result not exist"),
     WORKFLOW_NODE_RUNNING_FAIL("工作流节点运行失败!", "The workflow node failed to run!"),
+    WORKFLOW_INDEX_COLUMN_NOT_EXIST("工作流节点索引列不存在", "Workflow node index column not exist"),
+    WORKFLOW_NODE_INPUT_NOT_EXIST("工作流节点输入不存在", "Workflow node input not exist"),
 
     /**
      * 作业
