@@ -111,4 +111,12 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @return 工作流节点
      */
     WorkflowNode getWorkflowNodeById(Long id);
+
+    /**
+     * 获取所有运行成功的节点taskId列表
+     *
+     * @param workflowId 工作流主键id
+     * @return 运行中节点列表
+     */
+    List<String> getTaskIds(Long workflowId);
 }
