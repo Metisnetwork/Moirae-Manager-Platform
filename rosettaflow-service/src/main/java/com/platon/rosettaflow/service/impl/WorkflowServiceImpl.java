@@ -2,7 +2,6 @@ package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -504,7 +503,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         this.update(updateWrapper);
     }
 
-
     /**
      * 更新子作业
      *
@@ -546,7 +544,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
-
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
         WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeResource) {
@@ -579,7 +576,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             // 把可变参数进行替换
             log.info("jsonStruct.getStruct() is:{}", struct);
             if (!JsonUtils.isJson(struct)) {
-                log.error("WorkflowServiceImpl->getContractExtraParams,{}",ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
+                log.error("WorkflowServiceImpl->getContractExtraParams,{}", ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_VARIABLE_STRUCT_ERROR.getMsg());
             }
             JSONObject jsonObject = JSON.parseObject(struct);
@@ -668,19 +665,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
             taskMetaDataDeclareDto.setMetaDataId(input.getDataTableId());
 
-            List<Integer> selectedColumns = new ArrayList<>();
             String[] columnIdsArr = input.getDataColumnIds().split(",");
-
+            if (columnIdsArr.length < 1) {
+                log.error("WorkflowServiceImpl->getDataSupplierList 获取当前工作流节点索引列不存在");
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_INDEX_COLUMN_NOT_EXIST.getMsg());
+            }
+            List<Integer> columnIndexList = metaDataDetailsService.getColumnIndexByIds(columnIdsArr);
 
             if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
                 taskMetaDataDeclareDto.setKeyColumn(
                         metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
             }
-            for (String s : columnIdsArr) {
-                if (StrUtil.isNotBlank(s)) {
-                    selectedColumns.add(Integer.valueOf(s.trim()));
-                }
-            }
+            List<Integer> selectedColumns = new ArrayList<>(columnIndexList);
 
             taskMetaDataDeclareDto.setSelectedColumns(selectedColumns);
 

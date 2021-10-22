@@ -84,6 +84,7 @@ public enum ErrorMsg {
     WORKFLOW_NODE_NOT_RESOURCE_EXIST("工作流节点环境未配置", "Workflow node environment is not configured"),
     WORKFLOW_PRE_TASK_RESULT_NOT_EXIST("工作流前一个节点运行节点获取失败", "Workflow pre task result not exist"),
     WORKFLOW_NODE_RUNNING_FAIL("工作流节点运行失败!", "The workflow node failed to run!"),
+    WORKFLOW_INDEX_COLUMN_NOT_EXIST("工作流节点索引列不存在", "Workflow node index column not exist"),
 
     /**
      * 作业
