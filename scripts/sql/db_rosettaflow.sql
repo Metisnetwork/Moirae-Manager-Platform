@@ -395,7 +395,7 @@ CREATE TABLE `t_workflow_node_input` (
   `data_table_id` varchar(128) DEFAULT NULL COMMENT '数据表ID',
   `key_column` bigint(20) DEFAULT NULL COMMENT 'ID列(列索引)(存id值)',
   `dependent_variable` bigint(20) DEFAULT NULL COMMENT '因变量(标签)(存id值)',
-  `data_column_ids` varchar(128) DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
+  `data_column_ids` varchar(1024) DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
   `data_file_id` varchar(128) DEFAULT NULL COMMENT '数据文件id',
   `sender_flag` tinyint(4) DEFAULT NULL COMMENT '是否发起方: 0-否,1-是',
   `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',

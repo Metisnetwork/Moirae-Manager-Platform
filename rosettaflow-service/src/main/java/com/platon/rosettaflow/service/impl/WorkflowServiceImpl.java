@@ -436,17 +436,22 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (workflowDto.getStartNode() > 1) {
             preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
             if (null == preTaskResult) {
+                log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
             }
         }
 
         //获取工作流节点输入信息
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+        if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
+            log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
+        }
 
         //获取工作流节点输出信息
         List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
 
-        //获取工作流节点自变量及因变量
+        //获取工作流节点自变量及因变量(这期没有些功能)
 //        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.getByWorkflowNodeId(workflowNode.getId());
 
         //工作流节点资源表
@@ -741,6 +746,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private void checkEditPermission(Long projectId) {
         Byte role = projectService.getRoleByProjectId(projectId);
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
+            log.error("checkEditPermission error:{}", ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
         }
     }

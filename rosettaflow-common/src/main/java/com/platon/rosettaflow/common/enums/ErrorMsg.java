@@ -85,6 +85,7 @@ public enum ErrorMsg {
     WORKFLOW_PRE_TASK_RESULT_NOT_EXIST("工作流前一个节点运行节点获取失败", "Workflow pre task result not exist"),
     WORKFLOW_NODE_RUNNING_FAIL("工作流节点运行失败!", "The workflow node failed to run!"),
     WORKFLOW_INDEX_COLUMN_NOT_EXIST("工作流节点索引列不存在", "Workflow node index column not exist"),
+    WORKFLOW_NODE_INPUT_NOT_EXIST("工作流节点输入不存在", "Workflow node input not exist"),
 
     /**
      * 作业
