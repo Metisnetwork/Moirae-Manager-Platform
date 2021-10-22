@@ -20,7 +20,7 @@ public class WorkflowNodeOutputReq {
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
 
-    @ApiModelProperty(value = "存储形式: 1-明文，2:密文(默认为1)")
+    @ApiModelProperty(value = "存储形式: 1-明文，2:密文")
     private Integer storePattern;
 
     @ApiModelProperty(value = "存储路径")

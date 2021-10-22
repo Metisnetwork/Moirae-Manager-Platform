@@ -2,8 +2,6 @@ package com.platon.rosettaflow.dto;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 /**
  * @author houz
  */
@@ -79,6 +77,11 @@ public class AlgorithmDto {
      * 所需的运行时长 (单位: ms)
      */
     private Long runTime;
+
+    /**
+     * 输出存储形式: 1-明文，2:密文
+     */
+    private Byte  storePattern;
 
     /**
      * 代码类型

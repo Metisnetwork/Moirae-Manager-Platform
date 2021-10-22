@@ -61,6 +61,9 @@ public class NodeAlgorithmVo {
     @ApiModelProperty(value = "所需的运行时长 (单位: h)")
     private Long runTime;
 
+    @ApiModelProperty(value = "输出存储形式: 1-明文，2:密文")
+    private Byte storePattern;
+
 
 
     /** 展示时处理内存单位 */
