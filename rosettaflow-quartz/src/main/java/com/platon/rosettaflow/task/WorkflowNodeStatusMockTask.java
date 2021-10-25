@@ -25,10 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -150,10 +147,11 @@ public class WorkflowNodeStatusMockTask {
     private List<TaskDetailResponseDto> getMockResponse(Map<String, WorkflowNode> workflowNodeMap) {
         List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
         TaskDetailResponseDto taskDetailResponseDto;
-        for (int i = 0; i < workflowNodeMap.keySet().size(); i++) {
+        Set<String> taskIds = workflowNodeMap.keySet();
+        for (String taskId : taskIds) {
             taskDetailResponseDto = new TaskDetailResponseDto();
             TaskDetailShowDto taskDetailShowDto = new TaskDetailShowDto();
-            taskDetailShowDto.setTaskId(UUID.randomUUID().toString());
+            taskDetailShowDto.setTaskId(taskId);
             taskDetailShowDto.setState(TaskRunningStatusEnum.SUCCESS.getValue());
             taskDetailResponseDto.setInformation(taskDetailShowDto);
             taskDetailResponseDtoList.add(taskDetailResponseDto);
