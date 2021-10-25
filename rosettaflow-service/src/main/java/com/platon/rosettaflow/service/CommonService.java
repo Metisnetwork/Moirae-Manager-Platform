@@ -18,7 +18,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class CommonService {
-    static final String DATE_TIME_FMT = "yyyyMMddHHmmss";
+    static final String DATE_TIME_FMT = "yyyyMMddHHmmssSSS";
     static final String TASK_NAME_PRE = "task_";
 
     /**
@@ -47,5 +47,9 @@ public class CommonService {
             throw new BusinessException(RespCodeEnum.UN_LOGIN);
         }
         return currentUser;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(DateUtil.format(new Date(), DATE_TIME_FMT));
     }
 }

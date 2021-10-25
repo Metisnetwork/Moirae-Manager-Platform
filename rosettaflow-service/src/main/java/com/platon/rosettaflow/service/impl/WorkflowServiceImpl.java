@@ -289,7 +289,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
         // 组装发布任务请求对象
         TaskDto taskDto = this.assemblyTaskDto(workflowDto);
-        log.info("开始启动工作流任务workflowId:{},任务名称：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName());
+        log.info("开始启动工作流任务workflowId:{},任务名称：{},请求数据为：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName(), JSON.toJSONString(taskDto));
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
         boolean isPublishSuccess = false;
@@ -695,12 +695,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             }
             List<Integer> columnIndexList = metaDataDetailsService.getColumnIndexByIds(columnIdsArr);
 
-            if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
-                taskMetaDataDeclareDto.setKeyColumn(
-                        metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
-            }
-            List<Integer> selectedColumns = new ArrayList<>(columnIndexList);
+            taskMetaDataDeclareDto.setKeyColumn(metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
 
+            List<Integer> selectedColumns = new ArrayList<>(columnIndexList);
             taskMetaDataDeclareDto.setSelectedColumns(selectedColumns);
 
             taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
@@ -737,7 +734,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
                 OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
                 Organization organization = organizationService.getByIdentityId(workflowNodeInput.getIdentityId());
-                sender.setPartyId(workflowNodeInput.getPartyId());
+                sender.setPartyId("s0");
                 sender.setNodeName(organization.getNodeName());
                 sender.setNodeId(organization.getNodeId());
                 sender.setIdentityId(workflowNodeInput.getIdentityId());
@@ -751,7 +748,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender) {
         OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
-        algoSupplier.setPartyId(sender.getPartyId());
+        algoSupplier.setPartyId("A0");
         algoSupplier.setNodeName(sender.getNodeName());
         algoSupplier.setNodeId(sender.getNodeId());
         algoSupplier.setIdentityId(sender.getIdentityId());

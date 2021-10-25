@@ -275,7 +275,6 @@ public class TaskServiceClient {
         //task_name
         PublishTaskDeclareRequest.Builder publishTaskDeclareRequestBuilder = PublishTaskDeclareRequest.newBuilder()
                 .setTaskName(taskDto.getTaskName());
-
         // 发起任务的用户的信息 (task是属于用户的)
         publishTaskDeclareRequestBuilder.setUser(taskDto.getUser());
         //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
@@ -296,7 +295,6 @@ public class TaskServiceClient {
                 .setIdentityId(taskDto.getAlgoSupplier().getIdentityId())
                 .build();
         publishTaskDeclareRequestBuilder.setAlgoSupplier(algoSupplier);
-
         // data_supplier
         TaskDataSupplierDeclareDto dataSupplierDeclareDto;
         for (int i = 0; i < taskDto.getTaskDataSupplierDeclareDtoList().size(); i++) {
@@ -308,7 +306,6 @@ public class TaskServiceClient {
                     .setNodeId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getNodeId())
                     .setIdentityId(dataSupplierDeclareDto.getTaskOrganizationIdentityInfoDto().getIdentityId())
                     .build();
-
             //meta_data_info
             TaskMetadataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetadataDeclare.newBuilder()
                     .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
@@ -324,12 +321,10 @@ public class TaskServiceClient {
 
             publishTaskDeclareRequestBuilder.addDataSuppliers(taskDataSupplierDeclare);
         }
-
         //power_party_ids
         for (int i = 0; i < taskDto.getPowerPartyIds().size(); i++) {
             publishTaskDeclareRequestBuilder.addPowerPartyIds(taskDto.getPowerPartyIds().get(i));
         }
-
         //receivers
         TaskOrganization receiver;
         OrganizationIdentityInfoDto receiverDto;
@@ -343,7 +338,6 @@ public class TaskServiceClient {
                     .build();
             publishTaskDeclareRequestBuilder.addReceivers(receiver);
         }
-
         //任务所需资源声明
         TaskResourceCostDeclare resourceCostBuilder = TaskResourceCostDeclare.newBuilder()
                 .setMemory(taskDto.getResourceCostDeclareDto().getMemory())
@@ -352,7 +346,6 @@ public class TaskServiceClient {
                 .setDuration(taskDto.getResourceCostDeclareDto().getDuration())
                 .build();
         publishTaskDeclareRequestBuilder.setOperationCost(resourceCostBuilder);
-
         //  计算合约代码
         publishTaskDeclareRequestBuilder.setCalculateContractCode(taskDto.getCalculateContractCode());
         //  数据分片合约代码
@@ -365,7 +358,7 @@ public class TaskServiceClient {
         publishTaskDeclareRequestBuilder.setSign(ByteString.copyFromUtf8(taskDto.getSign()));
         //任务描述 (非必须)
         publishTaskDeclareRequestBuilder.setDesc(taskDto.getDesc());
-
+        log.info("发布任务请求json数据>>>{}", publishTaskDeclareRequestBuilder.build());
         return publishTaskDeclareRequestBuilder.build();
     }
 
