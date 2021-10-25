@@ -51,7 +51,7 @@ public class SyncUserDataAuthTask {
                 return;
             }
         } catch (Exception e) {
-            log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage());
+            log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage(), e);
             return;
         }
 

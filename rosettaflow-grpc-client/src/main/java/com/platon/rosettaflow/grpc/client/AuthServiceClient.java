@@ -63,12 +63,14 @@ public class AuthServiceClient {
         metaDataUsageBuilder.setUsageTypeValue(requestDto.getAuth().getMetaDataUsageDto().getUseType());
         if (requestDto.getAuth().getMetaDataUsageDto().getUseType() == MetaDataUsageEnum.PERIOD.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getStartAt() == null || requestDto.getAuth().getMetaDataUsageDto().getEndAt() == null) {
+                log.error("AuthServiceClient->applyMetaDataAuthority() fail reason:{}", ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
             }
             metaDataUsageBuilder.setStartAt(requestDto.getAuth().getMetaDataUsageDto().getStartAt());
             metaDataUsageBuilder.setEndAt(requestDto.getAuth().getMetaDataUsageDto().getEndAt());
         } else if (requestDto.getAuth().getMetaDataUsageDto().getUseType() == MetaDataUsageEnum.TIMES.getValue()) {
             if (requestDto.getAuth().getMetaDataUsageDto().getTimes() == null) {
+                log.error("AuthServiceClient->applyMetaDataAuthority() fail reason:{}", ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.APPLY_METADATA_USAGE_TYPE_ERROR.getMsg());
             }
             metaDataUsageBuilder.setTimes(requestDto.getAuth().getMetaDataUsageDto().getTimes());
@@ -83,6 +85,7 @@ public class AuthServiceClient {
         ApplyMetadataAuthorityResponse applyMetaDataAuthorityResponse = authServiceBlockingStub.applyMetadataAuthority(applyMetaDataAuthorityRequest.build());
 
         if (applyMetaDataAuthorityResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("AuthServiceClient->applyMetaDataAuthority() fail reason:{}", applyMetaDataAuthorityResponse.getMsg());
             throw new BusinessException(applyMetaDataAuthorityResponse.getStatus(), applyMetaDataAuthorityResponse.getMsg());
         }
 
@@ -194,6 +197,7 @@ public class AuthServiceClient {
         GetNodeIdentityResponse nodeIdentity = authServiceBlockingStub.getNodeIdentity(empty);
 
         if (nodeIdentity.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("AuthServiceClient->getNodeIdentity() fail reason:{}", nodeIdentity.getMsg());
             throw new BusinessException(nodeIdentity.getStatus(), nodeIdentity.getMsg());
         }
 
@@ -212,6 +216,7 @@ public class AuthServiceClient {
         GetIdentityListResponse getIdentityListResponse = authServiceBlockingStub.getIdentityList(empty);
 
         if (getIdentityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("AuthServiceClient->getIdentityList() fail reason:{}", getIdentityListResponse.getMsg());
             throw new BusinessException(getIdentityListResponse.getStatus(), getIdentityListResponse.getMsg());
         }
 

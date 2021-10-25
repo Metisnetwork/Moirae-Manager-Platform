@@ -40,6 +40,7 @@ public class TaskServiceClient {
     public PublishTaskDeclareResponseDto syncPublishTask(TaskDto taskDto) {
         PublishTaskDeclareResponse taskDeclareResponse = taskServiceBlockingStub.publishTaskDeclare(assemblyPublishTaskDeclareRequest(taskDto));
         if (taskDeclareResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("TaskServiceClient->syncPublishTask() fail reason:{}", taskDeclareResponse.getMsg());
             throw new BusinessException(taskDeclareResponse.getStatus(), taskDeclareResponse.getMsg());
         }
         PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = new PublishTaskDeclareResponseDto();
@@ -83,6 +84,7 @@ public class TaskServiceClient {
         GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(empty);
 
         if (getTaskDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("TaskServiceClient->getTaskDetailList() fail reason:{}", getTaskDetailListResponse.getMsg());
             throw new BusinessException(getTaskDetailListResponse.getStatus(), getTaskDetailListResponse.getMsg());
         }
 

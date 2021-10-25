@@ -55,6 +55,7 @@ public class MetaDataServiceClient {
         Empty empty = Empty.newBuilder().build();
         GetLocalMetadataDetailListResponse getSelfMetadataDetailListResponse = metaDataServiceBlockingStub.getLocalMetadataDetailList(empty);
         if (getSelfMetadataDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("MetaDataServiceClient->getLocalMetadataDetailList() fail reason:{}", getSelfMetadataDetailListResponse.getMsg());
             throw new BusinessException(getSelfMetadataDetailListResponse.getStatus(), getSelfMetadataDetailListResponse.getMsg());
         }
 
@@ -92,6 +93,7 @@ public class MetaDataServiceClient {
 
     private void processRespList(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, GetGlobalMetadataDetailListResponse metaDataDetailListResponse) {
         if (metaDataDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("MetaDataServiceClient->processRespList() fail reason:{}", metaDataDetailListResponse.getMsg());
             throw new BusinessException(metaDataDetailListResponse.getStatus(), metaDataDetailListResponse.getMsg());
         }
 

@@ -53,7 +53,7 @@ public class SyncMetaDataTask {
         try {
             metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
         } catch (Exception e) {
-            log.error("从net同步元数据失败,失败原因：{}", e.getMessage());
+            log.error("从net同步元数据失败,失败原因：{}", e.getMessage(), e);
             return;
         }
 
@@ -130,6 +130,7 @@ public class SyncMetaDataTask {
         metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
         //元数据id为空不入库
         if (StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())) {
+            log.error("MetaDataId is null jump over");
             return null;
         }
         metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
