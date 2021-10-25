@@ -90,6 +90,15 @@ public class SyncSubJobNodeStatusMockTask {
             if (subJobNodeMap.containsKey(taskId)) {
                 node = subJobNodeMap.get(taskId);
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
+                    //获取待保存任务结果数据
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                    if (Objects.isNull(taskResultResponseDto)) {
+                        log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
+                        return;
+                    }
+                    TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
+                    saveTaskResultList.add(taskResult);
+
                     //如果是最后一个节点，需要更新整个子作业状态成功
                     if (node.getNodeStep().equals(node.getNodeNumber())) {
                         subJobSuccessIds.add(node.getSubJobId());
@@ -97,14 +106,15 @@ public class SyncSubJobNodeStatusMockTask {
                         //如果有下一个节点，则启动下一个节点
                         Object workflowDtoJson = redissonObject.getValue(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
                         if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
+                            //前一个节点taskId
                             WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
+                            workflowDto.setPreTaskId(taskId);
+                            workflowDto.setPreTaskResult(taskResult);
                             workflowService.start(workflowDto);
                         }
                     }
                     subJobNodeSuccessIds.add(node.getId());
-                    //获取待保存任务结果数据
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
-                    saveTaskResultList.add(BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class));
+
                 } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个子作业状态失败
                     if (node.getNodeStep().equals(node.getNodeNumber())) {
