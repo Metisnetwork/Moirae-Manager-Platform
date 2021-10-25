@@ -221,6 +221,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         return this.list(wrapper);
     }
 
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public void deleteBatchJob(List<Long> ids) {
         if (ids.isEmpty()) {
@@ -239,25 +240,37 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_DELETE.getMsg());
         }
         //检查子作业是否存在运行中
+        Object[] subJobArrayIds = null;
         List<SubJob> subJobList = subJobService.queryBatchSubJobListByJobId(ids);
-        Object[] subJobArrayIds = subJobList.stream().map(SubJob::getId).toArray();
-        boolean isExistRunningSubJob = subJobList.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
-        if (isExistRunningSubJob) {
-            log.error(ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+        if(!Objects.isNull(subJobList) && !subJobList.isEmpty()){
+            subJobArrayIds = subJobList.stream().map(SubJob::getId).toArray();
+            boolean isExistRunningSubJob = subJobList.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
+            if (isExistRunningSubJob) {
+                log.error(ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+            }
         }
         //检查子作业节点是否存在运行中节点
-        List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(subJobArrayIds);
-        Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
-        boolean isExistRunningSubJobNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobNodeStatusEnum.RUNNING.getValue());
-        if (isExistRunningSubJobNode) {
-            log.error(ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
+        Object[] subJobNodeArrayIds = null;
+        if(!Objects.isNull(subJobArrayIds) && subJobArrayIds.length > 0){
+            List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(subJobArrayIds);
+            subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
+            boolean isExistRunningSubJobNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobNodeStatusEnum.RUNNING.getValue());
+            if (isExistRunningSubJobNode) {
+                log.error(ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NODE_NOT_DELETE.getMsg());
+            }
         }
         //批量更新作业、子作业、子作业节点有效状态
-        this.updateBatchStatus(ids.toArray(), StatusEnum.UN_VALID.getValue());
-        subJobService.updateBatchStatus(subJobArrayIds, StatusEnum.UN_VALID.getValue());
-        subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
+        if(!Objects.isNull(ids.toArray()) && ids.toArray().length > 0){
+            this.updateBatchStatus(ids.toArray(), StatusEnum.UN_VALID.getValue());
+        }
+        if(!Objects.isNull(subJobArrayIds) && subJobArrayIds.length > 0){
+            subJobService.updateBatchStatus(subJobArrayIds, StatusEnum.UN_VALID.getValue());
+        }
+        if(!Objects.isNull(subJobNodeArrayIds) && subJobNodeArrayIds.length > 0){
+            subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
+        }
     }
 
     /**

@@ -462,7 +462,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //获取工作流节点输入信息
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
-            log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
+            log.error("Start workflow->assemblyTaskDto getByWorkflowNodeId fail by id:{}", workflowNode.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
         }
 

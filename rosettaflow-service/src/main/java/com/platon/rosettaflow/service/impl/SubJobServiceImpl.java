@@ -25,6 +25,7 @@ import com.platon.rosettaflow.service.ISubJobService;
 import com.platon.rosettaflow.service.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -179,6 +180,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
     }
 
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public void deleteBatchSubJob(List<Long> ids) {
         if (ids.isEmpty()) {
@@ -197,11 +199,14 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
         }
         //子作业节点是否存在运行中节点
-        List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(ids.toArray());
-        boolean isRunningNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobStatusEnum.RUNNING.getValue());
-        if (isRunningNode) {
-            log.error(ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+        List<SubJobNode> subJobNodeList = null;
+        if (!ids.isEmpty()) {
+            subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(ids.toArray());
+            boolean isRunningNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobStatusEnum.RUNNING.getValue());
+            if (isRunningNode) {
+                log.error(ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_NOT_DELETE.getMsg());
+            }
         }
         //批量更新子作业状态
         LambdaUpdateWrapper<SubJob> updateSubJobWrapper = Wrappers.lambdaUpdate();
@@ -210,8 +215,10 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         updateSubJobWrapper.in(SubJob::getId, ids);
         this.update(updateSubJobWrapper);
         //批量更新子作业节点状态
-        Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
-        subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
+        if(!Objects.isNull(subJobNodeList) && !subJobNodeList.isEmpty()){
+            Object[] subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
+            subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
+        }
     }
 
 
