@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.dto;
 
+import com.platon.rosettaflow.mapper.domain.TaskResult;
 import com.platon.rosettaflow.mapper.domain.Workflow;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -60,5 +61,9 @@ public class WorkflowDto extends Workflow {
      * 工作流前一个节点执行的taskId
      */
     private String preTaskId;
+    /**
+     * 上一个节点运行结果
+     */
+    private TaskResult preTaskResult;
 
 }

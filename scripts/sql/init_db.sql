@@ -14,8 +14,8 @@ INSERT INTO `t_workflow_temp` VALUES ('1', '1', '协同营销对应工作流', '
 -- init t_algorithm
 -- ----------------------------
 TRUNCATE t_algorithm;
-INSERT INTO `t_algorithm` VALUES ('1', '逻辑回归训练', 'lr_train.py用于做逻辑回归训练', '春明提供支持', '3', '3', 'python', 'window,linux,mac', '3', '8589934592', '2', '4', '20000000', '108', '1', '1', now(), now());
-INSERT INTO `t_algorithm` VALUES ('2', '分类模型预测', 'lr_predict.py用于做逻辑回归预测', '春明提供支持', '3', '3', 'python', 'window,linux,mac', '3', '8589934592', '4', '4', '10000000', '500', '1', '1', now(), now());
+INSERT INTO `t_algorithm` VALUES ('1', '逻辑回归训练', 'lr_train.py用于做逻辑回归训练', '春明提供支持', '3', '1', 'python', 'window,linux,mac', '3', '8589934592', '2', '4', '20000000', '108', '1', '1', '1', now(), now());
+INSERT INTO `t_algorithm` VALUES ('2', '分类模型预测', 'lr_predict.py用于做逻辑回归预测', '春明提供支持', '3', '1', 'python', 'window,linux,mac', '3', '8589934592', '4', '4', '10000000', '500', '1', '1', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm_code

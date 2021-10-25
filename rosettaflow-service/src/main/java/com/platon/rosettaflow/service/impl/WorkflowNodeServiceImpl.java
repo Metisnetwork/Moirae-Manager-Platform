@@ -161,7 +161,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             }
             algorithmIdSet.add(workflowNodeDto.getAlgorithmId());
             // 保存工作流节点
-            Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, count, workflowNodeDtoList.size());
+            Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, ++count, workflowNodeDtoList.size());
             // 拼装工作流节点输入
             workflowNodeInputList.addAll(this.assemblyNodeInput(workflowNodeId, workflowNodeDto));
             // 拼装工作流节点输出
@@ -196,7 +196,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowNode.setNodeName(workflowNodeDto.getNodeName());
         workflowNode.setAlgorithmId(workflowNodeDto.getAlgorithmId());
         workflowNode.setNodeStep(workflowNodeDto.getNodeStep());
-        if (++count == listSize) {
+        if (count == listSize) {
             // 将最后一个节点步骤的下一节点步骤字段值置空
             workflowNode.setNextNodeStep(null);
         } else {

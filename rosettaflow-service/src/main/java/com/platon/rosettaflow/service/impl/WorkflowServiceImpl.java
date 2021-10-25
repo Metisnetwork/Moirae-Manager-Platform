@@ -282,7 +282,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
         // 保存用户和地址及签名并更新工作流状态为运行中
-        if (!workflowDto.isJobFlg()) {
+        if (!workflowDto.isJobFlg() && workflowDto.getStartNode() == 1) {
             this.updateSign(workflowDto);
         }
 
@@ -335,7 +335,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
             workflowDto.setTaskId(workflowNode.getTaskId());
             String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
-            redissonObject.setValue(taskKey + workflowDto.getTaskId(), JSON.toJSONString(workflowDto));
+            redissonObject.setValue(taskKey + workflowDto.getTaskId(), workflowDto);
         }
     }
 
@@ -450,14 +450,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
 
         //如果不是第一个节点，调用net,获取前一个节点的计算结果
-        TaskResult preTaskResult = null;
-        if (workflowDto.getStartNode() > 1) {
-            preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
-            if (null == preTaskResult) {
-                log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
-            }
-        }
+//        TaskResult preTaskResult = null;
+//        if (workflowDto.getStartNode() > 1) {
+//            preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
+//            if (null == preTaskResult) {
+//                log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
+//                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
+//            }
+//        }
 
         //获取工作流节点输入信息
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
@@ -498,7 +498,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 算力提供方 暂定三方
         taskDto.setPowerPartyIds(getPowerPartyIds());
         //数据提供方
-        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap, preTaskResult));
+        taskDto.setTaskDataSupplierDeclareDtoList(getDataSupplierList(workflowNodeInputList, organizationMap, workflowDto.getPreTaskResult()));
         //任务结果接受者
         taskDto.setTaskResultReceiverDeclareDtoList(getReceivers(workflowNodeOutputList, organizationMap));
         // 任务需要花费的资源声明
@@ -508,7 +508,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
         //合约调用的额外可变入参 (json 字符串, 根据算法来)
-        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), preTaskResult, workflowNodeInputList));
+        taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowDto.getPreTaskResult(), workflowNodeInputList));
         //发起任务的账户的签名
         taskDto.setSign(workflowDto.getSign());
         //任务描述 (非必须)

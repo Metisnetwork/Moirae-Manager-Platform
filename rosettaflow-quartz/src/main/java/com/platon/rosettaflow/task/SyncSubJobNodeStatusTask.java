@@ -1,8 +1,6 @@
 package com.platon.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.SubJobNodeStatusEnum;
 import com.platon.rosettaflow.common.enums.SubJobStatusEnum;
@@ -84,7 +82,6 @@ public class SyncSubJobNodeStatusTask {
         //待更新任务结果数据集(当前组织参与的待保存任务结果文件摘要列表)
         List<TaskResult> saveTaskResultList = new ArrayList<>();
 
-
         //获取所有任务详情
         List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
         String taskId;
@@ -95,21 +92,25 @@ public class SyncSubJobNodeStatusTask {
             if (subJobNodeMap.containsKey(taskId)) {
                 node = subJobNodeMap.get(taskId);
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
+                    //获取待保存任务结果数据
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                    if (taskResultResponseDto == null) {
+                        log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
+                        return;
+                    }
+                    saveTaskResultList.add(BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class));
+
                     //如果是最后一个节点，需要更新整个子作业状态成功
                     if (node.getNodeStep().equals(node.getNodeNumber())) {
                         subJobSuccessIds.add(node.getSubJobId());
                     } else {
                         //如果有下一个节点，则启动下一个节点
-                        Object workflowDtoJson = redissonObject.getValue(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
-                        if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
-                            WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
+                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
+                        if (null != workflowDto) {
                             workflowService.start(workflowDto);
                         }
                     }
                     subJobNodeSuccessIds.add(node.getId());
-                    //获取待保存任务结果数据
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
-                    saveTaskResultList.add(BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class));
                 } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个子作业状态失败
                     if (node.getNodeStep().equals(node.getNodeNumber())) {

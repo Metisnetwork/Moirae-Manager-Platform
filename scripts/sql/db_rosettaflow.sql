@@ -212,27 +212,27 @@ CREATE TABLE `t_algorithm_type` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm`;
 CREATE TABLE `t_algorithm` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
-  `algorithm_name` varchar(30) DEFAULT NULL COMMENT '算法名称',
-  `algorithm_desc` varchar(200) DEFAULT NULL COMMENT '算法描述',
-  `author` varchar(30) DEFAULT NULL COMMENT '算法作者',
-  `max_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最大数量',
-  `min_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最小数量',
-  `support_language` varchar(64) DEFAULT NULL COMMENT '支持语言,多个以","进行分隔',
-  `support_os_system` varchar(64) DEFAULT NULL COMMENT '支持操作系统,多个以","进行分隔',
-  `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
-  `cost_mem` bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
-  `cost_cpu` int(11) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
-  `cost_gpu` int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
-  `cost_bandwidth` bigint(20) DEFAULT 0 COMMENT '所需的带宽 (单位: bps)',
-  `run_time` bigint(20) NOT NULL DEFAULT 3600000 COMMENT '所需的运行时长,默认1小时 (单位: ms)',
-  `store_pattern` tinyint(4) DEFAULT 1 COMMENT '输出存储形式: 1-明文，2:密文',
-  `public_Flag` tinyint(4) NOT NULL DEFAULT 1 COMMENT '是否是公有算法: 0-否，1-是',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1-有效',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='算法表';
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
+    `algorithm_name` varchar(30) DEFAULT NULL COMMENT '算法名称',
+    `algorithm_desc` varchar(200) DEFAULT NULL COMMENT '算法描述',
+    `author` varchar(30) DEFAULT NULL COMMENT '算法作者',
+    `max_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最大数量',
+    `min_numbers` bigint(20) DEFAULT NULL COMMENT '支持协同方最小数量',
+    `support_language` varchar(64) DEFAULT NULL COMMENT '支持语言,多个以","进行分隔',
+    `support_os_system` varchar(64) DEFAULT NULL COMMENT '支持操作系统,多个以","进行分隔',
+    `algorithm_type` tinyint(4) DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
+    `cost_mem` bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+    `cost_cpu` int(11) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+    `cost_gpu` int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+    `cost_bandwidth` bigint(20) DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
+    `run_time` bigint(20) NOT NULL DEFAULT '3600000' COMMENT '所需的运行时长,默认1小时 (单位: ms)',
+    `store_pattern` tinyint(4) DEFAULT '1' COMMENT '输出存储形式: 1-明文，2:密文',
+    `public_Flag` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否是公有算法: 0-否，1-是',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1-有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='算法表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm_auth`
