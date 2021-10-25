@@ -141,7 +141,6 @@ public class TaskServiceClient {
 
             //拼装最外层信息
             taskDetailResponseDto.setInformation(taskDetailDto);
-            taskDetailResponseDto.setRole(getTaskDetailResponse.getRole().getNumber());
             taskDetailResponseDtoList.add(taskDetailResponseDto);
         }
         return taskDetailResponseDtoList;
