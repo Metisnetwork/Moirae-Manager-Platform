@@ -104,6 +104,7 @@ public class SysConstant {
             "data/columnList",
             "algorithm/list",
             "algorithm/details",
+            "projectTemplate/list",
             "testGrpc",
             "redis"
     };
