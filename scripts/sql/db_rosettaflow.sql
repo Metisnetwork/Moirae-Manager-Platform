@@ -229,9 +229,11 @@ CREATE TABLE `t_algorithm` (
     `store_pattern` tinyint(4) DEFAULT '1' COMMENT '输出存储形式: 1-明文，2:密文',
     `public_Flag` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否是公有算法: 0-否，1-是',
     `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1-有效',
+    `del_version` bigint(11) DEFAULT 0 COMMENT '版本标识，用于逻辑删除',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UK_ALG_NAME` (`algorithm_name`, `status`, `del_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='算法表';
 
 -- ----------------------------

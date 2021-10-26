@@ -18,6 +18,7 @@ import com.platon.rosettaflow.service.IAlgorithmTypeService;
 import com.platon.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -54,6 +55,9 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             algorithmCodeService.addAlgorithmCode(algorithmCode);
         } catch (Exception e) {
             log.error("addAlgorithm--新增算法失败, 错误信息:{}", e.getMessage());
+            if (e instanceof DuplicateKeyException) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NAME_EXISTED.getMsg());
+            }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_ALG_ERROR.getMsg());
         }
     }
@@ -75,6 +79,9 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             algorithmCodeService.updateAlgorithmCode(algorithmCode);
         } catch (Exception e) {
             log.error("updateAlgorithm--修改算法失败, 错误信息:{}", e.getMessage());
+            if (e instanceof DuplicateKeyException) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NAME_EXISTED.getMsg());
+            }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.UPDATE_ALG_ERROR.getMsg());
         }
     }

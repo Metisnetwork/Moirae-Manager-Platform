@@ -102,6 +102,11 @@ public class Algorithm implements Serializable {
     private Byte status;
 
     /**
+     * 版本标识，用于逻辑删除
+     */
+    private Byte delVersion;
+
+    /**
      * 创建时间
      */
     private Date createTime;

@@ -47,6 +47,7 @@ public enum ErrorMsg {
      */
     ADD_ALG_ERROR("新增算法错误", "New algorithm error"),
     UPDATE_ALG_ERROR("修改算法错误", "Modify algorithm error"),
+    ALG_NAME_EXISTED("算法名称已存在", "Algorithm name already exists"),
     QUERY_ALG_DETAILS_ERROR("查询算法详情错误", "Query algorithm details error"),
     ALG_NOT_EXIST("算法不存在", "Algorithm does not exist"),
     ALG_CODE_NOT_EXIST("算法代码不存在", "Algorithm code does not exist"),
