@@ -266,10 +266,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void clearWorkflowNode(Long workflowId) {
-        Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        Workflow workflow = workflowService.getById(workflowId);
         if (Objects.isNull(workflow)) {
-            log.error("Workflow does not exist, workflowId:{}", workflowId);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
+            return;
         }
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
