@@ -63,7 +63,7 @@ public class WorkflowNodeStatusTask {
     @Resource
     private ITaskResultService taskResultService;
 
-    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
+    @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "WorkflowNodeStatusTask")
     public void run() {
@@ -87,6 +87,9 @@ public class WorkflowNodeStatusTask {
 
         //获取所的任务详情
         List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
+        for (TaskDetailResponseDto dto : taskDetailResponseDtoList) {
+            log.info("任务id>>>{},处理状态>>>{}", dto.getInformation().getTaskId(), dto.getInformation().getState());
+        }
         String taskId;
         WorkflowNode node;
         for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
@@ -95,6 +98,7 @@ public class WorkflowNodeStatusTask {
                 node = workflowNodeMap.get(taskId);
                 log.info("工作流id:{},任务名称：{},taskId:{},rosettanet处理成功！", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
+                    log.info("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
                     //获取待保存任务结果数据
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
                     if (taskResultResponseDto == null) {
@@ -109,14 +113,17 @@ public class WorkflowNodeStatusTask {
                         workflowSuccessIds.add(node.getWorkflowId());
                     } else {
                         //如果有下一个节点，则启动下一个节点
-                        Object workflowDtoJson = redissonObject.getValue(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
-                        if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
-                            WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
+                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
+                        if (null != workflowDto) {
+                            //前一个节点taskId
+                            workflowDto.setPreTaskId(taskId);
+                            workflowDto.setPreTaskResult(taskResult);
                             workflowService.start(workflowDto);
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
+                    log.error("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
                     //如果是最后一个节点，需要更新整个工作流的状态为失败
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
                         workflowFailIds.add(node.getWorkflowId());

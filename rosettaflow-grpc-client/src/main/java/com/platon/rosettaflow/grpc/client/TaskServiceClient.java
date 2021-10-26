@@ -312,8 +312,10 @@ public class TaskServiceClient {
             TaskMetadataDeclare.Builder taskMetaDataDeclareBuilder = TaskMetadataDeclare.newBuilder()
                     .setMetadataId(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getMetaDataId())
                     .setKeyColumn(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getKeyColumn());
-            for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().size(); j++) {
-                taskMetaDataDeclareBuilder.addSelectedColumns(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
+            if (null != dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns()) {
+                for (int j = 0; j < dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().size(); j++) {
+                    taskMetaDataDeclareBuilder.addSelectedColumns(dataSupplierDeclareDto.getTaskMetaDataDeclareDto().getSelectedColumns().get(j));
+                }
             }
 
             TaskDataSupplierDeclare taskDataSupplierDeclare = TaskDataSupplierDeclare.newBuilder()

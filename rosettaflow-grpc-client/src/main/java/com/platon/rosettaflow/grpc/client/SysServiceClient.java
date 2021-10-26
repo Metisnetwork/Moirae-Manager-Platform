@@ -40,7 +40,15 @@ public class SysServiceClient {
 
         GetTaskResultFileSummaryResponse getTaskResultFileSummaryResponse = yarnServiceBlockingStub.getTaskResultFileSummary(request);
         if (null != getTaskResultFileSummaryResponse) {
-            return BeanUtil.toBean(getTaskResultFileSummaryResponse, GetTaskResultFileSummaryResponseDto.class);
+            GetTaskResultFileSummaryResponseDto dto = new GetTaskResultFileSummaryResponseDto();
+            dto.setTaskId(getTaskResultFileSummaryResponse.getTaskId());
+            dto.setFileName(getTaskResultFileSummaryResponse.getFileName());
+            dto.setMetadataId(getTaskResultFileSummaryResponse.getMetadataId());
+            dto.setOriginId(getTaskResultFileSummaryResponse.getOriginId());
+            dto.setFilePath(getTaskResultFileSummaryResponse.getFilePath());
+            dto.setIp(getTaskResultFileSummaryResponse.getIp());
+            dto.setPort(getTaskResultFileSummaryResponse.getPort());
+            return dto;
         }
         return null;
     }
