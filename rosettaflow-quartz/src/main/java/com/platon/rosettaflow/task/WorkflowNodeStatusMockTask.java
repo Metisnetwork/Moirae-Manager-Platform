@@ -114,7 +114,6 @@ public class WorkflowNodeStatusMockTask {
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
-
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个工作流的状态为失败
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {

@@ -95,6 +95,15 @@ public class WorkflowNodeStatusTask {
                 node = workflowNodeMap.get(taskId);
                 log.info("工作流id:{},任务名称：{},taskId:{},rosettanet处理成功！", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
+                    //获取待保存任务结果数据
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                    if (taskResultResponseDto == null) {
+                        log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
+                        return;
+                    }
+                    TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
+                    saveTaskResultList.add(taskResult);
+
                     //如果是最后一个节点，需要更新整个工作流的状态为成功
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
                         workflowSuccessIds.add(node.getWorkflowId());
@@ -107,9 +116,6 @@ public class WorkflowNodeStatusTask {
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
-                    //获取待保存任务结果数据
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
-                    saveTaskResultList.add(BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class));
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个工作流的状态为失败
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
