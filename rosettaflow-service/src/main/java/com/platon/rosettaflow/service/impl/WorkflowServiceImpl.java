@@ -135,7 +135,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         Workflow workflow = this.getOne(queryWrapper);
         if (Objects.isNull(workflow)) {
-            log.error("workflow not found by id:{}", id);
+            log.error("Workflow does not exist, workflowId:{}", id);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_EXIST.getMsg());
         }
         return workflow;
