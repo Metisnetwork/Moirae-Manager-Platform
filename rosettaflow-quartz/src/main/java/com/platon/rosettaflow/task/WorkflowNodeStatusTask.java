@@ -132,7 +132,7 @@ public class WorkflowNodeStatusTask {
         }
         //更新工作流失败记录
         if (workflowFailIds.size() > 0) {
-            workflowService.updateRunStatus(workflowSuccessIds.toArray(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
+            workflowService.updateRunStatus(workflowFailIds.toArray(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
         }
         //更新工作流节点成功记录
         if (workflowNodeSuccessIds.size() > 0) {
