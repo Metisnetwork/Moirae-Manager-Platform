@@ -67,7 +67,7 @@ public class SaveNodeResourceReq {
      */
     public Long getRunTime() {
         return new BigDecimal(this.runTime)
-                .multiply(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000))
+                .multiply(BigDecimal.valueOf(SysConstant.INT_60 * SysConstant.INT_1000))
                 .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }

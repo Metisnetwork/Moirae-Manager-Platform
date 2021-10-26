@@ -94,16 +94,16 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "44f7dc0005b041a4a9cbd41c68ab3756";
+        String uuid = "ec1ab67261cd4a0387223c9952a3f455";
         //登录签名
-        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
+        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{ec1ab67261cd4a0387223c9952a3f455}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
         //启动工作流签名
 //        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"d6a151c0703d47e6baa068700e8c5381\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"key\",\"type\":\"string\"}]}}";
 
         try {
             json = StrUtil.format(json, uuid);
             System.out.println("加密的json字符串为>>>" + json);
-            Credentials credentials = Credentials.create("567762b8a66385de7bfc6fd96f5de618da1389b6974638c995c5e94a861b922b");
+            Credentials credentials = Credentials.create("f366d751f2b18ee39404e6be657dab7cd0e31da62ff7dbb49ddb8da15521e8ac");
             System.out.println("钱包hrp地址>>>" + credentials.getAddress());
             System.out.println("钱包0x地址>>>" + AddressChangeUtils.convert0xAddress(credentials.getAddress()));
 

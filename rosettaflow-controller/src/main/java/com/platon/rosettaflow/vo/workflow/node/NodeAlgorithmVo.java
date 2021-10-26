@@ -93,7 +93,7 @@ public class NodeAlgorithmVo {
             return 0L;
         }
         return new BigDecimal(this.runTime)
-                .divide(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000),
+                .divide(BigDecimal.valueOf(SysConstant.INT_60 * SysConstant.INT_1000),
                         SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
     }
 

@@ -14,6 +14,7 @@ public class SysConstant {
     public static final int INT_3 = 3;
 
     /** 换算单位 */
+    public static final int INT_60 = 60;
     public static final int INT_1024 = 1024;
     public static final int INT_1000 = 1000;
     public static final int INT_3600 = 3600;
@@ -104,6 +105,7 @@ public class SysConstant {
             "data/columnList",
             "algorithm/list",
             "algorithm/details",
+            "projectTemplate/list",
             "testGrpc",
             "redis"
     };
