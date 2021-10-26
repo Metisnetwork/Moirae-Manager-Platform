@@ -3,7 +3,6 @@ package com.platon.rosettaflow.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.mapper.domain.WorkflowNodeInput;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,7 +21,8 @@ public interface IWorkflowNodeInputService extends IService<WorkflowNodeInput> {
     List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     *  物理批量删除工作流节点输入数据，根据节点id
+     * 物理批量删除工作流节点输入数据，根据节点id
+     *
      * @param workflowNodeIdList 工作流节点id列表
      */
     void deleteByWorkflowNodeId(List<Long> workflowNodeIdList);

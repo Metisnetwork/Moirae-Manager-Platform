@@ -8,9 +8,11 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 添加工作流节点资源请求对象
+ *
  * @author hudenian
  * @date 2021/8/31
  */
@@ -39,28 +41,34 @@ public class SaveNodeResourceReq {
     @NotNull(message = "{node.cost.runTime.notNull}")
     private Long runTime;
 
-    /** 保存时处理内存单位 */
+    /**
+     * 保存时处理内存单位
+     */
     public Long getCostMem() {
         return new BigDecimal(this.costMem)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_1024
                         * SysConstant.INT_1024 * SysConstant.INT_1024))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
 
-    /** 保存时处理带宽单位 */
+    /**
+     * 保存时处理带宽单位
+     */
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
 
-    /** 保存时最长运行时间单位处理 （换算为毫秒存库）*/
+    /**
+     * 保存时最长运行时间单位处理 （换算为毫秒存库）
+     */
     public Long getRunTime() {
         return new BigDecimal(this.runTime)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
 

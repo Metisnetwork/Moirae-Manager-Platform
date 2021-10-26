@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 添加工作流节点资源请求对象
@@ -45,7 +46,7 @@ public class WorkflowNodeResourceReq {
         return new BigDecimal(this.costMem)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_1024
                         * SysConstant.INT_1024 * SysConstant.INT_1024))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
 
@@ -56,15 +57,17 @@ public class WorkflowNodeResourceReq {
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
 
-    /** 保存时最长运行时间单位处理 （换算为毫秒存库）*/
+    /**
+     * 保存时最长运行时间单位处理 （换算为毫秒存库）
+     */
     public Long getRunTime() {
         return new BigDecimal(this.runTime)
                 .multiply(BigDecimal.valueOf(SysConstant.INT_3600 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, BigDecimal.ROUND_UP)
+                .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
 

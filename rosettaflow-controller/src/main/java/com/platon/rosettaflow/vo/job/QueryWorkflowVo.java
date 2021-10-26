@@ -4,11 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
 /**
  * 查询关联工作流响应对象
+ *
  * @author houz
  * @date 2021/8/26
  */

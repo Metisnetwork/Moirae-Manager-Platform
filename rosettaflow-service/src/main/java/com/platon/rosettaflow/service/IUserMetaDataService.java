@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.MetaDataDto;
 import com.platon.rosettaflow.dto.UserMetaDataDto;
-import com.platon.rosettaflow.mapper.domain.MetaDataDetails;
 import com.platon.rosettaflow.mapper.domain.UserMetaData;
 
 import java.util.List;
@@ -70,6 +69,7 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
 
     /**
      * 批量插入列表
+     *
      * @param userMetaDataList 插入用户授权数据列表集合
      * @return 插入记录数
      */

@@ -11,14 +11,14 @@ public interface IAlgorithmCodeService extends IService<AlgorithmCode> {
     /**
      * 新增算法代码
      *
-     * @param algorithmCode
+     * @param algorithmCode 算法代码对象
      */
     void addAlgorithmCode(AlgorithmCode algorithmCode);
 
     /**
      * 根据算法id修改算法
      *
-     * @param algorithmCode
+     * @param algorithmCode 算法代码对象
      */
     void updateAlgorithmCode(AlgorithmCode algorithmCode);
 
@@ -30,13 +30,6 @@ public interface IAlgorithmCodeService extends IService<AlgorithmCode> {
      */
     AlgorithmCode getByAlgorithmId(Long algorithmId);
 
-    /**
-     * 复制保存算法代码
-     * @param oldAlgorithmId 源算法id
-     * @param newAlgorithmId 目的算法id
-     * @param oldNodeId 源节点id
-     */
-    void copySaveAlgorithmCode(Long oldAlgorithmId,Long newAlgorithmId, Long oldNodeId);
     /**
      * 清空算法表
      */

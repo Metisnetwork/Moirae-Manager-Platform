@@ -462,11 +462,4 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         return organizationList;
     }
 
-    @Override
-    public WorkflowNode getWorkflowNodeById(Long id) {
-        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getId, id);
-        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
-        return this.getOne(wrapper);
-    }
 }
