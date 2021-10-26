@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"dev"})
+@Profile({"dev", "uat"})
 public class WorkflowNodeStatusMockTask {
     /**
      * 查询 当前时间之前5小时的正在运行的数据

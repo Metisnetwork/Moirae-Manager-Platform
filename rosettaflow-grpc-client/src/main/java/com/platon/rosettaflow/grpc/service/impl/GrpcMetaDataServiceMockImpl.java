@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"dev"})
+@Profile({"dev", "uat"})
 public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
 
     /**

@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Service
-@Profile({"dev"})
+@Profile({"dev", "uat"})
 public class GrpcTaskServiceMockImpl implements GrpcTaskService {
 
     @Override

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"dev"})
+@Profile({"dev", "uat"})
 public class SyncSubJobNodeStatusMockTask {
 
     @Resource
@@ -149,10 +149,11 @@ public class SyncSubJobNodeStatusMockTask {
 
     /**
      * 模拟处理成功数据
+     *
      * @param subJobNodeMap 作业节点集合
      * @return taskDetailResponseDto  任务集合
      */
-    List<TaskDetailResponseDto> getResponseMockTaskDetailList(Map<String, SubJobNodeDto> subJobNodeMap){
+    List<TaskDetailResponseDto> getResponseMockTaskDetailList(Map<String, SubJobNodeDto> subJobNodeMap) {
         List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
         Set<String> jobNodeTaskIds = subJobNodeMap.keySet();
         for (String taskId : jobNodeTaskIds) {

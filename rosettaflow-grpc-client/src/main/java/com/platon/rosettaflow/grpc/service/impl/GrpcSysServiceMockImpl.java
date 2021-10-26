@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"dev"})
+@Profile({"dev", "uat"})
 public class GrpcSysServiceMockImpl implements GrpcSysService {
     @Override
     public GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(String taskId) {

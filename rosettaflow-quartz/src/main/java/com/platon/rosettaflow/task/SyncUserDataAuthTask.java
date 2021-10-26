@@ -61,7 +61,7 @@ public class SyncUserDataAuthTask {
 
         for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
             userMetaData = getUserMetaData(authorityDto);
-            //如果钱包地址不合法，此条数据过滤旧不入库
+            //如果钱包地址不合法，此条数据过滤不入库
             if (null == userMetaData) {
                 continue;
             }
