@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -92,9 +93,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private IAlgorithmVariableStructService algorithmVariableStructService;
-
-    @Resource
-    private ITaskResultService taskResultService;
 
     @Resource
     private RedissonObject redissonObject;
@@ -449,16 +447,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             dataSplitContractCode = workflowNodeCode.getDataSplitContractCode();
         }
 
-        //如果不是第一个节点，调用net,获取前一个节点的计算结果
-//        TaskResult preTaskResult = null;
-//        if (workflowDto.getStartNode() > 1) {
-//            preTaskResult = taskResultService.queryTaskResultByTaskId(workflowDto.getPreTaskId());
-//            if (null == preTaskResult) {
-//                log.error("Start workflow->assemblyTaskDto:{}", ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
-//                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_PRE_TASK_RESULT_NOT_EXIST.getMsg());
-//            }
-//        }
-
         //获取工作流节点输入信息
         List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
@@ -706,16 +694,20 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
             taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
 
-            //TODO 如果有上一个节点的模型，需要做为输入传给底层
-            /*if(null != preTaskResult && SenderFlagEnum.TRUE.getValue() ==input.getSenderFlag()){
+            //如果有上一个节点的模型，需要做为输入传给底层
+            if (null != preTaskResult && SenderFlagEnum.TRUE.getValue() == input.getSenderFlag()) {
                 taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
-                taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(taskOrganizationIdentityInfoDto);
+                OrganizationIdentityInfoDto modelOrg = new OrganizationIdentityInfoDto();
+                BeanUtil.copyProperties(taskOrganizationIdentityInfoDto, modelOrg);
+                modelOrg.setPartyId("p" + workflowNodeInputList.size());
+                taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(modelOrg);
 
                 taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
-                taskMetaDataDeclareDto.setMetaDataId(preTaskResult.getFilePath());
+                taskMetaDataDeclareDto.setMetaDataId(preTaskResult.getMetadataId());
+                taskMetaDataDeclareDto.setKeyColumn(0);
                 taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
                 taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
-            }*/
+            }
         }
 
         //模型提供方
