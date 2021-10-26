@@ -98,6 +98,13 @@ public interface IJobService extends IService<Job> {
     List<Job> listRunJobByWorkflowId(Long workflowId);
 
     /**
+     * 获取所有正在运行作业列表
+     *
+     * @return 作业列表
+     */
+    List<Job> listRunAllJob();
+
+    /**
      *  批量删除作业
      * @param ids 作业ids集合
      */

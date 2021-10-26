@@ -1,11 +1,10 @@
 package com.platon.rosettaflow.task;
-
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.Resource;
+
 
 
 /**
@@ -23,8 +22,5 @@ public class SyncJobStatusTask {
     @Lock(keys = "SyncJobStatusTask")
     public void run() {
         jobManager.finishJobBatchWithTask();
-
     }
-
-
 }
