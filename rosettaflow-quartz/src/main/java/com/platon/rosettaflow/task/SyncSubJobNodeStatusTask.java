@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +65,7 @@ public class SyncSubJobNodeStatusTask {
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
+        log.info("同步更新子作业节点运行中任务检查准备>>>>");
         List<SubJobNodeDto> subJobNodeDtoList = subJobNodeService.getRunningNodeWithWorkIdAndNodeNum();
         //如果没有需要同步的数据则不进行同步
         if (subJobNodeDtoList.size() == 0) {
@@ -94,19 +96,25 @@ public class SyncSubJobNodeStatusTask {
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     //获取待保存任务结果数据
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
-                    if (taskResultResponseDto == null) {
+                    if (Objects.isNull(taskResultResponseDto)) {
                         log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
                         return;
                     }
-                    saveTaskResultList.add(BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class));
+                    TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
+                    saveTaskResultList.add(taskResult);
 
                     //如果是最后一个节点，需要更新整个子作业状态成功
                     if (node.getNodeStep().equals(node.getNodeNumber())) {
                         subJobSuccessIds.add(node.getSubJobId());
                     } else {
                         //如果有下一个节点，则启动下一个节点
+                        log.info("同步更新子作业节点运行中任务,启动下一个节点>>>>redis key:{}", SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
                         WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
-                        if (null != workflowDto) {
+                        log.info("同步更新子作业节点运行中任务,启动下一个节点>>>>redis workflowDto:{}", workflowDto);
+                        if (!Objects.isNull(workflowDto)) {
+                            //前一个节点taskId
+                            workflowDto.setPreTaskId(taskId);
+                            workflowDto.setPreTaskResult(taskResult);
                             workflowService.start(workflowDto);
                         }
                     }

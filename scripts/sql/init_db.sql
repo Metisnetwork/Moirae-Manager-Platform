@@ -41,9 +41,8 @@ INSERT INTO `t_workflow_node_temp` VALUES ('2', '1', '2', '分类模型预测', 
 -- init t_algorithm_variable_struct
 -- ----------------------------
 TRUNCATE t_algorithm_variable_struct;
-INSERT INTO `t_algorithm_variable_struct` VALUES ('1', '1', '{\"label_owner\":\"p0\",\"label_column_name\":\"Y\",\"algorithm_parameter\":{\"label_owner\":\"p0\",\"label_column\":\"Y\",\"algorithm_parameter\":{\"epochs\":10,\"batch_size\":256,\"learning_rate\":0.1,\"use_validation_set\":true,\"validation_set_rate\":0.2,\"predict_threshold\":0.5}}}', '逻辑回归训练变量参数', '1', now(), now());
-INSERT INTO `t_algorithm_variable_struct` VALUES ('2', '2', '{\"model_restore_party\":\"p0\",\"model_path\":\"file_path\",\"predict_threshold\":0.5}', '逻辑回归预测变量参数', '1', now(), now());
-
+INSERT INTO `t_algorithm_variable_struct` VALUES ('1', '1', '{\"label_owner\":\"p0\",\"label_column\":\"Y\",\"algorithm_parameter\":{\"epochs\":10,\"batch_size\":256,\"learning_rate\":0.1,\"use_validation_set\":true,\"validation_set_rate\":0.2,\"predict_threshold\":0.5}}', '逻辑回归训练变量参数', '1', '2021-10-26 14:05:13', '2021-10-26 17:08:32');
+INSERT INTO `t_algorithm_variable_struct` VALUES ('2', '2', '{\"model_restore_party\":\"p0\",\"model_path\":\"file_path\",\"predict_threshold\":0.5}', '逻辑回归预测变量参数', '1', '2021-10-26 14:05:13', '2021-10-26 14:05:13');
 -- ----------------------------
 -- init t_algorithm_type
 -- ----------------------------

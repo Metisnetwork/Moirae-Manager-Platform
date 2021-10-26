@@ -287,16 +287,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         /* ------ 此处先执行第一个节点，待第一个节点执行成功后再执行 -----*/
         // 组装发布任务请求对象
         TaskDto taskDto = this.assemblyTaskDto(workflowDto);
-        log.info("开始启动工作流任务workflowId:{},任务名称：{},请求数据为：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName(), JSON.toJSONString(taskDto));
+        log.info("任务发布>>>>开始启动工作流任务workflowId:{},任务名称：{},请求数据为：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName(), JSON.toJSONString(taskDto));
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
+        SubJobNode subJobNodeInfo = new SubJobNode();
         boolean isPublishSuccess = false;
         try {
             respDto = grpcTaskService.syncPublishTask(taskDto);
             if (GrpcConstant.GRPC_SUCCESS_CODE == respDto.getStatus()) {
                 isPublishSuccess = true;
             }
-            log.info("工作流id:{},任务名称：{},rosettanet收到处理任务，返回的taskId：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName(), respDto.getTaskId());
+            log.info("任务发布结果>>>>工作流id:{},任务名称：{},rosettanet收到处理任务，返回的taskId：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName(), respDto.getTaskId());
         } catch (Exception e) {
             log.error("publish task fail, task name:{}, work flow nodeId:{},error msg:{}", taskDto.getTaskName(), taskDto.getWorkFlowNodeId(), e.getMessage(), e);
             if (workflowDto.isJobFlg()) {
@@ -313,7 +314,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             //1.更新子作业
             this.updateSubJobInfo(workflowDto, isPublishSuccess);
             //2.更新子作业节点信息
-            this.updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
+            subJobNodeInfo = this.updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
         } else {
             //1.更新工作流
             Workflow workflow = this.queryWorkflowDetail(workflowNode.getWorkflowId());
@@ -331,9 +332,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         boolean hasNext = workflowNode.getNextNodeStep() != null && workflowNode.getNextNodeStep() > 1;
         if (isPublishSuccess && hasNext) {
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
-            workflowDto.setTaskId(workflowNode.getTaskId());
+            workflowDto.setTaskId(workflowDto.isJobFlg() ? subJobNodeInfo.getTaskId() : workflowNode.getTaskId());
             String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
             redissonObject.setValue(taskKey + workflowDto.getTaskId(), workflowDto);
+            log.info("多节点继续执行下个节点>>>>redis key:{},", taskKey + workflowDto.getTaskId());
         }
     }
 
@@ -535,8 +537,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param workflowNode     工作流节点
      * @param isPublishSuccess 节点是否发布成功
      * @param respDto          发布响应结果
+     * @return SubJobNode      子作业节点
      */
-    private void updateSubJobNodeInfo(WorkflowDto workflowDto, WorkflowNode workflowNode, boolean isPublishSuccess, PublishTaskDeclareResponseDto respDto) {
+    private SubJobNode updateSubJobNodeInfo(WorkflowDto workflowDto, WorkflowNode workflowNode, boolean isPublishSuccess, PublishTaskDeclareResponseDto respDto) {
         SubJobNode subJobNode = subJobNodeService.querySubJobNodeByJobIdAndNodeStep(workflowDto.getSubJobId(), workflowDto.getStartNode());
         if (Objects.isNull(subJobNode)) {
             subJobNode = new SubJobNode();
@@ -553,6 +556,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.error("start sub job fail, is save sub job node. subJobNode:{}", JSON.toJSONString(subJobNode));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.SUB_JOB_RESTART_FAILED_ERROR.getMsg());
         }
+        return subJobNode;
     }
 
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
