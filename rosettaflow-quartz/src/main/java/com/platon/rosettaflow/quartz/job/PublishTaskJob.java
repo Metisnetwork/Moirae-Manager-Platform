@@ -62,7 +62,6 @@ public class PublishTaskJob implements Job {
         subJob.setWorkflowId(workflowId);
         subJob.setBeginTime(now());
         subJob.setSubJobStatus(SubJobStatusEnum.RUNNING.getValue());
-        // 数据库默认status为1
         subJobService.save(subJob);
         log.info("处理作业,作业id:{},工作流id:{},记录子作业表id:{}", jobId, workflowId, subJob.getId());
 

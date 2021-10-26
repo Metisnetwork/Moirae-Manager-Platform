@@ -1,8 +1,6 @@
 package com.platon.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.SubJobNodeStatusEnum;
 import com.platon.rosettaflow.common.enums.SubJobStatusEnum;
@@ -61,6 +59,7 @@ public class SyncSubJobNodeStatusMockTask {
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
+        log.info("同步更新子作业节点运行中任务检查准备>>>>");
         List<SubJobNodeDto> subJobNodeDtoList = subJobNodeService.getRunningNodeWithWorkIdAndNodeNum();
         //如果没有需要同步的数据则不进行同步
         if (subJobNodeDtoList.size() == 0) {
@@ -104,17 +103,17 @@ public class SyncSubJobNodeStatusMockTask {
                         subJobSuccessIds.add(node.getSubJobId());
                     } else {
                         //如果有下一个节点，则启动下一个节点
-                        Object workflowDtoJson = redissonObject.getValue(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
-                        if (null != workflowDtoJson && StrUtil.isNotBlank((String) workflowDtoJson)) {
+                        log.info("同步更新子作业节点运行中任务,启动下一个节点>>>>redis key:{}", SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
+                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
+                        log.info("同步更新子作业节点运行中任务,启动下一个节点>>>>redis workflowDto:{}", workflowDto);
+                        if (!Objects.isNull(workflowDto)) {
                             //前一个节点taskId
-                            WorkflowDto workflowDto = JSON.parseObject((String) workflowDtoJson, WorkflowDto.class);
                             workflowDto.setPreTaskId(taskId);
                             workflowDto.setPreTaskResult(taskResult);
                             workflowService.start(workflowDto);
                         }
                     }
                     subJobNodeSuccessIds.add(node.getId());
-
                 } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个子作业状态失败
                     if (node.getNodeStep().equals(node.getNodeNumber())) {

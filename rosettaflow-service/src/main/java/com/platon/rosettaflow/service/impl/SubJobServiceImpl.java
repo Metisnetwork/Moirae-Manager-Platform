@@ -183,7 +183,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public void deleteBatchSubJob(List<Long> ids) {
-        if (ids.isEmpty()) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
             log.error(ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ID_NOT_EXIST.getMsg());
         }
