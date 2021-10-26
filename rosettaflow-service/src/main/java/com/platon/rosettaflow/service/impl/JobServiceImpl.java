@@ -221,6 +221,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         return this.list(wrapper);
     }
 
+    @Override
+    public List<Job> listRunAllJob() {
+        LambdaQueryWrapper<Job> jobQueryWrapper = Wrappers.lambdaQuery();
+        jobQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue());
+        jobQueryWrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
+        return this.list(jobQueryWrapper);
+    }
+
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public void deleteBatchJob(List<Long> ids) {

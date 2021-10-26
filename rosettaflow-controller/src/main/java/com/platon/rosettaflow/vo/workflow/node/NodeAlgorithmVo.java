@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 工作流节点代码响应参数
@@ -74,7 +75,7 @@ public class NodeAlgorithmVo {
         return new BigDecimal(this.costMem)
                 .divide(BigDecimal.valueOf(SysConstant.INT_1024
                                 * SysConstant.INT_1024 * SysConstant.INT_1024),
-                        SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
+                        SysConstant.INT_0, RoundingMode.UP).longValue();
     }
 
     /** 展示时处理带宽单位 */
@@ -84,7 +85,7 @@ public class NodeAlgorithmVo {
         }
         return new BigDecimal(this.costBandwidth)
                 .divide(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000),
-                        SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
+                        SysConstant.INT_0, RoundingMode.UP).longValue();
     }
 
     /** 展示时最长运行时间单位处理 */
@@ -94,7 +95,7 @@ public class NodeAlgorithmVo {
         }
         return new BigDecimal(this.runTime)
                 .divide(BigDecimal.valueOf(SysConstant.INT_60 * SysConstant.INT_1000),
-                        SysConstant.INT_0, BigDecimal.ROUND_UP).longValue();
+                        SysConstant.INT_0, RoundingMode.HALF_UP).longValue();
     }
 
 }

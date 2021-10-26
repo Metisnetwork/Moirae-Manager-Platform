@@ -1,10 +1,7 @@
 package com.platon.rosettaflow.task;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.platon.rosettaflow.common.enums.JobRepeatEnum;
 import com.platon.rosettaflow.common.enums.JobStatusEnum;
-import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.mapper.domain.Job;
 import com.platon.rosettaflow.quartz.job.PublishTaskJob;
 import com.platon.rosettaflow.service.IJobService;
@@ -14,10 +11,9 @@ import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -145,6 +141,7 @@ public class JobManager {
      *
      * @param job job信息
      */
+    @SuppressWarnings("unused")
     public void finishJob(Job job) {
         job.setJobStatus(JobStatusEnum.FINISH.getValue());
         jobService.updateById(job);
@@ -168,26 +165,17 @@ public class JobManager {
      */
     public void finishJobBatchWithTask() {
         try {
-            //1、获取调度任务所有作业
-            List<Long> schedulerJobIdList = new ArrayList<>();
-            Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.groupEquals(JobManager.GROUP));
-            jobKeySet.forEach(jobKey ->
-                    schedulerJobIdList.add(Long.valueOf(jobKey.getName()))
-            );
-            //2、获取所有状态为运行中作业
-            LambdaQueryWrapper<Job> jobQueryWrapper = Wrappers.lambdaQuery();
-            jobQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue());
-            jobQueryWrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
-            List<Job> jobList = jobService.list(jobQueryWrapper);
-            //3、筛选出状态为结束作业
-            List<Job> jobFinishList = jobList.stream().filter(job ->
-                    !schedulerJobIdList.contains(job.getId())
-            ).collect(Collectors.toList());
-            //4、批量更新作业状态
+            //1、获取所有运行状态作业
+            List<Job> jobList = jobService.listRunAllJob();
+            //2、筛选出结束时间 > 当前时间，待结束作业
+            List<Job> jobFinishList = jobList.stream().filter(job -> {
+                Date currentTime = new Date();
+                return currentTime.before(job.getEndTime());
+            }).collect(Collectors.toList());
+            //3、批量更新作业状态
             if (!jobFinishList.isEmpty()) {
                 finishJobBatch(jobFinishList);
             }
-
         } catch (Exception e) {
             log.error("SyncJobStatusTask error {}", e.getMessage(), e);
         }
