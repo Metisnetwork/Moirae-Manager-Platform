@@ -57,8 +57,11 @@ public class AlgDetailsVo {
     @ApiModelProperty(value = "所需的运行时长 (单位: ms)")
     private Long runTime;
 
+    @ApiModelProperty(value = "是否需要模型: 0-否，1:是")
+    private Byte inputModel;
+
     @ApiModelProperty(value = "输出存储形式: 1-明文，2:密文")
-    private Long storePattern;
+    private Byte storePattern;
 
     @ApiModelProperty(value = "代码编辑类型")
     private String editType;
