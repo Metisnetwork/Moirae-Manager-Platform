@@ -79,6 +79,11 @@ public class AlgorithmDto {
     private Long runTime;
 
     /**
+     * 是否需要输入模型: 0-否，1:是
+     */
+    private Byte  inputModel;
+
+    /**
      * 输出存储形式: 1-明文，2:密文
      */
     private Byte  storePattern;

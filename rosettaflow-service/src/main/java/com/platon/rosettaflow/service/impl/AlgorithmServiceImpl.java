@@ -1,10 +1,13 @@
 package com.platon.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.ErrorMsg;
 import com.platon.rosettaflow.common.enums.RespCodeEnum;
+import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
 import com.platon.rosettaflow.mapper.AlgorithmMapper;
@@ -89,6 +92,14 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     @Override
     public List<AlgorithmDto> queryAlgorithmList(String algorithmName) {
         return this.baseMapper.queryAlgorithmList(algorithmName);
+    }
+
+    @Override
+    public Algorithm getAlgorithmById(Long id) {
+        LambdaQueryWrapper<Algorithm> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Algorithm::getId, id);
+        queryWrapper.eq(Algorithm::getStatus, StatusEnum.VALID.getValue());
+        return this.getOne(queryWrapper);
     }
 
     @Override

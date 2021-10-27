@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.AlgorithmDto;
@@ -160,6 +161,12 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
             }
             algorithmIdSet.add(workflowNodeDto.getAlgorithmId());
+            // 判断当前节点算法是否需要输入模型
+            Algorithm algorithm = algorithmService.getAlgorithmById(workflowNodeDto.getAlgorithmId());
+            boolean modelFlag = workflowNodeDto.getModelId() == null || workflowNodeDto.getModelId() == 0;
+            if (SysConstant.INT_1 == algorithm.getInputModel() && modelFlag) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
+            }
             // 保存工作流节点
             Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, ++count, workflowNodeDtoList.size());
             // 拼装工作流节点输入
