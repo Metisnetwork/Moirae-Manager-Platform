@@ -48,6 +48,7 @@
         a.cost_gpu as costGpu,
         a.cost_bandwidth as costBandwidth,
         a.run_time as runTime,
+        a.input_model as inputModel,
         a.store_pattern as storePattern,
         b.edit_type as editType,
         b.calculate_contract_code as calculateContractCode
