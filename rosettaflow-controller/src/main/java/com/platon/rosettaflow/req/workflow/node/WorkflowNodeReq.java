@@ -36,6 +36,9 @@ public class WorkflowNodeReq {
     @Positive(message = "{workflow.node.step.positive}")
     private Integer nodeStep;
 
+    @ApiModelProperty(value = "工作流当前节点模型ID")
+    private Long modelId;
+
     @ApiModelProperty(value = "输入请求列表", required = true)
     private List<WorkflowNodeInputReq> workflowNodeInputReqList;
 

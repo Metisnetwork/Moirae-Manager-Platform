@@ -196,6 +196,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowNode.setNodeName(workflowNodeDto.getNodeName());
         workflowNode.setAlgorithmId(workflowNodeDto.getAlgorithmId());
         workflowNode.setNodeStep(workflowNodeDto.getNodeStep());
+        workflowNode.setModelId(workflowNodeDto.getModelId());
         if (count == listSize) {
             // 将最后一个节点步骤的下一节点步骤字段值置空
             workflowNode.setNextNodeStep(null);

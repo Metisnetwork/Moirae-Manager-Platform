@@ -30,6 +30,9 @@ public class WorkflowNodeVo {
     @ApiModelProperty(value = "节点在工作流中序号,从1开始")
     private Integer nodeStep;
 
+    @ApiModelProperty(value = "节点模型ID")
+    private Long modelId;
+
     @ApiModelProperty(value = "下个节点在工作流中序号,从1开始")
     private Integer nextNodeStep;
 
