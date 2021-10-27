@@ -88,6 +88,8 @@ public enum ErrorMsg {
     WORKFLOW_NODE_RUNNING_FAIL("工作流节点运行失败!", "The workflow node failed to run!"),
     WORKFLOW_INDEX_COLUMN_NOT_EXIST("工作流节点索引列不存在", "Workflow node index column not exist"),
     WORKFLOW_NODE_INPUT_NOT_EXIST("工作流节点输入不存在", "Workflow node input not exist"),
+    WORKFLOW_NODE_TASK_RESULT_NOT_EXIST("工作流节点输入模型不存在", "Workflow node input model not exist"),
+    WORKFLOW_NODE_MODEL_NOT_EXIST("工作流节点输入模型路径不存在", "Workflow node input model file path not exist"),
 
     /**
      * 作业

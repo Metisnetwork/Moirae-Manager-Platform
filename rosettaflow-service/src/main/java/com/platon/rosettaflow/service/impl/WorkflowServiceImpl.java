@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.platon.rosettaflow.common.constants.AlgorithmConstant;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -96,6 +97,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private RedissonObject redissonObject;
+
+    @Resource
+    private ITaskResultService taskResultService;
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
@@ -432,6 +436,16 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public TaskDto assemblyTaskDto(WorkflowDto workflowDto) {
         WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(), workflowDto.getStartNode());
 
+        //有指定当前工作流节点模型输入,获取工作流节点模型
+        if (workflowNode.getModelId() != null && workflowNode.getModelId() > 0) {
+            TaskResult taskResult = taskResultService.getById(workflowNode.getModelId());
+            if (taskResult == null) {
+                log.error("WorkflowServiceImpl->getDataSupplierList,fail reason:{}", ErrorMsg.WORKFLOW_NODE_TASK_RESULT_NOT_EXIST.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_TASK_RESULT_NOT_EXIST.getMsg());
+            }
+            workflowDto.setPreTaskResult(taskResult);
+        }
+
         //获取工作流代码输入信息
         String calculateContractCode;
         String dataSplitContractCode;
@@ -596,7 +610,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             }
             JSONObject jsonObject = JSON.parseObject(struct);
             //逻辑训练动态参数[因变量(标签)]
-            if (jsonObject.containsKey("label_column")) {
+            if (jsonObject.containsKey(AlgorithmConstant.LABEL_COLUMN)) {
                 for (WorkflowNodeInput input : workflowNodeInputList) {
                     if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
                         jsonObject.put("label_column",
@@ -604,11 +618,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                     }
                 }
             }
-            if(jsonObject.containsKey("model_restore_party")){
+            if (jsonObject.containsKey(AlgorithmConstant.MODEL_RESTORE_PARTY)) {
                 jsonObject.put("model_restore_party", "p" + workflowNodeInputList.size());
             }
             //逻辑回归动态参数[模型所在的路径，需填绝对路径]
-            if (jsonObject.containsKey("model_path")) {
+            if (jsonObject.containsKey(AlgorithmConstant.MODEL_PATH)) {
+                if (preTaskResult == null || preTaskResult.getFilePath() == null) {
+                    log.error("启动工作流失败,未指定当前工作流节点的模型输入路径");
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
+                }
                 jsonObject.put("model_path", preTaskResult.getFilePath());
             }
             return jsonObject.toJSONString();
@@ -716,9 +734,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
             }
         }
-
         //模型提供方
-
         return taskDataSupplierDeclareDtoList;
     }
 
