@@ -11,7 +11,9 @@ import com.platon.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.platon.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.platon.rosettaflow.grpc.service.GrpcAuthService;
 import com.platon.rosettaflow.grpc.service.GrpcMetaDataService;
+import com.platon.rosettaflow.grpc.service.GrpcSysService;
 import com.platon.rosettaflow.grpc.service.GrpcTaskService;
+import com.platon.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.platon.rosettaflow.grpc.task.req.dto.TaskEventDto;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author admin
@@ -50,6 +53,9 @@ public class RpcTestController {
 
     @Resource
     private IWorkflowService workflowService;
+
+    @Resource
+    private GrpcSysService grpcSysService;
 
     @GetMapping("getNodeIdentity")
     @ApiOperation(value = "getNodeIdentity接口测试", notes = "查询自己组织的identity信息")
@@ -124,6 +130,19 @@ public class RpcTestController {
         return ResponseVo.createSuccess(metaDataAuthorityDtoList);
     }
 
+    @GetMapping("task/getTaskDetailById{taskId}")
+    @ApiOperation(value = "grpc getTaskDetailById查询任务详情根据任务id", notes = "grpc getTaskDetailById查询任务详情根据任务id")
+    public ResponseVo<TaskDetailResponseDto> getTaskDetailById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
+        log.info("grpc getTaskDetailById查询任务详情根据任务id");
+        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getTaskDetailList();
+        if (Objects.isNull(metaDataAuthorityDtoList) || metaDataAuthorityDtoList.isEmpty()) {
+             return ResponseVo.createSuccess();
+        }
+        TaskDetailResponseDto taskDetailResponseDto = metaDataAuthorityDtoList.stream().findFirst()
+                                                         .filter(taskDetailResponseDto1 -> taskDetailResponseDto1.getInformation().getTaskId().equals(taskId)).get();
+        return ResponseVo.createSuccess(taskDetailResponseDto);
+    }
+
 
     @GetMapping("task/getTaskEventListById{taskId}")
     @ApiOperation(value = "grpc getTaskEventListById查询任务事件根据任务id", notes = "grpc getTaskEventListById查询任务事件根据任务id")
@@ -144,5 +163,13 @@ public class RpcTestController {
         TaskDto taskDto = workflowService.assemblyTaskDto(workflowDto);
         PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = grpcTaskService.syncPublishTask(taskDto);
         return ResponseVo.createSuccess(publishTaskDeclareResponseDto.getMsg());
+    }
+
+    @GetMapping("task/getTaskResultById{taskId}")
+    @ApiOperation(value = "grpc getTaskResultById查询任务结果根据任务id", notes = "grpc getTaskResultById查询任务结果根据任务id")
+    public ResponseVo<GetTaskResultFileSummaryResponseDto> getTaskResultById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
+        log.info("grpc getTaskResultById查询任务结果根据任务id");
+        GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+        return ResponseVo.createSuccess(taskResultResponseDto);
     }
 }
