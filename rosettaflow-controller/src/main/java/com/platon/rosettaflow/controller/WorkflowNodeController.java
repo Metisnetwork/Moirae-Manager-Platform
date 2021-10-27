@@ -47,7 +47,7 @@ public class WorkflowNodeController {
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
     public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id) {
         List<WorkflowNodeDto> workflowNodeDtoList = workflowNodeService.queryNodeDetailsList(id);
-        return ResponseVo.createSuccess(convertToWorkflowVo(workflowNodeDtoList));
+        return ResponseVo.createSuccess(this.convertToWorkflowVo(workflowNodeDtoList));
     }
 
     /**

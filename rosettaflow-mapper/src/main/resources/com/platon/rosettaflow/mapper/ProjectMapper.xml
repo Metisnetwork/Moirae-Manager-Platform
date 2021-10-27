@@ -62,7 +62,8 @@
         ORDER BY a.create_time desc
     </select>
     <select id="queryAllModelByProjectId" resultType="com.platon.rosettaflow.dto.ProjectModelDto">
-        SELECT r.file_name   AS fileName,
+        SELECT r.id   AS modelId,
+               r.file_name   AS fileName,
                r.metadata_id AS metadataId,
                r.origin_id   AS originId,
                r.file_path   AS filePath

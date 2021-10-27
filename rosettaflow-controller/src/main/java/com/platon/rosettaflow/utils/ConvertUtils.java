@@ -94,6 +94,8 @@ public class ConvertUtils {
             workflowNodeDto.setNodeName(workflowNodeReq.getNodeName());
             // 节点步骤
             workflowNodeDto.setNodeStep(workflowNodeReq.getNodeStep());
+            // 模型id
+            workflowNodeDto.setModelId(workflowNodeReq.getModelId());
             // 校验工作流节点配置参数
             if (checkFlag) {
                 checkNodeParam(workflowNodeDto);

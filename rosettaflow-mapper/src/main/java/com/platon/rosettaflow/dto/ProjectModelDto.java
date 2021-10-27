@@ -10,6 +10,11 @@ import lombok.Data;
 public class ProjectModelDto {
 
     /**
+     * 模型主键id
+     */
+    private Long modelId;
+
+    /**
      * 模型所属的机构id
      */
     private String originId;
