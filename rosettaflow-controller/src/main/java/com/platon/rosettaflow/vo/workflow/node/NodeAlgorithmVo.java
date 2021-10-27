@@ -65,6 +65,9 @@ public class NodeAlgorithmVo {
     @ApiModelProperty(value = "输出存储形式: 1-明文，2:密文")
     private Byte storePattern;
 
+    @ApiModelProperty(value = "是否需要模型: 0-否，1:是")
+    private Byte inputModel;
+
 
 
 //    /** 展示时处理内存单位 */
