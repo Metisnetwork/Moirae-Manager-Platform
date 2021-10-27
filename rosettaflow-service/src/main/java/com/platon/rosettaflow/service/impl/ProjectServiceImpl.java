@@ -14,6 +14,7 @@ import com.platon.rosettaflow.common.enums.StatusEnum;
 import com.platon.rosettaflow.common.exception.BusinessException;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
+import com.platon.rosettaflow.dto.ProjectModelDto;
 import com.platon.rosettaflow.mapper.ProjectMapper;
 import com.platon.rosettaflow.mapper.domain.*;
 import com.platon.rosettaflow.service.*;
@@ -286,6 +287,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public List<User> queryAllUserNickName(Long projectId) {
         return userService.queryUserByProjectId(projectId);
+    }
+
+    @Override
+    public List<ProjectModelDto> queryAllModelByProjectId(Long projectId) {
+        return this.baseMapper.queryAllModelByProjectId(projectId);
     }
 
     /**

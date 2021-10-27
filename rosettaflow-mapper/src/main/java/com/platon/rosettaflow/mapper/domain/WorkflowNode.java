@@ -39,8 +39,12 @@ public class WorkflowNode implements Serializable {
     /**
      * 下一个节点在工作流中序号,如果没有下个节点则为空
      */
-    @TableField(updateStrategy = FieldStrategy.IGNORED )
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer nextNodeStep;
+    /**
+     * 工作流节点需要的模型id,对应t_task_result表id
+     */
+    private Long modelId;
     /**
      * 运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败
      */

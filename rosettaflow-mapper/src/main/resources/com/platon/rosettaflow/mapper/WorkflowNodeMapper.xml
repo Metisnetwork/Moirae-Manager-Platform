@@ -8,6 +8,7 @@
         <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId"/>
         <result column="node_step" jdbcType="INTEGER" property="nodeStep"/>
         <result column="next_node_step" jdbcType="INTEGER" property="nextNodeStep"/>
+        <result column="model_id" jdbcType="BIGINT" property="modelId"/>
         <result column="run_status" jdbcType="TINYINT" property="runStatus"/>
         <result column="task_id" jdbcType="VARCHAR" property="taskId"/>
         <result column="run_msg" jdbcType="VARCHAR" property="runMsg"/>
@@ -16,7 +17,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, node_name, workflow_id, algorithm_id, node_step,next_node_step, run_status, task_id, run_msg, `status`,
+    id, node_name, workflow_id, algorithm_id, node_step,next_node_step,model_id, run_status, task_id, run_msg, `status`,
     create_time, update_time
   </sql>
 </mapper>

@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
+import com.platon.rosettaflow.dto.ProjectModelDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.mapper.domain.User;
@@ -15,6 +16,7 @@ import com.platon.rosettaflow.vo.ResponseVo;
 import com.platon.rosettaflow.vo.project.ProjMemberListVo;
 import com.platon.rosettaflow.vo.project.ProjectDetailsVo;
 import com.platon.rosettaflow.vo.project.ProjectListVo;
+import com.platon.rosettaflow.vo.project.ProjectModelVo;
 import com.platon.rosettaflow.vo.user.UserNicknameVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -129,6 +131,13 @@ public class ProjectController {
     public ResponseVo<List<UserNicknameVo>> queryAllUserNickname(@ApiParam(value = "项目ID", required = true) @PathVariable Long projectId) {
         List<User> list = projectService.queryAllUserNickName(projectId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
+    }
+
+    @GetMapping("queryAllModelByProjectId/{projectId}")
+    @ApiOperation(value = "查询当前项目下所有模型", notes = "查询当前项目下所有模型")
+    public ResponseVo<List<ProjectModelVo>> queryAllModelByProjectId(@ApiParam(value = "项目ID", required = true) @PathVariable Long projectId) {
+        List<ProjectModelDto> list = projectService.queryAllModelByProjectId(projectId);
+        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectModelVo.class));
     }
 
 }

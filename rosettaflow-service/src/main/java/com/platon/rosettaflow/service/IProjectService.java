@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
+import com.platon.rosettaflow.dto.ProjectModelDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 import com.platon.rosettaflow.mapper.domain.ProjectMember;
 import com.platon.rosettaflow.mapper.domain.User;
@@ -116,4 +117,12 @@ public interface IProjectService extends IService<Project> {
      * @return 用户列表
      */
     List<User> queryAllUserNickName(Long projectId);
+
+    /**
+     * 获取当前项目下面生成的所有模型
+     *
+     * @param projectId 项目id
+     * @return 项目模型列表
+     */
+    List<ProjectModelDto> queryAllModelByProjectId(Long projectId);
 }

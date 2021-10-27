@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platon.rosettaflow.dto.ProjMemberDto;
 import com.platon.rosettaflow.dto.ProjectDto;
+import com.platon.rosettaflow.dto.ProjectModelDto;
 import com.platon.rosettaflow.mapper.domain.Project;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 项目mapper类
@@ -37,4 +40,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
     IPage<ProjMemberDto> queryProjMemberList(@Param(value = "projectId") Long projectId,
                                              @Param(value = "userName") String userName,
                                              IPage<ProjMemberDto> iPage);
+    /**
+     * 获取当前项目下面生成的所有模型
+     *
+     * @param projectId 项目id
+     * @return 项目模型列表
+     */
+    List<ProjectModelDto> queryAllModelByProjectId(@Param("projectId") Long projectId);
 }
