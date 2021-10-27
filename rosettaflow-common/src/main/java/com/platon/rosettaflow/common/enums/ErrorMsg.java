@@ -84,11 +84,14 @@ public enum ErrorMsg {
     WORKFLOW_NODE_NOT_OUTPUT_EXIST("工作流节点输出未配置", "Workflow node output is not configured"),
     WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码未配置", "Workflow node code is not configured"),
     WORKFLOW_NODE_NOT_RESOURCE_EXIST("工作流节点环境未配置", "Workflow node environment is not configured"),
+    WORKFLOW_NODE_MODEL_NOT_EXIST("工作流节点模型未配置！", "The workflow node model is not configured!"),
     WORKFLOW_PRE_TASK_RESULT_NOT_EXIST("工作流前一个节点运行节点获取失败", "Workflow pre task result not exist"),
     WORKFLOW_NODE_RUNNING_FAIL("工作流节点运行失败!", "The workflow node failed to run!"),
     WORKFLOW_INDEX_COLUMN_NOT_EXIST("工作流节点索引列不存在", "Workflow node index column not exist"),
     WORKFLOW_NODE_INPUT_NOT_EXIST("工作流节点输入不存在", "Workflow node input not exist"),
-    WORKFLOW_NODE_MODEL_NOT_EXIST("工作流节点未配置模型！", "No model configured for workflow node"),
+
+    WORKFLOW_NODE_TASK_RESULT_NOT_EXIST("工作流节点输入模型不存在", "Workflow node input model not exist"),
+    WORKFLOW_NODE_MODEL_PATH_NOT_EXIST("工作流节点输入模型路径不存在", "Workflow node input model file path not exist"),
 
     /**
      * 作业

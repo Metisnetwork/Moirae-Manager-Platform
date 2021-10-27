@@ -54,5 +54,4 @@ public class WorkflowNodeReq {
     @ApiModelProperty(value = "工作流节点输入变量请求对象")
     private List<WorkflowNodeVariableReq> workflowNodeVariableReqList;
 
-
 }
