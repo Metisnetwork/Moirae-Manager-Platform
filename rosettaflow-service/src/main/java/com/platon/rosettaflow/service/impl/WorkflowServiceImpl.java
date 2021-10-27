@@ -604,11 +604,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                     }
                 }
             }
+            if(jsonObject.containsKey("model_restore_party")){
+                jsonObject.put("model_restore_party", "p" + workflowNodeInputList.size());
+            }
             //逻辑回归动态参数[模型所在的路径，需填绝对路径]
             if (jsonObject.containsKey("model_path")) {
                 jsonObject.put("model_path", preTaskResult.getFilePath());
             }
-            return jsonStruct.getStruct();
+            return jsonObject.toJSONString();
         }
     }
 
