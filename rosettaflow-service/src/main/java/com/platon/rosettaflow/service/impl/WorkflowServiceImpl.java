@@ -293,6 +293,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         TaskDto taskDto = this.assemblyTaskDto(workflowDto);
         log.info("任务发布>>>>开始启动工作流任务workflowId:{},任务名称：{},请求数据为：{}", taskDto.getWorkFlowNodeId(), taskDto.getTaskName(), JSON.toJSONString(taskDto));
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
+
+        // 启动前判断当前节点算法是否有模型
+        this.checkModel(workflowNode);
+
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
         SubJobNode subJobNodeInfo = new SubJobNode();
         boolean isPublishSuccess = false;
@@ -343,6 +347,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
     }
 
+    /** 启动前判断当前节点算法是否有模型 */
+    private void checkModel(WorkflowNode workflowNode) {
+        Algorithm algorithm = algorithmService.getAlgorithmById(workflowNode.getAlgorithmId());
+        boolean modelFlag = workflowNode.getModelId() == null || workflowNode.getModelId() == 0;
+        if (SysConstant.INT_1 == algorithm.getInputModel() && modelFlag) {
+            log.error("checkModel--当前节点未配置模型, inputModel:{}, workflowNode:{}",  algorithm.getInputModel(), workflowNode);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
+        }
+    }
 
     private void updateSign(WorkflowDto workflowDto) {
         LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
