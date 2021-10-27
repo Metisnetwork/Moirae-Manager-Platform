@@ -67,29 +67,29 @@ public class AlgorithmReq {
     @ApiModelProperty(value = "算法代码", example = "code")
     private String algorithmCode;
 
-    /**
-     * 保存时处理内存单位
-     */
-    @SuppressWarnings("unused")
-    public Long getCostMem() {
-        return new BigDecimal(this.costMem)
-                .multiply(BigDecimal.valueOf(SysConstant.INT_1024
-                        * SysConstant.INT_1024 * SysConstant.INT_1024))
-                .setScale(SysConstant.INT_0, RoundingMode.UP)
-                .longValue();
-    }
-
-    /**
-     * 保存时处理带宽单位
-     */
-    @SuppressWarnings("unused")
-    public Long getCostBandwidth() {
-        return new BigDecimal(this.costBandwidth)
-                .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
-                .setScale(SysConstant.INT_0, RoundingMode.UP)
-                .longValue();
-    }
-
+//    /**
+//     * 保存时处理内存单位
+//     */
+//    @SuppressWarnings("unused")
+//    public Long getCostMem() {
+//        return new BigDecimal(this.costMem)
+//                .multiply(BigDecimal.valueOf(SysConstant.INT_1024
+//                        * SysConstant.INT_1024 * SysConstant.INT_1024))
+//                .setScale(SysConstant.INT_0, RoundingMode.UP)
+//                .longValue();
+//    }
+//
+//    /**
+//     * 保存时处理带宽单位
+//     */
+//    @SuppressWarnings("unused")
+//    public Long getCostBandwidth() {
+//        return new BigDecimal(this.costBandwidth)
+//                .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
+//                .setScale(SysConstant.INT_0, RoundingMode.UP)
+//                .longValue();
+//    }
+//
     /**
      * 保存时最长运行时间单位处理 （换算为毫秒存库）
      */
