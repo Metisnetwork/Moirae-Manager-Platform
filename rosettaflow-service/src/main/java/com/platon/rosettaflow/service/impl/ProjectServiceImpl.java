@@ -220,13 +220,15 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void updateProjMember(ProjectMember projectMember) {
         ProjectMember oldMember = projectMemberService.getById(projectMember.getId());
 
         //管理员只有一个时，不能更改管理员的角色
         List<ProjectMember> projectMemberList = projectMemberService.getAdminList(oldMember.getProjectId());
-        if (projectMemberList.size() == 1 && projectMemberList.get(0).getRole() != projectMember.getRole().byteValue()) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_must__ERROR.getMsg());
+        if (projectMemberList.size() == 1 && projectMember.getUserId().intValue() == projectMemberList.get(0).getUserId() && projectMember.getRole() != ProjectMemberRoleEnum.ADMIN.getRoleId()) {
+            log.error("ProjectServiceImpl->updateProjMember,fail reason:{}", ErrorMsg.USER_ADMIN_MUST_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_MUST_ERROR.getMsg());
         }
         // 校验项目成员角色
         checkAdminPermission(oldMember.getProjectId());
