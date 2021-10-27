@@ -10,7 +10,8 @@ import java.util.Date;
 
 /**
  * t_algorithm
- * @author 
+ *
+ * @author admin
  */
 @Data
 @TableName(value = "t_algorithm")
@@ -105,11 +106,6 @@ public class Algorithm implements Serializable {
      * 状态: 0-无效，1- 有效
      */
     private Byte status;
-
-    /**
-     * 版本标识，用于逻辑删除
-     */
-    private Byte delVersion;
 
     /**
      * 创建时间

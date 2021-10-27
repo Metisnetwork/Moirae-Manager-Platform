@@ -1,13 +1,14 @@
 package com.platon.rosettaflow.mapper.domain;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * t_job_step
+ *
  * @author admin
  */
 @Data
@@ -15,55 +16,55 @@ public class JobStep implements Serializable {
     /**
      * 任务表ID(自增长)
      */
-    @ApiModelProperty(value="任务表ID(自增长)")
+    @ApiModelProperty(value = "任务表ID(自增长)")
     private Long id;
 
     /**
      * 任务编号
      */
-    @ApiModelProperty(value="任务编号")
+    @ApiModelProperty(value = "任务编号")
     private String jobNo;
 
     /**
      * 任务id
      */
-    @ApiModelProperty(value="任务id")
+    @ApiModelProperty(value = "任务id")
     private Long jobId;
 
     /**
      * 工作流节点id
      */
-    @ApiModelProperty(value="工作流节点id")
+    @ApiModelProperty(value = "工作流节点id")
     private Long workflowNodeId;
 
     /**
      * 工作流节点步骤表id
      */
-    @ApiModelProperty(value="工作流节点步骤表id")
+    @ApiModelProperty(value = "工作流节点步骤表id")
     private Long step;
 
     /**
      * 作业状态:0-未开始,1-运行中,2-待协作方同意,3-运行成功,4-运行失败
      */
-    @ApiModelProperty(value="作业状态:0-未开始,1-运行中,2-待协作方同意,3-运行成功,4-运行失败")
+    @ApiModelProperty(value = "作业状态:0-未开始,1-运行中,2-待协作方同意,3-运行成功,4-运行失败")
     private Byte status;
 
     /**
      * 保存路径
      */
-    @ApiModelProperty(value="保存路径")
+    @ApiModelProperty(value = "保存路径")
     private String savePath;
 
     /**
      * 创建时间
      */
-    @ApiModelProperty(value="创建时间")
+    @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @ApiModelProperty(value="更新时间")
+    @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
@@ -81,14 +82,14 @@ public class JobStep implements Serializable {
         }
         JobStep other = (JobStep) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getJobNo() == null ? other.getJobNo() == null : this.getJobNo().equals(other.getJobNo()))
-            && (this.getJobId() == null ? other.getJobId() == null : this.getJobId().equals(other.getJobId()))
-            && (this.getWorkflowNodeId() == null ? other.getWorkflowNodeId() == null : this.getWorkflowNodeId().equals(other.getWorkflowNodeId()))
-            && (this.getStep() == null ? other.getStep() == null : this.getStep().equals(other.getStep()))
-            && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-            && (this.getSavePath() == null ? other.getSavePath() == null : this.getSavePath().equals(other.getSavePath()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
+                && (this.getJobNo() == null ? other.getJobNo() == null : this.getJobNo().equals(other.getJobNo()))
+                && (this.getJobId() == null ? other.getJobId() == null : this.getJobId().equals(other.getJobId()))
+                && (this.getWorkflowNodeId() == null ? other.getWorkflowNodeId() == null : this.getWorkflowNodeId().equals(other.getWorkflowNodeId()))
+                && (this.getStep() == null ? other.getStep() == null : this.getStep().equals(other.getStep()))
+                && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
+                && (this.getSavePath() == null ? other.getSavePath() == null : this.getSavePath().equals(other.getSavePath()))
+                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
+                && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
     }
 
     @Override
@@ -109,21 +110,19 @@ public class JobStep implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", jobNo=").append(jobNo);
-        sb.append(", jobId=").append(jobId);
-        sb.append(", workflowNodeId=").append(workflowNodeId);
-        sb.append(", step=").append(step);
-        sb.append(", status=").append(status);
-        sb.append(", savePath=").append(savePath);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", updateTime=").append(updateTime);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+        return getClass().getSimpleName() +
+                " [" +
+                "Hash = " + hashCode() +
+                ", id=" + id +
+                ", jobNo=" + jobNo +
+                ", jobId=" + jobId +
+                ", workflowNodeId=" + workflowNodeId +
+                ", step=" + step +
+                ", status=" + status +
+                ", savePath=" + savePath +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", serialVersionUID=" + serialVersionUID +
+                "]";
     }
 }
