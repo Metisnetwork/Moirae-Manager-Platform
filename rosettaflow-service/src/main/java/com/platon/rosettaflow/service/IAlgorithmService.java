@@ -34,6 +34,13 @@ public interface IAlgorithmService extends IService<Algorithm> {
     List<AlgorithmDto> queryAlgorithmList(String algorithmName);
 
     /**
+     * 获取算法，通过算法id
+     * @param id 算法id
+     * @return Algorithm
+     */
+    Algorithm getAlgorithmById(Long id);
+
+    /**
      * 查询算法详情
      * @param id 算法id
      * @return AlgorithmDto
