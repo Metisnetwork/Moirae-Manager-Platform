@@ -61,7 +61,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
                 getMetaDataAuthorityDto.setUser("0x007a85e3230b5d96ab15e8e37c7a27daae53e703");
             }
 
-            getMetaDataAuthorityDto.setUserType(UserTypeEnum.ALAYA.getValue());
+            getMetaDataAuthorityDto.setUserType(UserTypeEnum.TEST_NETWORK.getValue());
 
             metaDataAuthorityDto = new MetaDataAuthorityDto();
             nodeIdentityDto = new NodeIdentityDto();
