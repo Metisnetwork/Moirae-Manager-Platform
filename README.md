@@ -35,17 +35,17 @@
 
 RosettaFlow model对应包名
 ```
-com.platon.rosettaflow.mapper.domain
+com.moirae.rosettaflow.mapper.domain
 ```
 
 RosettaFlow dao对应包名
 ```
-com.platon.rosettaflow.mapper
+com.moirae.rosettaflow.mapper
 ```
 
 RosettaFlow xml文件对应包名
 ```
-com.platon.rosettaflow.mapper
+com.moirae.rosettaflow.mapper
 ```
 
 model是常用注解说明

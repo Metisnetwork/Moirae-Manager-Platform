@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.WorkflowNodeVariableMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.WorkflowNodeVariable">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
+        <result column="var_node_type" jdbcType="TINYINT" property="varNodeType"/>
+        <result column="var_node_key" jdbcType="VARCHAR" property="varNodeKey"/>
+        <result column="var_node_value" jdbcType="VARCHAR" property="varNodeValue"/>
+        <result column="var_node_desc" jdbcType="VARCHAR" property="varNodeDesc"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, workflow_node_id, var_node_type, var_node_key, var_node_value, var_node_desc, 
+    `status`, create_time, update_time
+  </sql>
+    <insert id="batchInsert">
+        <foreach collection="workflowNodeVariableList" item="v" separator=";">
+            insert into t_workflow_node_variable
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="v.workflowNodeId != null">
+                    workflow_node_id,
+                </if>
+                <if test="v.varNodeType != null">
+                    var_node_type,
+                </if>
+                <if test="v.varNodeKey != null">
+                    var_node_key,
+                </if>
+                <if test="v.varNodeValue != null">
+                    var_node_value,
+                </if>
+                <if test="v.varNodeDesc != null">
+                    var_node_desc,
+                </if>
+                <if test="v.status != null">
+                    `status`,
+                </if>
+                <if test="v.createTime != null">
+                    create_time,
+                </if>
+                <if test="v.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="v.workflowNodeId != null">
+                    #{v.workflowNodeId,jdbcType=BIGINT},
+                </if>
+                <if test="v.varNodeType != null">
+                    #{v.varNodeType,jdbcType=TINYINT},
+                </if>
+                <if test="v.varNodeKey != null">
+                    #{v.varNodeKey,jdbcType=VARCHAR},
+                </if>
+                <if test="v.varNodeValue != null">
+                    #{v.varNodeValue,jdbcType=VARCHAR},
+                </if>
+                <if test="v.varNodeDesc != null">
+                    #{v.varNodeDesc,jdbcType=VARCHAR},
+                </if>
+                <if test="v.status != null">
+                    #{v.status,jdbcType=TINYINT},
+                </if>
+                <if test="v.createTime != null">
+                    #{v.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="v.updateTime != null">
+                    #{v.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+</mapper>

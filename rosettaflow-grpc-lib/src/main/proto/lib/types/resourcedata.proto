@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "com.platon.rosettaflow.grpc.service";
+option java_package = "com.moirae.rosettaflow.grpc.service";
 option java_outer_classname = "ResourceDataProto";
 package types;
 

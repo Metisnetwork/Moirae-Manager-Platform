@@ -558,7 +558,6 @@ CREATE TABLE `t_job`
     `update_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 5
   DEFAULT CHARSET = utf8mb4 COMMENT ='作业表';
 -- ----------------------------
 -- Table structure for `t_sub_job`

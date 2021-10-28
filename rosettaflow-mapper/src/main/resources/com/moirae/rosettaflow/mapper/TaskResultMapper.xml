@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.TaskResultMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.TaskResult">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="task_id" jdbcType="VARCHAR" property="taskId"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="metadata_id" jdbcType="VARCHAR" property="metadataId"/>
+        <result column="origin_id" jdbcType="VARCHAR" property="originId"/>
+        <result column="file_path" jdbcType="VARCHAR" property="filePath"/>
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="port" jdbcType="VARCHAR" property="port"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, task_id, file_name, metadata_id, origin_id, file_path, ip, port, `status`, create_time,
+        update_time
+    </sql>
+
+    <insert id="batchInsert">
+        <foreach collection="taskResultList" item="taskResult" separator=";">
+            replace into t_task_result
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="taskResult.taskId != null">
+                    task_id,
+                </if>
+                <if test="taskResult.fileName != null">
+                    file_name,
+                </if>
+                <if test="taskResult.metadataId != null">
+                    metadata_id,
+                </if>
+                <if test="taskResult.originId != null">
+                    origin_id,
+                </if>
+                <if test="taskResult.filePath != null">
+                    file_path,
+                </if>
+                <if test="taskResult.ip != null">
+                    ip,
+                </if>
+                <if test="taskResult.port != null">
+                    port,
+                </if>
+                <if test="taskResult.status != null">
+                    `status`,
+                </if>
+                <if test="taskResult.createTime != null">
+                    create_time,
+                </if>
+                <if test="taskResult.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="taskResult.taskId != null">
+                    #{taskResult.taskId,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.fileName != null">
+                    #{taskResult.fileName,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.metadataId != null">
+                    #{taskResult.metadataId,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.originId != null">
+                    #{taskResult.originId,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.filePath != null">
+                    #{taskResult.filePath,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.ip != null">
+                    #{taskResult.ip,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.port != null">
+                    #{taskResult.port,jdbcType=VARCHAR},
+                </if>
+                <if test="taskResult.status != null">
+                    #{taskResult.status,jdbcType=TINYINT},
+                </if>
+                <if test="taskResult.createTime != null">
+                    #{taskResult.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="taskResult.updateTime != null">
+                    #{taskResult.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+
+</mapper>

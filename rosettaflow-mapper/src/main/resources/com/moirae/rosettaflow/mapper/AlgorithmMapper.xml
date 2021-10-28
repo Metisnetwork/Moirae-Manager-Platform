@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.AlgorithmMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.Algorithm">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName"/>
+        <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc"/>
+        <result column="author" jdbcType="VARCHAR" property="author"/>
+        <result column="max_numbers" jdbcType="BIGINT" property="maxNumbers"/>
+        <result column="min_numbers" jdbcType="BIGINT" property="minNumbers"/>
+        <result column="support_language" jdbcType="VARCHAR" property="supportLanguage"/>
+        <result column="support_os_system" jdbcType="VARCHAR" property="supportOsSystem"/>
+        <result column="algorithm_type" jdbcType="TINYINT" property="algorithmType"/>
+        <result column="cost_mem" jdbcType="BIGINT" property="costMem"/>
+        <result column="cost_cpu" jdbcType="INTEGER" property="costCpu"/>
+        <result column="cost_gpu" jdbcType="INTEGER" property="costGpu"/>
+        <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth"/>
+        <result column="run_time" jdbcType="BIGINT" property="runTime"/>
+        <result column="input_model" jdbcType="TINYINT" property="inputModel"/>
+        <result column="store_pattern" jdbcType="TINYINT" property="storePattern"/>
+        <result column="public_flag" jdbcType="TINYINT" property="publicFlag"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, algorithm_name, algorithm_desc, max_numbers, min_numbers, support_language,
+        support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
+        run_time, input_model, store_pattern, public_flag, `status`, create_time, update_time
+    </sql>
+    <update id="truncate">
+        TRUNCATE TABLE t_algorithm
+    </update>
+
+    <sql id="Algorithm_Column_List">
+        select
+        a.id as algorithmId,
+        a.algorithm_name as algorithmName,
+        a.algorithm_desc as algorithmDesc,
+        a.author as author,
+        a.max_numbers as maxNumbers,
+        a.min_numbers as minNumbers,
+        a.support_language as supportLanguage,
+        a.support_os_system as supportOsSystem,
+        a.algorithm_type as algorithmType,
+        a.cost_mem as costMem,
+        a.cost_cpu as costCpu,
+        a.cost_gpu as costGpu,
+        a.cost_bandwidth as costBandwidth,
+        a.run_time as runTime,
+        a.input_model as inputModel,
+        a.store_pattern as storePattern,
+        b.edit_type as editType,
+        b.calculate_contract_code as calculateContractCode
+        from
+        t_algorithm a, t_algorithm_code b
+        where
+        a.id = b.algorithm_id
+        and a.status = '1'
+        and b.status = '1'
+    </sql>
+
+    <!-- 查询算法列表 -->
+    <select id="queryAlgorithmList" resultType="com.moirae.rosettaflow.dto.AlgorithmDto">
+        select
+        a.id as algorithmId,
+        a.algorithm_name as algorithmName,
+        a.algorithm_desc as algorithmDesc,
+        a.algorithm_type as algorithmType
+        from
+        t_algorithm a
+        where
+        a.status = '1'
+        <if test="algorithmName != null and algorithmName != ''">
+            and a.algorithm_name LIKE CONCAT('%', #{algorithmName, jdbcType=VARCHAR}, '%')
+        </if>
+        order by a.algorithm_type asc
+    </select>
+
+    <!-- 查询算法树列表 -->
+    <select id="queryAlgorithmTreeList" resultType="com.moirae.rosettaflow.dto.AlgorithmDto">
+        <include refid="Algorithm_Column_List"/>
+        order by a.algorithm_type asc
+    </select>
+
+    <!-- 查询算法详情 -->
+    <select id="queryAlgorithmDetails" resultType="com.moirae.rosettaflow.dto.AlgorithmDto">
+        <include refid="Algorithm_Column_List"/>
+        and a.id = #{algorithmId, jdbcType=BIGINT}
+    </select>
+</mapper>
