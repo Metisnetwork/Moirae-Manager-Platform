@@ -103,7 +103,7 @@ public class TaskServiceClient {
             taskDetailDto.setTaskName(getTaskDetailResponse.getInformation().getTaskName());
             //发起任务的用户的信息 (task是属于用户的)
             taskDetailDto.setUser(getTaskDetailResponse.getInformation().getUser());
-            //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+            //用户类型 (0: 未定义; 1: 第二地址; 2: Alaya地址; 3: PlatON地址)
             taskDetailDto.setUserType(getTaskDetailResponse.getInformation().getUserTypeValue());
 
             // 任务发起方组织信息
@@ -279,7 +279,7 @@ public class TaskServiceClient {
                 .setTaskName(taskDto.getTaskName());
         // 发起任务的用户的信息 (task是属于用户的)
         publishTaskDeclareRequestBuilder.setUser(taskDto.getUser());
-        //用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+        //用户类型 (0: 未定义; 1: 第二地址; 2: Alaya地址; 3: PlatON地址)
         publishTaskDeclareRequestBuilder.setUserType(UserType.forNumber(taskDto.getUserType()));
         //任务发起者 组织信息
         TaskOrganization sender = TaskOrganization.newBuilder()

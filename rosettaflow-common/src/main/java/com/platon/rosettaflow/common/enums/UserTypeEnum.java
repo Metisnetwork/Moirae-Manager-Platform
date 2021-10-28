@@ -13,7 +13,7 @@ public enum UserTypeEnum {
      */
     UNKNOWN(0),
     /**
-     * 以太坊地址
+     * 第二地址
      */
     ETH(1),
     /**

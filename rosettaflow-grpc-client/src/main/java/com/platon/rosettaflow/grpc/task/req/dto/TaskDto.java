@@ -26,7 +26,7 @@ public class TaskDto {
      */
     private String user;
     /**
-     * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址)
+     * 用户类型 (0: 未定义; 1: 第二地址; 2: Alaya地址; 3: PlatON地址)
      */
     private Integer userType;
 
