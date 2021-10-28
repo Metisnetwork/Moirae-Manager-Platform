@@ -36,20 +36,12 @@ public class JobManager {
     @Resource
     private IJobService jobService;
 
-    @Resource
-    private RedissonClient redissonClient;
-
     /**
      * 服务启动加载所有的job
      */
     @PostConstruct
     @Lock(keys = "JobManager")
     public void init() {
-        //服务启动，清除缓存作业消息队列
-        /*boolean isDelete = redisUtil.deleteBatch(Arrays.asList(SysConstant.JOB_ADD_QUEUE, SysConstant.JOB_EDIT_QUEUE));
-        if (!isDelete) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_RUNNING_CACHE_CLEAR_ERROR.getMsg());
-        }*/
         //服务启动，启动所有未完成作业
         List<Job> jobList = jobService.getAllUnfinishedJob();
         for (Job job : jobList) {

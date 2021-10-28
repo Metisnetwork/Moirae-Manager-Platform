@@ -25,7 +25,6 @@ public class ListenJobTask {
     @Resource
     private RedissonClient redissonClient;
 
-
     /**
      * 注意：测试时候当注释定时任务时，同步注释掉SyncJobStatusTask任务，否则可能出现数据状态不一致
      */

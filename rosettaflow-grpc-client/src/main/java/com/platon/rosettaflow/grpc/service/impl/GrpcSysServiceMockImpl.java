@@ -24,7 +24,7 @@ public class GrpcSysServiceMockImpl implements GrpcSysService {
         responseDto.setOriginId("originId");
         responseDto.setIp("localhost");
         responseDto.setPort("9999");
-        responseDto.setFileName("mockFileName");
+        responseDto.setFileName("task `task:"+taskId+"` result file");
         responseDto.setFilePath("/mockFilePath");
         responseDto.setMetadataId("mockMetaDataId");
         return responseDto;

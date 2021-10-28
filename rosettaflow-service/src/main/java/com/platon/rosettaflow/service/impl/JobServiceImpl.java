@@ -55,12 +55,15 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Override
     public List<Job> getAllUnfinishedJob() {
+        //包含两部分数据：1-重复执行未超过结束时间的数据，2-只执行一次，运行中的数据
         LambdaQueryWrapper<Job> wrapper = Wrappers.lambdaQuery();
-        wrapper.and(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.UN_START.getValue())
+        wrapper.and(w1 -> w1.eq(Job::getRepeatFlag, JobRepeatEnum.REPEAT.getValue())
                         .le(Job::getBeginTime, new Date(System.currentTimeMillis()))
                         .ge(Job::getEndTime, new Date(System.currentTimeMillis()))
                         .eq(Job::getStatus, StatusEnum.VALID.getValue()))
-                .or(jobLambdaQueryWrapper -> jobLambdaQueryWrapper.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue()).eq(Job::getStatus, StatusEnum.VALID.getValue()))
+                .or(w2 -> w2.eq(Job::getJobStatus, JobStatusEnum.RUNNING.getValue())
+                        .eq(Job::getRepeatFlag, JobRepeatEnum.NOREPEAT.getValue())
+                        .eq(Job::getStatus, StatusEnum.VALID.getValue()))
                 .orderByAsc(Job::getId);
         return this.baseMapper.selectList(wrapper);
     }
@@ -160,7 +163,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EXIST.getMsg());
         }
         //如果作业正在执行不能够修改
-        if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue() ) {
+        if (job.getJobStatus() == JobStatusEnum.RUNNING.getValue()) {
             log.error("Job is running edit failed, jobId:{}->,{}", jobDto.getId(), ErrorMsg.JOB_NOT_EDIT.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EDIT.getMsg());
         }
@@ -168,7 +171,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         updateWrapper.eq(Job::getId, jobDto.getId());
         updateWrapper.set(Job::getName, jobDto.getName());
         updateWrapper.set(Job::getDesc, jobDto.getDesc());
-        if(!this.update(updateWrapper)) {
+        if (!this.update(updateWrapper)) {
             log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_EDIT_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_EDIT_ERROR.getMsg());
         }
@@ -250,7 +253,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         //检查子作业是否存在运行中
         Object[] subJobArrayIds = null;
         List<SubJob> subJobList = subJobService.queryBatchSubJobListByJobId(ids);
-        if(!Objects.isNull(subJobList) && !subJobList.isEmpty()){
+        if (!Objects.isNull(subJobList) && !subJobList.isEmpty()) {
             subJobArrayIds = subJobList.stream().map(SubJob::getId).toArray();
             boolean isExistRunningSubJob = subJobList.stream().anyMatch(subJob -> subJob.getSubJobStatus() == SubJobStatusEnum.RUNNING.getValue());
             if (isExistRunningSubJob) {
@@ -260,7 +263,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
         //检查子作业节点是否存在运行中节点
         Object[] subJobNodeArrayIds = null;
-        if(!Objects.isNull(subJobArrayIds) && subJobArrayIds.length > 0){
+        if (!Objects.isNull(subJobArrayIds) && subJobArrayIds.length > 0) {
             List<SubJobNode> subJobNodeList = subJobNodeService.queryBatchSubJobListNodeByJobId(subJobArrayIds);
             subJobNodeArrayIds = subJobNodeList.stream().map(SubJobNode::getId).toArray();
             boolean isExistRunningSubJobNode = subJobNodeList.stream().anyMatch(subJobNode -> subJobNode.getRunStatus() == SubJobNodeStatusEnum.RUNNING.getValue());
@@ -270,13 +273,13 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             }
         }
         //批量更新作业、子作业、子作业节点有效状态
-        if(!Objects.isNull(ids.toArray()) && ids.toArray().length > 0){
+        if (ids.toArray().length > 0) {
             this.updateBatchStatus(ids.toArray(), StatusEnum.UN_VALID.getValue());
         }
-        if(!Objects.isNull(subJobArrayIds) && subJobArrayIds.length > 0){
+        if (!Objects.isNull(subJobArrayIds) && subJobArrayIds.length > 0) {
             subJobService.updateBatchStatus(subJobArrayIds, StatusEnum.UN_VALID.getValue());
         }
-        if(!Objects.isNull(subJobNodeArrayIds) && subJobNodeArrayIds.length > 0){
+        if (!Objects.isNull(subJobNodeArrayIds) && subJobNodeArrayIds.length > 0) {
             subJobNodeService.updateBatchStatus(subJobNodeArrayIds, StatusEnum.UN_VALID.getValue());
         }
     }

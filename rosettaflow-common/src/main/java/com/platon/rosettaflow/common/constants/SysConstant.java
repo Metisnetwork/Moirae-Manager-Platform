@@ -108,7 +108,8 @@ public class SysConstant {
             "algorithm/details",
             "projectTemplate/list",
             "testGrpc",
-            "redis"
+            "redis",
+            "quartz"
     };
 
     /**
