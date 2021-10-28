@@ -38,6 +38,11 @@ public class AddJobReq {
     @Range(min = 0, max = 1, message = "{job.repeatFlag.type.error}")
     private Byte repeatFlag;
 
+    @ApiModelProperty(value = "是否限制结束时间：0-否,1-是", required = true)
+    @NotNull(message = "{job.endTimeFlag.notNull}")
+    @Range(min = 0, max = 1, message = "{job.endTimeFlag.type.error}")
+    private Byte endTimeFlag;
+
     @ApiModelProperty(value = "重复间隔，单位分钟;当是否重复为是时，才必选；如果非必填则可以填空")
     @Positive(message = "{job.repeatInterval.positive}")
     private Integer repeatInterval;

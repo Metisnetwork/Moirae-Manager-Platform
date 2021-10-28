@@ -10,6 +10,7 @@
     <result column="repeat_interval" jdbcType="INTEGER" property="repeatInterval" />
     <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="end_time_flag" jdbcType="TINYINT" property="endTimeFlag" />
     <result column="job_status" jdbcType="TINYINT" property="jobStatus" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -17,7 +18,7 @@
   </resultMap>
 
   <sql id="Base_Column_List">
-    id, workflow_id, `name`, `desc`, repeat_flag, repeat_interval, begin_time, end_time, 
+    id, workflow_id, `name`, `desc`, repeat_flag, repeat_interval, begin_time, end_time, end_time_flag,
     job_status, `status`, create_time, update_time
   </sql>
 
@@ -54,6 +55,7 @@
         repeat_interval = #{repeatInterval,jdbcType=INTEGER},
         begin_time = #{beginTime,jdbcType=TIMESTAMP},
         end_time = #{endTime,jdbcType=TIMESTAMP},
+        end_time_flag = #{endTimeFlag,jdbcType=INTEGER},
         job_status = #{jobStatus,jdbcType=INTEGER},
         `status` = #{status,jdbcType=INTEGER},
         update_time = #{updateTime,jdbcType=TIMESTAMP}

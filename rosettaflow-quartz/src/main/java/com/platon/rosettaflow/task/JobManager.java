@@ -1,5 +1,6 @@
 package com.platon.rosettaflow.task;
 
+import com.platon.rosettaflow.common.enums.JobEndTimeLimitEnum;
 import com.platon.rosettaflow.common.enums.JobRepeatEnum;
 import com.platon.rosettaflow.common.enums.JobStatusEnum;
 import com.platon.rosettaflow.mapper.domain.Job;
@@ -76,7 +77,7 @@ public class JobManager {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(job.getId().toString(), GROUP)
                 .startAt(job.getBeginTime())
-                .endAt(job.getEndTime())
+                .endAt(job.getEndTimeFlag() == JobEndTimeLimitEnum.LIMIT.getValue() ? job.getEndTime() : new Date(4102386722000L))
                 .withSchedule(simpleScheduleBuilder)
                 .build();
         try {

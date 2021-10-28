@@ -60,6 +60,11 @@ public class Job implements Serializable {
     private Date endTime;
 
     /**
+     * 是否限制结束时间：0-否,1-是
+     */
+    private Byte endTimeFlag;
+
+    /**
      * 状态: 0-未开始，1-运行中，2-已停止，3-已结束
      */
     private Byte jobStatus;

@@ -117,7 +117,6 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void edit(JobDto jobDto) {
-        Job jobOriginal = new Job();
         Job job = this.getValidJobById(jobDto.getId());
         if (null == job) {
             log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_NOT_EXIST.getMsg());
@@ -131,13 +130,13 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
         checkParam(jobDto);
         //修改作业
-        BeanCopierUtils.copy(job, jobOriginal);
         BeanCopierUtils.copy(jobDto, job);
         job.setJobStatus(JobStatusEnum.UN_START.getValue());
         job.setStatus(StatusEnum.VALID.getValue());
         if (job.getRepeatFlag() == JobRepeatEnum.NOREPEAT.getValue()) {
             job.setRepeatInterval(null);
             job.setEndTime(null);
+            job.setEndTimeFlag(JobEndTimeLimitEnum.LIMIT.getValue());
             job.setStatus(StatusEnum.VALID.getValue());
             job.setUpdateTime(new Date());
         }
@@ -293,16 +292,28 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_TIME_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_ERROR.getMsg());
         }
-        //作业执行重复时,结束时间及重复次数合法性
+        //作业执行重复时,重复次数合法性
         if (jobDto.getRepeatFlag() == JobRepeatEnum.REPEAT.getValue()) {
-            if (Objects.isNull(jobDto.getEndTime()) || Objects.isNull(jobDto.getRepeatInterval())) {
-                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_TIME_REPEAT_INTERVAL_ERROR.getMsg());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_REPEAT_INTERVAL_ERROR.getMsg());
+            if (Objects.isNull(jobDto.getRepeatInterval())) {
+                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_REPEAT_INTERVAL_ERROR.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_REPEAT_INTERVAL_ERROR.getMsg());
             }
         } else {
-            if (!Objects.isNull(jobDto.getEndTime()) || !Objects.isNull(jobDto.getRepeatInterval())) {
-                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_TIME_NO_REPEAT_INTERVAL_ERROR.getMsg());
+            if (!Objects.isNull(jobDto.getRepeatInterval())) {
+                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_NO_REPEAT_INTERVAL_ERROR.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NO_REPEAT_INTERVAL_ERROR.getMsg());
+            }
+        }
+        //作业结束时间校验
+        if (jobDto.getEndTimeFlag() == JobEndTimeLimitEnum.LIMIT.getValue()) {
+           if (Objects.isNull(jobDto.getEndTime())) {
+               log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_ENDTIME_NOT_NULL.getMsg());
+               throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ENDTIME_NOT_NULL.getMsg());
+           }
+        } else {
+            if (!Objects.isNull(jobDto.getEndTime())) {
+                log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_ENDTIME_NULL.getMsg());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ENDTIME_NULL.getMsg());
             }
         }
     }
