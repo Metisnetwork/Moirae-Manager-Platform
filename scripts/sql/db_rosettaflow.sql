@@ -551,6 +551,7 @@ CREATE TABLE `t_job`
     `repeat_interval` int(11)             DEFAULT NULL COMMENT '重复间隔，单位分钟',
     `begin_time`      datetime            DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
     `end_time`        datetime            DEFAULT NULL COMMENT '结束时间',
+    `end_time_flag`   tinyint(4)          DEFAULT '1' COMMENT '是否限制结束时间：0-否,1-是',
     `job_status`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态: 0-未开始，1-运行中，2-已停止，3-已结束',
     `status`          tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
     `create_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

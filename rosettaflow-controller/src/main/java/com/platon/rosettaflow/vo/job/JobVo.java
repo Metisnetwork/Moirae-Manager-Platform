@@ -48,6 +48,9 @@ public class JobVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date endTime;
 
+    @ApiModelProperty("是否限制结束时间：0-否,1-是")
+    private Byte endTimeFlag;
+
     @ApiModelProperty("状态: 0-未开始，1-运行中，2-已停止，3-已结束")
     private Byte jobStatus;
 

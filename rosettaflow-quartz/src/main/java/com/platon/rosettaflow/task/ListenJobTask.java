@@ -37,7 +37,7 @@ public class ListenJobTask {
                 Job job = (Job) redissonClient.getBlockingQueue(SysConstant.JOB_ADD_QUEUE).take();
                 log.info("------redis message add queue jobId:" + job.getId());
                 jobManager.startJob(job);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 log.error("从redis JOB_ADD_QUEUE队列中获取添加作业失败，失败原因：{}", e.getMessage(), e);
             }
         }

@@ -14,4 +14,5 @@ import lombok.EqualsAndHashCode;
 public class JobDto  extends Job {
 
     private String workflowName;
+
 }
