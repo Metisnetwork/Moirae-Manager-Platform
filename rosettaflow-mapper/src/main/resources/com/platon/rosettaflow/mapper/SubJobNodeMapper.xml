@@ -22,8 +22,8 @@
             twf.node_number
         FROM
             t_sub_job_node AS tsjn
-                LEFT JOIN t_sub_job AS tsj ON tsjn.sub_job_id = tsj.id
-                LEFT JOIN t_workflow AS twf ON tsj.workflow_id = twf.id
+                INNER JOIN t_sub_job AS tsj ON tsjn.sub_job_id = tsj.id
+                INNER JOIN t_workflow AS twf ON tsj.workflow_id = twf.id
         WHERE
             tsjn.run_status = 1 AND tsjn.`status` = 1
     </select>

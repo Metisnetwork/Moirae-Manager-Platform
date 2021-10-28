@@ -26,6 +26,7 @@ public interface GrpcTaskService {
      * @param taskDto  任务信息
      * @param callback 回调函数
      */
+    @SuppressWarnings("unused")
     void asyncPublishTask(TaskDto taskDto, Consumer<PublishTaskDeclareResponse> callback);
 
     /**
@@ -49,6 +50,7 @@ public interface GrpcTaskService {
      * @param taskIds 任务id列表
      * @return 任务事件列表
      */
+    @SuppressWarnings("unused")
     List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds);
 
     /**

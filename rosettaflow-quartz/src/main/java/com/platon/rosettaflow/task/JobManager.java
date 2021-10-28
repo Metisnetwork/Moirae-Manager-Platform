@@ -9,8 +9,8 @@ import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Date;
@@ -37,12 +37,11 @@ public class JobManager {
     private IJobService jobService;
 
     /**
-     * 服务启动加载所有的job
+     * 服务启动加载所有未完成作业
      */
     @PostConstruct
     @Lock(keys = "JobManager")
     public void init() {
-        //服务启动，启动所有未完成作业
         List<Job> jobList = jobService.getAllUnfinishedJob();
         for (Job job : jobList) {
             startJob(job);
@@ -125,7 +124,6 @@ public class JobManager {
         stopJob(job);
         job.setJobStatus(JobStatusEnum.STOP.getValue());
         jobService.updateById(job);
-
     }
 
     /**

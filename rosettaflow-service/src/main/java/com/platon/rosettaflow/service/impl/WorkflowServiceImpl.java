@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platon.rosettaflow.common.constants.AlgorithmConstant;
+import com.platon.rosettaflow.common.constants.SysConfig;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.*;
 import com.platon.rosettaflow.common.exception.BusinessException;
@@ -49,6 +50,9 @@ import static cn.hutool.core.date.DateTime.now;
 @Slf4j
 @Service
 public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> implements IWorkflowService {
+
+    @Resource
+    private SysConfig sysConfig;
 
     @Resource
     private CommonService commonService;
@@ -342,17 +346,19 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             workflowDto.setStartNode(workflowNode.getNextNodeStep());
             workflowDto.setTaskId(workflowDto.isJobFlg() ? subJobNodeInfo.getTaskId() : workflowNode.getTaskId());
             String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
-            redissonObject.setValue(taskKey + workflowDto.getTaskId(), workflowDto);
+            redissonObject.setValue(taskKey + workflowDto.getTaskId(), workflowDto, sysConfig.getRedisTimeOut());
             log.info("多节点继续执行下个节点>>>>redis key:{},", taskKey + workflowDto.getTaskId());
         }
     }
 
-    /** 启动前判断当前节点算法是否有模型 */
+    /**
+     * 启动前判断当前节点算法是否有模型
+     */
     private void checkModel(WorkflowNode workflowNode) {
         Algorithm algorithm = algorithmService.getAlgorithmById(workflowNode.getAlgorithmId());
         boolean modelFlag = workflowNode.getModelId() == null || workflowNode.getModelId() == 0;
         if (SysConstant.INT_1 == algorithm.getInputModel() && modelFlag) {
-            log.error("checkModel--当前节点未配置模型, inputModel:{}, workflowNode:{}",  algorithm.getInputModel(), workflowNode);
+            log.error("checkModel--当前节点未配置模型, inputModel:{}, workflowNode:{}", algorithm.getInputModel(), workflowNode);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
         }
     }

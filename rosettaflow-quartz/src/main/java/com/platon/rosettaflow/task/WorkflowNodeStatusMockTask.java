@@ -95,7 +95,7 @@ public class WorkflowNodeStatusMockTask {
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
                     if (taskResultResponseDto == null) {
                         log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
-                        return;
+                        continue;
                     }
                     TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
                     saveTaskResultList.add(taskResult);
@@ -114,6 +114,8 @@ public class WorkflowNodeStatusMockTask {
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
+                    //执行成空，清除redis中的key
+                    redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个工作流的状态为失败
                     if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {

@@ -18,14 +18,14 @@ import java.util.List;
 /**
  * @author admin
  * @date 2021/10/13
- * @description 系统状态 接口
+ * @description 系统状态接口
  */
 @Slf4j
 @Component
 public class SysServiceClient {
 
     @GrpcClient("carrier-grpc-server")
-    private YarnServiceGrpc.YarnServiceBlockingStub yarnServiceBlockingStub;
+    YarnServiceGrpc.YarnServiceBlockingStub yarnServiceBlockingStub;
 
     /**
      * 查询指定任务的结果摘要

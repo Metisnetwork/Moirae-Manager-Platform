@@ -1,8 +1,6 @@
 package com.platon.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.platon.rosettaflow.common.constants.SysConstant;
 import com.platon.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.platon.rosettaflow.common.enums.WorkflowRunStatusEnum;
@@ -56,7 +54,6 @@ public class WorkflowNodeStatusTask {
     @Resource
     private RedissonObject redissonObject;
 
-
     @Resource
     private GrpcSysService grpcSysService;
 
@@ -87,23 +84,21 @@ public class WorkflowNodeStatusTask {
 
         //获取所的任务详情
         List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
-        for (TaskDetailResponseDto dto : taskDetailResponseDtoList) {
-            log.info("任务id>>>{},处理状态>>>{}", dto.getInformation().getTaskId(), dto.getInformation().getState());
-        }
+
         String taskId;
         WorkflowNode node;
         for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
             taskId = taskDetailResponseDto.getInformation().getTaskId();
             if (workflowNodeMap.containsKey(taskId)) {
                 node = workflowNodeMap.get(taskId);
-                log.info("工作流id:{},任务名称：{},taskId:{},rosettanet处理成功！", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
+                log.info("工作流id:{},taskId:{},rosettanet处理结束!", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     log.info("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
                     //获取待保存任务结果数据
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
                     if (taskResultResponseDto == null) {
-                        log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
-                        return;
+                        log.error("WorkflowNodeStatusMockTask,taskId:{}获取任务结果失败！",taskId);
+                        continue;
                     }
                     TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
                     saveTaskResultList.add(taskResult);
@@ -122,6 +117,8 @@ public class WorkflowNodeStatusTask {
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
+                    //执行成功，清除redis中的key
+                    redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                     log.error("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
                     //如果是最后一个节点，需要更新整个工作流的状态为失败

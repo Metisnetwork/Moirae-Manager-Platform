@@ -65,7 +65,6 @@ public class SyncSubJobNodeStatusTask {
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
-        log.info("同步更新子作业节点运行中任务检查准备>>>>");
         List<SubJobNodeDto> subJobNodeDtoList = subJobNodeService.getRunningNodeWithWorkIdAndNodeNum();
         //如果没有需要同步的数据则不进行同步
         if (subJobNodeDtoList.size() == 0) {
@@ -98,7 +97,7 @@ public class SyncSubJobNodeStatusTask {
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
                     if (Objects.isNull(taskResultResponseDto)) {
                         log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
-                        return;
+                        continue;
                     }
                     TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
                     saveTaskResultList.add(taskResult);
@@ -119,6 +118,8 @@ public class SyncSubJobNodeStatusTask {
                         }
                     }
                     subJobNodeSuccessIds.add(node.getId());
+                    //执行成功，清除redis中的key
+                    redissonObject.delete(SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
                 } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个子作业状态失败
                     if (node.getNodeStep().equals(node.getNodeNumber())) {

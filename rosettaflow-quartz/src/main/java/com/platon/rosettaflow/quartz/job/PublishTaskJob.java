@@ -42,7 +42,7 @@ public class PublishTaskJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         Long workflowId = (Long) jobExecutionContext.getJobDetail().getJobDataMap().get("workflowId");
         Long jobId = (Long) jobExecutionContext.getJobDetail().getJobDataMap().get("jobId");
-        log.info("开始处理作业,作业id:{},工作流id:{}", jobId, workflowId);
+        log.info("PublishTaskJob->execute:开始处理作业,作业id:{},工作流id:{}", jobId, workflowId);
 
         Workflow workFlow = workflowService.getById(workflowId);
         if (null == workFlow) {
@@ -63,7 +63,7 @@ public class PublishTaskJob implements Job {
         subJob.setBeginTime(now());
         subJob.setSubJobStatus(SubJobStatusEnum.RUNNING.getValue());
         subJobService.save(subJob);
-        log.info("处理作业,作业id:{},工作流id:{},记录子作业表id:{}", jobId, workflowId, subJob.getId());
+        log.info("PublishTaskJob->execute:处理作业,作业id:{},工作流id:{},记录子作业表id:{}", jobId, workflowId, subJob.getId());
 
         //启动工作流
         WorkflowDto workflowDto = new WorkflowDto();
@@ -73,6 +73,6 @@ public class PublishTaskJob implements Job {
         workflowDto.setJobFlg(true);
         workflowDto.setSubJobId(subJob.getId());
         workflowService.start(workflowDto);
-        log.info("处理作业,作业id:{},工作流id:{},记录子作业表id:{},此工作流一共有{}个节点,当前运行第{}个节点", jobId, workflowId, subJob.getId(), workflowDto.getEndNode(), workflowDto.getStartNode());
+        log.info("PublishTaskJob->execute:处理作业,作业id:{},工作流id:{},记录子作业表id:{},此工作流一共有{}个节点,当前运行第{}个节点", jobId, workflowId, subJob.getId(), workflowDto.getEndNode(), workflowDto.getStartNode());
     }
 }

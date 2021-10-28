@@ -33,7 +33,7 @@ import java.util.List;
 public class AuthServiceClient {
 
     @GrpcClient("carrier-grpc-server")
-    private AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
+    AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
 
     public ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto) {
         ApplyMetadataAuthorityRequest.Builder applyMetaDataAuthorityRequest = ApplyMetadataAuthorityRequest.newBuilder();

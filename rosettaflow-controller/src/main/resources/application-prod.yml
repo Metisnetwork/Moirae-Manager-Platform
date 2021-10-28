@@ -37,6 +37,8 @@ system:
     algorithmFilepath: classpath:script/algorithm.csv
     # 数据库数据批量更新
     batchSize: 1000
+    # redis中数据默认保存超时时间(毫秒)
+    redisTimeOut: 86400000
 
 grpc:
   client:

@@ -27,7 +27,7 @@ import java.util.List;
 public class MetaDataServiceClient {
 
     @GrpcClient("carrier-grpc-server")
-    private MetadataServiceGrpc.MetadataServiceBlockingStub metaDataServiceBlockingStub;
+    MetadataServiceGrpc.MetadataServiceBlockingStub metaDataServiceBlockingStub;
 
     /**
      * 查看全网元数据列表

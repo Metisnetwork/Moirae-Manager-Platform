@@ -17,4 +17,5 @@ public class SysConfig {
     private long nonceTimeOut = 5 * 60 * 1000;
     private String algorithmFilepath = "classpath:script/algorithm.csv";
     private long batchSize = 500;
+    private long redisTimeOut = 24 * 60 * 60 * 1000;
 }

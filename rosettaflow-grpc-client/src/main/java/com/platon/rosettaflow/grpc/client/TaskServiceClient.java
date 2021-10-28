@@ -22,17 +22,17 @@ import java.util.function.Consumer;
 /**
  * @author admin
  * @date 2021/9/1
- * @description
+ * @description 任务处理相关接口
  */
 @Slf4j
 @Component
 public class TaskServiceClient {
 
     @GrpcClient("carrier-grpc-server")
-    private TaskServiceGrpc.TaskServiceBlockingStub taskServiceBlockingStub;
+    TaskServiceGrpc.TaskServiceBlockingStub taskServiceBlockingStub;
 
     @GrpcClient("carrier-grpc-server")
-    private TaskServiceGrpc.TaskServiceStub taskServiceStub;
+    TaskServiceGrpc.TaskServiceStub taskServiceStub;
 
     /**
      * 发布一个任务,同步等待结果
