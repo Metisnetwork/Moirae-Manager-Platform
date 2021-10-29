@@ -14,7 +14,7 @@ public class TerminateTaskRequestDto {
      */
     private String user;
     /**
-     * 用户类型 (0: 未定义; 1: 第二地址; 2: Alaya地址; 3: PlatON地址)
+     * 用户类型 (0: 未定义; 1: 第二地址; 2: 测试网地址; 3: 主网地址)
      */
     private Integer userType;
     /**
