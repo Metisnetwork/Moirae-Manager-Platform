@@ -22,11 +22,11 @@ public class TaskResultServiceImpl extends ServiceImpl<TaskResultMapper, TaskRes
 
 
     @Override
-    public TaskResult queryTaskResultByTaskId(String taskId) {
+    public List<TaskResult> queryTaskResultByTaskId(String taskId) {
         LambdaQueryWrapper<TaskResult> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(TaskResult::getTaskId, taskId);
         queryWrapper.eq(TaskResult::getStatus, StatusEnum.VALID.getValue());
-        return this.getOne(queryWrapper);
+        return this.list(queryWrapper);
     }
 
     @Override
