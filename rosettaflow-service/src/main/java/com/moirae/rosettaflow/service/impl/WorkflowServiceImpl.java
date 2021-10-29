@@ -357,7 +357,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private void checkModel(WorkflowNode workflowNode) {
         Algorithm algorithm = algorithmService.getAlgorithmById(workflowNode.getAlgorithmId());
         boolean modelFlag = workflowNode.getModelId() == null || workflowNode.getModelId() == 0;
-        if (SysConstant.INT_1 == algorithm.getInputModel() && modelFlag) {
+        //如果算法需要使用模型，且是第一个节点，则需要判断是否有模型，否则可以重前一个节点获取模型
+        if (workflowNode.getNodeStep() == SysConstant.INT_1 && InputModelEnum.NEED.getValue() == algorithm.getInputModel() && modelFlag) {
             log.error("checkModel--当前节点未配置模型, inputModel:{}, workflowNode:{}", algorithm.getInputModel(), workflowNode);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
         }
