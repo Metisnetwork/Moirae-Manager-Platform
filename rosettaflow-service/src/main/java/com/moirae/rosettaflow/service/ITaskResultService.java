@@ -2,7 +2,6 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public interface ITaskResultService extends IService<TaskResult> {
      * @param taskId 任务id
      * @return 任务结果
      */
-    TaskResult queryTaskResultByTaskId(String taskId);
+    List<TaskResult> queryTaskResultByTaskId(String taskId);
 
     /**
      * 批量保存任务执行结果

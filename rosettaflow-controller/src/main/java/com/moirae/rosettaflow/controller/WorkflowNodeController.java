@@ -93,9 +93,9 @@ public class WorkflowNodeController {
 
     @GetMapping(value = "getTaskResult/{taskId}")
     @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
-    public ResponseVo<WorkflowNodeTaskResultVo> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
-        TaskResult taskResult = taskResultService.queryTaskResultByTaskId(taskId);
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(taskResult,WorkflowNodeTaskResultVo.class));
+    public ResponseVo<List<NodeTaskResultVo>> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
+        List<TaskResult> taskResultList = taskResultService.queryTaskResultByTaskId(taskId);
+        return ResponseVo.createSuccess(BeanUtil.copyToList(taskResultList, NodeTaskResultVo.class));
     }
 
 }

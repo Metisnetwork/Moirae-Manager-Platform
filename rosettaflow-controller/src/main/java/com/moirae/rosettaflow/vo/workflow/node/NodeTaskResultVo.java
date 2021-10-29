@@ -9,13 +9,14 @@ import lombok.Data;
 import java.util.Date;
 
 /**
+ * 工作流节点运行结果
  * @author hudenian
  * @date 2021/9/17
- * @description 工作流节点运行结果
+ * @description
  */
 @Data
 @ApiModel(value = "工作流节点运行结果")
-public class WorkflowNodeTaskResultVo {
+public class NodeTaskResultVo {
 
     @ApiModelProperty(value = "任务结果主键id")
     private Long id;
