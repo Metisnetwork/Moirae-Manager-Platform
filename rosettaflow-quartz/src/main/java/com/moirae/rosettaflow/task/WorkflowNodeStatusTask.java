@@ -121,10 +121,8 @@ public class WorkflowNodeStatusTask {
                     redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
                 } else if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.FAIL.getValue()) {
                     log.error("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
-                    //如果是最后一个节点，需要更新整个工作流的状态为失败
-                    if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
-                        workflowFailIds.add(node.getWorkflowId());
-                    }
+                    //单个节点失败，需要更新整个工作流的状态为失败
+                    workflowFailIds.add(node.getWorkflowId());
                     workflowNodeFailIds.add(node.getId());
                 }
             }
