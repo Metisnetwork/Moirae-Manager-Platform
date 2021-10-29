@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test", "local"})
+@Profile({"prod", "test", "local", "xty"})
 public class GrpcMetaDataServiceImpl implements GrpcMetaDataService {
 
     @Resource

@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test", "local"})
+@Profile({"prod", "test", "local", "xty"})
 public class WorkflowNodeStatusTask {
     /**
      * 查询 当前时间之前5小时的正在运行的数据
@@ -91,7 +91,7 @@ public class WorkflowNodeStatusTask {
             taskId = taskDetailResponseDto.getInformation().getTaskId();
             if (workflowNodeMap.containsKey(taskId)) {
                 node = workflowNodeMap.get(taskId);
-                log.info("工作流id:{},taskId:{},rosettanet处理结束!", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
+                log.info("工作流id:{},taskId:{},rosettanet处理结束!", node.getWorkflowId(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     log.info("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
                     //获取待保存任务结果数据

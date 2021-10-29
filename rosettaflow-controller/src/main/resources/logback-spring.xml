@@ -21,14 +21,14 @@
         </encoder>
     </appender>
 
-    <springProfile name="local | dev | test">
+    <springProfile name="local | dev | test | xty">
         <root>
             <level value="INFO"/>
             <appender-ref ref="console"/>
         </root>
     </springProfile>
 
-    <springProfile name="dev | test | uat | prod | local">
+    <springProfile name="dev | test | uat | prod | local | xty">
         <root>
             <level value="INFO"/>
             <appender-ref ref="fileAppender"/>

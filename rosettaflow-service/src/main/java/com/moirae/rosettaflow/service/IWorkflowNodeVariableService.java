@@ -2,7 +2,6 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeVariable;
 
 import java.util.List;
@@ -22,7 +21,8 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
     List<WorkflowNodeVariable> getByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     *物物理批量删除工作流节点输入变量，根据节点id
+     * 物物理批量删除工作流节点输入变量，根据节点id
+     *
      * @param workflowNodeIdList 工作流节点id列表
      */
     void deleteByWorkflowNodeId(List<Long> workflowNodeIdList);
@@ -44,9 +44,10 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
 
     /**
      * 复制工作流节点变量
+     *
      * @param newNodeId 新节点id
      * @param oldNodeId 旧节点id
-     * @return
+     * @return 工作流节点变量列表
      */
     List<WorkflowNodeVariable> copyWorkflowNodeVariable(Long newNodeId, Long oldNodeId);
 

@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test", "local"})
+@Profile({"prod", "test", "local", "xty"})
 public class SyncMetaDataTask {
 
     @Resource
