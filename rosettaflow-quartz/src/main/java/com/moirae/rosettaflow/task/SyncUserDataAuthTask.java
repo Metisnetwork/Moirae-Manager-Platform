@@ -49,11 +49,15 @@ public class SyncUserDataAuthTask {
             metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
             if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
                 return;
+            } else {
+                //删除原来授权数据
+                userMetaDataService.truncate();
             }
         } catch (Exception e) {
             log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage(), e);
             return;
         }
+
 
         List<UserMetaData> userMetaDataList = new ArrayList<>();
         UserMetaData userMetaData;
