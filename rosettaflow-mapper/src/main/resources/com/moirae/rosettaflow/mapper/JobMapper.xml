@@ -36,6 +36,9 @@
       LEFT JOIN t_workflow AS tw ON tj.workflow_id = tw.id
     <where>
       AND tj.status = 1
+      <if test="projectId != null and projectId != ''">
+      AND tw.project_id = #{projectId,jdbcType=BIGINT}
+      </if>
       <if test="jobName != null and jobName != ''">
       AND  tj.`name` LIKE CONCAT('%',#{jobName, jdbcType=VARCHAR},'%')
       </if>

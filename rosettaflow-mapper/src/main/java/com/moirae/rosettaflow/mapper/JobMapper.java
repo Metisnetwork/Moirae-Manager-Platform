@@ -15,10 +15,11 @@ public interface JobMapper extends BaseMapper<Job> {
     /**
      *  查询作业列表
      * @param jobName : 作业名称
+     * @param projectId : 项目id
      * @param page :作业page
      * @return : 作业列表
      */
-    IPage<JobDto> queryJobList(@Param("jobName") String jobName, IPage<JobDto> page);
+    IPage<JobDto> queryJobList(@Param("jobName") String jobName, @Param("projectId") Long projectId, IPage<JobDto> page);
 
     /**
      *  修改作业根据作业id

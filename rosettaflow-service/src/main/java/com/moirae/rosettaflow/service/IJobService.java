@@ -27,9 +27,10 @@ public interface IJobService extends IService<Job> {
      * @param current 当前页
      * @param size    每页大小
      * @param jobName 作业名称
+     * @param projectId 项目id
      * @return 分页数据
      */
-    IPage<JobDto> list(Long current, Long size, String jobName);
+    IPage<JobDto> list(Long current, Long size, String jobName, Long projectId);
 
     /**
      * 获取有效状态的job

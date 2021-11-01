@@ -69,9 +69,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     }
 
     @Override
-    public IPage<JobDto> list(Long current, Long size, String jobName) {
+    public IPage<JobDto> list(Long current, Long size, String jobName ,Long projectId) {
         Page<JobDto> jobPage = new Page<>(current, size);
-        return this.baseMapper.queryJobList(jobName, jobPage);
+        return this.baseMapper.queryJobList(jobName, projectId, jobPage);
     }
 
     @Override
