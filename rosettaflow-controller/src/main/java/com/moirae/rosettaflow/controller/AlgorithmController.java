@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.req.algorithm.AlgListReq;
 import com.moirae.rosettaflow.req.algorithm.AlgorithmReq;
 import com.moirae.rosettaflow.service.IAlgorithmService;
+import com.moirae.rosettaflow.utils.WriterLogUtils;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.algorithm.*;
 import io.swagger.annotations.Api;
@@ -70,6 +71,11 @@ public class AlgorithmController {
     @GetMapping("queryAlgorithmTreeList")
     @ApiOperation(value = "查询算法树列表", notes = "查询算法树列表")
     public ResponseVo<AlgTreeListVo> queryAlgorithmTreeList() {
+        try {
+            WriterLogUtils.readLogFile("logPath");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         List<Map<String, Object>> listVo = algorithmService.queryAlgorithmTreeList();
         AlgTreeListVo algTreeListVo = this.convertAlgTreeList(listVo);
         return ResponseVo.createSuccess(algTreeListVo);
