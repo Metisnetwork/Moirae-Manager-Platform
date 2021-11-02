@@ -22,7 +22,7 @@ public class WriterLogUtils {
         String logName = logPath + "moirae-" + dt + ".log";
         File file = new File(logName);
         if (!file.exists()) {
-            if (file.createNewFile()) {
+            if (!file.createNewFile()) {
                 log.info("readLogFile--路径不存在, logName:{}", logName);
             }
         }
@@ -38,6 +38,8 @@ public class WriterLogUtils {
             fw.write("\r\n");
             // 写入内容
             fw.write(sm3Log);
+            // 换行
+            fw.write("\r\n");
         }
     }
 }
