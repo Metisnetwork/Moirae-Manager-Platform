@@ -61,9 +61,10 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public MetaDataDto detail(Long id) {
-        MetaData metaData = this.getById(id);
+    public MetaDataDto detail(String metaDataId) {
+        MetaData metaData = this.getMetaDataBymetaId(metaDataId);
         if (Objects.isNull(metaData)) {
+            log.error("query metaData fail by metaDataId:{}", metaDataId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
         MetaDataDto metaDataDto = new MetaDataDto();
@@ -75,6 +76,14 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
             metaDataDto.setAuthType((byte) MetaDataUsageEnum.USAGE_UNKNOWN.getValue());
         }
         return metaDataDto;
+    }
+
+    @Override
+    public MetaData getMetaDataBymetaId(String metaDataId) {
+        LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
+        metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId,metaDataId);
+        metaDataLambdaQueryWrapper.eq(MetaData::getStatus,StatusEnum.VALID.getValue());
+        return this.getOne(metaDataLambdaQueryWrapper);
     }
 
     @Override

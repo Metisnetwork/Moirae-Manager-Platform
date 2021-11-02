@@ -55,10 +55,10 @@ public class DataController {
         return convertToMetaDataVo(servicePage);
     }
 
-    @GetMapping(value = "detail/{id}")
+    @GetMapping(value = "detail/{metaDataId}")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
-    public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "元数据表ID", required = true) @PathVariable Long id) {
-        MetaDataDto metaDataDto = metaDataService.detail(id);
+    public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "元数据表metaDataId", required = true) @PathVariable String metaDataId) {
+        MetaDataDto metaDataDto = metaDataService.detail(metaDataId);
         return ResponseVo.createSuccess(BeanUtil.copyProperties(metaDataDto, MetaDataDetailVo.class));
     }
 
