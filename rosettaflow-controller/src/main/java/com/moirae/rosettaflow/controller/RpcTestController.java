@@ -1,7 +1,10 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
 import com.moirae.rosettaflow.dto.WorkflowDto;
+import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
+import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
@@ -9,16 +12,14 @@ import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
-import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
-import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
-import com.moirae.rosettaflow.grpc.service.GrpcSysService;
-import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
+import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.req.data.DownloadTaskReq;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
@@ -29,7 +30,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -56,6 +60,10 @@ public class RpcTestController {
 
     @Resource
     private GrpcSysService grpcSysService;
+
+    @Resource
+    private GrpcDataProviderService grpcDataProviderService;
+
 
     @GetMapping("getNodeIdentity")
     @ApiOperation(value = "getNodeIdentity接口测试", notes = "查询自己组织的identity信息")
@@ -171,5 +179,21 @@ public class RpcTestController {
         log.info("grpc getTaskResultById查询任务结果根据任务id");
         GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
         return ResponseVo.createSuccess(taskResultResponseDto);
+    }
+
+    @GetMapping("task/getDownloadTask")
+    @ApiOperation(value = "grpc getDownloadTask下载任务结果数据", notes = "grpc getDownloadTask下载任务结果数据")
+    public ResponseVo<List<DownloadReplyResponseDto>> getDownloadTask(@Valid DownloadTaskReq downloadTaskReq) {
+        log.info("grpc getDownloadTask下载任务结果数据");
+
+        Map<String, String> compressMap = new HashMap<>();
+        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress())).getMsg());
+
+        DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
+        downloadRequestDto.setFilePath(downloadTaskReq.getFilePath());
+        downloadRequestDto.setCompress(compressMap);
+
+        List<DownloadReplyResponseDto> downloadReplyResponseDtoList = grpcDataProviderService.downloadTask(downloadRequestDto);
+        return ResponseVo.createSuccess(downloadReplyResponseDtoList);
     }
 }

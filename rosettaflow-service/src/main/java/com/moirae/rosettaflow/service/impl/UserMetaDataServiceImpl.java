@@ -68,7 +68,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public void auth(UserMetaDataDto userMetaDataDto) {
         MetaData metaData = metaDataService.getById(userMetaDataDto.getId());
         if (null == metaData) {
-            log.error(ErrorMsg.METADATA_NOT_EXIST.getMsg());
+            log.error("query meta data not exist, id:{}", userMetaDataDto.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
         if (userMetaDataDto.getAuthType() == MetaDataUsageEnum.TIMES.getValue()) {
