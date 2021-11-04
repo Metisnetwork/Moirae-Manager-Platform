@@ -13,6 +13,7 @@ import com.moirae.rosettaflow.req.data.MetaDataReq;
 import com.moirae.rosettaflow.service.IMetaDataDetailsService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
+import com.moirae.rosettaflow.task.SyncUserDataAuthTask;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.data.*;
@@ -48,6 +49,9 @@ public class DataController {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
+    @Resource
+    private SyncUserDataAuthTask syncUserDataAuthTask;
+
     @GetMapping("pageList")
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
     public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
@@ -65,6 +69,8 @@ public class DataController {
     @GetMapping("listByOwner")
     @ApiOperation(value = "我的元数据列表", notes = "我的元数据列表")
     public ResponseVo<PageVo<UserMetaDataVo>> listByOwner(@Valid MetaDataReq metaDataReq) {
+        //预先同步授权数据
+        syncUserDataAuthTask.run();
         IPage<UserMetaDataDto> servicePage = userMetaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
         return convertUserMetaDataToResponseVo(servicePage);
     }
