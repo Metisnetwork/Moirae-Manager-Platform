@@ -75,7 +75,6 @@ public class SyncUserDataAuthTask {
         metaDataAuthorityDtoList.removeIf(dto -> dto.getAuditMetaDataOption() == 0 && mulMetaDataIdList.contains(dto.getMetaDataAuthorityDto().getMetaDataId()));
 
         //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 begin
-        Set<String> metaDataAuthIdSet = new HashSet<>();
         Map<String, Integer> countMetaDataIdMap = new HashMap<>(metaDataAuthorityDtoList.size());
         mulMetaDataIdList.clear();
         for (GetMetaDataAuthorityDto getMetaDataAuthorityDto : metaDataAuthorityDtoList) {
