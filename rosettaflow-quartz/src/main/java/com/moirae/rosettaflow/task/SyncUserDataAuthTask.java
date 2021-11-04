@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author hudenian
@@ -57,6 +56,23 @@ public class SyncUserDataAuthTask {
             log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage(), e);
             return;
         }
+
+        //metaDataId重复的个数
+        Map<String, Integer> countMap = new HashMap<>(metaDataAuthorityDtoList.size());
+        //找到有多条授权记录的数据
+        List<String> mulMetaDataIdList = new ArrayList<>();
+        String metaDataId;
+        for (GetMetaDataAuthorityDto getMetaDataAuthorityDto : metaDataAuthorityDtoList) {
+            metaDataId = getMetaDataAuthorityDto.getMetaDataAuthorityDto().getMetaDataId();
+            if (countMap.containsKey(metaDataId)) {
+                int val = countMap.get(metaDataId);
+                countMap.put(metaDataId, ++val);
+                mulMetaDataIdList.add(metaDataId);
+            } else {
+                countMap.put(metaDataId, 1);
+            }
+        }
+        metaDataAuthorityDtoList.removeIf(dto -> dto.getAuditMetaDataOption() == 0 && mulMetaDataIdList.contains(dto.getMetaDataAuthorityDto().getMetaDataId()));
 
 
         List<UserMetaData> userMetaDataList = new ArrayList<>();
