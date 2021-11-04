@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
+import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.UserMetaDataDto;
@@ -118,6 +119,21 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
+
+        //保存等待审核数据
+        UserMetaData userMetaData = new UserMetaData();
+        BeanCopierUtils.copy(userMetaDataDto, userMetaData);
+        userMetaData.setMetaDataId(metaData.getMetaDataId());
+        userMetaData.setIdentityName(metaData.getIdentityName());
+        userMetaData.setAddress(AddressChangeUtils.convert0xAddress(userMetaDataDto.getAddress()));
+        userMetaData.setApplyTime(new Date());
+        userMetaData.setAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
+        userMetaData.setId(null);
+        log.info("元数据授权申请,保存等待审核元数据，userMetaData：{}", userMetaData);
+        if (!this.save(userMetaData)) {
+            log.info("元数据授权申请,保存等待审核元数据失败，userMetaData：{}", userMetaData);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_SAVE_ERROR.getMsg());
+        }
     }
 
     @Override
