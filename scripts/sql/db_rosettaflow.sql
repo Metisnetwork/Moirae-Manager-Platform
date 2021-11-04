@@ -16,7 +16,6 @@ CREATE TABLE `t_user`
     UNIQUE KEY `UK_ADDRESS` (`address`) USING BTREE COMMENT '用户地址唯一',
     UNIQUE KEY `UK_USERNAME` (`user_name`) USING BTREE COMMENT '用户名称唯一'
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 13
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
 
 
@@ -102,7 +101,6 @@ CREATE TABLE `t_meta_data`
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_META_DATA_ID` (`meta_data_id`, `data_status`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 11
   DEFAULT CHARSET = utf8mb4 COMMENT ='元数据表';
 
 -- ----------------------------
@@ -155,7 +153,6 @@ CREATE TABLE `t_user_meta_data`
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_USER_META_DATA_ID` (`meta_data_id`, `address`, `auth_status`, `auth_metadata_state`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 16
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户元数据授权表';
 
 -- ----------------------------
@@ -409,7 +406,6 @@ CREATE TABLE `t_workflow_node`
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_NODE_STEP` (`workflow_id`, `node_step`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 15
   DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点表';
 
 -- ----------------------------

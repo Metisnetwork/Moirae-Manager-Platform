@@ -54,6 +54,6 @@ grpc:
 #单Redis节点模式
 redisson:
   singleServerConfig:
-    address: 10.10.8.174:7379
+    address: localhost:7379
 
 
