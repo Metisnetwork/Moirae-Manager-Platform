@@ -45,7 +45,7 @@ public class ResponseVo<T> {
         return new ResponseVo<>(RespCodeEnum.SUCCESS);
     }
 
-    public static <T> ResponseVo<T> createFail() {
+    public static <T> ResponseVo createFail() {
         return new ResponseVo<>(RespCodeEnum.FAIL);
     }
 
