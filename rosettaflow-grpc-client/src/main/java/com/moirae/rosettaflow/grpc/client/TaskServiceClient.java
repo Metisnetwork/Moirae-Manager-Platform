@@ -251,6 +251,7 @@ public class TaskServiceClient {
             taskEventShowDto = new TaskEventDto();
             taskEventShowDto.setType(taskEventListResponse.getTaskEventList(i).getType());
             taskEventShowDto.setTaskId(taskEventListResponse.getTaskEventList(i).getTaskId());
+            taskEventShowDto.setPartyId(taskEventListResponse.getTaskEventList(i).getPartyId());
 
             NodeIdentityDto owner = new NodeIdentityDto();
             owner.setNodeName(taskEventListResponse.getTaskEventList(i).getOwner().getNodeName());
@@ -362,7 +363,7 @@ public class TaskServiceClient {
         publishTaskDeclareRequestBuilder.setSign(ByteString.copyFromUtf8(taskDto.getSign()));
         //任务描述 (非必须)
         publishTaskDeclareRequestBuilder.setDesc(taskDto.getDesc());
-        log.info("发布任务请求json数据>>>{}", publishTaskDeclareRequestBuilder.build());
+        log.info("发布任务,任务名称{}请求数据>>>{}", taskDto.getTaskName(), publishTaskDeclareRequestBuilder.build());
         return publishTaskDeclareRequestBuilder.build();
     }
 

@@ -134,6 +134,7 @@ public class WorkflowController {
                 vo.setName(taskEventDto.getOwner().getNodeName());
                 vo.setNodeId(taskEventDto.getOwner().getNodeId());
                 vo.setIdentityId(taskEventDto.getOwner().getIdentityId());
+                vo.setPartyId(taskEventDto.getPartyId());
                 vo.setContent(taskEventDto.getContent());
                 vo.setCreateAt(DateUtil.date(taskEventDto.getCreateAt()));
                 taskEventVoList.add(vo);

@@ -32,6 +32,9 @@ public class TaskEventVo {
     @ApiModelProperty(value = "组织的身份标识Id")
     private String identityId;
 
+    @ApiModelProperty(value = "产生事件的partyId (单个组织可以担任任务的多个party, 区分是哪一方产生的event)")
+    private String partyId;
+
     @ApiModelProperty(value = "事件内容")
     private String content;
 
