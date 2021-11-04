@@ -74,6 +74,22 @@ public class SyncUserDataAuthTask {
         }
         metaDataAuthorityDtoList.removeIf(dto -> dto.getAuditMetaDataOption() == 0 && mulMetaDataIdList.contains(dto.getMetaDataAuthorityDto().getMetaDataId()));
 
+        //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 begin
+        Set<String> metaDataAuthIdSet = new HashSet<>();
+        Map<String, Integer> countMetaDataIdMap = new HashMap<>(metaDataAuthorityDtoList.size());
+        mulMetaDataIdList.clear();
+        for (GetMetaDataAuthorityDto getMetaDataAuthorityDto : metaDataAuthorityDtoList) {
+            metaDataId = getMetaDataAuthorityDto.getMetaDataAuthorityDto().getMetaDataId();
+            if (countMetaDataIdMap.containsKey(metaDataId)) {
+                int val = countMetaDataIdMap.get(metaDataId);
+                countMetaDataIdMap.put(metaDataId, ++val);
+                mulMetaDataIdList.add(getMetaDataAuthorityDto.getMetaDataAuthId());
+            } else {
+                countMetaDataIdMap.put(metaDataId, 1);
+            }
+        }
+        metaDataAuthorityDtoList.removeIf(dto -> mulMetaDataIdList.contains(dto.getMetaDataAuthId()));
+        //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 end
 
         List<UserMetaData> userMetaDataList = new ArrayList<>();
         UserMetaData userMetaData;
