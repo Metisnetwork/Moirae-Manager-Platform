@@ -16,7 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author hudenian
@@ -46,12 +49,12 @@ public class SyncUserDataAuthTask {
         List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
         try {
             metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-            if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
+          /*  if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() < 1) {
                 return;
             } else {
                 //删除原来授权数据
                 userMetaDataService.truncate();
-            }
+            }*/
         } catch (Exception e) {
             log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage(), e);
             return;

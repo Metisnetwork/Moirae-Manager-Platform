@@ -52,12 +52,12 @@ public class SyncMetaDataTask {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
         try {
             metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
-            if (metaDataDetailResponseDtoList != null && metaDataDetailResponseDtoList.size() > 0) {
+           /* if (metaDataDetailResponseDtoList != null && metaDataDetailResponseDtoList.size() > 0) {
                 //元数据同步成功，删除旧数据
                 delOldData();
             } else {
                 return;
-            }
+            }*/
         } catch (Exception e) {
             log.error("从net同步元数据失败,失败原因：{}", e.getMessage(), e);
             return;
@@ -157,6 +157,7 @@ public class SyncMetaDataTask {
     /**
      * 清空旧数据
      */
+    @SuppressWarnings("unused")
     private void delOldData() {
         //删除元数据
         metaDataService.truncate();
