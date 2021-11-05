@@ -128,6 +128,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         userMetaData.setAddress(AddressChangeUtils.convert0xAddress(userMetaDataDto.getAddress()));
         userMetaData.setApplyTime(new Date());
         userMetaData.setAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
+        userMetaData.setAuthMetadataState(UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         userMetaData.setId(null);
         log.info("元数据授权申请,保存等待审核元数据，userMetaData：{}", userMetaData);
         if (!this.save(userMetaData)) {

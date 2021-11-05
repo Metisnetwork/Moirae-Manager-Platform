@@ -18,4 +18,5 @@ public class UserMetaDataDto extends UserMetaData {
     private Byte userType;
 
     private String sign;
+
 }

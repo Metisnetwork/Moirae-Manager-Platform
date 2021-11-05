@@ -4,6 +4,8 @@ import com.moirae.rosettaflow.mapper.domain.MetaData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
  * @author hudenian
  * @date 2021/8/25
@@ -24,6 +26,22 @@ public class MetaDataDto extends MetaData {
      * 数据授权信息有效性状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)
      */
     private Byte authMetadataState;
+    /**
+     * 授权开始时间
+     */
+    private Date authBeginTime;
+    /**
+     * 授权结束时间
+     */
+    private Date authEndTime;
+    /**
+     * 授权值:按次数单位为（次）
+     */
+    private Integer authValue;
+    /**
+     * 授权值:以次数方式申请则显示次数，以时间方式申请则显示时间
+     */
+    private String authValueStr;
 
 
 

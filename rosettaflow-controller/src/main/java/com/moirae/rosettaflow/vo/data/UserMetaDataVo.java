@@ -38,6 +38,9 @@ public class UserMetaDataVo {
     @ApiModelProperty(value = "授权值:按次数单位为（次）")
     private Integer authValue;
 
+    @ApiModelProperty(value = "授权值:以次数方式申请则显示次数，以时间方式申请则显示时间")
+    private String authValueStr;
+
     @ApiModelProperty(value = "授权开始时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authBeginTime;

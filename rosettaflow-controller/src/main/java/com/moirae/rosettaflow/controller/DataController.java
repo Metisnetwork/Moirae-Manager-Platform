@@ -2,6 +2,8 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.AuthTypeEnum;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
 import com.moirae.rosettaflow.dto.MetaDataDto;
@@ -13,7 +15,6 @@ import com.moirae.rosettaflow.req.data.MetaDataReq;
 import com.moirae.rosettaflow.service.IMetaDataDetailsService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
-import com.moirae.rosettaflow.task.SyncUserDataAuthTask;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.data.*;
@@ -26,8 +27,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * @author hudenian
@@ -119,8 +123,18 @@ public class DataController {
     }
 
     private ResponseVo<PageVo<UserMetaDataVo>> convertUserMetaDataToResponseVo(IPage<UserMetaDataDto> pageDto) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
         List<UserMetaDataVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, UserMetaDataVo.class)));
+        pageDto.getRecords().forEach(userMetaDataDto -> {
+            UserMetaDataVo userMetaDataVo = new UserMetaDataVo();
+            BeanCopierUtils.copy(userMetaDataDto, userMetaDataVo);
+            String authTime = "";
+            if(!Objects.isNull(userMetaDataDto.getAuthBeginTime()) && !Objects.isNull(userMetaDataDto.getAuthEndTime())){
+                authTime = dateFormat.format(userMetaDataDto.getAuthBeginTime()) + "~" + dateFormat.format(userMetaDataDto.getAuthEndTime());
+            }
+            userMetaDataVo.setAuthValueStr(userMetaDataDto.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaDataDto.getAuthValue()) :  authTime);
+            items.add(userMetaDataVo);
+        });
 
         PageVo<UserMetaDataVo> pageVo = new PageVo<>();
         BeanUtil.copyProperties(pageDto, pageVo);
