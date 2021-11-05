@@ -55,11 +55,11 @@
         t_user_meta_data umd
         INNER JOIN t_meta_data md ON umd.meta_data_id = md.meta_data_id
         WHERE
-        (umd.auth_type = 1 AND expire = 0)
+        ((umd.auth_type = 1 AND expire = 0)
         OR (
         umd.auth_type = 2
         AND used_times <![CDATA[ < ]]> auth_value
-        )
+        ))
         AND umd.`status` = 1
         AND md.`status` = 1
         AND umd.identity_id = #{identityId, jdbcType=VARCHAR}
