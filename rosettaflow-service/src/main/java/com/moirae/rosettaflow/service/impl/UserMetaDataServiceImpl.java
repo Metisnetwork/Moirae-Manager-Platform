@@ -181,4 +181,9 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public int batchInsert(List<UserMetaData> userMetaDataList) {
         return this.baseMapper.batchInsert(userMetaDataList);
     }
+
+    @Override
+    public void updateTimesByMetaDataId(List<String> metaDataIdList, String address) {
+        this.baseMapper.updateTimesByMetaDataId(metaDataIdList, address);
+    }
 }

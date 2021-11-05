@@ -105,6 +105,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private ITaskResultService taskResultService;
 
+    @Resource
+    private IUserMetaDataService userMetaDataService;
+
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
@@ -338,7 +341,16 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             //3.持久化数据
             workflowNodeService.updateById(workflowNode);
             this.updateById(workflow);
-
+            // 更新元数据使用次数
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+            if (null != workflowNodeInputList && workflowNodeInputList.size() > 0) {
+                List<String> inputDataList = new ArrayList<>();
+                for(WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+                    inputDataList.add(workflowNodeInput.getDataTableId());
+                }
+                // 按次数授权的数据次数加1
+                userMetaDataService.updateTimesByMetaDataId(inputDataList, workflowDto.getAddress());
+            }
         }
         //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点,放在redis中待下次处理
         boolean hasNext = workflowNode.getNextNodeStep() != null && workflowNode.getNextNodeStep() > 1;

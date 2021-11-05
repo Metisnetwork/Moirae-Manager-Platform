@@ -74,4 +74,12 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @return 插入记录数
      */
     int batchInsert(List<UserMetaData> userMetaDataList);
+
+    /**
+     * 更新按次数授权数据的次数
+     * @param metaDataIdList 元数据id集合
+     * @param address 用户地址
+     * @return UserMetaData集合
+     */
+    void updateTimesByMetaDataId(List<String> metaDataIdList, String address);
 }

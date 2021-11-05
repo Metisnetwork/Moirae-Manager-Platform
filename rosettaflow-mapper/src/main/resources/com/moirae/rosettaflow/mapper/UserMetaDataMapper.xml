@@ -76,6 +76,23 @@
           AND umd.auth_status = 1
           AND umd.address = #{address, jdbcType=VARCHAR}
     </select>
+    <!-- 更新按次数授权数据的次数 -->
+    <update id="updateTimesByMetaDataId">
+        <foreach collection="metaDataIdList" item="metaDataId" separator=";">
+            update
+                t_user_meta_data
+            set
+                used_times = used_times + 1
+            where 1=1
+                AND `status` = 1
+                AND auth_value &gt;= 1
+                AND auth_status = 1
+                AND auth_type = 2
+                AND auth_metadata_state = 2
+                AND address = #{address, jdbcType=VARCHAR}
+                AND meta_data_id = #{metaDataId, jdbcType=VARCHAR}
+        </foreach>
+    </update>
 
     <insert id="batchInsert">
         <foreach collection="userMetaDataList" item="userMetaData" separator=";">
