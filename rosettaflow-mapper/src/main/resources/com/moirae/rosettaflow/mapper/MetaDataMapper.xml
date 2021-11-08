@@ -53,16 +53,18 @@
         md.data_name
         FROM
         t_user_meta_data umd
-        INNER JOIN t_meta_data md ON umd.meta_data_id = md.meta_data_id
+        LEFT JOIN t_meta_data md ON umd.meta_data_id = md.meta_data_id
         WHERE
-        ((umd.auth_type = 1 AND expire = 0)
+        ((umd.auth_type = 1 AND umd.expire = 0)
         OR (
         umd.auth_type = 2
-        AND used_times <![CDATA[ < ]]> auth_value
+        AND used_times <![CDATA[ < ]]> umd.auth_value
         ))
         AND umd.`status` = 1
         AND md.`status` = 1
+        AND umd.auth_metadata_state = 2
         AND umd.identity_id = #{identityId, jdbcType=VARCHAR}
+        AND umd.address = #{address, jdbcType=VARCHAR}
     </select>
 
     <insert id="batchInsert">

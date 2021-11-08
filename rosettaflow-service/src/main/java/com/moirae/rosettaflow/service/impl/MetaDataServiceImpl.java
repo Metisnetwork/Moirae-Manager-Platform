@@ -9,8 +9,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
+import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.mapper.MetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
@@ -103,7 +105,17 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     @Override
     public List<MetaDataDto> getAllAuthTables(String identityId) {
-        return this.baseMapper.getAllAuthTables(identityId);
+        UserDto userDto = UserContext.get();
+        if (Objects.isNull(userDto)) {
+            log.error(ErrorMsg.USER_UN_LOGIN.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
+        }
+        String address = userDto.getAddress();
+        if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
+            address = AddressChangeUtils.convert0xAddress(address);
+        }
+
+        return this.baseMapper.getAllAuthTables(identityId, address);
     }
 
     @Override
