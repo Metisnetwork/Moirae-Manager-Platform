@@ -150,8 +150,7 @@ CREATE TABLE `t_user_meta_data`
     `status`              tinyint(4)  NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
     `create_time`         timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`         timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_USER_META_DATA_ID` (`meta_data_id`, `address`, `auth_status`, `auth_metadata_state`)
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户元数据授权表';
 

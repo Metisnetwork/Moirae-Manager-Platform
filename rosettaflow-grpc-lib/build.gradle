@@ -12,7 +12,7 @@ bootJar {
 }
 
 dependencies {
-    implementation 'com.google.protobuf:protobuf-java:3.17.3'
+    implementation 'com.google.protobuf:protobuf-java:3.19.1'
     implementation group: 'io.grpc', name: 'grpc-all', version: '1.39.0'
 }
 
