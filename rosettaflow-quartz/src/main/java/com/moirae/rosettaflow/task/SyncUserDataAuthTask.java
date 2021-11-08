@@ -60,7 +60,7 @@ public class SyncUserDataAuthTask {
             return;
         }
 
-        //metaDataId重复的个数
+      /*  //metaDataId重复的个数
         Map<String, Integer> countMap = new HashMap<>(metaDataAuthorityDtoList.size());
         //找到有多条授权记录的数据
         List<String> mulMetaDataIdList = new ArrayList<>();
@@ -91,7 +91,7 @@ public class SyncUserDataAuthTask {
             }
         }
         metaDataAuthorityDtoList.removeIf(dto -> mulMetaDataIdList.contains(dto.getMetaDataAuthId()));
-        //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 end
+        //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 end*/
 
         List<UserMetaData> userMetaDataList = new ArrayList<>();
         UserMetaData userMetaData;
