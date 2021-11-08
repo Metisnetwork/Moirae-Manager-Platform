@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.TimeZone;
 
 /**
  * @author hudenian
@@ -124,6 +124,7 @@ public class DataController {
 
     private ResponseVo<PageVo<UserMetaDataVo>> convertUserMetaDataToResponseVo(IPage<UserMetaDataDto> pageDto) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
         List<UserMetaDataVo> items = new ArrayList<>();
         pageDto.getRecords().forEach(userMetaDataDto -> {
             UserMetaDataVo userMetaDataVo = new UserMetaDataVo();
