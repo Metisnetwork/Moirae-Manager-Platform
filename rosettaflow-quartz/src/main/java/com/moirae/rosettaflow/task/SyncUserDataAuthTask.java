@@ -38,7 +38,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 60000 * 1000, initialDelay = 20000 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
