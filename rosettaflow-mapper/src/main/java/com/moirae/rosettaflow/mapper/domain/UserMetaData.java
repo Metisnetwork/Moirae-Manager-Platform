@@ -101,7 +101,7 @@ public class UserMetaData implements Serializable {
     /**
      * 已经使用的次数(按次数时有效)
      */
-    private Long usedTimes;
+    private Integer usedTimes;
 
 
     /**

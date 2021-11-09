@@ -38,7 +38,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 60000 * 1000, initialDelay = 20000 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
@@ -162,7 +162,7 @@ public class SyncUserDataAuthTask {
         userMetaData.setApplyTime(DateUtil.date(authorityDto.getApplyAt()));
         userMetaData.setAuditTime(DateUtil.date(authorityDto.getAuditAt()));
         userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire() ? MetaDataExpireStatusEnum.expire.getValue() : MetaDataExpireStatusEnum.un_expire.getValue());
-        userMetaData.setUsedTimes((long) authorityDto.getMetadataUsedQuoDto().getUsedTimes());
+        userMetaData.setUsedTimes(authorityDto.getMetadataUsedQuoDto().getUsedTimes());
         userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
         userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
         return userMetaData;

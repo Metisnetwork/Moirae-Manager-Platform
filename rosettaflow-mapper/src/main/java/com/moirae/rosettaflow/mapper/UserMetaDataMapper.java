@@ -24,6 +24,11 @@ public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
      */
     IPage<UserMetaDataDto> listByOwner(@Param("page") IPage<UserMetaData> page, @Param("address") String address, @Param("dataName") String dataName);
 
+    /**
+     * 查询用户授权数据组织信息
+     * @param address
+     * @return
+     */
     List<UserMetaDataDto> getUserMetaDataByAddress(@Param("address") String address);
 
     /**

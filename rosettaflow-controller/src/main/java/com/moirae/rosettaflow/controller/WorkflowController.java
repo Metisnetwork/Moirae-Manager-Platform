@@ -124,6 +124,11 @@ public class WorkflowController {
     @ApiOperation(value = "获取运行日志", notes = "获取运行日志")
     public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "workflowId", required = true) @PathVariable Long workflowId) {
         List<TaskEventDto> taskEventShowDtoList = workflowService.getTaskEventList(workflowId);
+        return ResponseVo.createSuccess(getLogConvertVo(taskEventShowDtoList));
+    }
+
+    /** 获取日志接口返回参数转换 */
+    private  List<TaskEventVo> getLogConvertVo(List<TaskEventDto> taskEventShowDtoList){
         List<TaskEventVo> taskEventVoList = new ArrayList<>();
         TaskEventVo vo;
         if (taskEventShowDtoList.size() > 0) {
@@ -140,7 +145,7 @@ public class WorkflowController {
                 taskEventVoList.add(vo);
             }
         }
-        return ResponseVo.createSuccess(taskEventVoList);
+        return taskEventVoList;
     }
 
     @PostMapping("terminate")

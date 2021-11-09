@@ -25,12 +25,13 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
     List<MetaDataDto> selectMetaDataWithAuth(String address);
 
     /**
-     * 根据identityId查询元数据列表
+     * 根据identityId、钱包地址，查询元数据列表
      *
      * @param identityId identityId
+     * @param address address
      * @return 元数据列表
      */
-    List<MetaDataDto> getAllAuthTables(@Param("identityId") String identityId);
+    List<MetaDataDto> getAllAuthTables(@Param("identityId") String identityId, @Param("address") String address);
 
     /**
      * 批量插入元数据信息
