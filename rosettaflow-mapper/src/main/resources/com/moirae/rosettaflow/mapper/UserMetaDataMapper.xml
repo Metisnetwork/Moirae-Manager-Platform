@@ -60,6 +60,7 @@
         <if test="dataName != null and dataName != ''">
             AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
         </if>
+        ORDER BY u.apply_time ASC
     </select>
     <!-- 查询工作流节点输入授权数据 -->
     <select id="getUserMetaDataByAddress" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
