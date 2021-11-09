@@ -162,7 +162,7 @@ public class SyncUserDataAuthTask {
         userMetaData.setApplyTime(DateUtil.date(authorityDto.getApplyAt()));
         userMetaData.setAuditTime(DateUtil.date(authorityDto.getAuditAt()));
         userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire() ? MetaDataExpireStatusEnum.expire.getValue() : MetaDataExpireStatusEnum.un_expire.getValue());
-        userMetaData.setUsedTimes((long) authorityDto.getMetadataUsedQuoDto().getUsedTimes());
+        userMetaData.setUsedTimes(authorityDto.getMetadataUsedQuoDto().getUsedTimes());
         userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
         userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
         return userMetaData;
