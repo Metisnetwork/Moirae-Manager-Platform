@@ -174,6 +174,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.in(UserMetaData::getMetaDataId, metaDataIdArr);
         wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
+        wrapper.orderByAsc(UserMetaData :: getApplyTime);
         return this.list(wrapper);
     }
 
