@@ -63,6 +63,21 @@
         ORDER BY u.apply_time ASC
     </select>
     <select id="getUserMetaDataByAddress" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
+        SELECT DISTINCT
+            umd.identity_id,
+            umd.identity_name,
+            umd.auth_type,
+            umd.expire,
+            umd.used_times,
+            umd.auth_value,
+            umd.auth_metadata_state
+        FROM t_user_meta_data umd
+            INNER JOIN t_user u
+            ON umd.address = u.address
+        WHERE umd.`status` = 1
+        AND umd.auth_status = 1
+        AND umd.address = #{address, jdbcType=VARCHAR}
+        <!--
         SELECT DISTINCT umd.identity_id,
                         umd.identity_name
         FROM t_user_meta_data umd
@@ -76,6 +91,7 @@
           AND umd.`status` = 1
           AND umd.auth_status = 1
           AND umd.address = #{address, jdbcType=VARCHAR}
+          -->
     </select>
     <!-- 更新按次数授权数据的次数 -->
     <update id="updateTimesByMetaDataId">
