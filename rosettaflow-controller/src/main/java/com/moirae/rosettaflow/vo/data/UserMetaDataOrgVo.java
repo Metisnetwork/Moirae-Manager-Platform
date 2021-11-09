@@ -13,7 +13,7 @@ import lombok.Data;
 @ApiModel
 public class UserMetaDataOrgVo {
 
-    @ApiModelProperty(value = "用户元数据授权表主键ID")
+    @ApiModelProperty(value = "用户元数据表ID")
     private Long id;
 
     @ApiModelProperty(value = "资源所属组织中调度服务的 nodeId")

@@ -32,9 +32,9 @@ public class WorkflowNodeInput implements Serializable {
      */
     private String identityId;
     /**
-     * 用户数据授权表主键ID
+     * 数据表ID
      */
-    private Long dataTableId;
+    private String dataTableId;
     /**
      * ID列(列索引)
      */
