@@ -20,8 +20,8 @@ public class WorkflowNodeInputReq {
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
 
-    @ApiModelProperty(value = "数据表ID")
-    private String dataTableId;
+    @ApiModelProperty(value = "用户数据授权表主键ID")
+    private Long dataTableId;
 
     @ApiModelProperty(value = "ID列(列索引)")
     @NotNull(message = "{node.identity.name.id.column}")

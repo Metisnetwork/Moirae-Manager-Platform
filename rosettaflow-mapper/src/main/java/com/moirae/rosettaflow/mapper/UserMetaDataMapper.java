@@ -24,6 +24,11 @@ public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
      */
     IPage<UserMetaDataDto> listByOwner(@Param("page") IPage<UserMetaData> page, @Param("address") String address, @Param("dataName") String dataName);
 
+    /**
+     * 查询工作流节点输入授权数据
+     * @param address 用户地址
+     * @return
+     */
     List<UserMetaDataDto> getUserMetaDataByAddress(@Param("address") String address);
 
     /**
@@ -32,7 +37,7 @@ public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
      * @param address 用户地址
      * @return UserMetaData
      */
-    int updateTimesByMetaDataId(@Param("metaDataIdList")List<String> metaDataIdList, @Param("address")String address);
+    int updateTimesByMetaDataId(@Param("metaDataIdList")List<Long> metaDataIdList, @Param("address")String address);
 
     /**
      * 批量插入

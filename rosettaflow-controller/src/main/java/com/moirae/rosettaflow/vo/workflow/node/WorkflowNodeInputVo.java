@@ -27,8 +27,8 @@ public class WorkflowNodeInputVo {
     @ApiModelProperty(value = "组织的身份标识Id")
     private String identityId;
 
-    @ApiModelProperty(value = "元数据id")
-    private String dataTableId;
+    @ApiModelProperty(value = "用户数据授权表主键ID")
+    private Long dataTableId;
 
     @ApiModelProperty(value = "数据字段ID,多个以”,“分隔")
     private String dataColumnIds;

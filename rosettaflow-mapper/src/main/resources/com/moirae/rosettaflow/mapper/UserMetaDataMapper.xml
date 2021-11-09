@@ -61,20 +61,19 @@
             AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
         </if>
     </select>
+    <!-- 查询工作流节点输入授权数据 -->
     <select id="getUserMetaDataByAddress" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
-        SELECT DISTINCT umd.identity_id,
-                        umd.identity_name
+        SELECT umd.id,
+               umd.identity_id,
+               umd.identity_name
         FROM t_user_meta_data umd
-                 INNER JOIN
-             t_user u
-             ON umd.address = u.address
+            INNER JOIN t_user u ON umd.address = u.address
         WHERE ((umd.auth_type = 1 AND expire = 0)
-            OR (
-                   umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value
-                   ))
-          AND umd.`status` = 1
-          AND umd.auth_status = 1
-          AND umd.address = #{address, jdbcType=VARCHAR}
+                OR (umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value))
+            AND umd.`status` = 1
+            AND umd.auth_status = 1
+            AND auth_metadata_state = 2
+            AND umd.address = #{address, jdbcType=VARCHAR}
     </select>
     <!-- 更新按次数授权数据的次数 -->
     <update id="updateTimesByMetaDataId">
@@ -90,7 +89,7 @@
                 AND auth_type = 2
                 AND auth_metadata_state = 2
                 AND address = #{address, jdbcType=VARCHAR}
-                AND meta_data_id = #{metaDataId, jdbcType=VARCHAR}
+                AND meta_data_id = #{metaDataId, jdbcType=BIGINT}
         </foreach>
     </update>
 
