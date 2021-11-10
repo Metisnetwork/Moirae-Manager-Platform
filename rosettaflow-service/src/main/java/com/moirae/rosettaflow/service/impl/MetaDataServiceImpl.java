@@ -66,8 +66,6 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     @Override
     public MetaDataDto detail(String userMetaDataId, String metaDataPkId) {
-
-
         MetaData metaData = this.getById(metaDataPkId);
         if (Objects.isNull(metaData)) {
             log.error("query metaData fail by id:{}", metaDataPkId);
@@ -75,7 +73,7 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         }
         //用户登录成功
         UserMetaData userMetaData = new UserMetaData();
-        if (!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())) {
+        if (!Objects.isNull(userMetaDataId) && StrUtil.isNotEmpty(userMetaDataId)) {
             userMetaData = userMetaDataService.getById(userMetaDataId);
             if(Objects.isNull(userMetaData)){
                 log.error("query userMetaData fail by id:{}", userMetaDataId);
