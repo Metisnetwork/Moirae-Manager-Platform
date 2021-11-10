@@ -8,10 +8,7 @@ import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.UserMetaDataDto;
-import com.moirae.rosettaflow.req.data.MetaDataAuthReq;
-import com.moirae.rosettaflow.req.data.MetaDataAuthTablesReq;
-import com.moirae.rosettaflow.req.data.MetaDataDetailReq;
-import com.moirae.rosettaflow.req.data.MetaDataReq;
+import com.moirae.rosettaflow.req.data.*;
 import com.moirae.rosettaflow.service.IMetaDataDetailsService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
@@ -61,10 +58,10 @@ public class DataController {
         return convertToMetaDataVo(servicePage);
     }
 
-    @GetMapping(value = "detail/{id}")
+    @GetMapping(value = "detail")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
-    public ResponseVo<MetaDataDetailVo> detail(@ApiParam(value = "用户授权数据表Id", required = true) @PathVariable String id) {
-        MetaDataDto metaDataDto = metaDataService.detail(id);
+    public ResponseVo<MetaDataDetailVo> detail(@Valid MetaDataDetailDescribeReq detailReq) {
+        MetaDataDto metaDataDto = metaDataService.detail(detailReq.getUserMetaDataId(), detailReq.getMetaDataPkId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(metaDataDto, MetaDataDetailVo.class));
     }
 

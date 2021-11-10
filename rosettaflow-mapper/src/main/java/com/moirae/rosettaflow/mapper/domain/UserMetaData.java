@@ -50,7 +50,7 @@ public class UserMetaData implements Serializable {
     private String address;
 
     /**
-     * 授权方式: 1-按时间, 2-按次数, 3-永久
+     * 授权方式: 0-未知, 1-按时间, 2-按次数, 3-永久
      */
     private Byte authType;
 

@@ -65,34 +65,45 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public MetaDataDto detail(String id) {
-        UserMetaData userMetaData = userMetaDataService.getById(id);
-        if(Objects.isNull(userMetaData)){
-            log.error("query userMetaData fail by id:{}", id);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
-        }
-        MetaData metaData = this.getMetaDataByMetaDataId(userMetaData.getMetaDataId());
+    public MetaDataDto detail(String userMetaDataId, String metaDataPkId) {
+
+
+        MetaData metaData = this.getById(metaDataPkId);
         if (Objects.isNull(metaData)) {
-            log.error("query metaData fail by metaDataId:{}", userMetaData.getMetaDataId());
+            log.error("query metaData fail by id:{}", metaDataPkId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
+        }
+        //用户登录成功
+        UserMetaData userMetaData = new UserMetaData();
+        if (!Objects.isNull(UserContext.get()) && StrUtil.isNotEmpty(UserContext.get().getAddress())) {
+            userMetaData = userMetaDataService.getById(userMetaDataId);
+            if(Objects.isNull(userMetaData)){
+                log.error("query userMetaData fail by id:{}", userMetaDataId);
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
+            }
         }
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
-        metaDataDto.setAuthType(userMetaData.getAuthType());
         metaDataDto.setAuthBeginTime(userMetaData.getAuthBeginTime());
         metaDataDto.setAuthEndTime(userMetaData.getAuthEndTime());
         metaDataDto.setAuthValue(userMetaData.getAuthValue());
         metaDataDto.setExpire(userMetaData.getExpire());
         metaDataDto.setAuthMetadataState(userMetaData.getAuthMetadataState());
         metaDataDto.setUsedTimes(userMetaData.getUsedTimes());
-        //授权值
+        //授权类型及授权值
         String authTime = "";
-        if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
-            SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
-            dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
-            authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
+        if (!Objects.isNull(userMetaData.getAuthType())) {
+            metaDataDto.setAuthType(userMetaData.getAuthType());
+            if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
+                SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
+                dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
+                authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
+            }
+            metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
+        } else {
+            metaDataDto.setAuthType(AuthTypeEnum.UNKNOWN.getValue());
+            metaDataDto.setAuthValueStr(authTime);
         }
-        metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
         return metaDataDto;
     }
 
