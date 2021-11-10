@@ -32,7 +32,6 @@ public class MetaData implements Serializable {
      */
     private String identityName;
     /**
-     * 源文件存放路径
      * 资源所属组织中调度服务的 nodeId
      */
     private String nodeId;
@@ -53,6 +52,7 @@ public class MetaData implements Serializable {
      */
     private String dataDesc;
     /**
+     * 源文件存放路径
      */
     private String filePath;
     /**

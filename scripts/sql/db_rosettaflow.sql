@@ -437,7 +437,7 @@ CREATE TABLE `t_workflow_node_input`
     `id`                 bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表ID(自增长)',
     `workflow_node_id`   bigint(20)          DEFAULT NULL COMMENT '工作流节点id',
     `identity_id`        varchar(128)        DEFAULT NULL COMMENT '组织的身份标识Id',
-    `data_table_id`      bigint(20)          DEFAULT NULL COMMENT '用户数据授权表主键ID',
+    `data_table_id`      varchar(128)        DEFAULT NULL COMMENT '数据表ID',
     `key_column`         bigint(20)          DEFAULT NULL COMMENT 'ID列(列索引)(存id值)',
     `dependent_variable` bigint(20)          DEFAULT NULL COMMENT '因变量(标签)(存id值)',
     `data_column_ids`    varchar(1024)       DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
