@@ -157,7 +157,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
         if (userAuthDataIdList.size() > 0) {
             List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdList);
-            if (userMetaDataList.size() < userAuthDataIdList.size()) {
+            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdList.size()) {
                 log.error("saveWorkflowNode--保存工作流接口, userAuthDataIdList:{}", JSON.toJSONString(userAuthDataIdList));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
             }

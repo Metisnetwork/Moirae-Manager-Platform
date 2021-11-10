@@ -47,8 +47,7 @@
     </select>
 
     <select id="getAllAuthTables" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
-        SELECT
-            umd.id as userMateDataId,
+        SELECT DISTINCT
             md.meta_data_id,
             md.identity_id,
             md.data_name
