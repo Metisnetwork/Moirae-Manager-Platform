@@ -88,11 +88,11 @@ public class SysConstant {
     /**
      * 国际化中文
      */
-    public static final String ZH_CN = "cn";
+    public static final String ZH_CN = "zh";
     /**
      * 国际化英文
      */
-    public static final String EN_US = "us";
+    public static final String EN_US = "en";
     /**
      * 不需要用户登录可以访问的接口
      */
