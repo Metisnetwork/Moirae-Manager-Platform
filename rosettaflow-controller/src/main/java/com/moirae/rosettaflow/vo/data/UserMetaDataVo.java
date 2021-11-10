@@ -17,11 +17,14 @@ import java.util.Date;
 @ApiModel
 public class UserMetaDataVo {
 
-    @ApiModelProperty(value = "用户数据表ID")
+    @ApiModelProperty(value = "用户授权数据表Id")
     private Long id;
 
-    @ApiModelProperty(value = "元数据id")
+    @ApiModelProperty(value = "元数据metaDataId")
     private String metaDataId;
+
+    @ApiModelProperty(value = "元数据表Id")
+    private Long metaDataPkId;
 
     @ApiModelProperty(value = "资源所属组织的身份标识Id")
     private String identityId;

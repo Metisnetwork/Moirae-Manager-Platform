@@ -64,6 +64,8 @@ public enum ErrorMsg {
     METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by times, the times must be greater than zero"),
     METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
     METADATA_AUTH_SAVE_ERROR("元数据授权申请保存失败", "Metadata authorization apply save error"),
+    METADATA_USER_NOT_EXIST("用户授权数据不存在", "User meta data not exist"),
+
 
     /**
      * 工作流
