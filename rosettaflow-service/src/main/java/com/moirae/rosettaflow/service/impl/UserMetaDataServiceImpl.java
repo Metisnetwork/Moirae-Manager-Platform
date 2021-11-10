@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
@@ -32,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -150,25 +148,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
             address = AddressChangeUtils.convert0xAddress(address);
         }
-        List<UserMetaDataDto> userMetaDataList = this.baseMapper.getUserMetaDataByAddress(address);
-        if (null == userMetaDataList || userMetaDataList.size() == 0) {
-            return new ArrayList<>();
-        }
-        for (UserMetaDataDto userMetaDataDto : userMetaDataList) {
-            int authType = userMetaDataDto.getAuthType();
-            int expire = userMetaDataDto.getExpire();
-            int authValue = userMetaDataDto.getAuthValue();
-            int usedTimes = userMetaDataDto.getUsedTimes();
-            // 判断是否已过期
-            boolean flag = (SysConstant.INT_1 == authType  && SysConstant.INT_1 ==expire)
-                    || (SysConstant.INT_2 == authType && usedTimes < authValue);
-            if (flag) {
-                // 数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权;
-                // 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)
-                userMetaDataDto.setAuthMetadataState((byte)2);
-            }
-        }
-        return userMetaDataList;
+        return this.baseMapper.getUserMetaDataByAddress(address);
     }
 
     @Override
