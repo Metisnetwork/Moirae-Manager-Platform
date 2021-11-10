@@ -47,21 +47,22 @@
     </select>
 
     <select id="getAllAuthTables" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
-        SELECT DISTINCT
-        md.meta_data_id,
-        md.identity_id,
-        md.data_name
+        SELECT
+            umd.id as userMateDataId,
+            md.meta_data_id,
+            md.identity_id,
+            md.data_name
         FROM
-        t_user_meta_data umd
-        LEFT JOIN t_meta_data md ON umd.meta_data_id = md.meta_data_id
+            t_user_meta_data umd
+        LEFT JOIN
+            t_meta_data md
+            ON umd.meta_data_id = md.meta_data_id
+            AND md.`status` = 1
         WHERE
-        ((umd.auth_type = 1 AND umd.expire = 0)
-        OR (
-        umd.auth_type = 2
-        AND used_times <![CDATA[ < ]]> umd.auth_value
-        ))
+            ((umd.auth_type = 1 AND umd.expire = 0)
+            OR (umd.auth_type = 2 AND used_times &lt; umd.auth_value))
         AND umd.`status` = 1
-        AND md.`status` = 1
+        AND umd.auth_status = 1
         AND umd.auth_metadata_state = 2
         AND umd.identity_id = #{identityId, jdbcType=VARCHAR}
         AND umd.address = #{address, jdbcType=VARCHAR}

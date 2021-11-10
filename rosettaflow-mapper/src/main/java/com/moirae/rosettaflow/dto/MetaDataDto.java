@@ -56,6 +56,4 @@ public class MetaDataDto extends MetaData {
     private Byte expire;
 
 
-
-
 }

@@ -13,8 +13,8 @@ import lombok.Data;
 @ApiModel
 public class MetaDataTablesVo {
 
-    @ApiModelProperty(value = "元数据表ID")
-    private Long id;
+    @ApiModelProperty(value = "用户数据授权表主键id")
+    private Long userMateDataId;
 
     @ApiModelProperty(value = "元数据id")
     private String metaDataId;
