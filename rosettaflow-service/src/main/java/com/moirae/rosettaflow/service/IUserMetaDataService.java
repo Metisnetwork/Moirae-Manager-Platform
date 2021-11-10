@@ -85,7 +85,7 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
 
     /**
      * 根据主键id批量查询元数据
-     * @param 身份列表 元数据id集合
+     * @param idList 元数据id集合
      * @return UserMetaData集合
      */
     List<UserMetaData> getUserMetaDataByIds(List<Long> idList);

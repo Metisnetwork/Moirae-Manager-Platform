@@ -68,6 +68,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Resource
     private IOrganizationService organizationService;
 
+    @Resource
+    private IUserMetaDataService userMetaDataService;
+
     @Override
     public List<WorkflowNodeDto> queryNodeDetailsList(Long id) {
         // 获取工作流节点列表
@@ -141,6 +144,25 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
+        // 校验节点配置输入是否有过期数据
+        List<Long> userAuthDataIdList = new ArrayList<>();
+        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
+            if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
+                continue;
+            }
+            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+                userAuthDataIdList.add(workflowNodeInput.getDataTableId());
+            }
+        }
+        if (userAuthDataIdList.size() > 0) {
+            List<UserMetaData> userMetaDataList = userMetaDataService.getUserMetaDataByIds(userAuthDataIdList);
+            if (userMetaDataList.size() < userAuthDataIdList.size()) {
+                log.error("saveWorkflowNode--保存工作流接口, userAuthDataIdList:{}", JSON.toJSONString(userAuthDataIdList));
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
+            }
+        }
+
         // 删除当前工作流所有节点数据
         workflowService.deleteWorkflowAllNodeData(workflowId);
 
