@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
@@ -186,5 +187,14 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Override
     public void updateTimesByMetaDataId(List<String> metaDataIdList, String address) {
         this.baseMapper.updateTimesByMetaDataId(metaDataIdList, address);
+    }
+
+    @Override
+    public List<UserMetaData> getByMetaDataId(List<String> metaDataIdList) {
+        LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(UserMetaData::getAuthMetadataState, SysConstant.INT_2);
+        queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
+        queryWrapper.in(UserMetaData::getMetaDataId, metaDataIdList);
+        return this.list(queryWrapper);
     }
 }

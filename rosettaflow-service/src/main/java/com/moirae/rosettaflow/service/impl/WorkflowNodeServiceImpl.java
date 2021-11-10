@@ -145,7 +145,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
         // 校验节点配置输入是否有过期数据
-        List<Long> userAuthDataIdList = new ArrayList<>();
+        List<String> userAuthDataIdList = new ArrayList<>();
         for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
             if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
@@ -156,7 +156,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             }
         }
         if (userAuthDataIdList.size() > 0) {
-            List<UserMetaData> userMetaDataList = userMetaDataService.getUserMetaDataByIds(userAuthDataIdList);
+            List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdList);
             if (userMetaDataList.size() < userAuthDataIdList.size()) {
                 log.error("saveWorkflowNode--保存工作流接口, userAuthDataIdList:{}", JSON.toJSONString(userAuthDataIdList));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());

@@ -75,8 +75,10 @@
             OR (umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value))
           AND umd.`status` = 1
           AND umd.auth_status = 1
+          AND umd.auth_metadata_state = 2
           AND umd.address = #{address, jdbcType=VARCHAR}
     </select>
+
     <!-- 更新按次数授权数据的次数 -->
     <update id="updateTimesByMetaDataId">
         <foreach collection="metaDataIdList" item="metaDataId" separator=";">

@@ -81,12 +81,12 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @param address 用户地址
      * @return UserMetaData集合
      */
-    void updateTimesByMetaDataId(List<Long> metaDataIdList, String address);
+    void updateTimesByMetaDataId(List<String> metaDataIdList, String address);
 
     /**
-     * 根据主键id批量查询元数据
-     * @param idList 元数据id集合
+     * 根据元数据id查询有效的授权元数据
+     * @param metaDataIdList 元数据id集合
      * @return UserMetaData集合
      */
-    List<UserMetaData> getUserMetaDataByIds(List<Long> idList);
+    List<UserMetaData> getByMetaDataId(List<String> metaDataIdList);
 }

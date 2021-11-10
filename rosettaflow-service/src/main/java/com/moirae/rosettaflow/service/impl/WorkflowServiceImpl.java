@@ -348,7 +348,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 for(WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
                     inputDataList.add(workflowNodeInput.getDataTableId());
                 }
-                // 按次数授权的数据次数加1
+                // 被使用的次数加1
                 userMetaDataService.updateTimesByMetaDataId(inputDataList, workflowDto.getAddress());
             }
         }
