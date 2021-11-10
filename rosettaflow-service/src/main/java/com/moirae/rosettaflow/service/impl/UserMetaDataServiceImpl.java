@@ -184,7 +184,15 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public void updateTimesByMetaDataId(List<String> metaDataIdList, String address) {
+    public void updateTimesByMetaDataId(List<Long> metaDataIdList, String address) {
         this.baseMapper.updateTimesByMetaDataId(metaDataIdList, address);
+    }
+
+    @Override
+    public List<UserMetaData> getUserMetaDataByIds(List<Long> idList) {
+        LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(UserMetaData::getId, idList);
+        queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
     }
 }

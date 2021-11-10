@@ -344,7 +344,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             // 更新元数据使用次数
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
             if (null != workflowNodeInputList && workflowNodeInputList.size() > 0) {
-                List<String> inputDataList = new ArrayList<>();
+                List<Long> inputDataList = new ArrayList<>();
                 for(WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
                     inputDataList.add(workflowNodeInput.getDataTableId());
                 }
@@ -723,6 +723,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
         OrganizationIdentityInfoDto taskOrganizationIdentityInfoDto;
         TaskMetaDataDeclareDto taskMetaDataDeclareDto;
+        // 批量查询元数据id
+        List<Long> idList = new ArrayList<>();
+        for (WorkflowNodeInput input : workflowNodeInputList) {
+            idList.add(input.getDataTableId());
+        }
+        Map<Long, String> metaDataIdMap = userMetaDataService.getUserMetaDataByIds(idList)
+                .stream().collect(Collectors.toMap(UserMetaData::getId, UserMetaData::getMetaDataId));
+
         for (WorkflowNodeInput input : workflowNodeInputList) {
             taskOrganizationIdentityInfoDto = new OrganizationIdentityInfoDto();
             taskOrganizationIdentityInfoDto.setPartyId(input.getPartyId());
@@ -731,7 +739,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskOrganizationIdentityInfoDto.setIdentityId(input.getIdentityId());
 
             taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
-            taskMetaDataDeclareDto.setMetaDataId(input.getDataTableId());
+            taskMetaDataDeclareDto.setMetaDataId(metaDataIdMap.get(input.getDataTableId()));
 
             String[] columnIdsArr = input.getDataColumnIds().split(",");
             if (columnIdsArr.length < 1) {

@@ -5,7 +5,7 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
-        <result column="data_table_id" jdbcType="VARCHAR" property="dataTableId"/>
+        <result column="data_table_id" jdbcType="BIGINT" property="dataTableId"/>
         <result column="key_column" jdbcType="BIGINT" property="keyColumn" />
         <result column="dependent_variable" jdbcType="BIGINT" property="dependentVariable" />
         <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds"/>
@@ -69,7 +69,7 @@
                     #{i.identityId,jdbcType=VARCHAR},
                 </if>
                 <if test="i.dataTableId != null">
-                    #{i.dataTableId,jdbcType=VARCHAR},
+                    #{i.dataTableId,jdbcType=BIGINT},
                 </if>
                 <if test="i.keyColumn != null">
                     #{i.keyColumn,jdbcType=BIGINT},
