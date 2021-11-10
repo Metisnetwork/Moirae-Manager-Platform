@@ -92,4 +92,14 @@ public class MetaDataDetailVo {
 
     @ApiModelProperty(value = "授权值:以次数方式申请则显示次数，以时间方式申请则显示时间")
     private String authValueStr;
+
+    @ApiModelProperty(value = "授权值:已经使用的次数(按次数时有效)")
+    private Integer usedTimes;
+
+    @ApiModelProperty(value = "是否已过期（按时间时需要）: 0-未过期, 1-已过期")
+    private Byte expire;
+
+    @ApiModelProperty(value = "数据授权信息有效性状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)")
+    private Byte authMetadataState;
+
 }

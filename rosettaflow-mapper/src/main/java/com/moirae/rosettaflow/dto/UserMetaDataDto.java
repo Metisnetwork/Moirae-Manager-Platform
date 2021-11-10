@@ -18,5 +18,9 @@ public class UserMetaDataDto extends UserMetaData {
     private Byte userType;
 
     private String sign;
+    /**
+     * t_meta_data表主键id
+     */
+    private Long metaDataPkId;
 
 }

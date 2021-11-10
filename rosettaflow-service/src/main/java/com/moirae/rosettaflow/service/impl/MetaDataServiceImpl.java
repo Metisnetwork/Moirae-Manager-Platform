@@ -65,38 +65,39 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public MetaDataDto detail(String metaDataId) {
-        MetaData metaData = this.getMetaDataBymetaId(metaDataId);
+    public MetaDataDto detail(String id) {
+        UserMetaData userMetaData = userMetaDataService.getById(id);
+        if(Objects.isNull(userMetaData)){
+            log.error("query userMetaData fail by id:{}", id);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
+        }
+        MetaData metaData = this.getMetaDataByMetaDataId(userMetaData.getMetaDataId());
         if (Objects.isNull(metaData)) {
-            log.error("query metaData fail by metaDataId:{}", metaDataId);
+            log.error("query metaData fail by metaDataId:{}", userMetaData.getMetaDataId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
-        UserMetaData userMetaData = userMetaDataService.getCurrentUserMetaDataByMetaDataId(metaData.getMetaDataId());
-        if (null != userMetaData) {
-            metaDataDto.setAuthType(userMetaData.getAuthType());
-            metaDataDto.setAuthBeginTime(userMetaData.getAuthBeginTime());
-            metaDataDto.setAuthEndTime(userMetaData.getAuthEndTime());
-            metaDataDto.setAuthValue(userMetaData.getAuthValue());
-            //授权值
-            String authTime = "";
-            if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
-                SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
-                dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
-                authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
-            }
-            metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
-
-        } else {
-            metaDataDto.setAuthType((byte) MetaDataUsageEnum.USAGE_UNKNOWN.getValue());
+        metaDataDto.setAuthType(userMetaData.getAuthType());
+        metaDataDto.setAuthBeginTime(userMetaData.getAuthBeginTime());
+        metaDataDto.setAuthEndTime(userMetaData.getAuthEndTime());
+        metaDataDto.setAuthValue(userMetaData.getAuthValue());
+        metaDataDto.setExpire(userMetaData.getExpire());
+        metaDataDto.setAuthMetadataState(userMetaData.getAuthMetadataState());
+        metaDataDto.setUsedTimes(userMetaData.getUsedTimes());
+        //授权值
+        String authTime = "";
+        if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
+            dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
+            authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
         }
-
+        metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
         return metaDataDto;
     }
 
     @Override
-    public MetaData getMetaDataBymetaId(String metaDataId) {
+    public MetaData getMetaDataByMetaDataId(String metaDataId) {
         LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
         metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId,metaDataId);
         metaDataLambdaQueryWrapper.eq(MetaData::getStatus,StatusEnum.VALID.getValue());
@@ -127,15 +128,18 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         List<MetaDataDto> records = new ArrayList<>();
         Map<String, Byte> authStatusMap = new HashMap<>(metaDataWithAuthList.size());
         Map<String, Byte> authMetaValidMap = new HashMap<>(metaDataWithAuthList.size());
+        Map<String, Long> authUserMetaDataPkId = new HashMap<>(metaDataWithAuthList.size());
         for (UserMetaData dataAuth : metaDataWithAuthList) {
             authStatusMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthStatus());
             authMetaValidMap.put(dataAuth.getMetaDataId(), dataAuth.getAuthMetadataState());
+            authUserMetaDataPkId.put(dataAuth.getMetaDataId(), dataAuth.getId());
         }
         page.getRecords().forEach(r -> {
             MetaDataDto m = new MetaDataDto();
             BeanCopierUtils.copy(r, m);
             m.setAuthStatus(authStatusMap.containsKey(r.getMetaDataId()) ? authStatusMap.get(r.getMetaDataId()) : UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
             m.setAuthMetadataState(authMetaValidMap.containsKey(r.getMetaDataId()) ? authMetaValidMap.get(r.getMetaDataId()) : UserMetaDataAuthorithStateEnum.UNKNOWN.getValue());
+            m.setUserMateDataId(authUserMetaDataPkId.get(r.getMetaDataId()));
             records.add(m);
         });
 

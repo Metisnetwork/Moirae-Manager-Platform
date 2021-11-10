@@ -20,6 +20,9 @@ public class MetaDataVo {
     @ApiModelProperty(value = "元数据表ID")
     private Long id;
 
+    @ApiModelProperty(value = "用户授权数据表ID")
+    private Long userMateDataId;
+
     @ApiModelProperty(value = "资源所属组织的身份标识Id")
     private String identityId;
 

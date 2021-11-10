@@ -42,6 +42,18 @@ public class MetaDataDto extends MetaData {
      * 授权值:以次数方式申请则显示次数，以时间方式申请则显示时间
      */
     private String authValueStr;
+    /**
+     * 已经使用的次数(按次数时有效)
+     */
+    private Integer usedTimes;
+    /**
+     * 授权用户数据表id
+     */
+    private Long userMateDataId;
+    /**
+     * 是否已过期（按时间时需要）: 0-未过期, 1-已过期
+     */
+    private Byte expire;
 
 
 
