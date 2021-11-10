@@ -34,8 +34,9 @@
     </update>
     <select id="listByOwner" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
         SELECT
-        m.id,
+        m.id AS 'metaDataPkId',
         m.data_name,
+        u.id,
         u.meta_data_id,
         u.identity_id,
         u.identity_name,
@@ -60,7 +61,7 @@
         <if test="dataName != null and dataName != ''">
             AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
         </if>
-        ORDER BY u.apply_time ASC
+        ORDER BY u.apply_time DESC
     </select>
     <select id="getUserMetaDataByAddress" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
         SELECT DISTINCT
