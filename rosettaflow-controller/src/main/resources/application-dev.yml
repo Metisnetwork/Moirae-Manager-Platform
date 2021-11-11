@@ -26,7 +26,8 @@ spring:
 mybatis-plus:
   configuration:
     call-setters-on-nulls: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 # 系统参数配置
 system:
   config:
