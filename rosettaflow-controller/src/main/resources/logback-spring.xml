@@ -30,7 +30,7 @@
 
     <springProfile name="dev | test | uat | prod | local | xty">
         <root>
-            <level value="INFO"/>
+            <level value="DEBUG"/>
             <appender-ref ref="fileAppender"/>
         </root>
     </springProfile>
