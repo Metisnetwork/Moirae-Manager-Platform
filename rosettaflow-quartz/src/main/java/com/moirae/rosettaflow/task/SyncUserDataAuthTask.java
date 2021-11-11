@@ -2,7 +2,9 @@ package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
+import com.moirae.rosettaflow.common.enums.AuthTypeEnum;
 import com.moirae.rosettaflow.common.enums.MetaDataExpireStatusEnum;
+import com.moirae.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,39 +60,6 @@ public class SyncUserDataAuthTask {
             log.error("从net同步用户元数据授权列表失败,失败原因：{}", e.getMessage(), e);
             return;
         }
-
-      /*  //metaDataId重复的个数
-        Map<String, Integer> countMap = new HashMap<>(metaDataAuthorityDtoList.size());
-        //找到有多条授权记录的数据
-        List<String> mulMetaDataIdList = new ArrayList<>();
-        String metaDataId;
-        for (GetMetaDataAuthorityDto getMetaDataAuthorityDto : metaDataAuthorityDtoList) {
-            metaDataId = getMetaDataAuthorityDto.getMetaDataAuthorityDto().getMetaDataId();
-            if (countMap.containsKey(metaDataId)) {
-                int val = countMap.get(metaDataId);
-                countMap.put(metaDataId, ++val);
-                mulMetaDataIdList.add(metaDataId);
-            } else {
-                countMap.put(metaDataId, 1);
-            }
-        }
-        metaDataAuthorityDtoList.removeIf(dto -> dto.getAuditMetaDataOption() == 0 && mulMetaDataIdList.contains(dto.getMetaDataAuthorityDto().getMetaDataId()));
-
-        //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 begin
-        Map<String, Integer> countMetaDataIdMap = new HashMap<>(metaDataAuthorityDtoList.size());
-        mulMetaDataIdList.clear();
-        for (GetMetaDataAuthorityDto getMetaDataAuthorityDto : metaDataAuthorityDtoList) {
-            metaDataId = getMetaDataAuthorityDto.getMetaDataAuthorityDto().getMetaDataId();
-            if (countMetaDataIdMap.containsKey(metaDataId)) {
-                int val = countMetaDataIdMap.get(metaDataId);
-                countMetaDataIdMap.put(metaDataId, ++val);
-                mulMetaDataIdList.add(getMetaDataAuthorityDto.getMetaDataAuthId());
-            } else {
-                countMetaDataIdMap.put(metaDataId, 1);
-            }
-        }
-        metaDataAuthorityDtoList.removeIf(dto -> mulMetaDataIdList.contains(dto.getMetaDataAuthId()));
-        //临时过滤metaDataId+user+metadataAuthorityState 一样的数据只能取一条 end*/
 
         List<UserMetaData> userMetaDataList = new ArrayList<>();
         UserMetaData userMetaData;
@@ -165,6 +135,11 @@ public class SyncUserDataAuthTask {
         userMetaData.setUsedTimes(authorityDto.getMetadataUsedQuoDto().getUsedTimes());
         userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
         userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
+        //如果按时间授权，超过授权截止日期，AuthMetadataState及expire由于net没有更新，flow要自己更新
+        if (userMetaData.getAuthType() == AuthTypeEnum.TIME.getValue() && new Date().after(userMetaData.getAuthEndTime())) {
+            userMetaData.setExpire((byte) 1);//已逾期
+            userMetaData.setAuthMetadataState(UserMetaDataAuthorithStateEnum.INVALID.getValue());
+        }
         return userMetaData;
     }
 }
