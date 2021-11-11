@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.task;
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.AuthTypeEnum;
+import com.moirae.rosettaflow.common.enums.ExpireTypeEnum;
 import com.moirae.rosettaflow.common.enums.MetaDataExpireStatusEnum;
 import com.moirae.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
@@ -16,11 +17,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hudenian
@@ -130,14 +131,14 @@ public class SyncUserDataAuthTask {
         int auditStatus = authorityDto.getAuditMetaDataOption();
         userMetaData.setAuthStatus((byte) auditStatus);
         userMetaData.setApplyTime(DateUtil.date(authorityDto.getApplyAt()));
-        userMetaData.setAuditTime(DateUtil.date(authorityDto.getAuditAt()));
+        userMetaData.setAuditTime((Objects.isNull(authorityDto.getAuditAt()) || authorityDto.getAuditAt() == 0) ? null : DateUtil.date(authorityDto.getAuditAt()));
         userMetaData.setExpire(authorityDto.getMetadataUsedQuoDto().isExpire() ? MetaDataExpireStatusEnum.expire.getValue() : MetaDataExpireStatusEnum.un_expire.getValue());
         userMetaData.setUsedTimes(authorityDto.getMetadataUsedQuoDto().getUsedTimes());
         userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
         userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
         //如果按时间授权，超过授权截止日期，AuthMetadataState及expire由于net没有更新，flow要自己更新
         if (userMetaData.getAuthType() == AuthTypeEnum.TIME.getValue() && new Date().after(userMetaData.getAuthEndTime())) {
-            userMetaData.setExpire((byte) 1);//已逾期
+            userMetaData.setExpire(ExpireTypeEnum.EXPIRE.getValue());
             userMetaData.setAuthMetadataState(UserMetaDataAuthorithStateEnum.INVALID.getValue());
         }
         return userMetaData;
