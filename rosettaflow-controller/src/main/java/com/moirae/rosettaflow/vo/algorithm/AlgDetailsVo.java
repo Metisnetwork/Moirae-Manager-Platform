@@ -86,7 +86,7 @@ public class AlgDetailsVo {
             return 0L;
         }
         return new BigDecimal(this.costBandwidth)
-                .divide(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000),
+                .divide(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024),
                         SysConstant.INT_0, RoundingMode.UP).longValue();
     }
 

@@ -56,7 +56,7 @@ public class WorkflowNodeResourceReq {
     @SuppressWarnings("unused")
     public Long getCostBandwidth() {
         return new BigDecimal(this.costBandwidth)
-                .multiply(BigDecimal.valueOf(SysConstant.INT_1000 * SysConstant.INT_1000))
+                .multiply(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024))
                 .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }
