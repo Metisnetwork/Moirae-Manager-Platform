@@ -158,7 +158,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         if (userAuthDataIdSet.size() > 0) {
             List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdSet);
             if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdSet.size()) {
-                log.error("saveWorkflowNode--保存工作流接口, userAuthDataIdList:{}", JSON.toJSONString(userAuthDataIdSet));
+                log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(userAuthDataIdSet));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
             }
         }
