@@ -9,23 +9,23 @@ public enum AuditMetaDataOptionEnum {
     /**
      * 等待审核中
      */
-    AUDIT_PENDING(0),
+    AUDIT_PENDING((byte)0),
     /**
      * 审核通过
      */
-    AUDIT_PASSED(1),
+    AUDIT_PASSED((byte)1),
     /**
      * 审核拒绝
      */
-    AUDIT_REFUSED(2);
+    AUDIT_REFUSED((byte)2);
 
-    private final int value;
+    private final byte value;
 
-    AuditMetaDataOptionEnum(int value) {
+    AuditMetaDataOptionEnum(byte value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public byte getValue() {
         return value;
     }
 }

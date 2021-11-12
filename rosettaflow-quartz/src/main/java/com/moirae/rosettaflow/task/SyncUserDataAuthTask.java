@@ -2,10 +2,7 @@ package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
-import com.moirae.rosettaflow.common.enums.AuthTypeEnum;
-import com.moirae.rosettaflow.common.enums.ExpireTypeEnum;
-import com.moirae.rosettaflow.common.enums.MetaDataExpireStatusEnum;
-import com.moirae.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
+import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
@@ -140,6 +137,7 @@ public class SyncUserDataAuthTask {
         if (userMetaData.getAuthType() == AuthTypeEnum.TIME.getValue() && new Date().after(userMetaData.getAuthEndTime())) {
             userMetaData.setExpire(ExpireTypeEnum.EXPIRE.getValue());
             userMetaData.setAuthMetadataState(UserMetaDataAuthorithStateEnum.INVALID.getValue());
+            userMetaData.setAuthStatus(AuditMetaDataOptionEnum.AUDIT_REFUSED.getValue());
         }
         return userMetaData;
     }
