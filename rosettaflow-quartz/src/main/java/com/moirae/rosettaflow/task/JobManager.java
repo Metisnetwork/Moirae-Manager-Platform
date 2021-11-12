@@ -162,7 +162,7 @@ public class JobManager {
             //2、筛选出结束时间 > 当前时间，待结束作业
             List<Job> jobFinishList = jobList.stream().filter(job -> {
                 Date currentTime = new Date();
-                return Objects.isNull(job.getEndTime()) ? false : currentTime.before(job.getEndTime());
+                return !Objects.isNull(job.getEndTime()) && job.getEndTime().after(currentTime);
             }).collect(Collectors.toList());
             //3、批量更新作业状态
             if (!jobFinishList.isEmpty()) {
