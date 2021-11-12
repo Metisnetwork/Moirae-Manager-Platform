@@ -16,9 +16,9 @@ INSERT INTO `t_workflow_temp` VALUES ('1', '1', '协同营销对应工作流', '
 TRUNCATE t_algorithm;
 INSERT INTO `t_algorithm` VALUES (1, '逻辑回归训练', '用于逻辑回归训练', 'Rosetta', 3, 2, 'python', 'window,linux,mac', 3, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 1, '2021-10-25 15:16:02', '2021-11-12 10:03:52');
 INSERT INTO `t_algorithm` VALUES (2, '分类模型预测', '用于分类模型的预测', 'Rosetta', 3, 2, 'python', 'window,linux,mac', 3, 1073741824, 1, 2, 3145728, 180000, 1, 1, 1, 1, '2021-10-25 15:16:02', '2021-11-12 10:03:46');
-INSERT INTO `t_algorithm` VALUES (3, '隐私集合求交（PSI）', '用于跨组织的数据交集查询', 'Rosetta', 3, 2, 'SQL\r\nPython', 'window,linux,mac', 1, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 0, '2021-10-25 16:47:14', '2021-11-12 10:02:38');
-INSERT INTO `t_algorithm` VALUES (4, '隐私求和', '用于多方参与的隐私数据求和', 'Rosetta', 3, 2, 'SQL\r\nPython', 'window,linux,mac', 1, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 0, '2021-10-25 17:01:40', '2021-11-12 10:02:59');
-INSERT INTO `t_algorithm` VALUES (5, '缺失值处理', '用于缺失值处理', 'Rosetta', 3, 2, 'SQL\r\nPython', 'window,linux,mac', 2, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 0, '2021-10-25 17:03:34', '2021-11-12 10:03:05');
+INSERT INTO `t_algorithm` VALUES (3, '隐私集合求交（PSI）', '用于跨组织的数据交集查询', 'Rosetta', 3, 2, 'SQL,Python', 'window,linux,mac', 1, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 0, '2021-10-25 16:47:14', '2021-11-12 10:02:38');
+INSERT INTO `t_algorithm` VALUES (4, '隐私求和', '用于多方参与的隐私数据求和', 'Rosetta', 3, 2, 'SQL,Python', 'window,linux,mac', 1, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 0, '2021-10-25 17:01:40', '2021-11-12 10:02:59');
+INSERT INTO `t_algorithm` VALUES (5, '缺失值处理', '用于缺失值处理', 'Rosetta', 3, 2, 'SQL,Python', 'window,linux,mac', 2, 1073741824, 1, 2, 3145728, 180000, 0, 1, 1, 0, '2021-10-25 17:03:34', '2021-11-12 10:03:05');
 
 
 -- ----------------------------
