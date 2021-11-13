@@ -429,9 +429,23 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
         } else {
             TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode.getTaskId());
-            TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
+            TerminateTaskRespDto terminateTaskRespDto = null;
+            for (int i = 0; i < 3; i++) {
+                try {
+                    terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
+                } catch (Exception e) {
+                    log.error("终止工作流失败，失败原因：{}", e.getMessage());
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException ex) {
+                        log.error("线程休眠失败，失败原因：{}", ex.getMessage());
+                    }
+                    continue;
+                }
+                break;
+            }
 
-            if (terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+            if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
                 this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
                 workflowNodeService.updateRunStatusByWorkflowId(workflowId, workflowNode.getRunStatus(), WorkflowRunStatusEnum.UN_RUN.getValue());
             } else {
