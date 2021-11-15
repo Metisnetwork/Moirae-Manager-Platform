@@ -89,7 +89,6 @@ public class SyncMetaDataTask {
 
             List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
             for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
-                assert metaData != null;
                 metaDataDetail = getMetaDataDetails(metaData, metaDataColumnDetailDto);
 
                 //添加元数据详情
