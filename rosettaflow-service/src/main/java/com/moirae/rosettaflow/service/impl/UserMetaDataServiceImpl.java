@@ -30,12 +30,8 @@ import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author hudenian
@@ -86,6 +82,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
         }
+        //检验授权数据是否有效
+        checkMetaDataAuthValid(metaData.getMetaDataId());
 
         ApplyMetaDataAuthorityRequestDto applyDto = new ApplyMetaDataAuthorityRequestDto();
         applyDto.setUser(userMetaDataDto.getAddress());
@@ -197,5 +195,29 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
         queryWrapper.in(UserMetaData::getMetaDataId, metaDataIdList);
         return this.list(queryWrapper);
+    }
+
+    /**
+     *  检查授权数据是否有效
+     * @param metaDataId ；元数据id
+     */
+    private void checkMetaDataAuthValid(String metaDataId){
+        Map<String,Byte> metaDataAuthExpireMap = new HashMap<>(2);
+        Map<String,Byte> metaDataAuthStatusMap = new HashMap<>(2);
+        List<UserMetaData> metaDataWithAuthList = this.getCurrentUserMetaDataByMetaDataIdArr(Arrays.asList(metaDataId).toArray());
+        metaDataWithAuthList.forEach(userMetaData -> {
+            metaDataAuthExpireMap.put(userMetaData.getMetaDataId(), userMetaData.getExpire());
+            metaDataAuthStatusMap.put(userMetaData.getMetaDataId(), userMetaData.getAuthStatus());
+        });
+        if (metaDataAuthStatusMap.get(metaDataId) == UserMetaDataAuditEnum.AUDIT_PENDING.getValue()) {
+            log.error("Meta data auth audit pending,can not reapply,metaDataId:{}",metaDataId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_PENDING_ERROR.getMsg());
+        }
+        if (metaDataAuthStatusMap.get(metaDataId) == UserMetaDataAuditEnum.AUDIT_PASSED.getValue() &&
+            metaDataAuthExpireMap.get(metaDataId) == ExpireTypeEnum.UN_EXPIRE.getValue()) {
+            log.error("Meta data auth unexpired,can not reapply,metaDataId:{}",metaDataId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_UNEXPIRED_ERROR.getMsg());
+        }
+
     }
 }

@@ -64,6 +64,8 @@ public enum ErrorMsg {
     METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by times, the times must be greater than zero"),
     METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
     METADATA_AUTH_SAVE_ERROR("元数据授权申请保存失败", "Metadata authorization apply save error"),
+    METADATA_AUTH_UNEXPIRED_ERROR("元数据申请审核通过未过期，不能重新发起申请", "Meta data auth unexpired,can not reapply"),
+    METADATA_AUTH_PENDING_ERROR("元数据申请等待审核中，不能重新发起申请", "Meta data auth audit pending,can not reapply"),
     METADATA_USER_NOT_EXIST("用户授权数据不存在", "User meta data not exist"),
     METADATA_USER_DATA_EXPIRE("有授权数据已过期，请检查！", "Authorized data has expired, please check!"),
 
