@@ -35,6 +35,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author hudenian
@@ -190,7 +191,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public List<UserMetaData> getByMetaDataId(List<String> metaDataIdList) {
+    public List<UserMetaData> getByMetaDataId(Set<String> metaDataIdList) {
         LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(UserMetaData::getAuthMetadataState, SysConstant.INT_2);
         queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());

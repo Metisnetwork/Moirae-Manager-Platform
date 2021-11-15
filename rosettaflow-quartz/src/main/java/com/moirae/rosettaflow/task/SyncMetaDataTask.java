@@ -73,6 +73,10 @@ public class SyncMetaDataTask {
         for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
             //添加元数据简介
             metaData = getMetaData(metaDataDetailResponseDto);
+            // 跳过元数据为null的数据
+            if (null == metaData) {
+                continue;
+            }
             newMetaDataList.add(metaData);
             ++metaDataSize;
             if (metaDataSize % sysConfig.getBatchSize() == 0) {
@@ -117,8 +121,7 @@ public class SyncMetaDataTask {
     }
 
     private MetaDataDetails getMetaDataDetails(MetaData metaData, MetaDataColumnDetailDto metaDataColumnDetailDto) {
-        MetaDataDetails metaDataDetail;
-        metaDataDetail = new MetaDataDetails();
+        MetaDataDetails metaDataDetail = new MetaDataDetails();
         metaDataDetail.setMetaDataId(metaData.getMetaDataId());
         metaDataDetail.setColumnIndex(metaDataColumnDetailDto.getIndex());
         metaDataDetail.setColumnName(metaDataColumnDetailDto.getName());
@@ -129,14 +132,13 @@ public class SyncMetaDataTask {
     }
 
     private MetaData getMetaData(MetaDataDetailResponseDto metaDataDetailResponseDto) {
-        MetaData metaData;
-        metaData = new MetaData();
+        MetaData metaData = new MetaData();
         metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
         metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
         metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
         //元数据id为空不入库
         if (StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())) {
-            log.error("MetaDataId is null jump over");
+            log.error("MetaDataId is null jump over, metaDataSummary:{}", metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary());
             return null;
         }
         metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());

@@ -145,20 +145,20 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
         // 校验节点配置输入是否有过期数据
-        List<String> userAuthDataIdList = new ArrayList<>();
+        Set<String> userAuthDataIdSet = new HashSet<>();
         for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
             if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
                 continue;
             }
             for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-                userAuthDataIdList.add(workflowNodeInput.getDataTableId());
+                userAuthDataIdSet.add(workflowNodeInput.getDataTableId());
             }
         }
-        if (userAuthDataIdList.size() > 0) {
-            List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdList);
-            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdList.size()) {
-                log.error("saveWorkflowNode--保存工作流接口, userAuthDataIdList:{}", JSON.toJSONString(userAuthDataIdList));
+        if (userAuthDataIdSet.size() > 0) {
+            List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdSet);
+            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdSet.size()) {
+                log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(userAuthDataIdSet));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
             }
         }

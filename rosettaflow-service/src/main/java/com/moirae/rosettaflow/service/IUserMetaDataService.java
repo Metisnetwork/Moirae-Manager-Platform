@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.dto.UserMetaDataDto;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hudenian
@@ -88,5 +89,5 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @param metaDataIdList 元数据id集合
      * @return UserMetaData集合
      */
-    List<UserMetaData> getByMetaDataId(List<String> metaDataIdList);
+    List<UserMetaData> getByMetaDataId(Set<String> metaDataIdList);
 }

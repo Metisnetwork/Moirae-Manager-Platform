@@ -236,7 +236,8 @@ public class TaskServiceClient {
                 .build();
         SimpleResponse simpleResponse = taskServiceBlockingStub.terminateTask(terminateReq);
         TerminateTaskRespDto terminateTaskRespDto = new TerminateTaskRespDto();
-        BeanCopierUtils.copy(simpleResponse, terminateTaskRespDto);
+        terminateTaskRespDto.setStatus(simpleResponse.getStatus());
+        terminateTaskRespDto.setMsg(simpleResponse.getMsg());
         return terminateTaskRespDto;
     }
 
