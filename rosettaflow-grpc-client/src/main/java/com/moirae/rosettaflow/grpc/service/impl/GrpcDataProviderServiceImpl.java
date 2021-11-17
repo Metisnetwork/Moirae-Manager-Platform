@@ -26,7 +26,7 @@ public class GrpcDataProviderServiceImpl implements GrpcDataProviderService {
 
 
     @Override
-    public List<DownloadReplyResponseDto> downloadTask(DownloadRequestDto requestDto) {
+    public DownloadReplyResponseDto downloadTask(DownloadRequestDto requestDto) {
         return dataProviderServiceClient.getTaskDownload(requestDto);
     }
 }

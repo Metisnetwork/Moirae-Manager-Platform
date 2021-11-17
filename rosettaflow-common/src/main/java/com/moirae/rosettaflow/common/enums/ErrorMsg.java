@@ -67,7 +67,9 @@ public enum ErrorMsg {
     METADATA_AUTH_UNEXPIRED_ERROR("元数据申请审核通过未过期，不能重新发起申请", "Meta data auth unexpired,can not reapply"),
     METADATA_AUTH_PENDING_ERROR("元数据申请等待审核中，不能重新发起申请", "Meta data auth audit pending,can not reapply"),
     METADATA_USER_NOT_EXIST("用户授权数据不存在", "User meta data not exist"),
-    METADATA_USER_DATA_EXPIRE("有授权数据已过期，请检查！", "Authorized data has expired, please check!"),
+    METADATA_USER_DATA_EXPIRE("有授权数据已过期，请检查", "Authorized data has expired, please check"),
+    METADATA_RESULT_DOWNLOAD_FAIL("元数据结果下载失败", "Metadata result download fail"),
+    METADATA_RESULT_DOWNLOAD_ERROR("元数据结果下载异常", "Metadata result download error"),
 
 
     /**

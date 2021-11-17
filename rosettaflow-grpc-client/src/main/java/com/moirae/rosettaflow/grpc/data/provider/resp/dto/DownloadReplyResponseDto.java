@@ -11,7 +11,7 @@ import lombok.Data;
 public class DownloadReplyResponseDto {
 
     /**
-     * 任务结果下载状态
+     * 任务结果下载状态: 0、Start，1、Finished，2、Cancelled，3、Failed
      */
     int downloadStatus;
 

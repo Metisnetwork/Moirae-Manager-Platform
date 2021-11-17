@@ -14,8 +14,8 @@ public interface GrpcDataProviderService {
     /**
      * 下载任务结果
      * @param requestDto : 任务结果下载入参
-     * @return List<DownloadReplyResponseDto> : 任务结果数据文件
+     * @return DownloadReplyResponseDto : 任务结果数据文件
      */
-     List<DownloadReplyResponseDto> downloadTask(DownloadRequestDto requestDto);
+    DownloadReplyResponseDto downloadTask(DownloadRequestDto requestDto);
 
 }
