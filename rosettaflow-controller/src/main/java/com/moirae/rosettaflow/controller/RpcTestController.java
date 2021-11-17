@@ -183,17 +183,17 @@ public class RpcTestController {
 
     @GetMapping("task/getDownloadTask")
     @ApiOperation(value = "grpc getDownloadTask下载任务结果数据", notes = "grpc getDownloadTask下载任务结果数据")
-    public ResponseVo<List<DownloadReplyResponseDto>> getDownloadTask(@Valid DownloadTaskReq downloadTaskReq) {
+    public ResponseVo<DownloadReplyResponseDto> getDownloadTask(@Valid DownloadTaskReq downloadTaskReq) {
         log.info("grpc getDownloadTask下载任务结果数据");
 
-        Map<String, String> compressMap = new HashMap<>();
+        Map<String, String> compressMap = new HashMap<>(2);
         compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress())).getMsg());
 
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
         downloadRequestDto.setFilePath(downloadTaskReq.getFilePath());
         downloadRequestDto.setCompress(compressMap);
 
-        List<DownloadReplyResponseDto> downloadReplyResponseDtoList = grpcDataProviderService.downloadTask(downloadRequestDto);
-        return ResponseVo.createSuccess(downloadReplyResponseDtoList);
+        DownloadReplyResponseDto downloadReplyResponseDto = grpcDataProviderService.downloadTask(downloadRequestDto);
+        return ResponseVo.createSuccess(downloadReplyResponseDto);
     }
 }
