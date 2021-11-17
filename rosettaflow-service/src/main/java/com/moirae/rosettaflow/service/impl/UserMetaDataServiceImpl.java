@@ -82,7 +82,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
         }
-        //检验授权数据是否有效
+        // 检验授权数据是否有效
         checkMetaDataAuthValid(metaData.getMetaDataId());
 
         ApplyMetaDataAuthorityRequestDto applyDto = new ApplyMetaDataAuthorityRequestDto();
@@ -205,6 +205,10 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         Map<String,Byte> metaDataAuthStatusMap = new HashMap<>(2);
         Map<String,Byte> authMetadataStateMap = new HashMap<>(2);
         List<UserMetaData> metaDataWithAuthList = this.getCurrentUserMetaDataByMetaDataIdArr(Collections.singletonList(metaDataId).toArray());
+        // 首次授权没有授权历史数据，直接返回
+        if (null == metaDataWithAuthList || metaDataWithAuthList.size() == 0) {
+            return;
+        }
         metaDataWithAuthList.forEach(userMetaData -> {
             metaDataAuthStatusMap.put(userMetaData.getMetaDataId(), userMetaData.getAuthStatus());
             authMetadataStateMap.put(userMetaData.getMetaDataId(), userMetaData.getAuthMetadataState());
