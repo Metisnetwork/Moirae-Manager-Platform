@@ -10,7 +10,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: root
+    password: ENC(5VUZHER1nqQ6dLc5fOfl6g==)
     url: jdbc:mysql://10.10.8.184:3306/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
     hikari:
       maximum-pool-size: 20
@@ -46,8 +46,6 @@ system:
 grpc:
   client:
     carrier-grpc-server:
-      # address: 'static://192.168.21.11:8801'
-      # address: 'static://192.168.21.198:8801'
       address: 'static://192.168.21.18:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
@@ -56,7 +54,7 @@ grpc:
 #集群模式
 redisson:
   model: CLUSTER
-  password: 123456
+  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
   multiple-server-config:
     node-addresses[0]: 10.10.8.175:6371
     node-addresses[1]: 10.10.8.175:6372
