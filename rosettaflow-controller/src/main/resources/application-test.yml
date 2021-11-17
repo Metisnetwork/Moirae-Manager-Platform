@@ -52,6 +52,7 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
 #集群模式
 redisson:
   model: CLUSTER
