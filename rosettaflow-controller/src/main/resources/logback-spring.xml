@@ -34,4 +34,11 @@
             <appender-ref ref="fileAppender"/>
         </root>
     </springProfile>
+
+    <springProfile name="test">
+        <logger name="com.moirae.rosettaflow.mapper" level="DEBUG" additivity="false">
+            <appender-ref ref="console" />
+            <appender-ref ref="fileAppender"/>
+        </logger>
+    </springProfile>
 </configuration>

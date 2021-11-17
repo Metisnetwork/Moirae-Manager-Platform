@@ -26,7 +26,8 @@ spring:
 mybatis-plus:
   configuration:
     call-setters-on-nulls: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 # 系统参数配置
 system:
   config:
@@ -62,5 +63,12 @@ redisson:
     node-addresses[3]: 10.10.8.176:6374
     node-addresses[4]: 10.10.8.176:6375
     node-addresses[5]: 10.10.8.176:6376
+
+
+jasypt:
+  encryptor:
+    # 生产环境命令行指定
+    #    password: ${JASYPT_PASSWORD}
+    password: 123456
 
 
