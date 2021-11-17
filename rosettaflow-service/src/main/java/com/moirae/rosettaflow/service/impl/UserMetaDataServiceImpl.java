@@ -82,7 +82,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
         }
-        //检验授权数据是否有效
+        // 检验授权数据是否有效
         checkMetaDataAuthValid(metaData.getMetaDataId());
 
         ApplyMetaDataAuthorityRequestDto applyDto = new ApplyMetaDataAuthorityRequestDto();
@@ -100,6 +100,9 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         //元数据id
         metaDataAuthorityDto.setMetaDataId(metaData.getMetaDataId());
 
+        // 保存用户授权申请元数据, 保存失败时，直接抛出异常，不掉rpc接口
+        this.saveUserMetaData(userMetaDataDto, metaData);
+
         //元数据怎么使用
         MetaDataUsageRuleDto metaDataUsageDto = new MetaDataUsageRuleDto();
         metaDataUsageDto.setUseType((int) userMetaDataDto.getAuthType());
@@ -115,11 +118,16 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
         ApplyMetaDataAuthorityResponseDto responseDto = grpcAuthService.applyMetaDataAuthority(applyDto);
         if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            log.info("元数据授权申请,net处理失败，失败原因：{}", responseDto.getMsg());
+            log.error("元数据授权申请,net处理失败，失败原因：{}", responseDto.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
+    }
 
+    /**
+     * 保存用户授权申请元数据
+     */
+    private void saveUserMetaData(UserMetaDataDto userMetaDataDto, MetaData metaData) {
         //保存等待审核数据
         UserMetaData userMetaData = new UserMetaData();
         BeanCopierUtils.copy(userMetaDataDto, userMetaData);
@@ -130,11 +138,11 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         userMetaData.setAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
         userMetaData.setAuthMetadataState(UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         userMetaData.setId(null);
-        log.info("元数据授权申请,保存等待审核元数据，userMetaData：{}", userMetaData);
         if (!this.save(userMetaData)) {
-            log.info("元数据授权申请,保存等待审核元数据失败，userMetaData：{}", userMetaData);
+            log.error("元数据授权申请, 保存等待审核元数据失败，userMetaData：{}", userMetaData);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_SAVE_ERROR.getMsg());
         }
+        log.info("元数据授权申请, 保存等待审核元数据成功，userMetaData：{}", userMetaData);
     }
 
     @Override
@@ -205,6 +213,10 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         Map<String,Byte> metaDataAuthStatusMap = new HashMap<>(2);
         Map<String,Byte> authMetadataStateMap = new HashMap<>(2);
         List<UserMetaData> metaDataWithAuthList = this.getCurrentUserMetaDataByMetaDataIdArr(Collections.singletonList(metaDataId).toArray());
+        // 首次授权没有授权历史数据，直接返回
+        if (null == metaDataWithAuthList || metaDataWithAuthList.size() == 0) {
+            return;
+        }
         metaDataWithAuthList.forEach(userMetaData -> {
             metaDataAuthStatusMap.put(userMetaData.getMetaDataId(), userMetaData.getAuthStatus());
             authMetadataStateMap.put(userMetaData.getMetaDataId(), userMetaData.getAuthMetadataState());
