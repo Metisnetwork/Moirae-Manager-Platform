@@ -159,6 +159,9 @@
                 <if test="userMetaData.updateTime != null">
                     update_time,
                 </if>
+                <if test="userMetaData.metadataAuthId != null">
+                    metadata_auth_id,
+                </if>
             </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="userMetaData.metaDataId != null">
@@ -217,6 +220,9 @@
                 </if>
                 <if test="userMetaData.updateTime != null">
                     #{userMetaData.updateTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.metadataAuthId != null">
+                    #{userMetaData.metadataAuthId,jdbcType=VARCHAR},
                 </if>
             </trim>
         </foreach>
