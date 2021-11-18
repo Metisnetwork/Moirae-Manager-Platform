@@ -89,6 +89,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void updateNickName(String address, String nickName) {
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(User::getUserName, nickName);
+        queryWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
+        User user = this.getOne(queryWrapper);
+        if (!Objects.isNull(user)) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
+        }
+
         try {
             LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
             updateWrapper.eq(User::getAddress, address);
@@ -97,9 +105,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             this.update(updateWrapper);
         } catch (Exception e) {
             log.error("updateNickName--修改用户昵称失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
-            }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MODIFY_USER_NAME_FAILED.getMsg());
         }
     }
