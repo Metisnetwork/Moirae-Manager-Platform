@@ -103,6 +103,11 @@ public class UserMetaData implements Serializable {
      */
     private Integer usedTimes;
 
+    /**
+     * 元数据申请授权id
+     */
+    private String metadataAuthId;
+
 
     /**
      * 状态: 0-无效，1- 有效

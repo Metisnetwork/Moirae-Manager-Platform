@@ -147,11 +147,12 @@ CREATE TABLE `t_user_meta_data`
     `auth_metadata_state` tinyint(4)           DEFAULT '0' COMMENT '数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)',
     `expire`              tinyint(4)           DEFAULT NULL COMMENT '是否已过期（按时间时需要）: 0-未过期, 1-已过期',
     `used_times`          bigint(20)           DEFAULT '0' COMMENT '已经使用的次数(按次数时有效)',
+    `metadata_auth_id`        varchar(256)         DEFAULT NULL COMMENT '元数据授权申请返回唯一id',
     `status`              tinyint(4)  NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
     `create_time`         timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`         timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_USER_META_DATA_ID` (`meta_data_id`, `address`, `apply_time`)
+    UNIQUE KEY `UK_META_AUTH_ID` (`metadata_auth_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户元数据授权表';
 
