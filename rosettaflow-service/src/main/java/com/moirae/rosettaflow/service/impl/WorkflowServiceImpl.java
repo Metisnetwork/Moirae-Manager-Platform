@@ -245,8 +245,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
             // 查询原工作流节点
             List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
-            // 保存复制的工作流节点及所属数据
-            workflowNodeService.saveCopyWorkflowNode(newWorkflowId, workflowNodeOldList);
+            // 保存复制的工作流节点及所属数据, Boolean.FALSE表示不是模板copy判断变量
+            workflowNodeService.saveCopyWorkflowNode(newWorkflowId, workflowNodeOldList, Boolean.FALSE);
         } catch (Exception e) {
             log.error("copyWorkflow--复制工作流接口失败, 错误信息:{}, 异常:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {

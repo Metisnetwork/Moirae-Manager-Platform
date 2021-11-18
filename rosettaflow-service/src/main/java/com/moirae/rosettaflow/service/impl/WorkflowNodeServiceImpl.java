@@ -335,7 +335,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    public void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList) {
+    public void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList, boolean tempFlag) {
         if (null == oldNodeList || oldNodeList.size() == 0) {
             return;
         }
@@ -352,31 +352,37 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             newNode.setNodeStep(oldNode.getNodeStep());
             newNode.setNextNodeStep(oldNode.getNextNodeStep());
             this.save(newNode);
-            // 复制节点输入数据
-            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.copyWorkflowNodeInput(newNode.getId(), oldNode.getId());
-            newNodeInputList.addAll(workflowNodeInputList);
-            // 复制节点输出数据
-            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.copyWorkflowNodeOutput(newNode.getId(), oldNode.getId());
-            newNodeOutputList.addAll(workflowNodeOutputList);
-            // 复制节点算法代码
-            WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.copyWorkflowNodeCode(newNode.getId(), oldNode.getId());
-            if (Objects.nonNull(workflowNodeCode)) {
-                newNodeCodeList.add(workflowNodeCode);
-            }
-            // 复制节点环境资源
-            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.copyWorkflowNodeResource(newNode.getId(), oldNode.getId());
-            if (Objects.nonNull(workflowNodeResource)) {
-                newNodeResourceList.add(workflowNodeResource);
-            }
-            // 复制节点变量
-            List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.copyWorkflowNodeVariable(newNode.getId(), oldNode.getId());
-            if (Objects.nonNull(workflowNodeResource)) {
-                newNodeVariableList.addAll(workflowNodeVariableList);
+            // 模板copy数据不保存配置信息
+            if (!tempFlag) {
+                // 复制节点输入数据
+                List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.copyWorkflowNodeInput(newNode.getId(), oldNode.getId());
+                newNodeInputList.addAll(workflowNodeInputList);
+                // 复制节点输出数据
+                List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.copyWorkflowNodeOutput(newNode.getId(), oldNode.getId());
+                newNodeOutputList.addAll(workflowNodeOutputList);
+                // 复制节点算法代码
+                WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.copyWorkflowNodeCode(newNode.getId(), oldNode.getId());
+                if (Objects.nonNull(workflowNodeCode)) {
+                    newNodeCodeList.add(workflowNodeCode);
+                }
+                // 复制节点环境资源
+                WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.copyWorkflowNodeResource(newNode.getId(), oldNode.getId());
+                if (Objects.nonNull(workflowNodeResource)) {
+                    newNodeResourceList.add(workflowNodeResource);
+                }
+                // 复制节点变量
+                List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.copyWorkflowNodeVariable(newNode.getId(), oldNode.getId());
+                if (Objects.nonNull(workflowNodeResource)) {
+                    newNodeVariableList.addAll(workflowNodeVariableList);
+                }
             }
         });
-        // 保存节点相关数据
-        this.saveNodeData(newNodeInputList, newNodeOutputList, newNodeCodeList,
-                newNodeResourceList, newNodeVariableList);
+        // 模板copy数据不保存配置信息
+        if (!tempFlag) {
+            // 保存节点相关数据
+            this.saveNodeData(newNodeInputList, newNodeOutputList, newNodeCodeList,
+                    newNodeResourceList, newNodeVariableList);
+        }
     }
 
     /**
@@ -412,7 +418,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public void addWorkflowNodeByTemplate(Long workflowId, List<WorkflowNodeTemp> workflowNodeTempList) {
         List<WorkflowNode> oldNodeList = BeanUtil.copyToList(workflowNodeTempList, WorkflowNode.class);
-        saveCopyWorkflowNode(workflowId, oldNodeList);
+        // Boolean.TRUE表示模板copy判断变量
+        this.saveCopyWorkflowNode(workflowId, oldNodeList, Boolean.TRUE);
     }
 
     @Override
