@@ -3,7 +3,6 @@ package com.moirae.rosettaflow.grpc.client;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
@@ -207,6 +206,7 @@ public class TaskServiceClient {
     public List<TaskEventDto> getTaskEventList(String taskId) {
         GetTaskEventListRequest getTaskEventListRequest = GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
         GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
+        log.info("查看某个任务的全部事件列表通过单个任务ID, taskEventListResponse:{}", taskEventListResponse);
         return getTaskEventShowDots(taskEventListResponse);
     }
 
