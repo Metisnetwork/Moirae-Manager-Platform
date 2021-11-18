@@ -19,6 +19,7 @@
         <result column="auth_metadata_state" jdbcType="TINYINT" property="authMetadataState" />
         <result column="expire" jdbcType="TINYINT" property="expire" />
         <result column="used_times" jdbcType="BIGINT" property="usedTimes" />
+        <result column="metadata_auth_id" jdbcType="VARCHAR" property="metadataAuthId" />
         <result column="status" jdbcType="TINYINT" property="status" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -26,7 +27,7 @@
     <sql id="Base_Column_List">
         id, meta_data_id, identity_id, identity_name, node_id, address, auth_type, auth_value,
         auth_begin_time, auth_end_time, auth_status, audit_suggestion, apply_time, audit_time,
-        auth_metadata_state, expire, used_times, `status`, create_time, update_time
+        auth_metadata_state, expire, used_times, metadata_auth_id, `status`, create_time, update_time
     </sql>
 
     <update id="truncate">
@@ -34,34 +35,34 @@
     </update>
     <select id="listByOwner" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
         SELECT
-        m.id AS 'metaDataPkId',
-        m.data_name,
-        u.id,
-        u.meta_data_id,
-        u.identity_id,
-        u.identity_name,
-        u.node_id,
-        u.address,
-        u.auth_type,
-        u.auth_value,
-        u.auth_begin_time,
-        u.auth_end_time,
-        u.auth_status,
-        u.apply_time,
-        u.audit_time,
-        u.`status`,
-        u.create_time,
-        u.update_time
+            m.id AS 'metaDataPkId',
+            m.data_name,
+            u.id,
+            u.meta_data_id,
+            u.identity_id,
+            u.identity_name,
+            u.node_id,
+            u.address,
+            u.auth_type,
+            u.auth_value,
+            u.auth_begin_time,
+            u.auth_end_time,
+            u.auth_status,
+            u.apply_time,
+            u.audit_time,
+            u.`status`,
+            u.create_time,
+            u.update_time
         FROM
-        t_user_meta_data u
+            t_user_meta_data u
         LEFT JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id
         WHERE
-        u.address = #{address,jdbcType=VARCHAR}
-        AND u.`status` = 1
-        <if test="dataName != null and dataName != ''">
-            AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
-        </if>
-        ORDER BY u.apply_time DESC
+            u.address = #{address,jdbcType=VARCHAR}
+            AND u.`status` = 1
+            <if test="dataName != null and dataName != ''">
+                AND m.data_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
+            </if>
+            ORDER BY u.apply_time DESC
     </select>
     <select id="getUserMetaDataByAddress" resultType="com.moirae.rosettaflow.dto.UserMetaDataDto">
         SELECT DISTINCT
@@ -72,7 +73,7 @@
              t_user u
              ON umd.address = u.address
         WHERE ((umd.auth_type = 1 AND expire = 0)
-            OR (umd.auth_type = 2 AND used_times <![CDATA[ < ]]> auth_value))
+            OR (umd.auth_type = 2 AND used_times &lt; auth_value))
           AND umd.`status` = 1
           AND umd.auth_status = 1
           AND umd.auth_metadata_state = 2
@@ -158,6 +159,9 @@
                 <if test="userMetaData.updateTime != null">
                     update_time,
                 </if>
+                <if test="userMetaData.metadataAuthId != null">
+                    metadata_auth_id,
+                </if>
             </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="userMetaData.metaDataId != null">
@@ -216,6 +220,9 @@
                 </if>
                 <if test="userMetaData.updateTime != null">
                     #{userMetaData.updateTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="userMetaData.metadataAuthId != null">
+                    #{userMetaData.metadataAuthId,jdbcType=VARCHAR},
                 </if>
             </trim>
         </foreach>

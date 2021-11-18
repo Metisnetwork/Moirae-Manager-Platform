@@ -100,9 +100,6 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         //元数据id
         metaDataAuthorityDto.setMetaDataId(metaData.getMetaDataId());
 
-        // 保存用户授权申请元数据, 保存失败时，直接抛出异常，不掉rpc接口
-        this.saveUserMetaData(userMetaDataDto, metaData);
-
         //元数据怎么使用
         MetaDataUsageRuleDto metaDataUsageDto = new MetaDataUsageRuleDto();
         metaDataUsageDto.setUseType((int) userMetaDataDto.getAuthType());
@@ -117,18 +114,20 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         applyDto.setSign(userMetaDataDto.getSign());
 
         ApplyMetaDataAuthorityResponseDto responseDto = grpcAuthService.applyMetaDataAuthority(applyDto);
-        if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            log.error("元数据授权申请,net处理失败，失败原因：{}", responseDto.getMsg());
+        if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE || StrUtil.isBlank(responseDto.getMetaDataAuthId())) {
+            log.error("元数据授权申请,net处理失败，失败原因：{}", responseDto);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
+        // 保存用户授权申请元数据, rpc接口调用失败时，不保存授权元数据
+        this.saveUserMetaData(userMetaDataDto, metaData, responseDto.getMetaDataAuthId());
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
     }
 
     /**
      * 保存用户授权申请元数据
      */
-    private void saveUserMetaData(UserMetaDataDto userMetaDataDto, MetaData metaData) {
-        //保存等待审核数据
+    private void saveUserMetaData(UserMetaDataDto userMetaDataDto, MetaData metaData, String metadataAuthId) {
+        // 保存等待审核数据
         UserMetaData userMetaData = new UserMetaData();
         BeanCopierUtils.copy(userMetaDataDto, userMetaData);
         userMetaData.setMetaDataId(metaData.getMetaDataId());
@@ -137,6 +136,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         userMetaData.setApplyTime(new Date());
         userMetaData.setAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
         userMetaData.setAuthMetadataState(UserMetaDataAuthorithStateEnum.RELEASED.getValue());
+        userMetaData.setMetadataAuthId(metadataAuthId);
         userMetaData.setId(null);
         if (!this.save(userMetaData)) {
             log.error("元数据授权申请, 保存等待审核元数据失败，userMetaData：{}", userMetaData);
