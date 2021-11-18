@@ -40,7 +40,7 @@ public class WorkflowNodeStatusTask {
     /**
      * 查询 当前时间之前5小时的正在运行的数据
      */
-    private static final int BEFORE_HOUR = -12;
+    private static final int BEFORE_HOUR = -48;
 
     @Resource
     private GrpcTaskService grpcTaskService;
