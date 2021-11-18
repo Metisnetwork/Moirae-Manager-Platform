@@ -91,8 +91,7 @@ public class SyncUserDataAuthTask {
     }
 
     private UserMetaData getUserMetaData(GetMetaDataAuthorityDto authorityDto) {
-        UserMetaData userMetaData;
-        userMetaData = new UserMetaData();
+        UserMetaData userMetaData = new UserMetaData();
         userMetaData.setMetaDataId(authorityDto.getMetaDataAuthorityDto().getMetaDataId());
         userMetaData.setIdentityId(authorityDto.getMetaDataAuthorityDto().getOwner().getIdentityId());
         userMetaData.setIdentityName(authorityDto.getMetaDataAuthorityDto().getOwner().getNodeName());
