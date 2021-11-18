@@ -134,6 +134,7 @@ public class SyncUserDataAuthTask {
         userMetaData.setUsedTimes(authorityDto.getMetadataUsedQuoDto().getUsedTimes());
         userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
         userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
+        userMetaData.setMetadataAuthId(authorityDto.getMetaDataAuthId());
         //如果按时间授权，超过授权截止日期，AuthMetadataState及expire由于net没有更新，flow要自己更新
         if (userMetaData.getAuthType() == AuthTypeEnum.TIME.getValue() && new Date().after(userMetaData.getAuthEndTime())) {
             userMetaData.setExpire(ExpireTypeEnum.EXPIRE.getValue());
