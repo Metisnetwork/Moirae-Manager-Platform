@@ -40,7 +40,9 @@ INSERT INTO `t_algorithm_code` VALUES (7, 7, 2, '# coding:utf-8\n\nimport os\nim
 -- ----------------------------
 TRUNCATE t_workflow_node_temp;
 INSERT INTO `t_workflow_node_temp` VALUES ('1', '1', '1', '逻辑回归训练', '1', '2', '0', '1', now(), now());
-INSERT INTO `t_workflow_node_temp` VALUES ('2', '2', '2', '分类模型预测', '2', null, '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('2', '1', '2', '分类模型预测', '2', null, '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('3', '2', '1', '线性回归训练', '1', '2', '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('4', '2', '2', '线性回归预测', '2', null, '0', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm_variable_struct
