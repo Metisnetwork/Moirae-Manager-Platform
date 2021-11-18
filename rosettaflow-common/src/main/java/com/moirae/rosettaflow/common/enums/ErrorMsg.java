@@ -132,6 +132,10 @@ public enum ErrorMsg {
     SUB_JOB_NODE_UPDATE_FAIL("子作业节点更新失败", "Sub job node update fail"),
     SUB_JOB_NODE_PUBLISH_FAIL("子作业节点发布失败", "Sub job node publish fail"),
 
+    /**
+     * rpc接口异常
+     */
+    RPC_INTERFACE_FAIL("调度服务接口异常，请稍后重试！", "The scheduling service interface is abnormal, please try again later!"),
 
     /**
      * 机构

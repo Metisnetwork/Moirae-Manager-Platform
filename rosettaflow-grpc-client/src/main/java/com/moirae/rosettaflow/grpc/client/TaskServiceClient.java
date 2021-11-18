@@ -3,7 +3,6 @@ package com.moirae.rosettaflow.grpc.client;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;

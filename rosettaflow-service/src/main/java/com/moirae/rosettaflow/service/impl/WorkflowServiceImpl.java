@@ -405,7 +405,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (null != workflowNodeList && workflowNodeList.size() > 0) {
             for (WorkflowNode workflowNode : workflowNodeList) {
                 if (StrUtil.isNotBlank(workflowNode.getTaskId())) {
-                    List<TaskEventDto> taskEventShowDtoList = grpcTaskService.getTaskEventList(workflowNode.getTaskId());
+                    List<TaskEventDto> taskEventShowDtoList;
+                    try {
+                        taskEventShowDtoList = grpcTaskService.getTaskEventList(workflowNode.getTaskId());
+                    }catch (Exception e) {
+                        log.error("调用rpc接口异常--获取运行日志, workflowId:{}, 错误信息:{}", workflowId, e);
+                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
+                    }
                     dtoList.addAll(taskEventShowDtoList);
                 }
             }
