@@ -3,12 +3,14 @@
 -- ----------------------------
 TRUNCATE t_project_temp;
 INSERT INTO `t_project_temp` VALUES ('1', '协同营销', '协同营销模板', '1', now(), now());
+INSERT INTO `t_project_temp` VALUES ('2', '线性训练', '线性训练模板', '1', now(), now());
 
 -- ----------------------------
 -- init t_workflow_temp
 -- ----------------------------
 TRUNCATE t_workflow_temp;
 INSERT INTO `t_workflow_temp` VALUES ('1', '1', '协同营销对应工作流', '协同营销对应工作流', '1', '0', '1', now(), now());
+INSERT INTO `t_workflow_temp` VALUES ('2', '2', '线性训练对应工作流', '线性训练对应工作流', '1', '0', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm
@@ -38,7 +40,7 @@ INSERT INTO `t_algorithm_code` VALUES (7, 7, 2, '# coding:utf-8\n\nimport os\nim
 -- ----------------------------
 TRUNCATE t_workflow_node_temp;
 INSERT INTO `t_workflow_node_temp` VALUES ('1', '1', '1', '逻辑回归训练', '1', '2', '0', '1', now(), now());
-INSERT INTO `t_workflow_node_temp` VALUES ('2', '1', '2', '分类模型预测', '2', null, '0', '1', now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES ('2', '2', '2', '分类模型预测', '2', null, '0', '1', now(), now());
 
 -- ----------------------------
 -- init t_algorithm_variable_struct
@@ -46,6 +48,9 @@ INSERT INTO `t_workflow_node_temp` VALUES ('2', '1', '2', '分类模型预测', 
 TRUNCATE t_algorithm_variable_struct;
 INSERT INTO `t_algorithm_variable_struct` VALUES ('1', '1', '{\"label_owner\":\"p0\",\"label_column\":\"Y\",\"algorithm_parameter\":{\"epochs\":10,\"batch_size\":256,\"learning_rate\":0.1,\"use_validation_set\":true,\"validation_set_rate\":0.2,\"predict_threshold\":0.5}}', '逻辑回归训练变量参数', '1', '2021-10-26 14:05:13', '2021-10-26 17:08:32');
 INSERT INTO `t_algorithm_variable_struct` VALUES ('2', '2', '{\"model_restore_party\":\"p0\",\"model_path\":\"file_path\",\"predict_threshold\":0.5}', '逻辑回归预测变量参数', '1', '2021-10-26 14:05:13', '2021-10-26 14:05:13');
+INSERT INTO `t_algorithm_variable_struct` VALUES ('3', '6', '{\"label_owner\":\"p0\",\"label_column\":\"Y\",\"algorithm_parameter\":{\"epochs\":10,\"batch_size\":256,\"learning_rate\":0.1,\"use_validation_set\":true,\"validation_set_rate\":0.2,\"predict_threshold\":0.5}}', '线性回归训练变量参数', '1', '2021-11-18 14:16:25', '2021-11-18 14:19:34');
+INSERT INTO `t_algorithm_variable_struct` VALUES ('4', '7', '{\"model_restore_party\":\"p0\",\"model_path\":\"file_path\",\"predict_threshold\":0.5}', '线性回归预测变量参数', '1', '2021-11-18 14:16:38', '2021-11-18 14:20:12');
+
 -- ----------------------------
 -- init t_algorithm_type
 -- ----------------------------
