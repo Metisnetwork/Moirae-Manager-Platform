@@ -2,8 +2,6 @@ package com.moirae.rosettaflow.grpc.client;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
-import com.moirae.rosettaflow.common.enums.ErrorMsg;
-import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
@@ -207,13 +205,8 @@ public class TaskServiceClient {
      */
     public List<TaskEventDto> getTaskEventList(String taskId) {
         GetTaskEventListRequest getTaskEventListRequest = GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
-        try {
-            GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
-            return getTaskEventShowDots(taskEventListResponse);
-        }catch (Exception e) {
-            log.error("调用rpc接口异常--获取运行日志, taskId:{}, 错误信息:{}", taskId, e);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
-        }
+        GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
+        return getTaskEventShowDots(taskEventListResponse);
     }
 
     /**
