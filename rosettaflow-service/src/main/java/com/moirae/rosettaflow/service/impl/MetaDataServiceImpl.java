@@ -114,6 +114,13 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
+    public Integer getAllMetaDataCount() {
+        LambdaQueryWrapper<MetaData> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaData::getStatus,StatusEnum.VALID.getValue());
+        return this.count(queryWrapper);
+    }
+
+    @Override
     public List<MetaDataDto> getAllAuthTables(String identityId) {
         UserDto userDto = UserContext.get();
         if (Objects.isNull(userDto)) {

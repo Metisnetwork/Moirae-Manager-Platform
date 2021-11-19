@@ -23,7 +23,6 @@ import com.moirae.rosettaflow.service.IUserService;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

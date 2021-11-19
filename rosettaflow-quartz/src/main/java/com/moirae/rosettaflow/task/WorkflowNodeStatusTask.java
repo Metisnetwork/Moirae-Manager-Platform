@@ -38,9 +38,9 @@ import java.util.stream.Collectors;
 @Profile({"prod", "test", "local", "xty"})
 public class WorkflowNodeStatusTask {
     /**
-     * 查询 当前时间之前48小时的正在运行的数据
+     * 查询 当前时间之前168小时(7天)的正在运行的数据
      */
-    private static final int BEFORE_HOUR = -48;
+    private static final int BEFORE_HOUR = -168;
 
     @Resource
     private GrpcTaskService grpcTaskService;
