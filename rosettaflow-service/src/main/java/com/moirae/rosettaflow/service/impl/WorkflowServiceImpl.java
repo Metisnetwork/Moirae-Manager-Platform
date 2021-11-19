@@ -289,7 +289,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         // 截止节点不能超过工作流最大节点
         if (null == workflow.getNodeNumber() || workflow.getNodeNumber() < workflowDto.getEndNode()) {
-            log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
+            log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), workflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
         // 保存用户和地址及签名并更新工作流状态为运行中
