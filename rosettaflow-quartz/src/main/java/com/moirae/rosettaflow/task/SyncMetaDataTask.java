@@ -50,7 +50,9 @@ public class SyncMetaDataTask {
         log.info("元数据信息同步开始>>>>");
         long begin;
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
+        int metaDataAllCount;
         try {
+            metaDataAllCount = metaDataService.getAllMetaDataCount();
             metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
            /* if (metaDataDetailResponseDtoList != null && metaDataDetailResponseDtoList.size() > 0) {
                 //元数据同步成功，删除旧数据
@@ -59,7 +61,15 @@ public class SyncMetaDataTask {
                 return;
             }*/
         } catch (Exception e) {
-            log.error("从net同步元数据失败,失败原因：{}", e.getMessage(), e);
+            log.error("元数据信息同步,从net同步元数据失败,失败原因：{}", e.getMessage(), e);
+            return;
+        }
+
+        if (checkSynchMetaDataChange(metaDataDetailResponseDtoList, metaDataAllCount)) {
+            delOldData();
+            log.error("元数据信息同步,从net同步元数据[元数据存在变更],故进行数据同步,net同步数据量:{}, metaData数据量:{}",metaDataDetailResponseDtoList.size(), metaDataAllCount);
+        } else {
+            log.error("元数据信息同步,从net同步元数据[未发现变更元数据],故不进行后续同步,net同步数据量:{}, metaData数据量:{}",metaDataDetailResponseDtoList.size(), metaDataAllCount);
             return;
         }
 
@@ -164,5 +174,16 @@ public class SyncMetaDataTask {
         metaDataService.truncate();
         //删除元数据详情
         metaDataDetailsService.truncate();
+    }
+
+
+    /**
+     *  检查元数据同步是否有数据上架/下架变更
+     * @param metaDataDetailResponseDtoList 同步元数据
+     * @param metaDataAllCount  metaData数量
+     * @return true:元数据变更可进行同步 ，false:元数据未变更不可进行同步
+     */
+    private boolean checkSynchMetaDataChange(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, int metaDataAllCount) {
+        return !metaDataDetailResponseDtoList.isEmpty() && (metaDataDetailResponseDtoList.size() != metaDataAllCount);
     }
 }
