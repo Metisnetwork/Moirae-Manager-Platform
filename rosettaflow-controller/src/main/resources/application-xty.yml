@@ -55,7 +55,7 @@ grpc:
 #单Redis节点模式
 redisson:
   singleServerConfig:
-    address: localhost:7379
+    address: 10.10.8.174:7379
 #集群模式
 #redisson:
 #  model: CLUSTER
