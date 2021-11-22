@@ -53,15 +53,15 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 #单Redis节点模式
-#redisson:
-#  singleServerConfig:
-#    address: localhost:7379
-#集群模式
 redisson:
-  model: CLUSTER
-  password: gasa123456
-  multiple-server-config:
-    node-addresses[0]: 10.10.8.173:6379
-    node-addresses[1]: 10.10.8.174:6379
+  singleServerConfig:
+    address: localhost:7379
+#集群模式
+#redisson:
+#  model: CLUSTER
+#  password: gasa123456
+#  multiple-server-config:
+#    node-addresses[0]: 10.10.8.173:6379
+#    node-addresses[1]: 10.10.8.174:6379
 
 
