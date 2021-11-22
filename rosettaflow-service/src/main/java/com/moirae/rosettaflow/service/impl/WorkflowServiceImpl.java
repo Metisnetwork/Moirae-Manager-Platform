@@ -173,6 +173,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         try {
             workflow.setWorkflowName(workflowName);
             workflow.setWorkflowDesc(workflowDesc);
+            // 更新最新时间
+            workflow.setUpdateTime(new Date());
             this.updateById(workflow);
         } catch (DuplicateKeyException dke) {
             log.info("editWorkflow--编辑工作流接口失败:{}", dke.getMessage(), dke);
@@ -276,18 +278,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void start(WorkflowDto workflowDto) {
-        Workflow orgWorkflow = this.queryWorkflowDetail(workflowDto.getId());
+        Workflow workflow = this.queryWorkflowDetail(workflowDto.getId());
         // 校验是否有编辑权限:非作业且启动第一个节点才进行校验
         if (!workflowDto.isJobFlg() && workflowDto.getStartNode() == 1) {
-            checkEditPermission(orgWorkflow.getProjectId());
+            checkEditPermission(workflow.getProjectId());
         }
         // 如果截止节点为空，设置为工作流最后一个节点
         if (null == workflowDto.getEndNode()) {
-            workflowDto.setEndNode(orgWorkflow.getNodeNumber());
+            workflowDto.setEndNode(workflow.getNodeNumber());
         }
         // 截止节点不能超过工作流最大节点
-        if (null == orgWorkflow.getNodeNumber() || orgWorkflow.getNodeNumber() < workflowDto.getEndNode()) {
-            log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), orgWorkflow.getNodeNumber());
+        if (null == workflow.getNodeNumber() || workflow.getNodeNumber() < workflowDto.getEndNode()) {
+            log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), workflow.getNodeNumber());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
         }
         // 保存用户和地址及签名并更新工作流状态为运行中
@@ -331,17 +333,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             //2.更新子作业节点信息
             subJobNodeInfo = this.updateSubJobNodeInfo(workflowDto, workflowNode, isPublishSuccess, respDto);
         } else {
-            //1.更新工作流
-            Workflow workflow = this.queryWorkflowDetail(workflowNode.getWorkflowId());
-            workflow.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
             //2.更新工作流节点
             workflowNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
             workflowNode.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
             workflowNode.setRunMsg(respDto.getMsg());
-            //3.持久化数据
+            // 更新最新修改时间
+            workflowNode.setUpdateTime(new Date());
             workflowNodeService.updateById(workflowNode);
+            //更新状态、最新修改时间
+            workflow.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
+            workflow.setUpdateTime(new Date());
             this.updateById(workflow);
-            // 更新元数据使用次数
+            //更新元数据使用次数
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
             if (null != workflowNodeInputList && workflowNodeInputList.size() > 0) {
                 List<String> inputDataList = new ArrayList<>();

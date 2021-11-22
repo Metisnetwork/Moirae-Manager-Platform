@@ -207,6 +207,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 workflowNodeResourceList, workflowNodeVariableList);
         // 更新工作流节点数量
         workflow.setNodeNumber(workflowNodeDtoList.size());
+        workflow.setUpdateTime(new Date());
         workflowService.updateById(workflow);
     }
 
