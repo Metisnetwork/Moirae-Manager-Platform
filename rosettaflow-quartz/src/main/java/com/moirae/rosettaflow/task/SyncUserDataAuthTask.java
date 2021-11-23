@@ -41,12 +41,12 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 2 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         log.info("用户申请授权元数据信息同步开始>>>>");
-        long begin = DateUtil.currentSeconds();
+        long begin = DateUtil.current();
         try {
             // 获取用户flow平台待审核的授权数据
             List<UserMetaData> userMetaDataOldList = userMetaDataService.getByAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
@@ -83,7 +83,7 @@ public class SyncUserDataAuthTask {
         } catch (Exception e) {
             log.error("从net同步用户元数据授权列表失败, 失败原因:{}, 错误信息:{}", e.getMessage(), e);
         }
-        log.info("用户申请授权元数据信息同步结束, 总耗时:{}s", DateUtil.currentSeconds() - begin);
+        log.info("用户申请授权元数据信息同步结束, 总耗时:{}s", (DateUtil.current() - begin)/1000);
     }
 
     /**
