@@ -83,7 +83,7 @@ public class SyncUserDataAuthTask {
         } catch (Exception e) {
             log.error("从net同步用户元数据授权列表失败, 失败原因:{}, 错误信息:{}", e.getMessage(), e);
         }
-        log.info("用户申请授权元数据信息同步结束, 总耗时:{}s", (DateUtil.current() - begin)/1000);
+        log.info("用户申请授权元数据信息同步结束, 总耗时:{}ms", (DateUtil.current() - begin));
     }
 
     /**
