@@ -62,19 +62,26 @@
 
     <!-- 查询算法列表 -->
     <select id="queryAlgorithmList" resultType="com.moirae.rosettaflow.dto.AlgorithmDto">
-        select
+        SELECT
         a.id as algorithmId,
         a.algorithm_name as algorithmName,
         a.algorithm_desc as algorithmDesc,
-        a.algorithm_type as algorithmType
-        from
-        t_algorithm a
-        where
-        a.status = '1'
+        a.algorithm_type as algorithmType,
+        a.author,
+        a.min_numbers,
+        a.support_language,
+        ac.calculate_contract_code
+        FROM
+        t_algorithm AS a
+        LEFT JOIN t_algorithm_code AS ac ON a.id = ac.algorithm_id
+        WHERE
+        a.`status` = '1'
+        AND ac.`status` = '1'
         <if test="algorithmName != null and algorithmName != ''">
             and a.algorithm_name LIKE CONCAT('%', #{algorithmName, jdbcType=VARCHAR}, '%')
         </if>
         order by a.algorithm_type asc
+
     </select>
 
     <!-- 查询算法树列表 -->
