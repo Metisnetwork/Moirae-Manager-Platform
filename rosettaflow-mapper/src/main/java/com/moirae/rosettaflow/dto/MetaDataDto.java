@@ -35,6 +35,15 @@ public class MetaDataDto extends MetaData {
      */
     private Date authEndTime;
     /**
+     * 发起授权申请的时间
+     */
+    private Date applyTime;
+    /**
+     * 审核授权申请的时间
+     */
+    private Date auditTime;
+
+    /**
      * 授权值:按次数单位为（次）
      */
     private Integer authValue;

@@ -84,6 +84,8 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         BeanCopierUtils.copy(metaData, metaDataDto);
         metaDataDto.setAuthBeginTime(userMetaData.getAuthBeginTime());
         metaDataDto.setAuthEndTime(userMetaData.getAuthEndTime());
+        metaDataDto.setApplyTime(userMetaData.getApplyTime());
+        metaDataDto.setAuditTime(userMetaData.getAuditTime());
         metaDataDto.setAuthValue(userMetaData.getAuthValue());
         metaDataDto.setExpire(userMetaData.getExpire());
         metaDataDto.setAuthMetadataState(userMetaData.getAuthMetadataState());
