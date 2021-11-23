@@ -3,11 +3,11 @@ package com.moirae.rosettaflow.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
@@ -30,6 +30,7 @@ import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.*;
 
@@ -192,6 +193,11 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
+    public int batchUpdate(List<UserMetaData> userMetaDataList) {
+        return this.baseMapper.batchUpdate(userMetaDataList);
+    }
+
+    @Override
     public void updateTimesByMetaDataId(List<String> metaDataIdList, String address) {
         this.baseMapper.updateTimesByMetaDataId(metaDataIdList, address);
     }
@@ -199,10 +205,18 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Override
     public List<UserMetaData> getByMetaDataId(Set<String> metaDataIdList) {
         LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(UserMetaData::getAuthMetadataState, SysConstant.INT_2);
+        queryWrapper.eq(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
         queryWrapper.in(UserMetaData::getMetaDataId, metaDataIdList);
         return this.list(queryWrapper);
+    }
+
+    @Override
+    public List<UserMetaData> getByAuthStatus(Byte authStatus) {
+        return list(new QueryWrapper<UserMetaData>()
+                        .select("DISTINCT meta_data_id, auth_status, metadata_auth_id").lambda()
+                        .eq(UserMetaData::getAuthStatus, authStatus)
+                        .eq(UserMetaData::getStatus, StatusEnum.VALID.getValue()));
     }
 
     /**

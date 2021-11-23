@@ -45,4 +45,11 @@ public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
      * @return
      */
     int batchInsert(@Param("userMetaDataList") List<UserMetaData> userMetaDataList);
+
+    /**
+     * 批量修改
+     * @param userMetaDataList
+     * @return
+     */
+    int batchUpdate(@Param("userMetaDataList") List<UserMetaData> userMetaDataList);
 }

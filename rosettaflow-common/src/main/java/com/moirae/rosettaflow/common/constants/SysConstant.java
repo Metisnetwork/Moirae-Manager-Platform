@@ -24,6 +24,12 @@ public class SysConstant {
     public static final int INT_3600 = 3600;
 
     /**
+     * 批量处理方式
+     */
+    public static final String INSERT = "INSERT";
+    public static final String UPDATE = "UPDATE";
+
+    /**
      * 启动工作流前是否需要整体保存：0-否，1-是
      */
     public static final String STR_0 = "0";
