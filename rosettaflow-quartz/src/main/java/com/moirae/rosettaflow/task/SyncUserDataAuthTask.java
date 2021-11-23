@@ -95,6 +95,9 @@ public class SyncUserDataAuthTask {
      * @param saveFlag 处理方式
      */
     private void batchDealUserAuthData(List<GetMetaDataAuthorityDto> metaDataList, String saveFlag){
+        if (0 == metaDataList.size()) {
+            return;
+        }
         List<UserMetaData> userMetaDataList = this.getUserMetaDataList(metaDataList);
         int insertLength = userMetaDataList.size();
         int i = 0;
@@ -130,9 +133,6 @@ public class SyncUserDataAuthTask {
      * @return UserMetaData集合
      */
     private List<UserMetaData> getUserMetaDataList(List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList) {
-        if (0 == metaDataAuthorityDtoList.size()) {
-            return new ArrayList<>();
-        }
         List<UserMetaData> userMetaDataList = new ArrayList<>();
         for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
             UserMetaData userMetaData = new UserMetaData();

@@ -62,7 +62,7 @@ INSERT INTO `t_algorithm_variable_struct` VALUES (2, 2, '{\"model_restore_party\
 INSERT INTO `t_algorithm_variable_struct` VALUES (3, 6, '{\"label_owner\":\"p0\",\"label_column\":\"Y\",\"algorithm_parameter\":{\"epochs\":10,\"batch_size\":256,\"learning_rate\":0.1,\"use_validation_set\":true,\"validation_set_rate\":0.2,\"predict_threshold\":0.5}}', '线性回归训练变量参数', 1, '2021-11-18 14:16:25', '2021-11-18 14:19:34');
 INSERT INTO `t_algorithm_variable_struct` VALUES (4, 7, '{\"model_restore_party\":\"p0\",\"model_path\":\"file_path\",\"predict_threshold\":0.5}', '线性回归预测变量参数', 1, '2021-11-18 14:16:38', '2021-11-18 14:20:12');
 INSERT INTO `t_algorithm_variable_struct` VALUES (5, 8, '{\"label_owner\":\"p0\",\"label_column\":\"Y\",\"algorithm_parameter\":{\"epochs\":10,\"batch_size\":256,\"learning_rate\":0.1,\"use_validation_set\":true,\"validation_set_rate\":0.2,\"predict_threshold\":0.5}}', 'DNN训练变量参数', 1, '2021-11-22 03:04:35', '2021-11-22 03:04:44');
-INSERT INTO `t_algorithm_variable_struct` VALUES (6, 9, '{\"model_restore_party\":\"p0\",\"model_path\":\"file_path\",\"predict_threshold\":0.5}', 'DNN预测变量参数', 1, '2021-11-22 03:06:10', '2021-11-22 03:06:26');
+INSERT INTO `t_algorithm_variable_struct` VALUES (6, 9, '{"model_restore_party":"p0","model_path":"file_path","algorithm_parameter":{"layer_units":[32,128,32,1],"layer_activation":["sigmoid","sigmoid","sigmoid","sigmoid"],"use_intercept":true,"predict_threshold":0.5}}', 'DNN预测变量参数', 1, '2021-11-22 03:06:10', '2021-11-22 03:06:26');
 
 -- ----------------------------
 -- init t_algorithm_type
