@@ -32,7 +32,7 @@ import java.util.List;
 @Configuration
 @EnableOpenApi
 @EnableKnife4j
-@Profile({"local", "dev", "uat", "test"})
+@Profile({"local", "dev", "uat", "test", "xty"})
 @Import(BeanValidatorPluginsConfiguration.class)
 public class SwaggerConfiguration {
     static final String TOKEN_KEY_DESC = "User's Access-Token";

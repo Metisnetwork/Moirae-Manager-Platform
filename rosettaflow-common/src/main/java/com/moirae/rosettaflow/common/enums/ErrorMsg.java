@@ -3,6 +3,8 @@ package com.moirae.rosettaflow.common.enums;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 
+import java.util.Objects;
+
 /**
  * @author hudenian
  * @date
@@ -151,7 +153,7 @@ public enum ErrorMsg {
     }
 
     public String getMsg() {
-        if (LanguageContext.get().equals(SysConstant.EN_US)) {
+        if (Objects.nonNull(LanguageContext.get()) && LanguageContext.get().equals(SysConstant.EN_US)) {
             return this.en;
         }
         return this.zh;

@@ -87,6 +87,14 @@ public class MetaDataDetailVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authEndTime;
 
+    @ApiModelProperty(value = "发起授权申请的时间")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
+    private Date applyTime;
+
+    @ApiModelProperty(value = "审核授权申请的时间")
+    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
+    private Date auditTime;
+
     @ApiModelProperty(value = "授权值:按次数单位为（次）")
     private Integer authValue;
 
