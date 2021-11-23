@@ -76,7 +76,10 @@ public class SyncUserDataAuthTask {
             List<GetMetaDataAuthorityDto>  updateAuthorityDtoList = new ArrayList<>();
             for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
                 if (metaDataAuthIdList.contains(authorityDto.getMetaDataAuthId())) {
-                    updateAuthorityDtoList.add(authorityDto);
+                    if (AuditMetaDataOptionEnum.AUDIT_PASSED.getValue() == authorityDto.getAuditMetaDataOption()
+                    || AuditMetaDataOptionEnum.AUDIT_REFUSED.getValue() == authorityDto.getAuditMetaDataOption()) {
+                        updateAuthorityDtoList.add(authorityDto);
+                    }
                 }
             }
             this.batchDealUserAuthData(updateAuthorityDtoList, SysConstant.UPDATE);
