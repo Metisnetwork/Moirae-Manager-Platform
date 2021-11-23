@@ -100,7 +100,7 @@
 
     <insert id="batchInsert">
         <foreach collection="userMetaDataList" item="userMetaData" separator=";">
-            replace into t_user_meta_data
+            insert into t_user_meta_data
             <trim prefix="(" suffix=")" suffixOverrides=",">
                 <if test="userMetaData.metaDataId != null">
                     meta_data_id,
@@ -225,6 +225,14 @@
                     #{userMetaData.metadataAuthId,jdbcType=VARCHAR},
                 </if>
             </trim>
+            ON DUPLICATE KEY UPDATE
+                node_id = #{userMetaData.nodeId,jdbcType=VARCHAR},
+                auth_status = #{userMetaData.authStatus,jdbcType=TINYINT},
+                audit_suggestion = #{userMetaData.auditSuggestion,jdbcType=VARCHAR},
+                audit_time = #{userMetaData.auditTime,jdbcType=TIMESTAMP},
+                auth_metadata_state = #{userMetaData.authMetadataState,jdbcType=TINYINT},
+                expire = #{userMetaData.expire,jdbcType=TINYINT},
+                used_times = #{userMetaData.usedTimes,jdbcType=BIGINT}
         </foreach>
     </insert>
 </mapper>

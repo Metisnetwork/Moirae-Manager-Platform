@@ -35,7 +35,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="test">
+    <springProfile name="test | xty | dev">
         <logger name="com.moirae.rosettaflow.mapper" level="DEBUG" additivity="false">
             <appender-ref ref="console" />
             <appender-ref ref="fileAppender"/>
