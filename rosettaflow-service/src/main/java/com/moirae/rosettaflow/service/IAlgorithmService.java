@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.mapper.domain.Algorithm;
@@ -28,10 +29,12 @@ public interface IAlgorithmService extends IService<Algorithm> {
 
     /**
      * 查询算法列表
+     * @param current 当前页数
+     * @param size 每页数量
      * @param algorithmName 算法名称
      * @return AlgorithmDto
      */
-    List<AlgorithmDto> queryAlgorithmList(String algorithmName);
+    IPage<AlgorithmDto> queryAlgorithmList(Long current, Long size, String algorithmName);
 
     /**
      * 获取算法，通过算法id
