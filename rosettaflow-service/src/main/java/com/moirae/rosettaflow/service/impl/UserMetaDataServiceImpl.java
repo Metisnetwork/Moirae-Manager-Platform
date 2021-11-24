@@ -3,7 +3,6 @@ package com.moirae.rosettaflow.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -213,10 +212,10 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Override
     public List<UserMetaData> getByAuthStatus(Byte authStatus) {
-        return list(new QueryWrapper<UserMetaData>()
-                        .select("DISTINCT meta_data_id, auth_status, metadata_auth_id").lambda()
-                        .eq(UserMetaData::getAuthStatus, authStatus)
-                        .eq(UserMetaData::getStatus, StatusEnum.VALID.getValue()));
+        LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(UserMetaData::getAuthStatus, authStatus);
+        queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
     }
 
     /**
