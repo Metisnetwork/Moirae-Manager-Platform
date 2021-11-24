@@ -46,12 +46,6 @@ public interface IMetaDataService extends IService<MetaData> {
     MetaData getMetaDataByMetaDataId(String metaDataId);
 
     /**
-     * 获取全部元数据数量
-     * @return 元数据集合数量
-     */
-    Integer getAllMetaDataCount();
-
-    /**
      * 根据identityId查询元数据列表
      *
      * @param identityId identityId

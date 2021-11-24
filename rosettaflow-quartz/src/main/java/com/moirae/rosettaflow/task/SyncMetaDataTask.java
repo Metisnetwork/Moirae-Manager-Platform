@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 同步元数据定时任务, 多久同步一次待确认
  * @author hudenian
  * @date 2021/8/23
- * @description 同步元数据定时任务, 多久同步一次待确认
  */
 @Slf4j
 @Component
@@ -43,126 +43,138 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 3600 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 1000 * 1000, initialDelay = 10 * 1000)
     @Transactional(rollbackFor = Exception.class)
     @Lock(keys = "SyncMetaDataTask")
     public void run() {
         log.info("元数据信息同步开始>>>>");
-        long begin;
-        List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
-        int metaDataAllCount;
+        long begin = DateUtil.current();
         try {
-            metaDataAllCount = metaDataService.getAllMetaDataCount();
-            metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
-           /* if (metaDataDetailResponseDtoList != null && metaDataDetailResponseDtoList.size() > 0) {
-                //元数据同步成功，删除旧数据
-                delOldData();
-            } else {
+            List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
+            if (null == metaDataDetailResponseDtoList || metaDataDetailResponseDtoList.size() == 0) {
                 return;
-            }*/
+            }
+            // 从net同步元数据[未发现变更元数据], 故不进行后续同步,
+            if (metaDataDetailResponseDtoList.size() == metaDataService.count()) {
+                log.info("元数据信息同步, 从net同步元数据[未发现变更元数据], 故不进行后续同步, net同步数据量:{}条", metaDataDetailResponseDtoList.size());
+                return;
+            }
+            // net更新数据量和flow不一致，重新更新数据
+            // 清空元数据和详情
+            this.delOldData();
+            // 批量插入元数据
+            this.batchInsertMetaData(metaDataDetailResponseDtoList);
+
+            // 批量插入元数据详情
+            for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
+                String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
+                List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
+                //  批量插入元数据详情
+                this.batchInsertMetaDataDetails(metaDataId, columnList);
+            }
         } catch (Exception e) {
             log.error("元数据信息同步,从net同步元数据失败,失败原因：{}", e.getMessage(), e);
+        }
+        log.info("元数据信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
+    }
+
+
+    /**
+     * 批量插入元数据
+     * @param metaDataDetailResponseDtoList 需更新数据
+     */
+    private void batchInsertMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList){
+        if (0 == metaDataDetailResponseDtoList.size()) {
             return;
         }
+        List<MetaData> newMetaDataList = this.getMetaDataList(metaDataDetailResponseDtoList);
+        int insertLength = newMetaDataList.size();
+        int i = 0;
+        log.info("批量插入元数据开始, 总条数:{}", insertLength);
+        while (insertLength > sysConfig.getBatchSize()){
+            long begin = DateUtil.current();
+            metaDataService.batchInsert(newMetaDataList.subList(i, i + sysConfig.getBatchSize()));
+            log.info("批量插入元数据, 开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
+            i = i + sysConfig.getBatchSize();
+            insertLength = insertLength - i;
 
-        if (checkSynchMetaDataChange(metaDataDetailResponseDtoList, metaDataAllCount)) {
-            delOldData();
-            log.error("元数据信息同步,从net同步元数据[元数据存在变更],故进行数据同步,net同步数据量:{}, metaData数据量:{}",metaDataDetailResponseDtoList.size(), metaDataAllCount);
-        } else {
-            log.error("元数据信息同步,从net同步元数据[未发现变更元数据],故不进行后续同步,net同步数据量:{}, metaData数据量:{}",metaDataDetailResponseDtoList.size(), metaDataAllCount);
+        }
+        if (insertLength > 0) {
+            long begin = DateUtil.current();
+            metaDataService.batchInsert(newMetaDataList.subList(i, i + insertLength));
+            log.info("批量插入元数据, 开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + insertLength, DateUtil.current() - begin);
+        }
+    }
+    /**
+     * 批量插入元数据详情
+     * @param metaDataId 元数据id
+     * @param columnList 需更新数据
+     */
+    private void batchInsertMetaDataDetails(String metaDataId, List<MetaDataColumnDetailDto> columnList){
+        if (0 == columnList.size()) {
             return;
         }
+        List<MetaDataDetails> newMetaDataDetailsList = this.getMetaDataDetailsList(metaDataId, columnList);
+        int insertLength = newMetaDataDetailsList.size();
+        int i = 0;
+        log.info("批量插入元数据详情开始，总条数:{}", insertLength);
+        while (insertLength > sysConfig.getBatchSize()){
+            long begin = DateUtil.current();
+            metaDataDetailsService.batchInsert(newMetaDataDetailsList.subList(i, i + sysConfig.getBatchSize()));
+            log.info("批量插入元数据详情，开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
+            i = i + sysConfig.getBatchSize();
+            insertLength = insertLength - i;
 
-        List<MetaData> newMetaDataList = new ArrayList<>();
-        List<MetaDataDetails> newMetaDataDetailsList = new ArrayList<>();
-        MetaData metaData;
-        MetaDataDetails metaDataDetail;
-        int metaDataSize = 0;
-        int metaDataDetailSize = 0;
+        }
+        if (insertLength > 0) {
+            long begin = DateUtil.current();
+            metaDataDetailsService.batchInsert(newMetaDataDetailsList.subList(i, i + insertLength));
+            log.info("批量插入元数据详情，开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + insertLength, DateUtil.current() - begin);
+        }
+    }
 
+    private List<MetaDataDetails> getMetaDataDetailsList(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
+        List<MetaDataDetails> metaDataDetailsList = new ArrayList<>();
+        for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
+            MetaDataDetails metaDataDetail = new MetaDataDetails();
+            metaDataDetail.setMetaDataId(metaDataId);
+            metaDataDetail.setColumnIndex(metaDataColumnDetailDto.getIndex());
+            metaDataDetail.setColumnName(metaDataColumnDetailDto.getName());
+            metaDataDetail.setColumnType(metaDataColumnDetailDto.getType());
+            metaDataDetail.setColumnSize((long) metaDataColumnDetailDto.getSize());
+            metaDataDetail.setColumnDesc(metaDataColumnDetailDto.getComment());
+            metaDataDetailsList.add(metaDataDetail);
+        }
+        return metaDataDetailsList;
+    }
+
+    private List<MetaData> getMetaDataList(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
+        List<MetaData> metaDataList = new ArrayList<>();
         for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-            //添加元数据简介
-            metaData = getMetaData(metaDataDetailResponseDto);
-            // 跳过元数据为null的数据
-            if (null == metaData) {
-                continue;
+            MetaData metaData = new MetaData();
+            metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
+            metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
+            metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
+            //元数据id为空不入库
+            if (StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())) {
+                // 跳过元数据为null的数据
+                log.error("MetaDataId is null jump over, metaDataSummary:{}", metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary());
             }
-            newMetaDataList.add(metaData);
-            ++metaDataSize;
-            if (metaDataSize % sysConfig.getBatchSize() == 0) {
-                begin = DateUtil.currentSeconds();
-                log.info("元数据更新{}条数据开始", sysConfig.getBatchSize());
-                metaDataService.batchInsert(newMetaDataList);
-                log.info("元数据更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
-                newMetaDataList.clear();
-            }
-
-            List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
-            for (MetaDataColumnDetailDto metaDataColumnDetailDto : columnList) {
-                metaDataDetail = getMetaDataDetails(metaData, metaDataColumnDetailDto);
-
-                //添加元数据详情
-                newMetaDataDetailsList.add(metaDataDetail);
-                ++metaDataDetailSize;
-                if (metaDataDetailSize % sysConfig.getBatchSize() == 0) {
-                    begin = DateUtil.currentSeconds();
-                    log.info("元数据详情更新{}条数据开始", sysConfig.getBatchSize());
-                    metaDataDetailsService.batchInsert(newMetaDataDetailsList);
-                    log.info("元数据详情更新{}条数据结束一共用时{}秒", sysConfig.getBatchSize(), DateUtil.currentSeconds() - begin);
-                    newMetaDataDetailsList.clear();
-                }
-            }
+            metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
+            metaData.setFileId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getOriginId());
+            metaData.setDataName(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getTableName());
+            metaData.setDataDesc(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDesc());
+            metaData.setFilePath(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFilePath());
+            metaData.setRows(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getRows());
+            metaData.setColumns(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getColumns());
+            metaData.setSize(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getSize());
+            metaData.setFileType(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFileType().byteValue());
+            metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
+            metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
+            metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
+            metaDataList.add(metaData);
         }
-
-        if (newMetaDataList.size() > 0) {
-            begin = DateUtil.currentSeconds();
-            log.info("元数据更新{}条数据开始", newMetaDataList.size());
-            metaDataService.batchInsert(newMetaDataList);
-            log.info("元数据更新{}条数据结束一共用时{}秒", newMetaDataList.size(), DateUtil.currentSeconds() - begin);
-        }
-        if (newMetaDataDetailsList.size() > 0) {
-            begin = DateUtil.currentSeconds();
-            log.info("元数据详情更新{}条数据开始", newMetaDataDetailsList.size());
-            metaDataDetailsService.batchInsert(newMetaDataDetailsList);
-            log.info("元数据详情更新{}条数据结束一共用时{}秒", newMetaDataDetailsList.size(), DateUtil.currentSeconds() - begin);
-        }
-        log.info("元数据信息同步结束>>>>");
-    }
-
-    private MetaDataDetails getMetaDataDetails(MetaData metaData, MetaDataColumnDetailDto metaDataColumnDetailDto) {
-        MetaDataDetails metaDataDetail = new MetaDataDetails();
-        metaDataDetail.setMetaDataId(metaData.getMetaDataId());
-        metaDataDetail.setColumnIndex(metaDataColumnDetailDto.getIndex());
-        metaDataDetail.setColumnName(metaDataColumnDetailDto.getName());
-        metaDataDetail.setColumnType(metaDataColumnDetailDto.getType());
-        metaDataDetail.setColumnSize((long) metaDataColumnDetailDto.getSize());
-        metaDataDetail.setColumnDesc(metaDataColumnDetailDto.getComment());
-        return metaDataDetail;
-    }
-
-    private MetaData getMetaData(MetaDataDetailResponseDto metaDataDetailResponseDto) {
-        MetaData metaData = new MetaData();
-        metaData.setIdentityId(metaDataDetailResponseDto.getOwner().getIdentityId());
-        metaData.setIdentityName(metaDataDetailResponseDto.getOwner().getNodeName());
-        metaData.setNodeId(metaDataDetailResponseDto.getOwner().getNodeId());
-        //元数据id为空不入库
-        if (StrUtil.isBlank(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId())) {
-            log.error("MetaDataId is null jump over, metaDataSummary:{}", metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary());
-            return null;
-        }
-        metaData.setMetaDataId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId());
-        metaData.setFileId(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getOriginId());
-        metaData.setDataName(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getTableName());
-        metaData.setDataDesc(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDesc());
-        metaData.setFilePath(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFilePath());
-        metaData.setRows(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getRows());
-        metaData.setColumns(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getColumns());
-        metaData.setSize(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getSize());
-        metaData.setFileType(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getFileType().byteValue());
-        metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
-        metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
-        metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
-        return metaData;
+        return metaDataList;
     }
 
     /**
@@ -174,16 +186,5 @@ public class SyncMetaDataTask {
         metaDataService.truncate();
         //删除元数据详情
         metaDataDetailsService.truncate();
-    }
-
-
-    /**
-     *  检查元数据同步是否有数据上架/下架变更
-     * @param metaDataDetailResponseDtoList 同步元数据
-     * @param metaDataAllCount  metaData数量
-     * @return true:元数据变更可进行同步 ，false:元数据未变更不可进行同步
-     */
-    private boolean checkSynchMetaDataChange(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList, int metaDataAllCount) {
-        return !metaDataDetailResponseDtoList.isEmpty() && (metaDataDetailResponseDtoList.size() != metaDataAllCount);
     }
 }
