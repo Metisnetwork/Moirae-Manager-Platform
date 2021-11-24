@@ -53,16 +53,21 @@ grpc:
       negotiationType: plaintext
 
 #集群模式
+#redisson:
+#  model: CLUSTER
+#  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
+#  multiple-server-config:
+#    node-addresses[0]: 10.10.8.175:6371
+#    node-addresses[1]: 10.10.8.175:6372
+#    node-addresses[2]: 10.10.8.175:6373
+#    node-addresses[3]: 10.10.8.176:6374
+#    node-addresses[4]: 10.10.8.176:6375
+#    node-addresses[5]: 10.10.8.176:6376
+#单Redis节点模式
 redisson:
-  model: CLUSTER
   password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
-  multiple-server-config:
-    node-addresses[0]: 10.10.8.175:6371
-    node-addresses[1]: 10.10.8.175:6372
-    node-addresses[2]: 10.10.8.175:6373
-    node-addresses[3]: 10.10.8.176:6374
-    node-addresses[4]: 10.10.8.176:6375
-    node-addresses[5]: 10.10.8.176:6376
+  singleServerConfig:
+    address: 10.10.8.176:6379
 
 
 jasypt:
