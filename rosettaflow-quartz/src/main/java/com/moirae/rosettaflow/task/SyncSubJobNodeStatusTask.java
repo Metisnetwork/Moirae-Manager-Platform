@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.SubJobNodeStatusEnum;
 import com.moirae.rosettaflow.common.enums.SubJobStatusEnum;
@@ -67,7 +68,7 @@ public class SyncSubJobNodeStatusTask {
     public void run() {
         List<SubJobNodeDto> subJobNodeDtoList = subJobNodeService.getRunningNodeWithWorkIdAndNodeNum();
         //如果没有需要同步的数据则不进行同步
-        if (subJobNodeDtoList.size() == 0) {
+        if (CollUtil.isEmpty(subJobNodeDtoList)) {
             return;
         }
         log.info("同步更新子作业节点运行中任务开始>>>>");

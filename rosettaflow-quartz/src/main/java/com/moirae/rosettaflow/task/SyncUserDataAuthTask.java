@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.task;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
@@ -48,7 +49,7 @@ public class SyncUserDataAuthTask {
             List<UserMetaData> userMetaDataOldList = userMetaDataService.getByAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
             // 获取所有待审核的用户数据id
             List<String> metaDataAuthIdList = new ArrayList<>();
-            if (null != userMetaDataOldList && userMetaDataOldList.size() > 0) {
+            if (CollUtil.isNotEmpty(userMetaDataOldList)) {
                 for (UserMetaData userMetaData : userMetaDataOldList) {
                     metaDataAuthIdList.add(userMetaData.getMetadataAuthId());
                 }
@@ -56,7 +57,7 @@ public class SyncUserDataAuthTask {
 
             // 查询调度服务，获取用户授权相关数据
             List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-            if (null == metaDataAuthorityDtoList || metaDataAuthorityDtoList.size() == 0) {
+            if (CollUtil.isEmpty(metaDataAuthorityDtoList)) {
                 return;
             }
             // 处理待审核数据为0时的情况

@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowRunStatusEnum;
@@ -66,7 +67,7 @@ public class WorkflowNodeStatusTask {
     public void run() {
         List<WorkflowNode> workflowNodeList = workflowNodeService.getRunningNode(BEFORE_HOUR);
         //如果没有需要同步的数据则不进行同步
-        if (workflowNodeList.size() == 0) {
+        if (CollUtil.isEmpty(workflowNodeList)) {
             return;
         }
         log.info("同步更新工作流节点中待确认任务开始>>>>");
@@ -97,7 +98,7 @@ public class WorkflowNodeStatusTask {
                     //获取待保存任务结果数据
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
                     if (taskResultResponseDto == null) {
-                        log.error("WorkflowNodeStatusMockTask,taskId:{}获取任务结果失败！",taskId);
+                        log.error("WorkflowNodeStatusMockTask,taskId:{}获取任务结果失败！", taskId);
                         continue;
                     }
                     TaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, TaskResult.class);
