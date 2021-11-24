@@ -43,7 +43,7 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 1000 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 600 * 1000, initialDelay = 10 * 1000)
     @Transactional(rollbackFor = Exception.class)
     @Lock(keys = "SyncMetaDataTask")
     public void run() {
