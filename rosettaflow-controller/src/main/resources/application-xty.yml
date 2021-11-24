@@ -54,6 +54,7 @@ grpc:
       negotiationType: plaintext
 #单Redis节点模式
 redisson:
+  password: 123456
   singleServerConfig:
     address: 10.10.8.174:7379
 #集群模式
