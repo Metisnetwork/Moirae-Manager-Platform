@@ -17,10 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 同步用户元数据授权列列表（当用户对元数据做授权申请后，redis记录设置已申请，此定时任务判断有待申请记录就启动同步，否则不同步）
@@ -45,7 +42,6 @@ public class SyncUserDataAuthTask {
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
-        log.info("用户申请授权元数据信息同步开始>>>>");
         long begin = DateUtil.current();
         try {
             // 获取用户flow平台待审核的授权数据
@@ -66,12 +62,15 @@ public class SyncUserDataAuthTask {
                 if (metaDataAuthorityDtoList.size() == userMetaDataService.count()) {
                     return;
                 }
+                log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，开始更新>>>>");
                 // 更新数据
                 // 清空原来授权数据
                 userMetaDataService.truncate();
                 this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.INSERT);
+                log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，更新结束>>>>");
                 return;
             }
+            log.info("待审核用户申请授权元数据信息同步开始>>>>");
             // 处理待审核数据不为0的情况
             List<GetMetaDataAuthorityDto>  updateAuthorityDtoList = new ArrayList<>();
             for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {

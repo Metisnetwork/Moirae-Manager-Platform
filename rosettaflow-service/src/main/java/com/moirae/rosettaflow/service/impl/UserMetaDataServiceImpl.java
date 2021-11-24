@@ -193,8 +193,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public int batchUpdate(List<UserMetaData> userMetaDataList) {
-        return this.baseMapper.batchUpdate(userMetaDataList);
+    public void batchUpdate(List<UserMetaData> userMetaDataList) {
+        this.baseMapper.batchUpdate(userMetaDataList);
     }
 
     @Override

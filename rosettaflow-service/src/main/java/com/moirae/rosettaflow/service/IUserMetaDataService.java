@@ -80,15 +80,13 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * 批量修改
      *
      * @param userMetaDataList 插入用户授权数据列表集合
-     * @return 插入记录数
      */
-    int batchUpdate(List<UserMetaData> userMetaDataList);
+    void batchUpdate(List<UserMetaData> userMetaDataList);
 
     /**
      * 更新按次数授权数据的次数
      * @param metaDataIdList 元数据id集合
      * @param address 用户地址
-     * @return UserMetaData集合
      */
     void updateTimesByMetaDataId(List<String> metaDataIdList, String address);
 
@@ -102,7 +100,7 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
     /**
      * 根据审核状态查询用户授权元数据
      * @param authStatus 审核状态
-     * @return
+     * @return 待审核元数据列表
      */
     List<UserMetaData> getByAuthStatus(Byte authStatus);
 }
