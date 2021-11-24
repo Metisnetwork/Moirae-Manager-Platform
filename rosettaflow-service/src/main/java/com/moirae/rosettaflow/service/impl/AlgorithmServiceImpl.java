@@ -2,7 +2,9 @@ package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
@@ -11,10 +13,7 @@ import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.mapper.AlgorithmMapper;
-import com.moirae.rosettaflow.mapper.domain.Algorithm;
-import com.moirae.rosettaflow.mapper.domain.AlgorithmCode;
-import com.moirae.rosettaflow.mapper.domain.AlgorithmType;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.IAlgorithmCodeService;
 import com.moirae.rosettaflow.service.IAlgorithmService;
 import com.moirae.rosettaflow.service.IAlgorithmTypeService;
@@ -90,9 +89,11 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     }
 
     @Override
-    public List<AlgorithmDto> queryAlgorithmList(String algorithmName) {
-        return this.baseMapper.queryAlgorithmList(algorithmName);
+    public IPage<AlgorithmDto> queryAlgorithmList(Long current, Long size, String algorithmName) {
+        Page<AlgorithmDto> page = new Page<>(current, size);
+        return this.baseMapper.queryAlgorithmList(page, algorithmName);
     }
+
 
     @Override
     public Algorithm getAlgorithmById(Long id) {

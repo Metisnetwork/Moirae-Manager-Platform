@@ -1,11 +1,14 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.AlgorithmTypeEnum;
+import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.req.algorithm.AlgListReq;
 import com.moirae.rosettaflow.req.algorithm.AlgorithmReq;
 import com.moirae.rosettaflow.service.IAlgorithmService;
+import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.algorithm.*;
 import io.swagger.annotations.Api;
@@ -53,9 +56,9 @@ public class AlgorithmController {
 
     @GetMapping("list")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
-    public ResponseVo<List<AlgorithmListVo>> list(@Valid AlgListReq algListReq) {
-        List<AlgorithmDto> listDto = algorithmService.queryAlgorithmList(algListReq.getAlgorithmName());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(listDto, AlgorithmListVo.class));
+    public ResponseVo<PageVo<AlgorithmListVo>> list(@Valid AlgListReq algListReq) {
+        IPage<AlgorithmDto> algorithmDtoIpage = algorithmService.queryAlgorithmList(algListReq.getCurrent(), algListReq.getSize(), algListReq.getAlgorithmName());
+        return convertAlgorithmDtoToResponseVo(algorithmDtoIpage);
     }
 
     @GetMapping("details/{id}")
@@ -101,6 +104,26 @@ public class AlgorithmController {
         }
         algTreeListVo.setAlgTreeVoList(algTreeVoList);
         return algTreeListVo;
+    }
+
+    /**
+     * 转换算法分页列表
+     * @param algorithmDtoIpage 算法分页page
+     * @return 算法列表
+     */
+    private ResponseVo<PageVo<AlgorithmListVo>> convertAlgorithmDtoToResponseVo(IPage<AlgorithmDto> algorithmDtoIpage) {
+        List<AlgorithmListVo> items = new ArrayList<>();
+        algorithmDtoIpage.getRecords().forEach(algorithmDto -> {
+            AlgorithmListVo algorithmListVo = new AlgorithmListVo();
+            BeanCopierUtils.copy(algorithmDto, algorithmListVo);
+            items.add(algorithmListVo);
+        });
+
+        PageVo<AlgorithmListVo> pageVo = new PageVo<>();
+        BeanUtil.copyProperties(algorithmDtoIpage, pageVo);
+        pageVo.setItems(items);
+
+        return ResponseVo.createSuccess(pageVo);
     }
 
 }
