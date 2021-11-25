@@ -23,4 +23,9 @@ public class UserMetaDataDto extends UserMetaData {
      */
     private Long metaDataPkId;
 
+    /**
+     * 转换后展示状态: 0-申请中, 1-已授权, 2-已拒绝, 3-已失效
+     */
+    private Byte authStatusShow;
+
 }

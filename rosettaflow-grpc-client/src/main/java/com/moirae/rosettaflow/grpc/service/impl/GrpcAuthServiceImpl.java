@@ -3,8 +3,10 @@ package com.moirae.rosettaflow.grpc.service.impl;
 import com.moirae.rosettaflow.grpc.client.AuthServiceClient;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
+import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -29,6 +31,11 @@ public class GrpcAuthServiceImpl implements GrpcAuthService {
     @Override
     public ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto) {
         return authServiceClient.applyMetaDataAuthority(requestDto);
+    }
+
+    @Override
+    public RevokeMetadataAuthorityResponseDto revokeMetadataAuthority(RevokeMetaDataAuthorityRequestDto requestDto) {
+        return authServiceClient.revokeMetadataAuthority(requestDto);
     }
 
     @Override

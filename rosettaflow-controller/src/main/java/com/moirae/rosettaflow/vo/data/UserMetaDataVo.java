@@ -55,6 +55,12 @@ public class UserMetaDataVo {
     @ApiModelProperty(value = "授权状态: 0-等待审核中, 1-审核通过, 2-审核拒绝")
     private Byte authStatus;
 
+    @ApiModelProperty(value = "数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)")
+    private Byte authMetadataState;
+
+    @ApiModelProperty(value = "转换后展示状态: 0-申请中, 1-已授权, 2-已拒绝, 3-已失效")
+    private Byte authStatusShow;
+
     @ApiModelProperty(value = "发起授权申请的时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date applyTime;

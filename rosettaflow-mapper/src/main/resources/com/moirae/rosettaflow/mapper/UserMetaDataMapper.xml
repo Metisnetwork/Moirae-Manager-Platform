@@ -48,6 +48,7 @@
             u.auth_begin_time,
             u.auth_end_time,
             u.auth_status,
+            u.auth_metadata_state,
             u.apply_time,
             u.audit_time,
             u.`status`,

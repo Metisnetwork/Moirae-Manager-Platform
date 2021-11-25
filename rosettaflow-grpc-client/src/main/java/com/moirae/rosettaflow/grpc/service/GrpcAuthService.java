@@ -2,8 +2,10 @@ package com.moirae.rosettaflow.grpc.service;
 
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
+import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 
 import java.util.List;
 
@@ -20,6 +22,14 @@ public interface GrpcAuthService {
      * @return 申请结果
      */
     ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto);
+
+
+    /**
+     * 撤销元数据授权申请
+     * @param requestDto 撤销授权的元数据信息
+     * @return 撤销结果
+     */
+    RevokeMetadataAuthorityResponseDto revokeMetadataAuthority(RevokeMetaDataAuthorityRequestDto requestDto);
 
     /**
      * 查询(本组织)的所有元数据的授权申请及审核结果详情列表

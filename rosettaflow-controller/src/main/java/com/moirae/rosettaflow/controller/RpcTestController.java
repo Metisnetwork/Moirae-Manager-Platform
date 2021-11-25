@@ -1,17 +1,23 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
+import com.moirae.rosettaflow.common.enums.UserTypeEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.WorkflowDto;
+import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
 import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
+import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
@@ -127,6 +133,20 @@ public class RpcTestController {
 
         ApplyMetaDataAuthorityResponseDto applyMetaDataAuthorityResponseDto = grpcAuthService.applyMetaDataAuthority(requestDto);
         return ResponseVo.createSuccess(applyMetaDataAuthorityResponseDto);
+    }
+
+
+    @PostMapping("revokeMetadataAuthority")
+    @ApiOperation(value = "grpc revokeMetadataAuthority撤销数据授权接口测试", notes = "grpc revokeMetadataAuthority撤销数据授权接口测试")
+    public ResponseVo<RevokeMetadataAuthorityResponseDto> revokeMetadataAuthority() {
+        log.info("grpc revokeMetadataAuthority撤销数据授权接口测试");
+        RevokeMetaDataAuthorityRequestDto requestDto = new RevokeMetaDataAuthorityRequestDto();
+        requestDto.setUser("lat1krh2rm747g2j0z6zp5sup06u6ez34fx8y8vd25");
+        requestDto.setMetadataAuthId("metaDataId");
+        requestDto.setSign("sign");
+        requestDto.setUserType(UserTypeEnum.checkUserType("lat1krh2rm747g2j0z6zp5sup06u6ez34fx8y8vd25"));
+        RevokeMetadataAuthorityResponseDto responseDto = grpcAuthService.revokeMetadataAuthority(requestDto);
+        return ResponseVo.createSuccess(responseDto);
     }
 
 

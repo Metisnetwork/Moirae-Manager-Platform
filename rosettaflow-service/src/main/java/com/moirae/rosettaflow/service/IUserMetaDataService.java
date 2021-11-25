@@ -38,6 +38,13 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
     void auth(UserMetaDataDto userMetaDataDto);
 
     /**
+     * 撤销用户元数据授权
+     *
+     * @param userMetaDataDto 元数据授权申请对象
+     */
+    void revoke(UserMetaDataDto userMetaDataDto);
+
+    /**
      * 获取用户已授权机构列表
      *
      * @return 授权机构列表
