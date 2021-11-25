@@ -17,7 +17,7 @@ import javax.validation.constraints.Positive;
 @ApiModel(value = "撤销元数据授权对象")
 public class MetaDataRevokeReq {
 
-    @ApiModelProperty(value = "用户授权数据表Id")
+    @ApiModelProperty(value = "用户授权数据表Id", required = true)
     @NotBlank(message = "{metadata.usermetadataid.notNull}")
     @Positive(message = "{metadata.usermetadataid.positive}")
     private Long id;
