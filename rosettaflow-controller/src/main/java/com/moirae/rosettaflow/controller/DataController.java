@@ -3,7 +3,10 @@ package com.moirae.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.AuthStatusShowEnum;
 import com.moirae.rosettaflow.common.enums.AuthTypeEnum;
+import com.moirae.rosettaflow.common.enums.UserMetaDataAuditEnum;
+import com.moirae.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
 import com.moirae.rosettaflow.dto.MetaDataDto;
@@ -88,6 +91,15 @@ public class DataController {
         return ResponseVo.createSuccess();
     }
 
+    @PostMapping("revoke")
+    @ApiOperation(value = "元数据撤销授权", notes = "元数据撤销授权")
+    public ResponseVo<?> revoke(@RequestBody @Valid MetaDataRevokeReq metaDataRevokeReq) {
+        UserMetaDataDto userMetaDataDto = new UserMetaDataDto();
+        BeanCopierUtils.copy(metaDataRevokeReq, userMetaDataDto);
+        userMetaDataService.revoke(userMetaDataDto);
+        return ResponseVo.createSuccess();
+    }
+
     @GetMapping("getAllAuthOrganization")
     @ApiOperation(value = "查询工作流输入组织", notes = "查询工作流输入组织")
     public ResponseVo<List<UserMetaDataOrgVo>> getAllAuthOrganization() {
@@ -126,11 +138,14 @@ public class DataController {
         pageDto.getRecords().forEach(userMetaDataDto -> {
             UserMetaDataVo userMetaDataVo = new UserMetaDataVo();
             BeanCopierUtils.copy(userMetaDataDto, userMetaDataVo);
+            //授权值
             String authTime = "";
             if(!Objects.isNull(userMetaDataDto.getAuthBeginTime()) && !Objects.isNull(userMetaDataDto.getAuthEndTime())){
                 authTime = dateFormat.format(userMetaDataDto.getAuthBeginTime()) + "~" + dateFormat.format(userMetaDataDto.getAuthEndTime());
             }
             userMetaDataVo.setAuthValueStr(userMetaDataDto.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaDataDto.getAuthValue()) :  authTime);
+            //状态
+            userMetaDataVo.setAuthStatusShow(getAuthStatusShow(userMetaDataDto));
             items.add(userMetaDataVo);
         });
 
@@ -150,4 +165,28 @@ public class DataController {
         return ResponseVo.createSuccess(pageVo);
     }
 
+
+    /**
+     * 获取转换后数据授权状态(前端展示使用)
+     * @param userMetaDataDto 用户元数据
+     * @return  授权状态
+     */
+    private Byte getAuthStatusShow (UserMetaDataDto userMetaDataDto) {
+
+        Byte authStatus = userMetaDataDto.getAuthStatus();
+        Byte authMetadataState = userMetaDataDto.getAuthMetadataState();
+        if (authStatus == UserMetaDataAuditEnum.AUDIT_PENDING.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
+            return AuthStatusShowEnum.APPLY.getValue();
+        } else if (authStatus == UserMetaDataAuditEnum.AUDIT_PASSED.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
+            return AuthStatusShowEnum.AUTHORIZED.getValue();
+        } else if (authStatus == UserMetaDataAuditEnum.AUDIT_REFUSED.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue()) {
+            return AuthStatusShowEnum.REFUSE.getValue();
+        } else if (authStatus == UserMetaDataAuditEnum.AUDIT_PASSED.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue()) {
+            return AuthStatusShowEnum.INVALID.getValue();
+        } else if (authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue() || authMetadataState == UserMetaDataAuthorithStateEnum.REVOKED.getValue()) {
+            return AuthStatusShowEnum.INVALID.getValue();
+        } else {
+            return AuthStatusShowEnum.UNKNOWN.getValue();
+        }
+    }
 }
