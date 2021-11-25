@@ -12,9 +12,11 @@ import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
+import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetadataUsedQuoDto;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.*;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -35,6 +37,11 @@ public class AuthServiceClient {
     @GrpcClient("carrier-grpc-server")
     AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
 
+    /**
+     * 元数据授权申请
+     * @param requestDto 元数据授权信息
+     * @return 授权结果
+     */
     public ApplyMetaDataAuthorityResponseDto applyMetaDataAuthority(ApplyMetaDataAuthorityRequestDto requestDto) {
         ApplyMetadataAuthorityRequest.Builder applyMetaDataAuthorityRequest = ApplyMetadataAuthorityRequest.newBuilder();
 
@@ -95,6 +102,32 @@ public class AuthServiceClient {
         applyMetaDataAuthorityResponseDto.setMetaDataAuthId(applyMetaDataAuthorityResponse.getMetadataAuthId());
         return applyMetaDataAuthorityResponseDto;
     }
+
+    /**
+     *  撤销元数据授权申请
+     * @param requestDto 撤销元数据信息
+     * @return 撤销结果
+     */
+    public RevokeMetadataAuthorityResponseDto revokeMetadataAuthority(RevokeMetaDataAuthorityRequestDto requestDto) {
+
+        RevokeMetadataAuthorityRequest.Builder request = RevokeMetadataAuthorityRequest.newBuilder();
+        request.setUser(requestDto.getUser());
+        request.setUserTypeValue(requestDto.getUserType());
+        request.setMetadataAuthId(requestDto.getMetadataAuthId());
+        request.setSign(ByteString.copyFromUtf8(requestDto.getSign()));
+
+        SimpleResponse response = authServiceBlockingStub.revokeMetadataAuthority(request.build());
+        if (response.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("AuthServiceClient->revokeMetadataAuthority() fail reason:{}", response.getMsg());
+            throw new BusinessException(response.getStatus(), response.getMsg());
+        }
+
+        RevokeMetadataAuthorityResponseDto responseDto = new RevokeMetadataAuthorityResponseDto();
+        responseDto.setStatus(response.getStatus());
+        responseDto.setMsg(response.getMsg());
+        return responseDto;
+    }
+
 
     /**
      * 查询(本组织)的所有元数据的授权申请及审核结果详情列表
