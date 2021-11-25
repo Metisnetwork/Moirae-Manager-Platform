@@ -73,6 +73,7 @@ public enum ErrorMsg {
     METADATA_RESULT_DOWNLOAD_FAIL("元数据结果下载失败", "Metadata result download fail"),
     METADATA_RESULT_DOWNLOAD_ERROR("元数据结果下载异常", "Metadata result download error"),
     METADATA_USER_AUTH_METADATA_STATE_UPDATE_FAIL("用户元数据授权状态更新失败", "Metadata user auth metadata state update fail"),
+    METADATA_USER_AUTH_METADATA_REVOKE_ERROR("用户元数据授权状态错误，不能发起撤销", "Metadata user auth metadata state error,can not revoke"),
 
 
     /**

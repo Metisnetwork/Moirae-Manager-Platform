@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.security.auth.message.AuthStatus;
 import java.util.*;
 
 /**
@@ -128,7 +129,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Override
     public void revoke(UserMetaDataDto userMetaDataDto) {
-        //检查userMetaData是否存在
+        //检查待撤销userMetaData数据
         LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(UserMetaData::getId, userMetaDataDto.getId());
         queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
@@ -137,6 +138,11 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
            log.error("query userMetaData fail by id:{}", userMetaDataDto.getId());
            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
        }
+       if (userMetaData.getAuthStatus() != UserMetaDataAuditEnum.AUDIT_PENDING.getValue() || userMetaData.getAuthMetadataState() != UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
+           log.error("user auth metaData status error,can not revoke,id:{}, authStatus:{}, authMetadataState:{}", userMetaData.getId(), userMetaData.getAuthStatus(), userMetaData.getAuthMetadataState());
+           throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_REVOKE_ERROR.getMsg());
+       }
+
         //撤销元数据授权
         RevokeMetaDataAuthorityRequestDto requestDto = new RevokeMetaDataAuthorityRequestDto();
         requestDto.setUser(userMetaDataDto.getAddress());
