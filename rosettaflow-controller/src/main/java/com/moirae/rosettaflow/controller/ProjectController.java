@@ -13,10 +13,7 @@ import com.moirae.rosettaflow.service.IProjectService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.project.ProjMemberListVo;
-import com.moirae.rosettaflow.vo.project.ProjectDetailsVo;
-import com.moirae.rosettaflow.vo.project.ProjectListVo;
-import com.moirae.rosettaflow.vo.project.ProjectModelVo;
+import com.moirae.rosettaflow.vo.project.*;
 import com.moirae.rosettaflow.vo.user.UserNicknameVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -61,9 +58,9 @@ public class ProjectController {
 
     @PostMapping("addProject")
     @ApiOperation(value = "新增项目", notes = "新增项目")
-    public ResponseVo<?> addProject(@RequestBody @Valid AddProjectReq addProjectReq) {
-        projectService.addProject(BeanUtil.copyProperties(addProjectReq, ProjectDto.class));
-        return ResponseVo.createSuccess();
+    public ResponseVo<ProjectVo> addProject(@RequestBody @Valid AddProjectReq addProjectReq) {
+        Long id = projectService.addProject(BeanUtil.copyProperties(addProjectReq, ProjectDto.class));
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(id, ProjectVo.class));
     }
 
     @PostMapping("updateProject")

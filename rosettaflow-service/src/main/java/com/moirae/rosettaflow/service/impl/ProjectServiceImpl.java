@@ -65,7 +65,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addProject(ProjectDto projectDto) {
+    public Long addProject(ProjectDto projectDto) {
         try {
             Long userId = commonService.getCurrentUser().getId();
             Project project = new Project();
@@ -96,6 +96,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                     }
                 }
             }
+            return project.getId();
         } catch (Exception e) {
             log.error("addProject--新增项目信息失败, 错误信息:{}, 异常:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {
