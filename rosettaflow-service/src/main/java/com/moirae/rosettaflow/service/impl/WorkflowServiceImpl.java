@@ -18,6 +18,7 @@ import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.JsonUtils;
+import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
@@ -262,12 +263,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 复制新增一条新的工作流数据
      */
     private Long saveCopyWorkflow(Long originId, String workflowName, String workflowDesc) {
+        UserDto userDto = commonService.getCurrentUser();
         Workflow originWorkflow = this.queryWorkflowDetail(originId);
         // 校验是否有编辑权限
         checkEditPermission(originWorkflow.getProjectId());
         Workflow newWorkflow = new Workflow();
         newWorkflow.setProjectId(originWorkflow.getProjectId());
-        newWorkflow.setUserId(UserContext.get().getId());
+        newWorkflow.setUserId(userDto.getId());
         newWorkflow.setWorkflowName(workflowName);
         newWorkflow.setWorkflowDesc(workflowDesc);
         newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());

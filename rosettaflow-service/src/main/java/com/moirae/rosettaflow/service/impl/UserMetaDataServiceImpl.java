@@ -27,6 +27,7 @@ import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.UserMetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
+import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
@@ -34,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.security.auth.message.AuthStatus;
 import java.util.*;
 
 /**
@@ -52,6 +52,10 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Resource
     private GrpcAuthService grpcAuthService;
 
+    @Resource
+    private CommonService commonService;
+
+
     @Override
     public void truncate() {
         this.baseMapper.truncate();
@@ -60,11 +64,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     @Override
     public IPage<UserMetaDataDto> list(Long current, Long size, String dataName) {
         Page<UserMetaData> page = new Page<>(current, size);
-        if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
-            log.error(ErrorMsg.USER_UN_LOGIN.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
-        }
-        return this.baseMapper.listByOwner(page, UserContext.get().getAddress(), dataName);
+        UserDto userDto = commonService.getCurrentUser();
+        return this.baseMapper.listByOwner(page, userDto.getAddress(), dataName);
     }
 
     @Override
@@ -189,11 +190,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Override
     public List<UserMetaDataDto> getAllAuthOrganization() {
-        UserDto userDto = UserContext.get();
-        if (Objects.isNull(userDto)) {
-            log.error(ErrorMsg.USER_UN_LOGIN.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
-        }
+        UserDto userDto = commonService.getCurrentUser();
         String address = userDto.getAddress();
         if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
             address = AddressChangeUtils.convert0xAddress(address);
@@ -208,22 +205,20 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Override
     public UserMetaData getCurrentUserMetaDataByMetaDataId(String metaDataId) {
-        //用户没有登录不查询
-        if (Objects.isNull(UserContext.get()) || null == UserContext.get().getAddress()) {
-            return null;
-        }
+        UserDto userDto = commonService.getCurrentUser();
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
-        wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
+        wrapper.eq(UserMetaData::getAddress, userDto.getAddress());
         wrapper.eq(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         return this.getOne(wrapper);
     }
 
     @Override
     public List<UserMetaData> getCurrentUserMetaDataByMetaDataIdArr(Object[] metaDataIdArr) {
+        UserDto userDto = commonService.getCurrentUser();
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.in(UserMetaData::getMetaDataId, metaDataIdArr);
-        wrapper.eq(UserMetaData::getAddress, UserContext.get().getAddress());
+        wrapper.eq(UserMetaData::getAddress, userDto.getAddress());
         wrapper.orderByAsc(UserMetaData :: getApplyTime);
         return this.list(wrapper);
     }

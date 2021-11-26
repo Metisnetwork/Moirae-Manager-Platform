@@ -16,6 +16,7 @@ import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.mapper.MetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
+import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
@@ -37,6 +38,10 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     @Resource
     private IUserMetaDataService userMetaDataService;
+
+    @Resource
+    private CommonService commonService;
+
 
     @Override
     public void truncate() {
@@ -117,13 +122,9 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     @Override
     public List<MetaDataDto> getAllAuthTables(String identityId) {
-        UserDto userDto = UserContext.get();
-        if (Objects.isNull(userDto)) {
-            log.error(ErrorMsg.USER_UN_LOGIN.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_UN_LOGIN.getMsg());
-        }
+        UserDto userDto = commonService.getCurrentUser();
         String address = userDto.getAddress();
-        if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
+        if (!StrUtil.startWith(address, AddressChangeUtils.HRP_ETH)) {
             address = AddressChangeUtils.convert0xAddress(address);
         }
 
