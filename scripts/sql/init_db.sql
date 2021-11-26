@@ -5,6 +5,7 @@ TRUNCATE t_project_temp;
 INSERT INTO `t_project_temp` VALUES (1, '协同营销', '协同营销模板', 1, now(), now());
 INSERT INTO `t_project_temp` VALUES (2, '线性训练', '线性训练模板', 1, now(), now());
 INSERT INTO `t_project_temp` VALUES (3, 'DNN算法', 'DNN算法模板', 1, now(), now());
+INSERT INTO `t_project_temp` VALUES (4, 'XGBoost算法', 'XGBoost算法模板', 1, now(), now());
 
 -- ----------------------------
 -- init t_workflow_temp
@@ -13,7 +14,7 @@ TRUNCATE t_workflow_temp;
 INSERT INTO `t_workflow_temp` VALUES (1, 1, '协同营销对应工作流', '协同营销对应工作流', 1, 0, 1, now(), now());
 INSERT INTO `t_workflow_temp` VALUES (2, 2, '线性训练对应工作流', '线性训练对应工作流', 1, 0, 1, now(), now());
 INSERT INTO `t_workflow_temp` VALUES (3, 3, 'DNN算法对应工作流', 'DNN算法对应工作流', 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (3, 3, 'XGBoost算法对应工作流', 'XGBoost算法对应工作流', 1, 0, 1, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (4, 4, 'XGBoost算法对应工作流', 'XGBoost算法对应工作流', 1, 0, 1, now(), now());
 
 -- ----------------------------
 -- init t_workflow_node_temp
@@ -25,8 +26,8 @@ INSERT INTO `t_workflow_node_temp` VALUES (3, 2, 1, '线性回归训练', 1, 2, 
 INSERT INTO `t_workflow_node_temp` VALUES (4, 2, 2, '线性回归预测', 2, null, 0, 1, now(), now());
 INSERT INTO `t_workflow_node_temp` VALUES (5, 3, 1, 'DNN训练', 1, 2, 0, 1, now(), now());
 INSERT INTO `t_workflow_node_temp` VALUES (6, 3, 2, 'DNN预测', 2, null, 0, 1, now(), now());
-INSERT INTO `t_workflow_node_temp` VALUES (5, 3, 1, 'XGBoost训练', 1, 2, 0, 1, now(), now());
-INSERT INTO `t_workflow_node_temp` VALUES (6, 3, 2, 'XGBoost预测', 2, null, 0, 1, now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES (7, 3, 1, 'XGBoost训练', 1, 2, 0, 1, now(), now());
+INSERT INTO `t_workflow_node_temp` VALUES (8, 3, 2, 'XGBoost预测', 2, null, 0, 1, now(), now());
 
 -- ----------------------------
 -- init t_algorithm
