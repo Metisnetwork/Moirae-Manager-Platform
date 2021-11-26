@@ -60,7 +60,7 @@ public class ProjectController {
     @ApiOperation(value = "新增项目", notes = "新增项目")
     public ResponseVo<ProjectVo> addProject(@RequestBody @Valid AddProjectReq addProjectReq) {
         Long id = projectService.addProject(BeanUtil.copyProperties(addProjectReq, ProjectDto.class));
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(id, ProjectVo.class));
+        return ResponseVo.createSuccess(new ProjectVo(id));
     }
 
     @PostMapping("updateProject")
