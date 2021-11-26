@@ -53,9 +53,9 @@ public enum RespCodeEnum {
     TOKEN_INVALID(20007, "Token invalid"),
 
     /**
-     * 作业调度处理失败
+     * user not exist
      */
-    JOB_FAILED(20008, "Job failed"),
+    USER_NOT_EXIST(20008, "User not exist"),
 
     /**
      * 业务失败

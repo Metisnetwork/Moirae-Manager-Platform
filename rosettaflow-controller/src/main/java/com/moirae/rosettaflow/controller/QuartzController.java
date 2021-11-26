@@ -113,7 +113,7 @@ public class QuartzController {
             log.error("");
             e.printStackTrace();
         }
-        return ResponseVo.create(RespCodeEnum.JOB_FAILED);
+        return ResponseVo.create(RespCodeEnum.FAIL);
     }
 
     @GetMapping("getAllTrigger")
@@ -126,6 +126,6 @@ public class QuartzController {
             log.error("");
             e.printStackTrace();
         }
-        return ResponseVo.create(RespCodeEnum.JOB_FAILED);
+        return ResponseVo.create(RespCodeEnum.FAIL);
     }
 }

@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.service.ITokenService;
+import com.moirae.rosettaflow.service.IUserService;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import com.moirae.rosettaflow.utils.IpUtils;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -38,6 +39,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Resource
     private ITokenService tokenService;
 
+    @Resource
+    private IUserService userService;
+
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
@@ -64,6 +68,12 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (StrUtil.isNotEmpty(token)) {
             userDto = tokenService.getUserByToken(token);
             if (null != userDto) {
+                if (null == userService.getByAddress(userDto.getAddress())) {
+                    tokenService.removeToken(token);
+                    log.error("user not exist: {}", userDto.getAddress());
+                    printResponse(response, RespCodeEnum.USER_NOT_EXIST);
+                    return false;
+                }
                 UserContext.set(userDto);
                 tokenService.refreshToken(token);
             } else {
