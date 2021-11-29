@@ -80,6 +80,7 @@ public class SyncUserDataAuthTask {
             List<GetMetaDataAuthorityDto>  updateAuthorityDtoList = new ArrayList<>();
             for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
                 if (metaDataAuthIdList.contains(authorityDto.getMetaDataAuthId())) {
+                    //todo... 撤销状态数据目前无法更新，net未定义清楚此情况，待后续完善逻辑
                     if (AuditMetaDataOptionEnum.AUDIT_PASSED.getValue() == authorityDto.getAuditMetaDataOption()
                     || AuditMetaDataOptionEnum.AUDIT_REFUSED.getValue() == authorityDto.getAuditMetaDataOption()) {
                         updateAuthorityDtoList.add(authorityDto);
