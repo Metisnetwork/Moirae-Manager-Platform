@@ -98,6 +98,16 @@ public class Algorithm implements Serializable {
     private Byte storePattern;
 
     /**
+     * 是否判断数据行数: 0-否，1-是
+     */
+    private Byte dataRowsFlag;
+
+    /**
+     * 是否判断数据列数: 0-否，1-是
+     */
+    private Byte dataColumnsFlag;
+
+    /**
      * 是否是共有算法
      */
     private Byte publicFlag;

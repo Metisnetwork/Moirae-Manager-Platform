@@ -18,6 +18,8 @@
         <result column="run_time" jdbcType="BIGINT" property="runTime"/>
         <result column="input_model" jdbcType="TINYINT" property="inputModel"/>
         <result column="store_pattern" jdbcType="TINYINT" property="storePattern"/>
+        <result column="data_rows_flag" jdbcType="TINYINT" property="dataRowsFlag"/>
+        <result column="data_columns_flag" jdbcType="TINYINT" property="dataColumnsFlag"/>
         <result column="public_flag" jdbcType="TINYINT" property="publicFlag"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -26,7 +28,8 @@
     <sql id="Base_Column_List">
         id, algorithm_name, algorithm_desc, max_numbers, min_numbers, support_language,
         support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
-        run_time, input_model, store_pattern, public_flag, `status`, create_time, update_time
+        run_time, input_model, store_pattern, data_rows_flag, data_columns_flag, public_flag,
+        `status`, create_time, update_time
     </sql>
     <update id="truncate">
         TRUNCATE TABLE t_algorithm
@@ -34,52 +37,54 @@
 
     <sql id="Algorithm_Column_List">
         select
-        a.id as algorithmId,
-        a.algorithm_name as algorithmName,
-        a.algorithm_desc as algorithmDesc,
-        a.author as author,
-        a.max_numbers as maxNumbers,
-        a.min_numbers as minNumbers,
-        a.support_language as supportLanguage,
-        a.support_os_system as supportOsSystem,
-        a.algorithm_type as algorithmType,
-        a.cost_mem as costMem,
-        a.cost_cpu as costCpu,
-        a.cost_gpu as costGpu,
-        a.cost_bandwidth as costBandwidth,
-        a.run_time as runTime,
-        a.input_model as inputModel,
-        a.store_pattern as storePattern,
-        b.edit_type as editType,
-        b.calculate_contract_code as calculateContractCode
+            a.id as algorithmId,
+            a.algorithm_name as algorithmName,
+            a.algorithm_desc as algorithmDesc,
+            a.author as author,
+            a.max_numbers as maxNumbers,
+            a.min_numbers as minNumbers,
+            a.support_language as supportLanguage,
+            a.support_os_system as supportOsSystem,
+            a.algorithm_type as algorithmType,
+            a.cost_mem as costMem,
+            a.cost_cpu as costCpu,
+            a.cost_gpu as costGpu,
+            a.cost_bandwidth as costBandwidth,
+            a.run_time as runTime,
+            a.input_model as inputModel,
+            a.store_pattern as storePattern,
+            a.data_rows_flag as dataRowsFlag,
+            a.data_columns_flag as dataColumnsFlag,
+            b.edit_type as editType,
+            b.calculate_contract_code as calculateContractCode
         from
-        t_algorithm a, t_algorithm_code b
+            t_algorithm a, t_algorithm_code b
         where
-        a.id = b.algorithm_id
-        and a.status = '1'
-        and b.status = '1'
+            a.id = b.algorithm_id
+            and a.status = '1'
+            and b.status = '1'
     </sql>
 
     <!-- 查询算法列表 -->
     <select id="queryAlgorithmList" resultType="com.moirae.rosettaflow.dto.AlgorithmDto">
         SELECT
-        a.id as algorithmId,
-        a.algorithm_name as algorithmName,
-        a.algorithm_desc as algorithmDesc,
-        a.algorithm_type as algorithmType,
-        a.author,
-        a.min_numbers,
-        a.support_language,
-        ac.calculate_contract_code
+            a.id as algorithmId,
+            a.algorithm_name as algorithmName,
+            a.algorithm_desc as algorithmDesc,
+            a.algorithm_type as algorithmType,
+            a.author,
+            a.min_numbers,
+            a.support_language,
+            ac.calculate_contract_code
         FROM
-        t_algorithm AS a
-        LEFT JOIN t_algorithm_code AS ac ON a.id = ac.algorithm_id
+            t_algorithm AS a
+            LEFT JOIN t_algorithm_code AS ac ON a.id = ac.algorithm_id
         WHERE
-        a.`status` = '1'
-        AND ac.`status` = '1'
-        <if test="algorithmName != null and algorithmName != ''">
-            and a.algorithm_name LIKE CONCAT('%', #{algorithmName, jdbcType=VARCHAR}, '%')
-        </if>
+            a.`status` = '1'
+            AND ac.`status` = '1'
+            <if test="algorithmName != null and algorithmName != ''">
+                and a.algorithm_name LIKE CONCAT('%', #{algorithmName, jdbcType=VARCHAR}, '%')
+            </if>
         order by a.algorithm_type asc
 
     </select>

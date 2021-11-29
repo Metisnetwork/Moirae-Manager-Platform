@@ -89,6 +89,16 @@ public class AlgorithmDto {
     private Byte  storePattern;
 
     /**
+     * 是否判断数据行数: 0-否，1-是
+     */
+    private Byte dataRowsFlag;
+
+    /**
+     * 是否判断数据列数: 0-否，1-是
+     */
+    private Byte dataColumnsFlag;
+
+    /**
      * 代码类型
      */
     private Byte editType;
