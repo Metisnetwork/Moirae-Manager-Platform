@@ -1,5 +1,5 @@
 server:
-  port: 8234
+  port: 8235
   servlet:
     context-path: /rosettaflow
     encoding:
