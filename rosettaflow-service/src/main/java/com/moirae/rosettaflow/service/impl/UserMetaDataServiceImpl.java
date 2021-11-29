@@ -30,7 +30,6 @@ import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
-import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

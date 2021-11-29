@@ -1,14 +1,11 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
 import com.moirae.rosettaflow.common.enums.UserTypeEnum;
-import com.moirae.rosettaflow.common.exception.BusinessException;
+import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.WorkflowDto;
-import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
-import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
@@ -203,17 +200,17 @@ public class RpcTestController {
 
     @GetMapping("task/getDownloadTask")
     @ApiOperation(value = "grpc getDownloadTask下载任务结果数据", notes = "grpc getDownloadTask下载任务结果数据")
-    public ResponseVo<DownloadReplyResponseDto> getDownloadTask(@Valid DownloadTaskReq downloadTaskReq) {
+    public ResponseVo<?> getDownloadTask(@Valid DownloadTaskReq downloadTaskReq) {
         log.info("grpc getDownloadTask下载任务结果数据");
 
         Map<String, String> compressMap = new HashMap<>(2);
         compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress())).getMsg());
-
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
-        downloadRequestDto.setFilePath(downloadTaskReq.getFilePath());
+        BeanCopierUtils.copy(downloadTaskReq, downloadRequestDto);
         downloadRequestDto.setCompress(compressMap);
 
-        DownloadReplyResponseDto downloadReplyResponseDto = grpcDataProviderService.downloadTask(downloadRequestDto);
-        return ResponseVo.createSuccess(downloadReplyResponseDto);
+        grpcDataProviderService.downloadTask(downloadRequestDto, downloadReplyResponseDto ->
+                log.info("grpc getDownloadTask下载任务结果数据, downloadStatus:{}, content:{}", downloadReplyResponseDto.getDownloadStatus(), downloadReplyResponseDto.getContent()));
+        return ResponseVo.createSuccess();
     }
 }

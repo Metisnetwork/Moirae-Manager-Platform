@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 /**
@@ -24,9 +25,8 @@ public class GrpcDataProviderServiceImpl implements GrpcDataProviderService {
     @Resource
     private DataProviderServiceClient dataProviderServiceClient;
 
-
     @Override
-    public DownloadReplyResponseDto downloadTask(DownloadRequestDto requestDto) {
-        return dataProviderServiceClient.getTaskDownload(requestDto);
+    public void downloadTask(DownloadRequestDto requestDto, Consumer<DownloadReplyResponseDto> callback) {
+         dataProviderServiceClient.getTaskDownload(requestDto, callback);
     }
 }

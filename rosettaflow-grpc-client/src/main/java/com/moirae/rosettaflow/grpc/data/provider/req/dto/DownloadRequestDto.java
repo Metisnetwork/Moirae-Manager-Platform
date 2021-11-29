@@ -19,4 +19,15 @@ public class DownloadRequestDto {
      * 任务结果目录压缩格式： "compress": "zip"  或者 "compress": "tar.gz"
      */
     private Map<String, String> compress;
+
+    /**
+     * 任务结果访问ip
+     */
+    private String ip;
+
+    /**
+     * 任务结果访问port
+     */
+    private int port;
+
 }

@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.grpc.service;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
 import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author hudenian
@@ -14,8 +15,8 @@ public interface GrpcDataProviderService {
     /**
      * 下载任务结果
      * @param requestDto : 任务结果下载入参
-     * @return DownloadReplyResponseDto : 任务结果数据文件
+     * @param callback : 任务结果下载回调
      */
-    DownloadReplyResponseDto downloadTask(DownloadRequestDto requestDto);
+    void downloadTask(DownloadRequestDto requestDto, Consumer<DownloadReplyResponseDto> callback);
 
 }

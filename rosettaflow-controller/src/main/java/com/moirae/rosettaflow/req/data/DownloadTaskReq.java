@@ -23,4 +23,11 @@ public class DownloadTaskReq {
     @ApiModelProperty(value = "下载任务结果数据压缩格式：1:zip, 2: tar.gz", required = true)
     private int compress;
 
+    @ApiModelProperty(value = "任务结果访问ip", required = true)
+    private String ip;
+
+    @ApiModelProperty(value = "任务结果访问port", required = true)
+    private int port;
+
+
 }

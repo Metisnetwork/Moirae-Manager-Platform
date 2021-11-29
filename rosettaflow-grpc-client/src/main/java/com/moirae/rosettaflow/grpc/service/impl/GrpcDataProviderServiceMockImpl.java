@@ -6,9 +6,7 @@ import com.moirae.rosettaflow.grpc.service.GrpcDataProviderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.List;
+import java.util.function.Consumer;
 
 
 /**
@@ -23,7 +21,7 @@ public class GrpcDataProviderServiceMockImpl implements GrpcDataProviderService 
 
 
     @Override
-    public DownloadReplyResponseDto downloadTask(DownloadRequestDto requestDto) {
-        return null;
+    public void downloadTask(DownloadRequestDto requestDto, Consumer<DownloadReplyResponseDto> callback) {
+
     }
 }
