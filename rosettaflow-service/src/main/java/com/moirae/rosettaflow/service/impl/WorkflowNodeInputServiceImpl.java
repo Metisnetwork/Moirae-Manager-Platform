@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.StatusEnum;
+import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.mapper.WorkflowNodeInputMapper;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeInput;
 import com.moirae.rosettaflow.service.IWorkflowNodeInputService;
@@ -69,6 +70,11 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     @Override
     public void batchInsert(List<WorkflowNodeInput> workflowNodeInputList) {
         this.baseMapper.batchInsert(workflowNodeInputList);
+    }
+
+    @Override
+    public List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(Long workflowNodeId) {
+        return this.baseMapper.getMetaDataByWorkflowNodeId(workflowNodeId);
     }
 
 }
