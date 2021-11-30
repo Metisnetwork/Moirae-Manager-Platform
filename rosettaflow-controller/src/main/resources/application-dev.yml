@@ -10,7 +10,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: root
+    password: ENC(5VUZHER1nqQ6dLc5fOfl6g==)
     url: jdbc:mysql://10.10.8.184:3306/db_rosettaflow?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
     hikari:
       maximum-pool-size: 20
@@ -26,6 +26,7 @@ spring:
 mybatis-plus:
   configuration:
     call-setters-on-nulls: true
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 # 系统参数配置
 system:
@@ -46,13 +47,33 @@ system:
 grpc:
   client:
     carrier-grpc-server:
-      address: 'static://192.168.9.151:8801'
+      address: 'static://192.168.21.187:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 
+#集群模式
+#redisson:
+#  model: CLUSTER
+#  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
+#  multiple-server-config:
+#    node-addresses[0]: 10.10.8.175:6371
+#    node-addresses[1]: 10.10.8.175:6372
+#    node-addresses[2]: 10.10.8.175:6373
+#    node-addresses[3]: 10.10.8.176:6374
+#    node-addresses[4]: 10.10.8.176:6375
+#    node-addresses[5]: 10.10.8.176:6376
 #单Redis节点模式
 redisson:
+  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
   singleServerConfig:
-    address: 10.10.8.176:6379
+    address: 10.10.8.173:6379
+
+
+jasypt:
+  encryptor:
+    # 生产环境命令行指定
+    #    password: ${JASYPT_PASSWORD}
+    password: 123456
+
 
