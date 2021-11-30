@@ -18,6 +18,7 @@ import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.JsonUtils;
+import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
@@ -28,7 +29,6 @@ import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.WorkflowMapper;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
-import com.moirae.rosettaflow.service.utils.UserContext;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -60,6 +60,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private IProjectService projectService;
+
+    @Resource
+    private IMetaDataService metaDataService;
 
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
@@ -306,7 +309,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         WorkflowNode workflowNode = workflowNodeService.getById(taskDto.getWorkFlowNodeId());
 
         // 启动前判断当前节点算法是否有模型
-        this.checkModel(workflowNode);
+        this.checkAlgorithm(workflowNode);
 
         PublishTaskDeclareResponseDto respDto = new PublishTaskDeclareResponseDto();
         SubJobNode subJobNodeInfo = new SubJobNode();
@@ -371,13 +374,26 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 启动前判断当前节点算法是否有模型
      */
-    private void checkModel(WorkflowNode workflowNode) {
+    private void checkAlgorithm(WorkflowNode workflowNode) {
         Algorithm algorithm = algorithmService.getAlgorithmById(workflowNode.getAlgorithmId());
+        // 启动前判断当前节点算法是否有模型
         boolean modelFlag = workflowNode.getModelId() == null || workflowNode.getModelId() == 0;
         //如果算法需要使用模型，且是第一个节点，则需要判断是否有模型，否则可以重前一个节点获取模型
         if (workflowNode.getNodeStep() == SysConstant.INT_1 && InputModelEnum.NEED.getValue() == algorithm.getInputModel() && modelFlag) {
             log.error("checkModel--当前节点未配置模型, inputModel:{}, workflowNode:{}", algorithm.getInputModel(), workflowNode);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
+        }
+        // 启动数是前判断当前节点多方数据行否相等
+        if (SysConstant.INT_1 == algorithm.getDataRowsFlag()) {
+            List<NodeMetaDataDto> nodeMetaDataDtoList = workflowNodeInputService.getMetaDataByWorkflowNodeId(workflowNode.getId());
+            if (!nodeMetaDataDtoList.isEmpty()) {
+                NodeMetaDataDto initNodeMetaDataDto = nodeMetaDataDtoList.get(0);
+                for (NodeMetaDataDto nodeMetaDataDto : nodeMetaDataDtoList) {
+                    if (initNodeMetaDataDto.getMetaDataRows() != nodeMetaDataDto.getMetaDataRows()) {
+                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_DATA_ROWS_CHECK.getMsg());
+                    }
+                }
+            }
         }
     }
 

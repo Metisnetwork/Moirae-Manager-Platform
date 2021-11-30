@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeInput;
 
 import java.util.List;
@@ -49,4 +50,12 @@ public interface IWorkflowNodeInputService extends IService<WorkflowNodeInput> {
      * @param workflowNodeInputList 节点输入列表
      */
     void batchInsert(List<WorkflowNodeInput> workflowNodeInputList);
+
+    /**
+     * 根据工作流节点id查询相关元数据信息
+     *
+     * @param workflowNodeId 工作流节点id
+     * @return 工元数据信息列表
+     */
+    List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(Long workflowNodeId);
 }
