@@ -89,6 +89,14 @@ public class MetaData implements Serializable {
     @TableField(value = "`status`")
     private Byte status;
     /**
+     * 元数据发布时间
+     */
+    private Date publishAt;
+    /**
+     * 元数据更新时间
+     */
+    private Date updateAt;
+    /**
      * 创建时间
      */
     private Date createTime;

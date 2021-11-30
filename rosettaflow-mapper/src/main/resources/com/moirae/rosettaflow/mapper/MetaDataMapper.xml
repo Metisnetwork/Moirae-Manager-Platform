@@ -19,13 +19,15 @@
         <result column="industry" jdbcType="VARCHAR" property="industry"/>
         <result column="data_status" jdbcType="TINYINT" property="dataStatus"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="publish_at" jdbcType="TIMESTAMP" property="publishAt"/>
+        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, identity_id, identity_name, node_id, meta_data_id, file_id, data_name, data_desc,
     file_path, `rows`, `columns`, `size`, file_type, has_title, industry, data_status,
-    `status`, create_time, update_time
+    `status`, publish_at, update_at, create_time, update_time
   </sql>
 
     <update id="truncate">
@@ -119,6 +121,12 @@
                 <if test="metaData.status != null">
                     `status`,
                 </if>
+                <if test="metaData.publishAt != null">
+                    publish_at,
+                </if>
+                <if test="metaData.updateAt != null">
+                    update_at,
+                </if>
                 <if test="metaData.createTime != null">
                     create_time,
                 </if>
@@ -174,6 +182,12 @@
                 </if>
                 <if test="metaData.status != null">
                     #{metaData.status,jdbcType=TINYINT},
+                </if>
+                <if test="metaData.publishAt != null">
+                    #{metaData.publishAt,jdbcType=TIMESTAMP},
+                </if>
+                <if test="metaData.updateAt != null">
+                    #{metaData.updateAt,jdbcType=TIMESTAMP},
                 </if>
                 <if test="metaData.createTime != null">
                     #{metaData.createTime,jdbcType=TIMESTAMP},
