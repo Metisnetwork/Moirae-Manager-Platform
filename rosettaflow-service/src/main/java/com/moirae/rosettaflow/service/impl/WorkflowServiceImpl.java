@@ -389,7 +389,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             if (!nodeMetaDataDtoList.isEmpty()) {
                 NodeMetaDataDto initNodeMetaDataDto = nodeMetaDataDtoList.get(0);
                 for (NodeMetaDataDto nodeMetaDataDto : nodeMetaDataDtoList) {
-                    if (initNodeMetaDataDto.getRows() != nodeMetaDataDto.getRows()) {
+                    if (initNodeMetaDataDto.getMetaDataRows() != nodeMetaDataDto.getMetaDataRows()) {
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_DATA_ROWS_CHECK.getMsg());
                     }
                 }

@@ -23,7 +23,7 @@
     <!-- 根据工作流节点id获取相关元数据信息-->
     <select id="getMetaDataByWorkflowNodeId" resultType="com.moirae.rosettaflow.dto.NodeMetaDataDto">
         select
-            b.meta_data_id as meteDataId,
+            b.meta_data_id as metaDataId,
             b.`rows` as metaDataRows
         from
             t_workflow_node_input a, t_meta_data b

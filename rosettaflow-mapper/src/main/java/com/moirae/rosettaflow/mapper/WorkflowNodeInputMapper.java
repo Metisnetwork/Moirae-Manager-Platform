@@ -18,7 +18,7 @@ public interface WorkflowNodeInputMapper extends BaseMapper<WorkflowNodeInput> {
      * @param workflowNodeId 工作流节点id
      * @return List
      */
-    List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(Long workflowNodeId);
+    List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(@Param("workflowNodeId") Long workflowNodeId);
 
     /**
      * 批量保存节点输入

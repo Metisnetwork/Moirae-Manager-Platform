@@ -17,6 +17,6 @@ public class NodeMetaDataDto {
     /**
      * 源文件的行数
      */
-    private int rows;
+    private int metaDataRows;
 
 }
