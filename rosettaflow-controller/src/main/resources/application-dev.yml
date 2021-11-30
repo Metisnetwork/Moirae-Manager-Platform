@@ -67,7 +67,7 @@ grpc:
 redisson:
   password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
   singleServerConfig:
-    address: 10.10.8.173:6379
+    address: 10.10.8.173:7379
 
 
 jasypt:
