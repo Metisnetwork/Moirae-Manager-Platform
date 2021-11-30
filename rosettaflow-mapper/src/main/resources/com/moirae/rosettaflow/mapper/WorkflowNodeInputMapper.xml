@@ -19,7 +19,34 @@
     <sql id="Base_Column_List">
     id, workflow_node_id, identity_id, data_table_id,
     data_column_id, data_file_id,sender_flag, party_id, `status`, create_time, update_time
-  </sql>
+    </sql>
+    <!-- 根据工作流节点id获取相关元数据信息-->
+    <select id="getMetaDataByWorkflowNodeId" resultType="com.moirae.rosettaflow.dto.NodeMetaDataDto">
+        select
+            b.meta_data_id as meteDataId,
+            b.`rows` as metaDataRows
+        from
+            t_workflow_node_input a, t_meta_data b
+        where
+            a.data_table_id = b.meta_data_id
+            and a.status = 1
+            and b.status = 1
+            and a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
+       <!--
+        select
+            b.meta_data_id as meteDataId,
+            b.`rows` as metaDataRows,
+            (select count(c.meta_data_id) from t_meta_data_details c
+            where c.meta_data_id = b.meta_data_id and c.status = 1) as metaDataColumns
+        from
+            t_workflow_node_input a, t_meta_data b
+        where
+            a.data_table_id = b.meta_data_id
+            and a.status = 1
+            and b.status = 1
+            and a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
+       -->
+    </select>
     <insert id="batchInsert">
         <foreach collection="workflowNodeInputList" item="i" separator=";">
             insert into t_workflow_node_input
