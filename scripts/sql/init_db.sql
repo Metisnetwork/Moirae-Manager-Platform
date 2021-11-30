@@ -77,6 +77,7 @@ INSERT INTO `t_algorithm_variable_struct` VALUES ('8', '11', '{\"model_restore_p
 -- ----------------------------
 -- init t_algorithm_type
 -- ----------------------------
+TRUNCATE t_algorithm_type;
 INSERT INTO `t_algorithm_type` VALUES ('1', '统计分析', '统计分析', '1', '1', now(), now());
 INSERT INTO `t_algorithm_type` VALUES ('2', '特征工程', '特征工程', '2', '1', now(), now());
 INSERT INTO `t_algorithm_type` VALUES ('3', '机器学习', '机器学习', '3', '1', now(), now());
