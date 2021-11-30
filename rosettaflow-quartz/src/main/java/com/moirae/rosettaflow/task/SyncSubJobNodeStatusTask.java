@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test", "local", "xty", "dev"})
+@Profile({"prod", "test", "local", "xty"})
 public class SyncSubJobNodeStatusTask {
 
     @Resource

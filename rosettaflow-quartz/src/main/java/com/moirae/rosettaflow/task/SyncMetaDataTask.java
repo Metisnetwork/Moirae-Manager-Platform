@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test", "local", "xty", "dev"})
+@Profile({"prod", "test", "local", "xty"})
 public class SyncMetaDataTask {
 
     @Resource
