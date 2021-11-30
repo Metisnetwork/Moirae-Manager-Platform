@@ -74,6 +74,7 @@ public enum ErrorMsg {
     METADATA_RESULT_DOWNLOAD_ERROR("元数据结果下载异常", "Metadata result download error"),
     METADATA_USER_AUTH_METADATA_STATE_UPDATE_FAIL("用户元数据授权状态更新失败", "Metadata user auth metadata state update fail"),
     METADATA_USER_AUTH_METADATA_REVOKE_ERROR("用户元数据授权状态错误，不能发起撤销", "Metadata user auth metadata state error,can not revoke"),
+    METADATA_USER_AUTH_METADATA_RPC_ERROR("申请授权调度服务网络异常！", "Application for authorization dispatch service network is abnormal!"),
 
 
     /**

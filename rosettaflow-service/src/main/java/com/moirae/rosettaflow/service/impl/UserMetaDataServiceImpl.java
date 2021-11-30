@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -37,9 +38,9 @@ import javax.annotation.Resource;
 import java.util.*;
 
 /**
+ * 用户数据授权实现类
  * @author hudenian
  * @date 2021/8/24
- * @description 功能描述
  */
 @Slf4j
 @Service
@@ -116,11 +117,16 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
         applyDto.setAuth(metaDataAuthorityDto);
         applyDto.setSign(userMetaDataDto.getSign());
-
-        ApplyMetaDataAuthorityResponseDto responseDto = grpcAuthService.applyMetaDataAuthority(applyDto);
-        if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE || StrUtil.isBlank(responseDto.getMetaDataAuthId())) {
-            log.error("元数据授权申请,net处理失败，失败原因：{}", responseDto);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
+        ApplyMetaDataAuthorityResponseDto responseDto = null;
+        try {
+            responseDto = grpcAuthService.applyMetaDataAuthority(applyDto);
+            if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE || StrUtil.isBlank(responseDto.getMetaDataAuthId())) {
+                log.error("元数据授权申请,net处理失败，失败原因：{}", responseDto);
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
+            }
+        } catch (Exception e) {
+            log.error("元数据授权申请,net处理失败，返回参数:{}, 失败原因：{}", JSON.toJSONString(responseDto), e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED,  ErrorMsg.METADATA_USER_AUTH_METADATA_RPC_ERROR.getMsg());
         }
         // 保存用户授权申请元数据, rpc接口调用失败时，不保存授权元数据
         this.saveUserMetaData(userMetaDataDto, metaData, responseDto.getMetaDataAuthId());
