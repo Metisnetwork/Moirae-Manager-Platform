@@ -27,7 +27,7 @@ import java.util.*;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test", "local", "xty"})
+@Profile({"prod", "test", "local", "xty", "dev"})
 public class SyncUserDataAuthTask {
 
     @Resource
