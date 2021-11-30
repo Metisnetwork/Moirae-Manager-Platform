@@ -57,4 +57,12 @@ public class MetaDataSummaryDto {
      * 元数据的状态 (0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表)
      */
     private Integer dataState;
+    /**
+     * 元数据发布时间
+     */
+    private Long publishAt;
+    /**
+     * 元数据更新时间
+     */
+    private Long updateAt;
 }

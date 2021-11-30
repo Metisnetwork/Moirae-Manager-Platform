@@ -153,6 +153,8 @@ public class MetaDataServiceClient {
         metaDataSummaryDto.setHasTitle(information.getMetadataSummary().getHasTitle());
         metaDataSummaryDto.setIndustry(information.getMetadataSummary().getIndustry());
         metaDataSummaryDto.setDataState(information.getMetadataSummary().getStateValue());
+        metaDataSummaryDto.setPublishAt(information.getMetadataSummary().getPublishAt());
+        metaDataSummaryDto.setUpdateAt(information.getMetadataSummary().getUpdateAt());
         metaDataDetailShowDto.setMetaDataSummary(metaDataSummaryDto);
         //元数据对应原始文件对外暴露的列描述列表
         List<MetaDataColumnDetailDto> metaDataColumnDetailDtoList = new ArrayList<>();

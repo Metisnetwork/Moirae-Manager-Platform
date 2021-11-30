@@ -16,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,7 +46,6 @@ public class SyncMetaDataTask {
     private IMetaDataDetailsService metaDataDetailsService;
 
     @Scheduled(fixedDelay = 600 * 1000, initialDelay = 10 * 1000)
-    @Transactional(rollbackFor = Exception.class)
     @Lock(keys = "SyncMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
@@ -55,13 +54,12 @@ public class SyncMetaDataTask {
             if (CollUtil.isEmpty(metaDataDetailResponseDtoList)) {
                 return;
             }
-            // 从net同步元数据[未发现变更元数据], 故不进行后续同步,
+            // 从net同步元数据[未发现变更元数据], 故不进行后续同步
             if (metaDataDetailResponseDtoList.size() == metaDataService.count()) {
                 log.info("元数据信息同步, net元数据与flow中元数据记录数一致, net同步数据量:{}条", metaDataDetailResponseDtoList.size());
                 return;
             }
-            // net更新数据量和flow不一致，重新同步元数据
-            // 清空元数据和详情
+            // net更新数据量和flow不一致，重新同步元数据，清空元数据和详情
             this.delOldData();
             // 批量插入元数据
             this.batchInsertMetaData(metaDataDetailResponseDtoList);
@@ -176,6 +174,10 @@ public class SyncMetaDataTask {
             metaData.setHasTitle(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getHasTitle() ? (byte) 1 : (byte) 0);
             metaData.setIndustry(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getIndustry());
             metaData.setDataStatus(metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState().byteValue());
+            Long publishAt = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getPublishAt();
+            Long updateAt = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getUpdateAt();
+            metaData.setPublishAt(publishAt > 0 ? new Date(publishAt) : null);
+            metaData.setUpdateAt(updateAt > 0 ? new Date(updateAt) : null);
             metaDataList.add(metaData);
         }
         return metaDataList;
