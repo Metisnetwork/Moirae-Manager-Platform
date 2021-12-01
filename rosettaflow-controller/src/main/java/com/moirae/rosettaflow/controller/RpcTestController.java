@@ -249,6 +249,7 @@ public class RpcTestController {
                         break;
                     case 2:
                     case 3:
+                        count.countDown();
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
                     default:
                         break;
