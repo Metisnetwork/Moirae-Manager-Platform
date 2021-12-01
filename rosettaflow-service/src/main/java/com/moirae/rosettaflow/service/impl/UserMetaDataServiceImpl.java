@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
@@ -34,7 +33,6 @@ import com.moirae.rosettaflow.service.IMetaDataService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -67,17 +65,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public IPage<UserMetaDataDto> list(Long current, Long size, String dataName) {
         Page<UserMetaData> page = new Page<>(current, size);
         UserDto userDto = commonService.getCurrentUser();
-        IPage<UserMetaDataDto> userMetaDataDtoIpage = this.baseMapper.listByOwner(page, userDto.getAddress(), dataName);
-        if (null == userMetaDataDtoIpage || CollectionUtils.isEmpty(userMetaDataDtoIpage.getRecords())) {
-           return userMetaDataDtoIpage;
-        }
-        for (UserMetaDataDto userMetaDataDto : userMetaDataDtoIpage.getRecords()) {
-            if (SysConstant.INT_4 == userMetaDataDto.getAuthMetadataState()) {
-                // 审核状态置为3标志已过期数据
-                userMetaDataDto.setAuthStatus((byte)3);
-            }
-        }
-        return userMetaDataDtoIpage;
+        return this.baseMapper.listByOwner(page, userDto.getAddress(), dataName);
     }
 
     @Override
