@@ -160,6 +160,7 @@ public class SyncUserDataAuthTask {
             userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
             userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
             userMetaData.setMetadataAuthId(authorityDto.getMetaDataAuthId());
+            userMetaData.setUpdateTime(new Date());
 
             // 授权方式: 1-按时间, 2-按次数, 3-永久
             userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
