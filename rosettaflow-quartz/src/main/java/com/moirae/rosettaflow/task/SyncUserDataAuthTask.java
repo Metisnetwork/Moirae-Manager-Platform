@@ -38,56 +38,29 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 120 * 1000, initialDelay = 2 * 1000)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            // 获取用户flow平台待审核的授权数据
-            List<UserMetaData> userMetaDataOldList = userMetaDataService.getByAuthStatus(UserMetaDataAuditEnum.AUDIT_PENDING.getValue());
-            // 获取所有待审核的用户数据id
-            List<String> metaDataAuthIdList = new ArrayList<>();
-            if (CollUtil.isNotEmpty(userMetaDataOldList)) {
-                for (UserMetaData userMetaData : userMetaDataOldList) {
-                    metaDataAuthIdList.add(userMetaData.getMetadataAuthId());
-                }
-            }
-
             // 查询调度服务，获取用户授权相关数据
             List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
             if (CollUtil.isEmpty(metaDataAuthorityDtoList)) {
                 return;
             }
-            // 处理待审核数据为0时的情况
-            if (0 == metaDataAuthIdList.size()) {
-                // 更新数据
-                if (metaDataAuthorityDtoList.size() == userMetaDataService.count()) {
-                    // 批量更新
-                    this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
-                    log.info("用户授权数据同步, net和moirae数据量一致整体批量更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
-                    return;
-                }
-                log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，开始更新>>>>");
-                // 更新数据
-                // 清空原来授权数据
-                userMetaDataService.truncate();
-                this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.INSERT);
-                log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，更新结束>>>>");
+            // 批量更新数据
+            if (metaDataAuthorityDtoList.size() == userMetaDataService.count()) {
+                // 批量更新
+                this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
+                log.info("用户授权数据同步, net和moirae数据量一致整体批量更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
                 return;
             }
-            log.info("待审核用户申请授权元数据信息同步开始>>>>");
-            // 处理待审核数据不为0的情况
-            List<GetMetaDataAuthorityDto>  updateAuthorityDtoList = new ArrayList<>();
-            for (GetMetaDataAuthorityDto authorityDto : metaDataAuthorityDtoList) {
-                if (metaDataAuthIdList.contains(authorityDto.getMetaDataAuthId())) {
-                    //todo... 撤销状态数据目前无法更新，net未定义清楚此情况，待后续完善逻辑
-                    if (AuditMetaDataOptionEnum.AUDIT_PASSED.getValue() == authorityDto.getAuditMetaDataOption()
-                    || AuditMetaDataOptionEnum.AUDIT_REFUSED.getValue() == authorityDto.getAuditMetaDataOption()) {
-                        updateAuthorityDtoList.add(authorityDto);
-                    }
-                }
-            }
-            this.batchDealUserAuthData(updateAuthorityDtoList, SysConstant.UPDATE);
+            log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，开始更新>>>>");
+            // 批量插入数据
+            // 清空原来授权数据
+            userMetaDataService.truncate();
+            this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.INSERT);
+            log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，更新结束>>>>");
         } catch (Exception e) {
             log.error("从net同步用户元数据授权列表失败, 失败原因:{}, 错误信息:{}", e.getMessage(), e);
         }
@@ -160,7 +133,6 @@ public class SyncUserDataAuthTask {
             userMetaData.setAuthMetadataState(authorityDto.getMetadataAuthorityState().byteValue());
             userMetaData.setAuditSuggestion(authorityDto.getAuditSuggestion());
             userMetaData.setMetadataAuthId(authorityDto.getMetaDataAuthId());
-            userMetaData.setUpdateTime(new Date());
 
             // 授权方式: 1-按时间, 2-按次数, 3-永久
             userMetaData.setAuthType(authorityDto.getMetaDataAuthorityDto().getMetaDataUsageDto().getUseType().byteValue());
