@@ -96,6 +96,8 @@ CREATE TABLE `t_meta_data`
     `industry`      varchar(20)           DEFAULT NULL COMMENT '元数据所属行业  1：金融业（银行）、2：金融业（保险）、3：金融业（证券）、4：金融业（其他）、5：ICT、 6：制造业、 7：能源业、 8：交通运输业、 9 ：医疗健康业、 10 ：公共服务业、 11：传媒广告业、 12 ：其他行业',
     `data_status`   tinyint(4)   NOT NULL DEFAULT '1' COMMENT '元数据的状态 (0-未知; 1- 还未发布的新表; 2- 已发布的表; 3- 已撤销的表)',
     `status`        tinyint(4)   NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+    `publish_at`    datetime     DEFAULT NULL         COMMENT '元数据发布时间',
+    `update_at`     datetime     DEFAULT NULL         COMMENT '元数据更新时间',
     `create_time`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
