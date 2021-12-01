@@ -16,11 +16,11 @@ public enum TaskDownloadCompressEnum {
     TAR_GZ(2,"tar.gz");
 
     private final int value;
-    private final String msg;
+    private final String compressType;
 
     TaskDownloadCompressEnum(int value, String msg) {
         this.value = value;
-        this.msg = msg;
+        this.compressType = msg;
     }
 
     public static TaskDownloadCompressEnum getByValue(int value) {
@@ -36,7 +36,7 @@ public enum TaskDownloadCompressEnum {
         return value;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getCompressType() {
+        return compressType;
     }
 }

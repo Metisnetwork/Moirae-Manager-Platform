@@ -1,7 +1,7 @@
 package com.moirae.rosettaflow.grpc.client;
 
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
-import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import com.moirae.rosettaflow.grpc.service.DataProviderGrpc;
 import com.moirae.rosettaflow.grpc.service.DownloadReply;
 import com.moirae.rosettaflow.grpc.service.DownloadRequest;
@@ -10,7 +10,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import java.util.Objects;
+
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -22,17 +23,12 @@ import java.util.function.Consumer;
 @Component
 public class DataProviderServiceClient {
 
-   /* @GrpcClient("carrier-grpc-server")
-    DataProviderGrpc.DataProviderBlockingStub dataProviderBlockingStub;*/
-
-
     /**
      * 下载任务结果
      *
      * @param requestDto : 任务结果下载入参
      */
-    public void getTaskDownload(DownloadRequestDto requestDto, Consumer<DownloadReplyResponseDto> callback) {
-
+    public void getTaskDownload(DownloadRequestDto requestDto, Consumer<DownloadReply> callback) {
         Channel channel;
         try {
             //1.获取连接
@@ -46,20 +42,13 @@ public class DataProviderServiceClient {
                     .setFilePath(requestDto.getFilePath())
                     .putOptions("compress", requestDto.getCompress().get("compress"))
                     .build();
+
             //3.调用下载
-            DataProviderGrpc.newStub(channel).downloadData(downloadRequest, new StreamObserver<DownloadReply>() {
+            AtomicReference<BusinessException> ex = new AtomicReference<>();
+            StreamObserver<DownloadReply> responseObserver = new StreamObserver<DownloadReply>() {
                 @Override
                 public void onNext(DownloadReply downloadReply) {
-                    boolean hasContent = downloadReply.hasContent();
-                    int taskStatus = downloadReply.getStatus().getNumber();
-
-                    log.error("Downloading metadata result file..., filePath:{}, taskStatus:{}, hasContent:{}", downloadRequest.getFilePath(), taskStatus, hasContent);
-                    DownloadReplyResponseDto responseDto = new DownloadReplyResponseDto();
-                    responseDto.setDownloadStatus(taskStatus);
-                    responseDto.setContent(hasContent ? downloadReply.getContent().toByteArray() : null);
-                    if (Objects.nonNull(callback)) {
-                        callback.accept(responseDto);
-                    }
+                    callback.accept(downloadReply);
                 }
 
                 @Override
@@ -71,7 +60,9 @@ public class DataProviderServiceClient {
                 public void onCompleted() {
                     log.error("Download metadata result file finish, filePath:{}", downloadRequest.getFilePath());
                 }
-            });
+            };
+            DataProviderGrpc.newStub(channel).downloadData(downloadRequest, responseObserver);
+
         } catch (Exception e) {
             log.error("Download metadata result file fail, fail reason:{}", e.getMessage());
         }

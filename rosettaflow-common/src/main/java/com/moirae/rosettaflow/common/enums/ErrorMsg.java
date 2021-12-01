@@ -106,6 +106,8 @@ public enum ErrorMsg {
 
     WORKFLOW_NODE_TASK_RESULT_NOT_EXIST("工作流节点输入模型不存在", "Workflow node input model not exist"),
     WORKFLOW_NODE_MODEL_PATH_NOT_EXIST("工作流节点输入模型路径不存在", "Workflow node input model file path not exist"),
+    WORKFLOW_FILE_DOWNLOAD_FAIL("工作流节点输入模型文件下载失败", "Workflow node model file download fail"),
+
 
     /**
      * 作业

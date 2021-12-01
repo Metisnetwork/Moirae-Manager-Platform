@@ -1,8 +1,12 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.google.protobuf.ByteString;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
 import com.moirae.rosettaflow.common.enums.UserTypeEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
@@ -24,6 +28,7 @@ import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.req.data.DownloadTaskReq;
 import com.moirae.rosettaflow.service.IWorkflowService;
+import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,11 +38,14 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author admin
@@ -200,17 +208,60 @@ public class RpcTestController {
 
     @GetMapping("task/getDownloadTask")
     @ApiOperation(value = "grpc getDownloadTask下载任务结果数据", notes = "grpc getDownloadTask下载任务结果数据")
-    public ResponseVo<?> getDownloadTask(@Valid DownloadTaskReq downloadTaskReq) {
+    public void getDownloadTask(HttpServletResponse response,@Valid DownloadTaskReq downloadTaskReq) {
         log.info("grpc getDownloadTask下载任务结果数据");
 
         Map<String, String> compressMap = new HashMap<>(2);
-        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress())).getMsg());
+        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress())).getCompressType());
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
         BeanCopierUtils.copy(downloadTaskReq, downloadRequestDto);
         downloadRequestDto.setCompress(compressMap);
 
-        grpcDataProviderService.downloadTask(downloadRequestDto, downloadReplyResponseDto ->
-                log.info("grpc getDownloadTask下载任务结果数据, downloadStatus:{}, content:{}", downloadReplyResponseDto.getDownloadStatus(), downloadReplyResponseDto.getContent()));
-        return ResponseVo.createSuccess();
+        AtomicReference<ByteString> byteString = new AtomicReference<>(ByteString.EMPTY);
+        CountDownLatch count = new CountDownLatch(1);
+
+        grpcDataProviderService.downloadTask(downloadRequestDto, downloadReply ->{
+            boolean hasContent = downloadReply.hasContent();
+            if(hasContent){
+                ByteString content = downloadReply.getContent();
+                ByteString bs = byteString.get().concat(content);
+                byteString.set(bs);
+            }
+
+            boolean hasStatus = downloadReply.hasStatus();
+            if(hasStatus){
+                TaskStatus status = downloadReply.getStatus();
+                /*
+                  Start = 0;
+                  Finished = 1;
+                  Cancelled = 2;
+                  Failed = 3;
+                 */
+                switch (status.getNumber()){
+                    case 0:
+                        log.debug("开始下载文件filePath:{}，状态:{}.......",downloadTaskReq.getFilePath(),"Start");
+                        break;
+                    case 1:
+                        log.debug("下载完成文件filePath:{}，状态:{}.......",downloadTaskReq.getFilePath(),"Finished");
+                        //TODO 下载的文件名待确认
+                        ExportFileUtil.exportCsv("下载的文件"+TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress()), byteString.get().toByteArray(),response);
+                        count.countDown();
+                        break;
+                    case 2:
+                    case 3:
+                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
+                    default:
+                        break;
+                }
+
+            }
+
+        });
+        try {
+            Thread.sleep(10000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        return ResponseVo.createSuccess();
     }
 }

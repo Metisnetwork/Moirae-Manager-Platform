@@ -17,6 +17,6 @@ public interface GrpcDataProviderService {
      * @param requestDto : 任务结果下载入参
      * @param callback : 任务结果下载回调
      */
-    void downloadTask(DownloadRequestDto requestDto, Consumer<DownloadReplyResponseDto> callback);
+    void downloadTask(DownloadRequestDto requestDto, Consumer<DownloadReply> callback);
 
 }
