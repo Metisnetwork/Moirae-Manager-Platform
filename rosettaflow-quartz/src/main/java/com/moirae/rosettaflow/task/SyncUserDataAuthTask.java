@@ -60,9 +60,11 @@ public class SyncUserDataAuthTask {
             }
             // 处理待审核数据为0时的情况
             if (0 == metaDataAuthIdList.size()) {
-                // 不更新数据
+                // 更新数据
                 if (metaDataAuthorityDtoList.size() == userMetaDataService.count()) {
-                    log.info("用户授权数据同步, 数据未变化不更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
+                    // 批量更新
+                    this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
+                    log.info("用户授权数据同步, net和moirae数据量一致整体批量更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
                     return;
                 }
                 log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，开始更新>>>>");

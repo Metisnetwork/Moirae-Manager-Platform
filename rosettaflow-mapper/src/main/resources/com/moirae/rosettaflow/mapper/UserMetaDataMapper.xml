@@ -99,6 +99,7 @@
         </foreach>
     </update>
 
+    <!-- 批量新增 -->
     <insert id="batchInsert">
         <foreach collection="userMetaDataList" item="userMetaData" separator=";">
             insert into t_user_meta_data
@@ -228,7 +229,8 @@
             </trim>
         </foreach>
     </insert>
-    <insert id="batchUpdate">
+    <!-- 批量更新 -->
+    <update id="batchUpdate">
         <foreach collection="userMetaDataList" item="userMetaData" separator=";">
             update t_user_meta_data
             <trim prefix="set" suffixOverrides=",">
@@ -280,17 +282,8 @@
                 <if test="userMetaData.usedTimes != null">
                     used_times = #{userMetaData.usedTimes,jdbcType=BIGINT},
                 </if>
-                <if test="userMetaData.status != null">
-                    `status` = #{userMetaData.status,jdbcType=TINYINT},
-                </if>
-                <if test="userMetaData.createTime != null">
-                    create_time = #{userMetaData.createTime,jdbcType=TIMESTAMP},
-                </if>
-                <if test="userMetaData.updateTime != null">
-                    update_time = #{userMetaData.updateTime,jdbcType=TIMESTAMP},
-                </if>
             </trim>
             where metadata_auth_id = #{userMetaData.metadataAuthId,jdbcType=VARCHAR}
         </foreach>
-    </insert>
+    </update>
 </mapper>
