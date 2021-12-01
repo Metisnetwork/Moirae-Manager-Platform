@@ -53,7 +53,8 @@ public class ExportFileUtil {
         try {
             response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Assembly response header error:{}",e.getMessage());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
         }
         response.setContentType("application/octet-stream");
         try {

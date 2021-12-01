@@ -35,7 +35,6 @@ public class DataProviderServiceClient {
             channel = ManagedChannelBuilder
                     .forAddress(requestDto.getIp(), requestDto.getPort())
                     .usePlaintext()
-                    .keepAliveWithoutCalls(true)
                     .build();
             //2.构建请求
             DownloadRequest downloadRequest = DownloadRequest.newBuilder()

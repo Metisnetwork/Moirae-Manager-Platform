@@ -244,7 +244,7 @@ public class RpcTestController {
                     case 1:
                         log.debug("下载完成文件filePath:{}，状态:{}.......",downloadTaskReq.getFilePath(),"Finished");
                         //TODO 下载的文件名待确认
-                        ExportFileUtil.exportCsv("下载的文件"+TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress()), byteString.get().toByteArray(),response);
+                        ExportFileUtil.exportCsv("下载的文件."+TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress()), byteString.get().toByteArray(),response);
                         count.countDown();
                         break;
                     case 2:
