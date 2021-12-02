@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -117,6 +118,12 @@ public class WorkflowNodeStatusTask {
                             try {
                                 workflowService.start(workflowDto);
                             } catch (Exception e) {
+                                workflowService.updateRunStatus(workflowDto.getId(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                                WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(),workflowDto.getStartNode());
+                                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                                workflowNode.setUpdateTime(new Date());
+                                workflowNode.setRunMsg(e.getMessage());
+                                workflowNodeService.updateById(workflowNode);
                                 log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
                                 redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
                             }
