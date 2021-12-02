@@ -26,8 +26,9 @@ public interface ISubJobNodeService extends IService<SubJobNode> {
      *
      * @param ids 子作业节点i主键ds
      * @param runStatus  运行状态
+     * @param runMsg  运行msg
      */
-    void updateRunStatus(Object[] ids, Byte runStatus);
+    void updateBatchRunStatus(Object[] ids, Byte runStatus, String runMsg);
 
 
     /**

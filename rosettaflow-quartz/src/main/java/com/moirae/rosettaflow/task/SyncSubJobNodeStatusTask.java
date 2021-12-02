@@ -140,11 +140,11 @@ public class SyncSubJobNodeStatusTask {
         }
         //更新子作业节点节点成功记录
         if (subJobNodeSuccessIds.size() > 0) {
-            subJobNodeService.updateRunStatus(subJobNodeSuccessIds.toArray(), SubJobNodeStatusEnum.RUN_SUCCESS.getValue());
+            subJobNodeService.updateBatchRunStatus(subJobNodeSuccessIds.toArray(), SubJobNodeStatusEnum.RUN_SUCCESS.getValue(), SubJobNodeStatusEnum.RUN_SUCCESS.getMsg());
         }
         //更新子作业节点失败记录
         if (subJobNodeFailIds.size() > 0) {
-            subJobNodeService.updateRunStatus(subJobNodeFailIds.toArray(), SubJobNodeStatusEnum.RUN_FAIL.getValue());
+            subJobNodeService.updateBatchRunStatus(subJobNodeFailIds.toArray(), SubJobNodeStatusEnum.RUN_FAIL.getValue(), SubJobNodeStatusEnum.RUN_FAIL.getMsg());
         }
         //更新任务结果记录
         if (saveTaskResultList.size() > 0) {

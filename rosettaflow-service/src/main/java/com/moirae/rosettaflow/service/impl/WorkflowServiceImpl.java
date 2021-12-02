@@ -112,6 +112,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private IUserMetaDataService userMetaDataService;
 
+    public WorkflowServiceImpl(IMetaDataService metaDataService) {
+        this.metaDataService = metaDataService;
+    }
+
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
@@ -636,7 +640,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         subJobNode.setRunStatus(isPublishSuccess ? SubJobNodeStatusEnum.RUNNING.getValue() : SubJobNodeStatusEnum.RUN_FAIL.getValue());
         subJobNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
-        subJobNode.setRunMsg(isPublishSuccess ? respDto.getMsg() : "");
+        subJobNode.setRunMsg(respDto.getMsg());
         subJobNode.setUpdateTime(now());
         boolean isSuccess = subJobNodeService.saveOrUpdate(subJobNode);
         if (!isSuccess) {
