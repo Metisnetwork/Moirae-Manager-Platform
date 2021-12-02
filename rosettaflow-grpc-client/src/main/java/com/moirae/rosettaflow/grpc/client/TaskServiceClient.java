@@ -38,10 +38,10 @@ public class TaskServiceClient {
      */
     public PublishTaskDeclareResponseDto syncPublishTask(TaskDto taskDto) {
         PublishTaskDeclareResponse taskDeclareResponse = taskServiceBlockingStub.publishTaskDeclare(assemblyPublishTaskDeclareRequest(taskDto));
-        if (taskDeclareResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            log.error("TaskServiceClient->syncPublishTask() fail reason:{}", taskDeclareResponse.getMsg());
-            throw new BusinessException(taskDeclareResponse.getStatus(), taskDeclareResponse.getMsg());
-        }
+//        if (taskDeclareResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+//            log.error("TaskServiceClient->syncPublishTask() fail reason:{}", taskDeclareResponse.getMsg());
+//            throw new BusinessException(taskDeclareResponse.getStatus(), taskDeclareResponse.getMsg());
+//        }
         PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = new PublishTaskDeclareResponseDto();
         publishTaskDeclareResponseDto.setStatus(taskDeclareResponse.getStatus());
         publishTaskDeclareResponseDto.setMsg(taskDeclareResponse.getMsg());
