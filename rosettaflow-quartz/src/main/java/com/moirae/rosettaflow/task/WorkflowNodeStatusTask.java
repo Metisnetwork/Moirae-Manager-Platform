@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -63,7 +62,6 @@ public class WorkflowNodeStatusTask {
     private ITaskResultService taskResultService;
 
     @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
-    @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "WorkflowNodeStatusTask")
     public void run() {
         List<WorkflowNode> workflowNodeList = workflowNodeService.getRunningNode(BEFORE_HOUR);
@@ -118,14 +116,13 @@ public class WorkflowNodeStatusTask {
                             try {
                                 workflowService.start(workflowDto);
                             } catch (Exception e) {
+                                log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
                                 workflowService.updateRunStatus(workflowDto.getId(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
-                                WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(),workflowDto.getStartNode());
+                                WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(), workflowDto.getStartNode());
                                 workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
                                 workflowNode.setUpdateTime(new Date());
                                 workflowNode.setRunMsg(e.getMessage());
                                 workflowNodeService.updateById(workflowNode);
-                                log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
-                                redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
                             }
                         }
                     }
