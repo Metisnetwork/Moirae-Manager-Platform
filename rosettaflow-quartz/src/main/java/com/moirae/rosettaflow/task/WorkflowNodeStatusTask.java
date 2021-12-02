@@ -70,7 +70,7 @@ public class WorkflowNodeStatusTask {
         if (CollUtil.isEmpty(workflowNodeList)) {
             return;
         }
-        log.info("同步更新工作流节点中待确认任务开始>>>>");
+        log.info("同步更新工作流节点中待确认任务开始，一共有{}条数据待更新,分别为：{}>>>>",workflowNodeList.size(),workflowNodeList);
         Map<String, WorkflowNode> workflowNodeMap = workflowNodeList.stream().collect(Collectors.toMap(WorkflowNode::getTaskId, workflowNode -> workflowNode));
         //工作流需要更新为成功的列表
         List<Long> workflowSuccessIds = new ArrayList<>();
