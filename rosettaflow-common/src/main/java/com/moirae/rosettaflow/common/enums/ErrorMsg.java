@@ -107,6 +107,8 @@ public enum ErrorMsg {
     WORKFLOW_NODE_TASK_RESULT_NOT_EXIST("工作流节点输入模型不存在", "Workflow node input model not exist"),
     WORKFLOW_NODE_MODEL_PATH_NOT_EXIST("工作流节点输入模型路径不存在", "Workflow node input model file path not exist"),
     WORKFLOW_FILE_DOWNLOAD_FAIL("工作流节点输入模型文件下载失败", "Workflow node model file download fail"),
+    WORKFLOW_FILE_DOWNLOAD_TIMEOUT("工作流节点输入模型文件下载超时", "Workflow node model file download timeout"),
+    WORKFLOW_FILE_DOWNLOAD_COMPRESSTYPE_ERROR("工作流节点输入模型文件下载压缩格式错误", "Workflow node model file download compressType error"),
 
 
     /**
@@ -148,7 +150,13 @@ public enum ErrorMsg {
     /**
      * 机构
      */
-    ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist");
+    ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist"),
+
+    /**
+     * 任务
+     */
+    TASK_RESULT_ID_NOT_EXIST("任务结果id不存在", "Task result not exist");
+
 
     private final String zh;
     private final String en;

@@ -9,16 +9,16 @@ import lombok.Data;
  */
 @Data
 public class DownloadReplyResponseDto {
-
     /**
      * 任务结果下载状态: 0、Start，1、Finished，2、Cancelled，3、Failed
      */
     int downloadStatus;
-
     /**
      * 任务结果内容
      */
     byte[] content;
-
-
+    /**
+     * 下载文件名称
+     */
+    String fileName;
 }

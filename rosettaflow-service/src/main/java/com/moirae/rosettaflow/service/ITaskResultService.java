@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
 
 import java.util.List;
@@ -26,4 +27,12 @@ public interface ITaskResultService extends IService<TaskResult> {
      * @param taskResultList 任务结果列表
      */
     void batchInsert(List<TaskResult> taskResultList);
+
+    /**
+     * 下载运行结果文件
+     * @param id 运行结果id
+     * @param compressType 压缩格式
+     * @return 返回下载文件
+     */
+    DownloadReplyResponseDto downloadTaskResultFile(int id, int compressType);
 }

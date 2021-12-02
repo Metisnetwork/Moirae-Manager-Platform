@@ -7,9 +7,9 @@ import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
 import com.moirae.rosettaflow.common.enums.UserTypeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
+import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
@@ -26,7 +26,6 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
-import com.moirae.rosettaflow.req.data.DownloadTaskReq;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -39,12 +38,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -206,20 +205,23 @@ public class RpcTestController {
         return ResponseVo.createSuccess(taskResultResponseDto);
     }
 
+
     @GetMapping("task/getDownloadTask")
     @ApiOperation(value = "grpc getDownloadTask下载任务结果数据", notes = "grpc getDownloadTask下载任务结果数据")
-    public void getDownloadTask(HttpServletResponse response,@Valid DownloadTaskReq downloadTaskReq) {
+    public void getDownloadTask(HttpServletResponse response, @RequestParam(name = "compress") int compress, @RequestParam(name = "filePath") String filePath, @RequestParam(name = "ip") String ip, @RequestParam(name = "port") String port) {
         log.info("grpc getDownloadTask下载任务结果数据");
-
+        //1.组装request
         Map<String, String> compressMap = new HashMap<>(2);
-        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress())).getCompressType());
+        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compress)).getCompressType());
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
-        BeanCopierUtils.copy(downloadTaskReq, downloadRequestDto);
+        downloadRequestDto.setFilePath(filePath);
+        downloadRequestDto.setIp(ip);
+        downloadRequestDto.setPort(port);
         downloadRequestDto.setCompress(compressMap);
-
+        //2.调用rpc
         AtomicReference<ByteString> byteString = new AtomicReference<>(ByteString.EMPTY);
         CountDownLatch count = new CountDownLatch(1);
-
+        DownloadReplyResponseDto responseDto = new DownloadReplyResponseDto();
         grpcDataProviderService.downloadTask(downloadRequestDto, downloadReply ->{
             boolean hasContent = downloadReply.hasContent();
             if(hasContent){
@@ -231,20 +233,14 @@ public class RpcTestController {
             boolean hasStatus = downloadReply.hasStatus();
             if(hasStatus){
                 TaskStatus status = downloadReply.getStatus();
-                /*
-                  Start = 0;
-                  Finished = 1;
-                  Cancelled = 2;
-                  Failed = 3;
-                 */
+                responseDto.setDownloadStatus(status.getNumber());
+                //状态:Start = 0、Finished = 1、Cancelled = 2、Failed = 3
                 switch (status.getNumber()){
                     case 0:
-                        log.debug("开始下载文件filePath:{}，状态:{}.......",downloadTaskReq.getFilePath(),"Start");
+                        log.debug("开始下载文件filePath:{}，状态:{}.......",downloadRequestDto.getFilePath(),"Start");
                         break;
                     case 1:
-                        log.debug("下载完成文件filePath:{}，状态:{}.......",downloadTaskReq.getFilePath(),"Finished");
-                        //TODO 下载的文件名待确认
-                        ExportFileUtil.exportCsv("下载的文件."+TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress()), byteString.get().toByteArray(),response);
+                        log.debug("下载完成文件filePath:{}，状态:{}.......",downloadRequestDto.getFilePath(),"Finished");
                         count.countDown();
                         break;
                     case 2:
@@ -254,15 +250,17 @@ public class RpcTestController {
                     default:
                         break;
                 }
-
             }
-
         });
         try {
-            Thread.sleep(10000L);
+            //3.倒计时锁,等待服务端响应返回数据
+            boolean await = count.await(60, TimeUnit.SECONDS);
+            if (!await) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_TIMEOUT.getMsg());
+            }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, e.getMessage());
         }
-//        return ResponseVo.createSuccess();
+        ExportFileUtil.exportCsv("下载文件."+ Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compress)).getCompressType(), byteString.get().toByteArray(),response);
     }
 }

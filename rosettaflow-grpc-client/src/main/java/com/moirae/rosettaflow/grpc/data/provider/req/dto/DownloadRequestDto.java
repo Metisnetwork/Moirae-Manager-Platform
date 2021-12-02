@@ -28,6 +28,6 @@ public class DownloadRequestDto {
     /**
      * 任务结果访问port
      */
-    private int port;
+    private String port;
 
 }

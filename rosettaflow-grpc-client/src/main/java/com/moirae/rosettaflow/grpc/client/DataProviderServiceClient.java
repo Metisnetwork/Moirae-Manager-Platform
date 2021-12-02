@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.grpc.client;
 
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
 import com.moirae.rosettaflow.grpc.service.DataProviderGrpc;
@@ -10,8 +12,6 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 @Slf4j
 @Component
 public class DataProviderServiceClient {
-
     /**
      * 下载任务结果
      *
@@ -33,7 +32,7 @@ public class DataProviderServiceClient {
         try {
             //1.获取连接
             channel = ManagedChannelBuilder
-                    .forAddress(requestDto.getIp(), requestDto.getPort())
+                    .forAddress(requestDto.getIp(), Integer.parseInt(requestDto.getPort()))
                     .usePlaintext()
                     .build();
             //2.构建请求
@@ -41,9 +40,7 @@ public class DataProviderServiceClient {
                     .setFilePath(requestDto.getFilePath())
                     .putOptions("compress", requestDto.getCompress().get("compress"))
                     .build();
-
             //3.调用下载
-            AtomicReference<BusinessException> ex = new AtomicReference<>();
             StreamObserver<DownloadReply> responseObserver = new StreamObserver<DownloadReply>() {
                 @Override
                 public void onNext(DownloadReply downloadReply) {
@@ -53,6 +50,7 @@ public class DataProviderServiceClient {
                 @Override
                 public void onError(Throwable throwable) {
                     log.error("Download metadata result file fail, filePath:{}, fail reason:{}", downloadRequest.getFilePath(), throwable.getMessage());
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
                 }
 
                 @Override
@@ -64,6 +62,7 @@ public class DataProviderServiceClient {
 
         } catch (Exception e) {
             log.error("Download metadata result file fail, fail reason:{}", e.getMessage());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
         }
     }
 

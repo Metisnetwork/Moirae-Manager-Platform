@@ -1,12 +1,11 @@
 package com.moirae.rosettaflow.req.data;
 
-import com.moirae.rosettaflow.req.CommonPageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * @author hudenian
@@ -17,17 +16,13 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "下载任务结果数据请求参数")
 public class DownloadTaskReq {
 
-    @ApiModelProperty(value = "任务结果数据目录filePath", required = true)
-    private String filePath;
+    @ApiModelProperty(value = "任务结果表id", required = true)
+    @NotNull(message = "{taskresult.id.notNull}")
+    @Positive(message = "{taskresult.id.positive}")
+    private int id;
 
     @ApiModelProperty(value = "下载任务结果数据压缩格式：1:zip, 2: tar.gz", required = true)
+    @NotNull(message = "{taskresult.compress.notNull}")
+    @Positive(message = "{taskresult.compress.positive}")
     private int compress;
-
-    @ApiModelProperty(value = "任务结果访问ip", required = true)
-    private String ip;
-
-    @ApiModelProperty(value = "任务结果访问port", required = true)
-    private int port;
-
-
 }
