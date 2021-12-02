@@ -864,6 +864,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             Map<String, Object> map = new HashMap<>(2);
             map.put("workflowNodeId", workflowNode.getId());
             map.put("runStatus", workflowNode.getRunStatus());
+            map.put("runMsg", workflowNode.getRunMsg());
             nodeList.add(map);
         });
         param.put("runStatus", workflow.getRunStatus());
