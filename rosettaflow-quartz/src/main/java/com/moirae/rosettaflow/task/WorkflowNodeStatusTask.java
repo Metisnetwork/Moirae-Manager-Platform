@@ -70,7 +70,7 @@ public class WorkflowNodeStatusTask {
         if (CollUtil.isEmpty(workflowNodeList)) {
             return;
         }
-        log.info("同步更新工作流节点中待确认任务开始，一共有{}条数据待更新,分别为：{}>>>>",workflowNodeList.size(),workflowNodeList);
+        log.info("同步更新工作流节点中待确认任务开始，一共有{}条数据待更新,分别为：{}>>>>", workflowNodeList.size(), workflowNodeList);
         Map<String, WorkflowNode> workflowNodeMap = workflowNodeList.stream().collect(Collectors.toMap(WorkflowNode::getTaskId, workflowNode -> workflowNode));
         //工作流需要更新为成功的列表
         List<Long> workflowSuccessIds = new ArrayList<>();
@@ -114,7 +114,12 @@ public class WorkflowNodeStatusTask {
                             //前一个节点taskId
                             workflowDto.setPreTaskId(taskId);
                             workflowDto.setPreTaskResult(taskResult);
-                            workflowService.start(workflowDto);
+                            try {
+                                workflowService.start(workflowDto);
+                            } catch (Exception e) {
+                                log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
+                                redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
+                            }
                         }
                     }
                     workflowNodeSuccessIds.add(node.getId());
