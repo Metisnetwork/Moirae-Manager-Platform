@@ -1,5 +1,4 @@
 syntax = "proto3";
-
 option java_multiple_files = true;
 option java_package = "com.moirae.rosettaflow.grpc.service";
 package common;
@@ -32,6 +31,7 @@ message TaskReadyGoReply {
 
 message TaskCancelReq {
     string task_id = 1;
+    string party_id = 2;
 }
 
 message TaskCancelReply {
