@@ -111,5 +111,12 @@ public interface IJobService extends IService<Job> {
      */
     void deleteBatchJob(List<Long> ids);
 
+    /**
+     * 是否存在指定的作业名称
+     * @param jobName
+     * @return 是否存在作业
+     */
+    boolean isExistJobName(String jobName);
+
 
 }

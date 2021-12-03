@@ -84,6 +84,7 @@ public enum ErrorMsg {
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),
     WORKFLOW_COPY_ERROR("复制工作流失败", "Failed to copy workflow"),
     WORKFLOW_EXIST("工作流已存在", "Workflow already exists"),
+    WORKFLOW_NAME_EXIST("工作流名称已存在", "Workflow name already exists"),
     WORKFLOW_RUNNING_EXIST("工作流正在运行中", "Workflow is running"),
     WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
     WORKFLOW_TERMINATE_NET_PROCESS_ERROR("工作流终止失败", "Workflow terminated failed"),
@@ -118,6 +119,7 @@ public enum ErrorMsg {
     JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
     JOB_PAUSE_ERROR("作业暂停失败", "Job modify error"),
     JOB_NOT_EXIST("原作业不存在", "Job not exist"),
+    JOB_NAME_EXIST("作业名称已存在", "job name already exists"),
     JOB_ID_NOT_EXIST("作业id不存在", "Job id not exist"),
     JOB_TIME_ERROR("作业时间错误", "Job time error"),
     JOB_RUNNING_OR_FINISH("作业正在执行或执行完成不能修改", "Job is running or finish can not modify"),
@@ -129,6 +131,7 @@ public enum ErrorMsg {
     JOB_NOT_STOP("作业并未停止中不能修改", "Job is not stop can not modify"),
     JOB_NOT_DELETE("作业运行中不能删除", "Job is running can not delete"),
     JOB_NOT_EDIT("作业运行中不能修改", "Job is running can not modify"),
+    JOB_NAME_ALREADY_EXISTS("作业名称已经存在", "Job is running can not modify"),
     JOB_RUNNING_CACHE_CLEAR_ERROR("作业执行缓存清理错误", "Job run cache clear error"),
 
     SUB_JOB_NOT_EXIST("子作业不存在", "Sub job not exist"),

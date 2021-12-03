@@ -166,6 +166,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             log.error("Job is running edit failed, jobId:{}->,{}", jobDto.getId(), ErrorMsg.JOB_NOT_EDIT.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NOT_EDIT.getMsg());
         }
+        //是否已存在作业名称
+        if (isExistJobName(jobDto.getName())) {
+            log.error("Job name already exists. Edit failed, jobId:{}", jobDto.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NAME_EXIST.getMsg());
+        }
         LambdaUpdateWrapper<Job> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(Job::getId, jobDto.getId());
         updateWrapper.set(Job::getName, jobDto.getName());
@@ -283,6 +288,15 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
     }
 
+    @Override
+    public boolean isExistJobName(String jobName) {
+        LambdaQueryWrapper<Job> jobQueryWrapper = Wrappers.lambdaQuery();
+        jobQueryWrapper.eq(Job::getName, jobName);
+        jobQueryWrapper.eq(Job::getStatus, StatusEnum.VALID.getValue());
+        Job job = this.getOne(jobQueryWrapper);
+        return Objects.nonNull(job);
+    }
+
     /**
      * 检查入参合法性
      */
@@ -315,6 +329,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
                 log.error("Class:{}->,{}", this.getClass(), ErrorMsg.JOB_ENDTIME_NULL.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_ENDTIME_NULL.getMsg());
             }
+        }
+        //是否已存在作业名称
+        if (isExistJobName(jobDto.getName())) {
+            log.error("Job name already exists. add failed, jobId:{}", jobDto.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.JOB_NAME_EXIST.getMsg());
         }
     }
 }
