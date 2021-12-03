@@ -66,13 +66,15 @@ public class TaskResultServiceImpl extends ServiceImpl<TaskResultMapper, TaskRes
             log.debug("Download taskResult file failed, compressType error, compressType:{} ", compressType);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_COMPRESSTYPE_ERROR.getMsg());
         }
-        Map<String, String> compressMap = new HashMap<>(2);
-        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compressType)).getCompressType());
+        //截取文件路径
+        String filePathOriginal = taskResult.getFilePath();
+        String filePathResult = filePathOriginal.contains(":") ? "task" + filePathOriginal.substring(filePathOriginal.indexOf(":")) : "";
+
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
-        //todo 下载文件路径filePath,rpc返回的是文件夹可能存在问题，待后续处理
         BeanCopierUtils.copy(taskResult, downloadRequestDto);
-        downloadRequestDto.setFilePath("/home/user1/fighter/data30002/银行预测小数据集_20211126-062130.csv");
-        downloadRequestDto.setCompress(compressMap);
+        downloadRequestDto.setFilePath(filePathResult);
+        downloadRequestDto.setCompress(TaskDownloadCompressEnum.getByValue(compressType).getCompressType());
+        downloadRequestDto.setFileRootDir("result");
         //3.调用rpc下载
         AtomicReference<ByteString> byteString = new AtomicReference<>(ByteString.EMPTY);
         CountDownLatch count = new CountDownLatch(1);

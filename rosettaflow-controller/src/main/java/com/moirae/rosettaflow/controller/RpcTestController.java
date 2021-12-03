@@ -38,9 +38,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -208,16 +206,16 @@ public class RpcTestController {
 
     @GetMapping("task/getDownloadTask")
     @ApiOperation(value = "grpc getDownloadTask下载任务结果数据", notes = "grpc getDownloadTask下载任务结果数据")
-    public void getDownloadTask(HttpServletResponse response, @RequestParam(name = "compress") int compress, @RequestParam(name = "filePath") String filePath, @RequestParam(name = "ip") String ip, @RequestParam(name = "port") String port) {
+    public void getDownloadTask(HttpServletResponse response, @RequestParam(name = "compress") int compress, @RequestParam(name = "filePath") String filePath,
+                                @RequestParam(name = "ip") String ip, @RequestParam(name = "port") String port, @RequestParam(name = "fileRootDir") String fileRootDir) {
         log.info("grpc getDownloadTask下载任务结果数据");
         //1.组装request
-        Map<String, String> compressMap = new HashMap<>(2);
-        compressMap.put("compress", Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compress)).getCompressType());
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
         downloadRequestDto.setFilePath(filePath);
         downloadRequestDto.setIp(ip);
         downloadRequestDto.setPort(port);
-        downloadRequestDto.setCompress(compressMap);
+        downloadRequestDto.setCompress(Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compress)).getCompressType());
+        downloadRequestDto.setFileRootDir(fileRootDir);
         //2.调用rpc
         AtomicReference<ByteString> byteString = new AtomicReference<>(ByteString.EMPTY);
         CountDownLatch count = new CountDownLatch(1);
@@ -245,6 +243,7 @@ public class RpcTestController {
                         break;
                     case 2:
                     case 3:
+                        log.debug("下载完成文件filePath:{}，状态:{}.......",downloadRequestDto.getFilePath(),"Failed");
                         count.countDown();
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
                     default:

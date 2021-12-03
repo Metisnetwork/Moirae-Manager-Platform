@@ -18,7 +18,12 @@ public class DownloadRequestDto {
     /**
      * 任务结果目录压缩格式： "compress": "zip"  或者 "compress": "tar.gz"
      */
-    private Map<String, String> compress;
+    private String compress;
+
+    /**
+     * file_root_dir(文件目录): data|result，data表示从数据目录下载，result表示从结果目录下载
+     */
+    private String fileRootDir;
 
     /**
      * 任务结果访问ip

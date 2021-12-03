@@ -38,7 +38,8 @@ public class DataProviderServiceClient {
             //2.构建请求
             DownloadRequest downloadRequest = DownloadRequest.newBuilder()
                     .setFilePath(requestDto.getFilePath())
-                    .putOptions("compress", requestDto.getCompress().get("compress"))
+                    .putOptions("compress", requestDto.getCompress())
+                    .putOptions("file_root_dir", requestDto.getFileRootDir())
                     .build();
             //3.调用下载
             StreamObserver<DownloadReply> responseObserver = new StreamObserver<DownloadReply>() {
@@ -55,7 +56,7 @@ public class DataProviderServiceClient {
 
                 @Override
                 public void onCompleted() {
-                    log.error("Download metadata result file finish, filePath:{}", downloadRequest.getFilePath());
+                    log.debug("Download metadata result file finish, filePath:{}", downloadRequest.getFilePath());
                 }
             };
             DataProviderGrpc.newStub(channel).downloadData(downloadRequest, responseObserver);
