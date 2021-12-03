@@ -71,7 +71,7 @@ public class TaskResultServiceImpl extends ServiceImpl<TaskResultMapper, TaskRes
         DownloadRequestDto downloadRequestDto = new DownloadRequestDto();
         //todo 下载文件路径filePath,rpc返回的是文件夹可能存在问题，待后续处理
         BeanCopierUtils.copy(taskResult, downloadRequestDto);
-        //downloadRequestDto.setFilePath("/home/user1/fighter/data30002/银行预测小数据集_20211126-062130.csv");
+        downloadRequestDto.setFilePath("/home/user1/fighter/data30002/银行预测小数据集_20211126-062130.csv");
         downloadRequestDto.setCompress(compressMap);
         //3.调用rpc下载
         AtomicReference<ByteString> byteString = new AtomicReference<>(ByteString.EMPTY);
