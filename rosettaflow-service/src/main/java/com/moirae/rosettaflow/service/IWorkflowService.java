@@ -182,4 +182,11 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, String taskId);
 
+    /**
+     * 是否存在指定的作业名称
+     * @param workflowName
+     * @return
+     */
+    boolean isExistWorkflowName(String workflowName);
+
 }
