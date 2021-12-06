@@ -1,6 +1,8 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.SubJobNodeStatusEnum;
 import com.moirae.rosettaflow.common.enums.SubJobStatusEnum;
@@ -11,6 +13,7 @@ import com.moirae.rosettaflow.grpc.service.GrpcSysService;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailShowDto;
+import com.moirae.rosettaflow.mapper.domain.SubJob;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
 import com.moirae.rosettaflow.service.ISubJobNodeService;
 import com.moirae.rosettaflow.service.ISubJobService;
@@ -67,9 +70,9 @@ public class SyncSubJobNodeStatusMockTask {
         log.info("SyncSubJobNodeStatusMockTask 同步更新子作业节点运行中任务开始>>>>");
         Map<String, SubJobNodeDto> subJobNodeMap = subJobNodeDtoList.stream().collect(Collectors.toMap(SubJobNodeDto::getTaskId, subJobNodeDto -> subJobNodeDto));
         //子作业需要更新为成功的列表
-        List<Long> subJobSuccessIds = new ArrayList<>();
+        List<SubJob> subJobSuccessList = new ArrayList<>();
         //子作业需要更新为失败的列表
-        List<Long> subJobFailIds = new ArrayList<>();
+        List<SubJob> subJobFailList = new ArrayList<>();
         //子作业节点需要更新为成功的列表
         List<Long> subJobNodeSuccessIds = new ArrayList<>();
         //子作业节点需要更新为失败的列表
@@ -85,6 +88,8 @@ public class SyncSubJobNodeStatusMockTask {
         for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
             taskId = taskDetailResponseDto.getInformation().getTaskId();
             int state = taskDetailResponseDto.getInformation().getState();
+            long taskStartAt = taskDetailResponseDto.getInformation().getStartAt();
+            long taskEndAt = taskDetailResponseDto.getInformation().getEndAt();
             if (subJobNodeMap.containsKey(taskId)) {
                 node = subJobNodeMap.get(taskId);
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
@@ -99,7 +104,8 @@ public class SyncSubJobNodeStatusMockTask {
 
                     //如果是最后一个节点，需要更新整个子作业状态成功
                     if (node.getNodeStep().equals(node.getNodeNumber())) {
-                        subJobSuccessIds.add(node.getSubJobId());
+                        SubJob subJobSuccess = buildUpdateSubJob(node.getSubJobId(), taskStartAt, taskEndAt, SubJobStatusEnum.RUN_SUCCESS.getValue());
+                        subJobSuccessList.add(subJobSuccess);
                     } else {
                         //如果有下一个节点，则启动下一个节点
                         log.info("同步更新子作业节点运行中任务,启动下一个节点>>>>redis key:{}", SysConstant.REDIS_SUB_JOB_PREFIX_KEY + taskId);
@@ -118,19 +124,20 @@ public class SyncSubJobNodeStatusMockTask {
                 } else if (state == TaskRunningStatusEnum.FAIL.getValue()) {
                     //如果是最后一个节点，需要更新整个子作业状态失败
                     if (node.getNodeStep().equals(node.getNodeNumber())) {
-                        subJobFailIds.add(node.getSubJobId());
+                        SubJob subJobFail = buildUpdateSubJob(node.getSubJobId(), taskStartAt, taskEndAt, SubJobStatusEnum.RUN_FAIL.getValue());
+                        subJobFailList.add(subJobFail);
                     }
                     subJobNodeFailIds.add(node.getId());
                 }
             }
         }
         //更新子作业成功记录
-        if (subJobSuccessIds.size() > 0) {
-            subJobService.updateRunStatus(subJobSuccessIds.toArray(), SubJobStatusEnum.RUN_SUCCESS.getValue());
+        if (subJobSuccessList.size() > 0) {
+            subJobService.updateBatchRunStatus(subJobSuccessList);
         }
         //更新子作业失败记录
-        if (subJobFailIds.size() > 0) {
-            subJobService.updateRunStatus(subJobFailIds.toArray(), SubJobStatusEnum.RUN_FAIL.getValue());
+        if (subJobFailList.size() > 0) {
+            subJobService.updateBatchRunStatus(subJobFailList);
         }
         //更新子作业节点节点成功记录
         if (subJobNodeSuccessIds.size() > 0) {
@@ -165,5 +172,23 @@ public class SyncSubJobNodeStatusMockTask {
             taskDetailResponseDtoList.add(taskDetailResponseDto);
         }
         return taskDetailResponseDtoList;
+    }
+
+    /**
+     * 构造更新子作业对象
+     * @param id 子作业id
+     * @param taskStartAt 开始时间
+     * @param taskEndAt 结束时间
+     * @param subJobStatus 作业状态
+     * @return 子作业
+     */
+    private SubJob buildUpdateSubJob(long id, long taskStartAt, long taskEndAt, Byte subJobStatus) {
+        SubJob subJob = new SubJob();
+        subJob.setId(id);
+        subJob.setSubJobStatus(subJobStatus);
+        subJob.setBeginTime(taskStartAt > 0 ? new Date(taskStartAt) : null);
+        subJob.setEndTime(taskEndAt > 0 ? new Date(taskEndAt) : null);
+        subJob.setRunTime((taskStartAt > 0 && taskEndAt > 0) ? String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)) : null);
+        return subJob;
     }
 }
