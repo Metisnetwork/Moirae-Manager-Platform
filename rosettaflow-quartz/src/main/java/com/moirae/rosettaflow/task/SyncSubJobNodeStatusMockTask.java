@@ -188,7 +188,7 @@ public class SyncSubJobNodeStatusMockTask {
         subJob.setSubJobStatus(subJobStatus);
         subJob.setBeginTime(taskStartAt > 0 ? new Date(taskStartAt) : null);
         subJob.setEndTime(taskEndAt > 0 ? new Date(taskEndAt) : null);
-        subJob.setRunTime((taskStartAt > 0 && taskEndAt > 0) ? String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)) : null);
+        subJob.setRunTime((taskStartAt > 0 && taskEndAt > 0) ? String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.SECOND)) : null);
         return subJob;
     }
 }
