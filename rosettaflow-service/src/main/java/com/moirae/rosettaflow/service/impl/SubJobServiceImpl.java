@@ -136,13 +136,10 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
     }
 
     @Override
-    public void updateRunStatus(Object[] ids, Byte runStatus) {
-        LambdaUpdateWrapper<SubJob> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(SubJob::getSubJobStatus, runStatus);
-        updateWrapper.set(SubJob::getUpdateTime, now());
-        updateWrapper.in(SubJob::getId, ids);
-        this.update(updateWrapper);
+    public void updateBatchRunStatus(List<SubJob> subJobList) {
+        this.updateBatchById(subJobList);
     }
+
 
     @Override
     public void updateBatchStatus(Object[] ids, Byte status) {

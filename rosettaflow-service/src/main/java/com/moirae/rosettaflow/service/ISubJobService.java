@@ -54,10 +54,9 @@ public interface ISubJobService extends IService<SubJob> {
     /**
      * 批量修改子作业运行状态
      *
-     * @param ids 子作业ids
-     * @param runStatus  运行状态
+     * @param subJobList 子作业集合
      */
-    void updateRunStatus(Object[] ids, Byte runStatus);
+    void updateBatchRunStatus(List<SubJob> subJobList);
 
     /**
      * 批量修改子作业有效状态

@@ -632,8 +632,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     private void updateSubJobInfo(WorkflowDto workflowDto, boolean isPublishSuccess) {
         SubJob subJob = subJobService.getById(workflowDto.getSubJobId());
-        subJob.setEndTime(now());
-        subJob.setRunTime(String.valueOf(DateUtil.between(subJob.getBeginTime(), subJob.getEndTime(), DateUnit.MINUTE)));
         subJob.setSubJobStatus(isPublishSuccess ? SubJobStatusEnum.RUNNING.getValue() : SubJobStatusEnum.RUN_FAIL.getValue());
         subJobService.updateById(subJob);
     }
