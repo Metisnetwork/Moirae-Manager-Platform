@@ -1,8 +1,6 @@
 package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +20,9 @@ import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
+import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
+import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
@@ -90,6 +90,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private GrpcTaskService grpcTaskService;
+
+    @Resource
+    private GrpcAuthService grpcAuthService;
 
     @Resource
     private ISubJobService subJobService;
@@ -590,7 +593,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //发起账户用户类型
         taskDto.setUserType(UserTypeEnum.checkUserType(workflowDto.getAddress()));
         //设置发起方
-        taskDto.setSender(getSender(workflowNodeInputList));
+        taskDto.setSender(getSender());
         //任务算法提供方 组织信息
         taskDto.setAlgoSupplier(getAlgoSupplier(taskDto.getSender()));
         // 算力提供方 暂定三方
@@ -833,24 +836,23 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     /**
      * 获取当前节点连接机构信息
      *
-     * @param workflowNodeInputList 任务输入信息列表
      * @return 机构信息
      */
-    private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
-        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-            if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
-                OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
-                Organization organization = organizationService.getByIdentityId(workflowNodeInput.getIdentityId());
-                sender.setPartyId("s0");
-                sender.setNodeName(organization.getNodeName());
-                sender.setNodeId(organization.getNodeId());
-                sender.setIdentityId(workflowNodeInput.getIdentityId());
-                return sender;
-            }
+    private OrganizationIdentityInfoDto getSender() {
+        NodeIdentityDto nodeIdentityDto;
+        try {
+            nodeIdentityDto = grpcAuthService.getNodeIdentity();
+            OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
+            sender.setPartyId("s0");
+            sender.setNodeName(nodeIdentityDto.getNodeName());
+            sender.setNodeId(nodeIdentityDto.getNodeId());
+            sender.setIdentityId(nodeIdentityDto.getIdentityId());
+            return sender;
+        } catch (Exception e) {
+            log.error("获取当前工作流节点发起方失败！");
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
         }
 
-        log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
-        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }
 
     private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender) {
