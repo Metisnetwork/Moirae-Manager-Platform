@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 
 /**
- * 查询当前项目下当前算法的模型请求参数
+ * 查询当前项目的算法模型请求参数
  * @author houz
  */
 @Data
@@ -23,7 +23,7 @@ public class ProjAlgModel {
     @NotNull(message = "project.id.notNull")
     private Long projectId;
 
-    @ApiModelProperty(value = "项目ID", required = true)
+    @ApiModelProperty(value = "算法ID", required = true)
     @NotNull(message = "algorithm.id.notNull")
     private Long algorithmId;
 }
