@@ -41,10 +41,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
                                              @Param(value = "userName") String userName,
                                              IPage<ProjMemberDto> iPage);
     /**
-     * 获取当前项目下面生成的所有模型
+     * 查询当前项目的算法模型
      *
      * @param projectId 项目id
+     * @param algorithmId 算法id
      * @return 项目模型列表
      */
-    List<ProjectModelDto> queryAllModelByProjectId(@Param("projectId") Long projectId);
+    List<ProjectModelDto> queryCurrentProjAlgModel(@Param("projectId") Long projectId, @Param("algorithmId") Long algorithmId);
 }
