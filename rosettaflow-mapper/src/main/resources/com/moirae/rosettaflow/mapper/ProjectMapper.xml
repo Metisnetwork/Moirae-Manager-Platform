@@ -61,21 +61,17 @@
         </if>
         ORDER BY a.create_time desc
     </select>
-
-    <!-- 查询当前项目的算法模型 -->
-    <select id="queryCurrentProjAlgModel" resultType="com.moirae.rosettaflow.dto.ProjectModelDto">
+    <select id="queryAllModelByProjectId" resultType="com.moirae.rosettaflow.dto.ProjectModelDto">
         SELECT r.id   AS modelId,
                r.file_name   AS fileName,
                r.metadata_id AS metadataId,
                r.origin_id   AS originId,
-               r.file_path   AS filePath,
-               n.algorithm_id AS algorithmId
+               r.file_path   AS filePath
         FROM t_project p
                  INNER JOIN t_workflow w ON p.id = w.project_id
                  INNER JOIN t_workflow_node n ON w.id = n.workflow_id
                  INNER JOIN t_task_result r ON n.task_id = r.task_id
         WHERE n.run_status = 2
           AND p.id = #{projectId, jdbcType=BIGINT}
-          AND n.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </select>
 </mapper>

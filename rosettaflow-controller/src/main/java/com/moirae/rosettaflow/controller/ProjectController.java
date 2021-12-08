@@ -130,10 +130,10 @@ public class ProjectController {
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
 
-    @GetMapping("queryCurrentProjAlgModel")
-    @ApiOperation(value = "查询当前项目的算法模型", notes = "查询当前项目的算法模型")
-    public ResponseVo<List<ProjectModelVo>> queryCurrentProjAlgModel(@RequestBody ProjAlgModel projAlgModel) {
-        List<ProjectModelDto> list = projectService.queryCurrentProjAlgModel(projAlgModel.getProjectId(), projAlgModel.getAlgorithmId());
+    @GetMapping("queryAllModelByProjectId/{projectId}")
+    @ApiOperation(value = "查询当前项目下所有模型", notes = "查询当前项目下所有模型")
+    public ResponseVo<List<ProjectModelVo>> queryAllModelByProjectId(@ApiParam(value = "项目ID", required = true) @PathVariable Long projectId) {
+        List<ProjectModelDto> list = projectService.queryAllModelByProjectId(projectId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectModelVo.class));
     }
 
