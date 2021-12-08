@@ -293,8 +293,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public List<ProjectModelDto> queryAllModelByProjectId(Long projectId) {
-        return this.baseMapper.queryAllModelByProjectId(projectId);
+    public List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId, Long algorithmId) {
+        return this.baseMapper.queryCurrentProjAlgModel(projectId, algorithmId);
     }
 
     /**
