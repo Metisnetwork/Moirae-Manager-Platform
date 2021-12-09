@@ -14,7 +14,7 @@ import lombok.Data;
 public class ProjectModelVo {
 
     @ApiModelProperty(value = "模型主键id")
-    private String modelId;
+    private Long modelId;
 
     @ApiModelProperty(value = "模型所属的机构id")
     private String originId;

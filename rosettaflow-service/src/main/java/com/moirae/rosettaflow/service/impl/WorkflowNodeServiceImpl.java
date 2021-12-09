@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
@@ -145,23 +146,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
         // 校验节点配置输入是否有过期数据
-        Set<String> userAuthDataIdSet = new HashSet<>();
-        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
-            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
-            if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
-                continue;
-            }
-            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-                userAuthDataIdSet.add(workflowNodeInput.getDataTableId());
-            }
-        }
-        if (userAuthDataIdSet.size() > 0) {
-            List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdSet);
-            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdSet.size()) {
-                log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(userAuthDataIdSet));
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
-            }
-        }
+        this.checkExpireConfigData(workflowNodeDtoList);
+
+        // 校验只有一个算法节点，且该节点需要模型时，是否传入模型参数
+        this.checkConfigModelParam(workflowNodeDtoList);
 
         // 删除当前工作流所有节点数据
         workflowService.deleteWorkflowAllNodeData(workflowId);
@@ -209,6 +197,41 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflow.setNodeNumber(workflowNodeDtoList.size());
         workflow.setUpdateTime(new Date());
         workflowService.updateById(workflow);
+    }
+
+    /** 校验节点配置输入是否有过期数据 */
+    private void checkExpireConfigData(List<WorkflowNodeDto> workflowNodeDtoList){
+        Set<String> userAuthDataIdSet = new HashSet<>();
+        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
+            if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
+                continue;
+            }
+            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+                userAuthDataIdSet.add(workflowNodeInput.getDataTableId());
+            }
+        }
+        if (userAuthDataIdSet.size() > 0) {
+            List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdSet);
+            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdSet.size()) {
+                log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(userAuthDataIdSet));
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
+            }
+        }
+    }
+
+    /** 校验只有一个算法节点，且该节点需要模型时，是否传入模型参数 */
+    private void checkConfigModelParam(List<WorkflowNodeDto> workflowNodeDtoList){
+        // 当前工作流只有一个节点，且需要输入模型
+        if (workflowNodeDtoList.size() == 1) {
+            int inputModel = workflowNodeDtoList.get(0).getAlgorithmDto().getInputModel();
+            Long ModelId = workflowNodeDtoList.get(0).getModelId();
+            // inputModel: 是否需要输入模型: 0-否，1:是
+            if (SysConstant.INT_1 == inputModel && (null == ModelId || ModelId == 0)) {
+                log.error("当前节点需输入模型，请检查, workflowNodeDto:{}", JSON.toJSONString(workflowNodeDtoList.get(0)));
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
+            }
+        }
     }
 
     /**

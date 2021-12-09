@@ -608,7 +608,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         taskDto.setCalculateContractCode(calculateContractCode);
         //数据分片合约代码
         taskDto.setDataSplitContractCode(dataSplitContractCode);
-        //合约调用的额外可变入参 (json 字符串, 根据算法来)
+        //合n约调用的额外可变入参 (jso 字符串, 根据算法来)
         taskDto.setContractExtraParams(getContractExtraParams(workflowNode.getAlgorithmId(), workflowDto.getPreTaskResult(), workflowNodeInputList));
         //发起任务的账户的签名
         taskDto.setSign(workflowDto.getSign());
