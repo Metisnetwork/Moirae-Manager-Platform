@@ -28,4 +28,7 @@ public class ProjectModelVo {
     @ApiModelProperty(value = "文件路径")
     private String filePath;
 
+    @ApiModelProperty(value = "模型由哪个算法生成")
+    private String algorithmName;
+
 }

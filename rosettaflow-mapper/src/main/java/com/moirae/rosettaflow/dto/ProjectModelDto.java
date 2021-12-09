@@ -33,4 +33,9 @@ public class ProjectModelDto {
      * 文件路径
      */
     private String filePath;
+
+    /**
+     * 模型由哪个算法生成
+     */
+    private String algorithmName;
 }
