@@ -77,7 +77,7 @@
                 INNER JOIN t_workflow w ON p.id = w.project_id
                 INNER JOIN t_workflow_node n ON w.id = n.workflow_id
                 INNER JOIN t_task_result r ON n.task_id = r.task_id
-                INNER JOIN t_algorithm a ON n.algorithm_id
+                INNER JOIN t_algorithm a ON a.id = n.algorithm_id
         WHERE
             n.run_status = 2
           AND n.task_id = r.task_id
