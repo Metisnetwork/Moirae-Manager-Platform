@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
+import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.req.workflow.node.WorkflowNodeReq;
@@ -97,7 +98,9 @@ public class ConvertUtils {
             // 模型id
             workflowNodeDto.setModelId(workflowNodeReq.getModelId());
             // 是否需要输入模型: 0-否，1:是
-            workflowNodeDto.getAlgorithmDto().setInputModel(workflowNodeReq.getInputModel().byteValue());
+            AlgorithmDto algorithmDto = new AlgorithmDto();
+            algorithmDto.setInputModel(workflowNodeReq.getInputModel().byteValue());
+            workflowNodeDto.setAlgorithmDto(algorithmDto);
             // 校验工作流节点配置参数
             if (checkFlag) {
                 checkNodeParam(workflowNodeDto);
