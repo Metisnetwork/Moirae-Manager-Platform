@@ -76,6 +76,5 @@
                  INNER JOIN t_task_result r ON n.task_id = r.task_id
         WHERE n.run_status = 2
           AND p.id = #{projectId, jdbcType=BIGINT}
-          AND n.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </select>
 </mapper>

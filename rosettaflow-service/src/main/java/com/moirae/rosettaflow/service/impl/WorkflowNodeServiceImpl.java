@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.SysConstant;
@@ -145,6 +146,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
+
+        // 校验节点输入配置数据发起方是否正确
+        this.checkSenderIfRight(workflowNodeDtoList);
+
         // 校验节点配置输入是否有过期数据
         this.checkExpireConfigData(workflowNodeDtoList);
 
@@ -199,6 +204,27 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowService.updateById(workflow);
     }
 
+    /** 校验节点输入配置数据发起方是否正确 */
+    private void checkSenderIfRight(List<WorkflowNodeDto> workflowNodeDtoList){
+        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
+            if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
+                continue;
+            }
+            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList){
+               // 获取发起方组织信息
+                NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
+                // senderFlag:是否发起方: 0-否,1-是
+                boolean flag = SysConstant.INT_1 == workflowNodeInput.getSenderFlag()
+                        && !workflowNodeInput.getIdentityId().equals(nodeIdentityDto.getIdentityId());
+                if (flag) {
+                    log.error("校验节点输入配置数据发起方是否正确, workflowNodeInput:{}, nodeIdentityDto:{}", JSON.toJSONString(workflowNodeInput), JSON.toJSONString(nodeIdentityDto));
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_If_SENDER_ERROR.getMsg());
+                }
+            }
+        }
+    }
+
     /** 校验节点配置输入是否有过期数据 */
     private void checkExpireConfigData(List<WorkflowNodeDto> workflowNodeDtoList){
         Set<String> userAuthDataIdSet = new HashSet<>();
@@ -227,7 +253,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             int inputModel = workflowNodeDtoList.get(0).getAlgorithmDto().getInputModel();
             Long ModelId = workflowNodeDtoList.get(0).getModelId();
             // inputModel: 是否需要输入模型: 0-否，1:是
-            if (SysConstant.INT_1 == inputModel && (null == ModelId || ModelId == 0)) {
+            boolean flag = SysConstant.INT_1 == inputModel && (null == ModelId || ModelId == 0);
+            if (flag) {
                 log.error("当前节点需输入模型，请检查, workflowNodeDto:{}", JSON.toJSONString(workflowNodeDtoList.get(0)));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
             }
