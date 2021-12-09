@@ -96,6 +96,8 @@ public class ConvertUtils {
             workflowNodeDto.setNodeStep(workflowNodeReq.getNodeStep());
             // 模型id
             workflowNodeDto.setModelId(workflowNodeReq.getModelId());
+            // 是否需要输入模型: 0-否，1:是
+            workflowNodeDto.getAlgorithmDto().setInputModel(workflowNodeReq.getInputModel().byteValue());
             // 校验工作流节点配置参数
             if (checkFlag) {
                 checkNodeParam(workflowNodeDto);

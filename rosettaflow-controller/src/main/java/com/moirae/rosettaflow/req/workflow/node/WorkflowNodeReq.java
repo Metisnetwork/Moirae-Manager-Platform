@@ -39,6 +39,9 @@ public class WorkflowNodeReq {
     @ApiModelProperty(value = "工作流当前节点模型ID")
     private Long modelId;
 
+    @ApiModelProperty(value = "是否需要输入模型: 0-否，1:是")
+    private Integer inputModel;
+
     @ApiModelProperty(value = "输入请求列表", required = true)
     private List<WorkflowNodeInputReq> workflowNodeInputReqList;
 
