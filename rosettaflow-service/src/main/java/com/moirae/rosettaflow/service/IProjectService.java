@@ -123,7 +123,8 @@ public interface IProjectService extends IService<Project> {
      * 获取当前项目下面生成的所有模型
      *
      * @param projectId 项目id
+     * @param algorithmId 算法id
      * @return 项目模型列表
      */
-    List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId);
+    List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId, Long algorithmId);
 }

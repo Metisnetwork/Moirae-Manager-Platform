@@ -44,7 +44,8 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * 查询当前项目的算法模型
      *
      * @param projectId 项目id
+     * @param algorithmId 算法id
      * @return 项目模型列表
      */
-    List<ProjectModelDto> queryCurrentProjAlgModel(@Param("projectId") Long projectId);
+    List<ProjectModelDto> queryCurrentProjAlgModel(@Param("projectId") Long projectId, @Param("algorithmId") Long algorithmId);
 }

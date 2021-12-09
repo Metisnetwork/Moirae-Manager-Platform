@@ -7,4 +7,4 @@ server:
 
 spring:
   profiles:
-    active: txy
+    active: test
