@@ -29,6 +29,8 @@ CREATE TABLE `t_organization`
     `node_name`   varchar(100)        DEFAULT NULL COMMENT '组织的身份名称',
     `node_id`     varchar(256)        DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
     `identity_id` varchar(128)        DEFAULT NULL COMMENT '组织的身份标识Id',
+    `identity_ip` varchar(20)        DEFAULT NULL COMMENT '组织的ip',
+    `identity_port` varchar(20)        DEFAULT NULL COMMENT '组织的端口',
     `status`      tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-未知，1- 正常， 2- 异常',
     `create_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

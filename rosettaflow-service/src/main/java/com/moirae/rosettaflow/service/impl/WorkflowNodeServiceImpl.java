@@ -146,10 +146,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
-
-        // 校验节点输入配置数据发起方是否正确
-        this.checkSenderIfRight(workflowNodeDtoList);
-
+        
         // 校验节点配置输入是否有过期数据
         this.checkExpireConfigData(workflowNodeDtoList);
 
@@ -202,27 +199,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflow.setNodeNumber(workflowNodeDtoList.size());
         workflow.setUpdateTime(new Date());
         workflowService.updateById(workflow);
-    }
-
-    /** 校验节点输入配置数据发起方是否正确 */
-    private void checkSenderIfRight(List<WorkflowNodeDto> workflowNodeDtoList){
-        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
-            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
-            if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
-                continue;
-            }
-            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList){
-               // 获取发起方组织信息
-                NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
-                // senderFlag:是否发起方: 0-否,1-是
-                boolean flag = SysConstant.INT_1 == workflowNodeInput.getSenderFlag()
-                        && !workflowNodeInput.getIdentityId().equals(nodeIdentityDto.getIdentityId());
-                if (flag) {
-                    log.error("校验节点输入配置数据发起方是否正确, workflowNodeInput:{}, nodeIdentityDto:{}", JSON.toJSONString(workflowNodeInput), JSON.toJSONString(nodeIdentityDto));
-                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_If_SENDER_ERROR.getMsg());
-                }
-            }
-        }
     }
 
     /** 校验节点配置输入是否有过期数据 */
