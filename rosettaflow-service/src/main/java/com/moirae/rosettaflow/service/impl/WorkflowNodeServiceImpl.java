@@ -74,7 +74,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IUserMetaDataService userMetaDataService;
 
     @Override
-    public List<WorkflowNodeDto> queryNodeDetailsList(Long id) {
+    public List<WorkflowNodeDto> queryNodeDetailsList(Long id, String language) {
         // 获取工作流节点列表
         List<WorkflowNode> workflowNodeList = getWorkflowNodeList(id);
         if (workflowNodeList == null || workflowNodeList.size() == 0) {
@@ -87,6 +87,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             // 算法对象
             AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
             if (Objects.nonNull(algorithmDto)) {
+                // 处理国际化语言
+                if (SysConstant.EN_US.equals(language)) {
+                    algorithmDto.setAlgorithmName(algorithmDto.getAlgorithmNameEn());
+                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmNameEn());
+                }
                 // 工作流节点算法代码, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
                 if (Objects.nonNull(workflowNodeCode)) {

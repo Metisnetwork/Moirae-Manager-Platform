@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.StatusEnum;
@@ -47,13 +48,24 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     private IWorkflowNodeTempService workflowNodeTempService;
 
     @Override
-    public List<ProjectTemp> projectTempList() {
+    public List<ProjectTemp> projectTempList(String language) {
         LambdaQueryWrapper<ProjectTemp> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ProjectTemp::getStatus, StatusEnum.VALID.getValue());
         List<ProjectTemp> returnList = this.list(wrapper);
         //添加空白模板
         ProjectTemp emptyTemp = new ProjectTemp();
         emptyTemp.setId(0L);
+        // 处理国际化
+        if (SysConstant.EN_US.equals(language)) {
+            for (ProjectTemp ProjectTemp : returnList) {
+                ProjectTemp.setProjectName(ProjectTemp.getProjectNameEn());
+                ProjectTemp.setProjectDesc(ProjectTemp.getProjectDescEn());
+            }
+            emptyTemp.setProjectName("blank");
+            emptyTemp.setProjectDesc("Blank template project");
+            returnList.add(0, emptyTemp);
+            return returnList;
+        }
         emptyTemp.setProjectName("空白");
         emptyTemp.setProjectDesc("空白模板项目");
         returnList.add(0, emptyTemp);

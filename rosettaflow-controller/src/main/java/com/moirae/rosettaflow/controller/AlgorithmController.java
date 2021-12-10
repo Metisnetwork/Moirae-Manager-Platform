@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +73,9 @@ public class AlgorithmController {
 
     @GetMapping("queryAlgorithmTreeList")
     @ApiOperation(value = "查询算法树列表", notes = "查询算法树列表")
-    public ResponseVo<AlgTreeListVo> queryAlgorithmTreeList() {
-        List<Map<String, Object>> listVo = algorithmService.queryAlgorithmTreeList();
+    public ResponseVo<AlgTreeListVo> queryAlgorithmTreeList(HttpServletRequest request) {
+        String language = request.getHeader("Accept-Language");
+        List<Map<String, Object>> listVo = algorithmService.queryAlgorithmTreeList(language);
         AlgTreeListVo algTreeListVo = this.convertAlgTreeList(listVo);
         return ResponseVo.createSuccess(algTreeListVo);
     }

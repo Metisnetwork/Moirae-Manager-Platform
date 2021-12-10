@@ -29,9 +29,19 @@ public class ProjectTemp implements Serializable {
     private String projectName;
 
     /**
+     * 英文项目名称
+     */
+    private String projectNameEn;
+
+    /**
      * 项目描述
      */
     private String projectDesc;
+
+    /**
+     * 英文项目描述
+     */
+    private String projectDescEn;
 
     /**
      * 状态: 0-无效，1- 有效

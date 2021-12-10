@@ -19,9 +19,10 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * 获取工作流节点详情列表
      *
      * @param id 工作流id
+     * @param language 国际化语言
      * @return 工作流详情
      */
-    List<WorkflowNodeDto> queryNodeDetailsList(Long id);
+    List<WorkflowNodeDto> queryNodeDetailsList(Long id, String language);
 
     /**
      * 保存工作流所有节点数据

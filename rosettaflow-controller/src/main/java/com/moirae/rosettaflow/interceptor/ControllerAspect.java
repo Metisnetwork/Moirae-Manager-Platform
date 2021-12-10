@@ -28,7 +28,6 @@ public class ControllerAspect {
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint pjp) {
         long start = System.currentTimeMillis();
-
         // 被拦截的类
         String clazzName = pjp.getTarget().getClass().getName();
         // 被拦截的方法签名

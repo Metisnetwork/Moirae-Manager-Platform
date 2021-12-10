@@ -16,7 +16,7 @@ public interface IProjectTempService extends IService<ProjectTemp> {
      *
      * @return ProjectTemp
      */
-    List<ProjectTemp> projectTempList();
+    List<ProjectTemp> projectTempList(String language);
 
     /**
      * 根据已创建的项目工作流添加项目模板

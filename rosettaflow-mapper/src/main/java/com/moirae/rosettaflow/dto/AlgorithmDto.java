@@ -19,9 +19,19 @@ public class AlgorithmDto {
     private String algorithmName;
 
     /**
+     * 英文算法名称
+     */
+    private String algorithmNameEn;
+
+    /**
      * 算法描述
      */
     private String algorithmDesc;
+
+    /**
+     * 英文算法描述
+     */
+    private String algorithmDescEn;
 
     /**
      * 作者

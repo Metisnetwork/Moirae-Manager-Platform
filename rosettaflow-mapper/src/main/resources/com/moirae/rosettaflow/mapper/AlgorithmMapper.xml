@@ -4,7 +4,9 @@
     <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.Algorithm">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName"/>
+        <result column="algorithm_name_en" jdbcType="VARCHAR" property="algorithmNameEn"/>
         <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc"/>
+        <result column="algorithm_desc_en" jdbcType="VARCHAR" property="algorithmDescEn"/>
         <result column="author" jdbcType="VARCHAR" property="author"/>
         <result column="max_numbers" jdbcType="BIGINT" property="maxNumbers"/>
         <result column="min_numbers" jdbcType="BIGINT" property="minNumbers"/>
@@ -26,7 +28,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id, algorithm_name, algorithm_desc, max_numbers, min_numbers, support_language,
+        id, algorithm_name, algorithm_name_en, algorithm_desc, algorithm_desc_en, max_numbers, min_numbers, support_language,
         support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
         run_time, input_model, store_pattern, data_rows_flag, data_columns_flag, public_flag,
         `status`, create_time, update_time
@@ -39,7 +41,9 @@
         select
             a.id as algorithmId,
             a.algorithm_name as algorithmName,
+            a.algorithm_name_en as algorithmNameEn,
             a.algorithm_desc as algorithmDesc,
+            a.algorithm_desc_en as algorithmDescEn,
             a.author as author,
             a.max_numbers as maxNumbers,
             a.min_numbers as minNumbers,
@@ -70,7 +74,9 @@
         SELECT
             a.id as algorithmId,
             a.algorithm_name as algorithmName,
+            a.algorithm_name_en as algorithmNameEn,
             a.algorithm_desc as algorithmDesc,
+            a.algorithm_desc_en as algorithmDescEn,
             a.algorithm_type as algorithmType,
             a.author,
             a.min_numbers,
@@ -86,7 +92,6 @@
                 and a.algorithm_name LIKE CONCAT('%', #{algorithmName, jdbcType=VARCHAR}, '%')
             </if>
         order by a.algorithm_type asc
-
     </select>
 
     <!-- 查询算法树列表 -->

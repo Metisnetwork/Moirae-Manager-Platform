@@ -29,9 +29,19 @@ public class AlgorithmType implements Serializable {
     private String algorithmTypeName;
 
     /**
+     * 英文算法名称
+     */
+    private String algorithmTypeNameEn;
+
+    /**
      * 算法描述
      */
     private String algorithmTypeDesc;
+
+    /**
+     * 英文算法描述
+     */
+    private String algorithmTypeDescEn;
 
     /**
      * 算法所属大类:1-统计分析,2-特征工程,3-机器学习

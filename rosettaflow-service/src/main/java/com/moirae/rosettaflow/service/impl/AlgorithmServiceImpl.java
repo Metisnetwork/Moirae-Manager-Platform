@@ -114,7 +114,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
     }
 
     @Override
-    public List<Map<String, Object>> queryAlgorithmTreeList() {
+    public List<Map<String, Object>> queryAlgorithmTreeList(String language) {
         List<Map<String, Object>> treeList = new ArrayList<>();
         // 获取算法大类
         List<AlgorithmType> algorithmTypeList = algorithmTypeService.list();
@@ -127,13 +127,19 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         for (AlgorithmType type : algorithmTypeList) {
             Map<String, Object> param = new HashMap<>(SysConstant.INT_2);
             param.put("algorithmId", type.getAlgorithmType());
-            param.put("algorithmName", type.getAlgorithmTypeName());
+            // 处理国际化语言
+            param.put("algorithmName", SysConstant.EN_US.equals(language) ? type.getAlgorithmTypeNameEn() : type.getAlgorithmTypeName());
 
             List<Map<String, Object>> childList = new ArrayList<>(SysConstant.INT_3);
             Iterator<AlgorithmDto> it = algorithmDtoList.iterator();
             AlgorithmDto algorithmDto;
             while (it.hasNext()) {
                 algorithmDto = it.next();
+                // 处理国际化语言
+                if (SysConstant.EN_US.equals(language)) {
+                    algorithmDto.setAlgorithmName(algorithmDto.getAlgorithmNameEn());
+                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmNameEn());
+                }
                 if (algorithmDto.getAlgorithmType() == type.getAlgorithmType().byteValue()) {
                     Map<String, Object> param1 = new HashMap<>(SysConstant.INT_3);
                     param1.put("algorithmId", algorithmDto.getAlgorithmId());

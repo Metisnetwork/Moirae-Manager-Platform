@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -33,8 +34,9 @@ public class ProjectTempController {
 
     @GetMapping("list")
     @ApiOperation(value = "查询项目模板列表", notes = "查询项目模板列表")
-    public ResponseVo<List<ProjTempListVo>> list() {
-        List<ProjectTemp> list = projectTempService.projectTempList();
+    public ResponseVo<List<ProjTempListVo>> list(HttpServletRequest request) {
+        String language = request.getHeader("Accept-Language");
+        List<ProjectTemp> list = projectTempService.projectTempList(language);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjTempListVo.class));
     }
 

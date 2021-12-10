@@ -187,8 +187,10 @@ DROP TABLE IF EXISTS `t_project_temp`;
 CREATE TABLE `t_project_temp`
 (
     `id`           bigint(20)  NOT NULL AUTO_INCREMENT COMMENT '项目模板表ID(自增长)',
-    `project_name` varchar(30) NOT NULL COMMENT '项目名称',
-    `project_desc` varchar(200)         DEFAULT NULL COMMENT '项目描述',
+    `project_name` varchar(30) NOT NULL COMMENT '中文项目名称',
+    `project_name_en` varchar(30) NOT NULL COMMENT '英文项目名称',
+    `project_desc` varchar(200)         DEFAULT NULL COMMENT '中文项目描述',
+    `project_desc_en` varchar(200)         DEFAULT NULL COMMENT '英文项目描述',
     `status`       tinyint(4)  NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',
     `create_time`  timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`  timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -224,8 +226,10 @@ DROP TABLE IF EXISTS `t_algorithm_type`;
 CREATE TABLE `t_algorithm_type`
 (
     `id`                  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
-    `algorithm_type_name` varchar(30)         DEFAULT NULL COMMENT '算法名称',
-    `algorithm_type_desc` varchar(200)        DEFAULT NULL COMMENT '算法描述',
+    `algorithm_type_name` varchar(30)         DEFAULT NULL COMMENT '中文算法名称',
+    `algorithm_type_name_en` varchar(30)         DEFAULT NULL COMMENT '英文算法名称',
+    `algorithm_type_desc` varchar(200)        DEFAULT NULL COMMENT '中文算法描述',
+    `algorithm_type_desc_en` varchar(200)        DEFAULT NULL COMMENT '英文算法描述',
     `algorithm_type`      tinyint(4)          DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
     `status`              tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1-有效',
     `create_time`         timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -241,8 +245,10 @@ DROP TABLE IF EXISTS `t_algorithm`;
 CREATE TABLE `t_algorithm`
 (
     `id`                bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
-    `algorithm_name`    varchar(30)         DEFAULT NULL COMMENT '算法名称',
-    `algorithm_desc`    varchar(200)        DEFAULT NULL COMMENT '算法描述',
+    `algorithm_name`    varchar(30)         DEFAULT NULL COMMENT '中文算法名称',
+    `algorithm_name_en`    varchar(30)         DEFAULT NULL COMMENT '英文算法名称',
+    `algorithm_desc`    varchar(200)        DEFAULT NULL COMMENT '中文算法描述',
+    `algorithm_desc_en`    varchar(200)        DEFAULT NULL COMMENT '英文算法描述',
     `author`            varchar(30)         DEFAULT NULL COMMENT '算法作者',
     `max_numbers`       bigint(20)          DEFAULT NULL COMMENT '支持协同方最大数量',
     `min_numbers`       bigint(20)          DEFAULT NULL COMMENT '支持协同方最小数量',

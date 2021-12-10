@@ -52,9 +52,10 @@ public interface IAlgorithmService extends IService<Algorithm> {
 
     /**
      * 查询算法树结构
-     * @return 数据
+     * @param language 国际化语言
+     * @return list
      */
-    List<Map<String, Object>> queryAlgorithmTreeList();
+    List<Map<String, Object>> queryAlgorithmTreeList(String language);
 
     /**
      * 复制保存算法
