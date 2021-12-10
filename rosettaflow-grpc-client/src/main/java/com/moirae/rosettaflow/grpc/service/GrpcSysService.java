@@ -1,7 +1,9 @@
 package com.moirae.rosettaflow.grpc.service;
 
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
+import io.grpc.ManagedChannel;
 
+import java.nio.channels.Channel;
 import java.util.List;
 
 /**
@@ -13,10 +15,11 @@ public interface GrpcSysService {
     /**
      * 查询指定任务的结果摘要
      *
+     * @param channel 对接net渠道
      * @param taskId 任务id
      * @return 任务结果文件摘要
      */
-    GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(String taskId);
+    GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(ManagedChannel channel, String taskId);
 
     /**
      * 获取当前节点所有任务结果摘要

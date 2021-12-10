@@ -16,12 +16,10 @@ import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponse
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.mapper.domain.SubJob;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
-import com.moirae.rosettaflow.service.ISubJobNodeService;
-import com.moirae.rosettaflow.service.ISubJobService;
-import com.moirae.rosettaflow.service.ITaskResultService;
-import com.moirae.rosettaflow.service.IWorkflowService;
+import com.moirae.rosettaflow.service.*;
 import com.zengtengpeng.annotation.Lock;
 import com.zengtengpeng.operation.RedissonObject;
+import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -62,6 +60,12 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private ITaskResultService taskResultService;
 
+    @Resource
+    private IWorkflowNodeOutputService workflowNodeOutputService;
+
+    @Resource
+    private NetManager netManager;
+
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncSubJobNodeStatusTask")
@@ -97,7 +101,9 @@ public class SyncSubJobNodeStatusTask {
                 node = subJobNodeMap.get(taskId);
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     //获取待保存任务结果数据
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                    String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
+                    ManagedChannel channel = netManager.getChannel(identityId);
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel, taskId);
                     if (Objects.isNull(taskResultResponseDto)) {
                         log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
                         continue;
@@ -160,9 +166,10 @@ public class SyncSubJobNodeStatusTask {
 
     /**
      * 构造更新子作业对象
-     * @param id 子作业id
-     * @param taskStartAt 开始时间
-     * @param taskEndAt 结束时间
+     *
+     * @param id           子作业id
+     * @param taskStartAt  开始时间
+     * @param taskEndAt    结束时间
      * @param subJobStatus 作业状态
      * @return 子作业
      */

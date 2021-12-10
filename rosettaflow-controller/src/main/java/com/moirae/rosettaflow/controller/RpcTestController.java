@@ -27,10 +27,12 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.service.IOrganizationService;
+import com.moirae.rosettaflow.service.IWorkflowNodeOutputService;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.service.NetManager;
 import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
+import io.grpc.ManagedChannel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -79,6 +81,9 @@ public class RpcTestController {
 
     @Resource
     private IOrganizationService organizationService;
+
+    @Resource
+    private IWorkflowNodeOutputService workflowNodeOutputService;
 
 
     @GetMapping("getNodeIdentity")
@@ -207,7 +212,9 @@ public class RpcTestController {
     @ApiOperation(value = "grpc getTaskResultById查询任务结果根据任务id", notes = "grpc getTaskResultById查询任务结果根据任务id")
     public ResponseVo<GetTaskResultFileSummaryResponseDto> getTaskResultById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
         log.info("grpc getTaskResultById查询任务结果根据任务id");
-        GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+        String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
+        ManagedChannel channel = netManager.getChannel(identityId);
+        GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel,taskId);
         return ResponseVo.createSuccess(taskResultResponseDto);
     }
 
