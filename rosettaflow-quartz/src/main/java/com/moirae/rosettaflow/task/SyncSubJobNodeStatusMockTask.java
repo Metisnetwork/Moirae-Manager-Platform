@@ -94,7 +94,7 @@ public class SyncSubJobNodeStatusMockTask {
                 node = subJobNodeMap.get(taskId);
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     //获取待保存任务结果数据
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(null, taskId);
                     if (Objects.isNull(taskResultResponseDto)) {
                         log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
                         continue;
@@ -176,9 +176,10 @@ public class SyncSubJobNodeStatusMockTask {
 
     /**
      * 构造更新子作业对象
-     * @param id 子作业id
-     * @param taskStartAt 开始时间
-     * @param taskEndAt 结束时间
+     *
+     * @param id           子作业id
+     * @param taskStartAt  开始时间
+     * @param taskEndAt    结束时间
      * @param subJobStatus 作业状态
      * @return 子作业
      */

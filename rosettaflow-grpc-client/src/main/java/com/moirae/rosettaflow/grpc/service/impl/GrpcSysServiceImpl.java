@@ -4,6 +4,7 @@ import com.moirae.rosettaflow.grpc.client.SysServiceClient;
 import com.moirae.rosettaflow.grpc.client.TaskServiceClient;
 import com.moirae.rosettaflow.grpc.service.GrpcSysService;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
+import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,8 @@ public class GrpcSysServiceImpl implements GrpcSysService {
     private SysServiceClient sysServiceClient;
 
     @Override
-    public GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(String taskId) {
-        return sysServiceClient.getTaskResultFileSummary(taskId);
+    public GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(ManagedChannel channel,String taskId) {
+        return sysServiceClient.getTaskResultFileSummary(channel,taskId);
     }
 
     @Override

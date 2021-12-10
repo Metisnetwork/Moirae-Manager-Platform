@@ -92,7 +92,7 @@ public class WorkflowNodeStatusMockTask {
                 log.info("工作流id:{},任务名称：{},taskId:{},rosettanet处理成功！", node.getWorkflowId(), node.getNodeName(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     //获取待保存任务结果数据
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(null,taskId);
                     if (taskResultResponseDto == null) {
                         log.error("WorkflowNodeStatusMockTask获取任务结果失败！");
                         continue;

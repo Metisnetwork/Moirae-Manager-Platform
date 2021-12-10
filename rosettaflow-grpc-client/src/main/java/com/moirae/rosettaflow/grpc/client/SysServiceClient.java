@@ -8,6 +8,7 @@ import com.moirae.rosettaflow.grpc.service.GetTaskResultFileSummaryRequest;
 import com.moirae.rosettaflow.grpc.service.GetTaskResultFileSummaryResponse;
 import com.moirae.rosettaflow.grpc.service.YarnServiceGrpc;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
+import io.grpc.Channel;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
@@ -27,18 +28,27 @@ public class SysServiceClient {
     @GrpcClient("carrier-grpc-server")
     YarnServiceGrpc.YarnServiceBlockingStub yarnServiceBlockingStub;
 
+//    /**
+//     * 查询指定任务的结果摘要
+//     *
+//     * @param taskId 任务id
+//     * @return 任务结果文件摘要
+//     */
+
     /**
      * 查询指定任务的结果摘要
      *
+     * @param channel 下载文件的渠道
      * @param taskId 任务id
-     * @return 任务结果文件摘要
+     * @return  任务结果文件摘要
      */
-    public GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(String taskId) {
+    public GetTaskResultFileSummaryResponseDto getTaskResultFileSummary(Channel channel, String taskId) {
         GetTaskResultFileSummaryRequest request = GetTaskResultFileSummaryRequest.newBuilder()
                 .setTaskId(taskId)
                 .build();
 
-        GetTaskResultFileSummaryResponse getTaskResultFileSummaryResponse = yarnServiceBlockingStub.getTaskResultFileSummary(request);
+        GetTaskResultFileSummaryResponse getTaskResultFileSummaryResponse =  YarnServiceGrpc.newBlockingStub(channel).getTaskResultFileSummary(request);
+//        GetTaskResultFileSummaryResponse getTaskResultFileSummaryResponse = yarnServiceBlockingStub.getTaskResultFileSummary(request);
         if (null != getTaskResultFileSummaryResponse) {
             GetTaskResultFileSummaryResponseDto dto = new GetTaskResultFileSummaryResponseDto();
             dto.setTaskId(getTaskResultFileSummaryResponse.getTaskId());
