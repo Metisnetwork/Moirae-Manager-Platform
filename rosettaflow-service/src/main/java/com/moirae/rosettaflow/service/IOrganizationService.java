@@ -33,4 +33,11 @@ public interface IOrganizationService extends IService<Organization> {
      * @return 组织列表
      */
     List<Organization> getByIdentityIds(Object[] identityArr);
+
+    /**
+     * 获取全部机构
+     *
+     * @return 组织列表
+     */
+    List<Organization> getAllIdentity();
 }

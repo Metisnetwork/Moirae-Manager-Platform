@@ -40,4 +40,11 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
         wrapper.in(Organization::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
+
+    @Override
+    public List<Organization> getAllIdentity() {
+        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(Organization::getStatus, StatusEnum.VALID.getValue());
+        return this.list(wrapper);
+    }
 }

@@ -27,15 +27,18 @@ import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResp
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.UserMetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.Organization;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IMetaDataService;
+import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户数据授权实现类
@@ -51,6 +54,9 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Resource
     private GrpcAuthService grpcAuthService;
+
+    @Resource
+    private IOrganizationService organizationService;
 
     @Resource
     private CommonService commonService;
@@ -197,10 +203,18 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     public List<UserMetaDataDto> getAllAuthOrganization() {
         UserDto userDto = commonService.getCurrentUser();
         String address = userDto.getAddress();
+        // 校验当前用户是否是当前登录用户的地址
         if (!StrUtil.startWith(userDto.getAddress(), AddressChangeUtils.HRP_ETH)) {
             address = AddressChangeUtils.convert0xAddress(address);
         }
-        return this.baseMapper.getUserMetaDataByAddress(address);
+        // 获取所有组织数据
+        List<Organization> organizationList = organizationService.getAllIdentity();
+        // 获得组织id集合
+        List orgIdList = organizationList.stream().map(organization -> organization.getIdentityId()).collect(Collectors.toList());
+        List<UserMetaDataDto> userMetaDataDtoList  = this.baseMapper.getUserMetaDataByAddress(address);
+        // 获得存在于组织id集合中的所有授权数据
+        return userMetaDataDtoList.stream().filter(userMetaDataDto ->
+                orgIdList.contains(userMetaDataDto.getIdentityId())).collect(Collectors.toList());
     }
 
     @Override
