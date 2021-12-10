@@ -36,6 +36,14 @@ public class Organization implements Serializable {
      */
     private String identityId;
     /**
+     * 组织的ip
+     */
+    private String identityIp;
+    /**
+     * 组织的端口
+     */
+    private String identityPort;
+    /**
      * 状态: 0-未知，1- 正常， 2- 异常
      */
     @TableField(value = "`status`")

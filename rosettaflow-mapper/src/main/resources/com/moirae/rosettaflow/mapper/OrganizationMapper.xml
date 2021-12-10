@@ -6,12 +6,14 @@
         <result column="node_name" jdbcType="VARCHAR" property="nodeName"/>
         <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
+        <result column="identity_ip" jdbcType="VARCHAR" property="identityIp"/>
+        <result column="identity_port" jdbcType="VARCHAR" property="identityPort"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, node_name, node_id, identity_id, `status`, create_time, update_time
+    id, node_name, node_id, identity_id, identity_ip, identity_port, `status`, create_time, update_time
   </sql>
 
     <insert id="batchInsert" >
@@ -26,6 +28,12 @@
             </if>
             <if test="organization.identityId != null">
                 identity_id,
+            </if>
+            <if test="organization.identityIp != null">
+                identity_ip,
+            </if>
+            <if test="organization.identityPort != null">
+                identity_port,
             </if>
             <if test="organization.status != null">
                 `status`,
@@ -46,6 +54,12 @@
             </if>
             <if test="organization.identityId != null">
                 #{organization.identityId,jdbcType=VARCHAR},
+            </if>
+            <if test="organization.identityIp != null">
+                #{organization.identityIp,jdbcType=VARCHAR},
+            </if>
+            <if test="organization.identityPort != null">
+                #{organization.identityPort,jdbcType=VARCHAR},
             </if>
             <if test="organization.status != null">
                 #{organization.status,jdbcType=TINYINT},
