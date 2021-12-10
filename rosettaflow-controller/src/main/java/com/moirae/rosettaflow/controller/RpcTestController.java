@@ -26,7 +26,9 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.IWorkflowService;
+import com.moirae.rosettaflow.service.NetManager;
 import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import io.swagger.annotations.Api;
@@ -71,6 +73,12 @@ public class RpcTestController {
 
     @Resource
     private GrpcDataProviderService grpcDataProviderService;
+
+    @Resource
+    private NetManager netManager;
+
+    @Resource
+    private IOrganizationService organizationService;
 
 
     @GetMapping("getNodeIdentity")
@@ -166,10 +174,10 @@ public class RpcTestController {
         log.info("grpc getTaskDetailById查询任务详情根据任务id");
         List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getTaskDetailList();
         if (Objects.isNull(metaDataAuthorityDtoList) || metaDataAuthorityDtoList.isEmpty()) {
-             return ResponseVo.createSuccess();
+            return ResponseVo.createSuccess();
         }
         TaskDetailResponseDto taskDetailResponseDto = metaDataAuthorityDtoList.stream().findFirst()
-                                                         .filter(taskDetailResponseDto1 -> taskDetailResponseDto1.getInformation().getTaskId().equals(taskId)).get();
+                .filter(taskDetailResponseDto1 -> taskDetailResponseDto1.getInformation().getTaskId().equals(taskId)).get();
         return ResponseVo.createSuccess(taskDetailResponseDto);
     }
 
@@ -191,7 +199,7 @@ public class RpcTestController {
         WorkflowDto workflowDto = new WorkflowDto();
         BeanUtil.copyProperties(orgWorkflow, workflowDto);
         TaskDto taskDto = workflowService.assemblyTaskDto(workflowDto);
-        PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = grpcTaskService.syncPublishTask(taskDto);
+        PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = grpcTaskService.syncPublishTask(netManager.getChannel(organizationService.list().get(0).getIdentityId()), taskDto);
         return ResponseVo.createSuccess(publishTaskDeclareResponseDto.getMsg());
     }
 
@@ -220,30 +228,30 @@ public class RpcTestController {
         AtomicReference<ByteString> byteString = new AtomicReference<>(ByteString.EMPTY);
         CountDownLatch count = new CountDownLatch(1);
         DownloadReplyResponseDto responseDto = new DownloadReplyResponseDto();
-        grpcDataProviderService.downloadTask(downloadRequestDto, downloadReply ->{
+        grpcDataProviderService.downloadTask(downloadRequestDto, downloadReply -> {
             boolean hasContent = downloadReply.hasContent();
-            if(hasContent){
+            if (hasContent) {
                 ByteString content = downloadReply.getContent();
                 ByteString bs = byteString.get().concat(content);
                 byteString.set(bs);
             }
 
             boolean hasStatus = downloadReply.hasStatus();
-            if(hasStatus){
+            if (hasStatus) {
                 TaskStatus status = downloadReply.getStatus();
                 responseDto.setDownloadStatus(status.getNumber());
                 //状态:Start = 0、Finished = 1、Cancelled = 2、Failed = 3
-                switch (status.getNumber()){
+                switch (status.getNumber()) {
                     case 0:
-                        log.debug("开始下载文件filePath:{}，状态:{}.......",downloadRequestDto.getFilePath(),"Start");
+                        log.debug("开始下载文件filePath:{}，状态:{}.......", downloadRequestDto.getFilePath(), "Start");
                         break;
                     case 1:
-                        log.debug("下载完成文件filePath:{}，状态:{}.......",downloadRequestDto.getFilePath(),"Finished");
+                        log.debug("下载完成文件filePath:{}，状态:{}.......", downloadRequestDto.getFilePath(), "Finished");
                         count.countDown();
                         break;
                     case 2:
                     case 3:
-                        log.debug("下载完成文件filePath:{}，状态:{}.......",downloadRequestDto.getFilePath(),"Failed");
+                        log.debug("下载完成文件filePath:{}，状态:{}.......", downloadRequestDto.getFilePath(), "Failed");
                         count.countDown();
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FILE_DOWNLOAD_FAIL.getMsg());
                     default:
@@ -260,6 +268,6 @@ public class RpcTestController {
         } catch (InterruptedException e) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, e.getMessage());
         }
-        ExportFileUtil.exportCsv("下载文件."+ Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compress)).getCompressType(), byteString.get().toByteArray(),response);
+        ExportFileUtil.exportCsv("下载文件." + Objects.requireNonNull(TaskDownloadCompressEnum.getByValue(compress)).getCompressType(), byteString.get().toByteArray(), response);
     }
 }

@@ -112,6 +112,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private IUserMetaDataService userMetaDataService;
 
+    @Resource
+    private NetManager netManager;
+
     public WorkflowServiceImpl(IMetaDataService metaDataService) {
         this.metaDataService = metaDataService;
     }
@@ -327,7 +330,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         SubJobNode subJobNodeInfo = new SubJobNode();
         boolean isPublishSuccess = false;
         try {
-            respDto = grpcTaskService.syncPublishTask(taskDto);
+            respDto = grpcTaskService.syncPublishTask(netManager.getChannel(taskDto.getSender().getIdentityId()),taskDto);
             if (GrpcConstant.GRPC_SUCCESS_CODE == respDto.getStatus()) {
                 isPublishSuccess = true;
             }

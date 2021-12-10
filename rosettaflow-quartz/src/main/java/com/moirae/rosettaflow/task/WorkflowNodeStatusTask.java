@@ -15,6 +15,7 @@ import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 import com.moirae.rosettaflow.service.ITaskResultService;
 import com.moirae.rosettaflow.service.IWorkflowNodeService;
 import com.moirae.rosettaflow.service.IWorkflowService;
+import com.moirae.rosettaflow.service.NetManager;
 import com.zengtengpeng.annotation.Lock;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +62,9 @@ public class WorkflowNodeStatusTask {
     @Resource
     private ITaskResultService taskResultService;
 
+    @Resource
+    private NetManager netManager;
+
     @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
     @Lock(keys = "WorkflowNodeStatusTask")
     public void run() {
@@ -94,7 +98,7 @@ public class WorkflowNodeStatusTask {
                 log.info("工作流id:{},taskId:{},rosettanet处理结束!", node.getWorkflowId(), node.getTaskId());
                 if (taskDetailResponseDto.getInformation().getState() == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     log.info("任务id>>>{},处理状态>>>{}", taskDetailResponseDto.getInformation().getTaskId(), taskDetailResponseDto.getInformation().getState());
-                    //获取待保存任务结果数据
+                    //从数据结果接收节点获取数据，获取待保存任务结果数据
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(taskId);
                     if (taskResultResponseDto == null) {
                         log.error("WorkflowNodeStatusMockTask,taskId:{}获取任务结果失败！", taskId);

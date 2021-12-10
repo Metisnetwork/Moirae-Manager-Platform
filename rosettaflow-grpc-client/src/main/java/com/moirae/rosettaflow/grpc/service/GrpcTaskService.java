@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.grpc.service;
 
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
+import io.grpc.Channel;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,13 +13,15 @@ import java.util.function.Consumer;
  * @description grpc任务处理服务
  */
 public interface GrpcTaskService {
+
     /**
      * 发布一个任务,同步等待结果
      *
+     * @param channel 调度服务
      * @param taskDto 任务信息
      * @return 任务处理结果
      */
-    PublishTaskDeclareResponseDto syncPublishTask(TaskDto taskDto);
+    PublishTaskDeclareResponseDto syncPublishTask(Channel channel, TaskDto taskDto);
 
     /**
      * 发布一个任务,异步等待结果

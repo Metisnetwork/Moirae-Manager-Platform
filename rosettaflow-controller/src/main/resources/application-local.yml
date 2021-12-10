@@ -48,7 +48,7 @@ system:
 grpc:
   client:
     carrier-grpc-server:
-      address: 'static://192.168.21.187:8801'
+      address: 'static://192.168.10.146:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
@@ -57,7 +57,7 @@ grpc:
 redisson:
   password: 123456
   singleServerConfig:
-    address: localhost:7379
+    address: 81.68.242.174:6379
 
 #集群模式
 #redisson:

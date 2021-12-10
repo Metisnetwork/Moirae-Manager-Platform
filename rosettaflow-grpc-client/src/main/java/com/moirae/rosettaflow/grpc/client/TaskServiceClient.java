@@ -9,6 +9,8 @@ import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
+import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -36,12 +38,11 @@ public class TaskServiceClient {
     /**
      * 发布一个任务,同步等待结果
      */
-    public PublishTaskDeclareResponseDto syncPublishTask(TaskDto taskDto) {
-        PublishTaskDeclareResponse taskDeclareResponse = taskServiceBlockingStub.publishTaskDeclare(assemblyPublishTaskDeclareRequest(taskDto));
-//        if (taskDeclareResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-//            log.error("TaskServiceClient->syncPublishTask() fail reason:{}", taskDeclareResponse.getMsg());
-//            throw new BusinessException(taskDeclareResponse.getStatus(), taskDeclareResponse.getMsg());
-//        }
+    public PublishTaskDeclareResponseDto syncPublishTask(Channel channel, TaskDto taskDto) {
+//        PublishTaskDeclareResponse taskDeclareResponse = taskServiceBlockingStub.publishTaskDeclare(assemblyPublishTaskDeclareRequest(taskDto));
+        PublishTaskDeclareResponse taskDeclareResponse = TaskServiceGrpc.newBlockingStub(channel).publishTaskDeclare(assemblyPublishTaskDeclareRequest(taskDto));
+
+
         PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = new PublishTaskDeclareResponseDto();
         publishTaskDeclareResponseDto.setStatus(taskDeclareResponse.getStatus());
         publishTaskDeclareResponseDto.setMsg(taskDeclareResponse.getMsg());
