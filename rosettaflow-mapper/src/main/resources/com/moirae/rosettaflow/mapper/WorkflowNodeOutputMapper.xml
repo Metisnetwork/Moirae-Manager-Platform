@@ -18,6 +18,37 @@
         id, workflow_node_id, identity_id, party_id, sender_flag,
         store_pattern, store_path, output_content, `status`, create_time, update_time
     </sql>
+
+    <select id="getByWorkflowNodeId" resultType="com.moirae.rosettaflow.dto.WorkflowNodeOutputDto">
+        select a.id               as id,
+               a.workflow_node_id as workflowNodeId,
+               a.identity_id      as identityId,
+               a.party_id         as partyId,
+               a.sender_flag      as senderFlag,
+               a.store_pattern    as storePattern,
+               a.store_path       as storePath,
+               a.output_content   as outputContent,
+               b.node_name        as identityName
+        from t_workflow_node_output a,
+             t_organization b
+        where a.status = 1
+          and b.status = 1
+          and a.identity_id = b.identity_id
+          and a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
+        order by a.party_id
+    </select>
+
+    <select id="getOutputIdentityIdByTaskId" resultType="string">
+        select
+            b.identity_id as identityId
+        from
+             t_workflow_node a, t_workflow_node_output b
+        where a.status = 1
+          and b.status = 1
+          and b.store_pattern = 1
+          and a.id = b.workflow_node_id
+          and a.task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
     <insert id="batchInsert">
         <foreach collection="workflowNodeOutputList" item="o" separator=";">
             insert into t_workflow_node_output
@@ -87,24 +118,4 @@
             </trim>
         </foreach>
     </insert>
-    <select id="getByWorkflowNodeId" resultType="com.moirae.rosettaflow.dto.WorkflowNodeOutputDto">
-        select a.id               as id,
-               a.workflow_node_id as workflowNodeId,
-               a.identity_id      as identityId,
-               a.party_id         as partyId,
-               a.sender_flag      as senderFlag,
-               a.store_pattern    as storePattern,
-               a.store_path       as storePath,
-               a.output_content   as outputContent,
-               b.node_name        as identityName
-        from t_workflow_node_output a,
-             t_organization b
-        where a.status = 1
-          and b.status = 1
-          and a.identity_id = b.identity_id
-          and a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
-        order by a.party_id
-    </select>
-
-
 </mapper>

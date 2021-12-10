@@ -35,9 +35,17 @@ public interface IWorkflowNodeOutputService extends IService<WorkflowNodeOutput>
     List<WorkflowNodeOutput> copyWorkflowNodeOutput(Long newNodeId, Long oldNodeId);
 
     /**
+     * 根据任务id获取输入放的组织id
+     * @param taskId 任务id
+     * @return identityId 组织id
+     */
+    String getOutputIdentityIdByTaskId(String taskId);
+
+    /**
      * 批量保存节点输出
      *
      * @param workflowNodeOutputList 节点输出列表
      */
     void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList);
+
 }
