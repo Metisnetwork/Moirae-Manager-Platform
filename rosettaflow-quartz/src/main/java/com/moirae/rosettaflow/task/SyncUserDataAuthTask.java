@@ -17,10 +17,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 同步用户元数据授权列列表（当用户对元数据做授权申请后，redis记录设置已申请，此定时任务判断有待申请记录就启动同步，否则不同步）
+ *
  * @author hudenian
  * @date 2021/8/25
  */
@@ -38,7 +42,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 120 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 180 * 1000, initialDelay = 2 * 1000)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         long begin = DateUtil.current();
@@ -69,10 +73,11 @@ public class SyncUserDataAuthTask {
 
     /**
      * 批量处理用户授权数据
+     *
      * @param metaDataList 需更新数据
-     * @param saveFlag 处理方式
+     * @param saveFlag     处理方式
      */
-    private void batchDealUserAuthData(List<GetMetaDataAuthorityDto> metaDataList, String saveFlag){
+    private void batchDealUserAuthData(List<GetMetaDataAuthorityDto> metaDataList, String saveFlag) {
         if (0 == metaDataList.size()) {
             return;
         }
@@ -80,7 +85,7 @@ public class SyncUserDataAuthTask {
         int insertLength = userMetaDataList.size();
         int i = 0;
         log.info("用户申请授权元数据据批量处理开始，总条数:{}", insertLength);
-        while (insertLength > sysConfig.getBatchSize()){
+        while (insertLength > sysConfig.getBatchSize()) {
             long begin = DateUtil.current();
             if (SysConstant.INSERT.equals(saveFlag)) {
                 userMetaDataService.batchInsert(userMetaDataList.subList(i, i + sysConfig.getBatchSize()));
@@ -107,6 +112,7 @@ public class SyncUserDataAuthTask {
 
     /**
      * 处理调度服务数据
+     *
      * @param metaDataAuthorityDtoList 需处理数据
      * @return UserMetaData集合
      */
