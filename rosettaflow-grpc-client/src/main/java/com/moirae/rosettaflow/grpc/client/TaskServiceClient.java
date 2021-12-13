@@ -204,21 +204,23 @@ public class TaskServiceClient {
     /**
      * 查看某个任务的全部事件列表通过单个任务ID
      */
-    public List<TaskEventDto> getTaskEventList(String taskId) {
+    public List<TaskEventDto> getTaskEventList(ManagedChannel channel, String taskId) {
         GetTaskEventListRequest getTaskEventListRequest = GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
-        GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
+//        GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
+        GetTaskEventListResponse taskEventListResponse = TaskServiceGrpc.newBlockingStub(channel).getTaskEventList(getTaskEventListRequest);
         return getTaskEventShowDots(taskEventListResponse);
     }
 
     /**
      * 查看多个任务的全部事件列表
      */
-    public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds) {
+    public List<TaskEventDto> getTaskEventListByTaskIds(ManagedChannel channel, String[] taskIds) {
         GetTaskEventListByTaskIdsRequest.Builder getTaskEventListByTaskIdsRequestBuilder = GetTaskEventListByTaskIdsRequest.newBuilder();
         for (int i = 0; i < taskIds.length; i++) {
             getTaskEventListByTaskIdsRequestBuilder.setTaskIds(i, taskIds[i]);
         }
-        GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventListByTaskIds(getTaskEventListByTaskIdsRequestBuilder.build());
+//        GetTaskEventListResponse taskEventListResponse = taskServiceBlockingStub.getTaskEventListByTaskIds(getTaskEventListByTaskIdsRequestBuilder.build());
+        GetTaskEventListResponse taskEventListResponse = TaskServiceGrpc.newBlockingStub(channel).getTaskEventListByTaskIds(getTaskEventListByTaskIdsRequestBuilder.build());
         return getTaskEventShowDots(taskEventListResponse);
     }
 

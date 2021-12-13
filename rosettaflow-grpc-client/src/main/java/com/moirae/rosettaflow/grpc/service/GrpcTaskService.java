@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.grpc.service;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -42,19 +43,21 @@ public interface GrpcTaskService {
     /**
      * 查看某个任务的全部事件列表通过单个任务ID
      *
+     * @param channel 对接net渠道
      * @param taskId 任务id
      * @return 事件详情列表
      */
-    List<TaskEventDto> getTaskEventList(String taskId);
+    List<TaskEventDto> getTaskEventList(ManagedChannel channel, String taskId);
 
     /**
      * 查看某个任务的全部事件列表通过批量的任务ID
      *
+     * @param channel 对接net渠道
      * @param taskIds 任务id列表
      * @return 任务事件列表
      */
     @SuppressWarnings("unused")
-    List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds);
+    List<TaskEventDto> getTaskEventListByTaskIds(ManagedChannel channel,String[] taskIds);
 
     /**
      * 终止任务

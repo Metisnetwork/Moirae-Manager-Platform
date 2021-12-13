@@ -191,7 +191,8 @@ public class RpcTestController {
     @ApiOperation(value = "grpc getTaskEventListById查询任务事件根据任务id", notes = "grpc getTaskEventListById查询任务事件根据任务id")
     public ResponseVo<List<TaskEventDto>> getTaskEventListById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
         log.info("grpc getTaskEventListById查询任务事件根据任务id");
-        List<TaskEventDto> taskEventDtoList = grpcTaskService.getTaskEventList(taskId);
+        String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
+        List<TaskEventDto> taskEventDtoList = grpcTaskService.getTaskEventList(netManager.getChannel(identityId),taskId);
         return ResponseVo.createSuccess(taskEventDtoList);
     }
 

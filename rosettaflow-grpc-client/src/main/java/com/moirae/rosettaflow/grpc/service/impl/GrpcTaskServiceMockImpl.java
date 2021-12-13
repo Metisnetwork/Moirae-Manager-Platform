@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskEventDto> getTaskEventList(String taskId) {
+    public List<TaskEventDto> getTaskEventList(ManagedChannel channel, String taskId) {
         List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
         TaskEventDto taskEventShowDto = new TaskEventDto();
         NodeIdentityDto nodeIdentityDto = new NodeIdentityDto();
@@ -71,7 +72,7 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskEventDto> getTaskEventListByTaskIds(String[] taskIds) {
+    public List<TaskEventDto> getTaskEventListByTaskIds(ManagedChannel channel, String[] taskIds) {
         List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
         TaskEventDto taskEventShowDto;
         NodeIdentityDto nodeIdentityDto;
