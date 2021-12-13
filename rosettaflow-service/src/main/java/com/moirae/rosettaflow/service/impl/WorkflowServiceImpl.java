@@ -1,8 +1,6 @@
 package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -330,7 +328,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         SubJobNode subJobNodeInfo = new SubJobNode();
         boolean isPublishSuccess = false;
         try {
-            respDto = grpcTaskService.syncPublishTask(netManager.getChannel(taskDto.getSender().getIdentityId()),taskDto);
+            respDto = grpcTaskService.syncPublishTask(netManager.getChannel(taskDto.getSender().getIdentityId()), taskDto);
             if (GrpcConstant.GRPC_SUCCESS_CODE == respDto.getStatus()) {
                 isPublishSuccess = true;
             }
@@ -368,7 +366,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
             if (null != workflowNodeInputList && workflowNodeInputList.size() > 0) {
                 List<String> inputDataList = new ArrayList<>();
-                for(WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+                for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
                     inputDataList.add(workflowNodeInput.getDataTableId());
                 }
                 // 被使用的次数加1
@@ -444,7 +442,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                     List<TaskEventDto> taskEventShowDtoList;
                     try {
                         taskEventShowDtoList = grpcTaskService.getTaskEventList(workflowNode.getTaskId());
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         log.error("调用rpc接口异常--获取运行日志, workflowId:{}, 错误信息:{}", workflowId, e);
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
                     }
@@ -841,7 +839,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
         for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-            if (SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
+            if (null != workflowNodeInput.getSenderFlag() && SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
                 OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
                 Organization organization = organizationService.getByIdentityId(workflowNodeInput.getIdentityId());
                 sender.setPartyId("s0");
@@ -850,6 +848,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 sender.setIdentityId(workflowNodeInput.getIdentityId());
                 return sender;
             }
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
         }
 
         log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
