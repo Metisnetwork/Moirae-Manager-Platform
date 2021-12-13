@@ -245,8 +245,8 @@ DROP TABLE IF EXISTS `t_algorithm`;
 CREATE TABLE `t_algorithm`
 (
     `id`                bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
-    `algorithm_name`    varchar(30)         DEFAULT NULL COMMENT '中文算法名称',
-    `algorithm_name_en`    varchar(30)         DEFAULT NULL COMMENT '英文算法名称',
+    `algorithm_name`    varchar(60)         DEFAULT NULL COMMENT '中文算法名称',
+    `algorithm_name_en`    varchar(60)         DEFAULT NULL COMMENT '英文算法名称',
     `algorithm_desc`    varchar(200)        DEFAULT NULL COMMENT '中文算法描述',
     `algorithm_desc_en`    varchar(200)        DEFAULT NULL COMMENT '英文算法描述',
     `author`            varchar(30)         DEFAULT NULL COMMENT '算法作者',
