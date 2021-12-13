@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.req.user;
 
+import com.moirae.rosettaflow.common.annotation.CheckAddress;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,7 +18,7 @@ import javax.validation.constraints.NotNull;
 public class LoginInReq {
 
     @ApiModelProperty(value = "用户钱包地址", required = true, notes = "address", example = "501eb3eeb2a40e6f2ff6f481302435e6e8af3666")
-    @NotBlank(message = "{user.address.notBlank}")
+    @CheckAddress()
     private String address;
 
     @ApiModelProperty(value = "签名明文(json格式字符串)", required = true, example = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"26e65a54b17e44b896a7f9a0353856d6\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}")

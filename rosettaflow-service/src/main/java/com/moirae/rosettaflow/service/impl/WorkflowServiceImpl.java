@@ -60,9 +60,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IProjectService projectService;
 
     @Resource
-    private IMetaDataService metaDataService;
-
-    @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
     @Resource
@@ -113,9 +110,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private NetManager netManager;
 
-    public WorkflowServiceImpl(IMetaDataService metaDataService) {
-        this.metaDataService = metaDataService;
-    }
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
