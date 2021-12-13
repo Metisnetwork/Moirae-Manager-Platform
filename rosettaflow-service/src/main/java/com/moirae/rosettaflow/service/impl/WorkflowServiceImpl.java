@@ -848,7 +848,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 sender.setIdentityId(workflowNodeInput.getIdentityId());
                 return sender;
             }
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
         }
 
         log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
