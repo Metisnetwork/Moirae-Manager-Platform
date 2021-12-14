@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.service;
 
+import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
+import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.domain.Organization;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -29,9 +31,29 @@ public class NetManager {
     @Resource
     private IOrganizationService organizationService;
 
+    @Resource
+    private GrpcAuthService grpcAuthService;
+
     @PostConstruct
     public void init() {
+        //判断组织的nodeid是否同步，未同步则进行同步操作
         List<Organization> organizationList = organizationService.list();
+        if (organizationList.size() == 0) {
+            log.error(">>>>>>>>>>>>>>>>>>>>>未配置组织信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            return;
+        }
+        int nodeIdLength = 30;
+        if (organizationList.get(0).getNodeId().length() < nodeIdLength) {
+            Map<String, String> identityNodeIdMap = new HashMap<>(organizationList.size());
+            List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
+                identityNodeIdMap.put(nodeIdentityDto.getIdentityId(), nodeIdentityDto.getNodeId());
+            }
+            for (Organization organization : organizationList) {
+                organization.setNodeId(identityNodeIdMap.get(organization.getIdentityId()));
+            }
+            organizationService.saveOrUpdateBatch(organizationList);
+        }
 
         for (Organization organization : organizationList) {
             channelMap.put(organization.getIdentityId(), assemblyChannel(organization.getIdentityIp(), organization.getIdentityPort()));
