@@ -386,8 +386,10 @@ CREATE TABLE `t_workflow_temp`
 (
     `id`              bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流模板ID(自增长)',
     `project_temp_id` bigint(20)          DEFAULT NULL COMMENT '项目模板表id',
-    `workflow_name`   varchar(64)         DEFAULT NULL COMMENT '工作流名称',
-    `workflow_desc`   varchar(128)        DEFAULT NULL COMMENT '工作流描述',
+    `workflow_name`   varchar(64)         DEFAULT NULL COMMENT '中文工作流名称',
+    `workflow_name_en`   varchar(128)         DEFAULT NULL COMMENT '英文工作流名称',
+    `workflow_desc`   varchar(128)        DEFAULT NULL COMMENT '中文工作流描述',
+    `workflow_desc_en`   varchar(128)        DEFAULT NULL COMMENT '英文工作流描述',
     `node_number`     int(11)             DEFAULT NULL COMMENT '节点数',
     `run_status`      tinyint(4) NOT NULL DEFAULT 0 COMMENT '运行状态:0-未完成,1-已完成',
     `status`          tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-无效，1- 有效',

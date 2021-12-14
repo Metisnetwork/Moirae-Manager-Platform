@@ -58,7 +58,7 @@ public class DataController {
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
     public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
         IPage<MetaDataDto> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
-        return convertToMetaDataVo(servicePage);
+        return this.convertToMetaDataVo(servicePage);
     }
 
     @GetMapping(value = "detail")
@@ -69,7 +69,7 @@ public class DataController {
     }
 
     @GetMapping("listByOwner")
-    @ApiOperation(value = "我的元数据列表", notes = "我的元数据列表")
+    @ApiOperation(value = "我的资源列表", notes = "我的资源列表")
     public ResponseVo<PageVo<UserMetaDataVo>> listByOwner(@Valid MetaDataReq metaDataReq) {
         IPage<UserMetaDataDto> servicePage = userMetaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
         return convertUserMetaDataToResponseVo(servicePage);
@@ -124,7 +124,6 @@ public class DataController {
     private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {
         List<MetaDataVo> items = new ArrayList<>();
         pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataVo.class)));
-
         PageVo<MetaDataVo> pageVo = new PageVo<>();
         BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);

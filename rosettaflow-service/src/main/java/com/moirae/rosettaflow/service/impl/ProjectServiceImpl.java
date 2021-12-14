@@ -82,6 +82,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
             // 如果项目模板ID不为空，将项目模板中的工作流复制到当前项目
             if (null != projectDto.getProjectTempId() && projectDto.getProjectTempId() > 0) {
+                // 模板id为1表示空白模板
+                if (projectDto.getProjectTempId() == 1) {
+                    return project.getId();
+                }
                 WorkflowTemp workflowTemp = workflowTempService.getWorkflowTemplate(projectDto.getProjectTempId());
                 if (null != workflowTemp) {
                     // 添加工作流

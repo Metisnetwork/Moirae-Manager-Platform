@@ -2,19 +2,20 @@
 -- init t_project_temp
 -- ----------------------------
 TRUNCATE t_project_temp;
-INSERT INTO `t_project_temp` VALUES (1, '协同营销', 'Collaborative marketing', '协同营销模板', 'Collaborative Marketing Template', 1, now(), now());
-INSERT INTO `t_project_temp` VALUES (2, '线性训练', 'Linear training', '线性训练模板', 'Linear training template', 1, now(), now());
-INSERT INTO `t_project_temp` VALUES (3, 'DNN算法', 'DNN algorithm', 'DNN算法模板', 'DNN algorithm template', 1, now(), now());
-INSERT INTO `t_project_temp` VALUES (4, 'XGBoost算法', 'XGBoost algorithm', 'XGBoost算法模板', 'XGBoost algorithm template', 1, now(), now());
+INSERT INTO `t_project_temp` VALUES (1, '空白', 'Blank', '空白模板', 'Blank template project', 1, now(), now());
+INSERT INTO `t_project_temp` VALUES (2, '协同营销', 'Collaborative Marketing', '协同营销模板', 'Collaborative marketing template', 1, now(), now());
+INSERT INTO `t_project_temp` VALUES (3, '线性训练', 'Linear training', '线性训练模板', 'Linear training template', 0, now(), now());
+INSERT INTO `t_project_temp` VALUES (4, 'DNN算法', 'DNN algorithm', 'DNN算法模板', 'DNN algorithm template', 0, now(), now());
+INSERT INTO `t_project_temp` VALUES (5, 'XGBoost算法', 'XGBoost algorithm', 'XGBoost算法模板', 'XGBoost algorithm template', 0, now(), now());
 
 -- ----------------------------
 -- init t_workflow_temp
 -- ----------------------------
 TRUNCATE t_workflow_temp;
-INSERT INTO `t_workflow_temp` VALUES (1, 1, '协同营销对应工作流', '协同营销对应工作流', 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (2, 2, '线性训练对应工作流', '线性训练对应工作流', 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (3, 3, 'DNN算法对应工作流', 'DNN算法对应工作流', 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (4, 4, 'XGBoost算法对应工作流', 'XGBoost算法对应工作流', 1, 0, 1, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (1, 1, '协同营销对应工作流', 'Collaborative Marketing workflow', '协同营销对应工作流', 'Collaborative Marketing workflow', 1, 0, 1, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (2, 2, '线性训练对应工作流', null, '线性训练对应工作流', null, 1, 0, 0, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (3, 3, 'DNN算法对应工作流', null, 'DNN算法对应工作流', null, 1, 0, 0, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (4, 4, 'XGBoost算法对应工作流', null, 'XGBoost算法对应工作流', null, 1, 0, 0, now(), now());
 
 -- ----------------------------
 -- init t_workflow_node_temp
@@ -33,17 +34,17 @@ INSERT INTO `t_workflow_node_temp` VALUES ('8', '4', '11', 'XGBoost预测', '2',
 -- init t_algorithm
 -- ----------------------------
 TRUNCATE t_algorithm;
-INSERT INTO `t_algorithm` VALUES ('1', '逻辑回归训练',  'Logistic regression training', '用于逻辑回归训练', 'For logistic regression training', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '1', '2021-10-25 15:16:02', '2021-11-12 10:03:52');
-INSERT INTO `t_algorithm` VALUES ('2', '分类模型预测', 'Classification model prediction', '用于分类模型的预测', 'Predictions for classification models', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '1', '1', '1', '0', '1', '1', '2021-10-25 15:16:02', '2021-11-12 10:03:46');
-INSERT INTO `t_algorithm` VALUES ('3', '隐私集合求交（PSI）', 'Privacy Set Intersection (PSI)', '用于跨组织的数据交集查询', 'Used for cross-organization data intersection query', 'Rosetta', '3', '2', 'SQL,Python', 'window,linux,mac', '1', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '0', '2021-10-25 16:47:14', '2021-11-12 10:02:38');
-INSERT INTO `t_algorithm` VALUES ('4', '隐私求和', 'Privacy Summation', '用于多方参与的隐私数据求和', 'Summation of private data for multi-party participation', 'Rosetta', '3', '2', 'SQL,Python', 'window,linux,mac', '1', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '0', '2021-10-25 17:01:40', '2021-11-12 10:02:59');
-INSERT INTO `t_algorithm` VALUES ('5', '缺失值处理', 'Missing value processing', '用于缺失值处理', 'Used for missing value processing', 'Rosetta', '3', '2', 'SQL,Python', 'window,linux,mac', '2', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '0', '2021-10-25 17:03:34', '2021-11-12 10:03:05');
-INSERT INTO `t_algorithm` VALUES ('6', '线性回归训练', 'Linear regression training', '用于线性回归训练', 'For linear regression training', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '1', '2021-11-17 15:00:00', '2021-11-17 13:00:00');
-INSERT INTO `t_algorithm` VALUES ('7', '线性回归预测', 'Linear regression prediction', '用于线性回归的预测', 'Forecast for linear regression', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '1', '1', '1', '0', '1', '1', '2021-11-17 15:00:00', '2021-11-17 13:00:00');
-INSERT INTO `t_algorithm` VALUES ('8', 'DNN训练', 'DNN training', '用于DNN训练', 'For DNN training', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '300000', '0', '1', '1', '0', '1', '1', '2021-11-22 11:00:40', '2021-11-22 11:00:44');
-INSERT INTO `t_algorithm` VALUES ('9', 'DNN预测', 'DNN prediction', '用于DNN预测算法', 'Used for DNN prediction algorithm', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '300000', '1', '1', '1', '0', '1', '1', '2021-11-22 11:05:49', '2021-11-22 11:05:52');
-INSERT INTO `t_algorithm` VALUES ('10', 'XGBoost训练', 'XGBoost training', '用于XGBoost训练', 'For XGBoost training', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '1', '2021-11-26 14:50:39', '2021-11-26 15:15:36');
-INSERT INTO `t_algorithm` VALUES ('11', 'XGBoost预测', 'XGBoost predictions', '用于XGBoost预测', 'Used for XGBoost prediction', 'Rosetta', '3', '2', 'python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '1', '1', '1', '0', '1', '1', '2021-11-26 14:51:58', '2021-11-26 14:52:59');
+INSERT INTO `t_algorithm` VALUES (1, '逻辑回归训练',  'Logistic Regression Training', '用于跨组织逻辑回归训练', 'Used for cross-organization logistic regression training', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '1', '2021-10-25 15:16:02', '2021-11-12 10:03:52');
+INSERT INTO `t_algorithm` VALUES (2, '逻辑回归预测', 'Logistic Regression Prediction', '用于跨组织逻辑回归预测', 'Used for cross-organization logistic regression prediction', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '1', '1', '1', '0', '1', '1', '2021-10-25 15:16:02', '2021-11-12 10:03:46');
+INSERT INTO `t_algorithm` VALUES (3, '隐私集合求交（PSI）', 'Privacy Set Intersection (PSI)', '用于跨组织的数据交集查询', 'Used for cross-organization data intersection query', 'Rosetta', '3', '2', 'SQL,Python', 'window,linux,mac', '1', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '0', '2021-10-25 16:47:14', '2021-11-12 10:02:38');
+INSERT INTO `t_algorithm` VALUES (4, '隐私求和', 'Privacy Summation', '用于多方参与的隐私数据求和', 'Summation of private data for multi-party participation', 'Rosetta', '3', '2', 'SQL,Python', 'window,linux,mac', '1', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '0', '2021-10-25 17:01:40', '2021-11-12 10:02:59');
+INSERT INTO `t_algorithm` VALUES (5, '缺失值处理', 'Missing value processing', '用于缺失值处理', 'Used for missing value processing', 'Rosetta', '3', '2', 'SQL,Python', 'window,linux,mac', '2', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '0', '2021-10-25 17:03:34', '2021-11-12 10:03:05');
+INSERT INTO `t_algorithm` VALUES (6, '线性回归训练', 'Linear Regression Training', '用于跨组织线性回归训练', 'Used for cross-organization linear regression training', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '1', '2021-11-17 15:00:00', '2021-11-17 13:00:00');
+INSERT INTO `t_algorithm` VALUES (7, '线性回归预测', 'Linear Regression Prediction', '用于跨组织线性回归的预测', 'Used for cross-organization linear regression prediction', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '1', '1', '1', '0', '1', '1', '2021-11-17 15:00:00', '2021-11-17 13:00:00');
+INSERT INTO `t_algorithm` VALUES (8, 'DNN训练', 'DNN Training', '用于跨组织DNN训练', 'Used for cross-organization DNN training', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '300000', '0', '1', '1', '0', '1', '1', '2021-11-22 11:00:40', '2021-11-22 11:00:44');
+INSERT INTO `t_algorithm` VALUES (9, 'DNN预测', 'DNN Prediction', '用于跨组织DNN预测算法', 'Used for cross-organization DNN prediction', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '300000', '1', '1', '1', '0', '1', '1', '2021-11-22 11:05:49', '2021-11-22 11:05:52');
+INSERT INTO `t_algorithm` VALUES (10, 'XGBoost训练', 'XGBoost Training', '用于跨组织XGBoost训练', 'Used for cross-organization XGBoost training', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '0', '1', '1', '0', '1', '1', '2021-11-26 14:50:39', '2021-11-26 15:15:36');
+INSERT INTO `t_algorithm` VALUES (11, 'XGBoost预测', 'XGBoost Prediction', '用于跨组织XGBoost预测', 'Used for cross-organization XGBoost prediction', 'Rosetta', '3', '2', 'Python', 'window,linux,mac', '3', '1073741824', '1', '2', '3145728', '180000', '1', '1', '1', '0', '1', '1', '2021-11-26 14:51:58', '2021-11-26 14:52:59');
 
 -- ----------------------------
 -- init t_algorithm_code
@@ -77,6 +78,6 @@ INSERT INTO `t_algorithm_variable_struct` VALUES (8, 11, '{\"model_restore_party
 -- init t_algorithm_type
 -- ----------------------------
 TRUNCATE t_algorithm_type;
-INSERT INTO `t_algorithm_type` VALUES (1, '统计分析', 'Statistical Analysis', '统计分析', 'Statistical Analysis', 1, 1, now(), now());
-INSERT INTO `t_algorithm_type` VALUES (2, '特征工程', 'Feature engineering', '特征工程', 'Feature engineering', 2, 1, now(), now());
-INSERT INTO `t_algorithm_type` VALUES (3, '机器学习', 'Machine learning', '机器学习', 'Machine learning', 3, 1, now(), now());
+INSERT INTO `t_algorithm_type` VALUES (1, '统计分析（开发中）', 'Statistics(developing)', '统计分析', 'Statistical Analysis', 1, 1, now(), now());
+INSERT INTO `t_algorithm_type` VALUES (2, '特征工程（开发中）', 'Feature Engineering(developing)', '特征工程', 'Feature engineering', 2, 1, now(), now());
+INSERT INTO `t_algorithm_type` VALUES (3, '机器学习', 'Machine Learning', '机器学习', 'Machine learning', 3, 1, now(), now());
