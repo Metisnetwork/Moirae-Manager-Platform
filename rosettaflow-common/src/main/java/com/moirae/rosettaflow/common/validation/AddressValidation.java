@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.common.validation;
 
 import com.moirae.rosettaflow.common.annotation.CheckAddress;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.ConstraintValidator;
@@ -12,6 +13,7 @@ import javax.validation.ConstraintValidatorContext;
  * @author hudenian
  * @date 2021/12/13
  */
+@Slf4j
 public class AddressValidation implements ConstraintValidator<CheckAddress, String> {
     @Override
     public void initialize(CheckAddress constraintAnnotation) {}
@@ -21,7 +23,12 @@ public class AddressValidation implements ConstraintValidator<CheckAddress, Stri
         if (StringUtils.isEmpty(value)) {
             return false;
         } else {
-            return AddressChangeUtils.convert0xAddress(value).toLowerCase().startsWith("0x");
+            try {
+                return AddressChangeUtils.convert0xAddress(value).toLowerCase().startsWith("0x");
+            } catch (Exception e) {
+                log.error("钱包地址格式错误, value:{}, 错误信息:{}", value, e.getMessage());
+                return false;
+            }
         }
     }
 }

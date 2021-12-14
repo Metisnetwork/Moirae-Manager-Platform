@@ -1,13 +1,13 @@
 package com.moirae.rosettaflow.req.data;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.moirae.rosettaflow.common.annotation.CheckAddress;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -45,7 +45,7 @@ public class MetaDataAuthReq {
     private Date authEndTime;
 
     @ApiModelProperty(value = "用户钱包地址", required = true)
-    @NotBlank(message = "{user.address.notBlank}")
+    @CheckAddress(message = "{user.address.format}")
     private String address;
 
     @ApiModelProperty(value = "发起数据授权申请的账户的签名", required = true)
