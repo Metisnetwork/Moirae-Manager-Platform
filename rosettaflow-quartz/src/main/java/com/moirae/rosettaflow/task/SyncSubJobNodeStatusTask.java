@@ -101,7 +101,7 @@ public class SyncSubJobNodeStatusTask {
                 node = subJobNodeMap.get(taskId);
                 if (state == TaskRunningStatusEnum.SUCCESS.getValue()) {
                     //获取待保存任务结果数据
-                    String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
+                    String identityId = workflowNodeOutputService.getOutputIdentityIdByWorkFlowIdAndStep(subJobNodeMap.get(taskId).getWorkflowId(),subJobNodeMap.get(taskId).getNodeStep().longValue());
                     ManagedChannel channel = netManager.getChannel(identityId);
                     GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel, taskId);
                     if (Objects.isNull(taskResultResponseDto)) {
