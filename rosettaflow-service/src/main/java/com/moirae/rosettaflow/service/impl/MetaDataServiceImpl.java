@@ -81,6 +81,7 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         BeanCopierUtils.copy(metaData, metaDataDto);
         // 用户没有登录，不处理授权信息
         if (null == userMetaDataId ||  userMetaDataId == 0) {
+            metaDataDto.setAuthType(AuthTypeEnum.UNKNOWN.getValue());
             return metaDataDto;
         }
         // 用户登录成功--查询用户授权数据
@@ -100,18 +101,13 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         metaDataDto.setAuthStatus(this.dealAuthStatus(userMetaData.getAuthStatus(), userMetaData.getAuthMetadataState()));
         //授权类型及授权值
         String authTime = "";
-        if (!Objects.isNull(userMetaData.getAuthType())) {
-            metaDataDto.setAuthType(userMetaData.getAuthType());
-            if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
-                SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
-                dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
-                authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
-            }
-            metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
-        } else {
-            metaDataDto.setAuthType(AuthTypeEnum.UNKNOWN.getValue());
-            metaDataDto.setAuthValueStr(authTime);
+        metaDataDto.setAuthType(userMetaData.getAuthType());
+        if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
+            dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
+            authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
         }
+        metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
         return metaDataDto;
     }
 
