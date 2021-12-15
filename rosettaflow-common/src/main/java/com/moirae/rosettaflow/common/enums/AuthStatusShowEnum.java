@@ -24,9 +24,13 @@ public enum AuthStatusShowEnum {
      */
     REFUSE((byte) 2),
     /**
+     * 已撤销
+     */
+    CANCELED((byte) 3),
+    /**
      * 已失效
      */
-    INVALID((byte) 3);
+    INVALID((byte) 4);
 
     private final byte value;
 

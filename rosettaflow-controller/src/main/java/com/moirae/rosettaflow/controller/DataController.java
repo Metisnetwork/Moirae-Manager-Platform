@@ -123,7 +123,11 @@ public class DataController {
 
     private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {
         List<MetaDataVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataVo.class)));
+        pageDto.getRecords().forEach(metaDataDto -> {
+            MetaDataVo metaDataVo = BeanUtil.copyProperties(metaDataDto, MetaDataVo.class);
+            metaDataVo.setAuthStatus(metaDataService.dealAuthStatus(metaDataDto.getAuthStatus(), metaDataDto.getAuthMetadataState()));
+            items.add(metaDataVo);
+        });
         PageVo<MetaDataVo> pageVo = new PageVo<>();
         BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
@@ -145,6 +149,7 @@ public class DataController {
             userMetaDataVo.setAuthValueStr(userMetaDataDto.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaDataDto.getAuthValue()) :  authTime);
             //状态
             userMetaDataVo.setAuthStatusShow(getAuthStatusShow(userMetaDataDto));
+            userMetaDataVo.setAuthStatus(metaDataService.dealAuthStatus(userMetaDataDto.getAuthStatus(), userMetaDataDto.getAuthMetadataState()));
             items.add(userMetaDataVo);
         });
 

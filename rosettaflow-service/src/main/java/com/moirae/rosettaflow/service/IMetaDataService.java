@@ -58,4 +58,12 @@ public interface IMetaDataService extends IService<MetaData> {
      * @param metaDataList 批量插入列表
      */
     void batchInsert(List<MetaData> metaDataList);
+
+    /**
+     * 授权状态处理
+     * @param authStatus 授权状态
+     * @param authMetadataState 数据状态
+     * @return authStatus
+     */
+    Byte dealAuthStatus(Byte authStatus, Byte authMetadataState);
 }

@@ -95,6 +95,7 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         metaDataDto.setExpire(userMetaData.getExpire());
         metaDataDto.setAuthMetadataState(userMetaData.getAuthMetadataState());
         metaDataDto.setUsedTimes(userMetaData.getUsedTimes());
+        metaDataDto.setAuthStatus(this.dealAuthStatus(metaDataDto.getAuthStatus(), metaDataDto.getAuthMetadataState()));
         //授权类型及授权值
         String authTime = "";
         if (!Objects.isNull(userMetaData.getAuthType())) {
@@ -161,5 +162,22 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         pageDto.setSize(page.getSize());
         pageDto.setTotal(page.getTotal());
         return pageDto;
+    }
+
+    @Override
+    public Byte dealAuthStatus(Byte authStatus, Byte authMetadataState) {
+        // 已撤销
+        if (authMetadataState == UserMetaDataAuthorithStateEnum.REVOKED.getValue()) {
+            return AuthStatusShowEnum.CANCELED.getValue();
+        }
+        // 已失效
+        if (authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue()) {
+            return AuthStatusShowEnum.INVALID.getValue();
+        }
+        // 未知
+        if(null == authStatus) {
+            return AuthStatusShowEnum.UNKNOWN.getValue();
+        }
+        return authStatus;
     }
 }
