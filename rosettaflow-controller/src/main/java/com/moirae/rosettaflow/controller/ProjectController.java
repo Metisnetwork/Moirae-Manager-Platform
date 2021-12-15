@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -58,8 +59,10 @@ public class ProjectController {
 
     @PostMapping("addProject")
     @ApiOperation(value = "新增项目", notes = "新增项目")
-    public ResponseVo<ProjectVo> addProject(@RequestBody @Valid AddProjectReq addProjectReq) {
-        Long id = projectService.addProject(BeanUtil.copyProperties(addProjectReq, ProjectDto.class));
+    public ResponseVo<ProjectVo> addProject(@RequestBody @Valid AddProjectReq addProjectReq, HttpServletRequest request) {
+        // 获取语言类型
+        String language = request.getHeader("Accept-Language");
+        Long id = projectService.addProject(BeanUtil.copyProperties(addProjectReq, ProjectDto.class), language);
         return ResponseVo.createSuccess(new ProjectVo(id));
     }
 

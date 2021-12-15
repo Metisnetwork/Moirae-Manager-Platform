@@ -258,8 +258,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             Long newWorkflowId = saveCopyWorkflow(originId, workflowName, workflowDesc);
             // 查询原工作流节点
             List<WorkflowNode> workflowNodeOldList = workflowNodeService.getWorkflowNodeList(originId);
-            // 保存复制的工作流节点及所属数据, Boolean.FALSE表示不是模板copy判断变量
-            workflowNodeService.saveCopyWorkflowNode(newWorkflowId, workflowNodeOldList, Boolean.FALSE);
+            // 复制工作流节点及所属数据
+            workflowNodeService.saveCopyWorkflowNode(newWorkflowId, workflowNodeOldList);
         } catch (Exception e) {
             log.error("copyWorkflow--复制工作流接口失败, 错误信息:{}, 异常:{}", e.getMessage(), e);
             if (e instanceof DuplicateKeyException) {
@@ -414,12 +414,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public Long addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp) {
+    public Long addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp, String language) {
         Workflow workflow = new Workflow();
         workflow.setProjectId(projectId);
         workflow.setUserId(userId);
-        workflow.setWorkflowName(workflowTemp.getWorkflowName());
-        workflow.setWorkflowDesc(workflowTemp.getWorkflowDesc());
+        // 处理国际化
+        workflow.setWorkflowName(SysConstant.EN_US.equals(language) ? workflowTemp.getWorkflowNameEn() : workflowTemp.getWorkflowName());
+        workflow.setWorkflowDesc(SysConstant.EN_US.equals(language) ? workflowTemp.getWorkflowDescEn() : workflowTemp.getWorkflowDesc());
         workflow.setNodeNumber(workflowTemp.getNodeNumber());
         workflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
         this.save(workflow);

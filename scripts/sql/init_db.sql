@@ -21,14 +21,14 @@ INSERT INTO `t_workflow_temp` VALUES (4, 4, 'XGBoost算法对应工作流', null
 -- init t_workflow_node_temp
 -- ----------------------------
 TRUNCATE t_workflow_node_temp;
-INSERT INTO `t_workflow_node_temp` VALUES ('1', '1', '1', '逻辑回归训练', '1', '2', '0', '1', '2021-12-01 03:44:28', '2021-12-01 03:44:28');
-INSERT INTO `t_workflow_node_temp` VALUES ('2', '1', '2', '分类模型预测', '2', null, '0', '1', '2021-12-01 03:44:28', '2021-12-01 03:44:28');
-INSERT INTO `t_workflow_node_temp` VALUES ('3', '2', '6', '线性回归训练', '1', '2', '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:19');
-INSERT INTO `t_workflow_node_temp` VALUES ('4', '2', '7', '线性回归预测', '2', null, '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:27');
-INSERT INTO `t_workflow_node_temp` VALUES ('5', '3', '8', 'DNN训练', '1', '2', '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:30');
-INSERT INTO `t_workflow_node_temp` VALUES ('6', '3', '9', 'DNN预测', '2', null, '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:34');
-INSERT INTO `t_workflow_node_temp` VALUES ('7', '4', '10', 'XGBoost训练', '1', '2', '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:37');
-INSERT INTO `t_workflow_node_temp` VALUES ('8', '4', '11', 'XGBoost预测', '2', null, '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:40');
+INSERT INTO `t_workflow_node_temp` VALUES (1, 1, 1, '逻辑回归训练',  'Logistic Regression Training', '1', '2', '0', '1', '2021-12-01 03:44:28', '2021-12-01 03:44:28');
+INSERT INTO `t_workflow_node_temp` VALUES (2, 1, 2, '逻辑回归预测', 'Logistic Regression Prediction', '2', null, '0', '1', '2021-12-01 03:44:28', '2021-12-01 03:44:28');
+INSERT INTO `t_workflow_node_temp` VALUES (3, 2, 6, '线性回归训练', 'Linear Regression Training', '1', '2', '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:19');
+INSERT INTO `t_workflow_node_temp` VALUES (4, 2, 7, '线性回归预测', 'Linear Regression Prediction', '2', null, '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:27');
+INSERT INTO `t_workflow_node_temp` VALUES (5, 3, 8, 'DNN训练', 'DNN Training', '1', '2', '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:30');
+INSERT INTO `t_workflow_node_temp` VALUES (6, 3, 9, 'DNN预测', 'DNN Prediction', '2', null, '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:34');
+INSERT INTO `t_workflow_node_temp` VALUES (7, 4, 10, 'XGBoost训练', 'XGBoost Training', '1', '2', '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:37');
+INSERT INTO `t_workflow_node_temp` VALUES (8, 4, 11, 'XGBoost预测', 'XGBoost Prediction', '2', null, '0', '1', '2021-12-01 03:44:29', '2021-12-01 08:20:40');
 
 -- ----------------------------
 -- init t_algorithm

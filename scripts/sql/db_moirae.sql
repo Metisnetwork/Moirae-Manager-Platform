@@ -227,7 +227,7 @@ CREATE TABLE `t_algorithm_type`
 (
     `id`                  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '算法表ID(自增长)',
     `algorithm_type_name` varchar(30)         DEFAULT NULL COMMENT '中文算法名称',
-    `algorithm_type_name_en` varchar(30)         DEFAULT NULL COMMENT '英文算法名称',
+    `algorithm_type_name_en` varchar(60)         DEFAULT NULL COMMENT '英文算法名称',
     `algorithm_type_desc` varchar(200)        DEFAULT NULL COMMENT '中文算法描述',
     `algorithm_type_desc_en` varchar(200)        DEFAULT NULL COMMENT '英文算法描述',
     `algorithm_type`      tinyint(4)          DEFAULT NULL COMMENT '算法所属大类:1-统计分析,2-特征工程,3-机器学习',
@@ -432,7 +432,8 @@ CREATE TABLE `t_workflow_node_temp`
     `id`               bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点模板表ID(自增长)',
     `workflow_temp_id` bigint(20)          DEFAULT NULL COMMENT '工作流模板表id',
     `algorithm_id`     bigint(20)          DEFAULT NULL COMMENT '算法id',
-    `node_name`        varchar(30)         DEFAULT NULL COMMENT '节点名称',
+    `node_name`        varchar(30)         DEFAULT NULL COMMENT '中文节点名称',
+    `node_name_en`        varchar(60)         DEFAULT NULL COMMENT '英文节点名称',
     `node_step`        int(11)             DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
     `next_node_step`   int(11)             DEFAULT NULL COMMENT '下一个节点,如果为空则无下个节点',
     `run_status`       tinyint(4)          DEFAULT NULL COMMENT '运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败',

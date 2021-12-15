@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -65,7 +66,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long addProject(ProjectDto projectDto) {
+    public Long addProject(ProjectDto projectDto, String language) {
         try {
             Long userId = commonService.getCurrentUser().getId();
             Project project = new Project();
@@ -89,14 +90,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 WorkflowTemp workflowTemp = workflowTempService.getWorkflowTemplate(projectDto.getProjectTempId());
                 if (null != workflowTemp) {
                     // 添加工作流
-                    Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), userId, workflowTemp);
+                    Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), userId, workflowTemp, language);
 
                     //从工作流节点模板中复制所有工作流节点
                     List<WorkflowNodeTemp> workflowNodeTempList = workflowNodeTempService.getByWorkflowTempId(workflowTemp.getId());
-
                     //根据工作流节点模板列表，添加工作流节点
                     if (workflowNodeTempList.size() > 0) {
-                        workflowNodeService.addWorkflowNodeByTemplate(workflowId, workflowNodeTempList);
+                        // 处理工作流节点名称国际化
+                        this.dealNodeNameLanguage(workflowNodeTempList, language);
+                        List<WorkflowNode> oldNodeList = BeanUtil.copyToList(workflowNodeTempList, WorkflowNode.class);
+                        // 保存节点
+                        workflowNodeService.saveCopyWorkflowNodeTemp(workflowId, oldNodeList);
                     }
                 }
             }
@@ -108,6 +112,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             }
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJ_ERROR.getMsg());
         }
+    }
+
+    /** 处理工作流节点名称国际化 */
+    private void dealNodeNameLanguage(List<WorkflowNodeTemp> workflowNodeTempList, String language){
+        workflowNodeTempList.forEach(nodeTemp ->
+                nodeTemp.setNodeName(SysConstant.EN_US.equals(language) ? nodeTemp.getNodeNameEn() : nodeTemp.getNodeName()));
     }
 
     @Override

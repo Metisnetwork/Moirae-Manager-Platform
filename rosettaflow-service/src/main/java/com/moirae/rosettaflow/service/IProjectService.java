@@ -21,9 +21,10 @@ public interface IProjectService extends IService<Project> {
      * 新增项目
      *
      * @param projectDto 项目信息
+     * @param language 语言类型
      * @return id 项目id
      */
-    Long addProject(ProjectDto projectDto);
+    Long addProject(ProjectDto projectDto, String language);
 
     /**
      * 修改项目

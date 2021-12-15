@@ -1,10 +1,10 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * t_workflow_temp
@@ -24,14 +24,24 @@ public class WorkflowTemp implements Serializable {
     private Long projectTempId;
 
     /**
-     * 工作流名称
+     * 中文工作流名称
      */
     private String workflowName;
 
     /**
-     * 工作流描述
+     * 英文工作流名称
+     */
+    private String workflowNameEn;
+
+    /**
+     * 中文工作流描述
      */
     private String workflowDesc;
+
+    /**
+     * 英文工作流描述
+     */
+    private String workflowDescEn;
 
     /**
      * 节点数

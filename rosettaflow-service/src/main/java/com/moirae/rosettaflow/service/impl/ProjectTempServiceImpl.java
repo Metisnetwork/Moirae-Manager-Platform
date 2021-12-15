@@ -52,9 +52,6 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
         LambdaQueryWrapper<ProjectTemp> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(ProjectTemp::getStatus, StatusEnum.VALID.getValue());
         List<ProjectTemp> returnList = this.list(wrapper);
-        //添加空白模板
-        ProjectTemp emptyTemp = new ProjectTemp();
-        emptyTemp.setId(0L);
         // 处理国际化
         if (SysConstant.EN_US.equals(language)) {
             for (ProjectTemp ProjectTemp : returnList) {

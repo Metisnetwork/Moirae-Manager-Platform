@@ -1,12 +1,12 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * t_workflow_node_temp
@@ -32,9 +32,14 @@ public class WorkflowNodeTemp implements Serializable {
     private Long algorithmId;
 
     /**
-     * 节点名称
+     * 中文节点名称
      */
     private String nodeName;
+
+    /**
+     * 英文节点名称
+     */
+    private String nodeNameEn;
 
     /**
      * 节点在工作流中序号,从1开始
