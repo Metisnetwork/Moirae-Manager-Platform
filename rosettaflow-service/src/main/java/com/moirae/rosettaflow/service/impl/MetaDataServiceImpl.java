@@ -118,7 +118,7 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public MetaData getMetaDataById(Long id){
         LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
-        metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId, id);
+        metaDataLambdaQueryWrapper.eq(MetaData::getId, id);
         metaDataLambdaQueryWrapper.eq(MetaData::getStatus,StatusEnum.VALID.getValue());
         return this.getOne(metaDataLambdaQueryWrapper);
     }
