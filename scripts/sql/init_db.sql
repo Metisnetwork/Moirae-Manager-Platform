@@ -12,10 +12,10 @@ INSERT INTO `t_project_temp` VALUES (5, 'XGBoost算法', 'XGBoost algorithm', 'X
 -- init t_workflow_temp
 -- ----------------------------
 TRUNCATE t_workflow_temp;
-INSERT INTO `t_workflow_temp` VALUES (1, 1, '协同营销对应工作流', 'Collaborative Marketing workflow', '协同营销对应工作流', 'Collaborative Marketing workflow', 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (2, 2, '线性训练对应工作流', null, '线性训练对应工作流', null, 1, 0, 0, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (3, 3, 'DNN算法对应工作流', null, 'DNN算法对应工作流', null, 1, 0, 0, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (4, 4, 'XGBoost算法对应工作流', null, 'XGBoost算法对应工作流', null, 1, 0, 0, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (1, 2, '协同营销对应工作流', 'Collaborative Marketing workflow', '协同营销对应工作流', 'Collaborative Marketing workflow', 1, 0, 1, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (2, 3, '线性训练对应工作流', null, '线性训练对应工作流', null, 1, 0, 1, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (3, 4, 'DNN算法对应工作流', null, 'DNN算法对应工作流', null, 1, 0, 1, now(), now());
+INSERT INTO `t_workflow_temp` VALUES (4, 5, 'XGBoost算法对应工作流', null, 'XGBoost算法对应工作流', null, 1, 0, 1, now(), now());
 
 -- ----------------------------
 -- init t_workflow_node_temp

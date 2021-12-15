@@ -362,7 +362,7 @@ CREATE TABLE `t_workflow`
     `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流ID(自增长)',
     `project_id`    bigint(20)          DEFAULT NULL COMMENT '项目id',
     `user_id`       bigint(20)          DEFAULT NULL COMMENT '用户id(创建方id)',
-    `workflow_name` varchar(30)         DEFAULT NULL COMMENT '工作流名称',
+    `workflow_name` varchar(60)         DEFAULT NULL COMMENT '工作流名称',
     `workflow_desc` varchar(200)        DEFAULT NULL COMMENT '工作流描述',
     `node_number`   int(11)             DEFAULT NULL COMMENT '节点数',
     `address`       varchar(64)         DEFAULT NULL COMMENT '发起任务的账户',
