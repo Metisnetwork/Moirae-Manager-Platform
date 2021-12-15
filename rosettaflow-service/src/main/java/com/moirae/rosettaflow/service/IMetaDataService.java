@@ -31,11 +31,19 @@ public interface IMetaDataService extends IService<MetaData> {
     /**
      * 获取元数据详情
      *
-     * @param userMetaDataId 用户授权数据表Id
      * @param metaDataPkId 元数据表Id
+     * @param userMetaDataId 用户授权数据表Id
      * @return 元数据详情
      */
-    MetaDataDto detail(String userMetaDataId, String metaDataPkId);
+    MetaDataDto detail(Long metaDataPkId, Long userMetaDataId);
+
+    /**
+     * 获取元数据通过ID
+     *
+     * @param id 元数据表Id
+     * @return MetaData
+     */
+    MetaData getMetaDataById(Long id);
 
     /**
      * 获取元数据详情
