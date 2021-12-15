@@ -21,10 +21,20 @@ public interface WorkflowNodeOutputMapper extends BaseMapper<WorkflowNodeOutput>
 
     /**
      * 根据任务id获取输入放的组织id
+     *
      * @param taskId 任务id
      * @return identityId 组织id
      */
     String getOutputIdentityIdByTaskId(@Param("taskId") String taskId);
+
+    /**
+     * 根据工作流id 及节点编号获取任务结果输出组织的IdentityId
+     *
+     * @param workflowNodeId 工作流id
+     * @param nodeStep       节点编号
+     * @return identityId
+     */
+    String getOutputIdentityIdByWorkFlowIdAndStep(@Param("workflowNodeId") Long workflowNodeId, @Param("nodeStep") Long nodeStep);
 
     /**
      * 批量保存节点输出

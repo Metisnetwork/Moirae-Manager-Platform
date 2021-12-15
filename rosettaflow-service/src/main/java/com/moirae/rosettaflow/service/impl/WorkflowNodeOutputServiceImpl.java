@@ -54,6 +54,11 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
         return this.baseMapper.getOutputIdentityIdByTaskId(taskId);
     }
 
+    @Override
+    public String getOutputIdentityIdByWorkFlowIdAndStep(Long workflowNodeId, Long nodeStep){
+        return this.baseMapper.getOutputIdentityIdByWorkFlowIdAndStep(workflowNodeId,nodeStep);
+    }
+
 
     @Override
     public void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList) {

@@ -39,16 +39,39 @@
     </select>
 
     <select id="getOutputIdentityIdByTaskId" resultType="string">
-        select
-            b.identity_id as identityId
-        from
-             t_workflow_node a, t_workflow_node_output b
-        where a.status = 1
-          and b.status = 1
-          and b.store_pattern = 1
-          and a.id = b.workflow_node_id
-          and a.task_id = #{taskId, jdbcType=VARCHAR}
+        SELECT
+            b.identity_id AS identityId
+        FROM
+            t_workflow_node a,
+            t_workflow_node_output b
+        WHERE
+            a. STATUS = 1
+          AND b. STATUS = 1
+          AND a.id = b.workflow_node_id
+          AND a.task_id = #{taskId, jdbcType=VARCHAR}
+        ORDER BY
+            a.id ASC
+        LIMIT 1
     </select>
+
+    <select id="getOutputIdentityIdByWorkFlowIdAndStep" resultType="string">
+        SELECT
+            b.identity_id AS identityId
+        FROM
+            t_workflow_node a,
+            t_workflow_node_output b
+        WHERE
+            a. STATUS = 1
+          AND b. STATUS = 1
+          AND a.id = b.workflow_node_id
+          AND a.workflow_id = #{workflowNodeId, jdbcType=BIGINT}
+          AND a.node_step = #{nodeStep, jdbcType=INTEGER}
+        ORDER BY
+            a.id ASC
+        LIMIT 1
+    </select>
+
+
     <insert id="batchInsert">
         <foreach collection="workflowNodeOutputList" item="o" separator=";">
             insert into t_workflow_node_output
