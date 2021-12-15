@@ -138,7 +138,7 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
                 // 处理国际化语言
                 if (SysConstant.EN_US.equals(language)) {
                     algorithmDto.setAlgorithmName(algorithmDto.getAlgorithmNameEn());
-                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmNameEn());
+                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmDescEn());
                 }
                 if (algorithmDto.getAlgorithmType() == type.getAlgorithmType().byteValue()) {
                     Map<String, Object> param1 = new HashMap<>(SysConstant.INT_3);

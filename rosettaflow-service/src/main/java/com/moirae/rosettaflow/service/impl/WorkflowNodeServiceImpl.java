@@ -89,7 +89,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
                 // 处理国际化语言
                 if (SysConstant.EN_US.equals(language)) {
                     algorithmDto.setAlgorithmName(algorithmDto.getAlgorithmNameEn());
-                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmNameEn());
+                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmDescEn());
                 }
                 // 工作流节点算法代码, 如果可查询出，表示已修改，否则没有变动
                 WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
