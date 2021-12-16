@@ -114,6 +114,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
+//        this.checkAccessPermission(projectId);
         return this.baseMapper.queryWorkFlowPageList(projectId, workflowName, page);
     }
 
@@ -867,6 +868,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
             log.error("checkEditPermission error:{}", ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * 校验当前用户是否有访问当前项目权限
+     */
+    private void checkAccessPermission(Long projectId) {
+        Byte role = projectService.getRoleByProjectId(projectId);
+        if (!Arrays.asList(SysConstant.ROLE_ARR).contains(role)) {
+            log.error("您无权访问当前项目--checkAccessPermission, projectId:{}, role:{}", projectId, role);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ACCESS_PERMISSION_ERROR.getMsg());
         }
     }
 

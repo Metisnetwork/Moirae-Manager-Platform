@@ -12,7 +12,7 @@ public enum UserMetaDataAuditEnum {
      */
     AUDIT_UNKNOWN((byte) -1),
     /**
-     * 等待审核中
+     * 等待审核中(已申请)
      */
     AUDIT_PENDING((byte) 0),
     /**

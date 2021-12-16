@@ -70,23 +70,26 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public MetaDataDto detail(String userMetaDataId, String metaDataPkId) {
-        MetaData metaData = this.getById(metaDataPkId);
+    public MetaDataDto detail(Long metaDataPkId, Long userMetaDataId) {
+        // 查询元数据
+        MetaData metaData = this.getMetaDataById(metaDataPkId);
         if (Objects.isNull(metaData)) {
             log.error("query metaData fail by id:{}", metaDataPkId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
-        //用户登录成功
-        UserMetaData userMetaData = new UserMetaData();
-        if (!Objects.isNull(userMetaDataId) && StrUtil.isNotEmpty(userMetaDataId)) {
-            userMetaData = userMetaDataService.getById(userMetaDataId);
-            if(Objects.isNull(userMetaData)){
-                log.error("query userMetaData fail by id:{}", userMetaDataId);
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
-            }
-        }
         MetaDataDto metaDataDto = new MetaDataDto();
         BeanCopierUtils.copy(metaData, metaDataDto);
+        // 用户没有登录，不处理授权信息
+        if (null == userMetaDataId ||  userMetaDataId == 0) {
+            metaDataDto.setAuthType(AuthTypeEnum.UNKNOWN.getValue());
+            return metaDataDto;
+        }
+        // 用户登录成功--查询用户授权数据
+        UserMetaData userMetaData = userMetaDataService.getById(userMetaDataId);
+        if(Objects.isNull(userMetaData)){
+            log.error("query userMetaData fail by id:{}", userMetaDataId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
+        }
         metaDataDto.setAuthBeginTime(userMetaData.getAuthBeginTime());
         metaDataDto.setAuthEndTime(userMetaData.getAuthEndTime());
         metaDataDto.setApplyTime(userMetaData.getApplyTime());
@@ -95,22 +98,25 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         metaDataDto.setExpire(userMetaData.getExpire());
         metaDataDto.setAuthMetadataState(userMetaData.getAuthMetadataState());
         metaDataDto.setUsedTimes(userMetaData.getUsedTimes());
-        metaDataDto.setAuthStatus(this.dealAuthStatus(metaDataDto.getAuthStatus(), metaDataDto.getAuthMetadataState()));
+        metaDataDto.setAuthStatus(this.dealAuthStatus(userMetaData.getAuthStatus(), userMetaData.getAuthMetadataState()));
         //授权类型及授权值
         String authTime = "";
-        if (!Objects.isNull(userMetaData.getAuthType())) {
-            metaDataDto.setAuthType(userMetaData.getAuthType());
-            if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
-                SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
-                dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
-                authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
-            }
-            metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
-        } else {
-            metaDataDto.setAuthType(AuthTypeEnum.UNKNOWN.getValue());
-            metaDataDto.setAuthValueStr(authTime);
+        metaDataDto.setAuthType(userMetaData.getAuthType());
+        if(!Objects.isNull(userMetaData.getAuthBeginTime()) && !Objects.isNull(userMetaData.getAuthEndTime())){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
+            dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
+            authTime = dateFormat.format(userMetaData.getAuthBeginTime()) + "~" + dateFormat.format(userMetaData.getAuthEndTime());
         }
+        metaDataDto.setAuthValueStr(userMetaData.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaData.getAuthValue()) :  authTime);
         return metaDataDto;
+    }
+
+    @Override
+    public MetaData getMetaDataById(Long id){
+        LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
+        metaDataLambdaQueryWrapper.eq(MetaData::getId, id);
+        metaDataLambdaQueryWrapper.eq(MetaData::getStatus,StatusEnum.VALID.getValue());
+        return this.getOne(metaDataLambdaQueryWrapper);
     }
 
     @Override

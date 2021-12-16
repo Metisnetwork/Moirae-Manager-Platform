@@ -24,6 +24,11 @@ public class SysConstant {
     public static final int INT_3600 = 3600;
 
     /**
+     * 角色数据
+     */
+    public static final int[] ROLE_ARR = {1, 2, 3};
+
+    /**
      * 批量处理方式
      */
     public static final String INSERT = "INSERT";

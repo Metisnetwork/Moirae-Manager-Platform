@@ -16,11 +16,11 @@ import javax.validation.constraints.Positive;
 public class MetaDataDetailDescribeReq {
 
     @ApiModelProperty(value = "元数据表id", required = true)
-    @NotNull(message = "{metadata.metadatapkid.notNull}")
-    @Positive(message = "{metadata.metadatapkid.positive}")
-    private String metaDataPkId;
+    @NotNull(message = "{metadata.id.notNull}")
+    @Positive(message = "{metadata.id.positive}")
+    private Long metaDataPkId;
 
     @ApiModelProperty(value = "用户授权数据表id")
-    private String userMetaDataId;
+    private Long userMetaDataId;
 
 }
