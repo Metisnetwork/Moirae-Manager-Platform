@@ -10,57 +10,61 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * t_organization
+ * t_user_org_maintain
  *
  * @author admin
  */
 @Data
-@TableName(value = "t_organization")
-public class Organization implements Serializable {
-    private static final long serialVersionUID = 1L;
+@TableName(value = "t_user_org_maintain")
+public class UserOrgMaintain implements Serializable {
     /**
-     * 组织表ID(自增长)
+     * 用户组织连接绑定关系表ID(自增长)
      */
     @TableId(type = IdType.AUTO)
     private Long id;
+
     /**
-     * 组织的身份名称
+     * 用户钱包地址
      */
-    private String nodeName;
-    /**
-     * 组织中调度服务的 nodeId
-     */
-    private String nodeId;
+    private String address;
+
     /**
      * 组织的身份标识Id
      */
     private String identityId;
+
     /**
      * 组织的ip
      */
     private String identityIp;
+
     /**
      * 组织的端口
      */
     private Integer identityPort;
 
     /**
-     * 是否公有可查节点: 0-否，1- 是
+     * 连接有效状态: 0-无效，1- 有效
      */
-    private Byte publicFlag;
+    private Byte validFlag;
+
     /**
      * 状态: 0-未知，1- 正常， 2- 异常
      */
     @TableField(value = "`status`")
     private Byte status;
+
     /**
      * 创建时间
      */
     private Date createTime;
+
     /**
      * 更新时间
      */
     private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     public boolean equals(Object that) {
@@ -73,11 +77,12 @@ public class Organization implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        Organization other = (Organization) that;
+        UserOrgMaintain other = (UserOrgMaintain) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getNodeName() == null ? other.getNodeName() == null : this.getNodeName().equals(other.getNodeName()))
-                && (this.getNodeId() == null ? other.getNodeId() == null : this.getNodeId().equals(other.getNodeId()))
+                && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
                 && (this.getIdentityId() == null ? other.getIdentityId() == null : this.getIdentityId().equals(other.getIdentityId()))
+                && (this.getIdentityIp() == null ? other.getIdentityIp() == null : this.getIdentityIp().equals(other.getIdentityIp()))
+                && (this.getIdentityPort() == null ? other.getIdentityPort() == null : this.getIdentityPort().equals(other.getIdentityPort()))
                 && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
                 && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
                 && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
@@ -88,9 +93,10 @@ public class Organization implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getNodeName() == null) ? 0 : getNodeName().hashCode());
-        result = prime * result + ((getNodeId() == null) ? 0 : getNodeId().hashCode());
+        result = prime * result + ((getAddress() == null) ? 0 : getAddress().hashCode());
         result = prime * result + ((getIdentityId() == null) ? 0 : getIdentityId().hashCode());
+        result = prime * result + ((getIdentityIp() == null) ? 0 : getIdentityIp().hashCode());
+        result = prime * result + ((getIdentityPort() == null) ? 0 : getIdentityPort().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
@@ -103,9 +109,10 @@ public class Organization implements Serializable {
                 " [" +
                 "Hash = " + hashCode() +
                 ", id=" + id +
-                ", nodeName=" + nodeName +
-                ", nodeId=" + nodeId +
+                ", address=" + address +
                 ", identityId=" + identityId +
+                ", identityIp=" + identityIp +
+                ", identityPort=" + identityPort +
                 ", status=" + status +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +

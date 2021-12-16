@@ -26,10 +26,7 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
-import com.moirae.rosettaflow.service.IOrganizationService;
-import com.moirae.rosettaflow.service.IWorkflowNodeOutputService;
-import com.moirae.rosettaflow.service.IWorkflowService;
-import com.moirae.rosettaflow.service.NetManager;
+import com.moirae.rosettaflow.service.*;
 import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import io.grpc.ManagedChannel;
@@ -83,6 +80,9 @@ public class RpcTestController {
     private IOrganizationService organizationService;
 
     @Resource
+    private IUserOrgMaintainService userOrgMaintainService;
+
+    @Resource
     private IWorkflowNodeOutputService workflowNodeOutputService;
 
 
@@ -92,6 +92,14 @@ public class RpcTestController {
         log.info("getNodeIdentity接口测试");
         NodeIdentityDto nodeIdentityDto = grpcAuthService.getNodeIdentity();
         return ResponseVo.createSuccess(nodeIdentityDto);
+    }
+
+    @GetMapping("getAllOrg")
+    @ApiOperation(value = "查询所有组织", notes = "查询所有组织")
+    public ResponseVo<List<NodeIdentityDto>> getAllOrg() {
+        log.info("查询所有组织");
+        List<NodeIdentityDto> orgList = grpcAuthService.getIdentityList();
+        return ResponseVo.createSuccess(orgList);
     }
 
     @GetMapping("getIdentityList")

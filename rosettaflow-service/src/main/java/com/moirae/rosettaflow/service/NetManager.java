@@ -71,9 +71,9 @@ public class NetManager {
      * @param port 组织端口
      * @return channel
      */
-    public ManagedChannel assemblyChannel(String ip, String port) {
+    public ManagedChannel assemblyChannel(String ip, Integer port) {
         return ManagedChannelBuilder
-                .forAddress(ip, Integer.parseInt(port))
+                .forAddress(ip, port)
                 .usePlaintext()
                 .keepAliveWithoutCalls(true)
                 .build();
@@ -130,5 +130,10 @@ public class NetManager {
         ipPortList.add(identityIdIpPortMap.get(identityId).split(delimiter)[0]);
         ipPortList.add(identityIdIpPortMap.get(identityId).split(delimiter)[1]);
         return ipPortList;
+    }
+
+    public void addChannel(String identityId, ManagedChannel channel, String ip, Integer port) {
+        channelMap.put(identityId, channel);
+        identityIdIpPortMap.put(identityId, ip + delimiter + port);
     }
 }

@@ -155,6 +155,7 @@ public enum ErrorMsg {
      * 机构
      */
     ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist"),
+    ORGANIZATION_INFO_ERROR("连接组织节点服务不可达", "Organization can not connect"),
 
     /**
      * 任务

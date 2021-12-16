@@ -30,7 +30,8 @@ CREATE TABLE `t_organization`
     `node_id`     varchar(256)        DEFAULT NULL COMMENT '组织中调度服务的 nodeId',
     `identity_id` varchar(128)        DEFAULT NULL COMMENT '组织的身份标识Id',
     `identity_ip` varchar(20)        DEFAULT NULL COMMENT '组织的ip',
-    `identity_port` varchar(20)        DEFAULT NULL COMMENT '组织的端口',
+    `identity_port` int(11)        DEFAULT NULL COMMENT '组织的端口',
+    `public_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否公有可查节点: 0-否，1- 是',
     `status`      tinyint(4) NOT NULL DEFAULT 1 COMMENT '状态: 0-未知，1- 正常， 2- 异常',
     `create_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -38,6 +39,25 @@ CREATE TABLE `t_organization`
     UNIQUE KEY `UK_ORG_IDENTITY_ID` (`identity_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='组织表';
+
+
+-- ----------------------------
+-- Table structure for `t_user_org_maintain`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_org_maintain`;
+CREATE TABLE `t_user_org_maintain` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户组织连接绑定关系表ID(自增长)',
+    `address` varchar(64) NOT NULL COMMENT '用户钱包地址',
+    `identity_id` varchar(128) DEFAULT NULL COMMENT '组织的身份标识Id',
+    `identity_ip` varchar(20) DEFAULT NULL COMMENT '组织的ip',
+    `identity_port` int(11) DEFAULT NULL COMMENT '组织的端口',
+    `valid_flag` tinyint(4) NOT NULL DEFAULT '1' COMMENT '连接有效状态: 0-无效，1- 有效',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-未知，1- 正常， 2- 异常',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UK_USER_IDENTITY_ID` (`address`,`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户组织连接绑定关系表';
 
 -- ----------------------------
 -- Table structure for `t_user_org`
