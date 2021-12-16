@@ -26,7 +26,7 @@ public class SysConstant {
     /**
      * 角色数据
      */
-    public static final int[] ROLE_ARR = {1, 2, 3};
+    public static final byte[] ROLE_BYTE_ARR = {1, 2, 3};
 
     /**
      * 批量处理方式
