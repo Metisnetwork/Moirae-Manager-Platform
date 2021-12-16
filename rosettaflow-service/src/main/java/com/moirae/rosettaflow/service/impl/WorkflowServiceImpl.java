@@ -114,7 +114,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
-        this.checkAccessPermission(projectId);
+//        this.checkAccessPermission(projectId);
         return this.baseMapper.queryWorkFlowPageList(projectId, workflowName, page);
     }
 
