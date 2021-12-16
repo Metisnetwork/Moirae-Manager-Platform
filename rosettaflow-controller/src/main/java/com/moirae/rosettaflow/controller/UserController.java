@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -51,7 +52,7 @@ public class UserController {
 
     @PostMapping("login")
     @ApiOperation(value = "用户登录", notes = "用户登录")
-    public ResponseVo<UserVo> login(@RequestBody @Valid LoginInReq loginInReq) {
+    public ResponseVo<UserVo> login(@RequestBody @Validated LoginInReq loginInReq) {
         log.info("用户登录钱包地址:{},发起登录操作", loginInReq.getAddress());
         userService.checkNonceValidity(loginInReq.getSignMessage(), loginInReq.getAddress());
         boolean flg;

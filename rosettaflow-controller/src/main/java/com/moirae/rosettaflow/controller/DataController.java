@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -63,7 +64,7 @@ public class DataController {
 
     @GetMapping(value = "detail")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
-    public ResponseVo<MetaDataDetailVo> detail(@Valid MetaDataDetailDescribeReq detailReq) {
+    public ResponseVo<MetaDataDetailVo> detail(@Validated MetaDataDetailDescribeReq detailReq) {
         MetaDataDto metaDataDto = metaDataService.detail(detailReq.getMetaDataPkId(), detailReq.getUserMetaDataId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(metaDataDto, MetaDataDetailVo.class));
     }
