@@ -71,9 +71,6 @@ public class UserMetaDataVo {
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date auditTime;
 
-    @ApiModelProperty(value = "状态: 0-无效，1- 有效")
-    private Byte status;
-
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
