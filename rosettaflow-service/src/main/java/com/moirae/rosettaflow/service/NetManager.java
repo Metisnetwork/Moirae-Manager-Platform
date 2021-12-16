@@ -133,6 +133,9 @@ public class NetManager {
     }
 
     public void addChannel(String identityId, ManagedChannel channel, String ip, Integer port) {
+        //老的channel关闭
+        ManagedChannel oldChannel = channelMap.get(identityId);
+        oldChannel.shutdown();
         channelMap.put(identityId, channel);
         identityIdIpPortMap.put(identityId, ip + delimiter + port);
     }
