@@ -53,7 +53,7 @@ public class SyncUserDataAuthTask {
                 return;
             }
             // 批量更新数据
-            if (metaDataAuthorityDtoList.size() == userMetaDataService.count()) {
+            if (metaDataAuthorityDtoList.size() <= userMetaDataService.count()) {
                 // 批量更新
                 this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
                 log.info("用户授权数据同步, net和moirae数据量一致整体批量更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
