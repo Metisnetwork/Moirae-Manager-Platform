@@ -29,6 +29,7 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -114,7 +115,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
-//        this.checkAccessPermission(projectId);
+        this.checkAccessPermission(projectId);
         return this.baseMapper.queryWorkFlowPageList(projectId, workflowName, page);
     }
 
@@ -876,7 +877,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     private void checkAccessPermission(Long projectId) {
         Byte role = projectService.getRoleByProjectId(projectId);
-        if (!Arrays.asList(SysConstant.ROLE_ARR).contains(role)) {
+        if (null == role || !ArrayUtils.contains(SysConstant.ROLE_BYTE_ARR, role)) {
             log.error("您无权访问当前项目--checkAccessPermission, projectId:{}, role:{}", projectId, role);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ACCESS_PERMISSION_ERROR.getMsg());
         }

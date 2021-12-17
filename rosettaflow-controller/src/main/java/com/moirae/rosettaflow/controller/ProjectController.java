@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -52,7 +53,7 @@ public class ProjectController {
 
     @GetMapping("queryProjectDetails")
     @ApiOperation(value = "查询项目详情", notes = "查询项目详情")
-    public ResponseVo<ProjectDetailsVo> queryProjectDetails(@Valid ProjDetailsReq projDetailsReq) {
+    public ResponseVo<ProjectDetailsVo> queryProjectDetails(@Validated ProjDetailsReq projDetailsReq) {
         Project project = projectService.queryProjectDetails(projDetailsReq.getId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(project, ProjectDetailsVo.class));
     }
@@ -135,8 +136,10 @@ public class ProjectController {
 
     @GetMapping("queryCurrentProjAlgModel")
     @ApiOperation(value = "查询当前项目的算法模型", notes = "查询当前项目的算法模型")
-    public ResponseVo<List<ProjectModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel) {
-        List<ProjectModelDto> list = projectService.queryCurrentProjAlgModel(projAlgModel.getProjectId(), projAlgModel.getAlgorithmId());
+    public ResponseVo<List<ProjectModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel, HttpServletRequest request) {
+        // 获取语言类型
+        String language = request.getHeader("Accept-Language");
+        List<ProjectModelDto> list = projectService.queryCurrentProjAlgModel(projAlgModel.getProjectId(), projAlgModel.getAlgorithmId(), language);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectModelVo.class));
     }
 
