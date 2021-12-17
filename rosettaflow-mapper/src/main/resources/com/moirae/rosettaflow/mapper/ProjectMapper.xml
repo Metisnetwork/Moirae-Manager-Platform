@@ -65,7 +65,9 @@
     <!-- 查询当前项目的算法模型 -->
     <select id="queryCurrentProjAlgModel" resultType="com.moirae.rosettaflow.dto.ProjectModelDto">
         SELECT
-            a.algorithm_name AS algorithmName,
+            CASE
+                WHEN 'en' = #{language, jdbcType=VARCHAR} THEN a.algorithm_name_en
+            ELSE a.algorithm_name END AS algorithmName,
             r.id AS modelId,
             r.file_name AS fileName,
             r.metadata_id AS metadataId,

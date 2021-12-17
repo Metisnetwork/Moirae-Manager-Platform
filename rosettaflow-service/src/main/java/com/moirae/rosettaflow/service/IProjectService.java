@@ -125,7 +125,8 @@ public interface IProjectService extends IService<Project> {
      *
      * @param projectId 项目id
      * @param algorithmId 算法id
+     * @param language 语言类型
      * @return 项目模型列表
      */
-    List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId, Long algorithmId);
+    List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId, Long algorithmId, String language);
 }
