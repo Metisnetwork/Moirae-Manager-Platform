@@ -36,6 +36,8 @@ system:
     kickMode: false
     # nonce存放时间，单位：秒
     nonceTimeOut: 300000
+    # 算法初始化文件
+    algorithmFilepath: classpath:script/algorithm.csv
     # 数据库数据批量更新
     batchSize: 1000
     # redis中数据默认保存超时时间(毫秒)
@@ -45,21 +47,26 @@ grpc:
   client:
     carrier-grpc-server:
       # 调度服务地址
-      address: 'static://192.168.21.18:8801'
+      address: 'static://39.98.124.39:8801'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 #集群模式
+#redisson:
+#  model: CLUSTER
+#  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
+#  multiple-server-config:
+#    node-addresses[0]: 10.10.8.175:6371
+#    node-addresses[1]: 10.10.8.175:6372
+#    node-addresses[2]: 10.10.8.175:6373
+#    node-addresses[3]: 10.10.8.176:6374
+#    node-addresses[4]: 10.10.8.176:6375
+#    node-addresses[5]: 10.10.8.176:6376
+#单Redis节点模式
 redisson:
-  model: CLUSTER
   password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
-  multiple-server-config:
-    node-addresses[0]: 10.10.8.175:6371
-    node-addresses[1]: 10.10.8.175:6372
-    node-addresses[2]: 10.10.8.175:6373
-    node-addresses[3]: 10.10.8.176:6374
-    node-addresses[4]: 10.10.8.176:6375
-    node-addresses[5]: 10.10.8.176:6376
+  singleServerConfig:
+    address: 10.10.8.176:6379
 
 jasypt:
   encryptor:

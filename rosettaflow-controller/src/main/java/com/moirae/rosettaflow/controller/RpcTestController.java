@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -99,6 +100,17 @@ public class RpcTestController {
     public ResponseVo<List<NodeIdentityDto>> getAllOrg() {
         log.info("查询所有组织");
         List<NodeIdentityDto> orgList = grpcAuthService.getIdentityList();
+        com.moirae.rosettaflow.mapper.domain.Organization organization = null;
+        List<com.moirae.rosettaflow.mapper.domain.Organization> upList = new ArrayList<>();
+        for (int i = 0; i < orgList.size(); i++) {
+            organization = new com.moirae.rosettaflow.mapper.domain.Organization();
+            organization.setNodeName(orgList.get(i).getNodeName());
+            organization.setNodeId(orgList.get(i).getNodeId());
+            organization.setIdentityId(orgList.get(i).getIdentityId());
+            organization.setPublicFlag((byte)1);
+            upList.add(organization);
+        }
+        organizationService.saveBatch(upList);
         return ResponseVo.createSuccess(orgList);
     }
 
