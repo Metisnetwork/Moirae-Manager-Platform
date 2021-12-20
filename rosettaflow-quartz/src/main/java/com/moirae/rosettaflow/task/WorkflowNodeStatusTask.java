@@ -2,13 +2,15 @@ package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.moirae.rosettaflow.dto.WorkflowDto;
+import com.moirae.rosettaflow.grpc.service.GetTaskDetailListResponse;
 import com.moirae.rosettaflow.grpc.service.GrpcSysService;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
-import com.moirae.rosettaflow.grpc.service.YarnServiceGrpc;
+import com.moirae.rosettaflow.grpc.service.TaskServiceGrpc;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
@@ -23,10 +25,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -65,6 +64,9 @@ public class WorkflowNodeStatusTask {
     private ITaskResultService taskResultService;
 
     @Resource
+    private com.moirae.rosettaflow.grpc.client.TaskServiceClient taskServiceClient;
+
+    @Resource
     private NetManager netManager;
 
     @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
@@ -88,12 +90,43 @@ public class WorkflowNodeStatusTask {
         //待更新任务结果数据集(当前组织参与的待保存任务结果文件摘要列表)
         List<TaskResult> saveTaskResultList = new ArrayList<>();
 
+        //begin
+        Set<String> identityIdSet = new HashSet<>();
+        for (int i = 0; i < workflowNodeList.size(); i++) {
+            String nodeIdentityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(workflowNodeList.get(i).getTaskId());
+            identityIdSet.add(nodeIdentityId);
+
+        }
+        List<TaskDetailResponseDto> taskDetailResponseDtoAllList = new ArrayList<>();
+
+        Iterator<String> it =  identityIdSet.iterator();
+//        List<TaskDetailResponseDto> nodeTaskDetailResponseDtoList
+        while (it.hasNext()){
+            ManagedChannel nodeChannel = netManager.getChannel(it.next());
+            Empty empty = Empty.newBuilder().build();
+            GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(nodeChannel).getTaskDetailList(empty);
+            List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
+            taskServiceClient.getTaskDetailResponseDtos(taskDetailResponseDtoList,getTaskDetailListResponse);
+            taskDetailResponseDtoAllList.addAll(taskDetailResponseDtoList);
+        }
+        log.info("all>>>{}",taskDetailResponseDtoAllList);
+
+//        for(TaskDetailResponseDto dto:taskDetailResponseDtoAllList){
+//            if(dto.getInformation().getTaskId().equals("task:0x3126167ebfd2719d2298c2de519d8660694eeafc42bf2ebde55e72d5d669d82f")){
+//                log.info("找到了");
+//            }
+//        }
+//        String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
+//        ManagedChannel channel = netManager.getChannel(identityId);
+        //end
+
         //获取所的任务详情
-        List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
+//        List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList();
 
         String taskId;
         WorkflowNode node;
-        for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
+//        for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
+        for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoAllList) {
             taskId = taskDetailResponseDto.getInformation().getTaskId();
             if (workflowNodeMap.containsKey(taskId)) {
                 node = workflowNodeMap.get(taskId);

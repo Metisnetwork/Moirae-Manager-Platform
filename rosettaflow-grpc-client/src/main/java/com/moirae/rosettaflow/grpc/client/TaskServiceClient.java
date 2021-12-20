@@ -88,6 +88,10 @@ public class TaskServiceClient {
             throw new BusinessException(getTaskDetailListResponse.getStatus(), getTaskDetailListResponse.getMsg());
         }
 
+        return getTaskDetailResponseDtos(taskDetailResponseDtoList, getTaskDetailListResponse);
+    }
+
+    public List<TaskDetailResponseDto> getTaskDetailResponseDtos(List<TaskDetailResponseDto> taskDetailResponseDtoList, GetTaskDetailListResponse getTaskDetailListResponse) {
         TaskDetailResponseDto taskDetailResponseDto;
         GetTaskDetailResponse getTaskDetailResponse;
         TaskDetailShowDto taskDetailDto;
