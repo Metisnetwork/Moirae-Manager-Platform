@@ -92,32 +92,27 @@ public class WorkflowNodeStatusTask {
 
         //begin
         Set<String> identityIdSet = new HashSet<>();
-        for (int i = 0; i < workflowNodeList.size(); i++) {
-            String nodeIdentityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(workflowNodeList.get(i).getTaskId());
+        for (WorkflowNode value : workflowNodeList) {
+            String nodeIdentityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(value.getTaskId());
             identityIdSet.add(nodeIdentityId);
 
         }
         List<TaskDetailResponseDto> taskDetailResponseDtoAllList = new ArrayList<>();
-
-        Iterator<String> it =  identityIdSet.iterator();
-//        List<TaskDetailResponseDto> nodeTaskDetailResponseDtoList
-        while (it.hasNext()){
-            ManagedChannel nodeChannel = netManager.getChannel(it.next());
+        Set<String> taskIdSet = new HashSet<>();
+        for (String s : identityIdSet) {
+            ManagedChannel nodeChannel = netManager.getChannel(s);
             Empty empty = Empty.newBuilder().build();
             GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(nodeChannel).getTaskDetailList(empty);
             List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
-            taskServiceClient.getTaskDetailResponseDtos(taskDetailResponseDtoList,getTaskDetailListResponse);
-            taskDetailResponseDtoAllList.addAll(taskDetailResponseDtoList);
+            taskServiceClient.getTaskDetailResponseDtos(taskDetailResponseDtoList, getTaskDetailListResponse);
+            for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
+                if (!taskIdSet.contains(taskDetailResponseDto.getInformation().getTaskId())) {
+                    taskIdSet.add(taskDetailResponseDto.getInformation().getTaskId());
+                    taskDetailResponseDtoAllList.add(taskDetailResponseDto);
+                }
+            }
         }
-        log.info("all>>>{}",taskDetailResponseDtoAllList);
-
-//        for(TaskDetailResponseDto dto:taskDetailResponseDtoAllList){
-//            if(dto.getInformation().getTaskId().equals("task:0x3126167ebfd2719d2298c2de519d8660694eeafc42bf2ebde55e72d5d669d82f")){
-//                log.info("找到了");
-//            }
-//        }
-//        String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
-//        ManagedChannel channel = netManager.getChannel(identityId);
+        log.info("all>>>{}", taskDetailResponseDtoAllList);
         //end
 
         //获取所的任务详情
@@ -137,8 +132,7 @@ public class WorkflowNodeStatusTask {
                     // 获取输出表发起方的组织id
                     String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(taskId);
                     ManagedChannel channel = netManager.getChannel(identityId);
-//                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = YarnServiceGrpc.newBlockingStub(channel).getTaskResultFileSummary(channel,taskId);
-                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel,taskId);
+                    GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel, taskId);
                     if (taskResultResponseDto == null) {
                         log.error("WorkflowNodeStatusMockTask,taskId:{}获取任务结果失败！", taskId);
                         continue;
