@@ -265,22 +265,29 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     public void deleteProjMember(Long projMemberId) {
         ProjectMember projectMember = projectMemberService.queryById(projMemberId);
         // 管理员只有一个时，不能删除最后一个管理员
-        List<ProjectMember> projectMemberList = projectMemberService.getAdminList(projectMember.getProjectId());
-        if (projectMemberList.size() == 1) {
-            log.error("ProjectServiceImpl->deleteProjMember,fail reason:{}", ErrorMsg.USER_ADMIN_DELETE_ERROR.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_DELETE_ERROR.getMsg());
-        }
+        Long userId = commonService.getCurrentUser().getId();
+        this.checkDeleteOneself(projectMember.getUserId(), userId);
         checkAdminPermission(projectMember.getProjectId());
         deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
         projectMemberService.removeById(projMemberId);
+    }
+
+    /** 不能删除自己*/
+    private void checkDeleteOneself(Long memberUserId, Long userId) {
+        if (memberUserId.equals(userId)) {
+            log.error("ProjectServiceImpl->deleteProjMember失败, userId:{}, memberUserId:{}", userId, memberUserId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_DELETE_ERROR.getMsg());
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteProjMemberBatch(String projMemberIds) {
         List<Long> idList = convertIdType(projMemberIds);
+        Long userId = commonService.getCurrentUser().getId();
         idList.forEach(id -> {
             ProjectMember projectMember = projectMemberService.queryById(id);
+            this.checkDeleteOneself(projectMember.getUserId(), userId);
             checkAdminPermission(projectMember.getProjectId());
             deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
         });
