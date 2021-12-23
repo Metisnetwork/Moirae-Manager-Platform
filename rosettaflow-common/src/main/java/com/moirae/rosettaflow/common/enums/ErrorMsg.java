@@ -42,7 +42,8 @@ public enum ErrorMsg {
     ALGORITHM_CODE_NOT_NOT_EXISTS("项目模板对应的工作流节点代码不存在", "Project template algorithm code not exists"),
     USER_ADMIN_PERMISSION_ERROR("您不是当前项目管理员，无操作权限！", "You are not this project administrator, No operation authority"),
     USER_NOT_PERMISSION_ERROR("您是项目查看者，暂无编辑权限！", "You are a project viewer and have no editing rights"),
-    USER_ADMIN_MUST_ERROR("不能删除最后一个管理员", "Cannot delete the last administrator"),
+    USER_ADMIN_UPDATE_ERROR("不能更改最后一个管理员", "Cannot update the last administrator"),
+    USER_ADMIN_DELETE_ERROR("不能删除最后一个管理员", "Cannot delete the last administrator"),
     USER_ACCESS_PERMISSION_ERROR("您无权访问当前项目！", "You don't have permission to access the current project!"),
 
     /**

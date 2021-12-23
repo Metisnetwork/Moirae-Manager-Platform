@@ -242,8 +242,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         //管理员只有一个时，不能更改管理员的角色
         List<ProjectMember> projectMemberList = projectMemberService.getAdminList(oldMember.getProjectId());
         if (projectMemberList.size() == 1 && projectMember.getUserId().intValue() == projectMemberList.get(0).getUserId() && projectMember.getRole() != ProjectMemberRoleEnum.ADMIN.getRoleId()) {
-            log.error("ProjectServiceImpl->updateProjMember,fail reason:{}", ErrorMsg.USER_ADMIN_MUST_ERROR.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_MUST_ERROR.getMsg());
+            log.error("ProjectServiceImpl->updateProjMember,fail reason:{}", ErrorMsg.USER_ADMIN_UPDATE_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_UPDATE_ERROR.getMsg());
         }
         // 校验项目成员角色
         checkAdminPermission(oldMember.getProjectId());
@@ -264,6 +264,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteProjMember(Long projMemberId) {
         ProjectMember projectMember = projectMemberService.queryById(projMemberId);
+        // 管理员只有一个时，不能删除最后一个管理员
+        List<ProjectMember> projectMemberList = projectMemberService.getAdminList(projectMember.getProjectId());
+        if (projectMemberList.size() == 1) {
+            log.error("ProjectServiceImpl->deleteProjMember,fail reason:{}", ErrorMsg.USER_ADMIN_DELETE_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ADMIN_DELETE_ERROR.getMsg());
+        }
         checkAdminPermission(projectMember.getProjectId());
         deleteRedisRole(projectMember.getUserId(), projectMember.getProjectId());
         projectMemberService.removeById(projMemberId);
