@@ -39,28 +39,32 @@ public class NetManager {
 
     @PostConstruct
     public void init() {
-        //判断组织的nodeid是否同步，未同步则进行同步操作
-        List<Organization> organizationList = organizationService.list();
-        if (organizationList.size() == 0) {
-            log.error(">>>>>>>>>>>>>>>>>>>>>未配置组织信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            return;
-        }
-        int nodeIdLength = 30;
-        if (organizationList.get(0).getNodeId().length() < nodeIdLength) {
-            Map<String, String> identityNodeIdMap = new HashMap<>(organizationList.size());
-            List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
-            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
-                identityNodeIdMap.put(nodeIdentityDto.getIdentityId(), nodeIdentityDto.getNodeId());
+        try {
+            //判断组织的nodeid是否同步，未同步则进行同步操作
+            List<Organization> organizationList = organizationService.list();
+            if (organizationList.size() == 0) {
+                log.error(">>>>>>>>>>>>>>>>>>>>>未配置组织信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                return;
             }
-            for (Organization organization : organizationList) {
-                organization.setNodeId(identityNodeIdMap.get(organization.getIdentityId()));
+            int nodeIdLength = 30;
+            if (organizationList.get(0).getNodeId().length() < nodeIdLength) {
+                Map<String, String> identityNodeIdMap = new HashMap<>(organizationList.size());
+                List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+                for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
+                    identityNodeIdMap.put(nodeIdentityDto.getIdentityId(), nodeIdentityDto.getNodeId());
+                }
+                for (Organization organization : organizationList) {
+                    organization.setNodeId(identityNodeIdMap.get(organization.getIdentityId()));
+                }
+                organizationService.saveOrUpdateBatch(organizationList);
             }
-            organizationService.saveOrUpdateBatch(organizationList);
-        }
 
-        for (Organization organization : organizationList) {
-            channelMap.put(organization.getIdentityId(), assemblyChannel(organization.getIdentityIp(), organization.getIdentityPort()));
-            identityIdIpPortMap.put(organization.getIdentityId(), organization.getIdentityIp() + delimiter + organization.getIdentityPort());
+            for (Organization organization : organizationList) {
+                channelMap.put(organization.getIdentityId(), assemblyChannel(organization.getIdentityIp(), organization.getIdentityPort()));
+                identityIdIpPortMap.put(organization.getIdentityId(), organization.getIdentityIp() + delimiter + organization.getIdentityPort());
+            }
+        } catch (Exception e) {
+            log.error("NetManager-同步组织数据失败, 错误信息:{}", e.getMessage());
         }
     }
 

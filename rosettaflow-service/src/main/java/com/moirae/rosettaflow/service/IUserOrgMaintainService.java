@@ -12,6 +12,7 @@ import com.moirae.rosettaflow.mapper.domain.UserOrgMaintain;
  * @date 2021/12/15
  */
 public interface IUserOrgMaintainService extends IService<UserOrgMaintain> {
+
     /**
      * 增加用户与组织及ip绑定关系
      *
@@ -49,9 +50,24 @@ public interface IUserOrgMaintainService extends IService<UserOrgMaintain> {
     IPage<UserOrgMaintainDto> queryUserOrgMaintainPageList(String orgName, Long current, Long size);
 
     /**
+     * 连接组织
+     *
+     * @param identityId 组织id
+     */
+    void connectIdentity(String identityId);
+
+    /**
+     * 断开连接组织
+     *
+     * @param identityId 组织id
+     */
+    void disconnectIdentity(String identityId);
+
+    /**
      * 删除用户与组织ip及port绑定关系
      *
      * @param id 用户组织连接绑定关系表id
      */
     void delIpPortBind(Long id);
+
 }

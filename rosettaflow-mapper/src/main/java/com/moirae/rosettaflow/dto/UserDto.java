@@ -14,7 +14,7 @@ public class UserDto extends User {
 
     private String token;
     /**
-     * 用户绑定的组织的身份标识Id
+     * 用户连接绑定的组织的身份标识Id
      */
     private String identityId;
 }

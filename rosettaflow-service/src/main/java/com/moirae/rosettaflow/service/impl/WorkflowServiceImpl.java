@@ -399,6 +399,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 NodeMetaDataDto initNodeMetaDataDto = nodeMetaDataDtoList.get(0);
                 for (NodeMetaDataDto nodeMetaDataDto : nodeMetaDataDtoList) {
                     if (initNodeMetaDataDto.getMetaDataRows() != nodeMetaDataDto.getMetaDataRows()) {
+                        log.error("checkModel--工作流节点多方数据行数不一致, initNodeMetaDataDto:{}, nodeMetaDataDto:{}", initNodeMetaDataDto, nodeMetaDataDto);
                         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_DATA_ROWS_CHECK.getMsg());
                     }
                 }
@@ -836,20 +837,34 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return 机构信息
      */
     private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
+        // 获取用户绑定连接的组织
+        UserDto userDto = commonService.getCurrentUser();
+        if (StrUtil.isNotBlank(userDto.getIdentityId())) {
+            return this.saveSender(userDto.getIdentityId());
+        }
+        // 用户没有绑定组织，默认发起方组织
         for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
             if (null != workflowNodeInput.getSenderFlag() && SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
-                OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
-                Organization organization = organizationService.getByIdentityId(workflowNodeInput.getIdentityId());
-                sender.setPartyId("s0");
-                sender.setNodeName(organization.getNodeName());
-                sender.setNodeId(organization.getNodeId());
-                sender.setIdentityId(workflowNodeInput.getIdentityId());
-                return sender;
+                return this.saveSender(workflowNodeInput.getIdentityId());
             }
         }
-
-        log.error("获取当前工作流节点输入信息中不存发起方，请核对信息:{}", workflowNodeInputList);
+        log.error("获取当前工作流节点输入信息中不存在发起方，请核对信息:{}", workflowNodeInputList);
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
+    }
+
+    /** 组装发起方数据 */
+    private OrganizationIdentityInfoDto saveSender(String identityId){
+        Organization organization = organizationService.getByIdentityId(identityId);
+        if (Objects.isNull(organization)) {
+            log.error("获取当前工作流节点输入信息中不存发起方，identityId:{}", identityId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
+        }
+        OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
+        sender.setPartyId("s0");
+        sender.setNodeName(organization.getNodeName());
+        sender.setNodeId(organization.getNodeId());
+        sender.setIdentityId(organization.getIdentityId());
+        return sender;
     }
 
     private OrganizationIdentityInfoDto getAlgoSupplier(OrganizationIdentityInfoDto sender) {

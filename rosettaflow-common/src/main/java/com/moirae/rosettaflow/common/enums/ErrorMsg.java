@@ -26,6 +26,7 @@ public enum ErrorMsg {
     USER_ADDRESS_ERROR("用户地址有误", "Wrong user address"),
     MODIFY_USER_NAME_FAILED("昵称修改失败", "Nickname modification failed"),
     USER_NAME_EXISTED("昵称已存在", "Nickname already exists"),
+    USER_IDENTITY_EXISTED("此组织不可用！", "this organization is not available!"),
 
     /**
      * 项目
@@ -95,7 +96,7 @@ public enum ErrorMsg {
     WORKFLOW_NODE_NOT_EXIST("工作流节点不存在", "Workflow node does not exist"),
     WORKFLOW_NODE_NOT_CACHE("工作流节点未缓存", "Workflow node not cached"),
     WORKFLOW_NODE_COUNT_CHECK("只支持运行一种算法", "Only one algorithm is supported"),
-    WORKFLOW_NODE_SENDER_NOT_EXIST("工作流节点需要一个发起方", "Workflow node need one sender"),
+    WORKFLOW_NODE_SENDER_NOT_EXIST("工作流节点发起方不存在！", "Workflow node does not exist sender"),
     WORKFLOW_NODE_NOT_INPUT_EXIST("工作流节点输入未配置", "Workflow node input is not configured"),
     WORKFLOW_NODE_NOT_OUTPUT_EXIST("工作流节点输出未配置", "Workflow node output is not configured"),
     WORKFLOW_NODE_CODE_NOT_EXIST("工作流节点代码未配置", "Workflow node code is not configured"),

@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.dto.UserOrgMaintainDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
+import com.moirae.rosettaflow.req.organization.ConnectIdentityReq;
 import com.moirae.rosettaflow.req.organization.DelIpPortBindReq;
 import com.moirae.rosettaflow.req.organization.IpPortBindReq;
 import com.moirae.rosettaflow.req.organization.ListUserOrgBindReq;
@@ -55,11 +56,24 @@ public class OrganizationController {
         return ResponseVo.createSuccess();
     }
 
+    @PostMapping("connectIdentity")
+    @ApiOperation(value = "连接组织", notes = "连接组织")
+    public ResponseVo<?> connectIdentity(@RequestBody @Valid ConnectIdentityReq ConnectIdentityReq) {
+        userOrgMaintainService.connectIdentity(ConnectIdentityReq.getIdentityId());
+        return ResponseVo.createSuccess();
+    }
+
+    @PostMapping("disconnectIdentity")
+    @ApiOperation(value = "断开连接组织", notes = "断开连接组织")
+    public ResponseVo<?> disconnectIdentity(@RequestBody @Valid ConnectIdentityReq ConnectIdentityReq) {
+        userOrgMaintainService.disconnectIdentity(ConnectIdentityReq.getIdentityId());
+        return ResponseVo.createSuccess();
+    }
+
     @PostMapping("delIpPortBind")
     @ApiOperation(value = "删除用户ip及port绑定关系", notes = "删除用户ip及port绑定关系")
     public ResponseVo<?> delIpPortBind(@RequestBody @Valid DelIpPortBindReq delIpPortBindReq) {
         userOrgMaintainService.delIpPortBind(delIpPortBindReq.getId());
         return ResponseVo.createSuccess();
     }
-
 }

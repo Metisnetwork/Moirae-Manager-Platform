@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,8 +9,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.protobuf.Empty;
+import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.enums.ValidFlagEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.UserDto;
@@ -24,6 +28,7 @@ import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.IUserOrgMaintainService;
 import com.moirae.rosettaflow.service.NetManager;
+import com.zengtengpeng.operation.RedissonObject;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 用户组织连接绑定关系服务类
@@ -54,6 +60,9 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
     @Resource
     private NetManager netManager;
 
+    @Resource
+    private RedissonObject redissonObject;
+
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -65,49 +74,47 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
         if (nodeIdentity.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("AuthServiceClient->getNodeIdentity() fail reason:{}", nodeIdentity.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
+        }
+        //添加或者更新组织表中的identityIp及identityPort
+        Organization organization = organizationService.getByIdentityId(nodeIdentity.getOwner().getIdentityId());
+        if (null == organization) {
+            organization = new Organization();
+            organization.setNodeName(nodeIdentity.getOwner().getNodeName());
+            organization.setNodeId(nodeIdentity.getOwner().getNodeId());
+            organization.setIdentityId(nodeIdentity.getOwner().getIdentityId());
+            organization.setIdentityIp(identityIp);
+            organization.setIdentityPort(identityPort);
+            organizationService.save(organization);
         } else {
-            //添加或者更新组织表中的identityIp及identityPort
-            Organization organization = organizationService.getByIdentityId(nodeIdentity.getOwner().getIdentityId());
-            if (null == organization) {
-                organization = new Organization();
-                organization.setNodeName(nodeIdentity.getOwner().getNodeName());
-                organization.setNodeId(nodeIdentity.getOwner().getNodeId());
-                organization.setIdentityId(nodeIdentity.getOwner().getIdentityId());
+            if (!organization.getIdentityIp().equals(identityIp) || organization.getIdentityPort() != identityPort.intValue()) {
                 organization.setIdentityIp(identityIp);
                 organization.setIdentityPort(identityPort);
-                organizationService.save(organization);
-            } else {
-                if (!organization.getIdentityIp().equals(identityIp) || organization.getIdentityPort() != identityPort.intValue()) {
-                    organization.setIdentityIp(identityIp);
-                    organization.setIdentityPort(identityPort);
-                    organization.setUpdateTime(new Date());
-                    organizationService.updateById(organization);
+                organization.setUpdateTime(new Date());
+                organizationService.updateById(organization);
 
-                    //把其它用户绑定此identity的连接有效状态置成无效
-                    this.updateValidFlag(organization.getIdentityId(), identityIp, identityPort);
-
-                }
+                //把其它用户绑定此identity的连接有效状态置成无效
+                this.updateValidFlag(organization.getIdentityId(), identityIp, identityPort);
             }
-
-            //获取原先的用户组织绑定关系信息，存在则更新，不存在则添加
-            UserOrgMaintain userOrgMaintain = this.getByAddressAndIdentityId(userDto.getAddress(), organization.getIdentityId());
-            if (null == userOrgMaintain) {
-                userOrgMaintain = new UserOrgMaintain();
-                userOrgMaintain.setAddress(userDto.getAddress());
-                userOrgMaintain.setIdentityId(organization.getIdentityId());
-                userOrgMaintain.setIdentityIp(organization.getIdentityIp());
-                userOrgMaintain.setIdentityPort(organization.getIdentityPort());
-                userOrgMaintainService.save(userOrgMaintain);
-            } else {
-                userOrgMaintain.setIdentityIp(organization.getIdentityIp());
-                userOrgMaintain.setIdentityPort(organization.getIdentityPort());
-                userOrgMaintain.setUpdateTime(new Date());
-                userOrgMaintainService.updateById(userOrgMaintain);
-            }
-
-            //netManager中添加此channel
-            netManager.addChannel(organization.getIdentityId(), managedChannel, identityIp, identityPort);
         }
+
+        //获取原先的用户组织绑定关系信息，存在则更新，不存在则添加
+        UserOrgMaintain userOrgMaintain = this.getByAddressAndIdentityId(userDto.getAddress(), organization.getIdentityId());
+        if (null == userOrgMaintain) {
+            userOrgMaintain = new UserOrgMaintain();
+            userOrgMaintain.setAddress(userDto.getAddress());
+            userOrgMaintain.setIdentityId(organization.getIdentityId());
+            userOrgMaintain.setIdentityIp(organization.getIdentityIp());
+            userOrgMaintain.setIdentityPort(organization.getIdentityPort());
+            userOrgMaintainService.save(userOrgMaintain);
+        } else {
+            userOrgMaintain.setIdentityIp(organization.getIdentityIp());
+            userOrgMaintain.setIdentityPort(organization.getIdentityPort());
+            userOrgMaintain.setUpdateTime(new Date());
+            userOrgMaintainService.updateById(userOrgMaintain);
+        }
+
+        //netManager中添加此channel
+        netManager.addChannel(organization.getIdentityId(), managedChannel, identityIp, identityPort);
     }
 
     /**
@@ -131,6 +138,8 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
         LambdaQueryWrapper<UserOrgMaintain> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(UserOrgMaintain::getAddress, address);
         queryWrapper.eq(UserOrgMaintain::getIdentityId, identityId);
+        queryWrapper.eq(UserOrgMaintain::getValidFlag, StatusEnum.VALID.getValue());
+        queryWrapper.eq(UserOrgMaintain::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(queryWrapper);
     }
 
@@ -142,6 +151,34 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
     }
 
     @Override
+    public void connectIdentity(String identityId) {
+        UserDto userDto = commonService.getCurrentUser();
+        UserOrgMaintain userOrgMaintain = this.getByAddressAndIdentityId(userDto.getAddress(), identityId);
+        if (Objects.isNull(userOrgMaintain)) {
+            log.error("connectIdentity-连接组织失败，userDto:{}", JSON.toJSONString(userDto));
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_IDENTITY_EXISTED.getMsg());
+        }
+        // 验证此是否可连接
+        ManagedChannel managedChannel = netManager.assemblyChannel(userOrgMaintain.getIdentityIp(), userOrgMaintain.getIdentityPort());
+        GetNodeIdentityResponse nodeResp = AuthServiceGrpc.newBlockingStub(managedChannel).getNodeIdentity(Empty.newBuilder().build());
+        if (nodeResp.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("AuthServiceClient->connectIdentity()失败, nodeResp:{}", nodeResp);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
+        }
+        userDto.setIdentityId(identityId);
+        // 更新用户缓存，存入连接的组织
+        redissonObject.setValue(SysConstant.REDIS_USER_PREFIX_KEY + userDto.getToken(), userDto);
+    }
+
+    @Override
+    public void disconnectIdentity(String identityId) {
+        UserDto userDto = commonService.getCurrentUser();
+        userDto.setIdentityId(null);
+        // 更新用户缓存，存入连接的组织
+        redissonObject.setValue(SysConstant.REDIS_USER_PREFIX_KEY + userDto.getToken(), userDto);
+    }
+
+    @Override
     public void delIpPortBind(Long id) {
         UserDto userDto = commonService.getCurrentUser();
         LambdaUpdateWrapper<UserOrgMaintain> wrapper = Wrappers.lambdaUpdate();
@@ -149,4 +186,5 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
         wrapper.eq(UserOrgMaintain::getId, id);
         this.baseMapper.delete(wrapper);
     }
+
 }
