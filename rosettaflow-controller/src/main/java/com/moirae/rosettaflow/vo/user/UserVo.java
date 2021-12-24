@@ -13,6 +13,9 @@ import lombok.Data;
 @ApiModel("登录返回参数")
 public class UserVo {
 
+    @ApiModelProperty("用户id")
+    private Long id;
+
     @ApiModelProperty("用户名")
     private String userName;
 
