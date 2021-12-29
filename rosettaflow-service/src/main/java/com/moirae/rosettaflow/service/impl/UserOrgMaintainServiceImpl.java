@@ -1,12 +1,9 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.constants.SysConstant;
@@ -30,12 +27,15 @@ import com.moirae.rosettaflow.service.IUserOrgMaintainService;
 import com.moirae.rosettaflow.service.NetManager;
 import com.zengtengpeng.operation.RedissonObject;
 import io.grpc.ManagedChannel;
+import jnr.ffi.annotations.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -64,6 +64,25 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
     private RedissonObject redissonObject;
 
 
+
+    @Override
+    public List<UserOrgMaintainDto> queryUserOrgMaintainPageList() {
+        UserDto userDto = commonService.getCurrentUser();
+        List<UserOrgMaintainDto> userOrgMaintainDtoList = this.baseMapper.queryUserOrgMaintainPageList(userDto.getAddress());
+        if (CollectionUtil.isEmpty(userOrgMaintainDtoList)) {
+            return userOrgMaintainDtoList;
+        }
+        userOrgMaintainDtoList.forEach(userOrgMaintainDto -> {
+            // 默认未连接
+            userOrgMaintainDto.setConnectFlag((byte)0);
+            if (userOrgMaintainDto.getIdentityId().equals(userDto.getIdentityId())) {
+                // 取出缓存中，已连接的组织，设置为已连接
+                userOrgMaintainDto.setConnectFlag((byte)1);
+            }
+        });
+        return userOrgMaintainDtoList;
+    }
+
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void ipPortBind(String identityIp, Integer identityPort) {
@@ -84,6 +103,8 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
             organization.setIdentityId(nodeIdentity.getOwner().getIdentityId());
             organization.setIdentityIp(identityIp);
             organization.setIdentityPort(identityPort);
+            // 新添加的不是公共组织
+            organization.setPublicFlag((byte)0);
             organizationService.save(organization);
         } else {
             if (!organization.getIdentityIp().equals(identityIp) || organization.getIdentityPort() != identityPort.intValue()) {
@@ -144,25 +165,31 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
     }
 
     @Override
-    public IPage<UserOrgMaintainDto> queryUserOrgMaintainPageList(String orgName, Long current, Long size) {
+    public void connectIdentity(String identityId) {
         UserDto userDto = commonService.getCurrentUser();
-        IPage<WorkflowDto> page = new Page<>(current, size);
-        return this.baseMapper.queryUserOrgMaintainPageList(userDto.getAddress(), orgName, page);
+        // 判断是否连接公组织
+        Organization organization = organizationService.getByIdentityIAndPublicFlag(identityId, StatusEnum.VALID.getValue());
+        if (Objects.nonNull(organization)) {
+            // 验证此组织是否可连接
+            this. checkConnectIdentity(userDto, identityId, organization.getIdentityIp(), organization.getIdentityPort());
+            return;
+        }
+        // 判断是否连接用户组织
+        UserOrgMaintain userOrgMaintain = this.getByAddressAndIdentityId(userDto.getAddress(), identityId);
+        if (Objects.isNull(userOrgMaintain)) {
+            log.error("AuthServiceClient-connectIdentity失败, identityId:{}, userDto:{}", identityId, userDto);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_IDENTITY_ERROR.getMsg());
+        }
+        // 验证此组织是否可连接
+        this. checkConnectIdentity(userDto, identityId, userOrgMaintain.getIdentityIp(), userOrgMaintain.getIdentityPort());
     }
 
     @Override
-    public void connectIdentity(String identityId) {
-        UserDto userDto = commonService.getCurrentUser();
-        UserOrgMaintain userOrgMaintain = this.getByAddressAndIdentityId(userDto.getAddress(), identityId);
-        if (Objects.isNull(userOrgMaintain)) {
-            log.error("connectIdentity-连接组织失败，userDto:{}", JSON.toJSONString(userDto));
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_IDENTITY_EXISTED.getMsg());
-        }
-        // 验证此是否可连接
-        ManagedChannel managedChannel = netManager.assemblyChannel(userOrgMaintain.getIdentityIp(), userOrgMaintain.getIdentityPort());
+    public void checkConnectIdentity(UserDto userDto, String identityId, String identityIp, Integer identityPort){
+        ManagedChannel managedChannel = netManager.assemblyChannel(identityIp, identityPort);
         GetNodeIdentityResponse nodeResp = AuthServiceGrpc.newBlockingStub(managedChannel).getNodeIdentity(Empty.newBuilder().build());
         if (nodeResp.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            log.error("AuthServiceClient->connectIdentity()失败, nodeResp:{}", nodeResp);
+            log.error("AuthServiceClient-connectIdentity失败, nodeResp:{}", nodeResp);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
         }
         userDto.setIdentityId(identityId);
@@ -179,12 +206,16 @@ public class UserOrgMaintainServiceImpl extends ServiceImpl<UserOrgMaintainMappe
     }
 
     @Override
-    public void delIpPortBind(Long id) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void delIpPortBind(String identityId) {
         UserDto userDto = commonService.getCurrentUser();
+        // 先删除用户组织
         LambdaUpdateWrapper<UserOrgMaintain> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(UserOrgMaintain::getAddress, userDto.getAddress());
-        wrapper.eq(UserOrgMaintain::getId, id);
+        wrapper.eq(UserOrgMaintain::getIdentityId, identityId);
         this.baseMapper.delete(wrapper);
+        // 删除组织表组织
+        organizationService.deleteByIdentityId(identityId);
     }
 
 }
