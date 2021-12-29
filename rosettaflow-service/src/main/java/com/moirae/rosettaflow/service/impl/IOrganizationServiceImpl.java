@@ -34,6 +34,23 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
     }
 
     @Override
+    public List<Organization> getAllPublicByIdentity() {
+        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Organization::getPublicFlag, StatusEnum.VALID.getValue());
+        wrapper.eq(Organization::getStatus, StatusEnum.VALID.getValue());
+        return this.list(wrapper);
+    }
+
+    @Override
+    public Organization getByIdentityIAndPublicFlag(String identityId, Byte publicFlag) {
+        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Organization::getIdentityId, identityId);
+        wrapper.eq(Organization::getPublicFlag, publicFlag);
+        wrapper.eq(Organization::getStatus, StatusEnum.VALID.getValue());
+        return this.getOne(wrapper);
+    }
+
+    @Override
     public List<Organization> getByIdentityIds(Object[] identityArr) {
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getIdentityId, identityArr);
@@ -46,5 +63,12 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
+    }
+
+    @Override
+    public Boolean deleteByIdentityId(String identityId) {
+        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Organization::getIdentityId, identityId);
+        return this.remove(wrapper);
     }
 }

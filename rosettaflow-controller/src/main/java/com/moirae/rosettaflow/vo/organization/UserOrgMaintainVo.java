@@ -16,9 +16,6 @@ import java.util.Date;
 @ApiModel(value = "用户维护组织信息详情返回参数")
 public class UserOrgMaintainVo {
 
-    @ApiModelProperty("用户组织连接绑定关系表id")
-    private Long id;
-
     @ApiModelProperty(value = "组织的身份名称")
     private String nodeName;
 
@@ -34,14 +31,9 @@ public class UserOrgMaintainVo {
     @ApiModelProperty(value = "是否公共可看的：0-否，1-是")
     private Byte publicFlag;
 
-    @ApiModelProperty(value = "连接有效状态: 0-无效，1- 有效")
+    @ApiModelProperty(value = "是否可连接: 0-无效，1- 有效")
     private Byte validFlag;
 
-    @ApiModelProperty(value = "创建时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
-    private Date createTime;
-
-    @ApiModelProperty(value = "更新时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
-    private Date updateTime;
+    @ApiModelProperty(value = "是否已连接：0-否，1-是")
+    private Byte connectFlag;
 }

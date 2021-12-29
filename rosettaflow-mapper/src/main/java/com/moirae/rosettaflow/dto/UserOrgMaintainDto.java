@@ -15,9 +15,15 @@ public class UserOrgMaintainDto extends UserOrgMaintain {
      * 组织的身份名称
      */
     private String nodeName;
+
     /**
      * 是否公共可看的：0-否，1-是
      */
     private Byte publicFlag;
+
+    /**
+     * 是否已连接：0-否，1-是
+     */
+    private Byte connectFlag;
 
 }

@@ -16,8 +16,7 @@ import javax.validation.constraints.*;
 @ApiModel(value = "删除ip及port与组织绑定关系请求")
 public class DelIpPortBindReq {
 
-    @ApiModelProperty(value = "用户组织连接绑定关系表ID", required = true)
-    @NotNull(message = "{bind.id.notNull}")
-    @Positive(message = "{bind.id.notNull}")
-    private Long id;
+    @ApiModelProperty(value = "组织ID不能为空", required = true)
+    @NotNull(message = "{identityId.id.NotBlank}")
+    private String identityId;
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
+import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
@@ -54,10 +55,18 @@ public class SyncMetaDataTask {
             if (CollUtil.isEmpty(metaDataDetailResponseDtoList)) {
                 return;
             }
+            // 判断是否有元数据状态更新，如果有，则需全量更新
+            boolean updateFlag = false;
+            for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
+                if (SysConstant.INT_2 != metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState()) {
+                    updateFlag = true;
+                    break;
+                }
+            }
             // 从net同步元数据[未发现变更元数据], 故不进行后续同步
-            if (metaDataDetailResponseDtoList.size() == metaDataService.count()) {
+            if (!updateFlag && metaDataDetailResponseDtoList.size() == metaDataService.count()) {
                 log.info("元数据信息同步, net元数据与flow中元数据记录数一致, net同步数据量:{}条", metaDataDetailResponseDtoList.size());
-                return;
+                    return;
             }
             // net更新数据量和flow不一致，重新同步元数据，清空元数据和详情
             this.delOldData();

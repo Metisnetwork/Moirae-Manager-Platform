@@ -17,38 +17,29 @@
     </sql>
     <select id="queryUserOrgMaintainPageList" resultType="com.moirae.rosettaflow.dto.UserOrgMaintainDto">
         SELECT
-        uo.id,
-        o.node_name AS nodeName,
-        o.identity_id as identityId,
-        o.identity_ip as identityIp,
-        o.identity_port identityPort,
-        o.public_flag as publicFlag,
-        IFNULL(uo.valid_flag,1) as validFlag,
-        uo.create_time as createTime,
-        uo.update_time as updateTime
+            o.node_name AS nodeName,
+            o.identity_id as identityId,
+            o.identity_ip as identityIp,
+            o.identity_port identityPort,
+            o.public_flag as publicFlag,
+            IFNULL(uo.valid_flag,1) as validFlag
         FROM
-        t_user_org_maintain uo
-        INNER JOIN t_organization o ON uo.identity_id = o.identity_id
+            t_user_org_maintain uo
+                INNER JOIN t_organization o ON uo.identity_id = o.identity_id
         WHERE
-        uo.address = #{address, jdbcType=VARCHAR}
-        <if test="orgName != null and orgName != ''">
-            AND o.node_name = #{orgName, jdbcType=VARCHAR}
-        </if>
-        AND o.public_flag = 0
-        AND o.`status`=1
-        AND uo.`status`=1
-        union ALL
+            uo.address = #{address, jdbcType=VARCHAR}
+          AND o.public_flag = 0
+          AND o.`status`=1
+          AND uo.`status`=1
+        UNION
         SELECT
-        0 as id,
-        o.node_name AS nodeName,
-        o.identity_id as identityId,
-        o.identity_ip as identityIp,
-        o.identity_port identityPort,
-        o.public_flag as publicFlag,
-        1 as validFlag,
-        o.create_time as createTime,
-        o.update_time as updateTime
+            o.node_name AS nodeName,
+            o.identity_id as identityId,
+            o.identity_ip as identityIp,
+            o.identity_port identityPort,
+            o.public_flag as publicFlag,
+            1 as validFlag
         FROM
-        t_organization o
+            t_organization o
     </select>
 </mapper>
