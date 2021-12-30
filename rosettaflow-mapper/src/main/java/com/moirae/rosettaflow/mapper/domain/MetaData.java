@@ -58,10 +58,12 @@ public class MetaData implements Serializable {
     /**
      * 源文件的行数
      */
+    @TableField(value = "`rows`")
     private Integer rows;
     /**
      * 源文件的列数
      */
+    @TableField(value = "`columns`")
     private Integer columns;
     /**
      * 源文件的大小 (单位: byte)
