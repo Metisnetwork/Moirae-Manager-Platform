@@ -837,11 +837,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return 机构信息
      */
     private OrganizationIdentityInfoDto getSender(List<WorkflowNodeInput> workflowNodeInputList) {
-        // 获取用户绑定连接的组织
-        UserDto userDto = commonService.getCurrentUser();
-        if (StrUtil.isNotBlank(userDto.getIdentityId())) {
-            return this.saveSender(userDto.getIdentityId());
-        }
+//        // 获取用户绑定连接的组织
+//        UserDto userDto = commonService.getCurrentUser();
+//        if (StrUtil.isNotBlank(userDto.getIdentityId())) {
+//            return this.saveSender(userDto.getIdentityId());
+//        }
         // 用户没有绑定组织，默认发起方组织
         for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
             if (null != workflowNodeInput.getSenderFlag() && SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
