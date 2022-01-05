@@ -153,7 +153,8 @@ public class WorkflowNodeStatusTask {
                             try {
                                 workflowService.start(workflowDto);
                             } catch (Exception e) {
-                                log.error(String.format("工作流id:s%,任务id:s%,对应下一个节点任务处理失败", node.getWorkflowId(), taskId), e);
+                                log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
+                                log.error("对应下一个节点任务处理失败原因：", e);
                                 workflowService.updateRunStatus(workflowDto.getId(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
                                 WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(), workflowDto.getStartNode());
                                 workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
