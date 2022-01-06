@@ -14,4 +14,9 @@ public class GrpcConstant {
      * grpc响应码-成功
      */
     public static int GRPC_SUCCESS_CODE = 0;
+
+    /**
+     * 分页大小
+     */
+    public static final long PAGE_SIZE = 100;
 }

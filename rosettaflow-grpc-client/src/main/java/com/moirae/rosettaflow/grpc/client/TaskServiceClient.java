@@ -12,10 +12,13 @@ import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -78,10 +81,13 @@ public class TaskServiceClient {
     /**
      * 查看本组织参与过的全部任务详情列表
      */
-    public List<TaskDetailResponseDto> getTaskDetailList() {
+    public List<TaskDetailResponseDto> getTaskDetailList(@NonNull Long latestSynced) {
         List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
-        Empty empty = Empty.newBuilder().build();
-        GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(empty);
+        GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
+                .setLastUpdated(latestSynced)
+                .setPageSize(GrpcConstant.PAGE_SIZE)
+                .build();
+        GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(request);
 
         if (getTaskDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("TaskServiceClient->getTaskDetailList() fail reason:{}", getTaskDetailListResponse.getMsg());
@@ -144,6 +150,8 @@ public class TaskServiceClient {
 
             // 任务描述 (非必须)
             taskDetailDto.setDesc(getTaskDetailResponse.getInformation().getDesc());
+            //数据的最后更新时间，UTC毫秒数
+            taskDetailDto.setUpdateAt(getTaskDetailResponse.getInformation().getUpdateAt());
 
             //拼装最外层信息
             taskDetailResponseDto.setInformation(taskDetailDto);

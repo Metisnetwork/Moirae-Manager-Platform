@@ -1,3 +1,4 @@
+use db_moirae;
 -- ----------------------------
 -- init t_project_temp
 -- ----------------------------
@@ -90,3 +91,10 @@ INSERT INTO `t_organization` VALUES ('2', 'companyB', '8d8f472b4cc53febd96c7c0e4
 INSERT INTO `t_organization` VALUES ('3', 'companyC', 'f1e41d70dbb79ae80ae555e8a3cfad663ae800010876eff92a449247f147f3024859b6ba2fbbf923d3a2228e971d9c71d236014704677cc36ea8617a0ae089c2', 'identity_e9a18a3a70ac402689b3ab666cd0de12', '39.101.171.59', '8801', '1', '1', '2021-12-21 17:18:12', '2021-12-21 17:19:24');
 INSERT INTO `t_organization` VALUES ('4', 'companyD', 'f228f49dfea0476249e928c274f7779b026e97b6d17b3bd5cb7d89bfd73f7efcbb080456174464df4710216d70397357fe9bdd64be2cb392dfd810b4fb85fd44', 'identity_3a1158e5d28e4e7da142605554115ae7', '39.98.117.220', '8801', '1', '1', '2021-12-21 17:18:12', '2021-12-21 17:19:28');
 INSERT INTO `t_organization` VALUES ('5', 'companyE', 'a1154e811f4d4e5feb875c1450901e7c977aece468510d3017e6835d80fdbb4773d86b9d0ed3e39f35b458d1a6e960f71f545c1d47013b84e238b20c5a8cc351', 'identity_1ddd067a254c4168819341f8b83c3786', '39.103.144.123', '8801', '1', '1', '2021-12-21 17:18:12', '2021-12-21 17:19:36');
+
+-- ----------------------------
+-- init t_data_sync
+-- ----------------------------
+INSERT INTO t_data_sync(data_type, latest_synced) VALUES('data_auth_req', '0');
+INSERT INTO t_data_sync(data_type, latest_synced) VALUES('local_meta_data', '0');
+INSERT INTO t_data_sync(data_type, latest_synced) VALUES('local_task', '0');

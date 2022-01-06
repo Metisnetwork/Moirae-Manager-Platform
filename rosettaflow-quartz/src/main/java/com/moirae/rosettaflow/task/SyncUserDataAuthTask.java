@@ -6,9 +6,12 @@ import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
+import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
+import com.moirae.rosettaflow.mapper.domain.DataSync;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
+import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -42,31 +45,41 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 180 * 1000, initialDelay = 2 * 1000)
+    @Resource
+    private IDataSyncService dataSyncService;
+
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            // 查询调度服务，获取用户授权相关数据
-            List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-            if (CollUtil.isEmpty(metaDataAuthorityDtoList)) {
-                return;
+            DataSync dataSyncByType = dataSyncService.getDataSyncByType(DataSyncTypeEnum.DATA_AUTH);
+            long latestSynced = dataSyncByType.getLatestSynced();
+            if (dataSyncByType == null) {//获取失败，则插入一条
+                dataSyncByType = new DataSync();
+                dataSyncByType.setDataType(DataSyncTypeEnum.DATA_AUTH.getDataType());
+                dataSyncByType.setLatestSynced(0);
+                dataSyncService.insertDataSync(dataSyncByType);
             }
-            // 批量更新数据
-            if (metaDataAuthorityDtoList.size() <= userMetaDataService.count()) {
+            List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
+            do {
+                metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList(latestSynced);
+                if (CollUtil.isEmpty(metaDataAuthorityDtoList)) {// 从net同步元数据[未发现变更元数据], 故不进行后续同步
+                    break;
+                }
+                // 批量更新数据
                 // 批量更新
                 this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
-                log.info("用户授权数据同步, net和moirae数据量一致整体批量更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
-                return;
-            }
-            log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，开始更新>>>>");
-            // 批量插入数据
-            // 清空原来授权数据
-            userMetaDataService.truncate();
-            this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.INSERT);
-            log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，更新结束>>>>");
+                log.info("用户授权数据同步,同步数据量:{}条", metaDataAuthorityDtoList.size());
+                latestSynced = metaDataAuthorityDtoList
+                        .get(metaDataAuthorityDtoList.size() - 1)
+                        .getUpdateAt();
+                //上次更新的latestSynced存到数据库中
+                dataSyncByType.setLatestSynced(latestSynced);
+                dataSyncService.updateDataSyncByType(dataSyncByType);
+            } while (metaDataAuthorityDtoList.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
         } catch (Exception e) {
-            log.error("从net同步用户元数据授权列表失败                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     , 失败原因:{}, 错误信息:{}", e.getMessage(), e);
+            log.error("从net同步用户元数据授权列表失败, 失败原因:{}, 错误信息:{}", e.getMessage(), e);
         }
         log.info("用户申请授权元数据信息同步结束, 总耗时:{}ms", (DateUtil.current() - begin));
     }

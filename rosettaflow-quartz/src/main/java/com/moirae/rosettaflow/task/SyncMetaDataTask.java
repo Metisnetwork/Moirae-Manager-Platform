@@ -4,11 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
+import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
+import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
+import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
+import com.moirae.rosettaflow.mapper.domain.DataSync;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataDetails;
+import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IMetaDataDetailsService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.zengtengpeng.annotation.Lock;
@@ -45,65 +50,64 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 600 * 1000, initialDelay = 10 * 1000)
+    @Resource
+    private IDataSyncService dataSyncService;
+
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
-            if (CollUtil.isEmpty(metaDataDetailResponseDtoList)) {
-                return;
+            DataSync dataSyncByType = dataSyncService.getDataSyncByType(DataSyncTypeEnum.META_DATA);
+            if (dataSyncByType == null) {//获取失败，则插入一条
+                dataSyncByType = new DataSync();
+                dataSyncByType.setDataType(DataSyncTypeEnum.META_DATA.getDataType());
+                dataSyncByType.setLatestSynced(0);
+                dataSyncService.insertDataSync(dataSyncByType);
             }
-            // 从net同步元数据[未发现变更元数据], 故不进行后续同步
-            if (metaDataDetailResponseDtoList.size() == metaDataService.count()) {
-                log.info("元数据信息同步, net元数据与flow中元数据记录数一致, net同步数据量:{}条", metaDataDetailResponseDtoList.size());
-                return;
-            }
-            // net更新数据量和flow不一致，重新同步元数据，清空元数据和详情
-            this.delOldData();
-            // 批量插入元数据
-            this.batchInsertMetaData(metaDataDetailResponseDtoList);
+            long latestSynced = dataSyncByType.getLatestSynced();
+            List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
+            do {
+                metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList(latestSynced);
+                if (CollUtil.isEmpty(metaDataDetailResponseDtoList)) {// 从net同步元数据[未发现变更元数据], 故不进行后续同步
+                    break;
+                }
+                // 批量更新元数据
+                this.batchUpdateMetaData(metaDataDetailResponseDtoList);
 
-            // 批量插入元数据详情
-            for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-                String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
-                List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
-                //  批量插入元数据详情
-                this.batchInsertMetaDataDetails(metaDataId, columnList);
-            }
+                // 批量更新元数据详情
+                for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
+                    String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
+                    List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
+                    //  批量更新元数据详情
+                    this.batchUpdateMetaDataDetails(metaDataId, columnList);
+                }
+                latestSynced = metaDataDetailResponseDtoList
+                        .get(metaDataDetailResponseDtoList.size() - 1)
+                        .getMetaDataDetailDto()
+                        .getMetaDataSummary()
+                        .getUpdateAt();
+                //上次更新的latestSynced存到数据库中
+                dataSyncByType.setLatestSynced(latestSynced);
+                dataSyncService.updateDataSyncByType(dataSyncByType);
+            } while (metaDataDetailResponseDtoList.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
         } catch (Exception e) {
             log.error("元数据信息同步,从net同步元数据失败,失败原因：{}", e.getMessage(), e);
         }
         log.info("元数据信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
-
     /**
-     * 批量插入元数据
-     *
      * @param metaDataDetailResponseDtoList 需更新数据
      */
-    private void batchInsertMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
+    private void batchUpdateMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
         if (0 == metaDataDetailResponseDtoList.size()) {
             return;
         }
         List<MetaData> newMetaDataList = this.getMetaDataList(metaDataDetailResponseDtoList);
-        int insertLength = newMetaDataList.size();
-        int i = 0;
-        log.info("批量插入元数据开始, 总条数:{}", insertLength);
-        while (insertLength > sysConfig.getBatchSize()) {
-            long begin = DateUtil.current();
-            metaDataService.batchInsert(newMetaDataList.subList(i, i + sysConfig.getBatchSize()));
-            log.info("批量插入元数据, 开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
-            i = i + sysConfig.getBatchSize();
-            insertLength = insertLength - i;
-
-        }
-        if (insertLength > 0) {
-            long begin = DateUtil.current();
-            metaDataService.batchInsert(newMetaDataList.subList(i, i + insertLength));
-            log.info("批量插入元数据, 开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + insertLength, DateUtil.current() - begin);
-        }
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), newMetaDataList, list -> {
+            metaDataService.batchUpdate(list);
+        });
     }
 
     /**
@@ -112,27 +116,14 @@ public class SyncMetaDataTask {
      * @param metaDataId 元数据id
      * @param columnList 需更新数据
      */
-    private void batchInsertMetaDataDetails(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
+    private void batchUpdateMetaDataDetails(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
         if (0 == columnList.size()) {
             return;
         }
         List<MetaDataDetails> newMetaDataDetailsList = this.getMetaDataDetailsList(metaDataId, columnList);
-        int insertLength = newMetaDataDetailsList.size();
-        int i = 0;
-        log.info("批量插入元数据详情开始，总条数:{}", insertLength);
-        while (insertLength > sysConfig.getBatchSize()) {
-            long begin = DateUtil.current();
-            metaDataDetailsService.batchInsert(newMetaDataDetailsList.subList(i, i + sysConfig.getBatchSize()));
-            log.info("批量插入元数据详情，开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
-            i = i + sysConfig.getBatchSize();
-            insertLength = insertLength - i;
-
-        }
-        if (insertLength > 0) {
-            long begin = DateUtil.current();
-            metaDataDetailsService.batchInsert(newMetaDataDetailsList.subList(i, i + insertLength));
-            log.info("批量插入元数据详情，开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + insertLength, DateUtil.current() - begin);
-        }
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), newMetaDataDetailsList, list -> {
+            metaDataDetailsService.batchUpdateByMetaDataIdAndColumnIndex(list);
+        });
     }
 
     private List<MetaDataDetails> getMetaDataDetailsList(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
@@ -183,13 +174,4 @@ public class SyncMetaDataTask {
         return metaDataList;
     }
 
-    /**
-     * 清空旧数据
-     */
-    private void delOldData() {
-        //删除元数据
-        metaDataService.truncate();
-        //删除元数据详情
-        metaDataDetailsService.truncate();
-    }
 }

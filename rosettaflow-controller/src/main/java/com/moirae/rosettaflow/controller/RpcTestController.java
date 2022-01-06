@@ -99,7 +99,7 @@ public class RpcTestController {
     @ApiOperation(value = "查询所有组织", notes = "查询所有组织")
     public ResponseVo<List<NodeIdentityDto>> getAllOrg() {
         log.info("查询所有组织");
-        List<NodeIdentityDto> orgList = grpcAuthService.getIdentityList();
+        List<NodeIdentityDto> orgList = grpcAuthService.getAllIdentityList();
         com.moirae.rosettaflow.mapper.domain.Organization organization = null;
         List<com.moirae.rosettaflow.mapper.domain.Organization> upList = new ArrayList<>();
         for (int i = 0; i < orgList.size(); i++) {
@@ -118,7 +118,7 @@ public class RpcTestController {
     @ApiOperation(value = "GetIdentityList接口测试", notes = "查询全网组织的身份信息列表(已入网的)")
     public ResponseVo<List<NodeIdentityDto>> getIdentityList() {
         log.info("GetIdentityList接口测试");
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getAllIdentityList();
         return ResponseVo.createSuccess(nodeIdentityDtoList.size() > 10 ? nodeIdentityDtoList.subList(0, 10) : nodeIdentityDtoList);
     }
 
@@ -126,7 +126,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc getTotalMetadataDetailList查看全网元数据列表", notes = "grpc getTotalMetadataDetailList查看全网元数据列表")
     public ResponseVo<List<MetaDataDetailResponseDto>> getGlobalMetadataDetailList() {
         log.info("grpc getTotalMetadataDetailList查看全网元数据列表");
-        List<MetaDataDetailResponseDto> metaDataDetailList = grpcMetaDataService.getGlobalMetadataDetailList();
+        List<MetaDataDetailResponseDto> metaDataDetailList = grpcMetaDataService.getAllGlobalMetadataDetailList();
         return ResponseVo.createSuccess(metaDataDetailList.size() > 10 ? metaDataDetailList.subList(0, 8) : metaDataDetailList);
     }
 
@@ -134,7 +134,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表", notes = "grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表")
     public ResponseVo<List<GetMetaDataAuthorityDto>> getMetadataAuthorityList() {
         log.info("grpc GetMetadataAuthorityList当前(组织)的所有元数据的授权申请及审核结果详情列表");
-        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getAllGlobalMetadataAuthorityList();
         return ResponseVo.createSuccess(metaDataAuthorityDtoList.size() > 10 ? metaDataAuthorityDtoList.subList(0, 8) : metaDataAuthorityDtoList);
     }
 
@@ -189,7 +189,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc GetTaskDetailList查看本组织参与过的全部任务详情列表", notes = "grpc GetTaskDetailList查看本组织参与过的全部任务详情列表")
     public ResponseVo<List<TaskDetailResponseDto>> getTaskDetailList() {
         log.info("grpc GetTaskDetailList查看本组织参与过的全部任务详情列表");
-        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getTaskDetailList();
+        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getAllTaskDetailList();
         return ResponseVo.createSuccess(metaDataAuthorityDtoList);
     }
 
@@ -197,7 +197,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc getTaskDetailById查询任务详情根据任务id", notes = "grpc getTaskDetailById查询任务详情根据任务id")
     public ResponseVo<TaskDetailResponseDto> getTaskDetailById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
         log.info("grpc getTaskDetailById查询任务详情根据任务id");
-        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getTaskDetailList();
+        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getAllTaskDetailList();
         if (Objects.isNull(metaDataAuthorityDtoList) || metaDataAuthorityDtoList.isEmpty()) {
             return ResponseVo.createSuccess();
         }

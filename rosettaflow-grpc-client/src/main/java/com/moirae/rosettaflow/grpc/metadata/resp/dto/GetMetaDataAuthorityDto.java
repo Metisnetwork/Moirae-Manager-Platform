@@ -50,5 +50,8 @@ public class GetMetaDataAuthorityDto {
      * 数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的or被拒绝的>;)
      */
     private Integer metadataAuthorityState;
-
+    /**
+     * 数据的最后更新时间，UTC毫秒数
+     */
+    private Long updateAt;
 }

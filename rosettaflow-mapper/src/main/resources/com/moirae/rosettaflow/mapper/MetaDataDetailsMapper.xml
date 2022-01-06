@@ -84,4 +84,42 @@
             </trim>
         </foreach>
     </insert>
+
+    <update id="batchUpdate">
+        <foreach collection="metaDataDetailsList" item="metaDataDetails" separator=";">
+            update t_meta_data_details set
+            <trim suffixOverrides=",">
+                <if test="metaDataDetails.metaDataId != null">
+                    meta_data_id = #{metaDataDetails.metaDataId},
+                </if>
+                <if test="metaDataDetails.columnIndex != null">
+                    column_index = #{metaDataDetails.columnIndex},
+                </if>
+                <if test="metaDataDetails.columnName != null">
+                    `column_name` = #{metaDataDetails.columnName},
+                </if>
+                <if test="metaDataDetails.columnType != null">
+                    column_type = #{metaDataDetails.columnType},
+                </if>
+                <if test="metaDataDetails.columnSize != null">
+                    column_size = #{metaDataDetails.columnSize},
+                </if>
+                <if test="metaDataDetails.columnDesc != null">
+                    column_desc = #{metaDataDetails.columnDesc},
+                </if>
+                <if test="metaDataDetails.status != null">
+                    `status` = #{metaDataDetails.status},
+                </if>
+                <if test="metaDataDetails.createTime != null">
+                    create_time = #{metaDataDetails.createTime},
+                </if>
+                <if test="metaDataDetails.updateTime != null">
+                    update_time = #{metaDataDetails.updateTime},
+                </if>
+            </trim>
+            <where>
+                meta_data_id = #{metaDataDetails.metaDataId} and column_index = #{metaDataDetails.columnIndex}
+            </where>
+        </foreach>
+    </update>
 </mapper>

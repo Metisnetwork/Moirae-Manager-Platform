@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.grpc.service;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,14 +18,23 @@ public interface GrpcMetaDataService {
      *
      * @return 获取所有元数据列表
      */
-    List<MetaDataDetailResponseDto> getGlobalMetadataDetailList();
+    List<MetaDataDetailResponseDto> getAllGlobalMetadataDetailList();
+
+    default List<MetaDataDetailResponseDto> getGlobalMetadataDetailList(Long latestSynced) {
+        return new ArrayList();
+    }
+
 
     /**
      * 查看 本组织元数据列表
      *
      * @return 本组织元数据列表
      */
-    List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList();
+    List<SelfMetaDataDetailResponseDto> getAllLocalMetadataDetailList();
+
+    default List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList(Long latestSynced) {
+        return new ArrayList();
+    }
 
     /**
      * 查询某 metadata 参与过的任务的taskId列表

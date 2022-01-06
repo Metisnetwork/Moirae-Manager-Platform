@@ -2,6 +2,8 @@ package com.moirae.rosettaflow.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
+import com.moirae.rosettaflow.controller.UserController;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.web3j.crypto.*;
@@ -20,6 +22,8 @@ import java.util.Map;
  * @date 2021/8/10
  * @description 钱包签名验证签名工具类
  */
+
+@Slf4j
 public class WalletSignUtils {
     /**
      * 签名
@@ -94,28 +98,51 @@ public class WalletSignUtils {
     }
 
     public static void main(String[] args) {
-        String uuid = "ec1ab67261cd4a0387223c9952a3f455";
+//        String uuid = "834733e3fc0f4c95a191aeb1ceed17eb";
+//        //登录签名
+//        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
+//        //启动工作流签名
+////        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"d6a151c0703d47e6baa068700e8c5381\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"key\",\"type\":\"string\"}]}}";
+//
+//        try {
+//            json = StrUtil.format(json, uuid);
+//            System.out.println("加密的json字符串为>>>" + json);
+//            Credentials credentials = Credentials.create("c065dc203f33c3fbe003fed50d917898cc69b09c133bb109257d8cd21841672a");
+//            System.out.println("钱包hrp地址>>>" + credentials.getAddress());
+//            System.out.println("钱包0x地址>>>" + AddressChangeUtils.convert0xAddress(credentials.getAddress()));
+//
+//            System.out.println("签名结果>>>" + signTypedDataV4(json, credentials.getEcKeyPair()));
+//
+//            System.out.println("验证签名结果>>>" + verifyTypedDataV4(
+//                    json,
+//                    "0xfb71e85fb91026933d0057c263b549197e4d93e8a955728892f3ae9cd4cc6c4973c235ecc4dc2bf6927006b53f42bc3f56110649f040357489f41b3cd9c10af71c",
+//                    "lax1j0q78v8g9l94pkwyk3tgk0vfy5ukdz3q2e7wqa"));
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        System.out.println(createLoginSign("108068000da24e58b4d13104e439be53",Credentials.create("c065dc203f33c3fbe003fed50d917898cc69b09c133bb109257d8cd21841672a")));
+    }
+
+    /**
+     * 创建登录签名
+     * @param nonce nonce，登录前需要先获取nonce {@link UserController#getLoginNonce(String)}
+     * @param credentials 钱包凭证
+     */
+    public static String createLoginSign(String nonce,Credentials credentials){
+        log.info("address>>>" + credentials.getAddress());
         //登录签名
-        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{ec1ab67261cd4a0387223c9952a3f455}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
-        //启动工作流签名
-//        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"d6a151c0703d47e6baa068700e8c5381\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"key\",\"type\":\"string\"}]}}";
-
+        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
         try {
-            json = StrUtil.format(json, uuid);
-            System.out.println("加密的json字符串为>>>" + json);
-            Credentials credentials = Credentials.create("f366d751f2b18ee39404e6be657dab7cd0e31da62ff7dbb49ddb8da15521e8ac");
-            System.out.println("钱包hrp地址>>>" + credentials.getAddress());
-            System.out.println("钱包0x地址>>>" + AddressChangeUtils.convert0xAddress(credentials.getAddress()));
-
-            System.out.println("签名结果>>>" + signTypedDataV4(json, credentials.getEcKeyPair()));
-
-            System.out.println("验证签名结果>>>" + verifyTypedDataV4(
-                    json,
-                    "0xfb71e85fb91026933d0057c263b549197e4d93e8a955728892f3ae9cd4cc6c4973c235ecc4dc2bf6927006b53f42bc3f56110649f040357489f41b3cd9c10af71c",
-                    "lax1j0q78v8g9l94pkwyk3tgk0vfy5ukdz3q2e7wqa"));
-
+            json = StrUtil.format(json, nonce);
+            log.info("signMessage>>>" + json);
+            String sign = signTypedDataV4(json, credentials.getEcKeyPair());
+            log.info("sign>>>" + sign);
+            return sign;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("创建登录签名失败！",e);
         }
+        return null;
     }
 }

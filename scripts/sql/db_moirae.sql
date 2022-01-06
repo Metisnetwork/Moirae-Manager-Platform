@@ -1,3 +1,4 @@
+use db_moirae;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
@@ -674,3 +675,14 @@ CREATE TABLE `t_task_result`
     UNIQUE KEY UK_TASK_RESULT (`task_id`, `metadata_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='任务运行结果表';
+
+-- ----------------------------
+-- Table structure for `t_data_sync`
+-- 记录数据同步时间
+-- ----------------------------
+DROP TABLE IF EXISTS `t_data_sync`;
+CREATE TABLE `t_data_sync` (
+  `data_type` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据类型',
+  `latest_synced` bigint NOT NULL DEFAULT '0' COMMENT '数据最新同步时间戳，精确到毫秒',
+  PRIMARY KEY (`data_type`)
+) COMMENT='数据同步时间记录';

@@ -507,7 +507,8 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
      */
     private List<Organization> syncOrganization() {
         List<Organization> organizationList = new ArrayList<>();
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+        //TODO 应该不需要从0开始同步
+        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getAllIdentityList();
         if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
 
             Organization org;

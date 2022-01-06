@@ -198,4 +198,76 @@
             </trim>
         </foreach>
     </insert>
+
+    <update id="batchUpdate">
+        <foreach collection="metaDataList" item="metaData" separator=";">
+            update t_meta_data set
+            <trim suffixOverrides=",">
+                <if test="metaData.identityId != null">
+                    identity_id = #{metaData.identityId},
+                </if>
+                <if test="metaData.identityName != null">
+                    identity_name = #{metaData.identityName},
+                </if>
+                <if test="metaData.nodeId != null">
+                    node_id = #{metaData.nodeId},
+                </if>
+                <if test="metaData.metaDataId != null">
+                    meta_data_id = #{metaData.metaDataId},
+                </if>
+                <if test="metaData.fileId != null">
+                    file_id = #{metaData.fileId},
+                </if>
+                <if test="metaData.dataName != null">
+                    data_name = #{metaData.dataName},
+                </if>
+                <if test="metaData.dataDesc != null">
+                    data_desc = #{metaData.dataDesc},
+                </if>
+                <if test="metaData.filePath != null">
+                    file_path = #{metaData.filePath},
+                </if>
+                <if test="metaData.rows != null">
+                    `rows` = #{metaData.rows},
+                </if>
+                <if test="metaData.columns != null">
+                    `columns` = #{metaData.columns},
+                </if>
+                <if test="metaData.size != null">
+                    `size` = #{metaData.size},
+                </if>
+                <if test="metaData.fileType != null">
+                    file_type = #{metaData.fileType},
+                </if>
+                <if test="metaData.hasTitle != null">
+                    has_title = #{metaData.hasTitle},
+                </if>
+                <if test="metaData.industry != null">
+                    industry = #{metaData.industry},
+                </if>
+                <if test="metaData.dataStatus != null">
+                    data_status = #{metaData.dataStatus},
+                </if>
+                <if test="metaData.status != null">
+                    `status` = #{metaData.status},
+                </if>
+                <if test="metaData.publishAt != null">
+                    publish_at = #{metaData.publishAt},
+                </if>
+                <if test="metaData.updateAt != null">
+                    update_at = #{metaData.updateAt},
+                </if>
+                <if test="metaData.createTime != null">
+                    create_time = #{metaData.createTime},
+                </if>
+                <if test="metaData.updateTime != null">
+                    update_time = #{metaData.updateTime},
+                </if>
+            </trim>
+            <where>
+                meta_data_id = #{metaData.metaDataId}
+            </where>
+        </foreach>
+    </update>
+
 </mapper>

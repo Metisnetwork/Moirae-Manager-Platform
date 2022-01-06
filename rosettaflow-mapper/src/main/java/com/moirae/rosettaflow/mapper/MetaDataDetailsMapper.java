@@ -19,4 +19,11 @@ public interface MetaDataDetailsMapper extends BaseMapper<MetaDataDetails> {
      * @return 插入记录数
      */
     int batchInsert(@Param("metaDataDetailsList") List<MetaDataDetails> metaDataDetailsList);
+
+    /**
+     * 批量更新元数据详情信息
+     * @param metaDataDetailsList 元数据详情列表
+     * @return 更新记录数
+     */
+    int batchUpdate(@Param("metaDataDetailsList") List<MetaDataDetails> metaDataDetailsList);
 }

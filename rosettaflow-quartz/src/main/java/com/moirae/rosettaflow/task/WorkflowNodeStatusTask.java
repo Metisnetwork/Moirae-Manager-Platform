@@ -2,17 +2,16 @@ package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.moirae.rosettaflow.dto.WorkflowDto;
-import com.moirae.rosettaflow.grpc.service.GetTaskDetailListResponse;
-import com.moirae.rosettaflow.grpc.service.GrpcSysService;
-import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
-import com.moirae.rosettaflow.grpc.service.TaskServiceGrpc;
+import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
+import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
+import com.moirae.rosettaflow.mapper.domain.DataSync;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 import com.moirae.rosettaflow.service.*;
@@ -69,7 +68,10 @@ public class WorkflowNodeStatusTask {
     @Resource
     private NetManager netManager;
 
-    @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
+    @Resource
+    private IDataSyncService dataSyncService;
+
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "WorkflowNodeStatusTask")
     public void run() {
         List<WorkflowNode> workflowNodeList = workflowNodeService.getRunningNode(BEFORE_HOUR);
@@ -101,11 +103,38 @@ public class WorkflowNodeStatusTask {
         Set<String> taskIdSet = new HashSet<>();
         for (String s : identityIdSet) {
             ManagedChannel nodeChannel = netManager.getChannel(s);
-            Empty empty = Empty.newBuilder().build();
-            GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(nodeChannel).getTaskDetailList(empty);
-            List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
-            taskServiceClient.getTaskDetailResponseDtos(taskDetailResponseDtoList, getTaskDetailListResponse);
-            for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
+            //分页获取
+            DataSync dataSyncByType = dataSyncService.getDataSyncByType(DataSyncTypeEnum.TASK.getDataType().concat(s));
+            if (dataSyncByType == null) {//获取失败，则插入一条
+                dataSyncByType = new DataSync();
+                dataSyncByType.setDataType(DataSyncTypeEnum.TASK.getDataType().concat(s));
+                dataSyncByType.setLatestSynced(0);
+                dataSyncService.insertDataSync(dataSyncByType);
+            }
+            long latestSynced = dataSyncByType.getLatestSynced();
+            List<TaskDetailResponseDto> allList = new ArrayList<>();
+            List<TaskDetailResponseDto> list;
+            do {
+                GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
+                        .setLastUpdated(latestSynced)
+                        .setPageSize(GrpcConstant.PAGE_SIZE)
+                        .build();
+                GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(nodeChannel).getTaskDetailList(request);
+                list = new ArrayList<>();
+                taskServiceClient.getTaskDetailResponseDtos(list, getTaskDetailListResponse);
+
+                if (list.isEmpty()) {
+                    break;
+                }
+                allList.addAll(list);
+                latestSynced = list.get(list.size() - 1).getInformation().getUpdateAt();
+
+                //上次更新的latestSynced存到数据库中
+                dataSyncByType.setLatestSynced(latestSynced);
+                dataSyncService.updateDataSyncByType(dataSyncByType);
+            } while (list.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
+            //遍历结果
+            for (TaskDetailResponseDto taskDetailResponseDto : allList) {
                 if (!taskIdSet.contains(taskDetailResponseDto.getInformation().getTaskId())) {
                     taskIdSet.add(taskDetailResponseDto.getInformation().getTaskId());
                     taskDetailResponseDtoAllList.add(taskDetailResponseDto);
