@@ -1,15 +1,12 @@
 package com.moirae.rosettaflow.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
-import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
-import com.moirae.rosettaflow.mapper.domain.DataSync;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
@@ -53,31 +50,20 @@ public class SyncUserDataAuthTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            DataSync dataSyncByType = dataSyncService.getDataSyncByType(DataSyncTypeEnum.DATA_AUTH);
-            long latestSynced = dataSyncByType.getLatestSynced();
-            if (dataSyncByType == null) {//获取失败，则插入一条
-                dataSyncByType = new DataSync();
-                dataSyncByType.setDataType(DataSyncTypeEnum.DATA_AUTH.getDataType());
-                dataSyncByType.setLatestSynced(0);
-                dataSyncService.insertDataSync(dataSyncByType);
-            }
-            List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList;
-            do {
-                metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList(latestSynced);
-                if (CollUtil.isEmpty(metaDataAuthorityDtoList)) {// 从net同步元数据[未发现变更元数据], 故不进行后续同步
-                    break;
-                }
-                // 批量更新数据
-                // 批量更新
-                this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
-                log.info("用户授权数据同步,同步数据量:{}条", metaDataAuthorityDtoList.size());
-                latestSynced = metaDataAuthorityDtoList
-                        .get(metaDataAuthorityDtoList.size() - 1)
-                        .getUpdateAt();
-                //上次更新的latestSynced存到数据库中
-                dataSyncByType.setLatestSynced(latestSynced);
-                dataSyncService.updateDataSyncByType(dataSyncByType);
-            } while (metaDataAuthorityDtoList.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
+            dataSyncService.sync(DataSyncTypeEnum.DATA_AUTH.getDataType(),//1.根据dataType同步类型获取新的同步时间DataSync
+                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                        return grpcAuthService.getGlobalMetadataAuthorityList(latestSynced);
+                    },
+                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                        // 批量更新
+                        this.batchDealUserAuthData(grpcResponseList, SysConstant.UPDATE);
+                        log.info("用户授权数据同步,同步数据量:{}条", grpcResponseList.size());
+                    },
+                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                        return grpcResponseList
+                                .get(grpcResponseList.size() - 1)
+                                .getUpdateAt();
+                    });
         } catch (Exception e) {
             log.error("从net同步用户元数据授权列表失败, 失败原因:{}, 错误信息:{}", e.getMessage(), e);
         }

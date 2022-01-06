@@ -72,6 +72,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Resource
     private IUserMetaDataService userMetaDataService;
 
+    @Resource
+    private IDataSyncService dataSyncService;
+
     @Override
     public List<WorkflowNodeDto> queryNodeDetailsList(Long id, String language) {
         // 获取工作流节点列表
@@ -150,7 +153,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
         }
-        
+
         // 校验节点配置输入是否有过期数据
         this.checkExpireConfigData(workflowNodeDtoList);
 
@@ -205,8 +208,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         workflowService.updateById(workflow);
     }
 
-    /** 校验节点配置输入是否有过期数据 */
-    private void checkExpireConfigData(List<WorkflowNodeDto> workflowNodeDtoList){
+    /**
+     * 校验节点配置输入是否有过期数据
+     */
+    private void checkExpireConfigData(List<WorkflowNodeDto> workflowNodeDtoList) {
         Set<String> userAuthDataIdSet = new HashSet<>();
         for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
@@ -219,15 +224,17 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
         if (userAuthDataIdSet.size() > 0) {
             List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdSet);
-            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdSet.size()) {
+            if (null != userMetaDataList && userMetaDataList.size() < userAuthDataIdSet.size()) {
                 log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(userAuthDataIdSet));
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
             }
         }
     }
 
-    /** 校验只有一个算法节点，且该节点需要模型时，是否传入模型参数 */
-    private void checkConfigModelParam(List<WorkflowNodeDto> workflowNodeDtoList){
+    /**
+     * 校验只有一个算法节点，且该节点需要模型时，是否传入模型参数
+     */
+    private void checkConfigModelParam(List<WorkflowNodeDto> workflowNodeDtoList) {
         // 当前工作流只有一个节点，且需要输入模型
         if (workflowNodeDtoList.size() == 1) {
             int inputModel = workflowNodeDtoList.get(0).getAlgorithmDto().getInputModel();
@@ -333,7 +340,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
         // 校验工作流状态是否运行中
         boolean isExistNodeRunning = workflowNodeList.stream().anyMatch(workflowNode -> workflowNode.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue());
-        if(workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue() || isExistNodeRunning){
+        if (workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue() || isExistNodeRunning) {
             log.error("Workflow runStatus is running or workflow node exist runStatus is running,can not clear, workflowId:{}", workflowId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_CLEAR.getMsg());
         }
@@ -370,7 +377,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         oldNodeList.forEach(oldNode -> this.copyWorkflowNode(oldNode, newWorkflowId));
     }
 
-    /** 复制工作流节点 */
+    /**
+     * 复制工作流节点
+     */
     private WorkflowNode copyWorkflowNode(WorkflowNode oldNode, Long newWorkflowId) {
         WorkflowNode newNode = new WorkflowNode();
         newNode.setWorkflowId(newWorkflowId);
@@ -506,22 +515,30 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
      * @return 组织信息列表
      */
     private List<Organization> syncOrganization() {
-        List<Organization> organizationList = new ArrayList<>();
-        //TODO 应该不需要从0开始同步
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getAllIdentityList();
-        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
+        List<Organization> allOrganizationList = new ArrayList<>();
 
-            Organization org;
-            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
-                org = new Organization();
-                org.setNodeName(nodeIdentityDto.getNodeName());
-                org.setNodeId(nodeIdentityDto.getNodeId());
-                org.setIdentityId(nodeIdentityDto.getIdentityId());
-                organizationList.add(org);
-            }
-            organizationService.batchInsert(organizationList);
-        }
-        return organizationList;
+        dataSyncService.sync(DataSyncTypeEnum.ORG_IDENTITY.getDataType(),
+                (latestSynced) -> {
+                    return grpcAuthService.getIdentityList(latestSynced);
+                },
+                (nodeIdentityDtoList) -> {
+                    List<Organization> organizationList = new ArrayList<>();
+                    for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
+                        Organization org = new Organization();
+                        org.setNodeName(nodeIdentityDto.getNodeName());
+                        org.setNodeId(nodeIdentityDto.getNodeId());
+                        org.setIdentityId(nodeIdentityDto.getIdentityId());
+                        organizationList.add(org);
+                    }
+                    allOrganizationList.addAll(organizationList);
+                    organizationService.batchInsert(organizationList);
+                },
+                (nodeIdentityDtoList) -> {
+                    return nodeIdentityDtoList
+                            .get(nodeIdentityDtoList.size() - 1)
+                            .getUpdateAt();
+                });
+        return allOrganizationList;
     }
 
 }

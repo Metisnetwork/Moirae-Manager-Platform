@@ -11,7 +11,6 @@ import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
-import com.moirae.rosettaflow.mapper.domain.DataSync;
 import com.moirae.rosettaflow.mapper.domain.TaskResult;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 import com.moirae.rosettaflow.service.*;
@@ -103,36 +102,27 @@ public class WorkflowNodeStatusTask {
         Set<String> taskIdSet = new HashSet<>();
         for (String s : identityIdSet) {
             ManagedChannel nodeChannel = netManager.getChannel(s);
-            //分页获取
-            DataSync dataSyncByType = dataSyncService.getDataSyncByType(DataSyncTypeEnum.TASK.getDataType().concat(s));
-            if (dataSyncByType == null) {//获取失败，则插入一条
-                dataSyncByType = new DataSync();
-                dataSyncByType.setDataType(DataSyncTypeEnum.TASK.getDataType().concat(s));
-                dataSyncByType.setLatestSynced(0);
-                dataSyncService.insertDataSync(dataSyncByType);
-            }
-            long latestSynced = dataSyncByType.getLatestSynced();
             List<TaskDetailResponseDto> allList = new ArrayList<>();
-            List<TaskDetailResponseDto> list;
-            do {
-                GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
-                        .setLastUpdated(latestSynced)
-                        .setPageSize(GrpcConstant.PAGE_SIZE)
-                        .build();
-                GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(nodeChannel).getTaskDetailList(request);
-                list = new ArrayList<>();
-                taskServiceClient.getTaskDetailResponseDtos(list, getTaskDetailListResponse);
-
-                if (list.isEmpty()) {
-                    break;
-                }
-                allList.addAll(list);
-                latestSynced = list.get(list.size() - 1).getInformation().getUpdateAt();
-
-                //上次更新的latestSynced存到数据库中
-                dataSyncByType.setLatestSynced(latestSynced);
-                dataSyncService.updateDataSyncByType(dataSyncByType);
-            } while (list.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
+            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType().concat(s),//1.根据dataType同步类型获取新的同步时间DataSync
+                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                        GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
+                                .setLastUpdated(latestSynced)
+                                .setPageSize(GrpcConstant.PAGE_SIZE)
+                                .build();
+                        GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(nodeChannel).getTaskDetailList(request);
+                        List<TaskDetailResponseDto> list = new ArrayList<>();
+                        taskServiceClient.getTaskDetailResponseDtos(list, getTaskDetailListResponse);
+                        return list;
+                    },
+                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                        allList.addAll(grpcResponseList);
+                    },
+                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                        return grpcResponseList
+                                .get(grpcResponseList.size() - 1)
+                                .getInformation()
+                                .getUpdateAt();
+                    });
             //遍历结果
             for (TaskDetailResponseDto taskDetailResponseDto : allList) {
                 if (!taskIdSet.contains(taskDetailResponseDto.getInformation().getTaskId())) {

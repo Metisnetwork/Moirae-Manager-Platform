@@ -1,16 +1,13 @@
 package com.moirae.rosettaflow.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
-import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
-import com.moirae.rosettaflow.mapper.domain.DataSync;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataDetails;
 import com.moirae.rosettaflow.service.IDataSyncService;
@@ -58,39 +55,28 @@ public class SyncMetaDataTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            DataSync dataSyncByType = dataSyncService.getDataSyncByType(DataSyncTypeEnum.META_DATA);
-            if (dataSyncByType == null) {//获取失败，则插入一条
-                dataSyncByType = new DataSync();
-                dataSyncByType.setDataType(DataSyncTypeEnum.META_DATA.getDataType());
-                dataSyncByType.setLatestSynced(0);
-                dataSyncService.insertDataSync(dataSyncByType);
-            }
-            long latestSynced = dataSyncByType.getLatestSynced();
-            List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList;
-            do {
-                metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList(latestSynced);
-                if (CollUtil.isEmpty(metaDataDetailResponseDtoList)) {// 从net同步元数据[未发现变更元数据], 故不进行后续同步
-                    break;
-                }
-                // 批量更新元数据
-                this.batchUpdateMetaData(metaDataDetailResponseDtoList);
-
-                // 批量更新元数据详情
-                for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-                    String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
-                    List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
-                    //  批量更新元数据详情
-                    this.batchUpdateMetaDataDetails(metaDataId, columnList);
-                }
-                latestSynced = metaDataDetailResponseDtoList
-                        .get(metaDataDetailResponseDtoList.size() - 1)
-                        .getMetaDataDetailDto()
-                        .getMetaDataSummary()
-                        .getUpdateAt();
-                //上次更新的latestSynced存到数据库中
-                dataSyncByType.setLatestSynced(latestSynced);
-                dataSyncService.updateDataSyncByType(dataSyncByType);
-            } while (metaDataDetailResponseDtoList.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
+            dataSyncService.sync(DataSyncTypeEnum.META_DATA.getDataType(),//1.根据dataType同步类型获取新的同步时间DataSync
+                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                        return grpcMetaDataService.getGlobalMetadataDetailList(latestSynced);
+                    },
+                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                        // 批量更新元数据
+                        this.batchUpdateMetaData(grpcResponseList);
+                        // 批量更新元数据详情
+                        for (MetaDataDetailResponseDto metaDataDetailResponseDto : grpcResponseList) {
+                            String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
+                            List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
+                            //  批量更新元数据详情
+                            this.batchUpdateMetaDataDetails(metaDataId, columnList);
+                        }
+                    },
+                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                        return grpcResponseList
+                                .get(grpcResponseList.size() - 1)
+                                .getMetaDataDetailDto()
+                                .getMetaDataSummary()
+                                .getUpdateAt();
+                    });
         } catch (Exception e) {
             log.error("元数据信息同步,从net同步元数据失败,失败原因：{}", e.getMessage(), e);
         }
@@ -101,9 +87,6 @@ public class SyncMetaDataTask {
      * @param metaDataDetailResponseDtoList 需更新数据
      */
     private void batchUpdateMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
-        if (0 == metaDataDetailResponseDtoList.size()) {
-            return;
-        }
         List<MetaData> newMetaDataList = this.getMetaDataList(metaDataDetailResponseDtoList);
         BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), newMetaDataList, list -> {
             metaDataService.batchUpdate(list);
