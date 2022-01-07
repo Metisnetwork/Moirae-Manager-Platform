@@ -18,4 +18,6 @@ public interface OrganizationMapper extends BaseMapper<Organization> {
      * @return 插入记录数
      */
     int batchInsert(@Param("organizationList") List<Organization> organizationList);
+
+    List<Organization> selectByUser(@Param(value = "address") String hexAddress);
 }

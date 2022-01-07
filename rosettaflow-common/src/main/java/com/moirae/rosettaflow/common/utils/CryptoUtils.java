@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.utils;
+package com.moirae.rosettaflow.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.crypto.ECDSASignature;

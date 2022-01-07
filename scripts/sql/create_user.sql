@@ -1,7 +1,3 @@
-# create user 'rosettaflow'@'%' identified by 'rosettaflow';
-# GRANT ALL ON db_moirae.* to 'moirae'@'%';
-# flush privileges;
-
 # 创建程序用户
 use mysql;
 create user 'moirae'@'%' identified by 'moirae@2021';

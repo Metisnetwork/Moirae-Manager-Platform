@@ -6,13 +6,11 @@
         <result column="user_name" jdbcType="VARCHAR" property="userName"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="org_identity_id" jdbcType="VARCHAR" property="orgIdentityId"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, user_name, address, `status`, create_time, update_time
-    </sql>
-    <select id="queryUserByProjectId" resultType="com.moirae.rosettaflow.mapper.domain.User">
+    <select id="queryUserByProjectId" resultMap="BaseResultMap">
         SELECT
             u.id,
             u.user_name

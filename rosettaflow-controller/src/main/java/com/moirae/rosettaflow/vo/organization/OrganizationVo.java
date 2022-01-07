@@ -1,12 +1,8 @@
 package com.moirae.rosettaflow.vo.organization;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * @author hudenian
@@ -14,7 +10,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel(value = "用户维护组织信息详情返回参数")
-public class UserOrgMaintainVo {
+public class OrganizationVo {
 
     @ApiModelProperty(value = "组织的身份名称")
     private String nodeName;
@@ -31,9 +27,6 @@ public class UserOrgMaintainVo {
     @ApiModelProperty(value = "是否公共可看的：0-否，1-是")
     private Byte publicFlag;
 
-    @ApiModelProperty(value = "是否可连接: 0-无效，1- 有效")
-    private Byte validFlag;
-
-    @ApiModelProperty(value = "是否已连接：0-否，1-是")
-    private Byte connectFlag;
+    @ApiModelProperty(value = "是否为默认的链接设置：0-否，1-是")
+    private Byte defaultConnectFlag;
 }

@@ -30,6 +30,17 @@ public interface IUserService extends IService<User> {
     UserDto generatorToken(String address, String hrpAddress);
 
     /**
+     * 通过签名方式登录
+     *
+     * @param hexAddress
+     * @param hrpAddress
+     * @param authenticateSignMessage
+     * @param authenticateSign
+     * @return
+     */
+    UserDto loginBySign(String hexAddress, String hrpAddress,String authenticateSignMessage, String authenticateSign);
+
+    /**
      * 登出
      */
     void logout();
@@ -56,14 +67,6 @@ public interface IUserService extends IService<User> {
      * @return nonce
      */
     String getLoginNonce(String address);
-
-    /**
-     * 检查nonce有效性
-     *
-     * @param nonce   nonce
-     * @param address 用户地址
-     */
-    void checkNonceValidity(String nonce, String address);
 
     /**
      * 根据项目id查询所有可以使用的用户信息

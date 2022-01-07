@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.UserOrgMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.UserOrg">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_address" jdbcType="VARCHAR" property="userAddress"/>
+        <result column="org_identity_id" jdbcType="VARCHAR" property="orgIdentityId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+</mapper>

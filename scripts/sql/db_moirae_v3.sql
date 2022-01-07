@@ -1,4 +1,6 @@
-SET FOREIGN_KEY_CHECKS = 0;
+CREATE DATABASE IF NOT EXISTS `db_moirae_cd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE `db_moirae_cd`;
 
 -- ----------------------------
 -- Table structure for `t_user`
@@ -15,8 +17,7 @@ CREATE TABLE `t_user`
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_ADDRESS` (`address`) USING BTREE COMMENT '用户地址唯一',
     UNIQUE KEY `UK_USERNAME` (`user_name`) USING BTREE COMMENT '用户名称唯一'
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
+) ENGINE = InnoDB COMMENT ='用户表';
 
 
 -- ----------------------------
@@ -37,8 +38,7 @@ CREATE TABLE `t_organization`
     `update_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_ORG_IDENTITY_ID` (`identity_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='组织表';
+) ENGINE = InnoDB COMMENT ='组织表';
 
 
 -- ----------------------------
@@ -57,7 +57,7 @@ CREATE TABLE `t_user_org_maintain` (
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_USER_IDENTITY_ID` (`address`,`identity_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户组织连接绑定关系表';
+) ENGINE=InnoDB COMMENT='用户组织连接绑定关系表';
 
 -- ----------------------------
 -- Table structure for `t_user_org`
@@ -75,8 +75,7 @@ CREATE TABLE `t_user_org`
     `update_time`   timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_USER_IDENTITY_ID` (`user_id`, `identity_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户绑定机构表';
+) ENGINE = InnoDB COMMENT ='用户绑定机构表';
 
 -- ----------------------------
 -- Table structure for `t_login_log`
@@ -92,8 +91,7 @@ CREATE TABLE `t_login_log`
     `create_time`   timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`   timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户登录日志表';
+) ENGINE = InnoDB COMMENT ='用户登录日志表';
 
 -- ----------------------------
 -- Table structure for `t_meta_data`
@@ -124,8 +122,7 @@ CREATE TABLE `t_meta_data`
     `update_time`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_META_DATA_ID` (`meta_data_id`, `data_status`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='元数据表';
+) ENGINE = InnoDB COMMENT ='元数据表';
 
 -- ----------------------------
 -- Table structure for `t_meta_data_details`
@@ -145,8 +142,7 @@ CREATE TABLE `t_meta_data_details`
     `update_time`  timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_META_DATA_COLUMN_ID` (`meta_data_id`, `column_index`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='元数据列详情表';
+) ENGINE = InnoDB COMMENT ='元数据列详情表';
 
 -- ----------------------------
 -- Table structure for `t_user_meta_data`
@@ -177,8 +173,7 @@ CREATE TABLE `t_user_meta_data`
     `update_time`         timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_META_AUTH_ID` (`metadata_auth_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户元数据授权表';
+) ENGINE = InnoDB COMMENT ='用户元数据授权表';
 
 -- ----------------------------
 -- Table structure for `t_project`
@@ -197,8 +192,7 @@ CREATE TABLE `t_project`
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_NAME` (`project_name`, `status`, `del_version`),
     KEY (`user_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='项目表';
+) ENGINE = InnoDB COMMENT ='项目表';
 
 -- ----------------------------
 -- Table structure for `t_project_temp`
@@ -216,8 +210,7 @@ CREATE TABLE `t_project_temp`
     `update_time`  timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_NAME` (`project_name`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='项目模板表';
+) ENGINE = InnoDB COMMENT ='项目模板表';
 
 
 -- ----------------------------
@@ -236,8 +229,7 @@ CREATE TABLE `t_project_member`
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_PROJ_USER_ID` (`project_id`, `user_id`),
     KEY (user_id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='项目成员管理表';
+) ENGINE = InnoDB COMMENT ='项目成员管理表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm_type`
@@ -255,8 +247,7 @@ CREATE TABLE `t_algorithm_type`
     `create_time`         timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`         timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='算法大类表';
+) ENGINE = InnoDB COMMENT ='算法大类表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm`
@@ -290,8 +281,7 @@ CREATE TABLE `t_algorithm`
     `update_time`       timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_ALG_NAME` (`algorithm_name`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='算法表';
+) ENGINE = InnoDB COMMENT ='算法表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm_auth`
@@ -312,8 +302,7 @@ CREATE TABLE `t_algorithm_auth`
     `update_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY `user_algorithm_id` (`user_id`, `algorithm_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='算法授权表';
+) ENGINE = InnoDB COMMENT ='算法授权表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm_code`
@@ -331,8 +320,7 @@ CREATE TABLE `t_algorithm_code`
     `update_time`              timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`algorithm_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='算法代码表';
+) ENGINE = InnoDB COMMENT ='算法代码表';
 
 -- ----------------------------
 -- Table structure for `t_algorithm_variable`
@@ -351,8 +339,7 @@ CREATE TABLE `t_algorithm_variable`
     `update_time`  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`algorithm_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='算法变量表';
+) ENGINE = InnoDB COMMENT ='算法变量表';
 
 
 -- ----------------------------
@@ -370,8 +357,7 @@ CREATE TABLE `t_algorithm_variable_struct`
     `update_time`  timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`algorithm_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='算法变量模板结构表';
+) ENGINE = InnoDB COMMENT ='算法变量模板结构表';
 
 -- ----------------------------
 -- Table structure for `t_workflow`
@@ -395,8 +381,7 @@ CREATE TABLE `t_workflow`
     PRIMARY KEY (`id`),
     UNIQUE KEY UK_FLOW_NAME (`project_id`, `workflow_name`, `status`, `del_version`),
     KEY `user_id` (`user_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流表';
+) ENGINE = InnoDB COMMENT ='工作流表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_temp`
@@ -416,8 +401,7 @@ CREATE TABLE `t_workflow_temp`
     `create_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流模板表';
+) ENGINE = InnoDB COMMENT ='工作流模板表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node`
@@ -440,8 +424,7 @@ CREATE TABLE `t_workflow_node`
     `update_time`    timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_NODE_STEP` (`workflow_id`, `node_step`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点表';
+) ENGINE = InnoDB COMMENT ='工作流节点表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_temp`
@@ -461,8 +444,7 @@ CREATE TABLE `t_workflow_node_temp`
     `create_time`      timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`      timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点模板表';
+) ENGINE = InnoDB COMMENT ='工作流节点模板表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_input`
@@ -485,8 +467,7 @@ CREATE TABLE `t_workflow_node_input`
     `update_time`        timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`workflow_node_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点输入表';
+) ENGINE = InnoDB COMMENT ='工作流节点输入表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_variable`
@@ -504,8 +485,7 @@ CREATE TABLE `t_workflow_node_variable`
     `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点变量表';
+) ENGINE = InnoDB COMMENT ='工作流节点变量表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_output`
@@ -526,8 +506,7 @@ CREATE TABLE `t_workflow_node_output`
     `update_time`      timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`workflow_node_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='项目工作流节点输出表';
+) ENGINE = InnoDB COMMENT ='项目工作流节点输出表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_code`
@@ -545,8 +524,7 @@ CREATE TABLE `t_workflow_node_code`
     `update_time`              timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`workflow_node_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点算法代码表';
+) ENGINE = InnoDB COMMENT ='工作流节点算法代码表';
 
 -- ----------------------------
 -- Table structure for `t_workflow_node_resource`
@@ -566,8 +544,7 @@ CREATE TABLE `t_workflow_node_resource`
     `update_time`      timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`workflow_node_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='工作流节点资源表';
+) ENGINE = InnoDB COMMENT ='工作流节点资源表';
 
 -- ----------------------------
 -- Table structure for `t_job`
@@ -589,8 +566,7 @@ CREATE TABLE `t_job`
     `create_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='作业表';
+) ENGINE = InnoDB COMMENT ='作业表';
 -- ----------------------------
 -- Table structure for `t_sub_job`
 -- ----------------------------
@@ -609,8 +585,7 @@ CREATE TABLE `t_sub_job`
     `update_time`    timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`job_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='子作业表';
+) ENGINE = InnoDB COMMENT ='子作业表';
 
 -- ----------------------------
 -- Table structure for `t_sub_job_node`
@@ -630,8 +605,7 @@ CREATE TABLE `t_sub_job_node`
     `update_time`  timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY `SUB_JOB_ALG_ID` (`sub_job_id`, `algorithm_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='子作业节点表';
+) ENGINE = InnoDB COMMENT ='子作业节点表';
 
 -- ----------------------------
 -- Table structure for `t_task_event`
@@ -650,8 +624,7 @@ CREATE TABLE `t_task_event`
     `create_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务事件表';
+) ENGINE = InnoDB COMMENT ='任务事件表';
 
 -- ----------------------------
 -- Table structure for `t_task_result`
@@ -672,5 +645,4 @@ CREATE TABLE `t_task_result`
     `update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY UK_TASK_RESULT (`task_id`, `metadata_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务运行结果表';
+) ENGINE = InnoDB COMMENT ='任务运行结果表';

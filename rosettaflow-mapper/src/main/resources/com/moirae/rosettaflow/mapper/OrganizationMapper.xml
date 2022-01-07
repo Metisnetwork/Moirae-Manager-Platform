@@ -14,8 +14,8 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, node_name, node_id, identity_id, identity_ip, identity_port,publicFlag, `status`, create_time, update_time
-  </sql>
+        id, node_name, node_id, identity_id, identity_ip, identity_port, publicFlag, `status`, create_time, update_time
+    </sql>
 
     <insert id="batchInsert" >
         <foreach collection="organizationList" item="organization" separator=";">
@@ -80,4 +80,16 @@
         </trim>
         </foreach>
     </insert>
+
+
+    <select id="selectByUser" resultMap="BaseResultMap">
+        SELECT
+            `node_name`,
+            `identity_id`,
+            `identity_ip`,
+            `identity_port`,
+            `public_flag`
+        FROM `t_organization`
+        WHERE `status` = 1 AND (`public_flag` = 1 OR `identity_id` IN ( SELECT `org_identity_id` FROM `t_user_org` WHERE `user_address` = #{address, jdbcType=VARCHAR}))
+    </select>
 </mapper>

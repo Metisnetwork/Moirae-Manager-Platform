@@ -81,9 +81,6 @@ public class RpcTestController {
     private IOrganizationService organizationService;
 
     @Resource
-    private IUserOrgMaintainService userOrgMaintainService;
-
-    @Resource
     private IWorkflowNodeOutputService workflowNodeOutputService;
 
 

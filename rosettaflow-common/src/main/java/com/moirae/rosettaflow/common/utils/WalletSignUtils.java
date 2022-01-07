@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.utils;
+package com.moirae.rosettaflow.common.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;

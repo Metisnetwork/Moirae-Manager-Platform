@@ -37,7 +37,6 @@ public class NetManager {
     @Resource
     private GrpcAuthService grpcAuthService;
 
-    @PostConstruct
     public void init() {
         try {
             //判断组织的nodeid是否同步，未同步则进行同步操作
@@ -64,7 +63,7 @@ public class NetManager {
                 identityIdIpPortMap.put(organization.getIdentityId(), organization.getIdentityIp() + delimiter + organization.getIdentityPort());
             }
         } catch (Exception e) {
-            log.error("NetManager-同步组织数据失败, 错误信息:{}", e.getMessage());
+            log.error("NetManager-同步组织数据失败", e);
         }
     }
 

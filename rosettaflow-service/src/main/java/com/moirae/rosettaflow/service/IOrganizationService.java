@@ -61,4 +61,35 @@ public interface IOrganizationService extends IService<Organization> {
      * @return Boolean
      */
     Boolean deleteByIdentityId(String identityId);
+
+    /**
+     * 查询用户的组织信息
+     *
+     * @param hexAddress
+     * @return
+     */
+    List<Organization> getAllByUser(String hexAddress);
+
+    /**
+     * 查询用户的组织信息
+     *
+     * @return
+     */
+    List<Organization> getAllByUserSession();
+
+
+    /**
+     * 添加用户组织
+     *
+     * @param identityIp
+     * @param identityPort
+     */
+    void addUserOrganization(String identityIp, Integer identityPort);
+
+    /**
+     * 删除用户组织
+     *
+     * @param identityId
+     */
+    void deleteUserOrganization(String identityId);
 }
