@@ -23,6 +23,7 @@ import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.UserMetaDataMapper;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 
 /**
  * 用户数据授权实现类
+ *
  * @author hudenian
  * @date 2021/8/24
  */
@@ -88,7 +90,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             }
         } else {
             if (null == userMetaDataDto.getAuthEndTime() || null == userMetaDataDto.getAuthBeginTime() ||
-                DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0 || userMetaDataDto.getAuthEndTime().before(userMetaDataDto.getAuthBeginTime())) {
+                    DateUtil.compare(userMetaDataDto.getAuthEndTime(), new Date()) < 0 || userMetaDataDto.getAuthEndTime().before(userMetaDataDto.getAuthBeginTime())) {
                 log.error(ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_TIME_ERROR.getMsg());
             }
@@ -132,7 +134,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             }
         } catch (Exception e) {
             log.error("元数据授权申请,net处理失败，返回参数:{}, 失败原因：{}", JSON.toJSONString(responseDto), e);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED,  ErrorMsg.METADATA_USER_AUTH_METADATA_RPC_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_RPC_ERROR.getMsg());
         }
         // 保存用户授权申请元数据, rpc接口调用失败时，不保存授权元数据
         this.saveUserMetaData(userMetaDataDto, metaData, responseDto.getMetaDataAuthId());
@@ -146,14 +148,29 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         queryWrapper.eq(UserMetaData::getId, userMetaDataDto.getId());
         queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
         UserMetaData userMetaData = this.getOne(queryWrapper);
-       if (Objects.isNull(userMetaData)) {
-           log.error("query userMetaData fail by id:{}", userMetaDataDto.getId());
-           throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
-       }
-       if (userMetaData.getAuthStatus() != UserMetaDataAuditEnum.AUDIT_PENDING.getValue() || userMetaData.getAuthMetadataState() != UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
-           log.error("user auth metaData status error,can not revoke,id:{}, authStatus:{}, authMetadataState:{}", userMetaData.getId(), userMetaData.getAuthStatus(), userMetaData.getAuthMetadataState());
-           throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_REVOKE_ERROR.getMsg());
-       }
+        if (Objects.isNull(userMetaData)) {
+            log.error("query userMetaData fail by id:{}", userMetaDataDto.getId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
+        }
+
+        //v2.0检测元数据状态并更新
+        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
+        metaDataAuthorityDtoList.stream()
+                .filter(getMetaDataAuthorityDto -> getMetaDataAuthorityDto.getMetaDataAuthId().equals(userMetaData.getMetadataAuthId())
+                        && getMetaDataAuthorityDto.getAuditMetaDataOption().byteValue() != UserMetaDataAuditEnum.AUDIT_PENDING.getValue())//状态不是待审核状态
+                .findFirst()
+                .ifPresent(getMetaDataAuthorityDto -> {
+                    userMetaData.setAuthStatus(getMetaDataAuthorityDto.getAuditMetaDataOption().byteValue());
+                    //状态不是待审核状态则更新状态
+                    LambdaUpdateWrapper<UserMetaData> updateWrapper = Wrappers.lambdaUpdate();
+                    updateWrapper.eq(UserMetaData::getId, userMetaDataDto.getId());
+                    updateWrapper.set(UserMetaData::getAuthStatus, userMetaData.getAuthStatus());
+                    this.update(updateWrapper);
+                });
+        if (userMetaData.getAuthStatus() != UserMetaDataAuditEnum.AUDIT_PENDING.getValue() || userMetaData.getAuthMetadataState() != UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
+            log.error("user auth metaData status error,can not revoke,id:{}, authStatus:{}, authMetadataState:{}", userMetaData.getId(), userMetaData.getAuthStatus(), userMetaData.getAuthMetadataState());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_REVOKE_ERROR.getMsg());
+        }
 
         //撤销元数据授权
         RevokeMetaDataAuthorityRequestDto requestDto = new RevokeMetaDataAuthorityRequestDto();
@@ -167,7 +184,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
         }
         //更新用户授权元数据，状态为已撤销数据授权
-        LambdaUpdateWrapper<UserMetaData>  updateWrapper = Wrappers.lambdaUpdate();
+        LambdaUpdateWrapper<UserMetaData> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(UserMetaData::getId, userMetaDataDto.getId());
         updateWrapper.set(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.REVOKED.getValue());
         boolean updateSuccess = this.update(updateWrapper);
@@ -211,7 +228,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         List<Organization> organizationList = organizationService.getAllIdentity();
         // 获得组织id集合
         List orgIdList = organizationList.stream().map(organization -> organization.getIdentityId()).collect(Collectors.toList());
-        List<UserMetaDataDto> userMetaDataDtoList  = this.baseMapper.getUserMetaDataByAddress(address);
+        List<UserMetaDataDto> userMetaDataDtoList = this.baseMapper.getUserMetaDataByAddress(address);
         // 获得存在于组织id集合中的所有授权数据
         return userMetaDataDtoList.stream().filter(userMetaDataDto ->
                 orgIdList.contains(userMetaDataDto.getIdentityId())).collect(Collectors.toList());
@@ -238,7 +255,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
         wrapper.in(UserMetaData::getMetaDataId, metaDataIdArr);
         wrapper.eq(UserMetaData::getAddress, userDto.getAddress());
-        wrapper.orderByAsc(UserMetaData :: getApplyTime);
+        wrapper.orderByAsc(UserMetaData::getApplyTime);
         return this.list(wrapper);
     }
 
@@ -275,12 +292,13 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     /**
-     *  检查授权数据是否有效
+     * 检查授权数据是否有效
+     *
      * @param metaDataId ；元数据id
      */
-    private void checkMetaDataAuthValid(String metaDataId){
-        Map<String,Byte> metaDataAuthStatusMap = new HashMap<>(2);
-        Map<String,Byte> authMetadataStateMap = new HashMap<>(2);
+    private void checkMetaDataAuthValid(String metaDataId) {
+        Map<String, Byte> metaDataAuthStatusMap = new HashMap<>(2);
+        Map<String, Byte> authMetadataStateMap = new HashMap<>(2);
         List<UserMetaData> metaDataWithAuthList = this.getCurrentUserMetaDataByMetaDataIdArr(Collections.singletonList(metaDataId).toArray());
         // 首次授权没有授权历史数据，直接返回
         if (null == metaDataWithAuthList || metaDataWithAuthList.size() == 0) {
@@ -293,13 +311,13 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
         //校验状态审核中
         if (metaDataAuthStatusMap.containsKey(metaDataId) && metaDataAuthStatusMap.get(metaDataId) == UserMetaDataAuditEnum.AUDIT_PENDING.getValue()) {
-            log.error("Meta data auth audit pending,can not reapply,metaDataId:{}",metaDataId);
+            log.error("Meta data auth audit pending,can not reapply,metaDataId:{}", metaDataId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_PENDING_ERROR.getMsg());
         }
         //校验状态审核通过
         if (metaDataAuthStatusMap.containsKey(metaDataId) && metaDataAuthStatusMap.get(metaDataId) == UserMetaDataAuditEnum.AUDIT_PASSED.getValue() &&
-            authMetadataStateMap.containsKey(metaDataId) && authMetadataStateMap.get(metaDataId) == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
-            log.error("Meta data auth unexpired,can not reapply,metaDataId:{}",metaDataId);
+                authMetadataStateMap.containsKey(metaDataId) && authMetadataStateMap.get(metaDataId) == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
+            log.error("Meta data auth unexpired,can not reapply,metaDataId:{}", metaDataId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_UNEXPIRED_ERROR.getMsg());
         }
 
