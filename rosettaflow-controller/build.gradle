@@ -2,6 +2,10 @@ plugins {
     id 'distribution'
 }
 
+jar {
+    enabled = false
+}
+
 bootJar {
     enabled = true
 }
