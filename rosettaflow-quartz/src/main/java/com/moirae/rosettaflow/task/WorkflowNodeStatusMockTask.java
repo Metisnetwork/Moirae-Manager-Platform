@@ -59,7 +59,7 @@ public class WorkflowNodeStatusMockTask {
     @Resource
     private ITaskResultService taskResultService;
 
-    @Scheduled(fixedDelay = 10 * 1000, initialDelay = 10 * 1000)
+//    @Scheduled(fixedDelay = 10 * 1000, initialDelay = 10 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "WorkflowNodeStatusMockTask")
     public void run() {
@@ -101,18 +101,19 @@ public class WorkflowNodeStatusMockTask {
                     saveTaskResultList.add(taskResult);
 
                     //如果是最后一个节点，需要更新整个工作流的状态为成功
-                    if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
-                        workflowSuccessIds.add(node.getWorkflowId());
-                    } else {
-                        //如果有下一个节点，则启动下一个节点
-                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
-                        if (null != workflowDto) {
-                            //前一个节点taskId
-                            workflowDto.setPreTaskId(taskId);
-                            workflowDto.setPreTaskResult(taskResult);
-                            workflowService.start(workflowDto);
-                        }
-                    }
+                    //todo
+//                    if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
+//                        workflowSuccessIds.add(node.getWorkflowId());
+//                    } else {
+//                        //如果有下一个节点，则启动下一个节点
+//                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
+//                        if (null != workflowDto) {
+//                            //前一个节点taskId
+//                            workflowDto.setPreTaskId(taskId);
+//                            workflowDto.setPreTaskResult(taskResult);
+//                            workflowService.start(workflowDto);
+//                        }
+//                    }
                     workflowNodeSuccessIds.add(node.getId());
                     //执行成空，清除redis中的key
                     redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);

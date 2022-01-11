@@ -40,21 +40,6 @@ public class AlgorithmController {
     @Resource
     private IAlgorithmService algorithmService;
 
-    @PostMapping("addAlgorithm")
-    @ApiOperation(value = "新增算法", notes = "新增算法")
-    public ResponseVo<?> addAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
-        algorithmService.addAlgorithm(BeanUtil.copyProperties(algorithmReq, AlgorithmDto.class));
-        return ResponseVo.createSuccess();
-
-    }
-
-    @PostMapping("updateAlgorithm")
-    @ApiOperation(value = "修改算法", notes = "修改算法")
-    public ResponseVo<?> updateAlgorithm(@RequestBody @Valid AlgorithmReq algorithmReq) {
-        algorithmService.updateAlgorithm(BeanUtil.copyProperties(algorithmReq, AlgorithmDto.class));
-        return ResponseVo.createSuccess();
-    }
-
     @GetMapping("list")
     @ApiOperation(value = "查询算法列表", notes = "查询算法列表")
     public ResponseVo<PageVo<AlgorithmListVo>> list(@Valid AlgListReq algListReq) {

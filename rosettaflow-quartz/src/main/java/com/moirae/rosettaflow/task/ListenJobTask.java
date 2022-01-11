@@ -28,7 +28,7 @@ public class ListenJobTask {
     /**
      * 注意：测试时候当注释定时任务时，同步注释掉SyncJobStatusTask任务，否则可能出现数据状态不一致
      */
-    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 11 * 1000)
+//    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 11 * 1000)
     @Lock(keys = "ListenJobTask-add-queue")
     @SuppressWarnings("InfiniteLoopStatement")
     public void listenAddJob() {
@@ -43,7 +43,7 @@ public class ListenJobTask {
         }
     }
 
-    @Scheduled(fixedDelay = 60 * 70 * 1000, initialDelay = 11 * 1000)
+//    @Scheduled(fixedDelay = 60 * 70 * 1000, initialDelay = 11 * 1000)
     @Lock(keys = "ListenJobTask-edit-queue")
     @SuppressWarnings("InfiniteLoopStatement")
     public void listenEditJob() {
@@ -58,7 +58,7 @@ public class ListenJobTask {
         }
     }
 
-    @Scheduled(fixedDelay = 60 * 80 * 1000, initialDelay = 11 * 1000)
+//    @Scheduled(fixedDelay = 60 * 80 * 1000, initialDelay = 11 * 1000)
     @Lock(keys = "ListenJobTask-pause-queue")
     @SuppressWarnings("InfiniteLoopStatement")
     public void listenPauseJob() {

@@ -52,18 +52,9 @@ public class WorkflowNodeInput implements Serializable {
      */
     private String dataFileId;
     /**
-     * 是否发起方: 0-否,1-是
-     */
-    private Byte senderFlag;
-    /**
      * 任务里面定义的 (p0 -> pN 方 ...)
      */
     private String partyId;
-    /**
-     * 状态: 0-无效，1- 有效
-     */
-    @TableField(value = "`status`")
-    private Byte status;
     /**
      * 创建时间
      */
@@ -71,6 +62,7 @@ public class WorkflowNodeInput implements Serializable {
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
 
 }

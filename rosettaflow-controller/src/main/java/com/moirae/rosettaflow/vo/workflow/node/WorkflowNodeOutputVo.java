@@ -19,9 +19,6 @@ public class WorkflowNodeOutputVo {
     @ApiModelProperty(value = "工作流节点表主键id")
     private Long workflowNodeId;
 
-    @ApiModelProperty(value = "是否发起方: 0-否,1-是")
-    private Byte senderFlag;
-
     @ApiModelProperty(value = "协同方组织的身份标识Id")
     private String identityId;
 

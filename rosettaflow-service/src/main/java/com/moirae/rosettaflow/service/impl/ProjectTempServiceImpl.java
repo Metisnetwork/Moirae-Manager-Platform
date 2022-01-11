@@ -35,13 +35,9 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     @Resource
     IWorkflowService workflowService;
     @Resource
-    WorkflowTempMapper workflowTempMapper;
-    @Resource
     IWorkflowNodeService workflowNodeService;
     @Resource
     WorkflowNodeTempMapper workflowNodeTempMapper;
-    @Resource
-    IAlgorithmService algorithmService;
     @Resource
     private IWorkflowTempService workflowTempService;
     @Resource
@@ -96,16 +92,6 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
     }
 
     /**
-     * 查询工作流模板列表
-     */
-    private List<WorkflowTemp> queryWorkflowTempList(Long projTempId) {
-        LambdaQueryWrapper<WorkflowTemp> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WorkflowTemp::getProjectTempId, projTempId);
-        queryWrapper.eq(WorkflowTemp::getStatus, StatusEnum.VALID.getValue());
-        return workflowTempMapper.selectList(queryWrapper);
-    }
-
-    /**
      * 查询工作流节点模板列表
      */
     private List<WorkflowNodeTemp> queryWorkflowNodeTempList(Long workflowTempId) {
@@ -135,24 +121,5 @@ public class ProjectTempServiceImpl extends ServiceImpl<ProjectTempMapper, Proje
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_PROJECT_TEMPLATE_ERROR.getMsg());
         }
         return projectTemp.getId();
-    }
-
-    /**
-     * 保存工作流
-     */
-    private Long saveWorkflow(Long projectId, WorkflowTemp workflowTemp) {
-        Workflow workflow = new Workflow();
-        workflow.setProjectId(projectId);
-        workflow.setWorkflowName(workflowTemp.getWorkflowName());
-        workflow.setWorkflowDesc(workflowTemp.getWorkflowDesc());
-        workflowService.addWorkflow(workflow);
-        return workflow.getId();
-    }
-
-    /**
-     * 保存算法
-     */
-    private Long saveAlgorithm(WorkflowNodeTemp nodeTemp) {
-        return algorithmService.copySaveAlgorithm(BeanUtil.toBean(nodeTemp, WorkflowNode.class));
     }
 }

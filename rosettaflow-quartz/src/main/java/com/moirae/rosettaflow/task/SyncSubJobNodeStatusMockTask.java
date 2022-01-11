@@ -58,7 +58,7 @@ public class SyncSubJobNodeStatusMockTask {
     @Resource
     private ITaskResultService taskResultService;
 
-    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
+//    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncSubJobNodeStatusMockTask")
     public void run() {

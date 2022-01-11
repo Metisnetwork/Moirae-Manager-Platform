@@ -17,7 +17,6 @@ import com.moirae.rosettaflow.mapper.OrganizationMapper;
 import com.moirae.rosettaflow.mapper.UserOrgMapper;
 import com.moirae.rosettaflow.mapper.domain.Organization;
 import com.moirae.rosettaflow.mapper.domain.UserOrg;
-import com.moirae.rosettaflow.mapper.domain.UserOrgMaintain;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.NetManager;
@@ -27,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -48,11 +46,6 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
 
     @Resource
     private UserOrgMapper userOrgMapper;
-
-    @PostConstruct
-    public void init() {
-        netManager.init();
-    }
 
     @Override
     public void batchInsert(List<Organization> organizationList) {

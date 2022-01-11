@@ -26,7 +26,7 @@ public class WorkflowDetailsVo {
     @ApiModelProperty(value = "工作流节点数")
     private Integer nodeNumber;
 
-    @ApiModelProperty(value = "运行状态:0-未完成,1-已完成")
+    @ApiModelProperty(value = "运行状态:0-未运行,1-运行中,2-运行成功，3-运行失败")
     private Integer runStatus;
 
 }

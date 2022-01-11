@@ -27,7 +27,8 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
     public WorkflowNodeResource getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeResource> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeResource::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeResource::getStatus, StatusEnum.VALID.getValue());
+        //todo
+//        wrapper.eq(WorkflowNodeResource::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
@@ -42,7 +43,8 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
     public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
         LambdaUpdateWrapper<WorkflowNodeResource> delWrapper = Wrappers.lambdaUpdate();
         delWrapper.eq(WorkflowNodeResource::getWorkflowNodeId, workflowNodeId);
-        delWrapper.set(WorkflowNodeResource::getStatus, StatusEnum.UN_VALID.getValue());
+        //todo
+//        delWrapper.set(WorkflowNodeResource::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
 

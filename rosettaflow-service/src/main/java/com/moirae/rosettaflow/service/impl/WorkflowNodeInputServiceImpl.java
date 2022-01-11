@@ -28,7 +28,8 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     public List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeInput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeInput::getStatus, StatusEnum.VALID.getValue());
+        //todo
+//        wrapper.eq(WorkflowNodeInput::getStatus, StatusEnum.VALID.getValue());
         wrapper.orderByAsc(WorkflowNodeInput::getPartyId);
         return this.list(wrapper);
     }
@@ -44,7 +45,8 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
         LambdaUpdateWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaUpdate();
         delWrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
-        delWrapper.set(WorkflowNodeInput::getStatus, StatusEnum.UN_VALID.getValue());
+        //todo
+//        delWrapper.set(WorkflowNodeInput::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
 

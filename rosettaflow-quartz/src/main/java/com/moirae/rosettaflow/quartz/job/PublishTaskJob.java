@@ -69,7 +69,8 @@ public class PublishTaskJob implements Job {
         WorkflowDto workflowDto = new WorkflowDto();
         BeanCopierUtils.copy(workFlow, workflowDto);
         workflowDto.setStartNode(1);
-        workflowDto.setEndNode(workFlow.getNodeNumber());
+        //todo
+//        workflowDto.setEndNode(workFlow.getNodeNumber());
         workflowDto.setJobFlg(true);
         workflowDto.setSubJobId(subJob.getId());
         workflowService.start(workflowDto);

@@ -120,7 +120,8 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
         WorkflowDto startWorkflowDto = new WorkflowDto();
         BeanCopierUtils.copy(workFlow, startWorkflowDto);
         startWorkflowDto.setStartNode(1);
-        startWorkflowDto.setEndNode(workFlow.getNodeNumber());
+        //TODO
+//        startWorkflowDto.setEndNode(workFlow.getNodeNumber());
         startWorkflowDto.setJobFlg(true);
         startWorkflowDto.setSubJobId(subJob.getId());
         workflowService.start(startWorkflowDto);

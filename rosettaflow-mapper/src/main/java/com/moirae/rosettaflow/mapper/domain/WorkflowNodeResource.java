@@ -48,17 +48,13 @@ public class WorkflowNodeResource implements Serializable {
      */
     private Long runTime;
     /**
-     * 状态: 0-无效，1- 有效
-     */
-    @TableField(value = "`status`")
-    private Byte status;
-    /**
      * 创建时间
      */
     private Date createTime;
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
 
 }

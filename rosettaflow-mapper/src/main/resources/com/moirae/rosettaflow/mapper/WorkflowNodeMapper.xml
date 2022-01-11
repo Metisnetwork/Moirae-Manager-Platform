@@ -20,4 +20,9 @@
     id, node_name, workflow_id, algorithm_id, node_step,next_node_step,model_id, run_status, task_id, run_msg, `status`,
     create_time, update_time
   </sql>
+    <select id="queryWorkflowNodeAndStatusList" resultType="com.moirae.rosettaflow.mapper.domain.WorkflowNode">
+
+
+
+    </select>
 </mapper>

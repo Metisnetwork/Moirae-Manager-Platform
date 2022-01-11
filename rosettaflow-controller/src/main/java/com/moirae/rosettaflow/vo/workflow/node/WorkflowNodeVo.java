@@ -33,20 +33,14 @@ public class WorkflowNodeVo {
     @ApiModelProperty(value = "节点模型ID")
     private Long modelId;
 
-    @ApiModelProperty(value = "下个节点在工作流中序号,从1开始")
-    private Integer nextNodeStep;
-
-    @ApiModelProperty(value = "运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败")
-    private Byte runStatus;
-
     @ApiModelProperty(value = "任务ID,底层处理完成后返回")
     private String taskId;
 
     @ApiModelProperty(value = "任务处理结果描述")
     private String runMsg;
 
-    @ApiModelProperty(value = "状态: 0-无效，1- 有效")
-    private Byte status;
+    @ApiModelProperty(value = "任务发启放组织id")
+    private String workflowNodeSenderIdentityId;
 
     @ApiModelProperty(value = "算法对象")
     private NodeAlgorithmVo nodeAlgorithmVo;

@@ -1,0 +1,60 @@
+package com.moirae.rosettaflow.mapper.domain;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+@Data
+@TableName(value = "t_workflow_run_status")
+public class WorkflowRunStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+    /**
+     * 项目工作流ID(自增长)
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    /**
+     * 工作流id
+     */
+    private Long workflowId;
+    /**
+     * 工作流版本号
+     */
+    private Integer workflowEditVersion;
+    /**
+     * 发起任务的账户的签名
+     */
+    private String sign;
+    /**
+     * 总步骤
+     */
+    private Integer step;
+    /**
+     * 当前步骤
+     */
+    private Integer curStep;
+    /**
+     * 开始时间
+     */
+    private Date beginTime;
+    /**
+     * 结束时间
+     */
+    private Date endTime;
+    /**
+     *  运行状态: 1-运行中,2-运行成功,3-运行失败
+     */
+    private Byte runStatus;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+}

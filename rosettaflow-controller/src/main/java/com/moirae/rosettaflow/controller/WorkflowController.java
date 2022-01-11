@@ -89,13 +89,6 @@ public class WorkflowController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("deleteBatch")
-    @ApiOperation(value = "批量删除工作流", notes = "批量删除工作流")
-    public ResponseVo<?> deleteBatch(@RequestBody @Validated DeleteBatchReq deleteBatchReq) {
-        workflowService.deleteWorkflowBatch(deleteBatchReq.getIds());
-        return ResponseVo.createSuccess();
-    }
-
     @PostMapping("copy")
     @ApiOperation(value = "复制工作流", notes = "复制工作流")
     public ResponseVo<?> copy(@RequestBody @Validated CopyWorkflowReq copyReq) {
@@ -158,18 +151,8 @@ public class WorkflowController {
     @GetMapping("getWorkflowStatus")
     @ApiOperation(value = "获取工作流状态", notes = "获取工作流状态")
     public ResponseVo<GetStatusVo> getWorkflowStatus(@Validated GetStatusReq getStatusReq) {
-        Map<String, Object> map = workflowService.getWorkflowStatusById(getStatusReq.getId());
-        return ResponseVo.createSuccess(convertGetStatusVo(map));
+        Workflow workflow = workflowService.getWorkflowStatusById(getStatusReq.getId());
+        GetStatusVo getStatusVo = BeanUtil.toBean(workflow, GetStatusVo.class);
+        return ResponseVo.createSuccess(getStatusVo);
     }
-
-    /**
-     * 获取工作流运行状态返回参数转换
-     */
-    private GetStatusVo convertGetStatusVo(Map<String, Object> map) {
-        GetStatusVo getStatusVo = BeanUtil.toBean(map, GetStatusVo.class);
-        List<GetNodeStatusVo> getNodeStatusVoList = BeanUtil.copyToList((Collection<?>) map.get("nodeList"), GetNodeStatusVo.class);
-        getStatusVo.setGetNodeStatusVoList(getNodeStatusVoList);
-        return getStatusVo;
-    }
-
 }

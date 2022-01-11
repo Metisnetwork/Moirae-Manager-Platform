@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.WorkflowDto;
+import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
@@ -86,12 +87,6 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     void deleteWorkflow(Long id);
 
-    /**
-     * 批量逻辑删除工作流
-     *
-     * @param ids 多个工作流表id
-     */
-    void deleteWorkflowBatch(String ids);
 
     /**
      * 物理删除当前工作流所有节点数据
@@ -156,7 +151,7 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param id 工作流id
      * @return List
      */
-    Map<String, Object> getWorkflowStatusById(Long id);
+    Workflow getWorkflowStatusById(Long id);
 
     /**
      * 组装发送任务对象
@@ -190,4 +185,13 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     boolean isExistWorkflowName(String workflowName);
 
+
+    /**
+     * 查询工作流的节点设置
+     *
+     * @param id
+     * @param language
+     * @return
+     */
+    List<WorkflowNodeDto> queryWorkflowNodeList(Long id, String language);
 }

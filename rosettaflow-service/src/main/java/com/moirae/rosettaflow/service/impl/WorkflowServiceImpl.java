@@ -16,18 +16,20 @@ import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.JsonUtils;
-import com.moirae.rosettaflow.dto.NodeMetaDataDto;
-import com.moirae.rosettaflow.dto.UserDto;
-import com.moirae.rosettaflow.dto.WorkflowDto;
+import com.moirae.rosettaflow.dto.*;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.WorkflowMapper;
+import com.moirae.rosettaflow.mapper.WorkflowNodeMapper;
+import com.moirae.rosettaflow.mapper.WorkflowRunStatusMapper;
+import com.moirae.rosettaflow.mapper.WorkflowRunTaskStatusMapper;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
 import com.zengtengpeng.operation.RedissonObject;
+import jnr.ffi.Struct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -111,6 +113,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private NetManager netManager;
 
+    @Resource
+    private WorkflowNodeMapper workflowNodeMapper;
+
+    @Resource
+    private WorkflowRunStatusMapper workflowRunStatusMapper;
+
+    @Resource
+    private WorkflowRunTaskStatusMapper workflowRunTaskStatusMapper;
 
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
@@ -179,15 +189,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = this.queryWorkflowDetail(id);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        if (isExistWorkflowName(workflowName)) {
+        if ((!workflow.getWorkflowName().equalsIgnoreCase(workflowName)) && isExistWorkflowName(workflowName)) {
             log.info("editWorkflow--编辑工作流名称已存在,workflowId:{}", id);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg());
         }
         try {
             workflow.setWorkflowName(workflowName);
             workflow.setWorkflowDesc(workflowDesc);
-            // 更新最新时间
-            workflow.setUpdateTime(new Date());
             this.updateById(workflow);
         } catch (DuplicateKeyException dke) {
             log.info("editWorkflow--编辑工作流接口失败:{}", dke.getMessage(), dke);
@@ -201,50 +209,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = this.queryWorkflowDetail(id);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        // 删除当前工作流所有节点数据
-        this.deleteWorkflowAllNodeData(id);
         // 逻辑删除工作流，并修改版本标识
-        workflow.setId(id);
-        workflow.setDelVersion(id);
         workflow.setStatus(StatusEnum.UN_VALID.getValue());
         this.updateById(workflow);
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void deleteWorkflowBatch(String ids) {
-        if (ids.trim().length() == 0) {
-            return;
-        }
-        // 转换id类型
-        List<Long> idsList = convertIdType(ids);
-        List<Workflow> workflowList = this.queryListById(idsList);
-        if (workflowList.size() > 0) {
-            // 校验是否有编辑权限
-            workflowList.forEach(workflow -> this.checkEditPermission(workflow.getProjectId()));
-            // 并行删除工作流中所有节点数据
-            workflowList.parallelStream().forEach(workflow -> this.deleteWorkflowAllNodeData(workflow.getId()));
-        }
-        // 逻辑删除工作流，并修改版本标识
-        if (idsList.size() > 0) {
-            List<Workflow> list = new ArrayList<>();
-            idsList.forEach(id -> {
-                Workflow workflow = new Workflow();
-                workflow.setId(id);
-                workflow.setDelVersion(id);
-                workflow.setStatus((byte) 0);
-                list.add(workflow);
-            });
-            this.updateBatchById(list);
-        }
-    }
-
-    /**
-     * 转换id类型
-     */
-    private List<Long> convertIdType(String ids) {
-        return Arrays.stream(ids.split(",")).map(id ->
-                Long.parseLong(id.trim())).collect(Collectors.toList());
     }
 
     @Override
@@ -284,7 +251,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         newWorkflow.setUserId(userDto.getId());
         newWorkflow.setWorkflowName(workflowName);
         newWorkflow.setWorkflowDesc(workflowDesc);
-        newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());
+        //TODO
+//        newWorkflow.setNodeNumber(originWorkflow.getNodeNumber());
         this.save(newWorkflow);
         return newWorkflow.getId();
     }
@@ -299,13 +267,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         // 如果截止节点为空，设置为工作流最后一个节点
         if (null == workflowDto.getEndNode()) {
-            workflowDto.setEndNode(workflow.getNodeNumber());
+            //TODO
+//            workflowDto.setEndNode(workflow.getNodeNumber());
         }
         // 截止节点不能超过工作流最大节点
-        if (null == workflow.getNodeNumber() || workflow.getNodeNumber() < workflowDto.getEndNode()) {
-            log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), workflow.getNodeNumber());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
-        }
+        // TODO
+//        if (null == workflow.getNodeNumber() || workflow.getNodeNumber() < workflowDto.getEndNode()) {
+//            log.error("endNode is:{} can not more than workflow max nodeNumber:{}", workflowDto.getEndNode(), workflow.getNodeNumber());
+//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_END_NODE_OVERFLOW.getMsg());
+//        }
         // 保存用户和地址及签名并更新工作流状态为运行中
         if (!workflowDto.isJobFlg() && workflowDto.getStartNode() == 1) {
             this.updateSign(workflowDto);
@@ -349,7 +319,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         } else {
             //2.更新工作流节点
             workflowNode.setTaskId(isPublishSuccess ? respDto.getTaskId() : "");
-            workflowNode.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
+            //TODO
+//            workflowNode.setRunStatus(isPublishSuccess ? WorkflowRunStatusEnum.RUNNING.getValue() : WorkflowRunStatusEnum.RUN_FAIL.getValue());
             workflowNode.setRunMsg(respDto.getMsg());
             // 更新最新修改时间
             workflowNode.setUpdateTime(new Date());
@@ -370,14 +341,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             }
         }
         //4.如果不是最后一个节点，当前工作流执行成功，继续执行下一个工作流节点,放在redis中待下次处理
-        boolean hasNext = workflowNode.getNextNodeStep() != null && workflowNode.getNextNodeStep() > 1;
-        if (isPublishSuccess && hasNext) {
-            workflowDto.setStartNode(workflowNode.getNextNodeStep());
-            workflowDto.setTaskId(workflowDto.isJobFlg() ? subJobNodeInfo.getTaskId() : workflowNode.getTaskId());
-            String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
-            redissonObject.setValue(taskKey + workflowDto.getTaskId(), workflowDto, sysConfig.getRedisTimeOut());
-            log.info("多节点继续执行下个节点>>>>redis key:{},", taskKey + workflowDto.getTaskId());
-        }
+        //TODO
+//        boolean hasNext = workflowNode.getNextNodeStep() != null && workflowNode.getNextNodeStep() > 1;
+//        if (isPublishSuccess && hasNext) {
+//            workflowDto.setStartNode(workflowNode.getNextNodeStep());
+//            workflowDto.setTaskId(workflowDto.isJobFlg() ? subJobNodeInfo.getTaskId() : workflowNode.getTaskId());
+//            String taskKey = workflowDto.isJobFlg() ? SysConstant.REDIS_SUB_JOB_PREFIX_KEY : SysConstant.REDIS_WORKFLOW_PREFIX_KEY;
+//            redissonObject.setValue(taskKey + workflowDto.getTaskId(), workflowDto, sysConfig.getRedisTimeOut());
+//            log.info("多节点继续执行下个节点>>>>redis key:{},", taskKey + workflowDto.getTaskId());
+//        }
     }
 
     /**
@@ -424,7 +396,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 处理国际化
         workflow.setWorkflowName(SysConstant.EN_US.equals(language) ? workflowTemp.getWorkflowNameEn() : workflowTemp.getWorkflowName());
         workflow.setWorkflowDesc(SysConstant.EN_US.equals(language) ? workflowTemp.getWorkflowDescEn() : workflowTemp.getWorkflowDesc());
-        workflow.setNodeNumber(workflowTemp.getNodeNumber());
+        // TODO
+//        workflow.setNodeNumber(workflowTemp.getNodeNumber());
         workflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
         this.save(workflow);
         return workflow.getId();
@@ -486,7 +459,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
             if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
                 this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
-                workflowNodeService.updateRunStatusByWorkflowId(workflowId, workflowNode.getRunStatus(), WorkflowRunStatusEnum.UN_RUN.getValue());
+                //todo
+//                workflowNodeService.updateRunStatusByWorkflowId(workflowId, workflowNode.getRunStatus(), WorkflowRunStatusEnum.UN_RUN.getValue());
             } else {
                 log.error("Terminate workflow with id:{} fail", workflowId);
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
@@ -511,6 +485,79 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         Workflow workflow = this.getOne(queryWrapper);
         return Objects.nonNull(workflow);
+    }
+
+    @Override
+    public List<WorkflowNodeDto> queryWorkflowNodeList(Long id, String language) {
+        // 查询工作流信息
+        Workflow workflow = queryWorkflowDetail(id);
+        // 获取工作流节点及最新执行状态列表
+        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowNodeAndStatusList(workflow.getId(), workflow.getEditVersion());
+        if (workflowNodeList == null || workflowNodeList.size() == 0) {
+            return new ArrayList<>();
+        }
+        // 获取工作流节点状态
+
+
+
+
+        List<WorkflowNodeDto> workflowNodeDtoList = new ArrayList<>();
+        for (WorkflowNode workflowNode : workflowNodeList) {
+            // 工作流节点dto
+            WorkflowNodeDto workflowNodeDto = BeanUtil.toBean(workflowNode, WorkflowNodeDto.class);
+            // 算法对象
+            AlgorithmDto algorithmDto = algorithmService.queryAlgorithmDetails(workflowNode.getAlgorithmId());
+            if (Objects.nonNull(algorithmDto)) {
+                // 处理国际化语言
+                if (SysConstant.EN_US.equals(language)) {
+                    algorithmDto.setAlgorithmName(algorithmDto.getAlgorithmNameEn());
+                    algorithmDto.setAlgorithmDesc(algorithmDto.getAlgorithmDescEn());
+                }
+                // 工作流节点算法代码, 如果可查询出，表示已修改，否则没有变动
+                WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.getByWorkflowNodeId(workflowNode.getId());
+                if (Objects.nonNull(workflowNodeCode)) {
+                    algorithmDto.setEditType(workflowNodeCode.getEditType());
+                    algorithmDto.setCalculateContractCode(workflowNodeCode.getCalculateContractCode());
+                }
+                // 工作流节点算法资源环境, 如果可查询出，表示已修改，否则没有变动
+                WorkflowNodeResource nodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+                if (Objects.nonNull(nodeResource)) {
+                    if (null != nodeResource.getCostCpu()) {
+                        algorithmDto.setCostCpu(nodeResource.getCostCpu());
+                    }
+                    if (null != nodeResource.getCostGpu()) {
+                        algorithmDto.setCostGpu(nodeResource.getCostGpu());
+                    }
+                    if (null != nodeResource.getCostMem()) {
+                        algorithmDto.setCostMem(nodeResource.getCostMem());
+                    }
+                    if (null != nodeResource.getCostBandwidth()) {
+                        algorithmDto.setCostBandwidth(nodeResource.getCostBandwidth());
+                    }
+                    if (null != nodeResource.getRunTime()) {
+                        algorithmDto.setRunTime(nodeResource.getRunTime());
+                    }
+                }
+            }
+            workflowNodeDto.setAlgorithmDto(algorithmDto);
+            //工作流节点输入列表
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+            workflowNodeDto.setWorkflowNodeInputList(workflowNodeInputList);
+            //工作流节点输出列表
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.getByWorkflowNodeId(workflowNode.getId());
+            workflowNodeDto.setWorkflowNodeOutputList(workflowNodeOutputList);
+            workflowNodeDtoList.add(workflowNodeDto);
+        }
+        return workflowNodeDtoList;
+    }
+
+    private List<WorkflowNode> getWorkflowNodeList(Workflow workflow) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getWorkflowId, workflow.getId());
+        wrapper.eq(WorkflowNode::getWorkflowEditVersion, workflow.getEditVersion());
+        // 所有节点正序排序
+        wrapper.orderByAsc(WorkflowNode::getNodeStep);
+        return workflowNodeMapper.selectList(wrapper);
     }
 
     @Override
@@ -624,6 +671,73 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         this.update(updateWrapper);
     }
 
+    @Override
+    public Workflow getWorkflowStatusById(Long id) {
+        // 查询工作流配置信息
+        Workflow workflow = queryWorkflowDetail(id);
+        workflow.setRunStatus(Integer.valueOf(0).byteValue());
+        // 查询工作流节点配置信息
+        List<WorkflowNode> workflowNodeList = queryWorkflowNodeList(workflow);
+        if(workflowNodeList.isEmpty()){
+            return workflow;
+        }
+        // 查询工作流状态
+        WorkflowRunStatus workflowRunStatus = queryWorkflowStatusNewest(workflow);
+        if(Objects.nonNull(workflowRunStatus)){
+            return workflow;
+        }
+        workflow.setRunStatus(workflowRunStatus.getRunStatus());
+        // 查询工作流节点任务状态
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = queryWorkflowRunTaskStatus(workflowRunStatus);
+        if(workflowRunTaskStatusList.isEmpty()){
+            return workflow;
+        }
+        workflow.setGetNodeStatusVoList(workflowRunTaskStatusList);
+        return workflow;
+    }
+
+    /**
+     * 获得工作流节点配置
+     *
+     * @param workflow
+     * @return
+     */
+    private List<WorkflowNode> queryWorkflowNodeList(Workflow workflow) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getWorkflowId, workflow.getId());
+        wrapper.eq(WorkflowNode::getWorkflowEditVersion, workflow.getEditVersion());
+        // 所有节点正序排序
+        wrapper.orderByAsc(WorkflowNode::getNodeStep);
+        return workflowNodeMapper.selectList(wrapper);
+    }
+
+    /**
+     * 获得最新工作流状态
+     *
+     * @param workflow
+     * @return
+     */
+    private WorkflowRunStatus queryWorkflowStatusNewest(Workflow workflow) {
+        LambdaQueryWrapper<WorkflowRunStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunStatus::getWorkflowId, workflow.getId());
+        wrapper.eq(WorkflowRunStatus::getWorkflowEditVersion, workflow.getEditVersion());
+        // 所有节点正序排序
+        wrapper.orderByDesc(WorkflowRunStatus::getId);
+        return workflowRunStatusMapper.selectOne(wrapper);
+    }
+
+    /**
+     * 获得最新工作流状态
+     *
+     * @param workflowRunStatus
+     * @return
+     */
+    private List<WorkflowRunTaskStatus> queryWorkflowRunTaskStatus(WorkflowRunStatus workflowRunStatus) {
+        LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunTaskStatus::getWorkflowRunId, workflowRunStatus.getId());
+        return workflowRunTaskStatusMapper.selectList(wrapper);
+    }
+
     /**
      * 更新子作业
      *
@@ -704,10 +818,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             //逻辑训练动态参数[因变量(标签)]
             if (jsonObject.containsKey(AlgorithmConstant.LABEL_COLUMN)) {
                 for (WorkflowNodeInput input : workflowNodeInputList) {
-                    if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
-                        jsonObject.put("label_column",
-                                metaDataDetailsService.getColumnIndexById(input.getDependentVariable()).getColumnName());
-                    }
+                    //TODO
+//                    if (input.getSenderFlag() == SenderFlagEnum.TRUE.getValue()) {
+//                        jsonObject.put("label_column",
+//                                metaDataDetailsService.getColumnIndexById(input.getDependentVariable()).getColumnName());
+//                    }
                 }
             }
             if (jsonObject.containsKey(AlgorithmConstant.MODEL_RESTORE_PARTY)) {
@@ -751,7 +866,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         OrganizationIdentityInfoDto organizationIdentityInfoDto;
         for (WorkflowNodeOutput output : workflowNodeOutputList) {
             organizationIdentityInfoDto = new OrganizationIdentityInfoDto();
-            organizationIdentityInfoDto.setPartyId(output.getPartyId());
+            // TODO
+//            organizationIdentityInfoDto.setPartyId(output.getPartyId());
             organizationIdentityInfoDto.setNodeName(organizationMap.get(output.getIdentityId()).getNodeName());
             organizationIdentityInfoDto.setNodeId(organizationMap.get(output.getIdentityId()).getNodeId());
             organizationIdentityInfoDto.setIdentityId(output.getIdentityId());
@@ -812,19 +928,20 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
 
             //如果有上一个节点的模型，需要做为输入传给底层
-            if (null != preTaskResult && SenderFlagEnum.TRUE.getValue() == input.getSenderFlag()) {
-                taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
-                OrganizationIdentityInfoDto modelOrg = new OrganizationIdentityInfoDto();
-                BeanUtil.copyProperties(taskOrganizationIdentityInfoDto, modelOrg);
-                modelOrg.setPartyId("p" + workflowNodeInputList.size());
-                taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(modelOrg);
-
-                taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
-                taskMetaDataDeclareDto.setMetaDataId(preTaskResult.getMetadataId());
-                taskMetaDataDeclareDto.setKeyColumn(0);
-                taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
-                taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
-            }
+            //todo
+//            if (null != preTaskResult && SenderFlagEnum.TRUE.getValue() == input.getSenderFlag()) {
+//                taskDataSupplierDeclareDto = new TaskDataSupplierDeclareDto();
+//                OrganizationIdentityInfoDto modelOrg = new OrganizationIdentityInfoDto();
+//                BeanUtil.copyProperties(taskOrganizationIdentityInfoDto, modelOrg);
+//                modelOrg.setPartyId("p" + workflowNodeInputList.size());
+//                taskDataSupplierDeclareDto.setTaskOrganizationIdentityInfoDto(modelOrg);
+//
+//                taskMetaDataDeclareDto = new TaskMetaDataDeclareDto();
+//                taskMetaDataDeclareDto.setMetaDataId(preTaskResult.getMetadataId());
+//                taskMetaDataDeclareDto.setKeyColumn(0);
+//                taskDataSupplierDeclareDto.setTaskMetaDataDeclareDto(taskMetaDataDeclareDto);
+//                taskDataSupplierDeclareDtoList.add(taskDataSupplierDeclareDto);
+//            }
         }
         //模型提供方
         return taskDataSupplierDeclareDtoList;
@@ -843,11 +960,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 //            return this.saveSender(userDto.getIdentityId());
 //        }
         // 用户没有绑定组织，默认发起方组织
-        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-            if (null != workflowNodeInput.getSenderFlag() && SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
-                return this.saveSender(workflowNodeInput.getIdentityId());
-            }
-        }
+        //todo
+//        for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
+//            if (null != workflowNodeInput.getSenderFlag() && SenderFlagEnum.TRUE.getValue() == workflowNodeInput.getSenderFlag()) {
+//                return this.saveSender(workflowNodeInput.getIdentityId());
+//            }
+//        }
         log.error("获取当前工作流节点输入信息中不存在发起方，请核对信息:{}", workflowNodeInputList);
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_NOT_EXIST.getMsg());
     }
@@ -896,23 +1014,5 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.error("您无权访问当前项目--checkAccessPermission, projectId:{}, role:{}", projectId, role);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ACCESS_PERMISSION_ERROR.getMsg());
         }
-    }
-
-    @Override
-    public Map<String, Object> getWorkflowStatusById(Long id) {
-        Map<String, Object> param = new HashMap<>(2);
-        Workflow workflow = queryWorkflowDetail(id);
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(id);
-        List<Map<String, Object>> nodeList = new ArrayList<>();
-        workflowNodeList.forEach(workflowNode -> {
-            Map<String, Object> map = new HashMap<>(2);
-            map.put("workflowNodeId", workflowNode.getId());
-            map.put("runStatus", workflowNode.getRunStatus());
-            map.put("runMsg", workflowNode.getRunMsg());
-            nodeList.add(map);
-        });
-        param.put("runStatus", workflow.getRunStatus());
-        param.put("nodeList", nodeList);
-        return param;
     }
 }

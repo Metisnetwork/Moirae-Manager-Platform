@@ -69,7 +69,7 @@ public class WorkflowNodeStatusTask {
     @Resource
     private NetManager netManager;
 
-    @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
+//    @Scheduled(fixedDelay = 15 * 1000, initialDelay = 15 * 1000)
     @Lock(keys = "WorkflowNodeStatusTask")
     public void run() {
         List<WorkflowNode> workflowNodeList = workflowNodeService.getRunningNode(BEFORE_HOUR);
@@ -141,29 +141,30 @@ public class WorkflowNodeStatusTask {
                     saveTaskResultList.add(taskResult);
 
                     //如果是最后一个节点，需要更新整个工作流的状态为成功
-                    if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
-                        workflowSuccessIds.add(node.getWorkflowId());
-                    } else {
-                        //如果有下一个节点，则启动下一个节点
-                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
-                        if (null != workflowDto) {
-                            //前一个节点taskId
-                            workflowDto.setPreTaskId(taskId);
-                            workflowDto.setPreTaskResult(taskResult);
-                            try {
-                                workflowService.start(workflowDto);
-                            } catch (Exception e) {
-                                log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
-                                log.error("对应下一个节点任务处理失败原因：", e);
-                                workflowService.updateRunStatus(workflowDto.getId(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
-                                WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(), workflowDto.getStartNode());
-                                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
-                                workflowNode.setUpdateTime(new Date());
-                                workflowNode.setRunMsg(e.getMessage());
-                                workflowNodeService.updateById(workflowNode);
-                            }
-                        }
-                    }
+                    //todo
+//                    if (null == node.getNextNodeStep() || node.getNextNodeStep() < 1) {
+//                        workflowSuccessIds.add(node.getWorkflowId());
+//                    } else {
+//                        //如果有下一个节点，则启动下一个节点
+//                        WorkflowDto workflowDto = redissonObject.getValue(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);
+//                        if (null != workflowDto) {
+//                            //前一个节点taskId
+//                            workflowDto.setPreTaskId(taskId);
+//                            workflowDto.setPreTaskResult(taskResult);
+//                            try {
+//                                workflowService.start(workflowDto);
+//                            } catch (Exception e) {
+//                                log.error("工作流id:{},任务id:{},对应下一个节点任务处理失败原因：{}", node.getWorkflowId(), taskId, e.getMessage());
+//                                log.error("对应下一个节点任务处理失败原因：", e);
+//                                workflowService.updateRunStatus(workflowDto.getId(), WorkflowRunStatusEnum.RUN_FAIL.getValue());
+//                                WorkflowNode workflowNode = workflowNodeService.getByWorkflowIdAndStep(workflowDto.getId(), workflowDto.getStartNode());
+//                                workflowNode.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+//                                workflowNode.setUpdateTime(new Date());
+//                                workflowNode.setRunMsg(e.getMessage());
+//                                workflowNodeService.updateById(workflowNode);
+//                            }
+//                        }
+//                    }
                     workflowNodeSuccessIds.add(node.getId());
                     //执行成功，清除redis中的key
                     redissonObject.delete(SysConstant.REDIS_WORKFLOW_PREFIX_KEY + taskId);

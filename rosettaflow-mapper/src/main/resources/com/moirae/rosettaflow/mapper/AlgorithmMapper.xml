@@ -3,6 +3,8 @@
 <mapper namespace="com.moirae.rosettaflow.mapper.AlgorithmMapper">
     <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.Algorithm">
         <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="algorithm_code" jdbcType="VARCHAR" property="algorithmCode"/>
+        <result column="algorithm_step" jdbcType="INTEGER" property="algorithmStep"/>
         <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName"/>
         <result column="algorithm_name_en" jdbcType="VARCHAR" property="algorithmNameEn"/>
         <result column="algorithm_desc" jdbcType="VARCHAR" property="algorithmDesc"/>
@@ -27,15 +29,6 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-        id, algorithm_name, algorithm_name_en, algorithm_desc, algorithm_desc_en, max_numbers, min_numbers, support_language,
-        support_os_system, algorithm_type, cost_mem, cost_cpu, cost_gpu, cost_bandwidth,
-        run_time, input_model, store_pattern, data_rows_flag, data_columns_flag, public_flag,
-        `status`, create_time, update_time
-    </sql>
-    <update id="truncate">
-        TRUNCATE TABLE t_algorithm
-    </update>
 
     <sql id="Algorithm_Column_List">
         select

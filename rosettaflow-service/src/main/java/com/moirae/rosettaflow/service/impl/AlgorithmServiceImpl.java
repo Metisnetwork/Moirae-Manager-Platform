@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -13,14 +12,11 @@ import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.mapper.AlgorithmMapper;
-import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.service.IAlgorithmCodeService;
+import com.moirae.rosettaflow.mapper.domain.Algorithm;
+import com.moirae.rosettaflow.mapper.domain.AlgorithmType;
 import com.moirae.rosettaflow.service.IAlgorithmService;
 import com.moirae.rosettaflow.service.IAlgorithmTypeService;
-import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,56 +33,7 @@ import java.util.*;
 public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm> implements IAlgorithmService {
 
     @Resource
-    IAlgorithmCodeService algorithmCodeService;
-
-    @Resource
     IAlgorithmTypeService algorithmTypeService;
-
-    @Override
-    public void addAlgorithm(AlgorithmDto algorithmDto) {
-        try {
-            Algorithm algorithm = new Algorithm();
-            BeanUtils.copyProperties(algorithmDto, algorithm);
-            // 保存算法
-            this.save(algorithm);
-            // 保存算法代码
-            AlgorithmCode algorithmCode = new AlgorithmCode();
-            algorithmCode.setAlgorithmId(algorithm.getId());
-            algorithmCode.setEditType(algorithmDto.getEditType());
-            algorithmCode.setCalculateContractCode(algorithmDto.getCalculateContractCode());
-            algorithmCodeService.addAlgorithmCode(algorithmCode);
-        } catch (Exception e) {
-            log.error("addAlgorithm--新增算法失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NAME_EXISTED.getMsg());
-            }
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ADD_ALG_ERROR.getMsg());
-        }
-    }
-
-    @Override
-    public void updateAlgorithm(AlgorithmDto algorithmDto) {
-        try {
-            Algorithm algorithm = new Algorithm();
-            BeanUtils.copyProperties(algorithmDto, algorithm);
-            // 算法id
-            algorithm.setId(algorithmDto.getAlgorithmId());
-            // 修改算法
-            this.updateById(algorithm);
-            // 修改算法代码
-            AlgorithmCode algorithmCode = new AlgorithmCode();
-            algorithmCode.setAlgorithmId(algorithmDto.getAlgorithmId());
-            algorithmCode.setEditType(algorithmDto.getEditType());
-            algorithmCode.setCalculateContractCode(algorithmDto.getCalculateContractCode());
-            algorithmCodeService.updateAlgorithmCode(algorithmCode);
-        } catch (Exception e) {
-            log.error("updateAlgorithm--修改算法失败, 错误信息:{}", e.getMessage());
-            if (e instanceof DuplicateKeyException) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NAME_EXISTED.getMsg());
-            }
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.UPDATE_ALG_ERROR.getMsg());
-        }
-    }
 
     @Override
     public IPage<AlgorithmDto> queryAlgorithmList(Long current, Long size, String algorithmName) {
@@ -154,22 +101,4 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
         }
         return treeList;
     }
-
-    @Override
-    public Long copySaveAlgorithm(WorkflowNode oldNode) {
-        AlgorithmDto algorithmDto = this.queryAlgorithmDetails(oldNode.getAlgorithmId());
-        if (Objects.isNull(algorithmDto)) {
-            return null;
-        }
-        Algorithm newAlgorithm = BeanUtil.toBean(algorithmDto, Algorithm.class);
-        newAlgorithm.setAuthor(UserContext.get() == null ? "" : UserContext.get().getUserName());
-        this.save(newAlgorithm);
-        return newAlgorithm.getId();
-    }
-
-    @Override
-    public void truncate() {
-        this.baseMapper.truncate();
-    }
-
 }

@@ -23,6 +23,16 @@ public class Algorithm implements Serializable {
     private Long id;
 
     /**
+     * 算法编码（线性回归、逻辑回归、。。。）
+     */
+    private String algorithmCode;
+
+    /**
+     * 算法编码中步骤（如训练-1, 预测-2）
+     */
+    private Integer algorithmStep;
+
+    /**
      * 算法名称
      */
     private String algorithmName;

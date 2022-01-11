@@ -31,7 +31,8 @@ public class WorkflowTempServiceImpl extends ServiceImpl<WorkflowTempMapper, Wor
         workflowTemp.setProjectTempId(projectTemplateId);
         workflowTemp.setWorkflowName(workflow.getWorkflowName());
         workflowTemp.setWorkflowDesc(workflow.getWorkflowDesc());
-        workflowTemp.setNodeNumber(workflow.getNodeNumber());
+        //todo
+//        workflowTemp.setNodeNumber(workflow.getNodeNumber());
         workflowTemp.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
         this.save(workflowTemp);
         return workflowTemp.getId();

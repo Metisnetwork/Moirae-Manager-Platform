@@ -13,6 +13,7 @@ import com.moirae.rosettaflow.req.workflow.node.ClearWorkflowNodeReq;
 import com.moirae.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
 import com.moirae.rosettaflow.service.ITaskResultService;
 import com.moirae.rosettaflow.service.IWorkflowNodeService;
+import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -49,13 +50,16 @@ public class WorkflowNodeController {
     private IWorkflowNodeService workflowNodeService;
 
     @Resource
+    private IWorkflowService workflowService;
+
+    @Resource
     private ITaskResultService taskResultService;
 
     @GetMapping(value = "queryNodeDetailsList/{id}")
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
     public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id, HttpServletRequest request) {
         String language = request.getHeader("Accept-Language");
-        List<WorkflowNodeDto> workflowNodeDtoList = workflowNodeService.queryNodeDetailsList(id, language);
+        List<WorkflowNodeDto> workflowNodeDtoList = workflowService.queryWorkflowNodeList(id, language);
         return ResponseVo.createSuccess(this.convertToWorkflowVo(workflowNodeDtoList));
     }
 
