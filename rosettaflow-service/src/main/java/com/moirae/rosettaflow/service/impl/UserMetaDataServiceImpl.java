@@ -274,6 +274,16 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         return this.list(queryWrapper);
     }
 
+    @Override
+    public boolean isValid(Set<String> tableIdList) {
+        List<UserMetaData> userMetaDataList = getByMetaDataId(tableIdList);
+        if (null != userMetaDataList  && userMetaDataList.size() < tableIdList.size()) {
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     /**
      *  检查授权数据是否有效
      * @param metaDataId ；元数据id

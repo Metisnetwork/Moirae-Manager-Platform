@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,10 +18,12 @@ import com.moirae.rosettaflow.mapper.domain.AlgorithmType;
 import com.moirae.rosettaflow.service.IAlgorithmService;
 import com.moirae.rosettaflow.service.IAlgorithmTypeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 算法实现类
@@ -100,5 +103,52 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
             treeList.add(param);
         }
         return treeList;
+    }
+
+    @Override
+    public Algorithm queryAlgorithmStepDetails(Long algorithmId) {
+        return this.baseMapper.queryAlgorithmStepDetails(algorithmId);
+    }
+
+    @Override
+    public void isValid(List<Long> algorithmIdList) {
+        List<Algorithm> algorithmList = getAlgorithmByIdList(algorithmIdList);
+        Map<Long, Algorithm> algorithmMap = algorithmList.stream().collect(Collectors.toMap(Algorithm::getId, item -> item));
+
+        // 必须是同一个算法 algorithm_code
+        String fristAlgorithmCode = null;
+        int preStep = 0;
+        for (Long algorithmId : algorithmIdList) {
+            // 算法是否存在
+            if(!algorithmMap.containsKey(algorithmId)){
+                log.error("不存在的算法, id = {}", algorithmId);
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
+            }
+            Algorithm algorithm = algorithmMap.get(algorithmId);
+            // 算法类型校验
+            if(StringUtils.isNoneBlank(fristAlgorithmCode)){
+                if(!StringUtils.equals(fristAlgorithmCode, algorithm.getAlgorithmCode())){
+                    log.error("不相同的算法, idList = {}", algorithmIdList);
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
+                }
+            }else{
+                fristAlgorithmCode = algorithm.getAlgorithmCode();
+            }
+
+            // 算法步骤
+            if(algorithm.getAlgorithmStep() < preStep){
+                log.error("相同的算法顺序错误, idList = {}", algorithmIdList);
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
+            }else{
+                preStep = algorithm.getAlgorithmStep();
+            }
+        }
+    }
+
+    private List<Algorithm> getAlgorithmByIdList(List<Long> algorithmIdList) {
+        LambdaQueryWrapper<Algorithm> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(Algorithm::getId, algorithmIdList);
+        queryWrapper.eq(Algorithm::getStatus, StatusEnum.VALID.getValue());
+        return this.list(queryWrapper);
     }
 }

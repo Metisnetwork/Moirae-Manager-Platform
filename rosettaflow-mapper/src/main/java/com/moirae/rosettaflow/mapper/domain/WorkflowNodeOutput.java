@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -44,6 +45,10 @@ public class WorkflowNodeOutput implements Serializable {
      */
     private String outputContent;
     /**
+     * 任务里面定义的 (q0 -> qN 方 ...)
+     */
+    private String partyId;
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -52,4 +57,12 @@ public class WorkflowNodeOutput implements Serializable {
      */
     @TableField(update = "now()")
     private Date updateTime;
+
+
+    /**
+     * 协同方组织名称
+     */
+    @TableField(exist = false)
+    private String identityName;
+
 }

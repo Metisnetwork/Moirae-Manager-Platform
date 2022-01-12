@@ -35,8 +35,4 @@ public class WorkflowNodeInputVo {
 
     @ApiModelProperty(value = "因变量(标签)")
     private Long dependentVariable;
-
-    @ApiModelProperty(value = "工作流节点变量列表")
-    private List<WorkflowNodeVariableVo> workflowNodeVariableVoList;
-
 }

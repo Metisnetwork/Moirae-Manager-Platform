@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -19,8 +20,9 @@ import java.util.List;
 @ApiModel(value = "工作流详情请求对象")
 public class WorkflowNodeReq {
 
-    @ApiModelProperty(value = "工作流ID")
-    private Long workflowId;
+    @ApiModelProperty(value = "工作流节点任务发启放组织id", required = true)
+    @NotBlank(message = "{workflow.node.sender.NotBlank}")
+    private String workflowNodeSenderIdentityId;
 
     @ApiModelProperty(value = "算法ID", required = true)
     @NotNull(message = "{algorithm.id.notNull}")
@@ -42,7 +44,7 @@ public class WorkflowNodeReq {
     @ApiModelProperty(value = "是否需要输入模型: 0-否，1:是")
     private Integer inputModel;
 
-    @ApiModelProperty(value = "输入请求列表", required = true)
+    @ApiModelProperty(value = "输入请求列表")
     private List<WorkflowNodeInputReq> workflowNodeInputReqList;
 
     @ApiModelProperty(value = "输出请求列表")

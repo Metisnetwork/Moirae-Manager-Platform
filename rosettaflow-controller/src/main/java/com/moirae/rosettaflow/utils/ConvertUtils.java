@@ -88,7 +88,8 @@ public class ConvertUtils {
                         workflowNodeReq.getWorkflowNodeVariableReqList(), WorkflowNodeVariable.class));
             }
             // 工作流id
-            workflowNodeDto.setWorkflowId(workflowNodeReq.getWorkflowId());
+            //TODO
+//            workflowNodeDto.setWorkflowId(workflowNodeReq.getWorkflowId());
             // 节点算法id
             workflowNodeDto.setAlgorithmId(workflowNodeReq.getAlgorithmId());
             // 节点名称

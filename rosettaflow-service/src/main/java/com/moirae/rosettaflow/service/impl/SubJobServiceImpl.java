@@ -243,7 +243,7 @@ public class SubJobServiceImpl extends ServiceImpl<SubJobMapper, SubJob> impleme
      * @return List<TerminateTaskRequestDto>  需要停止所有子作业节点请求参数
      */
     public List<TerminateTaskRequestDto> assemblyTerminateTaskRequestDto(SubJob subJob) {
-        Workflow workflow = workflowService.queryWorkflowDetail(subJob.getWorkflowId());
+        Workflow workflow = workflowService.queryWorkflow(subJob.getWorkflowId());
         List<SubJobNode> subJobNodeList = subJobNodeService.querySubJobNodeListBySubJobId(subJob.getId());
         List<TerminateTaskRequestDto> terminateTaskRequestDtoList = new ArrayList<>();
         subJobNodeList.forEach(subJobNode -> {

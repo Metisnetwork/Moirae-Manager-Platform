@@ -102,10 +102,10 @@ ALTER TABLE `t_workflow_node_code`
 
 ALTER TABLE `t_workflow_node_input`
     DROP COLUMN `sender_flag`,
+    DROP COLUMN `data_file_id`,
     DROP COLUMN `status`;
 
 ALTER TABLE `t_workflow_node_output`
-    DROP COLUMN `party_id`,
     DROP COLUMN `sender_flag`,
     DROP COLUMN `status`;
 

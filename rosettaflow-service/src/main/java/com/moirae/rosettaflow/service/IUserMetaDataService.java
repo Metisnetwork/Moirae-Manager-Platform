@@ -110,4 +110,12 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @return 待审核元数据列表
      */
     List<UserMetaData> getByAuthStatus(Byte authStatus);
+
+    /**
+     * 用户授权的元数据是否有效
+     *
+     * @param tableIdList
+     * @return
+     */
+    boolean isValid(Set<String> tableIdList);
 }

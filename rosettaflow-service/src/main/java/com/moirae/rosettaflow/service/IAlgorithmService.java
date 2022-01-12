@@ -44,4 +44,13 @@ public interface IAlgorithmService extends IService<Algorithm> {
      * @return list
      */
     List<Map<String, Object>> queryAlgorithmTreeList(String language);
+
+    /**
+     * 查询算法详情
+     * @param algorithmId 算法步骤id
+     * @return Algorithm
+     */
+    Algorithm queryAlgorithmStepDetails(Long algorithmId);
+
+    void isValid(List<Long> algorithmId);
 }

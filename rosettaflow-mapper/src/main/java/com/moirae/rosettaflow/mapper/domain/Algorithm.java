@@ -1,8 +1,10 @@
 package com.moirae.rosettaflow.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -149,4 +151,19 @@ public class Algorithm implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 算法id
+     */
+    @TableField(exist = false)
+    private Long algorithmId;
+    /**
+     * 算法编辑类型:1-sql, 2-noteBook
+     */
+    @TableField(exist = false)
+    private Byte editType;
+    /**
+     * 算法代码（计算合约）
+     */
+    @TableField(exist = false)
+    private String calculateContractCode;
 }

@@ -1,7 +1,5 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -10,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
@@ -23,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
-
-import static cn.hutool.core.date.DateTime.now;
 
 /**
  * 工作流节点服务实现类
@@ -79,7 +74,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             log.error("saveWorkflowAllNodeData--工作流节点信息workflowNodeDtoList不能为空");
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
         }
-        Workflow workflow = workflowService.queryWorkflowDetail(workflowId);
+        Workflow workflow = workflowService.queryWorkflow(workflowId);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
         // 判断当前工作流是否存在正在运行或者有加入正在运行的作业中，有则不让保存

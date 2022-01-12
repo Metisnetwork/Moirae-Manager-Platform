@@ -15,7 +15,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
 
-    <select id="queryWorkFlowPageList" resultType="com.moirae.rosettaflow.dto.WorkflowDto">
+    <select id="queryWorkFlowAndStatusPageList" resultType="com.moirae.rosettaflow.dto.WorkflowDto">
         SELECT
             w.id AS id,
             w.workflow_name AS workflowName,
@@ -24,11 +24,21 @@
             w.create_time AS createTime,
             u.user_name AS userName
         FROM t_workflow w INNER JOIN t_user u ON w.user_id = u.id
-        WHERE w.project_id =  1 AND w.status = 1 AND u.status = 1
+        WHERE w.project_id = #{projectId, jdbcType=BIGINT} AND w.status = 1 AND u.status = 1
         <if test="workflowName != null and workflowName != ''">
             and w.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
         </if>
         ORDER BY w.create_time DESC
+    </select>
+
+    <select id="queryWorkFlowAndStatus" resultType="com.moirae.rosettaflow.mapper.domain.Workflow">
+        SELECT
+            w.`id` AS id,
+            w.`edit_version` AS editVersion,
+            IFNULL((SELECT ws.`run_status` FROM `t_workflow_run_status` ws WHERE ws.`workflow_id` = w.`id` AND ws.`workflow_edit_version` = w.`edit_version` ORDER BY ws.`id` DESC LIMIT 1) , 0) AS runStatus,
+            w.project_id AS projectId
+        FROM `t_workflow` w
+        WHERE w.`id` = #{workflowId, jdbcType=BIGINT} AND w.`status` = 1
     </select>
 
     <delete id="deleteWorkflowAllNodeData">

@@ -58,7 +58,7 @@ public class Workflow implements Serializable {
     /**
      * 编辑版本标识，每次编辑后递增，从1开始
      */
-    private Long editVersion;
+    private Integer editVersion;
 
     /**
      * 状态: 0-无效，1- 有效
@@ -84,5 +84,19 @@ public class Workflow implements Serializable {
     private Byte runStatus;
 
     @TableField(exist = false)
-    private List<WorkflowRunTaskStatus> getNodeStatusVoList = new ArrayList<>();
+    private List<WorkflowNode> getNodeStatusVoList = new ArrayList<>();
+
+    @TableField(exist = false)
+    private List<WorkflowNode> workflowNodeVoList = new ArrayList<>();
+
+    /**
+     * 工作流ID
+     */
+    @TableField(exist = false)
+    private Long workflowId;
+    /**
+     * 工作流节点列表
+     */
+    @TableField(exist = false)
+    List<WorkflowNode> workflowNodeReqList;
 }

@@ -62,7 +62,7 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param id 工作流id
      * @return 工作流详情
      */
-    Workflow queryWorkflowDetail(Long id);
+    Workflow queryWorkflow(Long id);
 
     /**
      * 添加工作流
@@ -189,9 +189,16 @@ public interface IWorkflowService extends IService<Workflow> {
     /**
      * 查询工作流的节点设置
      *
-     * @param id
+     * @param workflowId
      * @param language
      * @return
      */
-    List<WorkflowNodeDto> queryWorkflowNodeList(Long id, String language);
+    Workflow queryWorkflowDetailAndStatus(Long workflowId, String language);
+
+    /**
+     * 保存工作流设置详情
+     *
+     * @param workflow
+     */
+    void saveWorkflowDetail(Workflow workflow);
 }

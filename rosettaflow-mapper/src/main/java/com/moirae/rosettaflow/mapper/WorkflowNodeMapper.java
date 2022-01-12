@@ -14,5 +14,5 @@ import java.util.List;
  */
 public interface WorkflowNodeMapper extends BaseMapper<WorkflowNode> {
 
-    List<WorkflowNode> queryWorkflowNodeAndStatusList(@Param("workflowId") Long workflowId,  @Param("editVersion") Long editVersion);
+    List<WorkflowNode> queryWorkflowNodeAndStatusList(@Param("workflowId") Long workflowId,  @Param("editVersion") Integer editVersion);
 }

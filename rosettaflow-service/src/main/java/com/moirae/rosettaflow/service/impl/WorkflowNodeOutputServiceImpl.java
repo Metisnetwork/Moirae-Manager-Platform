@@ -22,7 +22,7 @@ import java.util.List;
 public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutputMapper, WorkflowNodeOutput> implements IWorkflowNodeOutputService {
     @Override
     public List<WorkflowNodeOutput> getByWorkflowNodeId(Long workflowNodeId) {
-        return baseMapper.getByWorkflowNodeId(workflowNodeId);
+        return baseMapper.getWorkflowNodeOutputAndOrgNameByNodeId(workflowNodeId);
     }
 
     @Override

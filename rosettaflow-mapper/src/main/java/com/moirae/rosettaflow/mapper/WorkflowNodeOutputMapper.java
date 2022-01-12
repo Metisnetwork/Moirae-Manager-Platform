@@ -17,7 +17,7 @@ public interface WorkflowNodeOutputMapper extends BaseMapper<WorkflowNodeOutput>
      * @param workflowNodeId 工作流节点id
      * @return 节点输出列表
      */
-    List<WorkflowNodeOutput> getByWorkflowNodeId(Long workflowNodeId);
+    List<WorkflowNodeOutput> getWorkflowNodeOutputAndOrgNameByNodeId(Long workflowNodeId);
 
     /**
      * 根据任务id获取输入放的组织id

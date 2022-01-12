@@ -11,8 +11,10 @@ import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
+import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.service.AuthServiceGrpc;
 import com.moirae.rosettaflow.grpc.service.GetNodeIdentityResponse;
+import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.OrganizationMapper;
 import com.moirae.rosettaflow.mapper.UserOrgMapper;
 import com.moirae.rosettaflow.mapper.domain.Organization;
@@ -27,7 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hudenian
@@ -46,6 +51,9 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
 
     @Resource
     private UserOrgMapper userOrgMapper;
+
+    @Resource
+    private GrpcAuthService grpcAuthService;
 
     @Override
     public void batchInsert(List<Organization> organizationList) {
@@ -171,5 +179,41 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
         wrapper.eq(UserOrg::getUserAddress, userDto.getAddress());
         wrapper.eq(UserOrg::getOrgIdentityId, identityId);
         userOrgMapper.delete(wrapper);
+    }
+
+    @Override
+    public void isValid(Set<String> orgId) {
+        List<Organization> newOrganizationList = syncOrganization();
+        Set<String> identityIdSet = new HashSet<>();
+        newOrganizationList.forEach(o -> identityIdSet.add(o.getIdentityId()));
+        for (String identity : orgId) {
+            if (!identityIdSet.contains(identity)) {
+                log.error("AssemblyNodeInput->前端输入的机构信息identity:{}未找到", identity);
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
+            }
+        }
+    }
+
+    /**
+     * 同步组织信息
+     *
+     * @return 组织信息列表
+     */
+    private List<Organization> syncOrganization() {
+        List<Organization> organizationList = new ArrayList<>();
+        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
+
+            Organization org;
+            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
+                org = new Organization();
+                org.setNodeName(nodeIdentityDto.getNodeName());
+                org.setNodeId(nodeIdentityDto.getNodeId());
+                org.setIdentityId(nodeIdentityDto.getIdentityId());
+                organizationList.add(org);
+            }
+            batchInsert(organizationList);
+        }
+        return organizationList;
     }
 }

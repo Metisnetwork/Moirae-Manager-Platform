@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.Organization;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hudenian
@@ -92,4 +93,6 @@ public interface IOrganizationService extends IService<Organization> {
      * @param identityId
      */
     void deleteUserOrganization(String identityId);
+
+    void isValid(Set<String> senderOrgId);
 }

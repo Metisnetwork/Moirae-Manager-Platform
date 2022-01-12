@@ -18,7 +18,6 @@ import com.moirae.rosettaflow.vo.workflow.GetStatusVo;
 import com.moirae.rosettaflow.vo.workflow.TaskEventVo;
 import com.moirae.rosettaflow.vo.workflow.WorkflowDetailsVo;
 import com.moirae.rosettaflow.vo.workflow.WorkflowVo;
-import com.moirae.rosettaflow.vo.workflow.node.GetNodeStatusVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,9 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 工作流管理
@@ -63,7 +60,7 @@ public class WorkflowController {
     @GetMapping(value = "detail/{id}")
     @ApiOperation(value = "获取工作流详情", notes = "获取工作流详情")
     public ResponseVo<WorkflowDetailsVo> detail(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id) {
-        Workflow workflow = workflowService.queryWorkflowDetail(id);
+        Workflow workflow = workflowService.queryWorkflow(id);
         return ResponseVo.createSuccess(BeanUtil.toBean(workflow, WorkflowDetailsVo.class));
     }
 

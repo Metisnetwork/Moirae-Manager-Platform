@@ -98,4 +98,9 @@
         <include refid="Algorithm_Column_List"/>
         and a.id = #{algorithmId, jdbcType=BIGINT}
     </select>
+
+    <select id="queryAlgorithmStepDetails" resultType="com.moirae.rosettaflow.mapper.domain.Algorithm">
+        <include refid="Algorithm_Column_List"/>
+        and a.id = #{algorithmId, jdbcType=BIGINT}
+    </select>
 </mapper>

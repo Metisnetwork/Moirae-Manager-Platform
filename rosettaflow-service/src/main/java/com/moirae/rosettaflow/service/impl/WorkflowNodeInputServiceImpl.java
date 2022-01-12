@@ -63,7 +63,8 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
             newNodeInput.setIdentityId(oldNodeInput.getIdentityId());
             newNodeInput.setDataTableId(oldNodeInput.getDataTableId());
             newNodeInput.setDataColumnIds(oldNodeInput.getDataColumnIds());
-            newNodeInput.setDataFileId(oldNodeInput.getDataFileId());
+            //todo
+//            newNodeInput.setDataFileId(oldNodeInput.getDataFileId());
             newNodeInputList.add(newNodeInput);
         });
         return newNodeInputList;

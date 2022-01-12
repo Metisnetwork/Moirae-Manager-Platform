@@ -2,12 +2,9 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
-import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
-import com.moirae.rosettaflow.mapper.domain.TaskResult;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNodeInput;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNodeOutput;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.req.data.DownloadTaskReq;
 import com.moirae.rosettaflow.req.workflow.node.ClearWorkflowNodeReq;
 import com.moirae.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
@@ -29,9 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,41 +53,16 @@ public class WorkflowNodeController {
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
     public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id, HttpServletRequest request) {
         String language = request.getHeader("Accept-Language");
-        List<WorkflowNodeDto> workflowNodeDtoList = workflowService.queryWorkflowNodeList(id, language);
-        return ResponseVo.createSuccess(this.convertToWorkflowVo(workflowNodeDtoList));
-    }
-
-    /**
-     * 转换响应参数
-     */
-    private NodeDetailsListVo convertToWorkflowVo(List<WorkflowNodeDto> workflowNodeDtoList) {
-        NodeDetailsListVo nodeDetailsListVo = new NodeDetailsListVo();
-        List<WorkflowNodeVo> workflowNodeVoList = new ArrayList<>();
-        if (workflowNodeDtoList != null && workflowNodeDtoList.size() > 0) {
-            for (WorkflowNodeDto nodeDto : workflowNodeDtoList) {
-                WorkflowNodeVo workflowNodeVo = BeanUtil.toBean(nodeDto, WorkflowNodeVo.class);
-                // 输入参数转换
-                List<WorkflowNodeInput> nodeInputList = nodeDto.getWorkflowNodeInputList();
-                workflowNodeVo.setWorkflowNodeInputVoList(BeanUtil.copyToList(nodeInputList, WorkflowNodeInputVo.class));
-                // 输出参数转换
-                List<WorkflowNodeOutput> nodeOutputList = nodeDto.getWorkflowNodeOutputList();
-                workflowNodeVo.setWorkflowNodeOutputVoList(BeanUtil.copyToList(nodeOutputList, WorkflowNodeOutputVo.class));
-                // 节点算法转换
-                AlgorithmDto algorithmDto = nodeDto.getAlgorithmDto();
-                workflowNodeVo.setNodeAlgorithmVo(BeanUtil.toBean(algorithmDto, NodeAlgorithmVo.class));
-                workflowNodeVoList.add(workflowNodeVo);
-            }
-        }
-        nodeDetailsListVo.setWorkflowNodeVoList(workflowNodeVoList);
-        return nodeDetailsListVo;
+        Workflow workflow = workflowService.queryWorkflowDetailAndStatus(id, language);
+        NodeDetailsListVo nodeDetailsListVo = BeanUtil.toBean(workflow, NodeDetailsListVo.class);
+        return ResponseVo.createSuccess(nodeDetailsListVo);
     }
 
     @PostMapping("save")
     @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
     public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
-        List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(
-                workflowAllNodeReq.getWorkflowNodeReqList(), Boolean.FALSE);
-        workflowNodeService.saveWorkflowAllNodeData(workflowAllNodeReq.getWorkflowId(), workflowNodeDtoList);
+        Workflow workflow = BeanUtil.toBean(workflowAllNodeReq, Workflow.class);
+        workflowService.saveWorkflowDetail(workflow);
         return ResponseVo.createSuccess();
     }
 

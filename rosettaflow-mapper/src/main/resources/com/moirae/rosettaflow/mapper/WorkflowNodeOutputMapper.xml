@@ -5,8 +5,6 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
-        <result column="party_id" jdbcType="VARCHAR" property="partyId"/>
-        <result column="sender_flag" jdbcType="TINYINT" property="senderFlag"/>
         <result column="store_pattern" jdbcType="TINYINT" property="storePattern"/>
         <result column="store_path" jdbcType="VARCHAR" property="storePath"/>
         <result column="output_content" jdbcType="VARCHAR" property="outputContent"/>
@@ -19,23 +17,16 @@
         store_pattern, store_path, output_content, `status`, create_time, update_time
     </sql>
 
-    <select id="getByWorkflowNodeId" resultType="com.moirae.rosettaflow.dto.WorkflowNodeOutputDto">
+    <select id="getWorkflowNodeOutputAndOrgNameByNodeId" resultType="com.moirae.rosettaflow.mapper.domain.WorkflowNodeOutput">
         select a.id               as id,
                a.workflow_node_id as workflowNodeId,
                a.identity_id      as identityId,
-               a.party_id         as partyId,
-               a.sender_flag      as senderFlag,
                a.store_pattern    as storePattern,
                a.store_path       as storePath,
                a.output_content   as outputContent,
                b.node_name        as identityName
-        from t_workflow_node_output a,
-             t_organization b
-        where a.status = 1
-          and b.status = 1
-          and a.identity_id = b.identity_id
-          and a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
-        order by a.party_id
+        from t_workflow_node_output a left join t_organization b on a.identity_id = b.identity_id
+        where a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
     </select>
 
     <select id="getOutputIdentityIdByTaskId" resultType="string">
