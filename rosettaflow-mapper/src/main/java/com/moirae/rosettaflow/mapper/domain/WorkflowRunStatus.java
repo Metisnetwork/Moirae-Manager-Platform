@@ -1,12 +1,15 @@
 package com.moirae.rosettaflow.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @TableName(value = "t_workflow_run_status")
@@ -29,6 +32,10 @@ public class WorkflowRunStatus implements Serializable {
      * 发起任务的账户的签名
      */
     private String sign;
+    /**
+     * 发起任务的账户的地址
+     */
+    private String address;
     /**
      * 总步骤
      */
@@ -57,4 +64,14 @@ public class WorkflowRunStatus implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 步骤对应的任务状态
+     */
+    @TableField(exist = false)
+    private Map<Integer, WorkflowRunTaskStatus> workflowRunTaskStatusMap;
+    /**
+     *
+     */
+    private Workflow workflow;
 }

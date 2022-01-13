@@ -86,27 +86,11 @@ public class WorkflowController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("copy")
-    @ApiOperation(value = "复制工作流", notes = "复制工作流")
-    public ResponseVo<?> copy(@RequestBody @Validated CopyWorkflowReq copyReq) {
-        workflowService.copyWorkflow(copyReq.getOriginId(), copyReq.getWorkflowName(), copyReq.getWorkflowDesc());
-        return ResponseVo.createSuccess();
-    }
-
     @PostMapping("start")
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
-        //先保存工作流
-        if (SysConstant.STR_1.equals(startWorkflowReq.getSaveFlag())) {
-            List<WorkflowNodeDto> workflowNodeDtoList = ConvertUtils.convertSaveReq(
-                    startWorkflowReq.getWorkflowNodeReqList(), Boolean.TRUE);
-            workflowNodeService.saveWorkflowAllNodeData(startWorkflowReq.getWorkflowId(), workflowNodeDtoList);
-        }
-
-        //启动工作流
-        WorkflowDto workflowDto = BeanUtil.toBean(startWorkflowReq, WorkflowDto.class);
-        workflowDto.setId(startWorkflowReq.getWorkflowId());
-        workflowService.start(workflowDto);
+        Workflow workflow = BeanUtil.toBean(startWorkflowReq, Workflow.class);
+        workflowService.selectSaveAndStart(workflow);
         return ResponseVo.createSuccess();
     }
 

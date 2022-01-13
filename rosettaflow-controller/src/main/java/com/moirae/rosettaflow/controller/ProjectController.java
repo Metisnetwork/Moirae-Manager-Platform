@@ -133,14 +133,4 @@ public class ProjectController {
         List<User> list = projectService.queryAllUserNickName(projectId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
     }
-
-    @GetMapping("queryCurrentProjAlgModel")
-    @ApiOperation(value = "查询当前项目的算法模型", notes = "查询当前项目的算法模型")
-    public ResponseVo<List<ProjectModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel, HttpServletRequest request) {
-        // 获取语言类型
-        String language = request.getHeader("Accept-Language");
-        List<ProjectModelDto> list = projectService.queryCurrentProjAlgModel(projAlgModel.getProjectId(), projAlgModel.getAlgorithmId(), language);
-        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectModelVo.class));
-    }
-
 }

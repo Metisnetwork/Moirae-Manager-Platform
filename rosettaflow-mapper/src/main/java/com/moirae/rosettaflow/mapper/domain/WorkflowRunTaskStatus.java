@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -77,4 +78,13 @@ public class WorkflowRunTaskStatus implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+
+    @TableField(exist = false)
+    private WorkflowNode workflowNode;
+
+
+    @TableField(exist = false)
+    private Model model;
+
 }

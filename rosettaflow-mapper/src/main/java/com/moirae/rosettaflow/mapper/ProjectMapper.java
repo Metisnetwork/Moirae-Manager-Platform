@@ -40,15 +40,4 @@ public interface ProjectMapper extends BaseMapper<Project> {
     IPage<ProjMemberDto> queryProjMemberList(@Param(value = "projectId") Long projectId,
                                              @Param(value = "userName") String userName,
                                              IPage<ProjMemberDto> iPage);
-    /**
-     * 查询当前项目的算法模型
-     *
-     * @param projectId 项目id
-     * @param algorithmId 算法id
-     * @param language 语言类型
-     * @return 项目模型列表
-     */
-    List<ProjectModelDto> queryCurrentProjAlgModel(@Param("projectId") Long projectId,
-                                                   @Param("algorithmId") Long algorithmId,
-                                                   @Param("language") String language);
 }

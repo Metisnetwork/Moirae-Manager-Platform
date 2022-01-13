@@ -83,6 +83,9 @@ public class RpcTestController {
     @Resource
     private IWorkflowNodeOutputService workflowNodeOutputService;
 
+    @Resource
+    private IWorkflowRunStatusService workflowRunStatusService;
+
 
     @GetMapping("getNodeIdentity")
     @ApiOperation(value = "getNodeIdentity接口测试", notes = "查询自己组织的identity信息")
@@ -221,7 +224,7 @@ public class RpcTestController {
         Workflow orgWorkflow = workflowService.getById(workflowId);
         WorkflowDto workflowDto = new WorkflowDto();
         BeanUtil.copyProperties(orgWorkflow, workflowDto);
-        TaskDto taskDto = workflowService.assemblyTaskDto(workflowDto);
+        TaskDto taskDto = workflowRunStatusService.assemblyTaskDto(workflowDto);
         PublishTaskDeclareResponseDto publishTaskDeclareResponseDto = grpcTaskService.syncPublishTask(netManager.getChannel(organizationService.list().get(0).getIdentityId()), taskDto);
         return ResponseVo.createSuccess(publishTaskDeclareResponseDto.getMsg());
     }

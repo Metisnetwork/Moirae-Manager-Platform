@@ -96,22 +96,6 @@ public interface IWorkflowService extends IService<Workflow> {
     void deleteWorkflowAllNodeData(Long id);
 
     /**
-     * 复制工作流
-     *
-     * @param originId     源工作流id
-     * @param workflowName 工作流名称
-     * @param workflowDesc 工作流描述
-     */
-    void copyWorkflow(Long originId, String workflowName, String workflowDesc);
-
-    /**
-     * 启动工作流
-     *
-     * @param workflowDto 启动工作流请求对象
-     */
-    void start(WorkflowDto workflowDto);
-
-    /**
      * 获取运行日志
      *
      * @param workflowId 工作流id
@@ -154,14 +138,6 @@ public interface IWorkflowService extends IService<Workflow> {
     Workflow getWorkflowStatusById(Long id);
 
     /**
-     * 组装发送任务对象
-     *
-     * @param workflowDto 工作流节点参数信息
-     * @return 发送任务对象
-     */
-    TaskDto assemblyTaskDto(WorkflowDto workflowDto);
-
-    /**
      * 更新工作流运行状态
      *
      * @param ids       工作流id
@@ -201,4 +177,6 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param workflow
      */
     void saveWorkflowDetail(Workflow workflow);
+
+    void selectSaveAndStart(Workflow workflow);
 }

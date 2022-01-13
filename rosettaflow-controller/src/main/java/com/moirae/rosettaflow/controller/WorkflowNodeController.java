@@ -1,20 +1,16 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.moirae.rosettaflow.common.enums.TaskDownloadCompressEnum;
-import com.moirae.rosettaflow.dto.WorkflowNodeDto;
-import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
-import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.req.data.DownloadTaskReq;
+import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.req.workflow.node.ClearWorkflowNodeReq;
 import com.moirae.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
-import com.moirae.rosettaflow.service.ITaskResultService;
 import com.moirae.rosettaflow.service.IWorkflowNodeService;
+import com.moirae.rosettaflow.service.IWorkflowRunStatusService;
 import com.moirae.rosettaflow.service.IWorkflowService;
-import com.moirae.rosettaflow.utils.ConvertUtils;
-import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.workflow.node.*;
+import com.moirae.rosettaflow.vo.workflow.node.NodeDetailsListVo;
+import com.moirae.rosettaflow.vo.workflow.node.NodeTaskResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -47,7 +42,7 @@ public class WorkflowNodeController {
     private IWorkflowService workflowService;
 
     @Resource
-    private ITaskResultService taskResultService;
+    private IWorkflowRunStatusService workflowRunStatusService;
 
     @GetMapping(value = "queryNodeDetailsList/{id}")
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
@@ -76,16 +71,8 @@ public class WorkflowNodeController {
     @GetMapping(value = "getTaskResult/{taskId}")
     @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
     public ResponseVo<List<NodeTaskResultVo>> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
-        List<TaskResult> taskResultList = taskResultService.queryTaskResultByTaskId(taskId);
+        List<WorkflowRunTaskStatus> taskResultList = workflowRunStatusService.queryWorkflowRunTaskStatusByTaskId(taskId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(taskResultList, NodeTaskResultVo.class));
-    }
-
-    @GetMapping(value = "downloadTaskResultFile")
-    @ApiOperation(value = "下载运行结果文件", notes = "下载运行结果文件")
-    public void downloadTaskResultFileById(HttpServletResponse response, @Validated DownloadTaskReq downloadTaskReq) {
-        DownloadReplyResponseDto downloadReplyResponseDto = taskResultService.downloadTaskResultFile(downloadTaskReq.getId(), downloadTaskReq.getCompress());
-        String downloadFileName = downloadReplyResponseDto.getFileName() + "." + TaskDownloadCompressEnum.getByValue(downloadTaskReq.getCompress()).getCompressType();
-        ExportFileUtil.exportCsv(downloadFileName, downloadReplyResponseDto.getContent(), response);
     }
 
 }

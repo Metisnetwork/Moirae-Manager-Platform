@@ -119,14 +119,4 @@ public interface IProjectService extends IService<Project> {
      * @return 用户列表
      */
     List<User> queryAllUserNickName(Long projectId);
-
-    /**
-     * 获取当前项目下面生成的所有模型
-     *
-     * @param projectId 项目id
-     * @param algorithmId 算法id
-     * @param language 语言类型
-     * @return 项目模型列表
-     */
-    List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId, Long algorithmId, String language);
 }

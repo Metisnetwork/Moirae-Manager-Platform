@@ -40,8 +40,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Resource
     private IAlgorithmService algorithmService;
 
-    @Resource
-    private IJobService jobService;
 
     @Resource
     private IWorkflowNodeCodeService workflowNodeCodeService;
@@ -67,197 +65,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList) {
-        if (null == workflowNodeDtoList || workflowNodeDtoList.size() == 0) {
-            log.error("saveWorkflowAllNodeData--工作流节点信息workflowNodeDtoList不能为空");
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
-        }
-        Workflow workflow = workflowService.queryWorkflow(workflowId);
-        // 校验是否有编辑权限
-        checkEditPermission(workflow.getProjectId());
-        // 判断当前工作流是否存在正在运行或者有加入正在运行的作业中，有则不让保存
-        if (workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue()) {
-            log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
-        }
-        // 判断正在运行的作业是否包含此工作流
-        List<Job> jobList = jobService.listRunJobByWorkflowId(workflowId);
-        if (null != jobList && jobList.size() > 0) {
-            log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
-        }
-
-        // 校验节点配置输入是否有过期数据
-        this.checkExpireConfigData(workflowNodeDtoList);
-
-        // 校验只有一个算法节点，且该节点需要模型时，是否传入模型参数
-        this.checkConfigModelParam(workflowNodeDtoList);
-
-        // 删除当前工作流所有节点数据
-        workflowService.deleteWorkflowAllNodeData(workflowId);
-
-        // 加入所有工作流新节点
-        List<WorkflowNodeInput> workflowNodeInputList = new ArrayList<>();
-        List<WorkflowNodeOutput> workflowNodeOutputList = new ArrayList<>();
-        List<WorkflowNodeCode> workflowNodeCodeList = new ArrayList<>();
-        List<WorkflowNodeResource> workflowNodeResourceList = new ArrayList<>();
-        List<WorkflowNodeVariable> workflowNodeVariableList = new ArrayList<>();
-        // 节点记数
-        int count = 0;
-        // 算法集合
-        Set<Long> algorithmIdSet = new HashSet<>();
-        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
-            // 判断是否添加相同的算法
-            if (algorithmIdSet.contains(workflowNodeDto.getAlgorithmId())) {
-                log.error("saveWorkflowNode--判断是否添加相同的算法--workflowNodeDto:{}", JSON.toJSONString(workflowNodeDto));
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_REPEAT_ERROR.getMsg());
-            }
-            algorithmIdSet.add(workflowNodeDto.getAlgorithmId());
-            // 保存工作流节点
-            Long workflowNodeId = this.saveWorkflowNode(workflowId, workflowNodeDto, ++count, workflowNodeDtoList.size());
-            // 拼装工作流节点输入
-            workflowNodeInputList.addAll(this.assemblyNodeInput(workflowNodeId, workflowNodeDto));
-            // 拼装工作流节点输出
-            workflowNodeOutputList.addAll(this.assemblyNodeOutput(workflowNodeId, workflowNodeDto));
-            // 添加新的工作流节点代码
-            if (Objects.nonNull(workflowNodeDto.getWorkflowNodeCode())) {
-                workflowNodeDto.getWorkflowNodeCode().setWorkflowNodeId(workflowNodeId);
-                workflowNodeCodeList.add(workflowNodeDto.getWorkflowNodeCode());
-            }
-            // 添加新的工作流节点资源
-            if (Objects.nonNull(workflowNodeDto.getWorkflowNodeResource())) {
-                workflowNodeDto.getWorkflowNodeResource().setWorkflowNodeId(workflowNodeId);
-                workflowNodeResourceList.add(workflowNodeDto.getWorkflowNodeResource());
-            }
-            // 添加新的工作流节点变量
-            workflowNodeVariableList.addAll(this.saveWorkflowNodeVariable(workflowNodeId, workflowNodeDto));
-        }
-        // 保存节点相关数据
-        this.saveNodeData(workflowNodeInputList, workflowNodeOutputList, workflowNodeCodeList,
-                workflowNodeResourceList, workflowNodeVariableList);
-        // 更新工作流节点数量
-        //TODO
-//        workflow.setNodeNumber(workflowNodeDtoList.size());
-        workflow.setUpdateTime(new Date());
-        workflowService.updateById(workflow);
-    }
-
-    /** 校验节点配置输入是否有过期数据 */
-    private void checkExpireConfigData(List<WorkflowNodeDto> workflowNodeDtoList){
-        Set<String> userAuthDataIdSet = new HashSet<>();
-        for (WorkflowNodeDto workflowNodeDto : workflowNodeDtoList) {
-            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeDto.getWorkflowNodeInputList();
-            if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
-                continue;
-            }
-            for (WorkflowNodeInput workflowNodeInput : workflowNodeInputList) {
-                userAuthDataIdSet.add(workflowNodeInput.getDataTableId());
-            }
-        }
-        if (userAuthDataIdSet.size() > 0) {
-            List<UserMetaData> userMetaDataList = userMetaDataService.getByMetaDataId(userAuthDataIdSet);
-            if (null != userMetaDataList  && userMetaDataList.size() < userAuthDataIdSet.size()) {
-                log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(userAuthDataIdSet));
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
-            }
-        }
-    }
-
-    /** 校验只有一个算法节点，且该节点需要模型时，是否传入模型参数 */
-    private void checkConfigModelParam(List<WorkflowNodeDto> workflowNodeDtoList){
-        // 当前工作流只有一个节点，且需要输入模型
-        if (workflowNodeDtoList.size() == 1) {
-            int inputModel = workflowNodeDtoList.get(0).getAlgorithmDto().getInputModel();
-            Long ModelId = workflowNodeDtoList.get(0).getModelId();
-            // inputModel: 是否需要输入模型: 0-否，1:是
-            boolean flag = SysConstant.INT_1 == inputModel && (null == ModelId || ModelId == 0);
-            if (flag) {
-                log.error("当前节点需输入模型，请检查, workflowNodeDto:{}", JSON.toJSONString(workflowNodeDtoList.get(0)));
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
-            }
-        }
-    }
-
-    /**
-     * 保存工作流节点
-     */
-    private Long saveWorkflowNode(Long workflowId, WorkflowNodeDto workflowNodeDto, int count, int listSize) {
-        WorkflowNode workflowNode = new WorkflowNode();
-        workflowNode.setWorkflowId(workflowId);
-        workflowNode.setNodeName(workflowNodeDto.getNodeName());
-        workflowNode.setAlgorithmId(workflowNodeDto.getAlgorithmId());
-        workflowNode.setNodeStep(workflowNodeDto.getNodeStep());
-        workflowNode.setModelId(workflowNodeDto.getModelId());
-        //TODO
-//        if (count == listSize) {
-//            // 将最后一个节点步骤的下一节点步骤字段值置空
-//            workflowNode.setNextNodeStep(null);
-//        } else {
-//            workflowNode.setNextNodeStep(workflowNodeDto.getNodeStep() + 1);
-//        }
-        this.save(workflowNode);
-        return workflowNode.getId();
-    }
-
-    /**
-     * 拼装工作流节点输入
-     */
-    private List<WorkflowNodeInput> assemblyNodeInput(Long workflowNodeId, WorkflowNodeDto dto) {
-        if (null != dto.getWorkflowNodeInputList() && dto.getWorkflowNodeInputList().size() > 0) {
-            String[] identityIdArr = new String[dto.getWorkflowNodeInputList().size()];
-            //任务里面定义的 (p0 -> pN 方 ...)
-            //设置工作流节点id
-            for (int i = 0; i < dto.getWorkflowNodeInputList().size(); i++) {
-                dto.getWorkflowNodeInputList().get(i).setPartyId("p" + i);
-                dto.getWorkflowNodeInputList().get(i).setWorkflowNodeId(workflowNodeId);
-                identityIdArr[i] = dto.getWorkflowNodeInputList().get(i).getIdentityId();
-            }
-            // 校验组织信息
-            List<Organization> organizationList = organizationService.getByIdentityIds(identityIdArr);
-            if (null == organizationList || organizationList.size() != identityIdArr.length) {
-                List<Organization> newOrganizationList = syncOrganization();
-                Set<String> identityIdSet = new HashSet<>();
-                newOrganizationList.forEach(o -> identityIdSet.add(o.getIdentityId()));
-                for (String identity : identityIdArr) {
-                    if (!identityIdSet.contains(identity)) {
-                        log.error("AssemblyNodeInput->前端输入的机构信息identity:{}未找到", identity);
-                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
-                    }
-                }
-            }
-        }
-        return dto.getWorkflowNodeInputList() == null ? new ArrayList<>() : dto.getWorkflowNodeInputList();
-    }
-
-    /**
-     * 拼装工作流节点输出数据
-     */
-    private List<WorkflowNodeOutput> assemblyNodeOutput(Long workflowNodeId, WorkflowNodeDto dto) {
-        List<WorkflowNodeOutput> outputList = dto.getWorkflowNodeOutputList();
-        if (null != outputList && outputList.size() > 0) {
-            // 任务里面定义的 (p0 -> pN 方 ...)
-            for (int i = 0; i < outputList.size(); i++) {
-                //TODO
-//                outputList.get(i).setPartyId("q" + i);
-                outputList.get(i).setWorkflowNodeId(workflowNodeId);
-            }
-        }
-        return outputList == null ? new ArrayList<>() : outputList;
-    }
-
-    /**
-     * 保存工作流节点输入变量
-     */
-    private List<WorkflowNodeVariable> saveWorkflowNodeVariable(Long workflowNodeId, WorkflowNodeDto workflowNodeDto) {
-        List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeDto.getWorkflowNodeVariableList();
-        if (null == workflowNodeVariableList || workflowNodeVariableList.size() == 0) {
-            return new ArrayList<>();
-        }
-        workflowNodeVariableList.forEach(workflowNodeVariable -> workflowNodeVariable.setWorkflowNodeId(workflowNodeId));
-        return workflowNodeVariableList;
-    }
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -273,12 +80,11 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
             return;
         }
         // 校验工作流状态是否运行中
-        //todo
-//        boolean isExistNodeRunning = workflowNodeList.stream().anyMatch(workflowNode -> workflowNode.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue());
-//        if(workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue() || isExistNodeRunning){
-//            log.error("Workflow runStatus is running or workflow node exist runStatus is running,can not clear, workflowId:{}", workflowId);
-//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_CLEAR.getMsg());
-//        }
+        boolean isExistNodeRunning = workflowNodeList.stream().anyMatch(workflowNode -> workflowNode.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue());
+        if(workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue() || isExistNodeRunning){
+            log.error("Workflow runStatus is running or workflow node exist runStatus is running,can not clear, workflowId:{}", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_CLEAR.getMsg());
+        }
         // 物理删除当前工作流所有节点数据
         workflowService.deleteWorkflowAllNodeData(workflowId);
     }
@@ -288,7 +94,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
         wrapper.eq(WorkflowNode::getNodeStep, nodeStep);
-        //todo
 //        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         WorkflowNode workflowNode = this.getOne(wrapper);
         if (workflowNode == null) {
@@ -302,7 +107,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public List<WorkflowNode> getWorkflowNodeList(Long workflowId) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
-        //todo
 //        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         // 所有节点正序排序
         wrapper.orderByAsc(WorkflowNode::getNodeStep);
@@ -321,50 +125,9 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         newNode.setAlgorithmId(oldNode.getAlgorithmId());
         newNode.setNodeName(oldNode.getNodeName());
         newNode.setNodeStep(oldNode.getNodeStep());
-        //todo
 //        newNode.setNextNodeStep(oldNode.getNextNodeStep());
         this.save(newNode);
         return newNode;
-    }
-
-    @Override
-    public void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList) {
-        if (null == oldNodeList || oldNodeList.size() == 0) {
-            return;
-        }
-        List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
-        List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
-        List<WorkflowNodeCode> newNodeCodeList = new ArrayList<>();
-        List<WorkflowNodeResource> newNodeResourceList = new ArrayList<>();
-        List<WorkflowNodeVariable> newNodeVariableList = new ArrayList<>();
-        oldNodeList.forEach(oldNode -> {
-            // 复制节点
-            WorkflowNode newNode = this.copyWorkflowNode(oldNode, newWorkflowId);
-            // 复制节点输入数据
-            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.copyWorkflowNodeInput(newNode.getId(), oldNode.getId());
-            newNodeInputList.addAll(workflowNodeInputList);
-            // 复制节点输出数据
-            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.copyWorkflowNodeOutput(newNode.getId(), oldNode.getId());
-            newNodeOutputList.addAll(workflowNodeOutputList);
-            // 复制节点算法代码
-            WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.copyWorkflowNodeCode(newNode.getId(), oldNode.getId());
-            if (Objects.nonNull(workflowNodeCode)) {
-                newNodeCodeList.add(workflowNodeCode);
-            }
-            // 复制节点环境资源
-            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.copyWorkflowNodeResource(newNode.getId(), oldNode.getId());
-            if (Objects.nonNull(workflowNodeResource)) {
-                newNodeResourceList.add(workflowNodeResource);
-            }
-            // 复制节点变量
-            List<WorkflowNodeVariable> workflowNodeVariableList = workflowNodeVariableService.copyWorkflowNodeVariable(newNode.getId(), oldNode.getId());
-            if (Objects.nonNull(workflowNodeResource)) {
-                newNodeVariableList.addAll(workflowNodeVariableList);
-            }
-        });
-        // 保存节点相关数据
-        this.saveNodeData(newNodeInputList, newNodeOutputList, newNodeCodeList,
-                newNodeResourceList, newNodeVariableList);
     }
 
     /**
@@ -401,8 +164,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     public WorkflowNode getRunningNodeByWorkflowId(Long workflowId) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
-        //todo
-//        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
+        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
 //        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
@@ -410,19 +172,17 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Override
     public void updateRunStatusByWorkflowId(Long workflowId, Byte oldRunStatus, Byte newRunStatus) {
         LambdaUpdateWrapper<WorkflowNode> updateWrapper = Wrappers.lambdaUpdate();
-        //todo
-//        updateWrapper.set(WorkflowNode::getRunStatus, newRunStatus);
-//        updateWrapper.eq(WorkflowNode::getRunStatus, oldRunStatus);
-//        updateWrapper.eq(WorkflowNode::getWorkflowId, workflowId);
+        updateWrapper.set(WorkflowNode::getRunStatus, newRunStatus);
+        updateWrapper.eq(WorkflowNode::getRunStatus, oldRunStatus);
+        updateWrapper.eq(WorkflowNode::getWorkflowId, workflowId);
 //        updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         this.update(updateWrapper);
     }
 
     @Override
     public List<WorkflowNode> getRunningNode(int beforeHour) {
-        //todo
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-//        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
+        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
 //        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
 //        wrapper.ge(WorkflowNode::getUpdateTime, DateUtil.offsetHour(new Date(), beforeHour));
         return this.list(wrapper);
@@ -430,11 +190,10 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
 
     @Override
     public void updateRunStatus(Object[] ids, Byte runStatus) {
-        //todo
         LambdaUpdateWrapper<WorkflowNode> updateWrapper = Wrappers.lambdaUpdate();
-//        updateWrapper.set(WorkflowNode::getRunStatus, runStatus);
+        updateWrapper.set(WorkflowNode::getRunStatus, runStatus);
 //        updateWrapper.set(WorkflowNode::getUpdateTime, now());
-//        updateWrapper.in(WorkflowNode::getId, ids);
+        updateWrapper.in(WorkflowNode::getId, ids);
         this.update(updateWrapper);
     }
 
@@ -449,27 +208,5 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         }
     }
 
-    /**
-     * 同步组织信息
-     *
-     * @return 组织信息列表
-     */
-    private List<Organization> syncOrganization() {
-        List<Organization> organizationList = new ArrayList<>();
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
-        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
-
-            Organization org;
-            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
-                org = new Organization();
-                org.setNodeName(nodeIdentityDto.getNodeName());
-                org.setNodeId(nodeIdentityDto.getNodeId());
-                org.setIdentityId(nodeIdentityDto.getIdentityId());
-                organizationList.add(org);
-            }
-            organizationService.batchInsert(organizationList);
-        }
-        return organizationList;
-    }
 
 }

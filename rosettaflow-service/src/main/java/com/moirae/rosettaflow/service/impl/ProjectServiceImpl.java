@@ -319,11 +319,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         return userService.queryUserByProjectId(projectId);
     }
 
-    @Override
-    public List<ProjectModelDto> queryCurrentProjAlgModel(Long projectId, Long algorithmId, String language) {
-        return this.baseMapper.queryCurrentProjAlgModel(projectId, algorithmId, language);
-    }
-
     /**
      * 转换id类型
      */

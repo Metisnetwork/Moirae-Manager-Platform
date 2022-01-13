@@ -16,12 +16,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel(value = "查询当前项目的算法模型请求参数")
+@ApiModel(value = "查询当前用户的算法模型")
 public class ProjAlgModel {
-
-    @ApiModelProperty(value = "项目ID", required = true)
-    @NotNull(message = "project.id.notNull")
-    private Long projectId;
 
     @ApiModelProperty(value = "算法ID", required = true)
     @NotNull(message = "algorithm.id.notNull")

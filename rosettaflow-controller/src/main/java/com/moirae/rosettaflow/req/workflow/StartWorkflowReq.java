@@ -24,16 +24,6 @@ public class StartWorkflowReq {
     @Positive(message = "{workflow.id.positive}")
     private Long workflowId;
 
-    @ApiModelProperty(value = "起始节点", required = true)
-    @NotNull(message = "{workflow.startNode.notNull}")
-    @Positive(message = "{workflow.startNode.positive}")
-    private Integer startNode;
-
-    @ApiModelProperty(value = "截止节点", required = true)
-    @NotNull(message = "{workflow.endNode.notNull}")
-    @Positive(message = "{workflow.endNode.positive}")
-    private Integer endNode;
-
     @ApiModelProperty(value = "用户钱包地址", required = true)
     @NotBlank(message = "{user.address.notBlank}")
     private String address;

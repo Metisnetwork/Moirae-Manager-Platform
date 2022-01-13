@@ -43,8 +43,6 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
             WorkflowNodeOutput newNodeOutput = new WorkflowNodeOutput();
             newNodeOutput.setWorkflowNodeId(newNodeId);
             newNodeOutput.setIdentityId(oldNodeOutput.getIdentityId());
-            //todo
-//            newNodeOutput.setSenderFlag(oldNodeOutput.getSenderFlag());
             newNodeOutputList.add(newNodeOutput);
         });
         return newNodeOutputList;

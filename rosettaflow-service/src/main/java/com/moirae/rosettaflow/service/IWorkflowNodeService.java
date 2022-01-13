@@ -15,14 +15,6 @@ import java.util.List;
 public interface IWorkflowNodeService extends IService<WorkflowNode> {
 
     /**
-     * 保存工作流所有节点数据
-     *
-     * @param workflowId          工作流id
-     * @param workflowNodeDtoList 工作流节点列表
-     */
-    void saveWorkflowAllNodeData(Long workflowId, List<WorkflowNodeDto> workflowNodeDtoList);
-
-    /**
      * 清空工作流节点
      *
      * @param workflowId 工作流id
@@ -53,14 +45,6 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param oldNodeList   旧工作流列表
      */
     void saveCopyWorkflowNodeTemp(Long newWorkflowId, List<WorkflowNode> oldNodeList);
-
-    /**
-     * 复制保存工作流节点
-     *
-     * @param newWorkflowId 新工作流id
-     * @param oldNodeList   旧工作流列表
-     */
-    void saveCopyWorkflowNode(Long newWorkflowId, List<WorkflowNode> oldNodeList);
 
     /**
      * 获取正在运行的节点

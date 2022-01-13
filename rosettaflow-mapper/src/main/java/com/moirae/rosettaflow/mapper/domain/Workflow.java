@@ -88,7 +88,6 @@ public class Workflow implements Serializable {
 
     @TableField(exist = false)
     private List<WorkflowNode> workflowNodeVoList = new ArrayList<>();
-
     /**
      * 工作流ID
      */
@@ -99,4 +98,9 @@ public class Workflow implements Serializable {
      */
     @TableField(exist = false)
     List<WorkflowNode> workflowNodeReqList;
+    /**
+     * 是否需要保存（0：不需要，1：需要）
+     */
+    @TableField(exist = false)
+    private String saveFlag;
 }
