@@ -197,6 +197,14 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         this.update(updateWrapper);
     }
 
+    @Override
+    public List<WorkflowNode> queryByWorkflowIdAndVersion(Long workflowId, Integer version) {
+        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowNode::getWorkflowEditVersion, version);
+        return this.list(wrapper);
+    }
+
     /**
      * 校验是否有编辑权限
      */

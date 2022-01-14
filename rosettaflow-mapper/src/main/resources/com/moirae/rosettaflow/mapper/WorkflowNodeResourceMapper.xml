@@ -9,14 +9,9 @@
         <result column="cost_gpu" jdbcType="INTEGER" property="costGpu"/>
         <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth"/>
         <result column="run_time" jdbcType="BIGINT" property="runTime"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, workflow_node_id, cost_mem, cost_cpu, cost_gpu, cost_bandwidth, run_time,
-    `status`, create_time, update_time
-  </sql>
     <insert id="batchInsert">
         <foreach collection="workflowNodeResourceList" item="r" separator=";">
             insert into t_workflow_node_resource
@@ -38,9 +33,6 @@
                 </if>
                 <if test="r.runTime != null">
                     run_time,
-                </if>
-                <if test="r.status != null">
-                    `status`,
                 </if>
                 <if test="r.createTime != null">
                     create_time,
@@ -67,9 +59,6 @@
                 </if>
                 <if test="r.runTime != null">
                     #{r.runTime,jdbcType=BIGINT},
-                </if>
-                <if test="r.status != null">
-                    #{r.status,jdbcType=TINYINT},
                 </if>
                 <if test="r.createTime != null">
                     #{r.createTime,jdbcType=TIMESTAMP},

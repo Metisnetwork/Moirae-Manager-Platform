@@ -1,10 +1,8 @@
 package com.moirae.rosettaflow.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.mapper.WorkflowNodeCodeMapper;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeCode;
 import com.moirae.rosettaflow.service.IWorkflowNodeCodeService;
@@ -25,7 +23,7 @@ import java.util.Objects;
 public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMapper, WorkflowNodeCode> implements IWorkflowNodeCodeService {
 
     @Override
-    public WorkflowNodeCode getByWorkflowNodeId(Long workflowNodeId) {
+    public WorkflowNodeCode queryByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeCode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
         return this.getOne(wrapper);
@@ -33,7 +31,7 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
 
     @Override
     public WorkflowNodeCode copyWorkflowNodeCode(Long newNodeId, Long oldNodeId) {
-        WorkflowNodeCode oldNodeCode = this.getByWorkflowNodeId(oldNodeId);
+        WorkflowNodeCode oldNodeCode = this.queryByWorkflowNodeId(oldNodeId);
         if (Objects.isNull(oldNodeCode)) {
             return null;
         }

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,10 +35,6 @@ public class WorkflowNodeOutput implements Serializable {
      * 存储形式: 1-明文，2:密文
      */
     private Byte storePattern;
-    /**
-     * 存储路径
-     */
-    private String storePath;
     /**
      * 输出内容
      */

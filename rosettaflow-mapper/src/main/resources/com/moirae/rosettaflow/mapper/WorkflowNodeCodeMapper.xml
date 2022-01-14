@@ -7,14 +7,10 @@
         <result column="edit_type" jdbcType="TINYINT" property="editType"/>
         <result column="calculate_contract_code" jdbcType="VARCHAR" property="calculateContractCode"/>
         <result column="data_split_contract_code" jdbcType="VARCHAR" property="dataSplitContractCode"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, workflow_node_id, edit_type, calculate_contract_code, data_split_contract_code, 
-    `status`, create_time, update_time
-  </sql>
+
     <insert id="batchInsert">
         <foreach collection="workflowNodeCodeList" item="c" separator=";">
             insert into t_workflow_node_code
@@ -30,9 +26,6 @@
                 </if>
                 <if test="c.dataSplitContractCode != null">
                     data_split_contract_code,
-                </if>
-                <if test="c.status != null">
-                    `status`,
                 </if>
                 <if test="c.createTime != null">
                     create_time,
@@ -53,9 +46,6 @@
                 </if>
                 <if test="c.dataSplitContractCode != null">
                     #{c.dataSplitContractCode,jdbcType=VARCHAR},
-                </if>
-                <if test="c.status != null">
-                    #{c.status,jdbcType=TINYINT},
                 </if>
                 <if test="c.createTime != null">
                     #{c.createTime,jdbcType=TIMESTAMP},

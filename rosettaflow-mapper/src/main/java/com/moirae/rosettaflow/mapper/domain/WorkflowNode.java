@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -111,12 +112,12 @@ public class WorkflowNode implements Serializable {
      * 输入请求列表
      */
     @TableField(exist = false)
-    private List<WorkflowNodeInput> workflowNodeInputReqList;
+    private List<WorkflowNodeInput> workflowNodeInputReqList = new ArrayList<>();
     /**
      * 输出请求列表
      */
     @TableField(exist = false)
-    private List<WorkflowNodeOutput> workflowNodeOutputReqList;
+    private List<WorkflowNodeOutput> workflowNodeOutputReqList = new ArrayList<>();
     /**
      * 工作流节点代码请求对象
      */
@@ -131,5 +132,5 @@ public class WorkflowNode implements Serializable {
      * 工作流节点输入变量请求对象
      */
     @TableField(exist = false)
-    private List<WorkflowNodeVariable> workflowNodeVariableReqList;
+    private List<WorkflowNodeVariable> workflowNodeVariableReqList  = new ArrayList<>();
 }

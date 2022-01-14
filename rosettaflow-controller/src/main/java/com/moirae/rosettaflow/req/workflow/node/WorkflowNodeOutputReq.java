@@ -22,7 +22,4 @@ public class WorkflowNodeOutputReq {
 
     @ApiModelProperty(value = "存储形式: 1-明文，2:密文")
     private Integer storePattern;
-
-    @ApiModelProperty(value = "存储路径")
-    private String storePath;
 }

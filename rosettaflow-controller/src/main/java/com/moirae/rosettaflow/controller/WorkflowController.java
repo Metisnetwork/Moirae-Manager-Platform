@@ -3,9 +3,7 @@ package com.moirae.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.dto.WorkflowDto;
-import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.req.workflow.*;
@@ -90,7 +88,7 @@ public class WorkflowController {
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
         Workflow workflow = BeanUtil.toBean(startWorkflowReq, Workflow.class);
-        workflowService.selectSaveAndStart(workflow);
+        workflowService.saveWorkflowDetailAndStart(workflow);
         return ResponseVo.createSuccess();
     }
 

@@ -86,5 +86,6 @@ public class WorkflowRunTaskStatus implements Serializable {
 
     @TableField(exist = false)
     private Model model;
-
+    @TableField(exist = false)
+    private Integer nodeStep;
 }

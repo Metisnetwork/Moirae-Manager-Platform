@@ -15,6 +15,9 @@ import java.math.RoundingMode;
 @ApiModel(value = "查询算法详情响应参数")
 public class AlgDetailsVo {
 
+    @ApiModelProperty(value = "算法ID")
+    private Long algorithmId;
+
     @ApiModelProperty(value = "算法名称")
     private String algorithmName;
 

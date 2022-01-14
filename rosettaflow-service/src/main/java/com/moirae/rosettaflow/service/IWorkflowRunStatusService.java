@@ -17,15 +17,9 @@ import java.util.List;
  */
 public interface IWorkflowRunStatusService extends IService<WorkflowRunStatus> {
 
-    /**
-     * 启动工作流
-     *
-     * @param workflow
-     * @return
-     */
-    WorkflowRunStatus submitTaskAndExecute(Workflow workflow);
-
     TaskDto assemblyTaskDto(WorkflowDto workflowDto);
 
     List<WorkflowRunTaskStatus> queryWorkflowRunTaskStatusByTaskId(String taskId);
+
+    WorkflowRunStatus submitTaskAndExecute(Long workflowId, Integer version, String address, String sign);
 }

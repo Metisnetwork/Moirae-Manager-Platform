@@ -45,11 +45,6 @@ public class WorkflowNodeVariable implements Serializable {
      */
     private String varNodeDesc;
     /**
-     * 状态: 0-无效，1- 有效
-     */
-    @TableField(value = "`status`")
-    private Byte status;
-    /**
      * 创建时间
      */
     private Date createTime;

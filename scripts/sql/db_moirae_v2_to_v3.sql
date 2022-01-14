@@ -107,6 +107,7 @@ ALTER TABLE `t_workflow_node_input`
 
 ALTER TABLE `t_workflow_node_output`
     DROP COLUMN `sender_flag`,
+    DROP COLUMN `store_path`,
     DROP COLUMN `status`;
 
 ALTER TABLE `t_workflow_node_resource`
@@ -121,7 +122,8 @@ CREATE TABLE `t_workflow_run_status` (
      `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
      `workflow_id` BIGINT(20) DEFAULT NULL COMMENT '工作流id',
      `workflow_edit_version` INT(11) NOT NULL DEFAULT '1' COMMENT '工作流版本号',
-     `sign` VARCHAR(512) DEFAULT NULL COMMENT '发起任务的账户的签名',
+     `sign` VARCHAR(512) NOT NULL COMMENT '发起任务的账户的签名',
+     `address` varchar(64) NOT NULL COMMENT '发起任务的账户的地址',
      `step` INT(11) DEFAULT NULL COMMENT '总步骤',
      `cur_step` INT(11) DEFAULT NULL COMMENT '当前步骤',
      `begin_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
@@ -160,4 +162,14 @@ DROP TABLE `t_task_event`;
 
 -- 模板
 RENAME TABLE `t_workflow_node_temp` TO `t_workflow_temp_node`;
+
+
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_node`
+    DROP INDEX `UK_NODE_STEP`,
+    ADD  UNIQUE INDEX `UK_NODE_STEP` (`workflow_id`, `workflow_edit_version`, `node_step`);
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_node_variable`
+ADD KEY `workflow_node_id` (`workflow_node_id`)
+
 

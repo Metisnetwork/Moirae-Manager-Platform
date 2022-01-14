@@ -9,17 +9,10 @@
         <result column="key_column" jdbcType="BIGINT" property="keyColumn" />
         <result column="dependent_variable" jdbcType="BIGINT" property="dependentVariable" />
         <result column="data_column_ids" jdbcType="VARCHAR" property="dataColumnIds"/>
-        <result column="data_file_id" jdbcType="VARCHAR" property="dataFileId"/>
-        <result column="sender_flag" jdbcType="TINYINT" property="senderFlag"/>
         <result column="party_id" jdbcType="VARCHAR" property="partyId"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, workflow_node_id, identity_id, data_table_id,
-    data_column_id, data_file_id,sender_flag, party_id, `status`, create_time, update_time
-    </sql>
     <!-- 根据工作流节点id获取相关元数据信息-->
     <select id="getMetaDataByWorkflowNodeId" resultType="com.moirae.rosettaflow.dto.NodeMetaDataDto">
         select
@@ -69,17 +62,8 @@
                 <if test="i.dataColumnIds != null">
                     data_column_ids,
                 </if>
-                <if test="i.dataFileId != null">
-                    data_file_id,
-                </if>
-                <if test="i.senderFlag != null">
-                    sender_flag,
-                </if>
                 <if test="i.partyId != null">
                     party_id,
-                </if>
-                <if test="i.status != null">
-                    `status`,
                 </if>
                 <if test="i.createTime != null">
                     create_time,
@@ -107,17 +91,8 @@
                 <if test="i.dataColumnIds != null">
                     #{i.dataColumnIds,jdbcType=VARCHAR},
                 </if>
-                <if test="i.dataFileId != null">
-                    #{i.dataFileId,jdbcType=VARCHAR},
-                </if>
-                <if test="i.senderFlag != null">
-                    #{i.senderFlag,jdbcType=TINYINT},
-                </if>
                 <if test="i.partyId != null">
                     #{i.partyId,jdbcType=VARCHAR},
-                </if>
-                <if test="i.status != null">
-                    #{i.status,jdbcType=TINYINT},
                 </if>
                 <if test="i.createTime != null">
                     #{i.createTime,jdbcType=TIMESTAMP},

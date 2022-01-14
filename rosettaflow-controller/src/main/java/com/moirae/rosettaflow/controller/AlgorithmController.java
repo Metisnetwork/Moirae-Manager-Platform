@@ -83,6 +83,7 @@ public class AlgorithmController {
             childList.forEach(param -> {
                 AlgChildTreeVo algChildTreeVo = BeanUtil.toBean(param, AlgChildTreeVo.class);
                 AlgDetailsVo algDetailsVo = BeanUtil.toBean(param.get("algorithmDto"), AlgDetailsVo.class);
+                algDetailsVo.setAlgorithmId(algChildTreeVo.getAlgorithmId());
                 algChildTreeVo.setAlgDetailsVo(algDetailsVo);
                 algDetailsVoList.add(algChildTreeVo);
             });

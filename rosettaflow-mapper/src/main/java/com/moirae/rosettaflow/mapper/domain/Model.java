@@ -87,11 +87,6 @@ public class Model implements Serializable {
     @TableField(exist = false)
     private String fileName;
     /**
-     * 模型的元数据id
-     */
-    @TableField(exist = false)
-    private String metadataId;
-    /**
      * 模型由哪个算法生成
      */
     @TableField(exist = false)

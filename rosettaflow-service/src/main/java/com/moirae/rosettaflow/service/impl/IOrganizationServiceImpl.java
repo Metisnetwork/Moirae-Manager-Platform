@@ -89,7 +89,7 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
     public List<Organization> getByIdentityIds(Object[] identityArr) {
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getIdentityId, identityArr);
-        wrapper.in(Organization::getStatus, StatusEnum.VALID.getValue());
+        wrapper.eq(Organization::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
 
@@ -183,37 +183,10 @@ public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Or
 
     @Override
     public void isValid(Set<String> orgId) {
-        List<Organization> newOrganizationList = syncOrganization();
-        Set<String> identityIdSet = new HashSet<>();
-        newOrganizationList.forEach(o -> identityIdSet.add(o.getIdentityId()));
-        for (String identity : orgId) {
-            if (!identityIdSet.contains(identity)) {
-                log.error("AssemblyNodeInput->前端输入的机构信息identity:{}未找到", identity);
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
-            }
+        List<Organization> organizationList = getByIdentityIds(orgId.toArray());
+        if(orgId.size() != organizationList.size()){
+            log.error("AssemblyNodeInput->前端输入的机构信息identity:{}未找到", orgId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
         }
-    }
-
-    /**
-     * 同步组织信息
-     *
-     * @return 组织信息列表
-     */
-    private List<Organization> syncOrganization() {
-        List<Organization> organizationList = new ArrayList<>();
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
-        if (null != nodeIdentityDtoList && nodeIdentityDtoList.size() > 0) {
-
-            Organization org;
-            for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
-                org = new Organization();
-                org.setNodeName(nodeIdentityDto.getNodeName());
-                org.setNodeId(nodeIdentityDto.getNodeId());
-                org.setIdentityId(nodeIdentityDto.getIdentityId());
-                organizationList.add(org);
-            }
-            batchInsert(organizationList);
-        }
-        return organizationList;
     }
 }

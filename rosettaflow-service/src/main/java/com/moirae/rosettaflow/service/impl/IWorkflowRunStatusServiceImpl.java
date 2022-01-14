@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -28,16 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusMapper, WorkflowRunStatus> implements IWorkflowRunStatusService {
 
+    @Resource
+    private SysConfig sysConfig;
     @Resource
     private IWorkflowService workflowService;
     @Resource
@@ -46,9 +44,6 @@ public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatus
     private GrpcTaskService grpcTaskService;
     @Resource
     private NetManager netManager;
-
-    @Resource
-    private SysConfig sysConfig;
 
     @Resource
     private CommonService commonService;
@@ -110,15 +105,6 @@ public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatus
     private WorkflowNodeCodeMapper workflowNodeCodeMapper;
 
     @Override
-    public WorkflowRunStatus submitTaskAndExecute(Workflow workflow) {
-        // 创建工作流运行状态
-        WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(workflow);
-        createAndSaveWorkflowRunTaskStatus(workflow, workflowRunStatus);
-        executeTask(workflowRunStatus);
-        return workflowRunStatus;
-    }
-
-    @Override
     public TaskDto assemblyTaskDto(WorkflowDto workflowDto) {
         return null;
     }
@@ -126,6 +112,37 @@ public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatus
     @Override
     public List<WorkflowRunTaskStatus> queryWorkflowRunTaskStatusByTaskId(String taskId) {
         return null;
+    }
+
+    @Override
+    public WorkflowRunStatus submitTaskAndExecute(Long workflowId, Integer version, String address, String sign) {
+        // 加载工作流设置信息
+        Workflow workflow = workflowService.queryWorkflowDetail(workflowId, version);
+        // 配置启动校验(检验保存时未校验的)
+        checkBeforeStart(workflow);
+        // 生成执行记录
+        WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(workflow, address, sign);
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = createAndSaveWorkflowRunTaskStatus(workflow, workflowRunStatus);
+        // 设置关联字段
+        workflow.setWorkflowNodeMap(workflow.getWorkflowNodeReqList().stream().collect(Collectors.toMap(WorkflowNode::getNodeStep, item -> item)));
+        workflowRunStatus.setWorkflowRunTaskStatusMap(workflowRunTaskStatusList.stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getNodeStep, item -> item)));
+        workflowRunStatus.setWorkflow(workflow);
+        // 发起任务
+        executeTask(workflowRunStatus);
+        return workflowRunStatus;
+    }
+
+    private void checkBeforeStart(Workflow workflow) {
+        workflow.getWorkflowNodeReqList().forEach(item ->{
+            // 输入节点校验
+            if (null == item.getWorkflowNodeInputReqList() || item.getWorkflowNodeInputReqList().size() == 0) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
+            }
+            // 输出节点校验
+            if (null == item.getWorkflowNodeOutputReqList() || item.getWorkflowNodeOutputReqList().size() == 0) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
+            }
+        });
     }
 
     public WorkflowRunStatus executeTask(Long workflowRunStatusId) {
@@ -194,7 +211,7 @@ public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatus
         }
 
         //获取工作流节点输入信息
-        List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.getByWorkflowNodeId(workflowNode.getId());
+        List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.queryByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeInputList || workflowNodeInputList.size() == 0) {
             log.error("Start workflow->assemblyTaskDto getByWorkflowNodeId fail by id:{}", workflowNode.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_INPUT_NOT_EXIST.getMsg());
@@ -253,7 +270,7 @@ public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatus
 
 
     private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
-        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
+        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.queryByWorkflowNodeId(workflowNode.getId());
         if (null == workflowNodeResource) {
             Algorithm algorithm = algorithmService.getById(workflowNode.getAlgorithmId());
             if (null == algorithm) {
@@ -280,19 +297,23 @@ public class IWorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatus
                 workflowRunTaskStatus.setWorkflowRunId(workflowRunStatus.getId());
                 workflowRunTaskStatus.setWorkflowNodeId(item.getId());
                 workflowRunTaskStatus.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
+                workflowRunTaskStatus.setWorkflowNode(item);
+                workflowRunTaskStatus.setNodeStep(item.getNodeStep());
                 workflowRunTaskStatusService.save(workflowRunTaskStatus);
                 return workflowRunTaskStatus;
             })
             .collect(Collectors.toList());
     }
 
-    private WorkflowRunStatus createAndSaveWorkflowRunStatus(Workflow workflow){
+    private WorkflowRunStatus createAndSaveWorkflowRunStatus(Workflow workflow, String address, String sign){
         WorkflowRunStatus workflowRunStatus = new WorkflowRunStatus();
         workflowRunStatus.setWorkflowId(workflow.getId());
         workflowRunStatus.setWorkflowEditVersion(workflow.getEditVersion());
+        workflowRunStatus.setSign(sign);
         workflowRunStatus.setCurStep(1);
-        workflowRunStatus.setSign(workflow.getSign());
+        workflowRunStatus.setBeginTime(new Date());  //TODO 使用数据将时间
         workflowRunStatus.setStep(workflow.getWorkflowNodeReqList().size());
+        workflowRunStatus.setAddress(address);
         workflowRunStatus.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());
         save(workflowRunStatus);
         return workflowRunStatus;

@@ -18,7 +18,7 @@ public interface IWorkflowNodeVariableService extends IService<WorkflowNodeVaria
      * @param workflowNodeId 工作流节点id
      * @return 工作流节点节点自变量及因变量列表
      */
-    List<WorkflowNodeVariable> getByWorkflowNodeId(Long workflowNodeId);
+    List<WorkflowNodeVariable> queryByWorkflowNodeId(Long workflowNodeId);
 
     /**
      * 物物理批量删除工作流节点输入变量，根据节点id

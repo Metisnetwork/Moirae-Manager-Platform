@@ -17,7 +17,7 @@ public interface IWorkflowNodeResourceService extends IService<WorkflowNodeResou
      * @param workflowNodeId 工作流节点id
      * @return 工作流节点资源
      */
-    WorkflowNodeResource getByWorkflowNodeId(Long workflowNodeId);
+    WorkflowNodeResource queryByWorkflowNodeId(Long workflowNodeId);
 
     /**
      * 物物理批量删除工作流节点环境资源，根据节点id

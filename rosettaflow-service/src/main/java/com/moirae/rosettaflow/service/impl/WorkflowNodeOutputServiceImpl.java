@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.mapper.WorkflowNodeOutputMapper;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeOutput;
+import com.moirae.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.moirae.rosettaflow.service.IWorkflowNodeOutputService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,5 +63,12 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
     @Override
     public void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList) {
         this.baseMapper.batchInsert(workflowNodeOutputList);
+    }
+
+    @Override
+    public List<WorkflowNodeOutput> queryByWorkflowNodeId(Long id) {
+        LambdaQueryWrapper<WorkflowNodeOutput> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowNodeOutput::getWorkflowNodeId, id);
+        return this.list(wrapper);
     }
 }

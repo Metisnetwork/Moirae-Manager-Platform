@@ -23,7 +23,7 @@ public class ProjectModelVo {
     private String fileName;
 
     @ApiModelProperty(value = "模型的元数据id")
-    private String metadataId;
+    private String metaDataId;
 
     @ApiModelProperty(value = "文件路径")
     private String filePath;

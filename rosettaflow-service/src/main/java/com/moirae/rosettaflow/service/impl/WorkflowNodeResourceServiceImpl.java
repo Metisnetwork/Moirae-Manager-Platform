@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.mapper.WorkflowNodeResourceMapper;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNodeCode;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.moirae.rosettaflow.service.IWorkflowNodeResourceService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +22,9 @@ import java.util.Objects;
 @Service
 public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeResourceMapper, WorkflowNodeResource> implements IWorkflowNodeResourceService {
     @Override
-    public WorkflowNodeResource getByWorkflowNodeId(Long workflowNodeId) {
+    public WorkflowNodeResource queryByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeResource> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeResource::getWorkflowNodeId, workflowNodeId);
-//        wrapper.eq(WorkflowNodeResource::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
 
@@ -48,7 +45,7 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
 
     @Override
     public WorkflowNodeResource copyWorkflowNodeResource(Long newNodeId, Long oldNodeId) {
-        WorkflowNodeResource oldNodeResource = this.getByWorkflowNodeId(oldNodeId);
+        WorkflowNodeResource oldNodeResource = this.queryByWorkflowNodeId(oldNodeId);
         if (Objects.isNull(oldNodeResource)) {
             return null;
         }

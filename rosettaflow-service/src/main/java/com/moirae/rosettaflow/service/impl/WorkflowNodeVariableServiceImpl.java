@@ -24,10 +24,9 @@ import java.util.List;
 @Service
 public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVariableMapper, WorkflowNodeVariable> implements IWorkflowNodeVariableService {
     @Override
-    public List<WorkflowNodeVariable> getByWorkflowNodeId(Long workflowNodeId) {
+    public List<WorkflowNodeVariable> queryByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeVariable> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
-        wrapper.eq(WorkflowNodeVariable::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
     }
 
@@ -41,13 +40,12 @@ public class WorkflowNodeVariableServiceImpl extends ServiceImpl<WorkflowNodeVar
     public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
         LambdaUpdateWrapper<WorkflowNodeVariable> delWrapper = Wrappers.lambdaUpdate();
         delWrapper.eq(WorkflowNodeVariable::getWorkflowNodeId, workflowNodeId);
-        delWrapper.set(WorkflowNodeVariable::getStatus, StatusEnum.UN_VALID.getValue());
         this.update(delWrapper);
     }
 
     @Override
     public List<WorkflowNodeVariable> copyWorkflowNodeVariable(Long newNodeId, Long oldNodeId) {
-        List<WorkflowNodeVariable> oldNodeVariableList = this.getByWorkflowNodeId(oldNodeId);
+        List<WorkflowNodeVariable> oldNodeVariableList = this.queryByWorkflowNodeId(oldNodeId);
         if (null == oldNodeVariableList || oldNodeVariableList.size() == 0) {
             return new ArrayList<>();
         }

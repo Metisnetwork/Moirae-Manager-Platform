@@ -6,9 +6,7 @@
         <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
         <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
         <result column="store_pattern" jdbcType="TINYINT" property="storePattern"/>
-        <result column="store_path" jdbcType="VARCHAR" property="storePath"/>
         <result column="output_content" jdbcType="VARCHAR" property="outputContent"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
@@ -22,7 +20,6 @@
                a.workflow_node_id as workflowNodeId,
                a.identity_id      as identityId,
                a.store_pattern    as storePattern,
-               a.store_path       as storePath,
                a.output_content   as outputContent,
                b.node_name        as identityName
         from t_workflow_node_output a left join t_organization b on a.identity_id = b.identity_id
@@ -76,20 +73,11 @@
                 <if test="o.partyId != null">
                     party_id,
                 </if>
-                <if test="o.senderFlag != null">
-                    sender_flag,
-                </if>
                 <if test="o.storePattern != null">
                     store_pattern,
                 </if>
-                <if test="o.storePath != null">
-                    store_path,
-                </if>
                 <if test="o.outputContent != null">
                     output_content,
-                </if>
-                <if test="o.status != null">
-                    `status`,
                 </if>
                 <if test="o.createTime != null">
                     create_time,
@@ -108,20 +96,11 @@
                 <if test="o.partyId != null">
                     #{o.partyId,jdbcType=VARCHAR},
                 </if>
-                <if test="o.senderFlag != null">
-                    #{o.senderFlag,jdbcType=TINYINT},
-                </if>
                 <if test="o.storePattern != null">
                     #{o.storePattern,jdbcType=TINYINT},
                 </if>
-                <if test="o.storePath != null">
-                    #{o.storePath,jdbcType=VARCHAR},
-                </if>
                 <if test="o.outputContent != null">
                     #{o.outputContent,jdbcType=VARCHAR},
-                </if>
-                <if test="o.status != null">
-                    #{o.status,jdbcType=TINYINT},
                 </if>
                 <if test="o.createTime != null">
                     #{o.createTime,jdbcType=TIMESTAMP},

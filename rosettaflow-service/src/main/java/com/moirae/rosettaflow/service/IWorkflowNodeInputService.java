@@ -19,7 +19,7 @@ public interface IWorkflowNodeInputService extends IService<WorkflowNodeInput> {
      * @param workflowNodeId 工作流节点id
      * @return 工作流节点输入列表
      */
-    List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId);
+    List<WorkflowNodeInput> queryByWorkflowNodeId(Long workflowNodeId);
 
     /**
      * 物理批量删除工作流节点输入数据，根据节点id

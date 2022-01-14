@@ -6,10 +6,12 @@
             m.id as modelId,
             m.org_identity_id as originId,
             m.name as fileName,
-            m.meta_data_id as metadataId,
+            m.meta_data_id as metaDataId,
+            m.meta_data_id as meta,
             m.file_path as filePath,
             if('en' = #{language, jdbcType=VARCHAR}, a.algorithm_name_en, a.algorithm_name) as algorithmName
         FROM t_model m INNER JOIN t_algorithm a ON m.train_algorithm_id = a.id
         where m.train_user_address = #{address, jdbcType=VARCHAR} and m.train_algorithm_id = #{algorithmId, jdbcType=BIGINT}
+            and m.org_identity_id = #{identityId, jdbcType=VARCHAR}
     </select>
 </mapper>

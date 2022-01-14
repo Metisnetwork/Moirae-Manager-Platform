@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * t_workflow
@@ -103,4 +104,7 @@ public class Workflow implements Serializable {
      */
     @TableField(exist = false)
     private String saveFlag;
+
+    @TableField(exist = false)
+    Map<Integer, WorkflowNode> workflowNodeMap;
 }

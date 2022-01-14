@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.mapper.WorkflowNodeInputMapper;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeInput;
@@ -25,7 +24,7 @@ import java.util.List;
 public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputMapper, WorkflowNodeInput> implements IWorkflowNodeInputService {
 
     @Override
-    public List<WorkflowNodeInput> getByWorkflowNodeId(Long workflowNodeId) {
+    public List<WorkflowNodeInput> queryByWorkflowNodeId(Long workflowNodeId) {
         LambdaQueryWrapper<WorkflowNodeInput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
         wrapper.orderByAsc(WorkflowNodeInput::getPartyId);
@@ -48,7 +47,7 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
 
     @Override
     public List<WorkflowNodeInput> copyWorkflowNodeInput(Long newNodeId, Long oldNodeId) {
-        List<WorkflowNodeInput> oldNodeInputList = this.getByWorkflowNodeId(oldNodeId);
+        List<WorkflowNodeInput> oldNodeInputList = this.queryByWorkflowNodeId(oldNodeId);
         if (null == oldNodeInputList || oldNodeInputList.size() == 0) {
             return new ArrayList<>();
         }

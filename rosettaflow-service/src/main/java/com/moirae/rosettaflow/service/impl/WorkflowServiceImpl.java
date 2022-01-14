@@ -2,26 +2,20 @@ package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.constants.AlgorithmConstant;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.common.utils.JsonUtils;
-import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
-import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
-import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
@@ -80,6 +74,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private IWorkflowNodeResourceService workflowNodeResourceService;
+    @Resource
+    private IWorkflowNodeVariableService workflowNodeVariableService;
 
     @Resource
     private GrpcTaskService grpcTaskService;
@@ -97,6 +93,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IUserMetaDataService userMetaDataService;
     @Resource
     private IWorkflowRunStatusService workflowRunStatusService;
+    @Resource
+    private IModelService modelService;
 
     @Resource
     private NetManager netManager;
@@ -364,8 +362,113 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
+    public Workflow queryWorkflowDetail(Long workflowId, Integer version) {
+        Workflow workflow = queryWorkflow(workflowId);
+        List<WorkflowNode> workflowNodeList = workflowNodeService.queryByWorkflowIdAndVersion(workflowId, version);
+        for (WorkflowNode workflowNode : workflowNodeList) {
+            WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.queryByWorkflowNodeId(workflowNode.getId());
+            List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.queryByWorkflowNodeId(workflowNode.getId());
+            List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputService.queryByWorkflowNodeId(workflowNode.getId());
+            WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.queryByWorkflowNodeId(workflowNode.getId());
+            List<WorkflowNodeVariable> workflowNodeVariables = workflowNodeVariableService.queryByWorkflowNodeId(workflowNode.getId());
+            workflowNode.setWorkflowNodeCodeReq(workflowNodeCode);
+            workflowNode.setWorkflowNodeInputReqList(workflowNodeInputList);
+            workflowNode.setWorkflowNodeOutputReqList(workflowNodeOutputList);
+            workflowNode.setWorkflowNodeResourceReq(workflowNodeResource);
+            workflowNode.setWorkflowNodeVariableReqList(workflowNodeVariables);
+        }
+        return workflow;
+    }
+
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void saveWorkflowDetail(Workflow reqWorkflow) {
+        saveWorkflowDetailInnner(reqWorkflow);
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void saveWorkflowDetailAndStart(Workflow workflow) {
+        // 保存工作流
+        Integer version = saveWorkflowDetailInnner(workflow);
+        // 提交并执行工作流
+        workflowRunStatusService.submitTaskAndExecute(workflow.getWorkflowId(), version, workflow.getAddress(), workflow.getSign());
+    }
+
+    @Override
+    public void updateRunStatus(Long workflowId, Byte runStatus) {
+        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(Workflow::getRunStatus, runStatus);
+        updateWrapper.eq(Workflow::getId, workflowId);
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public void updateRunStatus(Object[] ids, Byte runStatus) {
+        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(Workflow::getRunStatus, runStatus);
+        updateWrapper.set(Workflow::getUpdateTime, now());
+        updateWrapper.in(Workflow::getId, ids);
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public Workflow getWorkflowStatusById(Long id) {
+        // 查询工作流配置信息
+        Workflow workflow = baseMapper.queryWorkFlowAndStatus(id);
+        // 查询工作流节点配置信息
+        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowNodeAndStatusList(workflow.getId(), workflow.getEditVersion());
+        workflow.setGetNodeStatusVoList(workflowNodeList);
+        return workflow;
+    }
+
+
+    private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
+        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.queryByWorkflowNodeId(workflowNode.getId());
+        if (null == workflowNodeResource) {
+            Algorithm algorithm = algorithmService.getById(workflowNode.getAlgorithmId());
+            if (null == algorithm) {
+                log.error("Can not find algorithm by id:{}", workflowNode.getAlgorithmId());
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NOT_EXIST.getMsg());
+            }
+            workflowNodeResource = new WorkflowNodeResource();
+            workflowNodeResource.setCostMem(algorithm.getCostMem());
+            workflowNodeResource.setCostCpu(algorithm.getCostCpu());
+            workflowNodeResource.setCostBandwidth(algorithm.getCostBandwidth());
+            workflowNodeResource.setRunTime(algorithm.getRunTime());
+        }
+        return workflowNodeResource;
+    }
+
+    /**
+     * 校验是否有编辑权限
+     */
+    private void checkEditPermission(Long projectId) {
+        Byte role = projectService.getRoleByProjectId(projectId);
+        if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
+            log.error("checkEditPermission error:{}", ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * 校验当前用户是否有访问当前项目权限
+     */
+    private void checkAccessPermission(Long projectId) {
+        Byte role = projectService.getRoleByProjectId(projectId);
+        if (null == role || !ArrayUtils.contains(SysConstant.ROLE_BYTE_ARR, role)) {
+            log.error("您无权访问当前项目--checkAccessPermission, projectId:{}, role:{}", projectId, role);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ACCESS_PERMISSION_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * 保存工作流设置
+     *
+     * @param reqWorkflow
+     * @return 工作流编辑版本
+     */
+    private Integer saveWorkflowDetailInnner(Workflow reqWorkflow) {
         // 节点参数校验
         if (null == reqWorkflow.getWorkflowNodeReqList() || reqWorkflow.getWorkflowNodeReqList().size() == 0) {
             log.error("saveWorkflowAllNodeData--工作流节点信息workflowNodeDtoList不能为空");
@@ -384,13 +487,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 .flatMap(workflowNode -> workflowNode.getWorkflowNodeInputReqList().stream())
                 .map(WorkflowNodeInput::getDataTableId)
                 .collect(Collectors.toSet());
-        if(userMetaDataService.isValid(tableIdList)){
+        if(!userMetaDataService.isValid(tableIdList)){
             log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(tableIdList));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
         }
         // 算法校验 - 模型输入校验（只有一个算法节点）
         if(reqWorkflow.getWorkflowNodeReqList().get(0).getInputModel() == SysConstant.INT_1
-                && (reqWorkflow.getWorkflowNodeReqList().get(0).getModelId() == null || reqWorkflow.getWorkflowNodeReqList().get(0).getModelId() == 0 )){
+                && (reqWorkflow.getWorkflowNodeReqList().get(0).getModelId() == null
+                || reqWorkflow.getWorkflowNodeReqList().get(0).getModelId() == 0
+                || Objects.isNull(modelService.queryById(reqWorkflow.getWorkflowNodeReqList().get(0).getModelId())))){
             log.error("当前节点需输入模型，请检查, workflowNodeDto:{}", JSON.toJSONString(reqWorkflow.getWorkflowNodeReqList().get(0)));
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
         }
@@ -417,8 +522,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<WorkflowNode> workflowNodeList = reqWorkflow.getWorkflowNodeReqList().stream()
                 .map(item -> {
                     item.setId(null);
-                    item.setWorkflowNodeId(workflow.getWorkflowId());
+                    item.setWorkflowId(workflow.getId());
                     item.setWorkflowEditVersion(workflow.getEditVersion());
+                    item.setSenderIdentityId(item.getWorkflowNodeSenderIdentityId());
                     workflowNodeService.save(item);
                     return item;
                 })
@@ -473,23 +579,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if(workflowNodeResourceList.size()>0){
             workflowNodeResourceMapper.batchInsert(workflowNodeResourceList);
         }
-    }
 
-    @Override
-    public void selectSaveAndStart(Workflow workflow) {
-        // 保存工作流
-        saveWorkflowDetail(workflow);
-        // 工作流是否可以启动
-        workflow.getWorkflowNodeReqList().forEach(item ->{
-            if (null == item.getWorkflowNodeInputReqList() || item.getWorkflowNodeInputReqList().size() == 0) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_INPUT_EXIST.getMsg());
-            }
-            if (null == item.getWorkflowNodeOutputReqList() || item.getWorkflowNodeOutputReqList().size() == 0) {
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
-            }
-        });
-
-        workflowRunStatusService.submitTaskAndExecute(workflow);
+        return workflow.getEditVersion();
     }
 
     private List<WorkflowNodeInput> getWorkflowNodeInputByNodeId(Long workflowNodeId) {
@@ -518,72 +609,5 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 所有节点正序排序
         wrapper.orderByAsc(WorkflowNode::getNodeStep);
         return workflowNodeMapper.selectList(wrapper);
-    }
-
-    @Override
-    public void updateRunStatus(Long workflowId, Byte runStatus) {
-        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getRunStatus, runStatus);
-        updateWrapper.eq(Workflow::getId, workflowId);
-        this.update(updateWrapper);
-    }
-
-    @Override
-    public void updateRunStatus(Object[] ids, Byte runStatus) {
-        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getRunStatus, runStatus);
-        updateWrapper.set(Workflow::getUpdateTime, now());
-        updateWrapper.in(Workflow::getId, ids);
-        this.update(updateWrapper);
-    }
-
-    @Override
-    public Workflow getWorkflowStatusById(Long id) {
-        // 查询工作流配置信息
-        Workflow workflow = baseMapper.queryWorkFlowAndStatus(id);
-        // 查询工作流节点配置信息
-        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowNodeAndStatusList(workflow.getId(), workflow.getEditVersion());
-        workflow.setGetNodeStatusVoList(workflowNodeList);
-        return workflow;
-    }
-
-
-    private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
-        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.getByWorkflowNodeId(workflowNode.getId());
-        if (null == workflowNodeResource) {
-            Algorithm algorithm = algorithmService.getById(workflowNode.getAlgorithmId());
-            if (null == algorithm) {
-                log.error("Can not find algorithm by id:{}", workflowNode.getAlgorithmId());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NOT_EXIST.getMsg());
-            }
-            workflowNodeResource = new WorkflowNodeResource();
-            workflowNodeResource.setCostMem(algorithm.getCostMem());
-            workflowNodeResource.setCostCpu(algorithm.getCostCpu());
-            workflowNodeResource.setCostBandwidth(algorithm.getCostBandwidth());
-            workflowNodeResource.setRunTime(algorithm.getRunTime());
-        }
-        return workflowNodeResource;
-    }
-
-    /**
-     * 校验是否有编辑权限
-     */
-    private void checkEditPermission(Long projectId) {
-        Byte role = projectService.getRoleByProjectId(projectId);
-        if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
-            log.error("checkEditPermission error:{}", ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
-        }
-    }
-
-    /**
-     * 校验当前用户是否有访问当前项目权限
-     */
-    private void checkAccessPermission(Long projectId) {
-        Byte role = projectService.getRoleByProjectId(projectId);
-        if (null == role || !ArrayUtils.contains(SysConstant.ROLE_BYTE_ARR, role)) {
-            log.error("您无权访问当前项目--checkAccessPermission, projectId:{}, role:{}", projectId, role);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ACCESS_PERMISSION_ERROR.getMsg());
-        }
     }
 }

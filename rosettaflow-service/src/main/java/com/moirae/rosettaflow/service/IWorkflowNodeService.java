@@ -25,7 +25,7 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * 根据工作流id及节点序号获取工作流节点
      *
      * @param workflowId 工作流id
-     * @param startNode  节点序号
+     * @param startNode  节点序号x
      * @return 工作流节点
      */
     WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer startNode);
@@ -79,4 +79,5 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      */
     void updateRunStatus(Object[] ids, Byte runStatus);
 
+    List<WorkflowNode> queryByWorkflowIdAndVersion(Long workflowId, Integer version);
 }

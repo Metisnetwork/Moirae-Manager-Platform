@@ -32,7 +32,7 @@ public class ModelController {
     public ResponseVo<List<ProjectModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel, HttpServletRequest request) {
         // 获取语言类型
         String language = request.getHeader("Accept-Language");
-        List<Model> list =  modelService.queryAvailableModel(projAlgModel.getAlgorithmId(), language);
+        List<Model> list =  modelService.queryAvailableModel(projAlgModel.getAlgorithmId(), projAlgModel.getIdentityId(), language);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectModelVo.class));
     }
 

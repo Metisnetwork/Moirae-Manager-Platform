@@ -57,4 +57,5 @@ public interface IWorkflowNodeOutputService extends IService<WorkflowNodeOutput>
      */
     void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList);
 
+    List<WorkflowNodeOutput> queryByWorkflowNodeId(Long id);
 }

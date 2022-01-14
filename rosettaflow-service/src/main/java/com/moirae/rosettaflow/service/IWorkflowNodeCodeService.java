@@ -17,7 +17,7 @@ public interface IWorkflowNodeCodeService extends IService<WorkflowNodeCode> {
      * @param workflowNodeId 工作流节点id
      * @return 工作流节点节点代码
      */
-    WorkflowNodeCode getByWorkflowNodeId(Long workflowNodeId);
+    WorkflowNodeCode queryByWorkflowNodeId(Long workflowNodeId);
 
     /**
      * 复制工作流节点算法代码
