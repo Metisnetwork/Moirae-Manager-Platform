@@ -4,7 +4,7 @@
     <select id="queryAvailableModel" resultType="com.moirae.rosettaflow.mapper.domain.Model">
         select
             m.id as modelId,
-            m.org_identity_id as originId,
+            m.org_identity_id as identityId,
             m.name as fileName,
             m.meta_data_id as metaDataId,
             m.meta_data_id as meta,

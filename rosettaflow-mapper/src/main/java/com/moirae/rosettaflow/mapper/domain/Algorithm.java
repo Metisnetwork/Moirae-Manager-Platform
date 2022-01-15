@@ -115,6 +115,11 @@ public class Algorithm implements Serializable {
     private Byte inputModel;
 
     /**
+     * 是否产生模型: 0-否，1:是
+     */
+    private Byte outputModel;
+
+    /**
      * 所需的运行时长 (单位: ms)
      */
     private Byte storePattern;

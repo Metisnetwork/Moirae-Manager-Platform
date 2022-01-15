@@ -144,12 +144,6 @@ CREATE TABLE `t_workflow_run_task_status` (
      `run_status` TINYINT(4) DEFAULT NULL COMMENT '运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败',
      `task_id` VARCHAR(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
      `run_msg` VARCHAR(256) DEFAULT NULL COMMENT '任务处理结果描述',
-     `file_name` VARCHAR(128) NOT NULL COMMENT '任务结果文件的名称',
-     `metadata_id` VARCHAR(128) NOT NULL COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
-     `origin_id` VARCHAR(128) NOT NULL COMMENT '任务结果文件的原始文件Id',
-     `file_path` VARCHAR(256) NOT NULL COMMENT '任务结果文件的完整相对路径名',
-     `ip` VARCHAR(32) NOT NULL COMMENT '任务结果文件所在的 数据服务内网ip',
-     `port` VARCHAR(8) NOT NULL COMMENT '任务结果文件所在的 数据服务内网port',
      `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
      `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
      PRIMARY KEY (`id`)
@@ -173,3 +167,32 @@ ALTER TABLE `db_moirae_cd`.`t_workflow_node_variable`
 ADD KEY `workflow_node_id` (`workflow_node_id`)
 
 
+
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_run_task_status`
+    CHANGE `file_name` `file_name` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务结果文件的名称',
+    CHANGE `metadata_id` `metadata_id` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
+    CHANGE `origin_id` `origin_id` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务结果文件的原始文件Id',
+    CHANGE `file_path` `file_path` VARCHAR(256) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务结果文件的完整相对路径名',
+    CHANGE `ip` `ip` VARCHAR(32) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务结果文件所在的 数据服务内网ip',
+    CHANGE `port` `port` VARCHAR(8) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务结果文件所在的 数据服务内网port';
+
+
+CREATE TABLE `t_workflow_run_task_result` (
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
+    `task_id` VARCHAR(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
+    `file_name` VARCHAR(128) NOT NULL COMMENT '任务结果文件的名称',
+    `metadata_id` VARCHAR(128) NOT NULL COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
+    `origin_id` VARCHAR(128) NOT NULL COMMENT '任务结果文件的原始文件Id',
+    `file_path` VARCHAR(256) NOT NULL COMMENT '任务结果文件的完整相对路径名',
+    `ip` VARCHAR(32) NOT NULL COMMENT '任务结果文件所在的 数据服务内网ip',
+    `port` VARCHAR(8) NOT NULL COMMENT '任务结果文件所在的 数据服务内网port',
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=INNODB COMMENT='工作流任务运行状态';
+
+
+
+ALTER TABLE `t_algorithm`
+    ADD COLUMN `output_model` tinyint(4) DEFAULT '0'  NOT NULL   COMMENT '是否产生模型: 0-否，1:是' AFTER `input_model`;

@@ -36,9 +36,6 @@ import java.util.List;
 public class WorkflowNodeController {
 
     @Resource
-    private IWorkflowNodeService workflowNodeService;
-
-    @Resource
     private IWorkflowService workflowService;
 
     @Resource
@@ -64,7 +61,7 @@ public class WorkflowNodeController {
     @PostMapping("clear")
     @ApiOperation(value = "清空工作流节点", notes = "清空工作流节点")
     public ResponseVo<?> clear(@RequestBody @Validated ClearWorkflowNodeReq clearNodeReq) {
-        workflowNodeService.clearWorkflowNode(clearNodeReq.getWorkflowId());
+        workflowService.clearWorkflowNode(clearNodeReq.getWorkflowId());
         return ResponseVo.createSuccess();
     }
 

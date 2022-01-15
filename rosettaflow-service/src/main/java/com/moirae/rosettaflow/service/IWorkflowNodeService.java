@@ -15,13 +15,6 @@ import java.util.List;
 public interface IWorkflowNodeService extends IService<WorkflowNode> {
 
     /**
-     * 清空工作流节点
-     *
-     * @param workflowId 工作流id
-     */
-    void clearWorkflowNode(Long workflowId);
-
-    /**
      * 根据工作流id及节点序号获取工作流节点
      *
      * @param workflowId 工作流id

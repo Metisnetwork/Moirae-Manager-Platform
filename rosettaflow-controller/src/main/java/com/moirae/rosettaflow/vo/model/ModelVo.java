@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.vo.project;
+package com.moirae.rosettaflow.vo.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,24 +11,15 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "项目模型")
-public class ProjectModelVo {
+public class ModelVo {
 
     @ApiModelProperty(value = "模型主键id")
     private Long modelId;
 
     @ApiModelProperty(value = "模型所属的机构id")
-    private String originId;
+    private String identityId;
 
     @ApiModelProperty(value = "模型名称")
     private String fileName;
-
-    @ApiModelProperty(value = "模型的元数据id")
-    private String metaDataId;
-
-    @ApiModelProperty(value = "文件路径")
-    private String filePath;
-
-    @ApiModelProperty(value = "模型由哪个算法生成")
-    private String algorithmName;
 
 }

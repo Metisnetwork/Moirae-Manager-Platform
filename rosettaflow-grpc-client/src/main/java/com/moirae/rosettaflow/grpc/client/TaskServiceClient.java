@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.grpc.client;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.exception.BusinessException;
@@ -282,6 +284,8 @@ public class TaskServiceClient {
      * @return rosettaNet请求参数对象
      */
     public PublishTaskDeclareRequest assemblyPublishTaskDeclareRequest(TaskDto taskDto) {
+        log.info(JSON.toJSONString(taskDto));
+
         //task_name
         PublishTaskDeclareRequest.Builder publishTaskDeclareRequestBuilder = PublishTaskDeclareRequest.newBuilder()
                 .setTaskName(taskDto.getTaskName());

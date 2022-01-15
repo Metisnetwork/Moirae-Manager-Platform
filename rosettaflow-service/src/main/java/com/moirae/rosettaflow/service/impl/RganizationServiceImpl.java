@@ -41,7 +41,7 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class IOrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements IOrganizationService {
+public class RganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements IOrganizationService {
 
     @Resource
     private CommonService commonService;

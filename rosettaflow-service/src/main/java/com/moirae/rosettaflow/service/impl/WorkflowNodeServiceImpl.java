@@ -65,30 +65,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void clearWorkflowNode(Long workflowId) {
-        Workflow workflow = workflowService.getById(workflowId);
-        if (Objects.isNull(workflow)) {
-            return;
-        }
-        // 校验是否有编辑权限
-        checkEditPermission(workflow.getProjectId());
-        List<WorkflowNode> workflowNodeList = this.getWorkflowNodeList(workflowId);
-        if (null == workflowNodeList || workflowNodeList.size() == 0) {
-            return;
-        }
-        // 校验工作流状态是否运行中
-        boolean isExistNodeRunning = workflowNodeList.stream().anyMatch(workflowNode -> workflowNode.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue());
-        if(workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue() || isExistNodeRunning){
-            log.error("Workflow runStatus is running or workflow node exist runStatus is running,can not clear, workflowId:{}", workflowId);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_CLEAR.getMsg());
-        }
-        // 物理删除当前工作流所有节点数据
-        workflowService.deleteWorkflowAllNodeData(workflowId);
-    }
-
     @Override
     public WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer nodeStep) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();

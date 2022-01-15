@@ -70,5 +70,6 @@ public class WorkflowRunStatus implements Serializable {
     /**
      *
      */
+    @TableField(exist = false)
     private Workflow workflow;
 }

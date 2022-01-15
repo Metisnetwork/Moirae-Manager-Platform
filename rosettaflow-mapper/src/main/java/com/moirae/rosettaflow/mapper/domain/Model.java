@@ -51,7 +51,7 @@ public class Model implements Serializable {
     /**
      * 训练模型的算法id
      */
-    private String trainAlgorithmId;
+    private Long trainAlgorithmId;
     /**
      * 训练模型的账户
      */
@@ -91,4 +91,7 @@ public class Model implements Serializable {
      */
     @TableField(exist = false)
     private String algorithmName;
+
+    @TableField(exist = false)
+    private String identityId;
 }

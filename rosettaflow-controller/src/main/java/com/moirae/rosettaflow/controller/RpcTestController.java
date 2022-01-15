@@ -27,6 +27,7 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.service.*;
+import com.moirae.rosettaflow.task.SyncSubJobNodeStatusTask;
 import com.moirae.rosettaflow.utils.ExportFileUtil;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import io.grpc.ManagedChannel;
@@ -85,6 +86,17 @@ public class RpcTestController {
 
     @Resource
     private IWorkflowRunStatusService workflowRunStatusService;
+
+    @Resource
+    private SyncSubJobNodeStatusTask syncSubJobNodeStatusTask;
+
+    @GetMapping("run")
+    @ApiOperation(value = "getNodeIdentity接口测试", notes = "查询自己组织的identity信息")
+    public ResponseVo<String> run() {
+        log.info("getNodeIdentity接口测试");
+        syncSubJobNodeStatusTask.run();
+        return ResponseVo.createSuccess("nodeIdentityDto");
+    }
 
 
     @GetMapping("getNodeIdentity")

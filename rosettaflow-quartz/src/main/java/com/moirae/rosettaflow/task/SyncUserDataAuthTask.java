@@ -42,7 +42,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-//    @Scheduled(fixedDelay = 180 * 1000, initialDelay = 2 * 1000)
+    @Scheduled(fixedDelay = 180 * 1000, initialDelay = 2 * 1000)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         long begin = DateUtil.current();

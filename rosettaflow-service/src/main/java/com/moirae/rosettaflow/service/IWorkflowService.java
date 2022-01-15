@@ -189,5 +189,5 @@ public interface IWorkflowService extends IService<Workflow> {
 
     void saveWorkflowDetailAndStart(Workflow workflow);
 
-
+    void clearWorkflowNode(Long workflowId);
 }

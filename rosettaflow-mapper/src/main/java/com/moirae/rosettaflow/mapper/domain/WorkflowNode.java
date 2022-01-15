@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * t_workflow
@@ -133,4 +134,12 @@ public class WorkflowNode implements Serializable {
      */
     @TableField(exist = false)
     private List<WorkflowNodeVariable> workflowNodeVariableReqList  = new ArrayList<>();
+    /**
+     * 当前输入模型
+     */
+    @TableField(exist = false)
+    private Model model;
+
+    @TableField(exist = false)
+    private Map<String, Organization> organizationMap;
 }

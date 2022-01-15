@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class IModelServiceImpl extends ServiceImpl<ModelMapper, Model> implements IModelService {
+public class ModelServiceImpl extends ServiceImpl<ModelMapper, Model> implements IModelService {
 
     @Resource
     CommonService commonService;

@@ -20,6 +20,7 @@ import com.moirae.rosettaflow.mapper.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
 import com.zengtengpeng.operation.RedissonObject;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -358,6 +359,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputMapper.getWorkflowNodeOutputAndOrgNameByNodeId(item.getWorkflowNodeId());
             item.setWorkflowNodeOutputVoList(workflowNodeOutputList);
         });
+
+        // 获得工作流模型
+        workflowNodeList.forEach(item -> {
+            if(item.getModelId() != null && item.getModelId() > 0 ){
+                Model model = modelService.getById(item.getModelId());
+                model.setIdentityId(model.getOrgIdentityId());
+                model.setModelId(model.getId());
+                model.setFileName(model.getName());
+                item.setModel(model);
+            }
+        });
         return workflow;
     }
 
@@ -365,6 +377,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public Workflow queryWorkflowDetail(Long workflowId, Integer version) {
         Workflow workflow = queryWorkflow(workflowId);
         List<WorkflowNode> workflowNodeList = workflowNodeService.queryByWorkflowIdAndVersion(workflowId, version);
+        workflow.setWorkflowNodeReqList(workflowNodeList);
         for (WorkflowNode workflowNode : workflowNodeList) {
             WorkflowNodeCode workflowNodeCode = workflowNodeCodeService.queryByWorkflowNodeId(workflowNode.getId());
             List<WorkflowNodeInput> workflowNodeInputList = workflowNodeInputService.queryByWorkflowNodeId(workflowNode.getId());
@@ -393,6 +406,30 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Integer version = saveWorkflowDetailInnner(workflow);
         // 提交并执行工作流
         workflowRunStatusService.submitTaskAndExecute(workflow.getWorkflowId(), version, workflow.getAddress(), workflow.getSign());
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void clearWorkflowNode(Long workflowId) {
+        Workflow workflow = baseMapper.queryWorkFlowAndStatus(workflowId);
+        if (Objects.isNull(workflow)) {
+            return;
+        }
+        // 校验是否有编辑权限
+        checkEditPermission(workflow.getProjectId());
+        List<WorkflowNode> workflowNodeList = workflowNodeService.queryByWorkflowIdAndVersion(workflowId, workflow.getEditVersion());
+        if (null == workflowNodeList || workflowNodeList.size() == 0) {
+            return;
+        }
+        // 校验工作流状态是否运行中
+        if(workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue()){
+            log.error("Workflow runStatus is running or workflow node exist runStatus is running,can not clear, workflowId:{}", workflowId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_CLEAR.getMsg());
+        }
+
+        // 更新工作流版本号
+        workflow.setEditVersion(workflow.getEditVersion() + 1);
+        updateById(workflow);
     }
 
     @Override

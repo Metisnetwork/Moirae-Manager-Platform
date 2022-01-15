@@ -22,4 +22,8 @@ public interface IWorkflowRunStatusService extends IService<WorkflowRunStatus> {
     List<WorkflowRunTaskStatus> queryWorkflowRunTaskStatusByTaskId(String taskId);
 
     WorkflowRunStatus submitTaskAndExecute(Long workflowId, Integer version, String address, String sign);
+
+    List<WorkflowRunTaskStatus> queryUnConfirmedWorkflowRunTaskStatus();
+
+    void taskFinish(Long aLong, String taskId, int state, long taskStartAt, long taskEndAt);
 }

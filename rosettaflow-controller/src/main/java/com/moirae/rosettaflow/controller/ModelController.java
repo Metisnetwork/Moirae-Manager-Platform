@@ -5,7 +5,7 @@ import com.moirae.rosettaflow.mapper.domain.Model;
 import com.moirae.rosettaflow.req.project.ProjAlgModel;
 import com.moirae.rosettaflow.service.IModelService;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.project.ProjectModelVo;
+import com.moirae.rosettaflow.vo.model.ModelVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +29,11 @@ public class ModelController {
 
     @GetMapping("queryAvailableModel")
     @ApiOperation(value = "查询当前用户的算法模型", notes = "查询当前用户的算法模型")
-    public ResponseVo<List<ProjectModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel, HttpServletRequest request) {
+    public ResponseVo<List<ModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel, HttpServletRequest request) {
         // 获取语言类型
         String language = request.getHeader("Accept-Language");
         List<Model> list =  modelService.queryAvailableModel(projAlgModel.getAlgorithmId(), projAlgModel.getIdentityId(), language);
-        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjectModelVo.class));
+        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ModelVo.class));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.vo.workflow.node;
 
+import com.moirae.rosettaflow.vo.model.ModelVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class WorkflowNodeVo {
     private Integer nodeStep;
 
     @ApiModelProperty(value = "节点模型ID")
-    private Long modelId;
+    private ModelVo model;
 
     @ApiModelProperty(value = "任务ID,底层处理完成后返回")
     private String taskId;
