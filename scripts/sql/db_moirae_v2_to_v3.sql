@@ -204,6 +204,18 @@ ALTER TABLE `db_moirae_cd`.`t_workflow_run_task_status`
 ALTER TABLE `db_moirae_cd`.`t_model`
     ADD COLUMN `supported_algorithm_id` BIGINT(20) NULL   COMMENT '模型支持输入的算法id' AFTER `train_user_address`;
 
+ALTER TABLE `db_moirae_cd`.`t_model`
+    ADD COLUMN `supported_algorithm_id` BIGINT(20) NULL   COMMENT '模型支持输入的算法id' AFTER `train_user_address`;
 
 ALTER TABLE `db_moirae_cd`.`t_model`
     CHANGE `name` `name` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '名称';
+
+
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_node`
+    ADD COLUMN `input_model` int(11) DEFAULT '0'  NOT NULL   COMMENT '是否需要输入模型: 0-否，1:是' AFTER `node_step`;
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_run_task_status`
+    ADD COLUMN `model_id` BIGINT(20) DEFAULT 0  NULL   COMMENT '工作流节点需要的模型id' AFTER `run_msg`;
+
+

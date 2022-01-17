@@ -29,6 +29,7 @@ import com.moirae.rosettaflow.service.*;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -100,6 +101,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public void taskFinish(Long workflowRunStatusId, String taskId, int state, long taskStartAt, long taskEndAt) {
         if (state == TaskRunningStatusEnum.SUCCESS.getValue() || state == TaskRunningStatusEnum.FAIL.getValue()) {
             // 加载工作量运行信息
@@ -172,14 +174,21 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 model.setTrainAlgorithmId(workflowNode.getAlgorithmId());
                 model.setTrainUserAddress(workflowRunStatus.getAddress());
                 model.setSupportedAlgorithmId(inputAlgorithm.getId());
+                modelService.save(model);
                 modelList.add(model);
             }
         }
         if(taskResultList.size() > 0){
             workflowRunTaskResultService.saveBatch(taskResultList);
         }
-        if(modelList.size() > 0){
-            modelService.saveBatch(modelList);
+        if(modelList.size() > 0 && workflowRunStatus.getStep() > workflowRunStatus.getCurStep()){
+            // 为下个任务设置模型id
+            WorkflowRunTaskStatus nextWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusMap().get(workflowRunStatus.getCurStep()+1);
+            WorkflowNode nextWorkflowNode = workflowRunStatus.getWorkflow().getWorkflowNodeMap().get(workflowRunStatus.getCurStep() + 1);
+            if(nextWorkflowNode.getInputModel() == SysConstant.INT_1 && nextWorkflowNode.getModelId() == 0){
+                Model model = modelList.stream().filter(item -> nextWorkflowNode.getSenderIdentityId().equals(item.getOrgIdentityId())).findFirst().get();
+                nextWorkflowRunTaskStatus.setModelId(model.getId());
+            }
         }
     }
 
@@ -268,8 +277,8 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         WorkflowNode curlWorkflowNode = workflowRunStatus.getWorkflow().getWorkflowNodeMap().get(workflowRunStatus.getCurStep());
 
         //有指定当前工作流节点模型输入,获取工作流节点模型
-        if (curlWorkflowNode.getModelId() != null && curlWorkflowNode.getModelId() > 0) {
-            Model model = modelService.getById(curlWorkflowNode.getModelId());
+        if(curlWorkflowNode.getInputModel() == SysConstant.INT_1){
+            Model model = modelService.getById(workflowRunStatus.getWorkflowRunTaskStatusMap().get(workflowRunStatus.getCurStep()).getModelId());
             if (model == null) {
                 log.error("WorkflowServiceImpl->getDataSupplierList,fail reason:{}", ErrorMsg.WORKFLOW_NODE_TASK_RESULT_NOT_EXIST.getMsg());
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_TASK_RESULT_NOT_EXIST.getMsg());
@@ -354,6 +363,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 workflowRunTaskStatus.setWorkflowNodeId(item.getId());
                 workflowRunTaskStatus.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
                 workflowRunTaskStatus.setNodeStep(item.getNodeStep());
+                workflowRunTaskStatus.setModelId(item.getModelId());
                 workflowRunTaskStatusService.save(workflowRunTaskStatus);
                 return workflowRunTaskStatus;
             })

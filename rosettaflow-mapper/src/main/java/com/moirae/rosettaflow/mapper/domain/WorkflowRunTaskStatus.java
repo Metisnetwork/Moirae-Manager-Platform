@@ -51,6 +51,10 @@ public class WorkflowRunTaskStatus implements Serializable {
      */
     private String runMsg;
     /**
+     * 工作流节点需要的模型id
+     */
+    private Long modelId;
+    /**
      * 创建时间
      */
     private Date createTime;

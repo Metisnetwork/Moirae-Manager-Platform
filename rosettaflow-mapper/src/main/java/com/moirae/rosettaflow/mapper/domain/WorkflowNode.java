@@ -47,9 +47,13 @@ public class WorkflowNode implements Serializable {
      */
     private Integer nodeStep;
     /**
-     * 工作流节点需要的模型id,对应t_task_result表id
+     * 工作流节点需要的模型id
      */
     private Long modelId;
+    /**
+     * 是否需要输入模型: 0-否，1:是
+     */
+    private Integer inputModel;
     /**
      * 任务发启放组织id
      */
@@ -104,11 +108,6 @@ public class WorkflowNode implements Serializable {
      */
     @TableField(exist = false)
     private List<WorkflowNodeOutput> workflowNodeOutputVoList;
-    /**
-     * 是否需要输入模型: 0-否，1:是
-     */
-    @TableField(exist = false)
-    private Integer inputModel;
     /**
      * 输入请求列表
      */
