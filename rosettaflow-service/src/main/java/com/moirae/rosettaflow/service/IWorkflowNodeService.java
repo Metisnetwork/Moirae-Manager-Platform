@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 
 import java.util.List;
@@ -13,15 +12,6 @@ import java.util.List;
  * @date 2021/8/16
  */
 public interface IWorkflowNodeService extends IService<WorkflowNode> {
-
-    /**
-     * 根据工作流id及节点序号获取工作流节点
-     *
-     * @param workflowId 工作流id
-     * @param startNode  节点序号x
-     * @return 工作流节点
-     */
-    WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer startNode);
 
     /**
      * 根据工作流id获取工作流节点列表（只查询生效的数据）
@@ -55,14 +45,6 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
      * @param newRunStatus 新的运行状态
      */
     void updateRunStatusByWorkflowId(Long workflowId, Byte oldRunStatus, Byte newRunStatus);
-
-    /**
-     * 获取所有运行中的节点
-     *
-     * @param beforeHour 开始前小时数
-     * @return 运行中节点列表
-     */
-    List<WorkflowNode> getRunningNode(int beforeHour);
 
     /**
      * 更新工作流节点运行状态

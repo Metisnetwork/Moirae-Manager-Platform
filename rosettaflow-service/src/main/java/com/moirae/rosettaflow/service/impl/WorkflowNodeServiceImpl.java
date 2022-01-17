@@ -66,20 +66,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private IUserMetaDataService userMetaDataService;
 
     @Override
-    public WorkflowNode getByWorkflowIdAndStep(Long workflowId, Integer nodeStep) {
-        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
-        wrapper.eq(WorkflowNode::getNodeStep, nodeStep);
-//        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
-        WorkflowNode workflowNode = this.getOne(wrapper);
-        if (workflowNode == null) {
-            log.error("workflow node not found by workflowId:{},nodeStep:{}", workflowId, nodeStep);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_EXIST.getMsg());
-        }
-        return workflowNode;
-    }
-
-    @Override
     public List<WorkflowNode> getWorkflowNodeList(Long workflowId) {
         LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNode::getWorkflowId, workflowId);
@@ -153,15 +139,6 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
         updateWrapper.eq(WorkflowNode::getWorkflowId, workflowId);
 //        updateWrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
         this.update(updateWrapper);
-    }
-
-    @Override
-    public List<WorkflowNode> getRunningNode(int beforeHour) {
-        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
-//        wrapper.eq(WorkflowNode::getStatus, StatusEnum.VALID.getValue());
-//        wrapper.ge(WorkflowNode::getUpdateTime, DateUtil.offsetHour(new Date(), beforeHour));
-        return this.list(wrapper);
     }
 
     @Override

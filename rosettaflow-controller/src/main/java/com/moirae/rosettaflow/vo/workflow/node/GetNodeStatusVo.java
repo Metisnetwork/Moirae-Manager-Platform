@@ -21,4 +21,7 @@ public class GetNodeStatusVo {
 
     @ApiModelProperty(value = "运行结果信息（失败时展示失败结果）")
     private String runMsg;
+
+    @ApiModelProperty(value = "任务ID,底层处理完成后返回")
+    private String taskId;
 }

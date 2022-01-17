@@ -1,13 +1,11 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.req.workflow.*;
-import com.moirae.rosettaflow.service.IWorkflowNodeService;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
@@ -25,7 +23,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,14 +40,10 @@ public class WorkflowController {
     @Resource
     private IWorkflowService workflowService;
 
-    @Resource
-    private IWorkflowNodeService workflowNodeService;
-
     @GetMapping("list")
     @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
     public ResponseVo<PageVo<WorkflowVo>> list(@Validated ListWorkflowReq listReq) {
-        IPage<WorkflowDto> page = workflowService.queryWorkFlowPageList(listReq.getProjectId(),
-                listReq.getWorkflowName(), listReq.getCurrent(), listReq.getSize());
+        IPage<WorkflowDto> page = workflowService.queryWorkFlowPageList(listReq.getProjectId(), listReq.getWorkflowName(), listReq.getCurrent(), listReq.getSize());
         List<WorkflowVo> items = BeanUtil.copyToList(page.getRecords(), WorkflowVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, items));
     }
@@ -96,28 +89,7 @@ public class WorkflowController {
     @ApiOperation(value = "获取运行日志", notes = "获取运行日志")
     public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "workflowId", required = true) @PathVariable Long workflowId) {
         List<TaskEventDto> taskEventShowDtoList = workflowService.getTaskEventList(workflowId);
-        return ResponseVo.createSuccess(getLogConvertVo(taskEventShowDtoList));
-    }
-
-    /** 获取日志接口返回参数转换 */
-    private  List<TaskEventVo> getLogConvertVo(List<TaskEventDto> taskEventShowDtoList){
-        List<TaskEventVo> taskEventVoList = new ArrayList<>();
-        TaskEventVo vo;
-        if (taskEventShowDtoList.size() > 0) {
-            for (TaskEventDto taskEventDto : taskEventShowDtoList) {
-                vo = new TaskEventVo();
-                vo.setType(taskEventDto.getType());
-                vo.setTaskId(taskEventDto.getTaskId());
-                vo.setName(taskEventDto.getOwner().getNodeName());
-                vo.setNodeId(taskEventDto.getOwner().getNodeId());
-                vo.setIdentityId(taskEventDto.getOwner().getIdentityId());
-                vo.setPartyId(taskEventDto.getPartyId());
-                vo.setContent(taskEventDto.getContent());
-                vo.setCreateAt(DateUtil.date(taskEventDto.getCreateAt()));
-                taskEventVoList.add(vo);
-            }
-        }
-        return taskEventVoList;
+        return ResponseVo.createSuccess(BeanUtil.copyToList(taskEventShowDtoList, TaskEventVo.class));
     }
 
     @PostMapping("terminate")

@@ -223,23 +223,21 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public List<TaskEventDto> getTaskEventList(Long workflowId) {
-        List<TaskEventDto> dtoList = new ArrayList<>();
-        List<WorkflowNode> workflowNodeList = workflowNodeService.getWorkflowNodeList(workflowId);
-        if (null != workflowNodeList && workflowNodeList.size() > 0) {
-            for (WorkflowNode workflowNode : workflowNodeList) {
-                if (StrUtil.isNotBlank(workflowNode.getTaskId())) {
-                    List<TaskEventDto> taskEventShowDtoList;
-                    try {
-                        String identityId = workflowNodeOutputService.getOutputIdentityIdByTaskId(workflowNode.getTaskId());
-                        taskEventShowDtoList = grpcTaskService.getTaskEventList(netManager.getChannel(identityId), workflowNode.getTaskId());
-                    } catch (Exception e) {
-                        log.error("调用rpc接口异常--获取运行日志, workflowId:{}, 错误信息:{}", workflowId, e);
-                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
+        Workflow workflow = getWorkflowStatusById(workflowId);
+        List<TaskEventDto> dtoList = workflow.getGetNodeStatusVoList().stream()
+                .flatMap(item ->{
+                    List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
+                    if (StrUtil.isNotBlank(item.getTaskId())) {
+                        try {
+                            taskEventShowDtoList = grpcTaskService.getTaskEventList(netManager.getChannel(item.getWorkflowNodeSenderIdentityId()), item.getTaskId());
+                        } catch (Exception e) {
+                            log.error("调用rpc接口异常--获取运行日志, workflowId:{}, 错误信息:{}", workflowId, e);
+                            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
+                        }
                     }
-                    dtoList.addAll(taskEventShowDtoList);
-                }
-            }
-        }
+                    return taskEventShowDtoList.stream();
+                })
+                .collect(Collectors.toList());
         return dtoList;
     }
 

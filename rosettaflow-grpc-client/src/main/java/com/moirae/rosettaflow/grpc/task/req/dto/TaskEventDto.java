@@ -34,4 +34,17 @@ public class TaskEventDto {
      * 事件产生时间
      */
     private Long createAt;
+
+    /**
+     * 组织名称
+     */
+    private String name;
+    /**
+     * 组织中调度服务的 nodeId
+     */
+    private String nodeId;
+    /**
+     * 组织的身份标识Id
+     */
+    private String identityId;
 }
