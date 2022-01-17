@@ -219,3 +219,5 @@ ALTER TABLE `db_moirae_cd`.`t_workflow_run_task_status`
     ADD COLUMN `model_id` BIGINT(20) DEFAULT 0  NULL   COMMENT '工作流节点需要的模型id' AFTER `run_msg`;
 
 
+ALTER TABLE `db_moirae_cd`.t_workflow_run_task_result
+    ADD COLUMN `identity_id`  varchar(128) NOT NULL  COMMENT '所属组织' AFTER `id`;

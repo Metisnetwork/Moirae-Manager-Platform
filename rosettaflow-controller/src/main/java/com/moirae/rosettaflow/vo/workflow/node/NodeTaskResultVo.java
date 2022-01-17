@@ -21,6 +21,9 @@ public class NodeTaskResultVo {
     @ApiModelProperty(value = "任务结果主键id")
     private Long id;
 
+    @ApiModelProperty(value = "组织的身份标识Id")
+    private String identityId;
+
     @ApiModelProperty(value = "任务id")
     private String taskId;
 

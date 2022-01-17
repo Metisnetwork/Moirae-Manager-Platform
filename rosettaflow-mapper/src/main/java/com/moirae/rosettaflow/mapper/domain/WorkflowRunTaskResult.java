@@ -18,6 +18,10 @@ public class WorkflowRunTaskResult implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
     /**
+     * 所属组织
+     */
+    private String identityId;
+    /**
      * 任务结果文件对应的任务Id
      */
     private String taskId;

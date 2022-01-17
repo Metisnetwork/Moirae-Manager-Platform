@@ -107,6 +107,8 @@ public enum ErrorMsg {
     WORKFLOW_INDEX_COLUMN_NOT_EXIST("工作流节点索引列不存在", "Workflow node index column not exist"),
     WORKFLOW_NODE_INPUT_NOT_EXIST("工作流节点输入不存在", "Workflow node input not exist"),
     WORKFLOW_NODE_If_SENDER_ERROR("节点输入配置数据发起方不正确！", "The originator of the node input configuration data is incorrect!"),
+    WORKFLOW_NODE_SENDER_MODEL_IDENTITY_STEP1_ERROR("节点输入配置任务发起方和模型不在一个组织内！", "Node input configuration task initiator and model are not in the same organization!"),
+    WORKFLOW_NODE_SENDER_MODEL_IDENTITY_STEP2_ERROR("节点输入配置任务发起方和上个节点输出不在一个组织内！", "The node input configuration task initiator and the last node output are not in the same organization!"),
 
     WORKFLOW_NODE_TASK_RESULT_NOT_EXIST("工作流节点输入模型不存在", "Workflow node input model not exist"),
     WORKFLOW_NODE_MODEL_PATH_NOT_EXIST("工作流节点输入模型路径不存在", "Workflow node input model file path not exist"),
@@ -114,39 +116,6 @@ public enum ErrorMsg {
     WORKFLOW_FILE_DOWNLOAD_TIMEOUT("工作流节点输入模型文件下载超时", "Workflow node model file download timeout"),
     WORKFLOW_FILE_DOWNLOAD_COMPRESSTYPE_ERROR("工作流节点输入模型文件下载压缩格式错误", "Workflow node model file download compressType error"),
 
-
-    /**
-     * 作业
-     */
-    JOB_ADD_ERROR("新增作业失败", "Add job error"),
-    JOB_EDIT_ERROR("作业更新失败", "Job modify error"),
-    JOB_PAUSE_ERROR("作业暂停失败", "Job modify error"),
-    JOB_NOT_EXIST("原作业不存在", "Job not exist"),
-    JOB_NAME_EXIST("作业名称已存在", "job name already exists"),
-    JOB_ID_NOT_EXIST("作业id不存在", "Job id not exist"),
-    JOB_TIME_ERROR("作业时间错误", "Job time error"),
-    JOB_RUNNING_OR_FINISH("作业正在执行或执行完成不能修改", "Job is running or finish can not modify"),
-    JOB_REPEAT_INTERVAL_ERROR("作业执行重复时，执行间隔时间错误", "Job is repeated,the job repeat interval error"),
-    JOB_NO_REPEAT_INTERVAL_ERROR("作业执行不重复时，执行间隔时间错误", "job is not repeated,the job repeat interval error"),
-    JOB_ENDTIME_NOT_NULL("作业结束时间不能为空", "job endTime can not empty"),
-    JOB_ENDTIME_NULL("作业结束时间必须为空", "job endTime can empty"),
-    JOB_NOT_RUNNING("作业并未执行中不能修改", "Job is not running can not modify"),
-    JOB_NOT_STOP("作业并未停止中不能修改", "Job is not stop can not modify"),
-    JOB_NOT_DELETE("作业运行中不能删除", "Job is running can not delete"),
-    JOB_NOT_EDIT("作业运行中不能修改", "Job is running can not modify"),
-    JOB_NAME_ALREADY_EXISTS("作业名称已经存在", "Job is running can not modify"),
-    JOB_RUNNING_CACHE_CLEAR_ERROR("作业执行缓存清理错误", "Job run cache clear error"),
-
-    SUB_JOB_NOT_EXIST("子作业不存在", "Sub job not exist"),
-    SUB_JOB_NOT_RUNNING("子作业非运行状态中不能暂停", "Sub job is not running can not stop"),
-    SUB_JOB_NOT_STOP("子作业非暂停状态中不能重启", "Sub job is not stop can not start"),
-    SUB_JOB_TERMINATE_NET_PROCESS_ERROR("子作业终止失败", "sub job terminated failed"),
-    SUB_JOB_RESTART_FAILED_ERROR("子作业重启失败", "sub job restart failed"),
-    SUB_JOB_NOT_DELETE("子作业运行中不能删除", "Sub job is running can not delete"),
-    SUB_JOB_ID_NOT_EXIST("子作业id不存在", "Sub job not exist"),
-    SUB_JOB_NODE_NOT_DELETE("子作业节点运行中不能删除", "Sub job node is running can not delete"),
-    SUB_JOB_NODE_UPDATE_FAIL("子作业节点更新失败", "Sub job node update fail"),
-    SUB_JOB_NODE_PUBLISH_FAIL("子作业节点发布失败", "Sub job node publish fail"),
 
     /**
      * rpc接口异常

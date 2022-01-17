@@ -457,24 +457,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         return workflow;
     }
 
-
-    private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
-        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.queryByWorkflowNodeId(workflowNode.getId());
-        if (null == workflowNodeResource) {
-            Algorithm algorithm = algorithmService.getById(workflowNode.getAlgorithmId());
-            if (null == algorithm) {
-                log.error("Can not find algorithm by id:{}", workflowNode.getAlgorithmId());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NOT_EXIST.getMsg());
-            }
-            workflowNodeResource = new WorkflowNodeResource();
-            workflowNodeResource.setCostMem(algorithm.getCostMem());
-            workflowNodeResource.setCostCpu(algorithm.getCostCpu());
-            workflowNodeResource.setCostBandwidth(algorithm.getCostBandwidth());
-            workflowNodeResource.setRunTime(algorithm.getRunTime());
-        }
-        return workflowNodeResource;
-    }
-
     /**
      * 校验是否有编辑权限
      */
@@ -549,6 +531,27 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 .collect(Collectors.toSet());
         senderOrgId.addAll(dataOrgId);
         organizationService.isValid(senderOrgId);
+        // 模型必须存在于发起方上面
+        reqWorkflow.getWorkflowNodeReqList().stream().forEach(item-> {
+            // 如果用户指定模型文件，任务的发起方必须和指定的模型在同一个组织。
+            if(item.getInputModel() == SysConstant.INT_1 && item.getModelId() > 0 ){
+                Model model = modelService.getById(item.getModelId());
+                if(!model.getOrgIdentityId().equals(item.getWorkflowNodeSenderIdentityId())){
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_MODEL_IDENTITY_STEP1_ERROR.getMsg());
+                }
+            }
+            // 如果用户指定模型为上个任务的输出， 任务的发起方必须在上个任务输出列表中。
+            if(item.getInputModel() == SysConstant.INT_1 && item.getModelId() == 0){
+                Set<String> preWorkflowNodeOutputOrg = reqWorkflow.getWorkflowNodeReqList().stream()
+                        .filter( o -> o.getNodeStep() == item.getNodeStep() - 1)
+                        .flatMap( o -> o.getWorkflowNodeOutputReqList().stream())
+                        .map(WorkflowNodeOutput::getIdentityId)
+                        .collect(Collectors.toSet());
+                if(!preWorkflowNodeOutputOrg.contains(item.getWorkflowNodeSenderIdentityId())){
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_SENDER_MODEL_IDENTITY_STEP2_ERROR.getMsg());
+                }
+            }
+        });
 
         // 更新工作流设置的版本号
         workflow.setEditVersion(workflow.getEditVersion() + 1);
@@ -635,14 +638,5 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         LambdaQueryWrapper<WorkflowNodeCode> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowNodeCode::getWorkflowNodeId, workflowNodeId);
         return workflowNodeCodeMapper.selectOne(wrapper);
-    }
-
-    private List<WorkflowNode> getWorkflowNodeList(Workflow workflow) {
-        LambdaQueryWrapper<WorkflowNode> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowNode::getWorkflowId, workflow.getId());
-        wrapper.eq(WorkflowNode::getWorkflowEditVersion, workflow.getEditVersion());
-        // 所有节点正序排序
-        wrapper.orderByAsc(WorkflowNode::getNodeStep);
-        return workflowNodeMapper.selectList(wrapper);
     }
 }

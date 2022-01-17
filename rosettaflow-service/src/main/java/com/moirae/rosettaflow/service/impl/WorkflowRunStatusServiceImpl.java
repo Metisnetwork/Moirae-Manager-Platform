@@ -160,6 +160,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             }
             // 处理结果
             WorkflowRunTaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, WorkflowRunTaskResult.class);
+            taskResult.setIdentityId(identityId);
             taskResultList.add(taskResult);
             // 处理模型
             if(OutputModelEnum.NEED.getValue() == algorithm.getOutputModel()){
