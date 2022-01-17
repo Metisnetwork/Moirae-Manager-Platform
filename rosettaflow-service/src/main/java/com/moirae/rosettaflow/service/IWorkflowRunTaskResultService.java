@@ -7,4 +7,5 @@ import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import java.util.List;
 
 public interface IWorkflowRunTaskResultService extends IService<WorkflowRunTaskResult> {
+    List<WorkflowRunTaskResult> queryByTaskId(String taskId);
 }

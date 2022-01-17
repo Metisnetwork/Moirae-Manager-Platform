@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.AlgorithmConstant;
-import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
@@ -24,10 +23,9 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskMetaDataDeclareDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskResourceCostDeclareDto;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
-import com.moirae.rosettaflow.mapper.*;
+import com.moirae.rosettaflow.mapper.WorkflowRunStatusMapper;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
-import com.zengtengpeng.operation.RedissonObject;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,11 +74,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     }
 
     @Override
-    public List<WorkflowRunTaskStatus> queryWorkflowRunTaskStatusByTaskId(String taskId) {
-        return null;
-    }
-
-    @Override
     public WorkflowRunStatus submitTaskAndExecute(Long workflowId, Integer version, String address, String sign) {
         // 加载工作流设置信息
         Workflow workflow = workflowService.queryWorkflowDetail(workflowId, version);
@@ -101,7 +94,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Override
     public List<WorkflowRunTaskStatus> queryUnConfirmedWorkflowRunTaskStatus() {
         LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowRunTaskStatus::getRunStatus, WorkflowRunStatusEnum.RUNNING);
+        wrapper.eq(WorkflowRunTaskStatus::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
         wrapper.isNotNull(WorkflowRunTaskStatus::getTaskId);
         return  workflowRunTaskStatusService.list(wrapper);
     }
@@ -115,6 +108,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             if(state == TaskRunningStatusEnum.SUCCESS.getValue()){
                 taskSuccess(workflowRunStatus, taskId, taskStartAt, taskEndAt);
                 if(workflowRunStatus.getCurStep().compareTo(workflowRunStatus.getStep()) < 0){
+                    workflowRunStatus.setCurStep(workflowRunStatus.getCurStep() + 1);
                     executeTask(workflowRunStatus);
                 }
             }
@@ -131,6 +125,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
 
         if(!taskId.equals(curWorkflowRunTaskStatus.getTaskId())){
             log.error("工作流状态错误！ workflowRunStatusId = {}  task = {}", workflowRunStatus.getId(), taskId);
+            return;
         }
         // 更新状态
         Date begin = taskStartAt > 0 ? new Date(taskStartAt) : null;
@@ -159,22 +154,24 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel, taskId);
             if (Objects.isNull(taskResultResponseDto)) {
                 log.error("WorkflowNodeStatusMockTask获取任务结果失败！ info = {}", taskResultResponseDto);
-                continue;
+                return;
             }
             // 处理结果
             WorkflowRunTaskResult taskResult = BeanUtil.copyProperties(taskResultResponseDto, WorkflowRunTaskResult.class);
             taskResultList.add(taskResult);
             // 处理模型
             if(OutputModelEnum.NEED.getValue() == algorithm.getOutputModel()){
+                Algorithm inputAlgorithm = algorithmService.getAlgorithmByIdCode(algorithm.getAlgorithmCode(), InputModelEnum.NEED.getValue());
                 Model model = new Model();
-                model.setOrgIdentityId(taskResult.getOriginId());
-                model.setName(taskResult.getFileName());
+                model.setOrgIdentityId(identityId);
+                model.setName(algorithm.getAlgorithmName()+"(" + taskId + ")");
                 model.setMetaDataId(taskResult.getMetadataId());
                 model.setFileId(taskResult.getOriginId());
                 model.setFilePath(taskResult.getFilePath());
                 model.setTrainTaskId(taskId);
                 model.setTrainAlgorithmId(workflowNode.getAlgorithmId());
                 model.setTrainUserAddress(workflowRunStatus.getAddress());
+                model.setSupportedAlgorithmId(inputAlgorithm.getId());
                 modelList.add(model);
             }
         }

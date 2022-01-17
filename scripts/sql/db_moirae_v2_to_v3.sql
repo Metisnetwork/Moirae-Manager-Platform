@@ -196,3 +196,14 @@ CREATE TABLE `t_workflow_run_task_result` (
 
 ALTER TABLE `t_algorithm`
     ADD COLUMN `output_model` tinyint(4) DEFAULT '0'  NOT NULL   COMMENT '是否产生模型: 0-否，1:是' AFTER `input_model`;
+
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_run_task_status`
+    ADD COLUMN `node_step` INT(11) NULL   COMMENT '节点在工作流中序号,从1开始' AFTER `workflow_node_id`;
+
+ALTER TABLE `db_moirae_cd`.`t_model`
+    ADD COLUMN `supported_algorithm_id` BIGINT(20) NULL   COMMENT '模型支持输入的算法id' AFTER `train_user_address`;
+
+
+ALTER TABLE `db_moirae_cd`.`t_model`
+    CHANGE `name` `name` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '名称';

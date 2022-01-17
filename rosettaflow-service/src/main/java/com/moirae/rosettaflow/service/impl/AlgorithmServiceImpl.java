@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.InputModelEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
@@ -143,6 +144,14 @@ public class AlgorithmServiceImpl extends ServiceImpl<AlgorithmMapper, Algorithm
                 preStep = algorithm.getAlgorithmStep();
             }
         }
+    }
+
+    @Override
+    public Algorithm getAlgorithmByIdCode(String algorithmCode, int inputModel) {
+        LambdaQueryWrapper<Algorithm> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Algorithm::getAlgorithmCode, algorithmCode);
+        queryWrapper.eq(Algorithm::getInputModel, inputModel);
+        return this.getOne(queryWrapper);
     }
 
     private List<Algorithm> getAlgorithmByIdList(List<Long> algorithmIdList) {

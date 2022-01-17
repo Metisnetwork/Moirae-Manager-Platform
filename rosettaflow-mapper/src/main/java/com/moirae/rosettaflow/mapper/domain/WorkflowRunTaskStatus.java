@@ -27,6 +27,10 @@ public class WorkflowRunTaskStatus implements Serializable {
      */
     private Long workflowNodeId;
     /**
+     * 节点在工作流中序号,从1开始
+     */
+    private Integer nodeStep;
+    /**
      * 开始时间
      */
     private Date beginTime;
@@ -57,6 +61,5 @@ public class WorkflowRunTaskStatus implements Serializable {
 
     @TableField(exist = false)
     private Model model;
-    @TableField(exist = false)
-    private Integer nodeStep;
+
 }

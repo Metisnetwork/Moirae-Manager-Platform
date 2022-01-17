@@ -53,4 +53,6 @@ public interface IAlgorithmService extends IService<Algorithm> {
     Algorithm queryAlgorithmStepDetails(Long algorithmId);
 
     void isValid(List<Long> algorithmId);
+
+    Algorithm getAlgorithmByIdCode(String algorithmCode, int inputModel);
 }

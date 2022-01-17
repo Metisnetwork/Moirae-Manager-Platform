@@ -2,11 +2,13 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.req.workflow.node.ClearWorkflowNodeReq;
 import com.moirae.rosettaflow.req.workflow.node.WorkflowAllNodeReq;
 import com.moirae.rosettaflow.service.IWorkflowNodeService;
 import com.moirae.rosettaflow.service.IWorkflowRunStatusService;
+import com.moirae.rosettaflow.service.IWorkflowRunTaskResultService;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.workflow.node.NodeDetailsListVo;
@@ -39,7 +41,7 @@ public class WorkflowNodeController {
     private IWorkflowService workflowService;
 
     @Resource
-    private IWorkflowRunStatusService workflowRunStatusService;
+    private IWorkflowRunTaskResultService workflowRunTaskResultService;
 
     @GetMapping(value = "queryNodeDetailsList/{id}")
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
@@ -68,7 +70,7 @@ public class WorkflowNodeController {
     @GetMapping(value = "getTaskResult/{taskId}")
     @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
     public ResponseVo<List<NodeTaskResultVo>> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
-        List<WorkflowRunTaskStatus> taskResultList = workflowRunStatusService.queryWorkflowRunTaskStatusByTaskId(taskId);
+        List<WorkflowRunTaskResult> taskResultList = workflowRunTaskResultService.queryByTaskId(taskId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(taskResultList, NodeTaskResultVo.class));
     }
 

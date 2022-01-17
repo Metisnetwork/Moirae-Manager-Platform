@@ -57,6 +57,10 @@ public class Model implements Serializable {
      */
     private String trainUserAddress;
     /**
+     * 模型支持输入的算法id
+     */
+    private Long supportedAlgorithmId;
+    /**
      * 状态: 0-无效，1- 有效
      */
     @TableField(value = "`status`")

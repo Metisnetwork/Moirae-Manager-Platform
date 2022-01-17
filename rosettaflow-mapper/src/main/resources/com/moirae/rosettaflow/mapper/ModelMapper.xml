@@ -11,7 +11,7 @@
             m.file_path as filePath,
             if('en' = #{language, jdbcType=VARCHAR}, a.algorithm_name_en, a.algorithm_name) as algorithmName
         FROM t_model m INNER JOIN t_algorithm a ON m.train_algorithm_id = a.id
-        where m.train_user_address = #{address, jdbcType=VARCHAR} and m.train_algorithm_id = #{algorithmId, jdbcType=BIGINT}
+        where m.train_user_address = #{address, jdbcType=VARCHAR} and m.supported_algorithm_id = #{algorithmId, jdbcType=BIGINT}
             and m.org_identity_id = #{identityId, jdbcType=VARCHAR}
     </select>
 </mapper>

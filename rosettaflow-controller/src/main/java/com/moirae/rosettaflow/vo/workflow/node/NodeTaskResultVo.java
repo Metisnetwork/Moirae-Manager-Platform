@@ -42,9 +42,6 @@ public class NodeTaskResultVo {
     @ApiModelProperty(value = "任务结果文件所在的 数据服务内网port")
     private String port;
 
-    @ApiModelProperty(value = "状态: 0-无效，1- 有效")
-    private Byte status;
-
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
