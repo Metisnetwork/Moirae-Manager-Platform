@@ -35,7 +35,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private IWorkflowRunStatusService workflowRunStatusService;
 
-//    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
+    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     @Transactional(rollbackFor = RuntimeException.class)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
