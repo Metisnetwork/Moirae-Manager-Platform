@@ -86,6 +86,11 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
         this.baseMapper.batchUpdate(metaDatadetails);
     }
 
+    @Override
+    public List<MetaDataDetails> existMetaDataIdAndColumnList(List<MetaDataDetails> newMetaDataDetailsList) {
+        return this.baseMapper.existMetaDataIdAndColumnList(newMetaDataDetailsList);
+    }
+
     private LambdaQueryWrapper<MetaDataDetails> getQueryWrapper(String metaDataId, Long id) {
         LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaDataDetails::getStatus, StatusEnum.VALID.getValue());

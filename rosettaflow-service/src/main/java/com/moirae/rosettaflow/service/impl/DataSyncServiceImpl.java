@@ -73,7 +73,7 @@ public class DataSyncServiceImpl extends ServiceImpl<DataSyncMapper, DataSync> i
             dataSyncByType = new DataSync();
             dataSyncByType.setDataType(dataType);
             dataSyncByType.setLatestSynced(0);
-            dataSyncByType.setDesc(dataTypeDesc);
+            dataSyncByType.setInfo(dataTypeDesc);
             this.insertDataSync(dataSyncByType);
         }
         long latestSynced = dataSyncByType.getLatestSynced();

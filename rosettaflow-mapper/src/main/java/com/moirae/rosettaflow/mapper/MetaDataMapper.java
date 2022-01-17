@@ -46,4 +46,11 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
      * @return 插入记录数
      */
     int batchUpdate(@Param("metaDataList") List<MetaData> metaDataList);
+
+    /**
+     * 查询出已存在的metaDataIdList
+     * @param metaDataIdList
+     * @return
+     */
+    List<String> existMetaDataIdList(@Param("metaDataIdList") List<String> metaDataIdList);
 }

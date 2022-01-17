@@ -84,4 +84,10 @@ public interface IMetaDataService extends IService<MetaData> {
      * @return
      */
     void batchUpdate(List<MetaData> metaDataList);
+
+    /**
+     * 查询出已存在的MetaDataIdList
+     * @return
+     */
+    List<String> existMetaDataIdList(List<String> metaDataIdList);
 }

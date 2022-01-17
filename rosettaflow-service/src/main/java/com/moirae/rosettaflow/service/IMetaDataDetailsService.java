@@ -77,4 +77,11 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @return
      */
     void batchUpdateByMetaDataIdAndColumnIndex(List<MetaDataDetails> metaDatadetails);
+
+    /**
+     * 查询已存在的数据
+     * @param newMetaDataDetailsList
+     * @return
+     */
+    List<MetaDataDetails> existMetaDataIdAndColumnList(List<MetaDataDetails> newMetaDataDetailsList);
 }

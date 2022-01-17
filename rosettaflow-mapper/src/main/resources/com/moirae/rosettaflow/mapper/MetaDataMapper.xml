@@ -270,4 +270,12 @@
         </foreach>
     </update>
 
+    <select id="existMetaDataIdList" resultType="java.lang.String">
+        select meta_data_id from t_meta_data
+        where meta_data_id in
+        <foreach collection="metaDataIdList" open="(" close=")" separator="," item="metaDataId">
+            #{metaDataId}
+        </foreach>
+    </select>
+
 </mapper>

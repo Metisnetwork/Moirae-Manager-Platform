@@ -192,4 +192,9 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     public void batchUpdate(List<MetaData> metaDataList) {
         this.baseMapper.batchUpdate(metaDataList);
     }
+
+    @Override
+    public List<String> existMetaDataIdList(List<String> metaDataIdList) {
+        return this.baseMapper.existMetaDataIdList(metaDataIdList);
+    }
 }

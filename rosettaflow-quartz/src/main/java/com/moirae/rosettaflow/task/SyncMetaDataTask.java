@@ -23,6 +23,8 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 同步元数据定时任务, 多久同步一次待确认
@@ -88,8 +90,30 @@ public class SyncMetaDataTask {
      */
     private void batchUpdateMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
         List<MetaData> newMetaDataList = this.getMetaDataList(metaDataDetailResponseDtoList);
-        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), newMetaDataList, list -> {
+
+        List<String> metaDataIdList = newMetaDataList.stream()
+                .map(MetaData::getMetaDataId)
+                .collect(Collectors.toList());
+
+        //查询已存在的数据
+        List<String> existMetaDataIdList = metaDataService.existMetaDataIdList(metaDataIdList);
+
+        //需要更新的数据
+        List<MetaData> needUpdate = newMetaDataList.stream()
+                .filter(metaData -> existMetaDataIdList.contains(metaData.getMetaDataId()))
+                .collect(Collectors.toList());
+        //需要新增的数据
+        List<MetaData> needInsert = newMetaDataList.stream()
+                .filter(metaData -> !existMetaDataIdList.contains(metaData.getMetaDataId()))
+                .collect(Collectors.toList());
+
+        //批量更新
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needUpdate, list -> {
             metaDataService.batchUpdate(list);
+        });
+        //批量新增
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needInsert, list -> {
+            metaDataService.batchInsert(list);
         });
     }
 
@@ -104,8 +128,27 @@ public class SyncMetaDataTask {
             return;
         }
         List<MetaDataDetails> newMetaDataDetailsList = this.getMetaDataDetailsList(metaDataId, columnList);
-        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), newMetaDataDetailsList, list -> {
+
+        //查询已存在的数据
+        List<MetaDataDetails> existMetaDataDetails = metaDataDetailsService.existMetaDataIdAndColumnList(newMetaDataDetailsList);
+
+        //需要更新的数据
+        List<MetaDataDetails> needUpdate = newMetaDataDetailsList.stream()
+                .filter(metaDataDetails -> existMetaDataDetails.contains(metaDataDetails))
+                .collect(Collectors.toList());
+        //需要新增的数据
+        List<MetaDataDetails> needInsert = newMetaDataDetailsList.stream()
+                .filter(metaDataDetails -> !existMetaDataDetails.contains(metaDataDetails))
+                .collect(Collectors.toList());
+
+        //更新
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needUpdate, list -> {
             metaDataDetailsService.batchUpdateByMetaDataIdAndColumnIndex(list);
+        });
+
+        //新增
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needInsert, list -> {
+            metaDataDetailsService.batchInsert(list);
         });
     }
 

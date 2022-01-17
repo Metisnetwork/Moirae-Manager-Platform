@@ -4,10 +4,11 @@
   <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.DataSync">
     <result column="data_type" jdbcType="VARCHAR" property="dataType" />
     <result column="latest_synced" jdbcType="BIGINT" property="latestSynced" />
+    <result column="info" jdbcType="VARCHAR" property="info" />
   </resultMap>
 
   <sql id="Base_Column_List">
-    data_type,latest_synced
+    data_type,latest_synced,`info`
   </sql>
 
 </mapper>

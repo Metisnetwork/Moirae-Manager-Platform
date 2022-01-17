@@ -26,4 +26,11 @@ public interface MetaDataDetailsMapper extends BaseMapper<MetaDataDetails> {
      * @return 更新记录数
      */
     int batchUpdate(@Param("metaDataDetailsList") List<MetaDataDetails> metaDataDetailsList);
+
+    /**
+     * 查询已存在的数据
+     * @param newMetaDataDetailsList
+     * @return
+     */
+    List<MetaDataDetails> existMetaDataIdAndColumnList(@Param("metaDataDetailsList") List<MetaDataDetails> newMetaDataDetailsList);
 }

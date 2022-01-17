@@ -122,4 +122,12 @@
             </where>
         </foreach>
     </update>
+
+    <select id="existMetaDataIdAndColumnList" resultMap="BaseResultMap">
+        select meta_data_id,column_index from t_meta_data_details
+        where
+        <foreach collection="metaDataDetailsList" separator="or" item="metaDataDetail">
+            (meta_data_id = #{metaDataDetail.metaDataId} and column_index = #{metaDataDetail.columnIndex})
+        </foreach>
+    </select>
 </mapper>

@@ -25,6 +25,6 @@ public class DataSync {
     @TableField("latest_synced")
     private long latestSynced;
 
-    @TableField("desc")
-    private String desc;
+    @TableField("info")
+    private String info;
 }
