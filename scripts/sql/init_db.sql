@@ -95,6 +95,7 @@ INSERT INTO `t_organization` VALUES ('5', 'companyE', 'a1154e811f4d4e5feb875c145
 -- ----------------------------
 -- init t_data_sync
 -- ----------------------------
-INSERT INTO t_data_sync(data_type, latest_synced) VALUES('data_auth_req', '0');
-INSERT INTO t_data_sync(data_type, latest_synced) VALUES('local_meta_data', '0');
-INSERT INTO t_data_sync(data_type, latest_synced) VALUES('local_task', '0');
+INSERT INTO t_data_sync(data_type, latest_synced,`desc`) VALUES('data_auth', '0','同步数据授权信息');
+INSERT INTO t_data_sync(data_type, latest_synced,`desc`) VALUES('meta_data', '0','同步元数据信息');
+INSERT INTO t_data_sync(data_type, latest_synced,`desc`) VALUES('sub_job_node_status', '0','同步子作业节点状态');
+INSERT INTO t_data_sync(data_type, latest_synced,`desc`) VALUES('org_identity', '0','同步组织身份信息');

@@ -86,7 +86,7 @@ public class SyncSubJobNodeStatusTask {
         log.info("同步更新子作业节点运行中任务开始>>>>");
         Map<String, SubJobNodeDto> subJobNodeMap = subJobNodeDtoList.stream().collect(Collectors.toMap(SubJobNodeDto::getTaskId, subJobNodeDto -> subJobNodeDto));
 
-        dataSyncService.sync(DataSyncTypeEnum.SUB_JOB_NODE_STATUS.getDataType(),//1.根据dataType同步类型获取新的同步时间DataSync
+        dataSyncService.sync(DataSyncTypeEnum.SUB_JOB_NODE_STATUS.getDataType(),DataSyncTypeEnum.SUB_JOB_NODE_STATUS.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                 (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                     return grpcTaskService.getTaskDetailList(latestSynced);
                 },

@@ -50,7 +50,7 @@ public class SyncUserDataAuthTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            dataSyncService.sync(DataSyncTypeEnum.DATA_AUTH.getDataType(),//1.根据dataType同步类型获取新的同步时间DataSync
+            dataSyncService.sync(DataSyncTypeEnum.DATA_AUTH.getDataType(),DataSyncTypeEnum.DATA_AUTH.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcAuthService.getGlobalMetadataAuthorityList(latestSynced);
                     },

@@ -517,7 +517,7 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     private List<Organization> syncOrganization() {
         List<Organization> allOrganizationList = new ArrayList<>();
 
-        dataSyncService.sync(DataSyncTypeEnum.ORG_IDENTITY.getDataType(),
+        dataSyncService.sync(DataSyncTypeEnum.ORG_IDENTITY.getDataType(),DataSyncTypeEnum.ORG_IDENTITY.getDesc(),
                 (latestSynced) -> {
                     return grpcAuthService.getIdentityList(latestSynced);
                 },

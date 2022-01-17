@@ -63,6 +63,7 @@ public class DataSyncServiceImpl extends ServiceImpl<DataSyncMapper, DataSync> i
      */
     @Override
     public <T> void sync(String dataType,
+                         String dataTypeDesc,
                          Function<Long, List<T>> grpcFunction,
                          Consumer<List<T>> bizProcessor,
                          Function<List<T>, Long> latestSyncedGenerator) {
@@ -72,6 +73,7 @@ public class DataSyncServiceImpl extends ServiceImpl<DataSyncMapper, DataSync> i
             dataSyncByType = new DataSync();
             dataSyncByType.setDataType(dataType);
             dataSyncByType.setLatestSynced(0);
+            dataSyncByType.setDesc(dataTypeDesc);
             this.insertDataSync(dataSyncByType);
         }
         long latestSynced = dataSyncByType.getLatestSynced();

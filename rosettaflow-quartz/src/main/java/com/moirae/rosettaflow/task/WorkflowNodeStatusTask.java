@@ -103,7 +103,7 @@ public class WorkflowNodeStatusTask {
         for (String s : identityIdSet) {
             ManagedChannel nodeChannel = netManager.getChannel(s);
             List<TaskDetailResponseDto> allList = new ArrayList<>();
-            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType().concat(s),//1.根据dataType同步类型获取新的同步时间DataSync
+            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType().concat(s),DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
                                 .setLastUpdated(latestSynced)

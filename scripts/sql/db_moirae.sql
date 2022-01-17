@@ -684,5 +684,6 @@ DROP TABLE IF EXISTS `t_data_sync`;
 CREATE TABLE `t_data_sync` (
   `data_type` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据类型',
   `latest_synced` bigint NOT NULL DEFAULT '0' COMMENT '数据最新同步时间戳，精确到毫秒',
+  ``
   PRIMARY KEY (`data_type`)
 ) COMMENT='数据同步时间记录';
