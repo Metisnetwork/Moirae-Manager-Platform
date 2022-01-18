@@ -96,7 +96,7 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
-    public TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto) {
+    public TerminateTaskRespDto terminateTask(Channel channel, TerminateTaskRequestDto requestDto) {
         TerminateTaskRespDto respDto = new TerminateTaskRespDto();
         respDto.setStatus(GrpcConstant.GRPC_SUCCESS_CODE);
         respDto.setMsg("处理成功");

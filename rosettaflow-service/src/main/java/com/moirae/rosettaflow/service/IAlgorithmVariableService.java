@@ -27,10 +27,4 @@ public interface IAlgorithmVariableService extends IService<AlgorithmVariable> {
      * @param newAlgorithmId 目的算法id
      */
     void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId);
-
-    /**
-     * 清空算法变量表
-     */
-    void truncate();
-
 }

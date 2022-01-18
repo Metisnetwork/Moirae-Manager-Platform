@@ -79,10 +79,15 @@ public class Workflow implements Serializable {
     private Date updateTime;
 
     /**
-     * 运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败
+     * 运行状态: 0-未开始 1-运行中,2-运行成功,3-运行失败
      */
     @TableField(exist = false)
     private Byte runStatus;
+    /**
+     * 取消状态: 0-未开始,1-取消中,2-取消成功,3-取消失败
+     */
+    @TableField(exist = false)
+    private Byte cancelStatus;
 
     @TableField(exist = false)
     private List<WorkflowNode> getNodeStatusVoList = new ArrayList<>();
@@ -107,4 +112,7 @@ public class Workflow implements Serializable {
 
     @TableField(exist = false)
     Map<Integer, WorkflowNode> workflowNodeMap;
+
+    @TableField(exist = false)
+    private Long workflowRunStatusId;
 }

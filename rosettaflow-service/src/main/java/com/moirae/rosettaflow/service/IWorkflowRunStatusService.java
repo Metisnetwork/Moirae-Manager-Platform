@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.mapper.domain.WorkflowRunStatus;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 
 import java.util.List;
+import java.util.stream.DoubleStream;
 
 /**
  * 工作流服务
@@ -22,5 +23,9 @@ public interface IWorkflowRunStatusService extends IService<WorkflowRunStatus> {
 
     List<WorkflowRunTaskStatus> queryUnConfirmedWorkflowRunTaskStatus();
 
-    void taskFinish(Long aLong, String taskId, int state, long taskStartAt, long taskEndAt);
+    void taskFinish(Long workflowRunStatusId, String taskId, int state, long taskStartAt, long taskEndAt);
+
+    void updateCancelStatus(Long workflowRunStatusId, byte value);
+
+    boolean cancel(WorkflowRunTaskStatus workflowRunTaskStatus);
 }

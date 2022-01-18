@@ -9,7 +9,6 @@ import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -33,6 +32,10 @@ public class SyncSubJobNodeStatusTask {
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.queryUnConfirmedWorkflowRunTaskStatus();
+        // 执行取消逻辑
+        workflowRunTaskStatusList = workflowRunTaskStatusList.stream()
+                .filter(item -> !workflowRunStatusService.cancel(item))
+                .collect(Collectors.toList());
         //如果没有需要同步的数据则不进行同步
         if (CollUtil.isEmpty(workflowRunTaskStatusList)) {
             return;

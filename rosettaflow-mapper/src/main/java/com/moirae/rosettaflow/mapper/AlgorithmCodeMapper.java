@@ -7,6 +7,4 @@ import com.moirae.rosettaflow.mapper.domain.AlgorithmCode;
  * @author houz
  */
 public interface AlgorithmCodeMapper extends BaseMapper<AlgorithmCode> {
-
-    void truncate();
 }

@@ -54,7 +54,7 @@ public class GrpcTaskServiceImpl implements GrpcTaskService {
     }
 
     @Override
-    public TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto) {
-        return taskServiceClient.terminateTask(requestDto);
+    public TerminateTaskRespDto terminateTask(Channel channel,TerminateTaskRequestDto requestDto) {
+        return taskServiceClient.terminateTask(channel, requestDto);
     }
 }

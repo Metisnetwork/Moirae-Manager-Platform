@@ -54,6 +54,10 @@ public class WorkflowRunStatus implements Serializable {
      */
     private Byte runStatus;
     /**
+     *  取消状态: 1-取消中,2-取消成功,3-取消失败
+     */
+    private Byte cancelStatus;
+    /**
      * 创建时间
      */
     private Date createTime;

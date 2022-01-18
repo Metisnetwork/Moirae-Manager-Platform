@@ -235,14 +235,14 @@ public class TaskServiceClient {
      *
      * @return 终止任务响应对象
      */
-    public TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto) {
+    public TerminateTaskRespDto terminateTask(Channel channel, TerminateTaskRequestDto requestDto) {
         TerminateTaskRequest terminateReq = TerminateTaskRequest.newBuilder()
                 .setUser(requestDto.getUser())
                 .setUserTypeValue(requestDto.getUserType())
                 .setTaskId(requestDto.getTaskId())
                 .setSign(ByteString.copyFromUtf8(requestDto.getSign()))
                 .build();
-        SimpleResponse simpleResponse = taskServiceBlockingStub.terminateTask(terminateReq);
+        SimpleResponse simpleResponse = TaskServiceGrpc.newBlockingStub(channel).terminateTask(terminateReq);
         TerminateTaskRespDto terminateTaskRespDto = new TerminateTaskRespDto();
         terminateTaskRespDto.setStatus(simpleResponse.getStatus());
         terminateTaskRespDto.setMsg(simpleResponse.getMsg());

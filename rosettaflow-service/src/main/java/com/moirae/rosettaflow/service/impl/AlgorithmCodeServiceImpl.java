@@ -46,10 +46,4 @@ public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, A
         wrapper.eq(AlgorithmCode::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(wrapper);
     }
-
-    @Override
-    public void truncate() {
-        this.baseMapper.truncate();
-    }
-
 }

@@ -221,3 +221,6 @@ ALTER TABLE `db_moirae_cd`.`t_workflow_run_task_status`
 
 ALTER TABLE `db_moirae_cd`.t_workflow_run_task_result
     ADD COLUMN `identity_id`  varchar(128) NOT NULL  COMMENT '所属组织' AFTER `id`;
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_run_status`
+    ADD COLUMN `cancel_status` TINYINT(4) NULL   COMMENT '取消状态: 1-取消中,2-取消成功,3-取消失败' AFTER `run_status`;

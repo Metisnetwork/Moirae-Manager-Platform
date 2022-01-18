@@ -65,5 +65,5 @@ public interface GrpcTaskService {
      * @param requestDto 终止任务请求对象
      * @return 终止任务响应对象
      */
-    TerminateTaskRespDto terminateTask(TerminateTaskRequestDto requestDto);
+    TerminateTaskRespDto terminateTask(Channel channel,TerminateTaskRequestDto requestDto);
 }

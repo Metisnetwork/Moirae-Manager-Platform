@@ -29,9 +29,4 @@ public interface IAlgorithmCodeService extends IService<AlgorithmCode> {
      * @return 算法代码
      */
     AlgorithmCode getByAlgorithmId(Long algorithmId);
-
-    /**
-     * 清空算法表
-     */
-    void truncate();
 }

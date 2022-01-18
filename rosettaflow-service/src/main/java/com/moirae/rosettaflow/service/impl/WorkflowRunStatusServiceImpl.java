@@ -11,17 +11,13 @@ import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.JsonUtils;
-import com.moirae.rosettaflow.dto.NodeMetaDataDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 import com.moirae.rosettaflow.grpc.service.GrpcSysService;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskDataSupplierDeclareDto;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskMetaDataDeclareDto;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskResourceCostDeclareDto;
+import com.moirae.rosettaflow.grpc.task.req.dto.*;
 import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import com.moirae.rosettaflow.mapper.WorkflowRunStatusMapper;
 import com.moirae.rosettaflow.mapper.domain.*;
@@ -42,6 +38,8 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private IWorkflowService workflowService;
     @Resource
+    private IWorkflowNodeService workflowNodeService;
+    @Resource
     private IWorkflowRunTaskStatusService workflowRunTaskStatusService;
     @Resource
     private IWorkflowRunTaskResultService workflowRunTaskResultService;
@@ -56,10 +54,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private IAlgorithmService algorithmService;
     @Resource
-    private IWorkflowNodeInputService workflowNodeInputService;
-    @Resource
-    private IWorkflowNodeResourceService workflowNodeResourceService;
-    @Resource
     private IOrganizationService organizationService;
     @Resource
     private IModelService modelService;
@@ -67,7 +61,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     private IAlgorithmVariableStructService algorithmVariableStructService;
     @Resource
     private GrpcSysService grpcSysService;
-
 
     @Override
     public TaskDto assemblyTaskDto(WorkflowDto workflowDto) {
@@ -119,6 +112,48 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 taskFail(workflowRunStatus, taskId, taskStartAt, taskEndAt);
             }
         }
+    }
+
+    @Override
+    public void updateCancelStatus(Long workflowRunStatusId, byte value) {
+        WorkflowRunStatus workflowRunStatus = getById(workflowRunStatusId);
+        workflowRunStatus.setCancelStatus(value);
+        updateById(workflowRunStatus);
+    }
+
+    @Override
+    public boolean cancel(WorkflowRunTaskStatus workflowRunTaskStatus) {
+        WorkflowRunStatus workflowRunStatus = getById(workflowRunTaskStatus.getWorkflowRunId());
+        if(workflowRunStatus.getCancelStatus() !=null && WorkflowRunStatusEnum.RUNNING.getValue() == workflowRunStatus.getCancelStatus()){
+            WorkflowNode workflowNode = workflowNodeService.getById(workflowRunTaskStatus.getWorkflowNodeId());
+            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflowRunStatus, workflowRunTaskStatus.getTaskId());
+            try {
+                TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(netManager.getChannel(workflowNode.getSenderIdentityId()), terminateTaskRequestDto);
+                log.info("终止工作流返回， terminateTaskRespDto = {}", terminateTaskRespDto);
+                if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+                    workflowRunStatus.setCancelStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
+                    updateById(workflowRunStatus);
+                }else{
+                    log.error("终止工作流失败，失败原因! 原因 = {}", terminateTaskRespDto);
+                    workflowRunStatus.setCancelStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                    updateById(workflowRunStatus);
+                }
+            } catch (Exception e) {
+                log.error("终止工作流失败，失败原因!", e);
+                workflowRunStatus.setCancelStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
+                updateById(workflowRunStatus);
+            }
+        }
+        return false;
+    }
+
+    public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(WorkflowRunStatus workflowRunStatus, String taskId) {
+        TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
+        terminateTaskRequestDto.setUser(workflowRunStatus.getAddress());
+        terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflowRunStatus.getAddress()));
+        terminateTaskRequestDto.setTaskId(taskId);
+        terminateTaskRequestDto.setSign(workflowRunStatus.getSign());
+        return terminateTaskRequestDto;
     }
 
     private void taskSuccess(WorkflowRunStatus workflowRunStatus, String taskId, long taskStartAt, long taskEndAt) {
@@ -333,29 +368,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         return taskDto;
     }
 
-
-
-    private WorkflowNodeResource getWorkflowNodeResource(WorkflowNode workflowNode) {
-        WorkflowNodeResource workflowNodeResource = workflowNodeResourceService.queryByWorkflowNodeId(workflowNode.getId());
-        if (null == workflowNodeResource) {
-            Algorithm algorithm = algorithmService.getById(workflowNode.getAlgorithmId());
-            if (null == algorithm) {
-                log.error("Can not find algorithm by id:{}", workflowNode.getAlgorithmId());
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ALG_NOT_EXIST.getMsg());
-            }
-            workflowNodeResource = new WorkflowNodeResource();
-            workflowNodeResource.setCostMem(algorithm.getCostMem());
-            workflowNodeResource.setCostCpu(algorithm.getCostCpu());
-            workflowNodeResource.setCostBandwidth(algorithm.getCostBandwidth());
-            workflowNodeResource.setRunTime(algorithm.getRunTime());
-        }
-        return workflowNodeResource;
-    }
-
-    private WorkflowRunStatus load(Long workflowRunStatusId) {
-        return null;
-    }
-
     private List<WorkflowRunTaskStatus> createAndSaveWorkflowRunTaskStatus(Workflow workflow, WorkflowRunStatus workflowRunStatus) {
         return workflow.getWorkflowNodeReqList().stream()
             .map(item -> {
@@ -543,32 +555,4 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             return jsonObject.toJSONString();
         }
     }
-
-    /**
-     * 启动前判断当前节点算法是否有模型
-     */
-    private void checkAlgorithm(WorkflowNode workflowNode) {
-        Algorithm algorithm = algorithmService.getAlgorithmById(workflowNode.getAlgorithmId());
-        // 启动前判断当前节点算法是否有模型
-        boolean modelFlag = workflowNode.getModelId() == null || workflowNode.getModelId() == 0;
-        //如果算法需要使用模型，且是第一个节点，则需要判断是否有模型，否则可以重前一个节点获取模型
-        if (workflowNode.getNodeStep() == SysConstant.INT_1 && InputModelEnum.NEED.getValue() == algorithm.getInputModel() && modelFlag) {
-            log.error("checkModel--当前节点未配置模型, inputModel:{}, workflowNode:{}", algorithm.getInputModel(), workflowNode);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_MODEL_NOT_EXIST.getMsg());
-        }
-        // 启动数是前判断当前节点多方数据行否相等
-        if (SysConstant.INT_1 == algorithm.getDataRowsFlag()) {
-            List<NodeMetaDataDto> nodeMetaDataDtoList = workflowNodeInputService.getMetaDataByWorkflowNodeId(workflowNode.getId());
-            if (!nodeMetaDataDtoList.isEmpty()) {
-                NodeMetaDataDto initNodeMetaDataDto = nodeMetaDataDtoList.get(0);
-                for (NodeMetaDataDto nodeMetaDataDto : nodeMetaDataDtoList) {
-                    if (initNodeMetaDataDto.getMetaDataRows() != nodeMetaDataDto.getMetaDataRows()) {
-                        log.error("checkModel--工作流节点多方数据行数不一致, initNodeMetaDataDto:{}, nodeMetaDataDto:{}", initNodeMetaDataDto, nodeMetaDataDto);
-                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_DATA_ROWS_CHECK.getMsg());
-                    }
-                }
-            }
-        }
-    }
-
 }

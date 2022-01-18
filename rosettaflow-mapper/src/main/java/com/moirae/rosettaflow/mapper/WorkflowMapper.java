@@ -37,5 +37,5 @@ public interface WorkflowMapper extends BaseMapper<Workflow> {
      * 删除与当前工作流相关所有节点数据
      * @param workflowId 工作流id
      */
-    void deleteWorkflowAllNodeData(Long workflowId);
+    void deleteWorkflowAllNodeData(@Param("workflowId") Long workflowId);
 }

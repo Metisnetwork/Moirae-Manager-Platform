@@ -8,19 +8,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.WorkflowDto;
-import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
-import com.moirae.rosettaflow.grpc.task.req.dto.*;
+import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
+import com.moirae.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
 import com.moirae.rosettaflow.mapper.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
-import com.zengtengpeng.operation.RedissonObject;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -28,7 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.date.DateTime.now;
@@ -44,52 +44,25 @@ import static cn.hutool.core.date.DateTime.now;
 public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> implements IWorkflowService {
 
     @Resource
-    private SysConfig sysConfig;
-
-    @Resource
     private CommonService commonService;
-
     @Resource
     private IProjectService projectService;
-
-    @Resource
-    private IMetaDataDetailsService metaDataDetailsService;
-
     @Resource
     private IAlgorithmService algorithmService;
-
-    @Resource
-    private IAlgorithmCodeService algorithmCodeService;
-
     @Resource
     private IWorkflowNodeService workflowNodeService;
-
     @Resource
     private IWorkflowNodeCodeService workflowNodeCodeService;
-
     @Resource
     private IWorkflowNodeInputService workflowNodeInputService;
-
     @Resource
     private IWorkflowNodeOutputService workflowNodeOutputService;
-
     @Resource
     private IWorkflowNodeResourceService workflowNodeResourceService;
     @Resource
     private IWorkflowNodeVariableService workflowNodeVariableService;
-
-    @Resource
-    private GrpcTaskService grpcTaskService;
-
     @Resource
     private IOrganizationService organizationService;
-
-    @Resource
-    private IAlgorithmVariableStructService algorithmVariableStructService;
-
-    @Resource
-    private RedissonObject redissonObject;
-
     @Resource
     private IUserMetaDataService userMetaDataService;
     @Resource
@@ -98,8 +71,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IModelService modelService;
 
     @Resource
+    private GrpcTaskService grpcTaskService;
+    @Resource
     private NetManager netManager;
-
     @Resource
     private WorkflowNodeMapper workflowNodeMapper;
     @Resource
@@ -243,44 +217,46 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public void terminate(Long workflowId) {
-        Workflow workflow = this.queryWorkflow(workflowId);
+        Workflow workflow = getWorkflowStatusById(workflowId);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
+        // 校验是否运行中
         if (workflow.getRunStatus() != WorkflowRunStatusEnum.RUNNING.getValue()) {
             log.error("workflow by id:{} is not running can not terminate", workflowId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_RUNNING.getMsg());
         }
-
-        //获取工作流正在执行的节点进行终止，并更新整个工作流状态为停止
-        WorkflowNode workflowNode = workflowNodeService.getRunningNodeByWorkflowId(workflowId);
-        if (null == workflowNode) {
-            this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
-        } else {
-            TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, workflowNode.getTaskId());
-            TerminateTaskRespDto terminateTaskRespDto = null;
-            for (int i = 0; i < 3; i++) {
-                try {
-                    terminateTaskRespDto = grpcTaskService.terminateTask(terminateTaskRequestDto);
-                } catch (Exception e) {
-                    log.error("终止工作流失败，失败原因：{}", e.getMessage());
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException ex) {
-                        log.error("线程休眠失败，失败原因：{}", ex.getMessage());
-                    }
-                    continue;
-                }
-                break;
-            }
-
-            if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
-                this.updateRunStatus(workflowId, WorkflowRunStatusEnum.UN_RUN.getValue());
-                workflowNodeService.updateRunStatusByWorkflowId(workflowId, workflowNode.getRunStatus(), WorkflowRunStatusEnum.UN_RUN.getValue());
-            } else {
-                log.error("Terminate workflow with id:{} fail", workflowId);
-                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
-            }
+        // 校验取消状态
+        if (workflow.getCancelStatus() == WorkflowRunStatusEnum.RUNNING.getValue()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELING.getMsg());
         }
+        if (workflow.getCancelStatus() == WorkflowRunStatusEnum.RUN_SUCCESS.getValue()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELLED_SUCCESS.getMsg());
+        }
+        if (workflow.getCancelStatus() == WorkflowRunStatusEnum.RUN_FAIL.getValue()) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELLED_FAIL.getMsg());
+        }
+
+        // 更新工作流运行状态
+        workflowRunStatusService.updateCancelStatus(workflow.getWorkflowRunStatusId(), WorkflowRunStatusEnum.RUNNING.getValue());
+
+
+//
+//        // 停止子任务
+//        workflow.getGetNodeStatusVoList().stream()
+//                .filter(item -> StringUtils.isNoneBlank(item.getTaskId()) && item.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue())
+//                .forEach(item ->{
+//                    TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, item.getTaskId());
+//                    try {
+//                        TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(netManager.getChannel(item.getWorkflowNodeSenderIdentityId()), terminateTaskRequestDto);
+//                        if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+//                            log.error("终止工作流失败，失败原因! msg = {}", terminateTaskRespDto);
+//                            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
+//                        }
+//                    } catch (Exception e) {
+//                        log.error("终止工作流失败，失败原因!", e);
+//                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
+//                    }
+//                });
     }
 
     @Override

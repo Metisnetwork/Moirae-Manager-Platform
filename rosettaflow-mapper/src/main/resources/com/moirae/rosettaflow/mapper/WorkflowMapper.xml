@@ -36,6 +36,8 @@
             w.`id` AS id,
             w.`edit_version` AS editVersion,
             IFNULL((SELECT ws.`run_status` FROM `t_workflow_run_status` ws WHERE ws.`workflow_id` = w.`id` AND ws.`workflow_edit_version` = w.`edit_version` ORDER BY ws.`id` DESC LIMIT 1) , 0) AS runStatus,
+            IFNULL((SELECT ws.`cancel_status` FROM `t_workflow_run_status` ws WHERE ws.`workflow_id` = w.`id` AND ws.`workflow_edit_version` = w.`edit_version` ORDER BY ws.`id` DESC LIMIT 1) , 0) AS cancelStatus,
+            (SELECT ws.`id` FROM `t_workflow_run_status` ws WHERE ws.`workflow_id` = w.`id` AND ws.`workflow_edit_version` = w.`edit_version` ORDER BY ws.`id` DESC LIMIT 1) AS workflowRunStatusId,
             w.project_id AS projectId
         FROM `t_workflow` w
         WHERE w.`id` = #{workflowId, jdbcType=BIGINT} AND w.`status` = 1
