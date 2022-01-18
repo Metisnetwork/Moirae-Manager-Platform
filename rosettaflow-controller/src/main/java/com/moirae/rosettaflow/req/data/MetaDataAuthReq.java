@@ -37,11 +37,9 @@ public class MetaDataAuthReq {
     private Integer authValue;
 
     @ApiModelProperty(value = "授权开始时间,按时间授权此字段必输", example = "2021-08-27 17:13:47")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authBeginTime;
 
     @ApiModelProperty(value = "授权结束时间,按时间授权此字段必输", example = "2021-10-27 17:13:47")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authEndTime;
 
     @ApiModelProperty(value = "用户钱包地址", required = true)

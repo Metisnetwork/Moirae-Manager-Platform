@@ -66,38 +66,30 @@ public class MetaDataDetailVo {
     private Byte dataStatus;
 
     @ApiModelProperty(value = "元数据发布时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date publishAt;
 
     @ApiModelProperty(value = "元数据更新时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date updateAt;
 
     @ApiModelProperty(value = "创建时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
 
     @ApiModelProperty(value = "更新时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date updateTime;
 
     @ApiModelProperty(value = "授权方式: 0-未知,1-按时间, 2-按次数, 3-永久")
     private Byte authType;
 
     @ApiModelProperty(value = "授权开始时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authBeginTime;
 
     @ApiModelProperty(value = "授权结束时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authEndTime;
 
     @ApiModelProperty(value = "发起授权申请的时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date applyTime;
 
     @ApiModelProperty(value = "审核授权申请的时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date auditTime;
 
     @ApiModelProperty(value = "授权值:按次数单位为（次）")
