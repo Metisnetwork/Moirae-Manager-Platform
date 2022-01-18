@@ -39,8 +39,8 @@ public class GrpcTaskServiceImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskDetailResponseDto> getTaskDetailList() {
-        return taskServiceClient.getTaskDetailList();
+    public List<TaskDetailResponseDto> getTaskDetailList(Channel channel) {
+        return taskServiceClient.getTaskDetailList(channel);
     }
 
     @Override

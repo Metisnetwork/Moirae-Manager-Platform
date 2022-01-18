@@ -38,7 +38,7 @@ public interface GrpcTaskService {
      *
      * @return 全部任务详情列表
      */
-    List<TaskDetailResponseDto> getTaskDetailList();
+    List<TaskDetailResponseDto> getTaskDetailList(Channel channel);
 
     /**
      * 查看某个任务的全部事件列表通过单个任务ID

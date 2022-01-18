@@ -80,10 +80,10 @@ public class TaskServiceClient {
     /**
      * 查看本组织参与过的全部任务详情列表
      */
-    public List<TaskDetailResponseDto> getTaskDetailList() {
+    public List<TaskDetailResponseDto> getTaskDetailList(Channel channel) {
         List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
         Empty empty = Empty.newBuilder().build();
-        GetTaskDetailListResponse getTaskDetailListResponse = taskServiceBlockingStub.getTaskDetailList(empty);
+        GetTaskDetailListResponse getTaskDetailListResponse = TaskServiceGrpc.newBlockingStub(channel).getTaskDetailList(empty);
 
         if (getTaskDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("TaskServiceClient->getTaskDetailList() fail reason:{}", getTaskDetailListResponse.getMsg());
