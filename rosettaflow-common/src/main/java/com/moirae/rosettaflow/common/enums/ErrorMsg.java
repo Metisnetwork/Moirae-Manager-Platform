@@ -26,7 +26,6 @@ public enum ErrorMsg {
     USER_ADDRESS_ERROR("用户地址有误", "Wrong user address"),
     MODIFY_USER_NAME_FAILED("昵称修改失败", "Nickname modification failed"),
     USER_NAME_EXISTED("昵称已存在", "Nickname already exists"),
-    USER_IDENTITY_EXISTED("此组织不可用！", "this organization is not available!"),
 
     /**
      * 项目
@@ -159,6 +158,8 @@ public enum ErrorMsg {
      */
     ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist"),
     ORGANIZATION_INFO_ERROR("连接组织节点服务不可达", "Organization can not connect"),
+    USER_IDENTITY_ERROR("此组织不可用！", "this organization is not available!"),
+    ORGANIZATION_DELETE_ERROR("公共组织不可删除！", "Public organization cannot be deleted!"),
 
     /**
      * 任务

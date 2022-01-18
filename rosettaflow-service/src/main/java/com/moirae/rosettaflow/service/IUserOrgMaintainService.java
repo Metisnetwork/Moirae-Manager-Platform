@@ -2,8 +2,11 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.UserOrgMaintainDto;
 import com.moirae.rosettaflow.mapper.domain.UserOrgMaintain;
+
+import java.util.List;
 
 /**
  * 用户组织连接绑定关系服务类
@@ -42,12 +45,9 @@ public interface IUserOrgMaintainService extends IService<UserOrgMaintain> {
     /**
      * 查询当前用户维护的组织绑定信息关系表
      *
-     * @param orgName 组织名称
-     * @param current 当前页
-     * @param size    每页大小
      * @return 用户维护组织关系分页列表
      */
-    IPage<UserOrgMaintainDto> queryUserOrgMaintainPageList(String orgName, Long current, Long size);
+    List<UserOrgMaintainDto> queryUserOrgMaintainPageList();
 
     /**
      * 连接组织
@@ -55,6 +55,15 @@ public interface IUserOrgMaintainService extends IService<UserOrgMaintain> {
      * @param identityId 组织id
      */
     void connectIdentity(String identityId);
+
+    /**
+     * 连接组织
+     * @param userDto 用户信息
+     * @param identityId 组织id
+     * @param identityIp 组织ip
+     * @param identityPort 组织端口
+     */
+    void checkConnectIdentity(UserDto userDto, String identityId, String identityIp, Integer identityPort);
 
     /**
      * 断开连接组织
@@ -66,8 +75,8 @@ public interface IUserOrgMaintainService extends IService<UserOrgMaintain> {
     /**
      * 删除用户与组织ip及port绑定关系
      *
-     * @param id 用户组织连接绑定关系表id
+     * @param identityId 组织id
      */
-    void delIpPortBind(Long id);
+    void delIpPortBind(String identityId);
 
 }

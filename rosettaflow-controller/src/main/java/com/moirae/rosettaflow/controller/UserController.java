@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
@@ -8,10 +9,13 @@ import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.dto.UserDto;
+import com.moirae.rosettaflow.mapper.domain.Organization;
 import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.req.user.LoginInReq;
 import com.moirae.rosettaflow.req.user.UpdateNickReq;
 import com.moirae.rosettaflow.req.user.UserDetailsReq;
+import com.moirae.rosettaflow.service.IOrganizationService;
+import com.moirae.rosettaflow.service.IUserOrgMaintainService;
 import com.moirae.rosettaflow.service.IUserService;
 import com.moirae.rosettaflow.utils.WalletSignUtils;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -44,6 +48,12 @@ public class UserController {
     @Resource
     private IUserService userService;
 
+    @Resource
+    private IOrganizationService organizationService;
+
+    @Resource
+    private IUserOrgMaintainService userOrgMaintainService;
+
     @GetMapping("getLoginNonce/{address}")
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
     public ResponseVo<NonceVo> getLoginNonce(@ApiParam(value = "用户钱包地址", required = true) @PathVariable String address) {
@@ -68,8 +78,27 @@ public class UserController {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
         UserDto userDto = userService.generatorToken(loginInReq.getAddress(), loginInReq.getHrpAddress());
+        // 随机取第一个组织进行连接连接组织
+        this.randomConnect(userDto);
         log.info("用户登录钱包地址:{},登录登录成功！", loginInReq.getAddress());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(userDto, UserVo.class));
+    }
+
+    /** 随机取第一个组织进行连接连接组织 */
+    private void randomConnect(UserDto userDto) {
+        try {
+            List<Organization> organizationList = organizationService.getAllPublicByIdentity();
+            if (CollectionUtil.isEmpty(organizationList)) {
+                log.error("用户登录时没有获取到公共组织-randomConnect, organizationList:{}", organizationList);
+                return;
+            }
+            // 随机取第一个组织
+            Organization organization = organizationList.get(0);
+            // 检验保存连接组织信息
+            userOrgMaintainService.checkConnectIdentity(userDto, organization.getIdentityId(), organization.getIdentityIp(), organization.getIdentityPort());
+        } catch (Exception e) {
+            log.error("登录时，检验保存连接组织信息失败-checkConnectIdentity, 错误信息:{}", e.getMessage());
+        }
     }
 
     @PostMapping("logout")
