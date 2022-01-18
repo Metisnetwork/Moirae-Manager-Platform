@@ -1,15 +1,16 @@
 package com.moirae.rosettaflow.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
-import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
+import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataColumnDetailDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataDetails;
+import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IMetaDataDetailsService;
 import com.moirae.rosettaflow.service.IMetaDataService;
 import com.zengtengpeng.annotation.Lock;
@@ -22,6 +23,8 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 同步元数据定时任务, 多久同步一次待确认
@@ -46,73 +49,72 @@ public class SyncMetaDataTask {
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
 
-    @Scheduled(fixedDelay = 600 * 1000, initialDelay = 10 * 1000)
+    @Resource
+    private IDataSyncService dataSyncService;
+
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = grpcMetaDataService.getGlobalMetadataDetailList();
-            if (CollUtil.isEmpty(metaDataDetailResponseDtoList)) {
-                return;
-            }
-            // 判断是否有元数据状态更新，如果有，则需全量更新
-            boolean updateFlag = false;
-            for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-                if (SysConstant.INT_2 != metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getDataState()) {
-                    updateFlag = true;
-                    break;
-                }
-            }
-            // 从net同步元数据[未发现变更元数据], 故不进行后续同步
-            if (!updateFlag && metaDataDetailResponseDtoList.size() == metaDataService.count()) {
-                log.info("元数据信息同步, net元数据与flow中元数据记录数一致, net同步数据量:{}条", metaDataDetailResponseDtoList.size());
-                    return;
-            }
-            // net更新数据量和flow不一致，重新同步元数据，清空元数据和详情
-            this.delOldData();
-            // 批量插入元数据
-            this.batchInsertMetaData(metaDataDetailResponseDtoList);
-
-            // 批量插入元数据详情
-            for (MetaDataDetailResponseDto metaDataDetailResponseDto : metaDataDetailResponseDtoList) {
-                String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
-                List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
-                //  批量插入元数据详情
-                this.batchInsertMetaDataDetails(metaDataId, columnList);
-            }
+            dataSyncService.sync(DataSyncTypeEnum.META_DATA.getDataType(),DataSyncTypeEnum.META_DATA.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                        return grpcMetaDataService.getGlobalMetadataDetailList(latestSynced);
+                    },
+                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                        // 批量更新元数据
+                        this.batchUpdateMetaData(grpcResponseList);
+                        // 批量更新元数据详情
+                        for (MetaDataDetailResponseDto metaDataDetailResponseDto : grpcResponseList) {
+                            String metaDataId = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataSummary().getMetaDataId();
+                            List<MetaDataColumnDetailDto> columnList = metaDataDetailResponseDto.getMetaDataDetailDto().getMetaDataColumnDetailDtoList();
+                            //  批量更新元数据详情
+                            this.batchUpdateMetaDataDetails(metaDataId, columnList);
+                        }
+                    },
+                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                        return grpcResponseList
+                                .get(grpcResponseList.size() - 1)
+                                .getMetaDataDetailDto()
+                                .getMetaDataSummary()
+                                .getUpdateAt();
+                    });
         } catch (Exception e) {
             log.error("元数据信息同步,从net同步元数据失败,失败原因：{}", e.getMessage(), e);
         }
         log.info("元数据信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
-
     /**
-     * 批量插入元数据
-     *
      * @param metaDataDetailResponseDtoList 需更新数据
      */
-    private void batchInsertMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
-        if (0 == metaDataDetailResponseDtoList.size()) {
-            return;
-        }
+    private void batchUpdateMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
         List<MetaData> newMetaDataList = this.getMetaDataList(metaDataDetailResponseDtoList);
-        int insertLength = newMetaDataList.size();
-        int i = 0;
-        log.info("批量插入元数据开始, 总条数:{}", insertLength);
-        while (insertLength > sysConfig.getBatchSize()) {
-            long begin = DateUtil.current();
-            metaDataService.batchInsert(newMetaDataList.subList(i, i + sysConfig.getBatchSize()));
-            log.info("批量插入元数据, 开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
-            i = i + sysConfig.getBatchSize();
-            insertLength = insertLength - i;
 
-        }
-        if (insertLength > 0) {
-            long begin = DateUtil.current();
-            metaDataService.batchInsert(newMetaDataList.subList(i, i + insertLength));
-            log.info("批量插入元数据, 开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + insertLength, DateUtil.current() - begin);
-        }
+        List<String> metaDataIdList = newMetaDataList.stream()
+                .map(MetaData::getMetaDataId)
+                .collect(Collectors.toList());
+
+        //查询已存在的数据
+        List<String> existMetaDataIdList = metaDataService.existMetaDataIdList(metaDataIdList);
+
+        //需要更新的数据
+        List<MetaData> needUpdate = newMetaDataList.stream()
+                .filter(metaData -> existMetaDataIdList.contains(metaData.getMetaDataId()))
+                .collect(Collectors.toList());
+        //需要新增的数据
+        List<MetaData> needInsert = newMetaDataList.stream()
+                .filter(metaData -> !existMetaDataIdList.contains(metaData.getMetaDataId()))
+                .collect(Collectors.toList());
+
+        //批量更新
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needUpdate, list -> {
+            metaDataService.batchUpdate(list);
+        });
+        //批量新增
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needInsert, list -> {
+            metaDataService.batchInsert(list);
+        });
     }
 
     /**
@@ -121,27 +123,33 @@ public class SyncMetaDataTask {
      * @param metaDataId 元数据id
      * @param columnList 需更新数据
      */
-    private void batchInsertMetaDataDetails(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
+    private void batchUpdateMetaDataDetails(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
         if (0 == columnList.size()) {
             return;
         }
         List<MetaDataDetails> newMetaDataDetailsList = this.getMetaDataDetailsList(metaDataId, columnList);
-        int insertLength = newMetaDataDetailsList.size();
-        int i = 0;
-        log.info("批量插入元数据详情开始，总条数:{}", insertLength);
-        while (insertLength > sysConfig.getBatchSize()) {
-            long begin = DateUtil.current();
-            metaDataDetailsService.batchInsert(newMetaDataDetailsList.subList(i, i + sysConfig.getBatchSize()));
-            log.info("批量插入元数据详情，开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
-            i = i + sysConfig.getBatchSize();
-            insertLength = insertLength - i;
 
-        }
-        if (insertLength > 0) {
-            long begin = DateUtil.current();
-            metaDataDetailsService.batchInsert(newMetaDataDetailsList.subList(i, i + insertLength));
-            log.info("批量插入元数据详情，开始条数:{}, 结束条数:{}, 耗时:{}ms", i, i + insertLength, DateUtil.current() - begin);
-        }
+        //查询已存在的数据
+        List<MetaDataDetails> existMetaDataDetails = metaDataDetailsService.existMetaDataIdAndColumnList(newMetaDataDetailsList);
+
+        //需要更新的数据
+        List<MetaDataDetails> needUpdate = newMetaDataDetailsList.stream()
+                .filter(metaDataDetails -> existMetaDataDetails.contains(metaDataDetails))
+                .collect(Collectors.toList());
+        //需要新增的数据
+        List<MetaDataDetails> needInsert = newMetaDataDetailsList.stream()
+                .filter(metaDataDetails -> !existMetaDataDetails.contains(metaDataDetails))
+                .collect(Collectors.toList());
+
+        //更新
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needUpdate, list -> {
+            metaDataDetailsService.batchUpdateByMetaDataIdAndColumnIndex(list);
+        });
+
+        //新增
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needInsert, list -> {
+            metaDataDetailsService.batchInsert(list);
+        });
     }
 
     private List<MetaDataDetails> getMetaDataDetailsList(String metaDataId, List<MetaDataColumnDetailDto> columnList) {
@@ -192,13 +200,4 @@ public class SyncMetaDataTask {
         return metaDataList;
     }
 
-    /**
-     * 清空旧数据
-     */
-    private void delOldData() {
-        //删除元数据
-        metaDataService.truncate();
-        //删除元数据详情
-        metaDataDetailsService.truncate();
-    }
 }

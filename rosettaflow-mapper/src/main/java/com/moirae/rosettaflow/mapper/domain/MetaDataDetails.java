@@ -73,16 +73,8 @@ public class MetaDataDetails implements Serializable {
             return false;
         }
         MetaDataDetails other = (MetaDataDetails) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getMetaDataId() == null ? other.getMetaDataId() == null : this.getMetaDataId().equals(other.getMetaDataId()))
-                && (this.getColumnIndex() == null ? other.getColumnIndex() == null : this.getColumnIndex().equals(other.getColumnIndex()))
-                && (this.getColumnName() == null ? other.getColumnName() == null : this.getColumnName().equals(other.getColumnName()))
-                && (this.getColumnType() == null ? other.getColumnType() == null : this.getColumnType().equals(other.getColumnType()))
-                && (this.getColumnSize() == null ? other.getColumnSize() == null : this.getColumnSize().equals(other.getColumnSize()))
-                && (this.getColumnDesc() == null ? other.getColumnDesc() == null : this.getColumnDesc().equals(other.getColumnDesc()))
-                && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-                && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
+        return (this.getMetaDataId() == null ? other.getMetaDataId() == null : this.getMetaDataId().equals(other.getMetaDataId()))
+                && (this.getColumnIndex() == null ? other.getColumnIndex() == null : this.getColumnIndex().equals(other.getColumnIndex()));
     }
 
     @Override

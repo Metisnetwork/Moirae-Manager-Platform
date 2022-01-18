@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.task;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
@@ -9,6 +8,7 @@ import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
+import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -42,31 +42,30 @@ public class SyncUserDataAuthTask {
     @Resource
     private IUserMetaDataService userMetaDataService;
 
-    @Scheduled(fixedDelay = 180 * 1000, initialDelay = 2 * 1000)
+    @Resource
+    private IDataSyncService dataSyncService;
+
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            // 查询调度服务，获取用户授权相关数据
-            List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-            if (CollUtil.isEmpty(metaDataAuthorityDtoList)) {
-                return;
-            }
-            // 批量更新数据
-            if (metaDataAuthorityDtoList.size() <= userMetaDataService.count()) {
-                // 批量更新
-                this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.UPDATE);
-                log.info("用户授权数据同步, net和moirae数据量一致整体批量更新, net同步数据量:{}条", metaDataAuthorityDtoList.size());
-                return;
-            }
-            log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，开始更新>>>>");
-            // 批量插入数据
-            // 清空原来授权数据
-            userMetaDataService.truncate();
-            this.batchDealUserAuthData(metaDataAuthorityDtoList, SysConstant.INSERT);
-            log.info("moirae管理台与net中用户申请授权元数据信息记录数不一致，更新结束>>>>");
+            dataSyncService.sync(DataSyncTypeEnum.DATA_AUTH.getDataType(),DataSyncTypeEnum.DATA_AUTH.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                        return grpcAuthService.getGlobalMetadataAuthorityList(latestSynced);
+                    },
+                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                        // 批量更新
+                        this.batchDealUserAuthData(grpcResponseList, SysConstant.UPDATE);
+                        log.info("用户授权数据同步,同步数据量:{}条", grpcResponseList.size());
+                    },
+                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                        return grpcResponseList
+                                .get(grpcResponseList.size() - 1)
+                                .getUpdateAt();
+                    });
         } catch (Exception e) {
-            log.error("从net同步用户元数据授权列表失败                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     , 失败原因:{}, 错误信息:{}", e.getMessage(), e);
+            log.error("从net同步用户元数据授权列表失败, 失败原因:{}, 错误信息:{}", e.getMessage(), e);
         }
         log.info("用户申请授权元数据信息同步结束, 总耗时:{}ms", (DateUtil.current() - begin));
     }

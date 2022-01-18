@@ -72,4 +72,8 @@ public class TaskDetailShowDto {
      * 任务描述 (非必须)
      */
     private String desc;
+    /**
+     * 数据的最后更新时间，UTC毫秒数
+     */
+    private Long updateAt;
 }

@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -185,5 +186,15 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
             return AuthStatusShowEnum.UNKNOWN.getValue();
         }
         return authStatus;
+    }
+
+    @Override
+    public void batchUpdate(List<MetaData> metaDataList) {
+        this.baseMapper.batchUpdate(metaDataList);
+    }
+
+    @Override
+    public List<String> existMetaDataIdList(List<String> metaDataIdList) {
+        return this.baseMapper.existMetaDataIdList(metaDataIdList);
     }
 }

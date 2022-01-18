@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityRespo
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ public interface GrpcAuthService {
 
     /**
      * 撤销元数据授权申请
+     *
      * @param requestDto 撤销授权的元数据信息
      * @return 撤销结果
      */
@@ -36,7 +38,11 @@ public interface GrpcAuthService {
      *
      * @return 元数据列表
      */
-    List<GetMetaDataAuthorityDto> getMetaDataAuthorityList();
+    List<GetMetaDataAuthorityDto> getAllMetaDataAuthorityList();
+
+    default List<GetMetaDataAuthorityDto> getMetaDataAuthorityList(Long latestSynced) {
+        return new ArrayList<>();
+    }
 
     /**
      * 查询自己组织信息
@@ -50,12 +56,20 @@ public interface GrpcAuthService {
      *
      * @return 全网组织的身份信息列表
      */
-    List<NodeIdentityDto> getIdentityList();
+    List<NodeIdentityDto> getAllIdentityList();
 
     /**
      * 查询(全网)的所有元数据的授权申请及审核结果详情列表
      *
      * @return 授权申请及审核结果详情列表
      */
-    List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList();
+    List<GetMetaDataAuthorityDto> getAllGlobalMetadataAuthorityList();
+
+    default List<NodeIdentityDto> getIdentityList(Long latestSynced) {
+        return new ArrayList<>();
+    }
+
+    default List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList(Long latestSynced) {
+        return new ArrayList<>();
+    }
 }

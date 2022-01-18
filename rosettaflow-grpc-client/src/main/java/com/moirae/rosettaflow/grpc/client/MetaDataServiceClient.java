@@ -10,10 +10,13 @@ import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.*;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +37,14 @@ public class MetaDataServiceClient {
      *
      * @return 获取所有元数据列表
      */
-    public List<MetaDataDetailResponseDto> getGlobalMetadataDetailList() {
+    public List<MetaDataDetailResponseDto> getGlobalMetadataDetailList(@NonNull Long latestSynced) {
         List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList = new ArrayList<>();
-        Empty empty = Empty.newBuilder().build();
-        GetGlobalMetadataDetailListResponse globalMetadataDetailList = metaDataServiceBlockingStub.getGlobalMetadataDetailList(empty);
+
+        GetGlobalMetadataDetailListRequest request = GetGlobalMetadataDetailListRequest.newBuilder()
+                .setLastUpdated(latestSynced)
+                .setPageSize(GrpcConstant.PAGE_SIZE)
+                .build();
+        GetGlobalMetadataDetailListResponse globalMetadataDetailList = metaDataServiceBlockingStub.getGlobalMetadataDetailList(request);
 
         processRespList(metaDataDetailResponseDtoList, globalMetadataDetailList);
 
@@ -49,11 +56,14 @@ public class MetaDataServiceClient {
      *
      * @return 本组织元数据列表
      */
-    public List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList() {
+    public List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList(@NonNull Long latestSynced) {
         List<SelfMetaDataDetailResponseDto> selfMetaDataDetailResponseDtoList = new ArrayList<>();
 
-        Empty empty = Empty.newBuilder().build();
-        GetLocalMetadataDetailListResponse getSelfMetadataDetailListResponse = metaDataServiceBlockingStub.getLocalMetadataDetailList(empty);
+        GetLocalMetadataDetailListRequest request = GetLocalMetadataDetailListRequest.newBuilder()
+                .setLastUpdated(latestSynced)
+                .setPageSize(GrpcConstant.PAGE_SIZE)
+                .build();
+        GetLocalMetadataDetailListResponse getSelfMetadataDetailListResponse = metaDataServiceBlockingStub.getLocalMetadataDetailList(request);
         if (getSelfMetadataDetailListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("MetaDataServiceClient->getLocalMetadataDetailList() fail reason:{}", getSelfMetadataDetailListResponse.getMsg());
             throw new BusinessException(getSelfMetadataDetailListResponse.getStatus(), getSelfMetadataDetailListResponse.getMsg());

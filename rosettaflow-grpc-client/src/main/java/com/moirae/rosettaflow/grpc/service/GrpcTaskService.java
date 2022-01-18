@@ -5,6 +5,7 @@ import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -38,7 +39,12 @@ public interface GrpcTaskService {
      *
      * @return 全部任务详情列表
      */
-    List<TaskDetailResponseDto> getTaskDetailList();
+    List<TaskDetailResponseDto> getAllTaskDetailList();
+
+    default List<TaskDetailResponseDto> getTaskDetailList(Long latestSynced) {
+        return new ArrayList();
+    }
+
 
     /**
      * 查看某个任务的全部事件列表通过单个任务ID

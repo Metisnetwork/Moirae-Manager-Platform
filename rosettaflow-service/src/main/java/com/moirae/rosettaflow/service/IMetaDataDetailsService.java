@@ -69,4 +69,19 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @return 索引列集合
      */
     List<Integer> getColumnIndexByIds(Object[] columnIdsArr);
+
+    /**
+     * 根据metaDataId和columnIndex更新数据
+     *
+     * @param metaDatadetails
+     * @return
+     */
+    void batchUpdateByMetaDataIdAndColumnIndex(List<MetaDataDetails> metaDatadetails);
+
+    /**
+     * 查询已存在的数据
+     * @param newMetaDataDetailsList
+     * @return
+     */
+    List<MetaDataDetails> existMetaDataIdAndColumnList(List<MetaDataDetails> newMetaDataDetailsList);
 }

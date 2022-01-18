@@ -18,10 +18,13 @@ import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetadataUsedQuoDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.*;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,11 +137,14 @@ public class AuthServiceClient {
      *
      * @return 获取数据授权申请列表
      */
-    public List<GetMetaDataAuthorityDto> getMetaDataAuthorityList() {
+    public List<GetMetaDataAuthorityDto> getMetaDataAuthorityList(@NonNull Long latestSynced) {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
 
-        Empty empty = Empty.newBuilder().build();
-        GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getLocalMetadataAuthorityList(empty);
+        GetMetadataAuthorityListRequest request = GetMetadataAuthorityListRequest.newBuilder()
+                .setLastUpdated(latestSynced)
+                .setPageSize(GrpcConstant.PAGE_SIZE)
+                .build();
+        GetMetadataAuthorityListResponse getMetaDataAuthorityListResponse = authServiceBlockingStub.getLocalMetadataAuthorityList(request);
         return getGetMetaDataAuthorityDtoList(getMetaDataAuthorityDtoList, getMetaDataAuthorityListResponse);
     }
 
@@ -147,11 +153,14 @@ public class AuthServiceClient {
      *
      * @return 授权申请及审核结果详情列表
      */
-    public List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList() {
+    public List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList(@NonNull Long latestSynced) {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
 
-        Empty empty = Empty.newBuilder().build();
-        GetMetadataAuthorityListResponse getMetadataAuthorityListResponse = authServiceBlockingStub.getGlobalMetadataAuthorityList(empty);
+        GetMetadataAuthorityListRequest request = GetMetadataAuthorityListRequest.newBuilder()
+                .setLastUpdated(latestSynced)
+                .setPageSize(GrpcConstant.PAGE_SIZE)
+                .build();
+        GetMetadataAuthorityListResponse getMetadataAuthorityListResponse = authServiceBlockingStub.getGlobalMetadataAuthorityList(request);
         return getGetMetaDataAuthorityDtoList(getMetaDataAuthorityDtoList, getMetadataAuthorityListResponse);
     }
 
@@ -213,7 +222,8 @@ public class AuthServiceClient {
             getMetaDataAuthorityDto.setAuditAt(getMetadataAuthorityListResponse.getList(i).getAuditAt());
             //数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的>)
             getMetaDataAuthorityDto.setMetadataAuthorityState(getMetadataAuthorityListResponse.getList(i).getStateValue());
-
+            //数据的最后更新时间，UTC毫秒数
+            getMetaDataAuthorityDto.setUpdateAt(getMetadataAuthorityListResponse.getList(i).getUpdateAt());
 
             getMetaDataAuthorityDtoList.add(getMetaDataAuthorityDto);
         }
@@ -242,11 +252,14 @@ public class AuthServiceClient {
         return nodeIdentityDto;
     }
 
-    public List<NodeIdentityDto> getIdentityList() {
+    public List<NodeIdentityDto> getIdentityList(@NonNull Long latestSynced) {
         List<NodeIdentityDto> memberList = new ArrayList<>();
 
-        Empty empty = Empty.newBuilder().build();
-        GetIdentityListResponse getIdentityListResponse = authServiceBlockingStub.getIdentityList(empty);
+        GetIdentityListRequest request = GetIdentityListRequest.newBuilder()
+                .setLastUpdated(latestSynced)
+                .setPageSize(GrpcConstant.PAGE_SIZE)
+                .build();
+        GetIdentityListResponse getIdentityListResponse = authServiceBlockingStub.getIdentityList(request);
 
         if (getIdentityListResponse.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("AuthServiceClient->getIdentityList() fail reason:{}", getIdentityListResponse.getMsg());
@@ -260,6 +273,7 @@ public class AuthServiceClient {
             member.setNodeId(getIdentityListResponse.getMemberList(i).getNodeId());
             member.setIdentityId(getIdentityListResponse.getMemberList(i).getIdentityId());
             member.setStatus(getIdentityListResponse.getMemberList(i).getStatusValue());
+            member.setUpdateAt(getIdentityListResponse.getMemberList(i).getUpdateAt());
             memberList.add(member);
         }
         return memberList;

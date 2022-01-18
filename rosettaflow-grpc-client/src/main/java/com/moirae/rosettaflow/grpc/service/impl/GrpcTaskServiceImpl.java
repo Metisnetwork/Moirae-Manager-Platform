@@ -1,6 +1,8 @@
 package com.moirae.rosettaflow.grpc.service.impl;
 
 import com.moirae.rosettaflow.grpc.client.TaskServiceClient;
+import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -39,8 +42,24 @@ public class GrpcTaskServiceImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskDetailResponseDto> getTaskDetailList() {
-        return taskServiceClient.getTaskDetailList();
+    public List<TaskDetailResponseDto> getAllTaskDetailList() {
+        long latestSynced = 0;
+        List<TaskDetailResponseDto> allList = new ArrayList<>();
+        List<TaskDetailResponseDto> list;
+        do {
+            list = taskServiceClient.getTaskDetailList(latestSynced);
+            if(list.isEmpty()){
+                break;
+            }
+            allList.addAll(list);
+            latestSynced = list.get(list.size() - 1).getInformation().getUpdateAt();
+        } while (list.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
+        return allList;
+    }
+
+    @Override
+    public List<TaskDetailResponseDto> getTaskDetailList(Long latestSynced) {
+        return taskServiceClient.getTaskDetailList(latestSynced);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class SysServiceClient {
         if (null != getTaskResultFileSummaryResponse) {
             GetTaskResultFileSummaryResponseDto dto = new GetTaskResultFileSummaryResponseDto();
             dto.setTaskId(getTaskResultFileSummaryResponse.getTaskId());
-            dto.setFileName(getTaskResultFileSummaryResponse.getFileName());
+            dto.setFileName(getTaskResultFileSummaryResponse.getTableName());
             dto.setMetadataId(getTaskResultFileSummaryResponse.getMetadataId());
             dto.setOriginId(getTaskResultFileSummaryResponse.getOriginId());
             dto.setFilePath(getTaskResultFileSummaryResponse.getFilePath());

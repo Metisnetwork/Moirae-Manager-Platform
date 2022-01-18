@@ -47,7 +47,7 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskDetailResponseDto> getTaskDetailList() {
+    public List<TaskDetailResponseDto> getAllTaskDetailList() {
         return null;
     }
 

@@ -1,5 +1,4 @@
-USE `db_moirae_cd`;
-
+use db_moirae;
 -- ----------------------------
 -- init t_project_temp
 -- ----------------------------
@@ -83,3 +82,11 @@ TRUNCATE t_algorithm_type;
 INSERT INTO `t_algorithm_type` VALUES (1, '统计分析（开发中）', 'Statistics(developing)', '统计分析', 'Statistical Analysis', 1, 1, now(), now());
 INSERT INTO `t_algorithm_type` VALUES (2, '特征工程（开发中）', 'Feature Engineering(developing)', '特征工程', 'Feature engineering', 2, 1, now(), now());
 INSERT INTO `t_algorithm_type` VALUES (3, '机器学习', 'Machine Learning', '机器学习', 'Machine learning', 3, 1, now(), now());
+
+-- ----------------------------
+-- init t_data_sync
+-- ----------------------------
+INSERT INTO t_data_sync(data_type, latest_synced,`info`) VALUES('data_auth', '0','同步数据授权信息');
+INSERT INTO t_data_sync(data_type, latest_synced,`info`) VALUES('meta_data', '0','同步元数据信息');
+INSERT INTO t_data_sync(data_type, latest_synced,`info`) VALUES('sub_job_node_status', '0','同步子作业节点状态');
+INSERT INTO t_data_sync(data_type, latest_synced,`info`) VALUES('org_identity', '0','同步组织身份信息');

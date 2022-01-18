@@ -48,7 +48,7 @@ public class NetManager {
             int nodeIdLength = 30;
             if (organizationList.get(0).getNodeId().length() < nodeIdLength) {
                 Map<String, String> identityNodeIdMap = new HashMap<>(organizationList.size());
-                List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+                List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getAllIdentityList();
                 for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
                     identityNodeIdMap.put(nodeIdentityDto.getIdentityId(), nodeIdentityDto.getNodeId());
                 }
@@ -106,7 +106,7 @@ public class NetManager {
             throw new BusinessException(RespCodeEnum.BIZ_EXCEPTION, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
         }
 
-        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getIdentityList();
+        List<NodeIdentityDto> nodeIdentityDtoList = grpcAuthService.getAllIdentityList();
         for (NodeIdentityDto nodeIdentityDto : nodeIdentityDtoList) {
             if (organization.getIdentityId().equals(nodeIdentityDto.getIdentityId())) {
                 organization.setNodeId(nodeIdentityDto.getNodeId());

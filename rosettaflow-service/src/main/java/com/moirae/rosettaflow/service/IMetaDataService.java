@@ -31,7 +31,7 @@ public interface IMetaDataService extends IService<MetaData> {
     /**
      * 获取元数据详情
      *
-     * @param metaDataPkId 元数据表Id
+     * @param metaDataPkId   元数据表Id
      * @param userMetaDataId 用户授权数据表Id
      * @return 元数据详情
      */
@@ -63,15 +63,31 @@ public interface IMetaDataService extends IService<MetaData> {
 
     /**
      * 批量更新数据
+     *
      * @param metaDataList 批量插入列表
      */
     void batchInsert(List<MetaData> metaDataList);
 
     /**
      * 授权状态处理
-     * @param authStatus 授权状态
+     *
+     * @param authStatus        授权状态
      * @param authMetadataState 数据状态
      * @return authStatus
      */
     Byte dealAuthStatus(Byte authStatus, Byte authMetadataState);
+
+    /**
+     * 根据metaDataId批量更新数据
+     *
+     * @param metaDataList
+     * @return
+     */
+    void batchUpdate(List<MetaData> metaDataList);
+
+    /**
+     * 查询出已存在的MetaDataIdList
+     * @return
+     */
+    List<String> existMetaDataIdList(List<String> metaDataIdList);
 }

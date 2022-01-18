@@ -35,7 +35,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
     static final int LEN_DETAIL = 5;
 
     @Override
-    public List<MetaDataDetailResponseDto> getGlobalMetadataDetailList() {
+    public List<MetaDataDetailResponseDto> getAllGlobalMetadataDetailList() {
         List<MetaDataDetailResponseDto> responseDtoList = new ArrayList<>();
         for (int i = 0; i < LEN; i++) {
             MetaDataDetailResponseDto metaData = new MetaDataDetailResponseDto();
@@ -83,7 +83,7 @@ public class GrpcMetaDataServiceMockImpl implements GrpcMetaDataService {
     }
 
     @Override
-    public List<SelfMetaDataDetailResponseDto> getLocalMetadataDetailList() {
+    public List<SelfMetaDataDetailResponseDto> getAllLocalMetadataDetailList() {
         return null;
     }
 

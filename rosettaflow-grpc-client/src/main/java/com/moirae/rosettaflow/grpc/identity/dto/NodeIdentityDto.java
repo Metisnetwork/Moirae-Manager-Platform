@@ -25,4 +25,8 @@ public class NodeIdentityDto {
      * the status for organization(deleted/normal)
      */
     private Integer status;
+    /**
+     * 数据的最后更新时间，UTC毫秒数
+     */
+    private Long updateAt;
 }

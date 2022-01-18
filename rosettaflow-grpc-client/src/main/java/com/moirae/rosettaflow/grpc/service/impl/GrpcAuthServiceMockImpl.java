@@ -51,7 +51,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
     }
 
     @Override
-    public List<GetMetaDataAuthorityDto> getMetaDataAuthorityList() {
+    public List<GetMetaDataAuthorityDto> getAllMetaDataAuthorityList() {
         List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = new ArrayList<>();
 
         GetMetaDataAuthorityDto getMetaDataAuthorityDto;
@@ -116,7 +116,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
     }
 
     @Override
-    public List<NodeIdentityDto> getIdentityList() {
+    public List<NodeIdentityDto> getAllIdentityList() {
         List<NodeIdentityDto> nodeIdentityDtoList = new ArrayList<>();
         NodeIdentityDto nodeIdentityDto;
         for (int i = 0; i < LEN; i++) {
@@ -131,7 +131,7 @@ public class GrpcAuthServiceMockImpl implements GrpcAuthService {
     }
 
     @Override
-    public List<GetMetaDataAuthorityDto> getGlobalMetadataAuthorityList() {
+    public List<GetMetaDataAuthorityDto> getAllGlobalMetadataAuthorityList() {
         List<GetMetaDataAuthorityDto> getMetaDataAuthorityDtoList = new ArrayList<>();
         getMetaDataAuthorityDtoList.add(new GetMetaDataAuthorityDto());
         getMetaDataAuthorityDtoList.add(new GetMetaDataAuthorityDto());
