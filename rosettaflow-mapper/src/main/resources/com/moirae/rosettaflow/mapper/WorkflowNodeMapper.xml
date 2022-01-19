@@ -26,7 +26,7 @@
             wn.`algorithm_id` AS algorithmId,
             wn.`node_step` AS nodeStep,
             wn.`model_id` AS modelId,
-            IFNULL((SELECT wns.`task_id` FROM `t_workflow_run_task_status` wns WHERE wns.`workflow_node_id` = wn.`id` ORDER BY wns.`id` DESC LIMIT 1) , 0) AS taskId,
+            (SELECT wns.`task_id` FROM `t_workflow_run_task_status` wns WHERE wns.`workflow_node_id` = wn.`id` ORDER BY wns.`id` DESC LIMIT 1) AS taskId,
             wn.`sender_identity_id` AS workflowNodeSenderIdentityId
         FROM `t_workflow_node` wn
         WHERE wn.`workflow_id` = #{workflowId, jdbcType=BIGINT} AND wn.`workflow_edit_version` = #{editVersion, jdbcType=INTEGER}

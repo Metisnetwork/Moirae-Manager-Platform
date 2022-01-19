@@ -112,7 +112,7 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param language 语言类型
      * @return 工作流id
      */
-    Long addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp, String language);
+    Workflow addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp, String language);
 
     /**
      * 终止工作流

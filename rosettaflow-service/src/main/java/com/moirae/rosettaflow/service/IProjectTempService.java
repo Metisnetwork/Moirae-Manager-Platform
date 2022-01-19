@@ -17,16 +17,4 @@ public interface IProjectTempService extends IService<ProjectTemp> {
      * @return ProjectTemp
      */
     List<ProjectTemp> projectTempList(String language);
-
-    /**
-     * 根据已创建的项目工作流添加项目模板
-     *
-     * @param workflowId 工作流id
-     */
-    void addProjectTemplate(Long workflowId);
-
-    /**
-     * 清空项目模板表
-     */
-    void truncate();
 }

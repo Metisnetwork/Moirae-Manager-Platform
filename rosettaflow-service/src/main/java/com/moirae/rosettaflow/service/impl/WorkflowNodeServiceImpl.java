@@ -76,18 +76,20 @@ public class WorkflowNodeServiceImpl extends ServiceImpl<WorkflowNodeMapper, Wor
     }
 
     @Override
-    public void saveCopyWorkflowNodeTemp(Long newWorkflowId, List<WorkflowNode> oldNodeList) {
-        oldNodeList.forEach(oldNode -> this.copyWorkflowNode(oldNode, newWorkflowId));
+    public void saveCopyWorkflowNodeTemp(Workflow workflow, List<WorkflowNode> oldNodeList) {
+        oldNodeList.forEach(oldNode -> this.copyWorkflowNode(oldNode, workflow));
     }
 
     /** 复制工作流节点 */
-    private WorkflowNode copyWorkflowNode(WorkflowNode oldNode, Long newWorkflowId) {
+    private WorkflowNode copyWorkflowNode(WorkflowNode oldNode, Workflow workflow) {
         WorkflowNode newNode = new WorkflowNode();
-        newNode.setWorkflowId(newWorkflowId);
+        newNode.setWorkflowId(workflow.getId());
+        newNode.setWorkflowEditVersion(workflow.getEditVersion());
         newNode.setAlgorithmId(oldNode.getAlgorithmId());
         newNode.setNodeName(oldNode.getNodeName());
         newNode.setNodeStep(oldNode.getNodeStep());
-//        newNode.setNextNodeStep(oldNode.getNextNodeStep());
+        newNode.setInputModel(oldNode.getInputModel());
+        newNode.setModelId(oldNode.getModelId());
         this.save(newNode);
         return newNode;
     }

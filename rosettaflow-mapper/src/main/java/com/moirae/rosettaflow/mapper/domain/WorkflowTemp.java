@@ -44,21 +44,6 @@ public class WorkflowTemp implements Serializable {
     private String workflowDescEn;
 
     /**
-     * 节点数
-     */
-    private Integer nodeNumber;
-
-    /**
-     * 运行状态:0-未完成,1-已完成
-     */
-    private Byte runStatus;
-
-    /**
-     * 状态: 0-无效，1- 有效
-     */
-    private Byte status;
-
-    /**
      * 创建时间
      */
     private Date createTime;

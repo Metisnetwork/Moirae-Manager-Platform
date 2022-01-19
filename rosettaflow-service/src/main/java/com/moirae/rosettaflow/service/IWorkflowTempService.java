@@ -10,19 +10,6 @@ import com.moirae.rosettaflow.mapper.domain.WorkflowTemp;
  * @description 工作流模板服务
  */
 public interface IWorkflowTempService extends IService<WorkflowTemp> {
-    /**
-     * 清空项目模板表
-     */
-    void truncate();
-
-    /**
-     * 根据项目id及工作流信息创建 项目工作流模板
-     *
-     * @param projectTemplateId 项目模板id
-     * @param workflow          工作流
-     * @return 工作流模板id
-     */
-    Long addWorkflowTemplate(long projectTemplateId, Workflow workflow);
 
     /**
      * 查询工作流模板

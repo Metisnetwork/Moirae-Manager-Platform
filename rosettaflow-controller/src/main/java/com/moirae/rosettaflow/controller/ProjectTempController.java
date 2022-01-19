@@ -39,12 +39,4 @@ public class ProjectTempController {
         List<ProjectTemp> list = projectTempService.projectTempList(language);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ProjTempListVo.class));
     }
-
-    @PostMapping("add")
-    @ApiOperation(value = "添加项目模板", notes = "添加项目模板")
-    public ResponseVo<?> add(@RequestBody @Valid AddProjectTemplateReq dddProjectTemplateReq) {
-        projectTempService.addProjectTemplate(dddProjectTemplateReq.getId());
-        return ResponseVo.createSuccess();
-    }
-
 }

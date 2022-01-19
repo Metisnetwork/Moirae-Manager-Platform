@@ -183,16 +183,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
 
     @Override
-    public Long addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp, String language) {
+    public Workflow addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp, String language) {
         Workflow workflow = new Workflow();
         workflow.setProjectId(projectId);
         workflow.setUserId(userId);
         // 处理国际化
         workflow.setWorkflowName(SysConstant.EN_US.equals(language) ? workflowTemp.getWorkflowNameEn() : workflowTemp.getWorkflowName());
         workflow.setWorkflowDesc(SysConstant.EN_US.equals(language) ? workflowTemp.getWorkflowDescEn() : workflowTemp.getWorkflowDesc());
-        workflow.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
+        workflow.setEditVersion(1);
+        workflow.setStatus(StatusEnum.VALID.getValue());
         this.save(workflow);
-        return workflow.getId();
+        return workflow;
     }
 
     @Override

@@ -8,17 +8,9 @@
         <result column="workflow_name_en" jdbcType="VARCHAR" property="workflowNameEn"/>
         <result column="workflow_desc" jdbcType="VARCHAR" property="workflowDesc"/>
         <result column="workflow_desc_en" jdbcType="VARCHAR" property="workflowDescEn"/>
-        <result column="node_number" jdbcType="INTEGER" property="nodeNumber"/>
-        <result column="run_status" jdbcType="TINYINT" property="runStatus"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, project_temp_id, workflow_name, workflow_name_en, workflow_desc, workflow_desc_en, node_number, run_status, `status`,
-    create_time, update_time
-  </sql>
-    <update id="truncate">
-      TRUNCATE TABLE t_workflow_temp
-    </update>
+    
 </mapper>

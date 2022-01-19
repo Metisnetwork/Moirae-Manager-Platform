@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 
 import java.util.List;
@@ -24,10 +25,10 @@ public interface IWorkflowNodeService extends IService<WorkflowNode> {
     /**
      * 模板复制保存工作流节点
      *
-     * @param newWorkflowId 新工作流id
+     * @param workflow 新工作流id
      * @param oldNodeList   旧工作流列表
      */
-    void saveCopyWorkflowNodeTemp(Long newWorkflowId, List<WorkflowNode> oldNodeList);
+    void saveCopyWorkflowNodeTemp(Workflow workflow, List<WorkflowNode> oldNodeList);
 
     /**
      * 获取正在运行的节点

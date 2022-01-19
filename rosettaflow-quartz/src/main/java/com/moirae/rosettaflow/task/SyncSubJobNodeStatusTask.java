@@ -32,7 +32,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private NetManager netManager;
 
-//    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
+    @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.queryUnConfirmedWorkflowRunTaskStatus();

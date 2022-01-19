@@ -224,3 +224,38 @@ ALTER TABLE `db_moirae_cd`.t_workflow_run_task_result
 
 ALTER TABLE `db_moirae_cd`.`t_workflow_run_status`
     ADD COLUMN `cancel_status` TINYINT(4) NULL   COMMENT '取消状态: 1-取消中,2-取消成功,3-取消失败' AFTER `run_status`;
+
+
+CREATE TABLE `t_workflow_temp` (
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '工作流模板ID(自增长)',
+    `project_temp_id` BIGINT(20) DEFAULT NULL COMMENT '项目模板表id',
+    `workflow_name` VARCHAR(64) DEFAULT NULL COMMENT '中文工作流名称',
+    `workflow_name_en` VARCHAR(128) DEFAULT NULL COMMENT '英文工作流名称',
+    `workflow_desc` VARCHAR(128) DEFAULT NULL COMMENT '中文工作流描述',
+    `workflow_desc_en` VARCHAR(128) DEFAULT NULL COMMENT '英文工作流描述',
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) COMMENT='工作流模板表';
+INSERT INTO `t_workflow_temp` VALUES (1, 2, '协同营销对应工作流', 'Collaborative Marketing workflow', '协同营销对应工作流', 'Collaborative Marketing workflow', now(), now());
+
+
+CREATE TABLE `t_workflow_temp_node` (
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点模板表ID(自增长)',
+    `workflow_temp_id` BIGINT(20) DEFAULT NULL COMMENT '工作流模板表id',
+    `algorithm_id` BIGINT(20) DEFAULT NULL COMMENT '算法id',
+    `node_name` VARCHAR(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '中文节点名称',
+    `node_name_en` VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '英文节点名称',
+    `node_step` INT(11) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
+    `input_model` int(11) NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
+    `model_id` bigint(20) DEFAULT NULL COMMENT '工作流节点需要的模型id,对应t_task_result表id',
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) COMMENT='工作流节点模板表';
+
+INSERT INTO `t_workflow_temp_node` VALUES (1, 1, 1, '逻辑回归训练',  'Logistic Regression Training', 1, 0, 0, now(), now());
+INSERT INTO `t_workflow_temp_node` VALUES (2, 1, 2, '逻辑回归预测', 'Logistic Regression Prediction', 2, 1, 0, now(), now());
+
+ALTER TABLE `db_moirae_cd`.`t_workflow_node`
+    CHANGE `sender_identity_id` `sender_identity_id` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NULL   COMMENT '任务发启放组织id';
