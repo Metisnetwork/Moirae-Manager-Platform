@@ -22,40 +22,9 @@ public interface IWorkflowNodeInputService extends IService<WorkflowNodeInput> {
     List<WorkflowNodeInput> queryByWorkflowNodeId(Long workflowNodeId);
 
     /**
-     * 物理批量删除工作流节点输入数据，根据节点id
-     *
-     * @param workflowNodeIdList 工作流节点id列表
-     */
-    void deleteByWorkflowNodeId(List<Long> workflowNodeIdList);
-
-    /**
-     * 逻辑删除工作流节点输入, 根据工作流节点id
-     *
-     * @param workflowNodeId 工作流节点id
-     */
-    void deleteLogicByWorkflowNodeId(Long workflowNodeId);
-
-    /**
-     * 复制工作流节点输入数据
-     *
-     * @param newNodeId 新工作流节点id
-     * @param oldNodeId 旧工作流节点id
-     * @return WorkflowNodeInput
-     */
-    List<WorkflowNodeInput> copyWorkflowNodeInput(Long newNodeId, Long oldNodeId);
-
-    /**
      * 批量保存节点输入
      *
      * @param workflowNodeInputList 节点输入列表
      */
     void batchInsert(List<WorkflowNodeInput> workflowNodeInputList);
-
-    /**
-     * 根据工作流节点id查询相关元数据信息
-     *
-     * @param workflowNodeId 工作流节点id
-     * @return 工元数据信息列表
-     */
-    List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(Long workflowNodeId);
 }

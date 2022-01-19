@@ -120,14 +120,6 @@ public class MetaDataServiceImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public MetaData getMetaDataByMetaDataId(String metaDataId) {
-        LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
-        metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId,metaDataId);
-        metaDataLambdaQueryWrapper.eq(MetaData::getStatus,StatusEnum.VALID.getValue());
-        return this.getOne(metaDataLambdaQueryWrapper);
-    }
-
-    @Override
     public List<MetaDataDto> getAllAuthTables(String identityId) {
         UserDto userDto = commonService.getCurrentUser();
         String address = userDto.getAddress();

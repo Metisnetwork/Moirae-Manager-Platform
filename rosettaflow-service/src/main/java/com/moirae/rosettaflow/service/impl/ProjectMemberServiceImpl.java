@@ -30,14 +30,6 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     }
 
     @Override
-    public List<ProjectMember> queryByProjectId(Long projectId) {
-        LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(ProjectMember::getProjectId, projectId);
-        queryWrapper.eq(ProjectMember::getStatus, StatusEnum.VALID.getValue());
-        return this.list(queryWrapper);
-    }
-
-    @Override
     public ProjectMember queryByProjectIdAndUserId(Long userId, Long projectId) {
         LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(ProjectMember::getProjectId, projectId);

@@ -22,28 +22,4 @@ import javax.annotation.Resource;
 @Service
 public class AlgorithmCodeServiceImpl extends ServiceImpl<AlgorithmCodeMapper, AlgorithmCode> implements IAlgorithmCodeService {
 
-    @Resource
-    private IWorkflowNodeCodeService workflowNodeCodeService;
-
-    @Override
-    public void addAlgorithmCode(AlgorithmCode algorithmCode) {
-        this.save(algorithmCode);
-    }
-
-    @Override
-    public void updateAlgorithmCode(AlgorithmCode algorithmCode) {
-        LambdaUpdateWrapper<AlgorithmCode> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.eq(AlgorithmCode::getAlgorithmId, algorithmCode.getAlgorithmId());
-        updateWrapper.eq(AlgorithmCode::getStatus, StatusEnum.VALID.getValue());
-        this.update(algorithmCode, updateWrapper);
-
-    }
-
-    @Override
-    public AlgorithmCode getByAlgorithmId(Long algorithmId) {
-        LambdaUpdateWrapper<AlgorithmCode> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(AlgorithmCode::getAlgorithmId, algorithmId);
-        wrapper.eq(AlgorithmCode::getStatus, StatusEnum.VALID.getValue());
-        return this.getOne(wrapper);
-    }
 }

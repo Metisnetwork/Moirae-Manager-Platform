@@ -20,14 +20,6 @@ public interface IProjectMemberService extends IService<ProjectMember> {
     ProjectMember queryById(Long id);
 
     /**
-     * 根据项目id查询项目成员
-     *
-     * @param projectId 项目id
-     * @return 项目成员列表
-     */
-    List<ProjectMember> queryByProjectId(Long projectId);
-
-    /**
      * 根据项目id和用户id查询项目成员
      *
      * @param userId    用户id

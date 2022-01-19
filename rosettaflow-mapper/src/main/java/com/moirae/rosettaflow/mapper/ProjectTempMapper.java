@@ -11,5 +11,4 @@ import java.util.List;
  */
 public interface ProjectTempMapper extends BaseMapper<ProjectTemp> {
 
-    void truncate();
 }

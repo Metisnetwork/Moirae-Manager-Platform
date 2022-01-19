@@ -32,45 +32,7 @@ public class WorkflowNodeInputServiceImpl extends ServiceImpl<WorkflowNodeInputM
     }
 
     @Override
-    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
-        LambdaQueryWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.in(WorkflowNodeInput::getWorkflowNodeId, workflowNodeIdList);
-        this.remove(delWrapper);
-    }
-
-    @Override
-    public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
-        LambdaUpdateWrapper<WorkflowNodeInput> delWrapper = Wrappers.lambdaUpdate();
-        delWrapper.eq(WorkflowNodeInput::getWorkflowNodeId, workflowNodeId);
-        this.update(delWrapper);
-    }
-
-    @Override
-    public List<WorkflowNodeInput> copyWorkflowNodeInput(Long newNodeId, Long oldNodeId) {
-        List<WorkflowNodeInput> oldNodeInputList = this.queryByWorkflowNodeId(oldNodeId);
-        if (null == oldNodeInputList || oldNodeInputList.size() == 0) {
-            return new ArrayList<>();
-        }
-        List<WorkflowNodeInput> newNodeInputList = new ArrayList<>();
-        oldNodeInputList.forEach(oldNodeInput -> {
-            WorkflowNodeInput newNodeInput = new WorkflowNodeInput();
-            newNodeInput.setWorkflowNodeId(newNodeId);
-            newNodeInput.setIdentityId(oldNodeInput.getIdentityId());
-            newNodeInput.setDataTableId(oldNodeInput.getDataTableId());
-            newNodeInput.setDataColumnIds(oldNodeInput.getDataColumnIds());
-            newNodeInputList.add(newNodeInput);
-        });
-        return newNodeInputList;
-    }
-
-    @Override
     public void batchInsert(List<WorkflowNodeInput> workflowNodeInputList) {
         this.baseMapper.batchInsert(workflowNodeInputList);
     }
-
-    @Override
-    public List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(Long workflowNodeId) {
-        return this.baseMapper.getMetaDataByWorkflowNodeId(workflowNodeId);
-    }
-
 }

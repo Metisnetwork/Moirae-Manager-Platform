@@ -21,15 +21,6 @@ public interface IUserService extends IService<User> {
     User getByAddress(String address);
 
     /**
-     * 生成用户token
-     *
-     * @param address    用户钱包地址0x
-     * @param hrpAddress hrp钱包地址
-     * @return 用户信息
-     */
-    UserDto generatorToken(String address, String hrpAddress);
-
-    /**
      * 通过签名方式登录
      *
      * @param hexAddress

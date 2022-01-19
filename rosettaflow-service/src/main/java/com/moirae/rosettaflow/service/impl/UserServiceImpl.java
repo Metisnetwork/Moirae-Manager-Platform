@@ -69,23 +69,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public UserDto generatorToken(String address, String hrpAddress) {
-        User user = this.getByAddress(address);
-        if (user == null) {
-            user = new User();
-            // 用户昵称
-            user.setUserName(hrpAddress);
-            // 钱包地址
-            user.setAddress(address);
-            this.save(user);
-        }
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        userDto.setToken(tokenService.setToken(userDto));
-        return userDto;
-    }
-
-    @Override
     public UserDto loginBySign(String hexAddress, String hrpAddress,String authenticateSignMessage, String authenticateSign) {
         // 检查nonce
         checkNonceValidity(authenticateSignMessage, hexAddress);

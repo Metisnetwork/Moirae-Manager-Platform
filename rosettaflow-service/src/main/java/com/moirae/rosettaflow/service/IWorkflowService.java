@@ -32,13 +32,6 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size);
 
-    /**
-     * 查询工作流列表，通过工作流id集合
-     *
-     * @param idList 工作流id列表
-     * @return 工作流列表
-     */
-    List<Workflow> queryListById(List<Long> idList);
 
     /**
      * 通过项目id查询工作流列表（不分页）
@@ -48,13 +41,6 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     List<Workflow> queryListByProjectId(List<Long> projectIdList);
 
-    /**
-     * 获取运行中的工作流列表（不分页）
-     *
-     * @param projectId 项目id
-     * @return 工作流列表
-     */
-    List<Workflow> queryWorkFlowByProjectId(Long projectId);
 
     /**
      * 获取工作流详情
@@ -87,14 +73,6 @@ public interface IWorkflowService extends IService<Workflow> {
      */
     void deleteWorkflow(Long id);
 
-
-    /**
-     * 物理删除当前工作流所有节点数据
-     *
-     * @param id 工作流表id
-     */
-    void deleteWorkflowAllNodeData(Long id);
-
     /**
      * 获取运行日志
      *
@@ -122,37 +100,12 @@ public interface IWorkflowService extends IService<Workflow> {
     void terminate(Long workflowId);
 
     /**
-     * 更新工作流运行状态
-     *
-     * @param workflowId 工作流id
-     * @param runStatus  运行状态
-     */
-    void updateRunStatus(Long workflowId, Byte runStatus);
-
-    /**
      * 获取工作流状态
      *
      * @param id 工作流id
      * @return List
      */
     Workflow getWorkflowStatusById(Long id);
-
-    /**
-     * 更新工作流运行状态
-     *
-     * @param ids       工作流id
-     * @param runStatus 运行状态
-     */
-    void updateRunStatus(Object[] ids, Byte runStatus);
-
-    /**
-     * 组装发送终止任务请求对象
-     *
-     * @param workflow 工作流信息
-     * @param taskId   任务节点taskId
-     * @return 发送终止任务请求对象
-     */
-    TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, String taskId);
 
     /**
      * 是否存在指定的作业名称

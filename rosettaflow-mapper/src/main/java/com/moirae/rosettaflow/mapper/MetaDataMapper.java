@@ -17,14 +17,6 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
     void truncate();
 
     /**
-     * 根据钱包地址查询元数据
-     *
-     * @param address 钱包地址
-     * @return 钱包地址查询到授权数据
-     */
-    List<MetaDataDto> selectMetaDataWithAuth(String address);
-
-    /**
      * 根据identityId、钱包地址，查询元数据列表
      *
      * @param identityId identityId

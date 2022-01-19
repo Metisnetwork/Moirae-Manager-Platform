@@ -93,27 +93,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public List<Workflow> queryListById(List<Long> idList) {
-        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.in(Workflow::getId, idList);
-        queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
-        return this.list(queryWrapper);
-    }
-
-    @Override
     public List<Workflow> queryListByProjectId(List<Long> projectIdList) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         queryWrapper.in(Workflow::getProjectId, projectIdList);
-        return this.list(queryWrapper);
-    }
-
-    @Override
-    public List<Workflow> queryWorkFlowByProjectId(Long projectId) {
-        LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Workflow::getProjectId, projectId);
-        queryWrapper.eq(Workflow::getRunStatus, WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
-        queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         return this.list(queryWrapper);
     }
 
@@ -177,12 +160,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public void deleteWorkflowAllNodeData(Long id) {
-        baseMapper.deleteWorkflowAllNodeData(id);
-    }
-
-
-    @Override
     public Workflow addWorkflowByTemplate(Long projectId, Long userId, WorkflowTemp workflowTemp, String language) {
         Workflow workflow = new Workflow();
         workflow.setProjectId(projectId);
@@ -239,35 +216,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
         // 更新工作流运行状态
         workflowRunStatusService.updateCancelStatus(workflow.getWorkflowRunStatusId(), WorkflowRunStatusEnum.RUNNING.getValue());
-
-
-//
-//        // 停止子任务
-//        workflow.getGetNodeStatusVoList().stream()
-//                .filter(item -> StringUtils.isNoneBlank(item.getTaskId()) && item.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue())
-//                .forEach(item ->{
-//                    TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflow, item.getTaskId());
-//                    try {
-//                        TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(netManager.getChannel(item.getWorkflowNodeSenderIdentityId()), terminateTaskRequestDto);
-//                        if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
-//                            log.error("终止工作流失败，失败原因! msg = {}", terminateTaskRespDto);
-//                            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
-//                        }
-//                    } catch (Exception e) {
-//                        log.error("终止工作流失败，失败原因!", e);
-//                        throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_TERMINATE_NET_PROCESS_ERROR.getMsg());
-//                    }
-//                });
-    }
-
-    @Override
-    public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(Workflow workflow, String taskId) {
-        TerminateTaskRequestDto terminateTaskRequestDto = new TerminateTaskRequestDto();
-        terminateTaskRequestDto.setUser(workflow.getAddress());
-        terminateTaskRequestDto.setUserType(UserTypeEnum.checkUserType(workflow.getAddress()));
-        terminateTaskRequestDto.setTaskId(taskId);
-        terminateTaskRequestDto.setSign(workflow.getSign());
-        return terminateTaskRequestDto;
     }
 
     @Override
@@ -405,23 +353,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 更新工作流版本号
         workflow.setEditVersion(workflow.getEditVersion() + 1);
         updateById(workflow);
-    }
-
-    @Override
-    public void updateRunStatus(Long workflowId, Byte runStatus) {
-        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getRunStatus, runStatus);
-        updateWrapper.eq(Workflow::getId, workflowId);
-        this.update(updateWrapper);
-    }
-
-    @Override
-    public void updateRunStatus(Object[] ids, Byte runStatus) {
-        LambdaUpdateWrapper<Workflow> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.set(Workflow::getRunStatus, runStatus);
-        updateWrapper.set(Workflow::getUpdateTime, now());
-        updateWrapper.in(Workflow::getId, ids);
-        this.update(updateWrapper);
     }
 
     @Override

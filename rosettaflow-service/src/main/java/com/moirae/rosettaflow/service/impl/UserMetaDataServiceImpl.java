@@ -223,16 +223,6 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public UserMetaData getCurrentUserMetaDataByMetaDataId(String metaDataId) {
-        UserDto userDto = commonService.getCurrentUser();
-        LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(UserMetaData::getMetaDataId, metaDataId);
-        wrapper.eq(UserMetaData::getAddress, userDto.getAddress());
-        wrapper.eq(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.RELEASED.getValue());
-        return this.getOne(wrapper);
-    }
-
-    @Override
     public List<UserMetaData> getCurrentUserMetaDataByMetaDataIdArr(Object[] metaDataIdArr) {
         UserDto userDto = commonService.getCurrentUser();
         LambdaQueryWrapper<UserMetaData> wrapper = Wrappers.lambdaQuery();
@@ -253,24 +243,11 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public void updateTimesByMetaDataId(List<String> metaDataIdList, String address) {
-        this.baseMapper.updateTimesByMetaDataId(metaDataIdList, address);
-    }
-
-    @Override
     public List<UserMetaData> getByMetaDataId(Set<String> metaDataIdList) {
         LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(UserMetaData::getAuthMetadataState, UserMetaDataAuthorithStateEnum.RELEASED.getValue());
         queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
         queryWrapper.in(UserMetaData::getMetaDataId, metaDataIdList);
-        return this.list(queryWrapper);
-    }
-
-    @Override
-    public List<UserMetaData> getByAuthStatus(Byte authStatus) {
-        LambdaQueryWrapper<UserMetaData> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(UserMetaData::getAuthStatus, authStatus);
-        queryWrapper.eq(UserMetaData::getStatus, StatusEnum.VALID.getValue());
         return this.list(queryWrapper);
     }
 

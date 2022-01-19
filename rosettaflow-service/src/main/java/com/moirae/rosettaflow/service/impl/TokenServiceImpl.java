@@ -128,29 +128,4 @@ public class TokenServiceImpl implements ITokenService {
         }
         return true;
     }
-
-    @Override
-    public boolean removeTokenById(@NotNull Long id) {
-        String tokenKey = getTokenKey(id);
-        String token = redissonObject.getValue(tokenKey);
-        if (token != null) {
-            redissonObject.delete(tokenKey);
-            redissonObject.delete(getUserKey(token));
-        }
-        return true;
-    }
-
-    @Override
-    public boolean refreshUserDto(@NotNull UserDto userDto) {
-        String token = getToken(userDto);
-        if (StrUtil.isEmpty(token)) {
-            log.warn("The token is not exists. UserId: {}.", userDto.getId());
-            return false;
-        } else {
-            String userKey = getUserKey(token);
-            redissonObject.setValue(userKey, userDto, sysConfig.getLoginTimeOut());
-            return true;
-        }
-    }
-
 }

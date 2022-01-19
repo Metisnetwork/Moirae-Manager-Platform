@@ -11,10 +11,4 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, project_name, project_desc, `status`, create_time, update_time
-  </sql>
-    <update id="truncate">
-      TRUNCATE TABLE t_project_temp
-    </update>
 </mapper>

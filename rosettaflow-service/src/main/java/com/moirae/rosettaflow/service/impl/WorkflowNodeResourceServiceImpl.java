@@ -29,36 +29,6 @@ public class WorkflowNodeResourceServiceImpl extends ServiceImpl<WorkflowNodeRes
     }
 
     @Override
-    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
-        LambdaQueryWrapper<WorkflowNodeResource> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.in(WorkflowNodeResource::getWorkflowNodeId, workflowNodeIdList);
-        this.remove(delWrapper);
-    }
-
-    @Override
-    public void deleteLogicByWorkflowNodeId(Long workflowNodeId) {
-        LambdaUpdateWrapper<WorkflowNodeResource> delWrapper = Wrappers.lambdaUpdate();
-        delWrapper.eq(WorkflowNodeResource::getWorkflowNodeId, workflowNodeId);
-//        delWrapper.set(WorkflowNodeResource::getStatus, StatusEnum.UN_VALID.getValue());
-        this.update(delWrapper);
-    }
-
-    @Override
-    public WorkflowNodeResource copyWorkflowNodeResource(Long newNodeId, Long oldNodeId) {
-        WorkflowNodeResource oldNodeResource = this.queryByWorkflowNodeId(oldNodeId);
-        if (Objects.isNull(oldNodeResource)) {
-            return null;
-        }
-        WorkflowNodeResource newNodeResource = new WorkflowNodeResource();
-        newNodeResource.setWorkflowNodeId(newNodeId);
-        newNodeResource.setCostMem(oldNodeResource.getCostMem());
-        newNodeResource.setCostCpu(oldNodeResource.getCostCpu());
-        newNodeResource.setCostGpu(oldNodeResource.getCostGpu());
-        newNodeResource.setCostBandwidth(oldNodeResource.getCostBandwidth());
-        return newNodeResource;
-    }
-
-    @Override
     public void batchInsert(List<WorkflowNodeResource> workflowNodeResourceList) {
         this.baseMapper.batchInsert(workflowNodeResourceList);
     }
