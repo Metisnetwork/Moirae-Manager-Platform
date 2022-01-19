@@ -13,11 +13,6 @@ public enum RespCodeEnum {
     SUCCESS(10000, "SUCCESS"),
 
     /**
-     * 失败
-     */
-    FAIL(20000, "FAIL"),
-
-    /**
      * 参数类型错误
      */
     PARAM_TYPE_ERROR(20001, "Param type error"),
@@ -36,11 +31,6 @@ public enum RespCodeEnum {
      * 请求参数错误
      */
     PARAM_ERROR(20004, "Request param error"),
-
-    /**
-     * 请求头不包含token
-     */
-    UN_TOKEN(20005, "Missing parameters TOKEN"),
 
     /**
      * 用户未登录

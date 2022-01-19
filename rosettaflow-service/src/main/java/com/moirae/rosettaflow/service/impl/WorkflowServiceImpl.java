@@ -298,7 +298,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public Workflow queryWorkflowDetail(Long workflowId, Integer version) {
-        Workflow workflow = queryWorkflow(workflowId);
+        Workflow workflow = getById(workflowId);
         List<WorkflowNode> workflowNodeList = workflowNodeService.queryByWorkflowIdAndVersion(workflowId, version);
         workflow.setWorkflowNodeReqList(workflowNodeList);
         for (WorkflowNode workflowNode : workflowNodeList) {

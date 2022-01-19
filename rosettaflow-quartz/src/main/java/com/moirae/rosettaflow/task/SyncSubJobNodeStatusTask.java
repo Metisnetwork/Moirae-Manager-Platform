@@ -58,8 +58,12 @@ public class SyncSubJobNodeStatusTask {
                 long taskStartAt = taskDetailResponseDto.getInformation().getStartAt();
                 long taskEndAt = taskDetailResponseDto.getInformation().getEndAt();
                 if (workflowRunTaskStatusMap.containsKey(taskId)) {
-                    log.info("同步更新子作业节点运行中任务开始 taskId = {}, result = {}", taskId, JSONObject.toJSON(taskDetailResponseDto));
-                    workflowRunStatusService.taskFinish(workflowRunTaskStatusMap.get(taskId), taskId, state, taskStartAt, taskEndAt);
+                    try{
+                        log.info("同步更新子作业节点运行中任务开始 taskId = {}, result = {}", taskId, JSONObject.toJSON(taskDetailResponseDto));
+                        workflowRunStatusService.taskFinish(workflowRunTaskStatusMap.get(taskId), taskId, state, taskStartAt, taskEndAt);
+                    }catch (Exception e){
+                        log.error("同步更新子作业节点运行中任务异常 taskId = " + taskId, e);
+                    }
                 }
             }
         }
