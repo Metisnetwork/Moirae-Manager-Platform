@@ -27,38 +27,9 @@ public class WorkflowNodeOutputServiceImpl extends ServiceImpl<WorkflowNodeOutpu
     }
 
     @Override
-    public void deleteByWorkflowNodeId(List<Long> workflowNodeIdList) {
-        LambdaQueryWrapper<WorkflowNodeOutput> delWrapper = Wrappers.lambdaQuery();
-        delWrapper.in(WorkflowNodeOutput::getWorkflowNodeId, workflowNodeIdList);
-        this.remove(delWrapper);
-    }
-
-    @Override
-    public List<WorkflowNodeOutput> copyWorkflowNodeOutput(Long newNodeId, Long oldNodeId) {
-        List<WorkflowNodeOutput> oldNodeOutputList = this.getByWorkflowNodeId(oldNodeId);
-        if (null == oldNodeOutputList || oldNodeOutputList.size() == 0) {
-            return new ArrayList<>();
-        }
-        List<WorkflowNodeOutput> newNodeOutputList = new ArrayList<>();
-        oldNodeOutputList.forEach(oldNodeOutput -> {
-            WorkflowNodeOutput newNodeOutput = new WorkflowNodeOutput();
-            newNodeOutput.setWorkflowNodeId(newNodeId);
-            newNodeOutput.setIdentityId(oldNodeOutput.getIdentityId());
-            newNodeOutputList.add(newNodeOutput);
-        });
-        return newNodeOutputList;
-    }
-
-    @Override
     public String getOutputIdentityIdByTaskId(String taskId){
         return this.baseMapper.getOutputIdentityIdByTaskId(taskId);
     }
-
-    @Override
-    public String getOutputIdentityIdByWorkFlowIdAndStep(Long workflowNodeId, Long nodeStep){
-        return this.baseMapper.getOutputIdentityIdByWorkFlowIdAndStep(workflowNodeId,nodeStep);
-    }
-
 
     @Override
     public void batchInsert(List<WorkflowNodeOutput> workflowNodeOutputList) {

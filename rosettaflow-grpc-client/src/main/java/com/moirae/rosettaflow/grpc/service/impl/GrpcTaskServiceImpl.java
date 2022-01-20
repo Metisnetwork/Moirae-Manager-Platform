@@ -42,12 +42,12 @@ public class GrpcTaskServiceImpl implements GrpcTaskService {
     }
 
     @Override
-    public List<TaskDetailResponseDto> getAllTaskDetailList() {
+    public List<TaskDetailResponseDto> getAllTaskDetailList(Channel channel) {
         long latestSynced = 0;
         List<TaskDetailResponseDto> allList = new ArrayList<>();
         List<TaskDetailResponseDto> list;
         do {
-            list = taskServiceClient.getTaskDetailList(latestSynced);
+            list = taskServiceClient.getTaskDetailList(channel,latestSynced);
             if(list.isEmpty()){
                 break;
             }

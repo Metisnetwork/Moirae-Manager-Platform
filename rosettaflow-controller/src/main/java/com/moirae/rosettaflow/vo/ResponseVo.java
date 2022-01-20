@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -33,28 +34,24 @@ public class ResponseVo<T> {
         this.data = data;
     }
 
-    private ResponseVo(RespCodeEnum respCodeEnum) {
-        this(respCodeEnum.getCode(), respCodeEnum.getMsg());
+    private ResponseVo(RespCodeEnum respCodeEnum, String msg) {
+        this(respCodeEnum.getCode(), msg);
     }
 
-    private ResponseVo(RespCodeEnum respCodeEnum, T data) {
-        this(respCodeEnum.getCode(), respCodeEnum.getMsg(), data);
+    private ResponseVo(RespCodeEnum respCodeEnum, String msg, T data) {
+        this(respCodeEnum.getCode(), msg, data);
     }
 
     public static <T> ResponseVo<T> createSuccess() {
-        return new ResponseVo<>(RespCodeEnum.SUCCESS);
-    }
-
-    public static <T> ResponseVo createFail() {
-        return new ResponseVo<>(RespCodeEnum.FAIL);
+        return new ResponseVo<>(RespCodeEnum.SUCCESS, ErrorMsg.SUCCESS.getMsg());
     }
 
     public static <T> ResponseVo<T> createSuccess(T data) {
-        return new ResponseVo<>(RespCodeEnum.SUCCESS, data);
+        return new ResponseVo<>(RespCodeEnum.SUCCESS, ErrorMsg.SUCCESS.getMsg(),data);
     }
 
-    public static <T> ResponseVo<T> create(RespCodeEnum respCodeEnum) {
-        return new ResponseVo<>(respCodeEnum);
+    public static <T> ResponseVo<T> create(RespCodeEnum respCodeEnum, String msg) {
+        return new ResponseVo<>(respCodeEnum, msg);
     }
 
     public static <T> ResponseVo<T> create(int code, String msg) {

@@ -28,23 +28,4 @@ public class AlgorithmVariableServiceImpl extends ServiceImpl<AlgorithmVariableM
         queryWrapper.eq(AlgorithmVariable::getStatus, StatusEnum.VALID.getValue());
         return this.list(queryWrapper);
     }
-
-    @Override
-    public void saveAlgorithmVariable(Long oldAlgorithmId, Long newAlgorithmId) {
-        List<AlgorithmVariable> variableOldList = this.getByAlgorithmId(oldAlgorithmId);
-        if (variableOldList == null || variableOldList.size() == 0) {
-            return;
-        }
-        List<AlgorithmVariable> newAlgorithmVariableList = new ArrayList<>();
-        for (AlgorithmVariable algorithmVariable : variableOldList) {
-            AlgorithmVariable newAlgorithmVariable = new AlgorithmVariable();
-            newAlgorithmVariable.setAlgorithmId(newAlgorithmId);
-            newAlgorithmVariable.setVarType(algorithmVariable.getVarType());
-            newAlgorithmVariable.setVarKey(algorithmVariable.getVarKey());
-            newAlgorithmVariable.setVarValue(algorithmVariable.getVarValue());
-            newAlgorithmVariable.setVarDesc(algorithmVariable.getVarDesc());
-            newAlgorithmVariableList.add(newAlgorithmVariable);
-        }
-        this.saveBatch(newAlgorithmVariableList);
-    }
 }

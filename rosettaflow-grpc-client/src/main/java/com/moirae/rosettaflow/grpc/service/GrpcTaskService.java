@@ -39,7 +39,7 @@ public interface GrpcTaskService {
      *
      * @return 全部任务详情列表
      */
-    List<TaskDetailResponseDto> getAllTaskDetailList();
+    List<TaskDetailResponseDto> getAllTaskDetailList(Channel channel);
 
     default List<TaskDetailResponseDto> getTaskDetailList(Long latestSynced) {
         return new ArrayList();

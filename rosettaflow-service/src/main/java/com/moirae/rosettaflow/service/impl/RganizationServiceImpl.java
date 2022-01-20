@@ -11,7 +11,6 @@ import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
-import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.service.AuthServiceGrpc;
 import com.moirae.rosettaflow.grpc.service.GetNodeIdentityResponse;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
@@ -29,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,23 +66,6 @@ public class RganizationServiceImpl extends ServiceImpl<OrganizationMapper, Orga
     }
 
     @Override
-    public List<Organization> getAllPublicByIdentity() {
-        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Organization::getPublicFlag, StatusEnum.VALID.getValue());
-        wrapper.eq(Organization::getStatus, StatusEnum.VALID.getValue());
-        return this.list(wrapper);
-    }
-
-    @Override
-    public Organization getByIdentityIAndPublicFlag(String identityId, Byte publicFlag) {
-        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Organization::getIdentityId, identityId);
-        wrapper.eq(Organization::getPublicFlag, publicFlag);
-        wrapper.eq(Organization::getStatus, StatusEnum.VALID.getValue());
-        return this.getOne(wrapper);
-    }
-
-    @Override
     public List<Organization> getByIdentityIds(Object[] identityArr) {
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getIdentityId, identityArr);
@@ -98,13 +78,6 @@ public class RganizationServiceImpl extends ServiceImpl<OrganizationMapper, Orga
         LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
         wrapper.in(Organization::getStatus, StatusEnum.VALID.getValue());
         return this.list(wrapper);
-    }
-
-    @Override
-    public Boolean deleteByIdentityId(String identityId) {
-        LambdaQueryWrapper<Organization> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Organization::getIdentityId, identityId);
-        return this.remove(wrapper);
     }
 
     @Override

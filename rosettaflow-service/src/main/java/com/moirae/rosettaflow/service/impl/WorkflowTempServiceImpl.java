@@ -3,10 +3,8 @@ package com.moirae.rosettaflow.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.enums.StatusEnum;
-import com.moirae.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.moirae.rosettaflow.mapper.WorkflowTempMapper;
-import com.moirae.rosettaflow.mapper.domain.*;
+import com.moirae.rosettaflow.mapper.domain.WorkflowTemp;
 import com.moirae.rosettaflow.service.IWorkflowTempService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,29 +18,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class WorkflowTempServiceImpl extends ServiceImpl<WorkflowTempMapper, WorkflowTemp> implements IWorkflowTempService {
-    @Override
-    public void truncate() {
-        this.baseMapper.truncate();
-    }
-
-    @Override
-    public Long addWorkflowTemplate(long projectTemplateId, Workflow workflow) {
-        WorkflowTemp workflowTemp = new WorkflowTemp();
-        workflowTemp.setProjectTempId(projectTemplateId);
-        workflowTemp.setWorkflowName(workflow.getWorkflowName());
-        workflowTemp.setWorkflowDesc(workflow.getWorkflowDesc());
-        //todo
-//        workflowTemp.setNodeNumber(workflow.getNodeNumber());
-        workflowTemp.setRunStatus(WorkflowRunStatusEnum.UN_RUN.getValue());
-        this.save(workflowTemp);
-        return workflowTemp.getId();
-    }
 
     @Override
     public WorkflowTemp getWorkflowTemplate(long projectTempId) {
         LambdaQueryWrapper<WorkflowTemp> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(WorkflowTemp::getProjectTempId, projectTempId);
-        queryWrapper.eq(WorkflowTemp::getStatus, StatusEnum.VALID.getValue());
         return this.getOne(queryWrapper);
     }
 }

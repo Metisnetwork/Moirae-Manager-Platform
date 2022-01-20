@@ -3,11 +3,13 @@ package com.moirae.rosettaflow.task;
 import cn.hutool.core.collection.CollUtil;
 import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.dto.SubJobNodeDto;
+import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IWorkflowRunStatusService;
+import com.moirae.rosettaflow.service.NetManager;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,6 +34,8 @@ public class SyncSubJobNodeStatusTask {
     private IWorkflowRunStatusService workflowRunStatusService;
     @Resource
     private IDataSyncService dataSyncService;
+    @Resource
+    private NetManager netManager;
 
     @Scheduled(fixedDelay = 30 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")
@@ -46,28 +50,28 @@ public class SyncSubJobNodeStatusTask {
             return;
         }
         log.info("同步更新子作业节点运行中任务开始>>>>");
-        Map<String, Long> workflowRunTaskStatusMap = workflowRunTaskStatusList.stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
-        dataSyncService.sync(DataSyncTypeEnum.SUB_JOB_NODE_STATUS.getDataType(),DataSyncTypeEnum.SUB_JOB_NODE_STATUS.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
-                (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
-                    return grpcTaskService.getTaskDetailList(latestSynced);
-                },
-                (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
-                    for (TaskDetailResponseDto taskDetailResponseDto : grpcResponseList) {
-                        String taskId = taskDetailResponseDto.getInformation().getTaskId();
-                        int state = taskDetailResponseDto.getInformation().getState();
-                        long taskStartAt = taskDetailResponseDto.getInformation().getStartAt();
-                        long taskEndAt = taskDetailResponseDto.getInformation().getEndAt();
-                        if (workflowRunTaskStatusMap.containsKey(taskId)) {
-                            workflowRunStatusService.taskFinish(workflowRunTaskStatusMap.get(taskId), taskId, state, taskStartAt, taskEndAt);
-                        }
+        // 通道 -> List<任务>
+        Map<String, List<WorkflowRunTaskStatus>> channelTaskSetMap = workflowRunTaskStatusList.stream().collect(Collectors.groupingBy(WorkflowRunTaskStatus::getSenderIdentityId));
+        //获取所有任务详情
+        for (String identityId: channelTaskSetMap.keySet()) {
+            // 任务id -> workflowRunId
+            Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
+            List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList(netManager.getChannel(identityId));
+            for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
+                String taskId = taskDetailResponseDto.getInformation().getTaskId();
+                int state = taskDetailResponseDto.getInformation().getState();
+                long taskStartAt = taskDetailResponseDto.getInformation().getStartAt();
+                long taskEndAt = taskDetailResponseDto.getInformation().getEndAt();
+                if (workflowRunTaskStatusMap.containsKey(taskId)) {
+                    try{
+                        log.info("同步更新子作业节点运行中任务开始 taskId = {}, result = {}", taskId, JSONObject.toJSON(taskDetailResponseDto));
+                        workflowRunStatusService.taskFinish(workflowRunTaskStatusMap.get(taskId), taskId, state, taskStartAt, taskEndAt);
+                    }catch (Exception e){
+                        log.error("同步更新子作业节点运行中任务异常 taskId = " + taskId, e);
                     }
-                },
-                (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
-                    return grpcResponseList
-                            .get(grpcResponseList.size() - 1)
-                            .getInformation()
-                            .getUpdateAt();
-                });
+                }
+            }
+        }
         log.info("同步更新子作业节点运行中任务结束>>>>");
     }
 }

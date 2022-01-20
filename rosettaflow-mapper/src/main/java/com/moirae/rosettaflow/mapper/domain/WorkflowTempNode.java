@@ -9,12 +9,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * t_workflow_node_temp
+ * t_workflow_temp_node
  * @author houz
  */
 @Data
-@TableName(value = "t_workflow_node_temp")
-public class WorkflowNodeTemp implements Serializable {
+@TableName(value = "t_workflow_temp_node")
+public class WorkflowTempNode implements Serializable {
     /**
      * 工作流节点模板表ID(自增长)
      */
@@ -47,19 +47,14 @@ public class WorkflowNodeTemp implements Serializable {
     private Integer nodeStep;
 
     /**
-     * 下一个节点,如果为空则无下个节点
+     * 工作流节点需要的模型id
      */
-    private Integer nextNodeStep;
+    private Long modelId;
 
     /**
-     * 运行状态:0-未开始,1-运行中,2-运行成功,3-运行失败
+     * 是否需要输入模型: 0-否，1:是
      */
-    private Byte runStatus;
-
-    /**
-     * 状态: 0-无效，1- 有效
-     */
-    private Byte status;
+    private Integer inputModel;
 
     /**
      * 创建时间

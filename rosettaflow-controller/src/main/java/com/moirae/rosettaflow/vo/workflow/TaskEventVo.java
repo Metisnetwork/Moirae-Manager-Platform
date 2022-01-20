@@ -39,7 +39,6 @@ public class TaskEventVo {
     private String content;
 
     @ApiModelProperty(value = "事件产生时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createAt;
 
 }

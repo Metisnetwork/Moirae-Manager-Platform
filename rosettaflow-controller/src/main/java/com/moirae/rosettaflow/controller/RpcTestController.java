@@ -201,7 +201,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc GetTaskDetailList查看本组织参与过的全部任务详情列表", notes = "grpc GetTaskDetailList查看本组织参与过的全部任务详情列表")
     public ResponseVo<List<TaskDetailResponseDto>> getTaskDetailList() {
         log.info("grpc GetTaskDetailList查看本组织参与过的全部任务详情列表");
-        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getAllTaskDetailList();
+        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getAllTaskDetailList(netManager.getChannel(organizationService.list().get(0).getIdentityId()));
         return ResponseVo.createSuccess(metaDataAuthorityDtoList);
     }
 
@@ -209,7 +209,7 @@ public class RpcTestController {
     @ApiOperation(value = "grpc getTaskDetailById查询任务详情根据任务id", notes = "grpc getTaskDetailById查询任务详情根据任务id")
     public ResponseVo<TaskDetailResponseDto> getTaskDetailById(@ApiParam(value = "taskId", required = true) @PathVariable String taskId) {
         log.info("grpc getTaskDetailById查询任务详情根据任务id");
-        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getAllTaskDetailList();
+        List<TaskDetailResponseDto> metaDataAuthorityDtoList = grpcTaskService.getAllTaskDetailList(netManager.getChannel(organizationService.list().get(0).getIdentityId()));
         if (Objects.isNull(metaDataAuthorityDtoList) || metaDataAuthorityDtoList.isEmpty()) {
             return ResponseVo.createSuccess();
         }

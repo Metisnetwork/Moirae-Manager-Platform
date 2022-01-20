@@ -32,10 +32,4 @@ public interface WorkflowMapper extends BaseMapper<Workflow> {
      * @return 工作流
      */
     Workflow queryWorkFlowAndStatus(@Param("workflowId") Long workflowId);
-
-    /**
-     * 删除与当前工作流相关所有节点数据
-     * @param workflowId 工作流id
-     */
-    void deleteWorkflowAllNodeData(@Param("workflowId") Long workflowId);
 }

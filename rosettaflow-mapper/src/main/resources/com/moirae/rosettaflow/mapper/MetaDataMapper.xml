@@ -38,16 +38,6 @@
         <result column="auth_status" property="authStatus" jdbcType="TINYINT"/>
     </resultMap>
 
-    <select id="selectMetaDataWithAuth" resultMap="BaseResultMap_With_Auth">
-        SELECT
-            tmd.*, tumd.auth_status
-        FROM
-            t_meta_data AS tmd
-            LEFT JOIN t_user_meta_data AS tumd ON tmd.meta_data_id = tumd.meta_data_id
-        WHERE
-            tumd.address = #{address, jdbcType=VARCHAR}
-    </select>
-
     <select id="getAllAuthTables" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
         SELECT DISTINCT
             md.meta_data_id,

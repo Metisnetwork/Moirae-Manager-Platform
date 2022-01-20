@@ -5,7 +5,7 @@ package com.moirae.rosettaflow.common.enums;
  * @author hudenian
  * @date 2021/9/26
  */
-public enum storePatternEnum {
+public enum StorePatternEnum {
     /**
      * 明文
      */
@@ -17,7 +17,7 @@ public enum storePatternEnum {
 
     private final byte value;
 
-    storePatternEnum(byte value) {
+    StorePatternEnum(byte value) {
         this.value = value;
     }
 

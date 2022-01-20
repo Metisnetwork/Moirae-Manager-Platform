@@ -21,4 +21,9 @@ public class WorkflowRunTaskStatusServiceImpl extends ServiceImpl<WorkflowRunTas
         wrapper.eq(WorkflowRunTaskStatus::getWorkflowRunId, workflowRunStatusId);
         return this.list(wrapper);
     }
+
+    @Override
+    public List<WorkflowRunTaskStatus> queryUnConfirmedWorkflowRunTaskStatus() {
+        return baseMapper.queryUnConfirmedWorkflowRunTaskStatus();
+    }
 }

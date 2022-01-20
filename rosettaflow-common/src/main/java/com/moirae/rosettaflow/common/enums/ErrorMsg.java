@@ -15,7 +15,15 @@ public enum ErrorMsg {
     /**
      * 通用
      */
+    SUCCESS("成功", "Success"),
     PARAM_ERROR("请求参数错误", "Request param error"),
+    EXCEPTION("系统异常，请联系管理台", "System exception,please contact the administrator"),
+    PARAM_TYPE_ERROR("参数类型错误", "Param type error"),
+    REQUEST_METHOD_ERROR("请求方式错误", "Request method error"),
+    PARAM_FORMAT_ERROR("参数格式错误", "Param format error"),
+    BIZ_FAILED("业务失败", "Business failed"),
+    BIZ_EXCEPTION("业务异常", "Business exception"),
+
 
     /**
      * 用户
@@ -26,6 +34,10 @@ public enum ErrorMsg {
     USER_ADDRESS_ERROR("用户地址有误", "Wrong user address"),
     MODIFY_USER_NAME_FAILED("昵称修改失败", "Nickname modification failed"),
     USER_NAME_EXISTED("昵称已存在", "Nickname already exists"),
+    UN_LOGIN("用户未登录", "User not login"),
+    TOKEN_INVALID("Token 无效", "Token invalid"),
+    USER_NOT_EXIST("用户不存在", "User not exist"),
+    NONCE_INVALID("Nonce 无效", "Nonce invalid"),
 
     /**
      * 项目
@@ -129,15 +141,7 @@ public enum ErrorMsg {
      * 机构
      */
     ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist"),
-    ORGANIZATION_INFO_ERROR("连接组织节点服务不可达", "Organization can not connect"),
-    USER_IDENTITY_ERROR("此组织不可用！", "this organization is not available!"),
-    ORGANIZATION_DELETE_ERROR("公共组织不可删除！", "Public organization cannot be deleted!"),
-
-    /**
-     * 任务
-     */
-    TASK_RESULT_ID_NOT_EXIST("任务结果id不存在", "Task result not exist");
-
+    ORGANIZATION_INFO_ERROR("连接组织节点服务不可达", "Organization can not connect");
 
     private final String zh;
     private final String en;

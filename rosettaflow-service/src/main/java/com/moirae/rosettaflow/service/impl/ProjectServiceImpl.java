@@ -15,7 +15,6 @@ import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.ProjMemberDto;
 import com.moirae.rosettaflow.dto.ProjectDto;
-import com.moirae.rosettaflow.dto.ProjectModelDto;
 import com.moirae.rosettaflow.mapper.ProjectMapper;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
@@ -50,7 +49,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private IWorkflowService workflowService;
 
     @Resource
-    private IWorkflowNodeTempService workflowNodeTempService;
+    private IWorkflowTempNodeService workflowNodeTempService;
 
     @Resource
     private IWorkflowNodeService workflowNodeService;
@@ -83,24 +82,19 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
             // 如果项目模板ID不为空，将项目模板中的工作流复制到当前项目
             if (null != projectDto.getProjectTempId() && projectDto.getProjectTempId() > 0) {
-                // 模板id为1表示空白模板
-                if (projectDto.getProjectTempId() == 1) {
-                    return project.getId();
-                }
                 WorkflowTemp workflowTemp = workflowTempService.getWorkflowTemplate(projectDto.getProjectTempId());
                 if (null != workflowTemp) {
                     // 添加工作流
-                    Long workflowId = workflowService.addWorkflowByTemplate(project.getId(), userId, workflowTemp, language);
-
+                    Workflow workflow = workflowService.addWorkflowByTemplate(project.getId(), userId, workflowTemp, language);
                     //从工作流节点模板中复制所有工作流节点
-                    List<WorkflowNodeTemp> workflowNodeTempList = workflowNodeTempService.getByWorkflowTempId(workflowTemp.getId());
+                    List<WorkflowTempNode> workflowNodeTempList = workflowNodeTempService.getByWorkflowTempId(workflowTemp.getId());
                     //根据工作流节点模板列表，添加工作流节点
                     if (workflowNodeTempList.size() > 0) {
                         // 处理工作流节点名称国际化
                         this.dealNodeNameLanguage(workflowNodeTempList, language);
                         List<WorkflowNode> oldNodeList = BeanUtil.copyToList(workflowNodeTempList, WorkflowNode.class);
                         // 保存节点
-                        workflowNodeService.saveCopyWorkflowNodeTemp(workflowId, oldNodeList);
+                        workflowNodeService.saveCopyWorkflowNodeTemp(workflow, oldNodeList);
                     }
                 }
             }
@@ -115,7 +109,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     /** 处理工作流节点名称国际化 */
-    private void dealNodeNameLanguage(List<WorkflowNodeTemp> workflowNodeTempList, String language){
+    private void dealNodeNameLanguage(List<WorkflowTempNode> workflowNodeTempList, String language){
         workflowNodeTempList.forEach(nodeTemp ->
                 nodeTemp.setNodeName(SysConstant.EN_US.equals(language) ? nodeTemp.getNodeNameEn() : nodeTemp.getNodeName()));
     }

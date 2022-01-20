@@ -45,11 +45,9 @@ public class UserMetaDataVo {
     private String authValueStr;
 
     @ApiModelProperty(value = "授权开始时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authBeginTime;
 
     @ApiModelProperty(value = "授权结束时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date authEndTime;
 
     @ApiModelProperty(value = "授权状态: -1-未知(1.未登录故获取不到授权状态 2.用户未申请使用元数据), 0-已申请(待审核), 1-已授权, 2-已拒绝, 3-已撤销, 4-已失效")
@@ -62,21 +60,17 @@ public class UserMetaDataVo {
     private Byte authStatusShow;
 
     @ApiModelProperty(value = "发起授权申请的时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date applyTime;
     /**
      * 审核授权申请的时间
      */
     @ApiModelProperty(value = "审核授权申请的时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date auditTime;
 
     @ApiModelProperty(value = "创建时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
 
     @ApiModelProperty(value = "更新时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date updateTime;
 
     @ApiModelProperty(value = "元数据名称")

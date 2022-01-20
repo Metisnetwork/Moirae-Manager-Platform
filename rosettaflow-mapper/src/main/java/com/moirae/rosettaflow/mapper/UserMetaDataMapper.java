@@ -32,14 +32,6 @@ public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
     List<UserMetaDataDto> getUserMetaDataByAddress(@Param("address") String address);
 
     /**
-     * 更新按次数授权数据的次数
-     * @param metaDataIdList 元数据id集合
-     * @param address 用户地址
-     * @return UserMetaData
-     */
-    int updateTimesByMetaDataId(@Param("metaDataIdList")List<String> metaDataIdList, @Param("address")String address);
-
-    /**
      * 批量插入
      * @param userMetaDataList
      * @return

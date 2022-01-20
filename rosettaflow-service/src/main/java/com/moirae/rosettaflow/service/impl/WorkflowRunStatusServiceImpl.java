@@ -87,10 +87,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
 
     @Override
     public List<WorkflowRunTaskStatus> queryUnConfirmedWorkflowRunTaskStatus() {
-        LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowRunTaskStatus::getRunStatus, WorkflowRunStatusEnum.RUNNING.getValue());
-        wrapper.isNotNull(WorkflowRunTaskStatus::getTaskId);
-        return  workflowRunTaskStatusService.list(wrapper);
+        return workflowRunTaskStatusService.queryUnConfirmedWorkflowRunTaskStatus();
     }
 
     @Override
@@ -238,7 +235,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         Date begin = taskStartAt > 0 ? new Date(taskStartAt) : null;
         Date end = taskEndAt > 0 ? new Date(taskEndAt) : null;
         curWorkflowRunTaskStatus.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
-        curWorkflowRunTaskStatus.setRunMsg("task fail! id = " + taskId);
+        curWorkflowRunTaskStatus.setRunMsg("task fail!");
         curWorkflowRunTaskStatus.setBeginTime(begin);
         curWorkflowRunTaskStatus.setEndTime(end);
         workflowRunTaskStatusService.updateById(curWorkflowRunTaskStatus);

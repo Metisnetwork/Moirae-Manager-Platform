@@ -30,20 +30,6 @@ public class WorkflowNodeCodeServiceImpl extends ServiceImpl<WorkflowNodeCodeMap
     }
 
     @Override
-    public WorkflowNodeCode copyWorkflowNodeCode(Long newNodeId, Long oldNodeId) {
-        WorkflowNodeCode oldNodeCode = this.queryByWorkflowNodeId(oldNodeId);
-        if (Objects.isNull(oldNodeCode)) {
-            return null;
-        }
-        WorkflowNodeCode newNodeCode = new WorkflowNodeCode();
-        newNodeCode.setWorkflowNodeId(newNodeId);
-        newNodeCode.setEditType(oldNodeCode.getEditType());
-        newNodeCode.setCalculateContractCode(oldNodeCode.getCalculateContractCode());
-        newNodeCode.setDataSplitContractCode(oldNodeCode.getDataSplitContractCode());
-        return newNodeCode;
-    }
-
-    @Override
     public void batchInsert(List<WorkflowNodeCode> workflowNodeCodeList) {
         this.baseMapper.batchInsert(workflowNodeCodeList);
     }

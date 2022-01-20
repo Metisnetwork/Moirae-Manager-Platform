@@ -47,21 +47,4 @@ public interface ITokenService {
      * @return boolean
      */
     boolean refreshToken(String token);
-
-    /**
-     * 根据手机号删除token
-     *
-     * @param id 用户id
-     * @return boolean
-     */
-    boolean removeTokenById(Long id);
-
-    /**
-     * 刷新用户token对应的userDto
-     *
-     * @param userDto userDto
-     * @return boolean
-     */
-    boolean refreshUserDto(UserDto userDto);
-
 }

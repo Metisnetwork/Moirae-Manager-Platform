@@ -30,7 +30,6 @@ public class WorkflowVo {
     private Byte runStatus;
 
     @ApiModelProperty(value = "创建时间")
-    @JsonFormat(pattern = SysConstant.DEFAULT_TIME_PATTERN, timezone = SysConstant.DEFAULT_TIMEZONE)
     private Date createTime;
 
     @ApiModelProperty(value = "创建者")

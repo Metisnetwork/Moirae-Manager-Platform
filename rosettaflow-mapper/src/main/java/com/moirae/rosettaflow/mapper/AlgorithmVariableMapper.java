@@ -9,5 +9,5 @@ import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
  * @author admin
  */
 public interface AlgorithmVariableMapper extends BaseMapper<AlgorithmVariable> {
-    void truncate();
+
 }

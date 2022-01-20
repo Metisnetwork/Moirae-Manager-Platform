@@ -40,15 +40,6 @@ public class MetaDataDetailsServiceImpl extends ServiceImpl<MetaDataDetailsMappe
     }
 
     @Override
-    public IPage<MetaDataDetailsDto> findById(Long id, Long current, Long size) {
-
-        Page<MetaDataDetails> page = new Page<>(current, size);
-        LambdaQueryWrapper<MetaDataDetails> wrapper = getQueryWrapper(null, id);
-        this.page(page, wrapper);
-        return this.convertToPageDto(page);
-    }
-
-    @Override
     public List<MetaDataDetailsDto> getAllAuthColumns(String metaDataId) {
         LambdaQueryWrapper<MetaDataDetails> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaDataDetails::getMetaDataId, metaDataId);

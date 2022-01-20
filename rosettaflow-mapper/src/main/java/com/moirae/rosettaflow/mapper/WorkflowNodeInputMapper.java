@@ -13,14 +13,6 @@ import java.util.List;
 public interface WorkflowNodeInputMapper extends BaseMapper<WorkflowNodeInput> {
 
     /**
-     * 根据工作流节点id获取相关元数据信息
-     *
-     * @param workflowNodeId 工作流节点id
-     * @return List
-     */
-    List<NodeMetaDataDto> getMetaDataByWorkflowNodeId(@Param("workflowNodeId") Long workflowNodeId);
-
-    /**
      * 批量保存节点输入
      *
      * @param workflowNodeInputList 节点输入列表

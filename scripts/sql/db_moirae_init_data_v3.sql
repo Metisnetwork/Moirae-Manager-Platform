@@ -5,18 +5,12 @@ use db_moirae;
 TRUNCATE t_project_temp;
 INSERT INTO `t_project_temp` VALUES (1, '空白', 'Blank', '空白模板', 'Blank template project', 1, now(), now());
 INSERT INTO `t_project_temp` VALUES (2, '协同营销', 'Collaborative Marketing', '协同营销模板', 'Collaborative marketing template', 1, now(), now());
-INSERT INTO `t_project_temp` VALUES (3, '线性训练', 'Linear training', '线性训练模板', 'Linear training template', 0, now(), now());
-INSERT INTO `t_project_temp` VALUES (4, 'DNN算法', 'DNN algorithm', 'DNN算法模板', 'DNN algorithm template', 0, now(), now());
-INSERT INTO `t_project_temp` VALUES (5, 'XGBoost算法', 'XGBoost algorithm', 'XGBoost算法模板', 'XGBoost algorithm template', 0, now(), now());
 
 -- ----------------------------
 -- init t_workflow_temp
 -- ----------------------------
 TRUNCATE t_workflow_temp;
 INSERT INTO `t_workflow_temp` VALUES (1, 2, '协同营销对应工作流', 'Collaborative Marketing workflow', '协同营销对应工作流', 'Collaborative Marketing workflow', 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (2, 3, '线性训练对应工作流', null, '线性训练对应工作流', null, 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (3, 4, 'DNN算法对应工作流', null, 'DNN算法对应工作流', null, 1, 0, 1, now(), now());
-INSERT INTO `t_workflow_temp` VALUES (4, 5, 'XGBoost算法对应工作流', null, 'XGBoost算法对应工作流', null, 1, 0, 1, now(), now());
 
 -- ----------------------------
 -- init t_workflow_node_temp

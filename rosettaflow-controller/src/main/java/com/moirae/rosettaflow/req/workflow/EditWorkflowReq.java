@@ -28,8 +28,8 @@ public class EditWorkflowReq {
     @Length(max = 30, message = "{workflow.name.Length}")
     private String workflowName;
 
-    @ApiModelProperty(value = "工作流描述", required = true)
-    @Length(max = 50, message = "{workflow.desc.Length}")
+    @ApiModelProperty(value = "工作流描述")
+    @Length(max = 200, message = "{workflow.desc.Length}")
     private String workflowDesc;
 
 }

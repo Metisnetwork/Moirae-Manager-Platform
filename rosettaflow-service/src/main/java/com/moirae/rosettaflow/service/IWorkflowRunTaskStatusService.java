@@ -8,4 +8,6 @@ import java.util.List;
 public interface IWorkflowRunTaskStatusService extends IService<WorkflowRunTaskStatus> {
 
     List<WorkflowRunTaskStatus> listByWorkflowRunStatusId(Long workflowRunStatusId);
+
+    List<WorkflowRunTaskStatus> queryUnConfirmedWorkflowRunTaskStatus();
 }

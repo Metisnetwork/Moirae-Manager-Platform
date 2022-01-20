@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.interceptor;
 
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -52,7 +53,7 @@ public class ControllerAspect {
         } catch (Throwable e) {
             log.error("An exception occurred on the request.", e);
 
-            returnObj = ResponseVo.create(RespCodeEnum.EXCEPTION);
+            returnObj = ResponseVo.create(RespCodeEnum.EXCEPTION, ErrorMsg.EXCEPTION.getMsg());
         }
 
         log.info("End of request, Used Time: {}ms, Return result: {}.", (System.currentTimeMillis() - start), returnObj);
