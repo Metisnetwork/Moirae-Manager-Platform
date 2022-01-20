@@ -52,6 +52,11 @@ public class GrpcTaskServiceMockImpl implements GrpcTaskService {
     }
 
     @Override
+    public List<TaskDetailResponseDto> getTaskDetailList(Channel channel, Long latestSynced) {
+        return null;
+    }
+
+    @Override
     public List<TaskEventDto> getTaskEventList(ManagedChannel channel, String taskId) {
         List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
         TaskEventDto taskEventShowDto = new TaskEventDto();

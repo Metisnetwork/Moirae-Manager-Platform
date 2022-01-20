@@ -1,8 +1,6 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.collection.CollUtil;
-import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
-import com.moirae.rosettaflow.dto.SubJobNodeDto;
 import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
@@ -16,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,7 +55,8 @@ public class SyncSubJobNodeStatusTask {
         for (String identityId: channelTaskSetMap.keySet()) {
             // 任务id -> workflowRunId
             Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
-            List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList(netManager.getChannel(identityId));
+//            List<TaskDetailResponseDto> taskDetailResponseDtoList = grpcTaskService.getTaskDetailList(netManager.getChannel(identityId));
+            List<TaskDetailResponseDto> taskDetailResponseDtoList = new ArrayList<>();
             for (TaskDetailResponseDto taskDetailResponseDto : taskDetailResponseDtoList) {
                 String taskId = taskDetailResponseDto.getInformation().getTaskId();
                 int state = taskDetailResponseDto.getInformation().getState();

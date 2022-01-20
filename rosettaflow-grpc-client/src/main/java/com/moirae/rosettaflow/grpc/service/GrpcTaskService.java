@@ -41,9 +41,7 @@ public interface GrpcTaskService {
      */
     List<TaskDetailResponseDto> getAllTaskDetailList(Channel channel);
 
-    default List<TaskDetailResponseDto> getTaskDetailList(Long latestSynced) {
-        return new ArrayList();
-    }
+    List<TaskDetailResponseDto> getTaskDetailList(Channel channel, Long latestSynced);
 
 
     /**
