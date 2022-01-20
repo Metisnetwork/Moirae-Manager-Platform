@@ -96,4 +96,11 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @return
      */
     boolean isValid(Set<String> tableIdList);
+
+    /**
+     * 查询已存在的metaDataAuthId
+     * @param userMetaDataAuthIdList
+     * @return
+     */
+    List<String> existMetaDataAuthIdList(List<String> userMetaDataAuthIdList);
 }

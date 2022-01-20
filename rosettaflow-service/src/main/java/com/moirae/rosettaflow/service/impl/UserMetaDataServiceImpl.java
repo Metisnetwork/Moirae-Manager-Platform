@@ -261,6 +261,11 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         }
     }
 
+    @Override
+    public List<String> existMetaDataAuthIdList(List<String> userMetaDataAuthIdList) {
+        return this.baseMapper.existMetaDataAuthIdList(userMetaDataAuthIdList);
+    }
+
     /**
      *  检查授权数据是否有效
      * @param metaDataId ；元数据id

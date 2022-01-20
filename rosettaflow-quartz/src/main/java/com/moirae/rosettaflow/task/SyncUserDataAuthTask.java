@@ -2,9 +2,9 @@ package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
+import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 同步用户元数据授权列列表（当用户对元数据做授权申请后，redis记录设置已申请，此定时任务判断有待申请记录就启动同步，否则不同步）
@@ -50,13 +51,13 @@ public class SyncUserDataAuthTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            dataSyncService.sync(DataSyncTypeEnum.DATA_AUTH.getDataType(),DataSyncTypeEnum.DATA_AUTH.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            dataSyncService.sync(DataSyncTypeEnum.DATA_AUTH.getDataType(), DataSyncTypeEnum.DATA_AUTH.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcAuthService.getGlobalMetadataAuthorityList(latestSynced);
                     },
                     (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
                         // 批量更新
-                        this.batchDealUserAuthData(grpcResponseList, SysConstant.UPDATE);
+                        this.batchDealUserAuthData(grpcResponseList);
                         log.info("用户授权数据同步,同步数据量:{}条", grpcResponseList.size());
                     },
                     (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
@@ -74,39 +75,35 @@ public class SyncUserDataAuthTask {
      * 批量处理用户授权数据
      *
      * @param metaDataList 需更新数据
-     * @param saveFlag     处理方式
      */
-    private void batchDealUserAuthData(List<GetMetaDataAuthorityDto> metaDataList, String saveFlag) {
+    private void batchDealUserAuthData(List<GetMetaDataAuthorityDto> metaDataList) {
+        Date begin = new Date();
         if (0 == metaDataList.size()) {
             return;
         }
         List<UserMetaData> userMetaDataList = this.getUserMetaDataList(metaDataList);
-        int insertLength = userMetaDataList.size();
-        int i = 0;
-        log.info("用户申请授权元数据据批量处理开始，总条数:{}", insertLength);
-        while (insertLength > sysConfig.getBatchSize()) {
-            long begin = DateUtil.current();
-            if (SysConstant.INSERT.equals(saveFlag)) {
-                userMetaDataService.batchInsert(userMetaDataList.subList(i, i + sysConfig.getBatchSize()));
-            }
-            if (SysConstant.UPDATE.equals(saveFlag)) {
-                userMetaDataService.batchUpdate(userMetaDataList.subList(i, i + sysConfig.getBatchSize()));
-            }
-            log.info("用户申请授权元数据据批量处理，处理方式:{}, 开始条数:{}, 结束条数:{}, 耗时:{}ms", saveFlag, i, i + sysConfig.getBatchSize(), DateUtil.current() - begin);
-            i = i + sysConfig.getBatchSize();
-            insertLength = insertLength - i;
+        //查询已存在的数据
+        List<String> userMetaDataAuthIdList = userMetaDataList.stream().map(UserMetaData::getMetadataAuthId).collect(Collectors.toList());
+        List<String> existMetaDataAuthIdList = userMetaDataService.existMetaDataAuthIdList(userMetaDataAuthIdList);
 
-        }
-        if (insertLength > 0) {
-            long begin = DateUtil.current();
-            if (SysConstant.INSERT.equals(saveFlag)) {
-                userMetaDataService.batchInsert(userMetaDataList.subList(i, i + insertLength));
-            }
-            if (SysConstant.UPDATE.equals(saveFlag)) {
-                userMetaDataService.batchUpdate(userMetaDataList.subList(i, i + insertLength));
-            }
-            log.info("用户申请授权元数据据批量处理，处理方式:{}, 开始条数:{}, 结束条数:{}, 耗时:{}ms", saveFlag, i, i + insertLength, DateUtil.current() - begin);
-        }
+        //需要更新的数据
+        List<UserMetaData> needUpdate = userMetaDataList.stream()
+                .filter(metaData -> existMetaDataAuthIdList.contains(metaData.getMetadataAuthId()))
+                .collect(Collectors.toList());
+        //需要新增的数据
+        List<UserMetaData> needInsert = userMetaDataList.stream()
+                .filter(metaData -> !existMetaDataAuthIdList.contains(metaData.getMetadataAuthId()))
+                .collect(Collectors.toList());
+
+        //批量更新
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needUpdate, list -> {
+            userMetaDataService.batchUpdate(list);
+        });
+        //批量新增
+        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), needInsert, list -> {
+            userMetaDataService.batchInsert(list);
+        });
+        log.info("用户申请授权元数据据批量处理，耗时:{}ms", DateUtil.current() - begin.getTime());
     }
 
     /**

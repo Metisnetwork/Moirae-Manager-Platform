@@ -44,4 +44,11 @@ public interface UserMetaDataMapper extends BaseMapper<UserMetaData> {
      * @return
      */
     int batchUpdate(@Param("userMetaDataList") List<UserMetaData> userMetaDataList);
+
+    /**
+     * 查询已存在的metaDataAuthId
+     * @param userMetaDataAuthIdList
+     * @return
+     */
+    List<String> existMetaDataAuthIdList(@Param("userMetaDataAuthIdList") List<String> userMetaDataAuthIdList);
 }
