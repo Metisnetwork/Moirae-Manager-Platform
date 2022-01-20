@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.dto.UserDto;
@@ -66,7 +67,7 @@ public class UserController {
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public ResponseVo<?> updateNickName(@RequestBody @Valid UpdateNickReq updateNickReq) {
         userService.updateNickName(updateNickReq.get0xAddress(), updateNickReq.getNickName());
-        return ResponseVo.create(RespCodeEnum.SUCCESS);
+        return ResponseVo.create(RespCodeEnum.SUCCESS, ErrorMsg.SUCCESS.getMsg());
     }
 
     @PostMapping("queryUserDetails")

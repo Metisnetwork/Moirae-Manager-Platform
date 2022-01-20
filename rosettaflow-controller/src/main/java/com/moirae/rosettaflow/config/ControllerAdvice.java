@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.config;
 
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -28,7 +29,7 @@ public class ControllerAdvice {
     @ExceptionHandler(Exception.class)
     public <T> ResponseVo<T> exceptionHandler(Exception e) {
         log.error("An exception occurred on the request.", e);
-        return ResponseVo.create(RespCodeEnum.EXCEPTION);
+        return ResponseVo.create(RespCodeEnum.EXCEPTION, ErrorMsg.EXCEPTION.getMsg());
     }
 
     /**
@@ -47,7 +48,7 @@ public class ControllerAdvice {
     @ExceptionHandler(TypeMismatchException.class)
     public <T> ResponseVo<T> typeMismatchExceptionHandler(TypeMismatchException e) {
         log.warn("Incorrect request parameter type.", e);
-        return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR);
+        return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR, ErrorMsg.PARAM_TYPE_ERROR.getMsg());
     }
 
     /**
@@ -60,7 +61,7 @@ public class ControllerAdvice {
         if (null != e.getBindingResult().getFieldError()) {
             errMsg = e.getBindingResult().getFieldError().getDefaultMessage();
         }
-        return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR.getCode(), errMsg == null ? RespCodeEnum.PARAM_TYPE_ERROR.getMsg() : errMsg);
+        return ResponseVo.create(RespCodeEnum.PARAM_TYPE_ERROR.getCode(), errMsg == null ? ErrorMsg.PARAM_TYPE_ERROR.getMsg() : errMsg);
     }
 
     /**
@@ -69,7 +70,7 @@ public class ControllerAdvice {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public <T> ResponseVo<T> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException e) {
         log.warn("Request method not supported.", e);
-        return ResponseVo.create(RespCodeEnum.REQUEST_METHOD_ERROR);
+        return ResponseVo.create(RespCodeEnum.REQUEST_METHOD_ERROR, ErrorMsg.REQUEST_METHOD_ERROR.getMsg());
     }
 
     /**
@@ -78,7 +79,7 @@ public class ControllerAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public <T> ResponseVo<T> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException e) {
         log.warn("Incorrect format of request parameters.", e);
-        return ResponseVo.create(RespCodeEnum.PARAM_FORMAT_ERROR);
+        return ResponseVo.create(RespCodeEnum.PARAM_FORMAT_ERROR, ErrorMsg.PARAM_FORMAT_ERROR.getMsg());
     }
 
     /**
@@ -91,7 +92,7 @@ public class ControllerAdvice {
         if (null != e.getBindingResult().getFieldError()) {
             errMsg = e.getBindingResult().getFieldError().getDefaultMessage();
         }
-        return ResponseVo.create(RespCodeEnum.PARAM_ERROR.getCode(), errMsg == null ? RespCodeEnum.PARAM_ERROR.getMsg() : errMsg);
+        return ResponseVo.create(RespCodeEnum.PARAM_ERROR.getCode(), errMsg == null ? ErrorMsg.PARAM_ERROR.getMsg() : errMsg);
     }
 
     /**
@@ -100,6 +101,6 @@ public class ControllerAdvice {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public <T> ResponseVo<T> httpMessageNotReadableExceptionHandler(MaxUploadSizeExceededException e) {
         log.warn("File size out of limit.", e);
-        return ResponseVo.create(RespCodeEnum.PARAM_ERROR.getCode(), RespCodeEnum.PARAM_ERROR.getMsg() + FILE_SIZE_OUT_LIMIT);
+        return ResponseVo.create(RespCodeEnum.PARAM_ERROR.getCode(), ErrorMsg.PARAM_ERROR.getMsg() + FILE_SIZE_OUT_LIMIT);
     }
 }

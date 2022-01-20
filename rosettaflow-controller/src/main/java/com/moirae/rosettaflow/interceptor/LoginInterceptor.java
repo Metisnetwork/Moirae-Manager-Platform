@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.interceptor;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.dto.UserDto;
@@ -71,7 +72,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 if (null == userService.getByAddress(userDto.getAddress())) {
                     tokenService.removeToken(token);
                     log.error("user not exist: {}", userDto.getAddress());
-                    printResponse(response, RespCodeEnum.USER_NOT_EXIST);
+                    printResponse(response, RespCodeEnum.USER_NOT_EXIST, ErrorMsg.USER_NOT_EXIST.getMsg());
                     return false;
                 }
                 UserContext.set(userDto);
@@ -79,13 +80,13 @@ public class LoginInterceptor implements HandlerInterceptor {
             } else {
                 if (needToken) {
                     log.error("Invalid token: {}", token);
-                    printResponse(response, RespCodeEnum.TOKEN_INVALID);
+                    printResponse(response, RespCodeEnum.TOKEN_INVALID, ErrorMsg.TOKEN_INVALID.getMsg());
                     return false;
                 }
             }
         } else {
             if (needToken) {
-                printResponse(response, RespCodeEnum.UN_LOGIN);
+                printResponse(response, RespCodeEnum.UN_LOGIN, ErrorMsg.UN_LOGIN.getMsg());
                 return false;
             }
         }
@@ -112,10 +113,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         MDC.clear();
     }
 
-    void printResponse(HttpServletResponse response, RespCodeEnum respCodeEnum) throws IOException {
+    void printResponse(HttpServletResponse response, RespCodeEnum respCodeEnum, String msg) throws IOException {
         response.setCharacterEncoding(ENCODING);
         response.setContentType(CONTENT_TYPE);
-        response.getWriter().write(JSON.toJSONString(ResponseVo.create(respCodeEnum)));
+        response.getWriter().write(JSON.toJSONString(ResponseVo.create(respCodeEnum, msg)));
     }
 
 }
