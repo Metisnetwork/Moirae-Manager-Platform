@@ -48,10 +48,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        boolean needToken = true;
+        boolean needLogin = true;
         for (int i = 0; i < SysConstant.LOGIN_URIS.length; i++) {
             if (request.getRequestURI().contains(SysConstant.LOGIN_URIS[i])) {
-                needToken = false;
+                needLogin = false;
                 break;
             }
         }
@@ -78,15 +78,13 @@ public class LoginInterceptor implements HandlerInterceptor {
                 UserContext.set(userDto);
                 tokenService.refreshToken(token);
             } else {
-                if (needToken) {
-                    log.error("Invalid token: {}", token);
-                    printResponse(response, RespCodeEnum.TOKEN_INVALID, ErrorMsg.TOKEN_INVALID.getMsg());
-                    return false;
-                }
+                log.error("Invalid token: {}", token);
+                printResponse(response, RespCodeEnum.TOKEN_INVALID,ErrorMsg.TOKEN_INVALID.getMsg());
+                return false;
             }
         } else {
-            if (needToken) {
-                printResponse(response, RespCodeEnum.UN_LOGIN, ErrorMsg.UN_LOGIN.getMsg());
+            if (needLogin) {
+                printResponse(response, RespCodeEnum.UN_LOGIN,ErrorMsg.UN_LOGIN.getMsg());
                 return false;
             }
         }
