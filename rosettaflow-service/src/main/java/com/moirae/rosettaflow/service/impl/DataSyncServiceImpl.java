@@ -80,7 +80,7 @@ public class DataSyncServiceImpl extends ServiceImpl<DataSyncMapper, DataSync> i
         List<T> grpcResponseList;
         do {
             //2.根据新的同步时间latestSynced获取分页列表grpcResponseList
-            grpcResponseList = grpcFunction.apply(latestSynced);
+            grpcResponseList = grpcFunction.apply(latestSynced > 1000 ? latestSynced - 1000 : latestSynced );
             if (CollUtil.isEmpty(grpcResponseList)) {
                 break;
             }
