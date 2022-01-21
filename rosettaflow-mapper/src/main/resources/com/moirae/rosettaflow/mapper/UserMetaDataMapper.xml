@@ -272,7 +272,7 @@
     <select id="existMetaDataAuthIdList" resultType="java.lang.String">
         select metadata_auth_id from t_user_meta_data
         where metadata_auth_id in
-        <foreach collection="userMetaDataAuthIdList" open="(" close=")" separator="," item="userMetaDataAuthId">
+        <foreach collection="userMetaDataAuthIdList" open="("  close=")" separator="," index="userMetaDataAuthId">
             #{userMetaDataAuthId}
         </foreach>
     </select>
