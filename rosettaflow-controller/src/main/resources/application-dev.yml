@@ -10,8 +10,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: ENC(5VUZHER1nqQ6dLc5fOfl6g==)
-    url: jdbc:mysql://10.10.8.184:3306/db_rosettaflow?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+    password: admin123!
+    url: jdbc:mysql://192.168.120.137:16000/db_moirae_v3?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -47,33 +47,19 @@ system:
 grpc:
   client:
     carrier-grpc-server:
-      address: 'static://192.168.21.187:8801'
+      address: 'static://192.168.10.150:10033'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-
+#单Redis节点模式
+redisson:
+  password: 123456
+  singleServerConfig:
+    address: 192.168.120.137:16100
 #集群模式
 #redisson:
 #  model: CLUSTER
-#  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
+#  password: gasa123456
 #  multiple-server-config:
-#    node-addresses[0]: 10.10.8.175:6371
-#    node-addresses[1]: 10.10.8.175:6372
-#    node-addresses[2]: 10.10.8.175:6373
-#    node-addresses[3]: 10.10.8.176:6374
-#    node-addresses[4]: 10.10.8.176:6375
-#    node-addresses[5]: 10.10.8.176:6376
-#单Redis节点模式
-redisson:
-  password: ENC(Wo5O14YPqpo8VTkqok/JIg==)
-  singleServerConfig:
-    address: 10.10.8.173:7379
-
-
-jasypt:
-  encryptor:
-    # 生产环境命令行指定
-    #    password: ${JASYPT_PASSWORD}
-    password: 123456
-
-
+#    node-addresses[0]: 10.10.8.173:6379
+#    node-addresses[1]: 10.10.8.174:6379

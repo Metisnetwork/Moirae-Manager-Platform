@@ -19,7 +19,6 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test", "local", "xty"})
 public class GrpcSysServiceImpl implements GrpcSysService {
 
     @Resource

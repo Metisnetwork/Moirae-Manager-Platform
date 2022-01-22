@@ -25,7 +25,6 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test", "local", "xty"})
 public class GrpcAuthServiceImpl implements GrpcAuthService {
 
     @Resource

@@ -20,7 +20,6 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test", "local", "xty"})
 public class GrpcDataProviderServiceImpl implements GrpcDataProviderService {
 
     @Resource

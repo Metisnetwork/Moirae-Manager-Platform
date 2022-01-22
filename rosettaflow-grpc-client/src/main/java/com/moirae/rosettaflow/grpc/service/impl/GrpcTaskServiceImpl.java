@@ -25,7 +25,6 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Service
-@Profile({"prod", "test", "local", "xty"})
 public class GrpcTaskServiceImpl implements GrpcTaskService {
 
     @Resource
