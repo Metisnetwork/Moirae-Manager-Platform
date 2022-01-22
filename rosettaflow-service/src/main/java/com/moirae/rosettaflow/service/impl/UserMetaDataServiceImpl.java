@@ -153,20 +153,6 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
         }
 
-        //v2.0检测元数据状态并更新
-        List<GetMetaDataAuthorityDto> metaDataAuthorityDtoList = grpcAuthService.getGlobalMetadataAuthorityList();
-        metaDataAuthorityDtoList.stream()
-                .filter(getMetaDataAuthorityDto -> getMetaDataAuthorityDto.getMetaDataAuthId().equals(userMetaData.getMetadataAuthId())
-                        && getMetaDataAuthorityDto.getAuditMetaDataOption().byteValue() != UserMetaDataAuditEnum.AUDIT_PENDING.getValue())//状态不是待审核状态
-                .findFirst()
-                .ifPresent(getMetaDataAuthorityDto -> {
-                    userMetaData.setAuthStatus(getMetaDataAuthorityDto.getAuditMetaDataOption().byteValue());
-                    //状态不是待审核状态则更新状态
-                    LambdaUpdateWrapper<UserMetaData> updateWrapper = Wrappers.lambdaUpdate();
-                    updateWrapper.eq(UserMetaData::getId, userMetaDataDto.getId());
-                    updateWrapper.set(UserMetaData::getAuthStatus, userMetaData.getAuthStatus());
-                    this.update(updateWrapper);
-                });
         if (userMetaData.getAuthStatus() != UserMetaDataAuditEnum.AUDIT_PENDING.getValue() || userMetaData.getAuthMetadataState() != UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
             log.error("user auth metaData status error,can not revoke,id:{}, authStatus:{}, authMetadataState:{}", userMetaData.getId(), userMetaData.getAuthStatus(), userMetaData.getAuthMetadataState());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_REVOKE_ERROR.getMsg());
