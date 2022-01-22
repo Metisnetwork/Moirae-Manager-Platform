@@ -12,5 +12,5 @@ dependencies {
     api 'org.apache.commons:commons-pool2:2.10.0'
     api 'cn.hutool:hutool-all:5.7.15'
     api 'com.google.guava:guava:31.0.1-jre'
-    api "com.platone.client:core:0.1.6.0-SNAPSHOT"
+    api "com.platon.sdk:core:1.1.0.0"
 }

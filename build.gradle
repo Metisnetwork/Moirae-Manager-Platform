@@ -33,14 +33,6 @@ subprojects {
         mavenLocal()
         maven {
             allowInsecureProtocol = true
-            url "http://192.168.9.39:8081/repository/maven-public/"
-        }
-        maven {
-            allowInsecureProtocol = true
-            url "http://192.168.10.40:8081/nexus/content/groups/public"
-        }
-        maven {
-            allowInsecureProtocol = true
             url "https://sdk.platon.network/nexus/content/groups/public"
         }
         maven {

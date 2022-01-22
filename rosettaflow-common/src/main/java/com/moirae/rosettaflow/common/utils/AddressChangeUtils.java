@@ -1,13 +1,11 @@
 package com.moirae.rosettaflow.common.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.platone.sdk.utlis.Bech32;
+import com.platon.bech32.Bech32;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.utils.Numeric;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 /**

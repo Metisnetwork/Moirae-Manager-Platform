@@ -12,7 +12,6 @@ import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
