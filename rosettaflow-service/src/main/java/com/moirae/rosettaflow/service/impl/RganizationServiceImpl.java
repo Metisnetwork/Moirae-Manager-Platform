@@ -103,7 +103,14 @@ public class RganizationServiceImpl extends ServiceImpl<OrganizationMapper, Orga
         // 查询组织信息
         ManagedChannel managedChannel = netManager.assemblyChannel(identityIp, identityPort);
         Empty empty = Empty.newBuilder().build();
-        GetNodeIdentityResponse nodeIdentity = AuthServiceGrpc.newBlockingStub(managedChannel).getNodeIdentity(empty);
+        GetNodeIdentityResponse nodeIdentity = null;
+        try {
+            nodeIdentity = AuthServiceGrpc.newBlockingStub(managedChannel).getNodeIdentity(empty);
+        } catch (Exception e){
+            log.error("AuthServiceClient->addUserOrganization() getNodeIdentity error",e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
+        }
+
         if (nodeIdentity.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("AuthServiceClient->getNodeIdentity() fail reason:{}", nodeIdentity.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
