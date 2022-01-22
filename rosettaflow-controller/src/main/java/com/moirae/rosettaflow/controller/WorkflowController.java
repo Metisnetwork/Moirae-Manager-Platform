@@ -2,18 +2,21 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunStatus;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
+import com.moirae.rosettaflow.req.data.MetaDataReq;
 import com.moirae.rosettaflow.req.workflow.*;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.workflow.GetStatusVo;
-import com.moirae.rosettaflow.vo.workflow.TaskEventVo;
-import com.moirae.rosettaflow.vo.workflow.WorkflowDetailsVo;
-import com.moirae.rosettaflow.vo.workflow.WorkflowVo;
+import com.moirae.rosettaflow.vo.data.MetaDataVo;
+import com.moirae.rosettaflow.vo.workflow.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,6 +26,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -105,5 +110,22 @@ public class WorkflowController {
         Workflow workflow = workflowService.getWorkflowStatusById(getStatusReq.getId());
         GetStatusVo getStatusVo = BeanUtil.toBean(workflow, GetStatusVo.class);
         return ResponseVo.createSuccess(getStatusVo);
+    }
+
+
+    @GetMapping("runningRecordList")
+    @ApiOperation(value = "获取工作流运行记录", notes = "获取工作流运行记录")
+    public ResponseVo<PageVo<RunningRecordVo>> runningRecordList(@Valid RunningRecordReq runningRecordReq) {
+        IPage<WorkflowRunStatus> page = workflowService.runningRecordList(runningRecordReq.getCurrent(), runningRecordReq.getSize(), runningRecordReq.getWorkflowName());
+        List<RunningRecordVo> items = BeanUtil.copyToList(page.getRecords(), RunningRecordVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, items));
+    }
+
+    @GetMapping("runningRecordItemList")
+    @ApiOperation(value = "获取工作流运行记录明细", notes = "获取工作流运行记录明细")
+    public ResponseVo<List<RunningRecordItemVo>> runningRecordItemList(@Valid RunningRecordItemReq runningRecordItemReq) {
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowService.runningRecordItemList(runningRecordItemReq.getId());
+        List<RunningRecordItemVo> items = BeanUtil.copyToList(workflowRunTaskStatusList, RunningRecordItemVo.class);
+        return ResponseVo.createSuccess(items);
     }
 }

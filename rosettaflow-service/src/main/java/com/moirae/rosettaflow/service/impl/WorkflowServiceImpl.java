@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
+import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
@@ -20,6 +21,7 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +71,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     private IWorkflowRunStatusService workflowRunStatusService;
     @Resource
     private IModelService modelService;
+    @Resource
+    private IWorkflowRunTaskResultService workflowRunTaskResultService;
 
     @Resource
     private GrpcTaskService grpcTaskService;
@@ -353,6 +357,26 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 更新工作流版本号
         workflow.setEditVersion(workflow.getEditVersion() + 1);
         updateById(workflow);
+    }
+
+    @Override
+    public IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, String workflowName) {
+        UserDto userDto = commonService.getCurrentUser();
+        IPage<WorkflowRunStatus> page = new Page<>(current, size);
+        return workflowRunStatusService.runningRecordList(userDto.getId(), workflowName, page);
+    }
+
+    @Override
+    public List<WorkflowRunTaskStatus> runningRecordItemList(Long workflowRunStatusId) {
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.runningRecordItemList(workflowRunStatusId);
+        workflowRunTaskStatusList.forEach(item -> {
+            if(StringUtils.isNotBlank(item.getTaskId())){
+                item.setTaskResultList(workflowRunTaskResultService.queryByTaskId(item.getTaskId()));
+            }else {
+                item.setTaskResultList(new ArrayList<>());
+            }
+        });
+        return workflowRunTaskStatusList;
     }
 
     @Override

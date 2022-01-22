@@ -8,6 +8,8 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunStatus;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTemp;
 
 import java.util.List;
@@ -143,4 +145,8 @@ public interface IWorkflowService extends IService<Workflow> {
     void saveWorkflowDetailAndStart(Workflow workflow);
 
     void clearWorkflowNode(Long workflowId);
+
+    IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, String workflowName);
+
+    List<WorkflowRunTaskStatus> runningRecordItemList(Long id);
 }

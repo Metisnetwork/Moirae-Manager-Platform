@@ -71,9 +71,8 @@ public class WorkflowRunStatus implements Serializable {
      */
     @TableField(exist = false)
     private Map<Integer, WorkflowRunTaskStatus> workflowRunTaskStatusMap;
-    /**
-     *
-     */
     @TableField(exist = false)
     private Workflow workflow;
+    @TableField(exist = false)
+    private String workflowName;
 }

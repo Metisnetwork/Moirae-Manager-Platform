@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDto;
@@ -28,4 +29,8 @@ public interface IWorkflowRunStatusService extends IService<WorkflowRunStatus> {
     void updateCancelStatus(Long workflowRunStatusId, byte value);
 
     boolean cancel(WorkflowRunTaskStatus workflowRunTaskStatus);
+
+    IPage<WorkflowRunStatus> runningRecordList(Long userId, String workflowName, IPage<WorkflowRunStatus> page);
+
+    List<WorkflowRunTaskStatus> runningRecordItemList(Long id);
 }

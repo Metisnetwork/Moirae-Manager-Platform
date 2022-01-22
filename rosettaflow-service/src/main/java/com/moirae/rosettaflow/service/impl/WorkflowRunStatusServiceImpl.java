@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.AlgorithmConstant;
@@ -142,6 +143,18 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             }
         }
         return false;
+    }
+
+    @Override
+    public IPage<WorkflowRunStatus> runningRecordList(Long userId,String workflowName, IPage<WorkflowRunStatus> page) {
+        return this.baseMapper.runningRecordList(userId, workflowName, page);
+    }
+
+    @Override
+    public List<WorkflowRunTaskStatus> runningRecordItemList(Long id) {
+        LambdaQueryWrapper<WorkflowRunTaskStatus> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(WorkflowRunTaskStatus::getWorkflowRunId, id);
+        return workflowRunTaskStatusService.list(queryWrapper);
     }
 
     public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(WorkflowRunStatus workflowRunStatus, String taskId) {

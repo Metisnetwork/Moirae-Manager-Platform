@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @TableName(value = "t_workflow_run_task_status")
@@ -67,5 +68,8 @@ public class WorkflowRunTaskStatus implements Serializable {
     private Model model;
 
     @TableField(exist = false)
-    private String  senderIdentityId;
+    private String senderIdentityId;
+
+    @TableField(exist = false)
+    private List<WorkflowRunTaskResult> taskResultList;
 }
