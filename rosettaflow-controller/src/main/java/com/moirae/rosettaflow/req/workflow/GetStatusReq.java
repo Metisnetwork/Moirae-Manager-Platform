@@ -23,4 +23,7 @@ public class GetStatusReq {
     @NotNull(message = "{workflow.id.notNull}")
     @Positive(message = "{workflow.id.positive}")
     private Long id;
+
+    @ApiModelProperty(value = "工作流运行记录id")
+    private Long runningRecordId;
 }

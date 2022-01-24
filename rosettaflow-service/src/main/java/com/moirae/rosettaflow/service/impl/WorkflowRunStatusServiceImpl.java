@@ -146,15 +146,8 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     }
 
     @Override
-    public IPage<WorkflowRunStatus> runningRecordList(Long userId,String workflowName, IPage<WorkflowRunStatus> page) {
-        return this.baseMapper.runningRecordList(userId, workflowName, page);
-    }
-
-    @Override
-    public List<WorkflowRunTaskStatus> runningRecordItemList(Long id) {
-        LambdaQueryWrapper<WorkflowRunTaskStatus> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WorkflowRunTaskStatus::getWorkflowRunId, id);
-        return workflowRunTaskStatusService.list(queryWrapper);
+    public IPage<WorkflowRunStatus> runningRecordList(Long userId, Long projectId, String workflowName, IPage<WorkflowRunStatus> page) {
+        return this.baseMapper.runningRecordList(userId, projectId, workflowName, page);
     }
 
     public TerminateTaskRequestDto assemblyTerminateTaskRequestDto(WorkflowRunStatus workflowRunStatus, String taskId) {

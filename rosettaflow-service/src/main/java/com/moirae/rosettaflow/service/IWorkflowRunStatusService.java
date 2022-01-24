@@ -30,7 +30,5 @@ public interface IWorkflowRunStatusService extends IService<WorkflowRunStatus> {
 
     boolean cancel(WorkflowRunTaskStatus workflowRunTaskStatus);
 
-    IPage<WorkflowRunStatus> runningRecordList(Long userId, String workflowName, IPage<WorkflowRunStatus> page);
-
-    List<WorkflowRunTaskStatus> runningRecordItemList(Long id);
+    IPage<WorkflowRunStatus> runningRecordList(Long userId, Long projectId, String workflowName, IPage<WorkflowRunStatus> page);
 }

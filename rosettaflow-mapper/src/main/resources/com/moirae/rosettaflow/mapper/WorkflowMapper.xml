@@ -42,4 +42,15 @@
         FROM `t_workflow` w
         WHERE w.`id` = #{workflowId, jdbcType=BIGINT} AND w.`status` = 1
     </select>
+    <select id="queryWorkFlowAndSpecifyStatus" resultType="com.moirae.rosettaflow.mapper.domain.Workflow">
+        SELECT
+            w.`id` AS id,
+            twrs.workflow_edit_version AS editVersion,
+            twrs.run_status AS runStatus,
+            twrs.cancel_status AS cancelStatus,
+            twrs.id AS workflowRunStatusId,
+            w.project_id AS projectId
+        FROM `t_workflow` w JOIN t_workflow_run_status twrs on w.id = twrs.workflow_id
+        WHERE twrs.`id` = #{workflowRunStatusId, jdbcType=BIGINT}
+    </select>
 </mapper>

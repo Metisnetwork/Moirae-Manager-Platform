@@ -3,7 +3,6 @@ package com.moirae.rosettaflow.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,7 +14,6 @@ import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
-import com.moirae.rosettaflow.grpc.task.req.dto.TerminateTaskRequestDto;
 import com.moirae.rosettaflow.mapper.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
@@ -32,8 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static cn.hutool.core.date.DateTime.now;
 
 /**
  * 工作流服务实现类
@@ -178,8 +174,14 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public List<TaskEventDto> getTaskEventList(Long workflowId) {
-        Workflow workflow = getWorkflowStatusById(workflowId);
+    public List<TaskEventDto> getTaskEventList(Long workflowId, Long workflowRunStatusId) {
+        Workflow workflow;
+        if(workflowRunStatusId != null && workflowRunStatusId > 0){
+            workflow = getWorkflowStatusByWorkflowRunStatusId(workflowRunStatusId);
+        }else{
+            workflow = getWorkflowStatusById(workflowId);
+        }
+
         List<TaskEventDto> dtoList = workflow.getGetNodeStatusVoList().stream()
                 .flatMap(item ->{
                     List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
@@ -196,6 +198,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 .collect(Collectors.toList());
         return dtoList;
     }
+
 
     @Override
     public void terminate(Long workflowId) {
@@ -231,14 +234,16 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         return Objects.nonNull(workflow);
     }
     @Override
-    public Workflow queryWorkflowDetailAndStatus(Long workflowId, String language) {
-        // 查询工作流信息
-        Workflow workflow = queryWorkflow(workflowId);
-        // 获取工作流节点及最新执行状态列表
-        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowNodeAndStatusList(workflow.getId(), workflow.getEditVersion());
-        workflow.setWorkflowNodeVoList(workflowNodeList);
+    public Workflow queryWorkflowDetailAndStatus(Long workflowId, Long workflowRunStatusId, String language) {
+        Workflow workflow;
+        if(workflowRunStatusId != null && workflowRunStatusId > 0){
+            workflow = queryWorkflowDetailAndSpecifyStatus(workflowRunStatusId);
+        }else{
+            workflow = queryWorkflowDetailAndCurrentStatus(workflowId);
+        }
+
         // 获得工作流节点配置的算法信息
-        workflowNodeList.forEach(item -> {
+        workflow.getWorkflowNodeVoList().forEach(item -> {
             Algorithm algorithm = algorithmService.queryAlgorithmStepDetails(item.getAlgorithmId());
             if (Objects.nonNull(algorithm)) {
                 // 处理国际化语言
@@ -276,19 +281,19 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         });
 
         // 获得工作流节点配置的输入信息
-        workflowNodeList.forEach(item -> {
+        workflow.getWorkflowNodeVoList().forEach(item -> {
             List<WorkflowNodeInput> workflowNodeInputList = getWorkflowNodeInputByNodeId(item.getWorkflowNodeId());
             item.setWorkflowNodeInputVoList(workflowNodeInputList);
         });
 
         // 获得工作流节点配置的输出信息
-        workflowNodeList.forEach(item -> {
+        workflow.getWorkflowNodeVoList().forEach(item -> {
             List<WorkflowNodeOutput> workflowNodeOutputList = workflowNodeOutputMapper.getWorkflowNodeOutputAndOrgNameByNodeId(item.getWorkflowNodeId());
             item.setWorkflowNodeOutputVoList(workflowNodeOutputList);
         });
 
         // 获得工作流模型
-        workflowNodeList.forEach(item -> {
+        workflow.getWorkflowNodeVoList().forEach(item -> {
             if(item.getModelId() != null && item.getModelId() > 0 ){
                 Model model = modelService.getById(item.getModelId());
                 model.setIdentityId(model.getOrgIdentityId());
@@ -360,23 +365,28 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, String workflowName) {
+    public IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, Long projectId, String workflowName) {
         UserDto userDto = commonService.getCurrentUser();
         IPage<WorkflowRunStatus> page = new Page<>(current, size);
-        return workflowRunStatusService.runningRecordList(userDto.getId(), workflowName, page);
+        return workflowRunStatusService.runningRecordList(userDto.getId(), projectId, workflowName, page);
     }
 
     @Override
-    public List<WorkflowRunTaskStatus> runningRecordItemList(Long workflowRunStatusId) {
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.runningRecordItemList(workflowRunStatusId);
-        workflowRunTaskStatusList.forEach(item -> {
-            if(StringUtils.isNotBlank(item.getTaskId())){
-                item.setTaskResultList(workflowRunTaskResultService.queryByTaskId(item.getTaskId()));
-            }else {
-                item.setTaskResultList(new ArrayList<>());
-            }
-        });
-        return workflowRunTaskStatusList;
+    public Workflow getWorkflowStatusById(Long id, Long workflowRunStatusId) {
+        if(workflowRunStatusId != null && workflowRunStatusId > 0){
+            return getWorkflowSpecifyStatus(workflowRunStatusId);
+        }else{
+            return getWorkflowStatusById(id);
+        }
+    }
+
+    private Workflow getWorkflowSpecifyStatus(Long workflowRunStatusId) {
+        // 查询工作流配置信息
+        Workflow workflow = baseMapper.queryWorkFlowAndSpecifyStatus(workflowRunStatusId);
+        // 查询工作流节点配置信息
+        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowDetailAndSpecifyStatus(workflowRunStatusId);
+        workflow.setGetNodeStatusVoList(workflowNodeList);
+        return workflow;
     }
 
     @Override
@@ -386,6 +396,34 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         // 查询工作流节点配置信息
         List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowNodeAndStatusList(workflow.getId(), workflow.getEditVersion());
         workflow.setGetNodeStatusVoList(workflowNodeList);
+        return workflow;
+    }
+
+    private Workflow getWorkflowStatusByWorkflowRunStatusId(Long workflowRunStatusId) {
+        // 查询工作流信息
+        Workflow workflow = new Workflow();
+        // 获取工作流节点及最新执行状态列表
+        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowDetailAndSpecifyStatus(workflowRunStatusId);
+        workflow.setGetNodeStatusVoList(workflowNodeList);
+        return workflow;
+    }
+
+
+    private Workflow queryWorkflowDetailAndCurrentStatus(Long workflowId) {
+        // 查询工作流信息
+        Workflow workflow = queryWorkflow(workflowId);
+        // 获取工作流节点及最新执行状态列表
+        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowNodeAndStatusList(workflow.getId(), workflow.getEditVersion());
+        workflow.setWorkflowNodeVoList(workflowNodeList);
+        return workflow;
+    }
+
+    private Workflow queryWorkflowDetailAndSpecifyStatus(Long workflowRunStatusId) {
+        // 查询工作流信息
+        Workflow workflow = new Workflow();
+        // 获取工作流节点及最新执行状态列表
+        List<WorkflowNode> workflowNodeList = workflowNodeMapper.queryWorkflowDetailAndSpecifyStatus(workflowRunStatusId);
+        workflow.setWorkflowNodeVoList(workflowNodeList);
         return workflow;
     }
 

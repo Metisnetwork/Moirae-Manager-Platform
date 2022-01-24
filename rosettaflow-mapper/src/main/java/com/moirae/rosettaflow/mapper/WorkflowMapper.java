@@ -32,4 +32,6 @@ public interface WorkflowMapper extends BaseMapper<Workflow> {
      * @return 工作流
      */
     Workflow queryWorkFlowAndStatus(@Param("workflowId") Long workflowId);
+
+    Workflow queryWorkFlowAndSpecifyStatus(@Param("workflowRunStatusId") Long workflowRunStatusId);
 }

@@ -75,4 +75,6 @@ public class WorkflowRunStatus implements Serializable {
     private Workflow workflow;
     @TableField(exist = false)
     private String workflowName;
+    @TableField(exist = false)
+    private Long projectId;
 }

@@ -10,5 +10,5 @@ import org.apache.ibatis.annotations.Param;
  * @date 2021/8/16
  */
 public interface WorkflowRunStatusMapper extends BaseMapper<WorkflowRunStatus> {
-    IPage<WorkflowRunStatus> runningRecordList(@Param("userId") Long userId, @Param("workflowName") String workflowName, IPage<WorkflowRunStatus> page);
+    IPage<WorkflowRunStatus> runningRecordList(@Param("userId") Long userId, @Param("projectId") Long projectId, @Param("workflowName") String workflowName, IPage<WorkflowRunStatus> page);
 }

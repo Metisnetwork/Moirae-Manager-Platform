@@ -43,11 +43,11 @@ public class WorkflowNodeController {
     @Resource
     private IWorkflowRunTaskResultService workflowRunTaskResultService;
 
-    @GetMapping(value = "queryNodeDetailsList/{id}")
+    @GetMapping(value = {"queryNodeDetailsList/{id}", "queryNodeDetailsList/{id}/{runningRecordId}"})
     @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
-    public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id, HttpServletRequest request) {
+    public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id, @ApiParam(value = "运行记录id") @PathVariable(required = false) Long runningRecordId, HttpServletRequest request) {
         String language = request.getHeader("Accept-Language");
-        Workflow workflow = workflowService.queryWorkflowDetailAndStatus(id, language);
+        Workflow workflow = workflowService.queryWorkflowDetailAndStatus(id, runningRecordId, language);
         NodeDetailsListVo nodeDetailsListVo = BeanUtil.toBean(workflow, NodeDetailsListVo.class);
         return ResponseVo.createSuccess(nodeDetailsListVo);
     }

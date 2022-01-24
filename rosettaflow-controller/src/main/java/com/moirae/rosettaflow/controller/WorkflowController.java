@@ -90,10 +90,10 @@ public class WorkflowController {
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("getLog/{workflowId}")
+    @PostMapping(value = {"getLog/{workflowId}", "getLog/{workflowId}/{runningRecordId}"})
     @ApiOperation(value = "获取运行日志", notes = "获取运行日志")
-    public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "workflowId", required = true) @PathVariable Long workflowId) {
-        List<TaskEventDto> taskEventShowDtoList = workflowService.getTaskEventList(workflowId);
+    public ResponseVo<List<TaskEventVo>> getLog(@ApiParam(value = "workflowId", required = true) @PathVariable Long workflowId, @ApiParam(value = "运行记录id") @PathVariable(required = false) Long runningRecordId) {
+        List<TaskEventDto> taskEventShowDtoList = workflowService.getTaskEventList(workflowId, runningRecordId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(taskEventShowDtoList, TaskEventVo.class));
     }
 
@@ -107,7 +107,7 @@ public class WorkflowController {
     @GetMapping("getWorkflowStatus")
     @ApiOperation(value = "获取工作流状态", notes = "获取工作流状态")
     public ResponseVo<GetStatusVo> getWorkflowStatus(@Validated GetStatusReq getStatusReq) {
-        Workflow workflow = workflowService.getWorkflowStatusById(getStatusReq.getId());
+        Workflow workflow = workflowService.getWorkflowStatusById(getStatusReq.getId(), getStatusReq.getRunningRecordId());
         GetStatusVo getStatusVo = BeanUtil.toBean(workflow, GetStatusVo.class);
         return ResponseVo.createSuccess(getStatusVo);
     }
@@ -116,16 +116,8 @@ public class WorkflowController {
     @GetMapping("runningRecordList")
     @ApiOperation(value = "获取工作流运行记录", notes = "获取工作流运行记录")
     public ResponseVo<PageVo<RunningRecordVo>> runningRecordList(@Valid RunningRecordReq runningRecordReq) {
-        IPage<WorkflowRunStatus> page = workflowService.runningRecordList(runningRecordReq.getCurrent(), runningRecordReq.getSize(), runningRecordReq.getWorkflowName());
+        IPage<WorkflowRunStatus> page = workflowService.runningRecordList(runningRecordReq.getCurrent(), runningRecordReq.getSize(), runningRecordReq.getProjectId(), runningRecordReq.getWorkflowName());
         List<RunningRecordVo> items = BeanUtil.copyToList(page.getRecords(), RunningRecordVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, items));
-    }
-
-    @GetMapping("runningRecordItemList")
-    @ApiOperation(value = "获取工作流运行记录明细", notes = "获取工作流运行记录明细")
-    public ResponseVo<List<RunningRecordItemVo>> runningRecordItemList(@Valid RunningRecordItemReq runningRecordItemReq) {
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowService.runningRecordItemList(runningRecordItemReq.getId());
-        List<RunningRecordItemVo> items = BeanUtil.copyToList(workflowRunTaskStatusList, RunningRecordItemVo.class);
-        return ResponseVo.createSuccess(items);
     }
 }

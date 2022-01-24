@@ -77,11 +77,11 @@ public interface IWorkflowService extends IService<Workflow> {
 
     /**
      * 获取运行日志
-     *
-     * @param workflowId 工作流id
-     * @return 运行日志
+     * @param workflowId
+     * @param workflowRunStatusId
+     * @return
      */
-    List<TaskEventDto> getTaskEventList(Long workflowId);
+    List<TaskEventDto> getTaskEventList(Long workflowId, Long workflowRunStatusId);
 
     /**
      * 根据项目id及工作流模板添加工作流
@@ -121,10 +121,11 @@ public interface IWorkflowService extends IService<Workflow> {
      * 查询工作流节点设置及状态
      *
      * @param workflowId
+     * @param workflowRunStatusId
      * @param language
      * @return
      */
-    Workflow queryWorkflowDetailAndStatus(Long workflowId, String language);
+    Workflow queryWorkflowDetailAndStatus(Long workflowId, Long workflowRunStatusId, String language);
 
     /**
      * 查询工作流节点设置
@@ -146,7 +147,7 @@ public interface IWorkflowService extends IService<Workflow> {
 
     void clearWorkflowNode(Long workflowId);
 
-    IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, String workflowName);
+    IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, Long projectId, String workflowName);
 
-    List<WorkflowRunTaskStatus> runningRecordItemList(Long id);
+    Workflow getWorkflowStatusById(Long id, Long runningRecordId);
 }

@@ -42,4 +42,7 @@ public class RunningRecordVo {
 
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "工程id")
+    private Long projectId;
 }

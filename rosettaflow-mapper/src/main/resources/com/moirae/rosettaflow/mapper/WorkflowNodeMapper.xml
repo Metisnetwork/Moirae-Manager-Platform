@@ -31,4 +31,20 @@
         FROM `t_workflow_node` wn
         WHERE wn.`workflow_id` = #{workflowId, jdbcType=BIGINT} AND wn.`workflow_edit_version` = #{editVersion, jdbcType=INTEGER}
     </select>
+    <select id="queryWorkflowDetailAndSpecifyStatus" resultType="com.moirae.rosettaflow.mapper.domain.WorkflowNode">
+        SELECT
+            wn.`id` AS workflowNodeId,
+            twrts.run_status AS runStatus,
+            twrts.run_msg AS runMsg,
+            wn.`id` AS id,
+            wn.`workflow_id` AS workflowId,
+            wn.`node_name` AS nodeName,
+            wn.`algorithm_id` AS algorithmId,
+            wn.`node_step` AS nodeStep,
+            wn.`model_id` AS modelId,
+            twrts.task_id AS taskId,
+            wn.`sender_identity_id` AS workflowNodeSenderIdentityId
+        FROM `t_workflow_node` wn join t_workflow_run_task_status twrts on wn.id = twrts.workflow_node_id
+        WHERE twrts.workflow_run_id = #{workflowRunStatusId, jdbcType=BIGINT}
+    </select>
 </mapper>
