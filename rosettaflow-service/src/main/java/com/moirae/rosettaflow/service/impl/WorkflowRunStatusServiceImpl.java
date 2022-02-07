@@ -25,6 +25,7 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -340,7 +341,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         TaskDto taskDto = new TaskDto();
         taskDto.setWorkFlowNodeId(curlWorkflowNode.getId());
         //任务名称
-        taskDto.setTaskName(commonService.generateTaskName(curlWorkflowNode.getId()));
+        taskDto.setTaskName(generateTaskName(workflowRunStatus));
         //发起任务用户
         taskDto.setUser(workflowRunStatus.getAddress());
         //发起账户用户类型
@@ -369,6 +370,20 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         taskDto.setDesc(curlWorkflowNode.getNodeName());
 
         return taskDto;
+    }
+
+    /**
+     * 生成任务名称
+     * {内部id}_{用户地址}_{算法名称}_{工作流名称}
+     * @param workflowRunStatus
+     * @return
+     */
+    private String generateTaskName(WorkflowRunStatus workflowRunStatus) {
+        Long id = workflowRunStatus.getWorkflowRunTaskStatusMap().get(workflowRunStatus.getCurStep()).getId();
+        String address = workflowRunStatus.getAddress();
+        String algorithmName = workflowRunStatus.getWorkflow().getWorkflowNodeMap().get(workflowRunStatus.getCurStep()).getNodeName();
+        String workflowName = workflowRunStatus.getWorkflow().getWorkflowName();
+        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + workflowName, 100);
     }
 
     private List<WorkflowRunTaskStatus> createAndSaveWorkflowRunTaskStatus(Workflow workflow, WorkflowRunStatus workflowRunStatus) {
