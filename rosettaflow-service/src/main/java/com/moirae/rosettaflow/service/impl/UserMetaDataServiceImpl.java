@@ -288,7 +288,8 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         });
 
         //校验状态审核中
-        if (metaDataAuthStatusMap.containsKey(metaDataId) && metaDataAuthStatusMap.get(metaDataId) == UserMetaDataAuditEnum.AUDIT_PENDING.getValue()) {
+        if (metaDataAuthStatusMap.containsKey(metaDataId) && metaDataAuthStatusMap.get(metaDataId) == UserMetaDataAuditEnum.AUDIT_PENDING.getValue() &&
+                authMetadataStateMap.containsKey(metaDataId) && authMetadataStateMap.get(metaDataId) == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
             log.error("Meta data auth audit pending,can not reapply,metaDataId:{}", metaDataId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_PENDING_ERROR.getMsg());
         }
