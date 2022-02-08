@@ -19,23 +19,23 @@ import java.math.RoundingMode;
 @ApiModel(value = "工作流节点资源请求对象")
 public class WorkflowNodeResourceReq {
 
-    @ApiModelProperty(value = "工作流节点资源内存", required = true)
+    @ApiModelProperty(value = "工作流节点资源内存 (单位: Mb)", required = true)
     @NotNull(message = "{node.cost.memory.notNull}")
     private Long costMem;
 
-    @ApiModelProperty(value = "工作流节点资源cpu", required = true)
+    @ApiModelProperty(value = "工作流节点资源cpu (单位: 个)", required = true)
     @NotNull(message = "{node.cost.cpu.notNull}")
     private Integer costCpu;
 
-    @ApiModelProperty(value = "工作流节点资源gpu", required = true)
+    @ApiModelProperty(value = "工作流节点资源gpu (单位：核)", required = true)
     @NotNull(message = "{node.cost.cpu.notNull}")
     private Integer costGpu;
 
-    @ApiModelProperty(value = "工作流节点资源带宽", required = true)
+    @ApiModelProperty(value = "工作流节点资源带宽 (单位: Mbps)", required = true)
     @NotNull(message = "{node.cost.bandwidth.notNull}")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "工作流节点运行时长(单位：h)")
+    @ApiModelProperty(value = "工作流节点运行时长 (单位: 分钟)")
     private Long runTime;
 
     /**
@@ -44,8 +44,7 @@ public class WorkflowNodeResourceReq {
     @SuppressWarnings("unused")
     public Long getCostMem() {
         return new BigDecimal(this.costMem)
-                .multiply(BigDecimal.valueOf(SysConstant.INT_1024
-                        * SysConstant.INT_1024 * SysConstant.INT_1024))
+                .multiply(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024))
                 .setScale(SysConstant.INT_0, RoundingMode.UP)
                 .longValue();
     }

@@ -45,19 +45,19 @@ public class AlgDetailsVo {
     @ApiModelProperty(value = "算法所属大类:1-统计分析,2-特征工程,3-机器学习")
     private String algorithmTypeDesc;
 
-    @ApiModelProperty(value = "所需的内存 (单位: byte)")
+    @ApiModelProperty(value = "所需的内存 (单位: Mb)")
     private Long costMem;
 
     @ApiModelProperty(value = "所需的核数 (单位: 个)")
     private Long costCpu;
 
-    @ApiModelProperty(value = "GPU核数(单位：核)")
+    @ApiModelProperty(value = "GPU核数 (单位：核)")
     private Integer costGpu;
 
-    @ApiModelProperty(value = "所需的带宽 (单位: bps)")
+    @ApiModelProperty(value = "所需的带宽 (单位: Mbps)")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "所需的运行时长 (单位: ms)")
+    @ApiModelProperty(value = "所需的运行时长 (单位: 分钟)")
     private Long runTime;
 
     @ApiModelProperty(value = "是否需要模型: 0-否，1:是")
@@ -78,8 +78,7 @@ public class AlgDetailsVo {
             return 0L;
         }
         return new BigDecimal(this.costMem)
-                .divide(BigDecimal.valueOf(SysConstant.INT_1024
-                        * SysConstant.INT_1024 * SysConstant.INT_1024),
+                .divide(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024),
                         SysConstant.INT_0, RoundingMode.UP).longValue();
     }
 

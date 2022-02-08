@@ -44,16 +44,16 @@ public class NodeAlgorithmVo {
     @ApiModelProperty(value = "算法代码（计算合约）")
     private String calculateContractCode;
 
-    @ApiModelProperty(value = "所需的内存 (单位: byte)")
+    @ApiModelProperty(value = "所需的内存 (单位: Mb)")
     private Long costMem;
 
     @ApiModelProperty(value = "所需的核数 (单位: 个)")
     private Integer costCpu;
 
-    @ApiModelProperty(value = "所需的带宽 (单位: bps)")
+    @ApiModelProperty(value = "所需的带宽 (单位: Mbps)")
     private Long costBandwidth;
 
-    @ApiModelProperty(value = "所需的运行时长 (单位: h)")
+    @ApiModelProperty(value = "所需的运行时长 (单位: 分钟)")
     private Long runTime;
 
     @ApiModelProperty(value = "输出存储形式: 1-明文，2:密文")
@@ -70,8 +70,7 @@ public class NodeAlgorithmVo {
             return 0L;
         }
         return new BigDecimal(this.costMem)
-                .divide(BigDecimal.valueOf(SysConstant.INT_1024
-                                * SysConstant.INT_1024 * SysConstant.INT_1024),
+                .divide(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024),
                         SysConstant.INT_0, RoundingMode.UP).longValue();
     }
 
