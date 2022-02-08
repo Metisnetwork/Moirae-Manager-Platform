@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author hudenian
@@ -105,7 +106,7 @@ public class RganizationServiceImpl extends ServiceImpl<OrganizationMapper, Orga
         Empty empty = Empty.newBuilder().build();
         GetNodeIdentityResponse nodeIdentity = null;
         try {
-            nodeIdentity = AuthServiceGrpc.newBlockingStub(managedChannel).getNodeIdentity(empty);
+            nodeIdentity = AuthServiceGrpc.newBlockingStub(managedChannel).withDeadlineAfter(10, TimeUnit.SECONDS).getNodeIdentity(empty);
         } catch (Exception e){
             log.error("AuthServiceClient->addUserOrganization() getNodeIdentity error",e);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
