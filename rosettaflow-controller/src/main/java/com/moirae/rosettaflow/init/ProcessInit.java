@@ -19,6 +19,8 @@ public class ProcessInit {
 
     @PostConstruct
     public void init() {
+        // 第一次启动时初始化公共组织
+        netManager.initPublicOrg();
         // 初始化组织的连接
         netManager.init();
     }

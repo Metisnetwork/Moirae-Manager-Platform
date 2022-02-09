@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: admin123!
-    url: jdbc:mysql://192.168.120.137:16000/db_moirae_v3?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.120.137:16000/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -37,17 +37,23 @@ system:
     kickMode: false
     # nonce存放时间，单位：秒
     nonceTimeOut: 300000
-    # 算法初始化文件
-    algorithmFilepath: classpath:script/algorithm.csv
     # 数据库数据批量更新
     batchSize: 1000
-    # redis中数据默认保存超时时间(毫秒)
-    redisTimeOut: 86400000
-
+    # 公共组织信息
+    publicOrgList:
+      - identity: identity:6a0528ed26df40c9a9d5fef04c97525e
+        host: 39.99.136.194
+        port: 10033
+      - identity: identity:ac8011c070d1445aaf26bc7a01627f9a
+        host: 39.98.115.31
+        port: 10033
+      - identity: identity:e926ef630cd240018125a04822068f1e
+        host: 39.101.198.154
+        port: 10033
 grpc:
   client:
     carrier-grpc-server:
-      address: 'static://192.168.10.150:10033'
+      address: 'static://${system.config.publicOrgList[0].host}:${system.config.publicOrgList[0].port}'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext

@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.service;
 
+import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author hudenian
@@ -33,9 +35,10 @@ public class NetManager {
 
     @Resource
     private IOrganizationService organizationService;
-
     @Resource
     private GrpcAuthService grpcAuthService;
+    @Resource
+    private SysConfig sysConfig;
 
     public void init() {
         try {
@@ -143,5 +146,33 @@ public class NetManager {
         }
         channelMap.put(identityId, channel);
         identityIdIpPortMap.put(identityId, ip + delimiter + port);
+    }
+
+    /**
+     * 第一次启动时初始化公共组织
+     */
+    public void initPublicOrg() {
+        if(organizationService.count() == 0 && sysConfig.getPublicOrgList().size() > 0){
+            log.info("init public organization! config = {}", sysConfig.getPublicOrgList());
+            Map<String, SysConfig.OrgConfig> orgConfigMap = sysConfig.getPublicOrgList().stream().collect(Collectors.toMap(SysConfig.OrgConfig::getIdentity, item -> item));
+
+            List<NodeIdentityDto> remoteOrganizationList = grpcAuthService.getAllIdentityList();
+            List<Organization> organizationList = remoteOrganizationList.stream()
+                    .filter(item -> orgConfigMap.containsKey(item.getIdentityId()))
+                    .map(item -> {
+                        Organization organization = new Organization();
+                        organization.setNodeName(item.getNodeName());
+                        organization.setNodeId(item.getNodeId());
+                        organization.setIdentityId(item.getIdentityId());
+                        organization.setIdentityIp(orgConfigMap.get(item.getIdentityId()).getHost());
+                        organization.setIdentityPort(orgConfigMap.get(item.getIdentityId()).getPort());
+                        organization.setPublicFlag((byte)1);
+                        return organization;
+                    })
+                    .collect(Collectors.toList());
+            if(organizationList.size() > 0){
+                organizationService.saveBatch(organizationList);
+            }
+        }
     }
 }
