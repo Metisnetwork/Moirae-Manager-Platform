@@ -179,8 +179,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         // 最后一个任务
         if(workflowRunStatus.getCurStep().compareTo(workflowRunStatus.getStep()) == 0){
             workflowRunStatus.setRunStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
-            workflowRunStatus.setBeginTime(begin);
-            workflowRunStatus.setEndTime(end);
+            workflowRunStatus.setEndTime(new Date());
             updateById(workflowRunStatus);
         }
 
@@ -248,8 +247,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         workflowRunTaskStatusService.updateById(curWorkflowRunTaskStatus);
 
         workflowRunStatus.setRunStatus(WorkflowRunStatusEnum.RUN_FAIL.getValue());
-        workflowRunStatus.setBeginTime(begin);
-        workflowRunStatus.setEndTime(end);
+        workflowRunStatus.setEndTime(new Date());
         updateById(workflowRunStatus);
     }
 
@@ -407,7 +405,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         workflowRunStatus.setWorkflowEditVersion(workflow.getEditVersion());
         workflowRunStatus.setSign(sign);
         workflowRunStatus.setCurStep(1);
-        workflowRunStatus.setBeginTime(new Date());  //TODO 使用数据将时间
         workflowRunStatus.setStep(workflow.getWorkflowNodeReqList().size());
         workflowRunStatus.setAddress(address);
         workflowRunStatus.setRunStatus(WorkflowRunStatusEnum.RUNNING.getValue());

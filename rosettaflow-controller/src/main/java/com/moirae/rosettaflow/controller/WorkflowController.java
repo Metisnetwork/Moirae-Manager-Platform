@@ -2,6 +2,8 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.moirae.rosettaflow.common.enums.TaskRunningStatusEnum;
+import com.moirae.rosettaflow.common.enums.WorkflowRunStatusEnum;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
@@ -118,6 +120,11 @@ public class WorkflowController {
     public ResponseVo<PageVo<RunningRecordVo>> runningRecordList(@Valid RunningRecordReq runningRecordReq) {
         IPage<WorkflowRunStatus> page = workflowService.runningRecordList(runningRecordReq.getCurrent(), runningRecordReq.getSize(), runningRecordReq.getProjectId(), runningRecordReq.getWorkflowName());
         List<RunningRecordVo> items = BeanUtil.copyToList(page.getRecords(), RunningRecordVo.class);
+        items.forEach(item -> {
+            if (item.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue()){
+                item.setEndTime(null);
+            }
+        });
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, items));
     }
 }
