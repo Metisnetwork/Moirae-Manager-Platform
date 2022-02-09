@@ -161,7 +161,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         //撤销元数据授权
         RevokeMetaDataAuthorityRequestDto requestDto = new RevokeMetaDataAuthorityRequestDto();
         requestDto.setUser(userMetaDataDto.getAddress());
-        requestDto.setMetadataAuthId(userMetaDataDto.getMetadataAuthId());
+        requestDto.setMetadataAuthId(userMetaData.getMetadataAuthId());
         requestDto.setSign(userMetaDataDto.getSign());
         requestDto.setUserType(UserTypeEnum.checkUserType(userMetaDataDto.getAddress()));
         RevokeMetadataAuthorityResponseDto responseDto = grpcAuthService.revokeMetadataAuthority(requestDto);
