@@ -124,4 +124,10 @@ public class UserMetaData implements Serializable {
      */
     private Date updateTime;
 
+    /**
+     * 元数据的状态 (0-未知; 1- 还未发布的新表; 2- 已发布的表; 3- 已撤销的表)
+     */
+    @TableField(exist = false)
+    private Byte dataStatus;
+
 }

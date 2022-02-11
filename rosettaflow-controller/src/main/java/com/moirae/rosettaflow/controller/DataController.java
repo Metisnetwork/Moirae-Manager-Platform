@@ -3,10 +3,7 @@ package com.moirae.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.constants.SysConstant;
-import com.moirae.rosettaflow.common.enums.AuthStatusShowEnum;
-import com.moirae.rosettaflow.common.enums.AuthTypeEnum;
-import com.moirae.rosettaflow.common.enums.UserMetaDataAuditEnum;
-import com.moirae.rosettaflow.common.enums.UserMetaDataAuthorithStateEnum;
+import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
 import com.moirae.rosettaflow.dto.MetaDataDto;
@@ -151,6 +148,7 @@ public class DataController {
             //状态
             userMetaDataVo.setAuthStatusShow(getAuthStatusShow(userMetaDataDto));
             userMetaDataVo.setAuthStatus(metaDataService.dealAuthStatus(userMetaDataDto.getAuthStatus(), userMetaDataDto.getAuthMetadataState()));
+            userMetaDataVo.setActionShow(getActionShow(userMetaDataVo.getAuthStatus(), userMetaDataDto.getDataStatus()));
             items.add(userMetaDataVo);
         });
 
@@ -158,6 +156,23 @@ public class DataController {
         BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
         return ResponseVo.createSuccess(pageVo);
+    }
+
+    /**
+     *
+     *  0-查看详情, 1-重新申请, 2-撤销申请
+     * @param authStatus
+     * @param dataStatus
+     * @return
+     */
+    private Integer getActionShow(Byte authStatus, Byte dataStatus) {
+        if(authStatus == UserMetaDataAuditEnum.AUDIT_REFUSED.getValue() && dataStatus == MetaDataStateEnum.MetaDataState_Released.getValue() ){
+            return 1;
+        }
+        if(authStatus == UserMetaDataAuditEnum.AUDIT_PENDING.getValue()){
+            return 2;
+        }
+        return 0;
     }
 
     private ResponseVo<PageVo<MetaDataColumnsVo>> convertToResponseVo(IPage<MetaDataDetailsDto> pageDto) {

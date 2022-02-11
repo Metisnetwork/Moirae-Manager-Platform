@@ -53,7 +53,8 @@
             u.audit_time,
             u.`status`,
             u.create_time,
-            u.update_time
+            u.update_time,
+            m.data_status
         FROM
             t_user_meta_data u
         LEFT JOIN t_meta_data m ON u.meta_data_id = m.meta_data_id

@@ -59,6 +59,9 @@ public class UserMetaDataVo {
     @ApiModelProperty(value = "转换后展示状态: 0-申请中, 1-已授权, 2-已拒绝, 3-已失效")
     private Byte authStatusShow;
 
+    @ApiModelProperty(value = "操作: 0-查看详情, 1-重新申请, 2-撤销申请")
+    private Integer actionShow;
+
     @ApiModelProperty(value = "发起授权申请的时间")
     private Date applyTime;
     /**
