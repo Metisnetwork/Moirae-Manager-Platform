@@ -55,6 +55,7 @@
         AND umd.`status` = 1
         AND umd.auth_status = 1
         AND umd.auth_metadata_state = 2
+        AND md.`data_status` = 2
         AND umd.identity_id = #{identityId, jdbcType=VARCHAR}
         AND umd.address = #{address, jdbcType=VARCHAR}
     </select>
