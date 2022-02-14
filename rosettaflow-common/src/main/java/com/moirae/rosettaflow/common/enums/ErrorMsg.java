@@ -78,6 +78,7 @@ public enum ErrorMsg {
     APPLY_METADATA_USAGE_TYPE_ERROR("元数据使用方式输入格式错误", "Apply metadata usage type error"),
     METADATA_NOT_EXIST("元数据不存在", "Meta data not exist"),
     METADATA_UNAVAILABLE("元数据不可用", "Meta data unavailable"),
+    METADATA_UNAVAILABLE_FORMAT("元数据不可用 {}", "Meta data unavailable {}"),
     METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by times, the times must be greater than zero"),
     METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
     METADATA_AUTH_SAVE_ERROR("元数据授权申请保存失败", "Metadata authorization apply save error"),
@@ -142,7 +143,11 @@ public enum ErrorMsg {
      * 机构
      */
     ORGANIZATION_NOT_EXIST("机构不存在", "Organization does not exist"),
-    ORGANIZATION_INFO_ERROR("连接组织节点服务不可达", "Organization can not connect");
+    ORGANIZATION_INFO_ERROR("连接组织节点服务不可达", "Organization can not connect"),
+    ORGANIZATION_UNAVAILABLE_SENDER("任务的发起方组织不可用 {}", "The originating organization of the task is unavailable {}"),
+    ORGANIZATION_UNAVAILABLE_DATA_PROVIDED("任务的数据提供方组织不可用 {}", "The data provider organization for the task is unavailable {}"),
+    ORGANIZATION_UNAVAILABLE_OUTPUT("任务的结果输出方组织不可用 {}", "The result exporter organization of the task is unavailable {}"),
+    ;
 
     private final String zh;
     private final String en;

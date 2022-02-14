@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -33,6 +34,8 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.moirae.rosettaflow.common.enums.RespCodeEnum.BIZ_EXCEPTION;
+
 @Slf4j
 @Service
 public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusMapper, WorkflowRunStatus> implements IWorkflowRunStatusService {
@@ -53,6 +56,8 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     private CommonService commonService;
     @Resource
     private IMetaDataDetailsService metaDataDetailsService;
+    @Resource
+    private IMetaDataService metaDataService;
     @Resource
     private IAlgorithmService algorithmService;
     @Resource
@@ -273,6 +278,36 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             if (null == item.getWorkflowNodeOutputReqList() || item.getWorkflowNodeOutputReqList().size() == 0) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
             }
+            // 组织校验(任务发起发方组织、算法提供方组织、数据提供方组织、结果接收方组织)
+            Organization organization = organizationService.getByIdentityId(item.getSenderIdentityId());
+            if(organization == null){
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_SENDER.getMsg(),item.getSenderIdentityId()) );
+            }
+            item.getWorkflowNodeInputReqList().stream().forEach(subItem ->{
+                Organization dataOrganization = organizationService.getByIdentityId(subItem.getIdentityId());
+                if(dataOrganization == null){
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_DATA_PROVIDED.getMsg(), subItem.getIdentityId()));
+                }
+            });
+            item.getWorkflowNodeOutputReqList().stream().forEach(subItem ->{
+                Organization outOrganization = organizationService.getByIdentityId(subItem.getIdentityId());
+                if(outOrganization == null){
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_OUTPUT.getMsg(), subItem.getIdentityId()));
+                }
+            });
+
+            // 元数据状态校验
+            item.getWorkflowNodeInputReqList().stream().forEach(subItem ->{
+                LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
+                metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId, subItem.getDataTableId());
+                metaDataLambdaQueryWrapper.eq(MetaData::getStatus, StatusEnum.VALID.getValue());
+                metaDataLambdaQueryWrapper.eq(MetaData::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
+                MetaData one = metaDataService.getOne(metaDataLambdaQueryWrapper);
+                if(one == null){
+                    //无效元数据
+                    throw new BusinessException(BIZ_EXCEPTION, StrUtil.format(ErrorMsg.METADATA_UNAVAILABLE_FORMAT.getMsg(), subItem.getDataTableId()));
+                }
+            });
         });
     }
 
