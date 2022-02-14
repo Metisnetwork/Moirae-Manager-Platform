@@ -170,4 +170,9 @@ public class RganizationServiceImpl extends ServiceImpl<OrganizationMapper, Orga
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
         }
     }
+
+    @Override
+    public void batchUpdate(List<Organization> organizationList) {
+        baseMapper.batchUpdate(organizationList);
+    }
 }

@@ -20,4 +20,6 @@ public interface OrganizationMapper extends BaseMapper<Organization> {
     int batchInsert(@Param("organizationList") List<Organization> organizationList);
 
     List<Organization> selectByUser(@Param(value = "address") String hexAddress);
+
+    int batchUpdate(@Param(value = "orgList") List<Organization> orgList);
 }
