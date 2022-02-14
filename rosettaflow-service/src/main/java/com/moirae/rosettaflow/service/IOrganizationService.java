@@ -74,4 +74,6 @@ public interface IOrganizationService extends IService<Organization> {
     void deleteUserOrganization(String identityId);
 
     void isValid(Set<String> senderOrgId);
+
+    void batchUpdate(List<Organization> organizationList);
 }

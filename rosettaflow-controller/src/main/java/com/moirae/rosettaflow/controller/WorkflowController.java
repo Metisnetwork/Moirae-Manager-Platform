@@ -1,18 +1,25 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.moirae.rosettaflow.common.enums.MetaDataStatusEnum;
+import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.enums.TaskRunningStatusEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowRunStatusEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.WorkflowDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
-import com.moirae.rosettaflow.mapper.domain.Workflow;
-import com.moirae.rosettaflow.mapper.domain.WorkflowRunStatus;
-import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
-import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.req.data.MetaDataReq;
 import com.moirae.rosettaflow.req.workflow.*;
+import com.moirae.rosettaflow.req.workflow.node.WorkflowNodeInputReq;
+import com.moirae.rosettaflow.req.workflow.node.WorkflowNodeOutputReq;
+import com.moirae.rosettaflow.service.IMetaDataService;
+import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
@@ -32,6 +39,8 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.moirae.rosettaflow.common.enums.RespCodeEnum.BIZ_EXCEPTION;
+
 /**
  * 工作流管理
  *
@@ -46,6 +55,10 @@ public class WorkflowController {
 
     @Resource
     private IWorkflowService workflowService;
+    @Resource
+    private IMetaDataService metaDataService;
+    @Resource
+    private IOrganizationService organizationService;
 
     @GetMapping("list")
     @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
@@ -87,9 +100,58 @@ public class WorkflowController {
     @PostMapping("start")
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
+        //校验工作流相关的数据和组织是否被撤销
+        checkWorkflowReq(startWorkflowReq);
+
         Workflow workflow = BeanUtil.toBean(startWorkflowReq, Workflow.class);
         workflowService.saveWorkflowDetailAndStart(workflow);
         return ResponseVo.createSuccess();
+    }
+
+    /**
+     * 校验工作流相关的数据和组织是否被撤销
+     * @param startWorkflowReq
+     */
+    private void checkWorkflowReq(StartWorkflowReq startWorkflowReq) {
+        startWorkflowReq.getWorkflowNodeReqList().forEach(workflowNodeReq -> {
+            List<WorkflowNodeInputReq> workflowNodeInputReqList = workflowNodeReq.getWorkflowNodeInputReqList();
+            workflowNodeInputReqList.forEach(workflowNodeInputReq -> {
+                String metaDataId = workflowNodeInputReq.getDataTableId();
+                String identityId = workflowNodeInputReq.getIdentityId();
+
+                //校验元数据
+                LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
+                metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId, metaDataId);
+                metaDataLambdaQueryWrapper.eq(MetaData::getStatus, StatusEnum.VALID.getValue());
+                MetaData one = metaDataService.getOne(metaDataLambdaQueryWrapper);
+                if(one == null){
+                    //无效元数据
+                    throw new BusinessException(BIZ_EXCEPTION,StrUtil.format("无效元数据，元素据Id：{}",metaDataId));
+                } else if(one.getDataStatus() == 3) {
+                    //元数据已被撤销
+                    throw new BusinessException(BIZ_EXCEPTION,StrUtil.format("元数据已被撤销，元素据Id：{}",metaDataId));
+                }
+
+                //校验组织
+                Organization organization = organizationService.getByIdentityId(identityId);
+                if(organization == null){
+                    //无效组织
+                    throw new BusinessException(BIZ_EXCEPTION,StrUtil.format("组织状态异常，组织Id：{}",identityId));
+                }
+            });
+
+
+            List<WorkflowNodeOutputReq> workflowNodeOutputReqList = workflowNodeReq.getWorkflowNodeOutputReqList();
+            workflowNodeOutputReqList.forEach(workflowNodeOutputReq -> {
+                String identityId = workflowNodeOutputReq.getIdentityId();
+                //校验组织
+                Organization organization = organizationService.getByIdentityId(identityId);
+                if(organization == null){
+                    //无效组织
+                    throw new BusinessException(BIZ_EXCEPTION, StrUtil.format("组织状态异常，组织Id：{}",identityId));
+                }
+            });
+        });
     }
 
     @PostMapping(value = {"getLog/{workflowId}", "getLog/{workflowId}/{runningRecordId}"})

@@ -92,4 +92,27 @@
         FROM `t_organization`
         WHERE `status` = 1 AND (`public_flag` = 1 OR `identity_id` IN ( SELECT `org_identity_id` FROM `t_user_org` WHERE `user_address` = #{address, jdbcType=VARCHAR}))
     </select>
+
+    <update id="batchUpdate">
+        <foreach collection="orgList" item="organization" separator=";">
+            update t_organization set
+            <trim suffixOverrides=",">
+                <if test="organization.nodeName != null">
+                    node_name = #{organization.nodeName,jdbcType=VARCHAR},
+                </if>
+                <if test="organization.nodeId != null">
+                    node_id = #{organization.nodeId,jdbcType=VARCHAR},
+                </if>
+                <if test="organization.status != null">
+                    status = #{organization.status,jdbcType=TINYINT},
+                </if>
+                <if test="organization.updateTime != null">
+                    update_time = #{organization.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+            <where>
+                identity_id = #{organization.identityId,jdbcType=VARCHAR}
+            </where>
+        </foreach>
+    </update>
 </mapper>
