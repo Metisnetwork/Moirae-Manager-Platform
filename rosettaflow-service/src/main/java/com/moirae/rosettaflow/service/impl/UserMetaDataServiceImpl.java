@@ -23,7 +23,6 @@ import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
-import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.UserMetaDataMapper;
@@ -82,6 +81,9 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
         if (null == metaData) {
             log.error("query meta data not exist, id:{}", userMetaDataDto.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
+        }
+        if(metaData.getDataStatus() != MetaDataStateEnum.MetaDataState_Released.getValue()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_UNAVAILABLE.getMsg());
         }
         if (userMetaDataDto.getAuthType() == MetaDataUsageEnum.TIMES.getValue()) {
             if (null == userMetaDataDto.getAuthValue() || userMetaDataDto.getAuthValue() < 1) {

@@ -77,6 +77,7 @@ public enum ErrorMsg {
      */
     APPLY_METADATA_USAGE_TYPE_ERROR("元数据使用方式输入格式错误", "Apply metadata usage type error"),
     METADATA_NOT_EXIST("元数据不存在", "Meta data not exist"),
+    METADATA_UNAVAILABLE("元数据不可用", "Meta data unavailable"),
     METADATA_AUTH_TIMES_ERROR("元数据授权申请按次时，使用次数必须大于零", "Metadata authorization by times, the times must be greater than zero"),
     METADATA_AUTH_TIME_ERROR("元数据授权申请时间错误", "Metadata authorization apply time error"),
     METADATA_AUTH_SAVE_ERROR("元数据授权申请保存失败", "Metadata authorization apply save error"),
