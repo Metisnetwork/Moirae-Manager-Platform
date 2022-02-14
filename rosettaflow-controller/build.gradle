@@ -27,6 +27,9 @@ distributions {
     }
 }
 
+distTar.dependsOn(bootJar)
+distZip.dependsOn(bootJar)
+
 dependencies {
     api project(':rosettaflow-quartz')
 
