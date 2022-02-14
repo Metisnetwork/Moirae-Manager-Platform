@@ -10,6 +10,23 @@ bootJar {
     enabled = true
 }
 
+distributions {
+    main {
+        contents {
+            from("$rootDir/scripts") {
+                include 'application-prod.yml'
+                include 'manage.sh'
+                include 'jasypt.properties'
+                include 'lib/*'
+                include 'sql/*'
+            }
+            from('build/libs') {
+                include '*.jar'
+            }
+        }
+    }
+}
+
 dependencies {
     api project(':rosettaflow-quartz')
 
