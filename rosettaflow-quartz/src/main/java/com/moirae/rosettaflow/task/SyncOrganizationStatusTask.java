@@ -6,9 +6,10 @@ import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
 import com.moirae.rosettaflow.grpc.client.AuthServiceClient;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
-import com.moirae.rosettaflow.mapper.domain.Organization;
+import com.moirae.rosettaflow.mapper.domain.Org;
+import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import com.moirae.rosettaflow.service.IDataSyncService;
-import com.moirae.rosettaflow.service.IOrganizationService;
+import com.moirae.rosettaflow.service.OrganizationService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,7 +36,7 @@ public class SyncOrganizationStatusTask {
     @Resource
     private AuthServiceClient authServiceClient;
     @Resource
-    private IOrganizationService organizationService;
+    private OrganizationService organizationService;
     @Resource
     private IDataSyncService dataSyncService;
 
@@ -67,20 +68,21 @@ public class SyncOrganizationStatusTask {
      * @param nodeIdentityDtoList 需更新数据
      */
     private void batchUpdateOrg(List<NodeIdentityDto> nodeIdentityDtoList) {
-        List<Organization> orgList = nodeIdentityDtoList.stream()
-                .map(nodeIdentityDto -> {
-                    Organization organization = new Organization();
-                    organization.setIdentityId(nodeIdentityDto.getIdentityId());
-                    organization.setNodeId(nodeIdentityDto.getNodeId());
-                    organization.setNodeName(nodeIdentityDto.getNodeName());
-                    organization.setStatus(nodeIdentityDto.getStatus().byteValue());
-//                    organization.setUpdateTime(new Date(nodeIdentityDto.getUpdateAt()));
-                    return organization;
+        List<Org> orgList = nodeIdentityDtoList.stream().map(nodeIdentityDto -> {
+                    Org org = new Org();
+                    org.setIdentityId(nodeIdentityDto.getIdentityId());
+                    org.setNodeId(nodeIdentityDto.getNodeId());
+                    org.setNodeName(nodeIdentityDto.getNodeName());
+                    org.setImageUrl(nodeIdentityDto.getImageUrl());
+                    org.setDetails(nodeIdentityDto.getDetails());
+                    org.setStatus(OrgStatusEnum.getEnum(nodeIdentityDto.getStatus()));
+                    org.setUpdateAt(new Date(nodeIdentityDto.getUpdateAt()));
+                    return org;
                 })
                 .collect(Collectors.toList());
         //更新
         BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), orgList, list -> {
-            organizationService.batchUpdate(list);
+            organizationService.batchReplace(list);
         });
     }
 }

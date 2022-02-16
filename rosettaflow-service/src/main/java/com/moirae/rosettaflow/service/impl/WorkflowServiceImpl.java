@@ -60,7 +60,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private IWorkflowNodeVariableService workflowNodeVariableService;
     @Resource
-    private IOrganizationService organizationService;
+    private OrganizationService organizationService;
     @Resource
     private IUserMetaDataService userMetaDataService;
     @Resource
@@ -72,8 +72,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Resource
     private GrpcTaskService grpcTaskService;
-    @Resource
-    private NetManager netManager;
     @Resource
     private WorkflowNodeMapper workflowNodeMapper;
     @Resource
@@ -187,7 +185,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                     List<TaskEventDto> taskEventShowDtoList = new ArrayList<>();
                     if (StrUtil.isNotBlank(item.getTaskId())) {
                         try {
-                            taskEventShowDtoList = grpcTaskService.getTaskEventList(netManager.getChannel(item.getWorkflowNodeSenderIdentityId()), item.getTaskId());
+                            taskEventShowDtoList = grpcTaskService.getTaskEventList(organizationService.getChannel(item.getWorkflowNodeSenderIdentityId()), item.getTaskId());
                         } catch (Exception e) {
                             log.error("调用rpc接口异常--获取运行日志, workflowId:{}, 错误信息:{}", workflowId, e);
                             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
@@ -500,7 +498,11 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 .map(WorkflowNodeInput::getIdentityId)
                 .collect(Collectors.toSet());
         senderOrgId.addAll(dataOrgId);
-        organizationService.isValid(senderOrgId);
+        if(!organizationService.isEffectiveAll(senderOrgId)){
+            log.error("AssemblyNodeInput->前端输入的机构信息identity:{}未找到", senderOrgId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
+        }
+
         // 模型必须存在于发起方上面
         reqWorkflow.getWorkflowNodeReqList().stream().forEach(item-> {
             // 如果用户指定模型文件，任务的发起方必须和指定的模型在同一个组织。

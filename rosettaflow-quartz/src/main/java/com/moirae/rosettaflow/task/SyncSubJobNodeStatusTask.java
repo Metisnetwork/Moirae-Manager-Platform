@@ -8,7 +8,7 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IWorkflowRunStatusService;
-import com.moirae.rosettaflow.service.NetManager;
+import com.moirae.rosettaflow.service.OrganizationService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,7 +34,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private IDataSyncService dataSyncService;
     @Resource
-    private NetManager netManager;
+    private OrganizationService organizationService;
 
     @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")
@@ -56,7 +56,7 @@ public class SyncSubJobNodeStatusTask {
             Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
             dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "-" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
-                        return grpcTaskService.getTaskDetailList(netManager.getChannel(identityId), latestSynced);
+                        return grpcTaskService.getTaskDetailList(organizationService.getChannel(identityId), latestSynced);
                     },
                     (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
                         for (TaskDetailResponseDto taskDetailResponseDto : grpcResponseList) {

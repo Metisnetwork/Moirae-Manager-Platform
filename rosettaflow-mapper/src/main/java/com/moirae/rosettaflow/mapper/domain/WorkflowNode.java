@@ -140,5 +140,5 @@ public class WorkflowNode implements Serializable {
     private Model model;
 
     @TableField(exist = false)
-    private Map<String, Organization> organizationMap;
+    private Map<String, Org> organizationMap;
 }

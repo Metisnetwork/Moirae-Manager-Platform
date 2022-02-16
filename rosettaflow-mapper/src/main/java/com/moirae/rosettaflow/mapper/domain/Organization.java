@@ -15,13 +15,11 @@ import java.util.Date;
  * @author admin
  */
 @Data
-@TableName(value = "t_organization")
 public class Organization implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * 组织表ID(自增长)
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
     /**
      * 组织的身份名称
@@ -51,7 +49,6 @@ public class Organization implements Serializable {
     /**
      * 状态: 0-未知，1- 正常， 2- 异常
      */
-    @TableField(value = "`status`")
     private Byte status;
     /**
      * 创建时间
@@ -60,12 +57,10 @@ public class Organization implements Serializable {
     /**
      * 更新时间
      */
-    @TableField(update = "now()")
     private Date updateTime;
 
     /**
      * 是否为默认的链接设置：0-否，1-是
      */
-    @TableField(exist = false)
     private Byte defaultConnectFlag;
 }

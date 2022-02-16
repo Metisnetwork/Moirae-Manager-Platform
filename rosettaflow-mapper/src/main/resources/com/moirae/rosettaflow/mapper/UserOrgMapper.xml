@@ -8,4 +8,21 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+
+    <select id="getIdentityIdListByUser" resultType="java.lang.String">
+        SELECT o.`identity_id`
+        FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
+        WHERE o.`status` = 1 AND (oe.`is_public` = 1 OR `identity_id` IN ( SELECT `org_identity_id` FROM `t_user_org` WHERE `user_address` = #{address, jdbcType=VARCHAR}))
+    </select>
+
+    <select id="getOrganizationListByUser" resultType="com.moirae.rosettaflow.mapper.domain.Organization">
+        SELECT
+            o.`node_name`,
+            o.`identity_id`,
+            oe.`identity_ip`,
+            oe.`identity_port`,
+            oe.`is_public` as public_flag
+        FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
+        WHERE `status` = 1 AND (oe.`is_public` = 1 OR `identity_id` IN ( SELECT `org_identity_id` FROM `t_user_org` WHERE `user_address` = #{address, jdbcType=VARCHAR}))
+    </select>
 </mapper>

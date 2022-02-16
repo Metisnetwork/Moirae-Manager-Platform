@@ -26,7 +26,4 @@ public class OrganizationVo {
 
     @ApiModelProperty(value = "是否公共可看的：0-否，1-是")
     private Byte publicFlag;
-
-    @ApiModelProperty(value = "是否为默认的链接设置：0-否，1-是")
-    private Byte defaultConnectFlag;
 }

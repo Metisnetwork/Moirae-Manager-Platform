@@ -274,6 +274,8 @@ public class AuthServiceClient {
             member.setIdentityId(getIdentityListResponse.getMemberList(i).getIdentityId());
             member.setStatus(getIdentityListResponse.getMemberList(i).getStatusValue());
             member.setUpdateAt(getIdentityListResponse.getMemberList(i).getUpdateAt());
+            member.setImageUrl(getIdentityListResponse.getMemberList(i).getImageUrl());
+            member.setDetails(getIdentityListResponse.getMemberList(i).getDetails());
             memberList.add(member);
         }
         return memberList;

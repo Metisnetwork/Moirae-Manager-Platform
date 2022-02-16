@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.init;
 
-import com.moirae.rosettaflow.service.NetManager;
+import com.moirae.rosettaflow.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +15,11 @@ import javax.annotation.Resource;
 public class ProcessInit {
 
     @Resource
-    private NetManager netManager;
+    private OrganizationService organizationService;
 
     @PostConstruct
     public void init() {
         // 第一次启动时初始化公共组织
-        netManager.initPublicOrg();
-        // 初始化组织的连接
-        netManager.init();
+        organizationService.initPublicOrg();
     }
 }

@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.mapper.WorkflowRunTaskResultMapper;
-import com.moirae.rosettaflow.mapper.domain.Organization;
+import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
-import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.IWorkflowRunTaskResultService;
+import com.moirae.rosettaflow.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class WorkflowRunTaskResultServiceImpl extends ServiceImpl<WorkflowRunTaskResultMapper, WorkflowRunTaskResult> implements IWorkflowRunTaskResultService {
 
     @Resource
-    private IOrganizationService organizationService;
+    private OrganizationService organizationService;
 
     @Override
     public List<WorkflowRunTaskResult> queryByTaskId(String taskId) {
@@ -30,8 +30,8 @@ public class WorkflowRunTaskResultServiceImpl extends ServiceImpl<WorkflowRunTas
 
         if(taskResultList.size() > 0){
             Set<String> identityIdSet = taskResultList.stream().map(WorkflowRunTaskResult::getIdentityId).collect(Collectors.toSet());
-            List<Organization> organizationList = organizationService.getByIdentityIds(identityIdSet.toArray());
-            Map<String, String> organizationMap = organizationList.stream().collect(Collectors.toMap(Organization::getIdentityId, Organization::getNodeName));
+            List<Org> organizationList = organizationService.getOrgListByIdentityIdList(identityIdSet);
+            Map<String, String> organizationMap = organizationList.stream().collect(Collectors.toMap(Org::getIdentityId, Org::getNodeName));
             taskResultList.stream().forEach(item -> {item.setIdentityName(organizationMap.get(item.getIdentityId()));});
         }
         return taskResultList;

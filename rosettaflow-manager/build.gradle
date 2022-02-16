@@ -1,0 +1,12 @@
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api project(':rosettaflow-mapper')
+    api project(':rosettaflow-grpc-client')
+}

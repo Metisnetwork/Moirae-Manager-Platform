@@ -5,7 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.mapper.domain.Organization;
 import com.moirae.rosettaflow.req.organization.DelIpPortBindReq;
 import com.moirae.rosettaflow.req.organization.IpPortBindReq;
-import com.moirae.rosettaflow.service.IOrganizationService;
+import com.moirae.rosettaflow.service.OrganizationService;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.organization.OrganizationVo;
 import io.swagger.annotations.Api;
@@ -29,12 +29,12 @@ import java.util.List;
 public class OrganizationController {
 
     @Resource
-    private IOrganizationService organizationService;
+    private OrganizationService organizationService;
 
     @GetMapping("list")
     @ApiOperation(value = "查询用户绑定的组织列表", notes = "查询用户绑定的组织列表")
     public ResponseVo<List<OrganizationVo>> list() {
-        List<Organization> organizationList = organizationService.getAllByUserSession();
+        List<Organization> organizationList = organizationService.getOrganizationListByUser();
         List<OrganizationVo> organizationVoList = BeanUtil.copyToList(organizationList, OrganizationVo.class);
         return ResponseVo.createSuccess(organizationVoList);
     }
@@ -42,14 +42,14 @@ public class OrganizationController {
     @PostMapping("addIpPortBind")
     @ApiOperation(value = "增加用户绑定的组织", notes = "增加用户绑定的组织")
     public ResponseVo<?> addIpPortBind(@RequestBody @Valid IpPortBindReq ipPortBindReq) {
-        organizationService.addUserOrganization(ipPortBindReq.getIdentityIp(), ipPortBindReq.getIdentityPort());
+        organizationService.addOrganizationByUser(ipPortBindReq.getIdentityIp(), ipPortBindReq.getIdentityPort());
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("delIpPortBind")
     @ApiOperation(value = "删除用户绑定的组织", notes = "删除用户绑定的组织")
     public ResponseVo<?> delIpPortBind(@RequestBody @Valid DelIpPortBindReq delIpPortBindReq) {
-        organizationService.deleteUserOrganization(delIpPortBindReq.getIdentityId());
+        organizationService.deleteOrganizationByUser(delIpPortBindReq.getIdentityId());
         return ResponseVo.createSuccess();
     }
 }

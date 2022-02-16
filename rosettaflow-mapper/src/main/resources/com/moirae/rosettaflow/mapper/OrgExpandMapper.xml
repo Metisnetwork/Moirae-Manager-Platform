@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.OrgExpandMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.OrgExpand">
+        <id column="identity_id" jdbcType="VARCHAR" property="identityId" />
+        <result column="identity_ip" jdbcType="VARCHAR" property="identityIp" />
+        <result column="identity_port" jdbcType="INTEGER" property="identityPort" />
+        <result column="is_public" jdbcType="BOOLEAN" property="isPublic" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+
+</mapper>

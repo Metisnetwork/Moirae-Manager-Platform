@@ -51,17 +51,13 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private GrpcTaskService grpcTaskService;
     @Resource
-    private NetManager netManager;
-    @Resource
-    private CommonService commonService;
-    @Resource
     private IMetaDataDetailsService metaDataDetailsService;
     @Resource
     private IMetaDataService metaDataService;
     @Resource
     private IAlgorithmService algorithmService;
     @Resource
-    private IOrganizationService organizationService;
+    private OrganizationService organizationService;
     @Resource
     private IModelService modelService;
     @Resource
@@ -132,7 +128,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             WorkflowNode workflowNode = workflowNodeService.getById(workflowRunTaskStatus.getWorkflowNodeId());
             TerminateTaskRequestDto terminateTaskRequestDto = assemblyTerminateTaskRequestDto(workflowRunStatus, workflowRunTaskStatus.getTaskId());
             try {
-                TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(netManager.getChannel(workflowNode.getSenderIdentityId()), terminateTaskRequestDto);
+                TerminateTaskRespDto terminateTaskRespDto = grpcTaskService.terminateTask(organizationService.getChannel(workflowNode.getSenderIdentityId()), terminateTaskRequestDto);
                 log.info("终止工作流返回， terminateTaskRespDto = {}", terminateTaskRespDto);
                 if (terminateTaskRespDto != null && terminateTaskRespDto.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
                     workflowRunStatus.setCancelStatus(WorkflowRunStatusEnum.RUN_SUCCESS.getValue());
@@ -195,7 +191,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         List<WorkflowRunTaskResult> taskResultList = new ArrayList<>();
         List<Model> modelList = new ArrayList<>();
         for (String identityId : identityIdSet) {
-            ManagedChannel channel = netManager.getChannel(identityId);
+            ManagedChannel channel = organizationService.getChannel(identityId);
             GetTaskResultFileSummaryResponseDto taskResultResponseDto = grpcSysService.getTaskResultFileSummary(channel, taskId);
             if (Objects.isNull(taskResultResponseDto)) {
                 log.error("WorkflowNodeStatusMockTask获取任务结果失败！ info = {}", taskResultResponseDto);
@@ -279,19 +275,16 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
             }
             // 组织校验(任务发起发方组织、算法提供方组织、数据提供方组织、结果接收方组织)
-            Organization organization = organizationService.getByIdentityId(item.getSenderIdentityId());
-            if(organization == null){
+            if(organizationService.isEffective(item.getSenderIdentityId())){
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_SENDER.getMsg(),item.getSenderIdentityId()) );
             }
             item.getWorkflowNodeInputReqList().stream().forEach(subItem ->{
-                Organization dataOrganization = organizationService.getByIdentityId(subItem.getIdentityId());
-                if(dataOrganization == null){
+                if(organizationService.isEffective(subItem.getIdentityId())){
                     throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_DATA_PROVIDED.getMsg(), subItem.getIdentityId()));
                 }
             });
             item.getWorkflowNodeOutputReqList().stream().forEach(subItem ->{
-                Organization outOrganization = organizationService.getByIdentityId(subItem.getIdentityId());
-                if(outOrganization == null){
+                if(organizationService.isEffective(subItem.getIdentityId())){
                     throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_OUTPUT.getMsg(), subItem.getIdentityId()));
                 }
             });
@@ -321,7 +314,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             TaskDto taskDto = assemblyTaskDto(workflowRunStatus);
             PublishTaskDeclareResponseDto respDto;
             try {
-                respDto = grpcTaskService.syncPublishTask(netManager.getChannel(taskDto.getSender().getIdentityId()), taskDto);
+                respDto = grpcTaskService.syncPublishTask(organizationService.getChannel(taskDto.getSender().getIdentityId()), taskDto);
                 curWorkflowRunTaskStatus.setTaskId(respDto.getTaskId());
                 curWorkflowRunTaskStatus.setRunMsg(respDto.getMsg());
                 if (GrpcConstant.GRPC_SUCCESS_CODE != respDto.getStatus()) {
@@ -368,7 +361,8 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 .collect(Collectors.toSet());
         inputOrgIdSet.add(curlWorkflowNode.getSenderIdentityId());
         inputOrgIdSet.addAll(outputOrgIdSet);
-        curlWorkflowNode.setOrganizationMap(organizationService.getByIdentityIds(inputOrgIdSet.toArray()).stream().collect(Collectors.toMap(Organization::getIdentityId, organization -> organization)));
+
+        curlWorkflowNode.setOrganizationMap(organizationService.getOrgListByIdentityIdList(inputOrgIdSet).stream().collect(Collectors.toMap(Org::getIdentityId, organization -> organization)));
 
         // 拼接任务
         TaskDto taskDto = new TaskDto();
@@ -448,7 +442,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     }
 
 
-    private OrganizationIdentityInfoDto senderOrganization(Organization organization){
+    private OrganizationIdentityInfoDto senderOrganization(Org organization){
         OrganizationIdentityInfoDto sender = new OrganizationIdentityInfoDto();
         sender.setPartyId("s0");
         sender.setNodeName(organization.getNodeName());
@@ -457,7 +451,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         return sender;
     }
 
-    private OrganizationIdentityInfoDto algoSupplierOrganization(Organization organization) {
+    private OrganizationIdentityInfoDto algoSupplierOrganization(Org organization) {
         OrganizationIdentityInfoDto algoSupplier = new OrganizationIdentityInfoDto();
         algoSupplier.setPartyId("A0");
         algoSupplier.setNodeName(organization.getNodeName());
@@ -466,7 +460,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         return algoSupplier;
     }
 
-    private OrganizationIdentityInfoDto inputModelOrganization(Organization organization, int partNumber){
+    private OrganizationIdentityInfoDto inputModelOrganization(Org organization, int partNumber){
         OrganizationIdentityInfoDto org = new OrganizationIdentityInfoDto();
         org.setPartyId("p" + partNumber);
         org.setNodeName(organization.getNodeName());
@@ -475,7 +469,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         return org;
     }
 
-    private OrganizationIdentityInfoDto inputDataOrganization(Organization organization,WorkflowNodeInput input){
+    private OrganizationIdentityInfoDto inputDataOrganization(Org organization,WorkflowNodeInput input){
         OrganizationIdentityInfoDto org = new OrganizationIdentityInfoDto();
         org.setPartyId(input.getPartyId());
         org.setNodeName(organization.getNodeName());
@@ -484,7 +478,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
         return org;
     }
 
-    private OrganizationIdentityInfoDto outputDataOrganization(Organization organization,WorkflowNodeOutput output){
+    private OrganizationIdentityInfoDto outputDataOrganization(Org organization,WorkflowNodeOutput output){
         OrganizationIdentityInfoDto org = new OrganizationIdentityInfoDto();
         org.setPartyId(output.getPartyId());
         org.setNodeName(organization.getNodeName());

@@ -18,12 +18,11 @@ import com.moirae.rosettaflow.common.utils.WalletSignUtils;
 import com.moirae.rosettaflow.dto.SignMessageDto;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.mapper.UserMapper;
-import com.moirae.rosettaflow.mapper.domain.Organization;
 import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.service.CommonService;
-import com.moirae.rosettaflow.service.IOrganizationService;
 import com.moirae.rosettaflow.service.ITokenService;
 import com.moirae.rosettaflow.service.IUserService;
+import com.moirae.rosettaflow.service.OrganizationService;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private CommonService commonService;
 
     @Resource
-    private IOrganizationService organizationService;
+    private OrganizationService organizationService;
 
     @Override
     public User getByAddress(String address) {
@@ -90,10 +89,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 设置用户组织
         if(StringUtils.isBlank(user.getOrgIdentityId())){
-            List<Organization> organizationList = organizationService.getAllByUser(hexAddress);
+            List<String> organizationList = organizationService.getIdentityIdListByUser(hexAddress);
             if (CollectionUtil.isNotEmpty(organizationList)) {
-                Organization organization = organizationList.get(new Random().nextInt(organizationList.size()));
-                user.setOrgIdentityId(organization.getIdentityId());
+                user.setOrgIdentityId(organizationList.get(new Random().nextInt(organizationList.size())));
                 isUpdate = true;
             }
         }
