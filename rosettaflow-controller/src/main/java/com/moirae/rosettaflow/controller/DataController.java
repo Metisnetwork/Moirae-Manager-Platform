@@ -9,8 +9,8 @@ import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.UserMetaDataDto;
 import com.moirae.rosettaflow.req.data.*;
-import com.moirae.rosettaflow.service.IMetaDataDetailsService;
-import com.moirae.rosettaflow.service.IMetaDataService;
+import com.moirae.rosettaflow.service.IMetaDataDetailsOldService;
+import com.moirae.rosettaflow.service.IMetaDataOldService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -43,13 +43,13 @@ import java.util.TimeZone;
 public class DataController {
 
     @Resource
-    private IMetaDataService metaDataService;
+    private IMetaDataOldService metaDataService;
 
     @Resource
     private IUserMetaDataService userMetaDataService;
 
     @Resource
-    private IMetaDataDetailsService metaDataDetailsService;
+    private IMetaDataDetailsOldService metaDataDetailsService;
 
 
     @GetMapping("pageList")

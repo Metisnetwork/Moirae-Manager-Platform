@@ -1,9 +1,5 @@
-package com.moirae.rosettaflow.mapper.domain;
+package com.moirae.rosettaflow.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import lombok.Data;
 
@@ -16,7 +12,7 @@ import java.util.Date;
  * @author admin
  */
 @Data
-public class Organization implements Serializable {
+public class OrganizationDto implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * 组织表ID(自增长)
@@ -66,4 +62,14 @@ public class Organization implements Serializable {
     private Byte defaultConnectFlag;
 
     private Date updateAt;
+
+    /**
+     * 总文件数
+     */
+    private Integer totalFile;
+
+    /**
+     * 总文件大小(字节)
+     */
+    private Long totalData;
 }

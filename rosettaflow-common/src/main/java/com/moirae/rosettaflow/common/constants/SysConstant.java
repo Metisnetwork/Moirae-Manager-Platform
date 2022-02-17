@@ -124,7 +124,8 @@ public class SysConstant {
             "testGrpc",
             "redis",
             "quartz",
-            "org/listOrgInfoByName"
+            "org/listOrgInfoByName",
+            "org/istOrgInfoByTotalData"
     };
 
     /**

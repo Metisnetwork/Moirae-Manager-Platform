@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.dto;
 
-import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.MetaDataOld;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MetaDataDto extends MetaData {
+public class MetaDataDto extends MetaDataOld {
     /**
      * 授权状态: -1-未知(1.未登录故获取不到元数据状态 2.用户未申请使用元数据),0-等待审核中, 1-审核通过, 2-审核拒绝
      */

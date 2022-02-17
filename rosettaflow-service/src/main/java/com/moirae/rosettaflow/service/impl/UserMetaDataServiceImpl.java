@@ -26,10 +26,10 @@ import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityRespo
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.UserMetaDataMapper;
-import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.MetaDataOld;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 import com.moirae.rosettaflow.service.CommonService;
-import com.moirae.rosettaflow.service.IMetaDataService;
+import com.moirae.rosettaflow.service.IMetaDataOldService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, UserMetaData> implements IUserMetaDataService {
 
     @Resource
-    private IMetaDataService metaDataService;
+    private IMetaDataOldService metaDataService;
 
     @Resource
     private GrpcAuthService grpcAuthService;
@@ -76,7 +76,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
 
     @Override
     public void auth(UserMetaDataDto userMetaDataDto) {
-        MetaData metaData = metaDataService.getById(userMetaDataDto.getId());
+        MetaDataOld metaData = metaDataService.getById(userMetaDataDto.getId());
         if (null == metaData) {
             log.error("query meta data not exist, id:{}", userMetaDataDto.getId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
@@ -184,7 +184,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     /**
      * 保存用户授权申请元数据
      */
-    private void saveUserMetaData(UserMetaDataDto userMetaDataDto, MetaData metaData, String metadataAuthId) {
+    private void saveUserMetaData(UserMetaDataDto userMetaDataDto, MetaDataOld metaData, String metadataAuthId) {
         // 保存等待审核数据
         UserMetaData userMetaData = new UserMetaData();
         BeanCopierUtils.copy(userMetaDataDto, userMetaData);

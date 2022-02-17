@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Data
 @TableName(value = "t_meta_data_details")
-public class MetaDataDetails implements Serializable {
+public class MetaDataDetailsOld implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * 数据详情表ID(自增长)
@@ -72,7 +72,7 @@ public class MetaDataDetails implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        MetaDataDetails other = (MetaDataDetails) that;
+        MetaDataDetailsOld other = (MetaDataDetailsOld) that;
         return (this.getMetaDataId() == null ? other.getMetaDataId() == null : this.getMetaDataId().equals(other.getMetaDataId()))
                 && (this.getColumnIndex() == null ? other.getColumnIndex() == null : this.getColumnIndex().equals(other.getColumnIndex()));
     }

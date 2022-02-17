@@ -3,7 +3,7 @@ package com.moirae.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.MetaDataDto;
-import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.MetaDataOld;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2021/8/24
  * @description 元数据服务
  */
-public interface IMetaDataService extends IService<MetaData> {
+public interface IMetaDataOldService extends IService<MetaDataOld> {
     /**
      * 清空元数据摘要表
      */
@@ -41,9 +41,9 @@ public interface IMetaDataService extends IService<MetaData> {
      * 获取元数据通过ID
      *
      * @param id 元数据表Id
-     * @return MetaData
+     * @return MetaDataOld
      */
-    MetaData getMetaDataById(Long id);
+    MetaDataOld getMetaDataById(Long id);
 
     /**
      * 根据identityId查询元数据列表
@@ -58,7 +58,7 @@ public interface IMetaDataService extends IService<MetaData> {
      *
      * @param metaDataList 批量插入列表
      */
-    void batchInsert(List<MetaData> metaDataList);
+    void batchInsert(List<MetaDataOld> metaDataList);
 
     /**
      * 授权状态处理
@@ -75,7 +75,7 @@ public interface IMetaDataService extends IService<MetaData> {
      * @param metaDataList
      * @return
      */
-    void batchUpdate(List<MetaData> metaDataList);
+    void batchUpdate(List<MetaDataOld> metaDataList);
 
     /**
      * 查询出已存在的MetaDataIdList

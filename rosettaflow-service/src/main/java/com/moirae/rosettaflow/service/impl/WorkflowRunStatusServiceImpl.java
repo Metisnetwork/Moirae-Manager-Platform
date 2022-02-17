@@ -51,9 +51,9 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private GrpcTaskService grpcTaskService;
     @Resource
-    private IMetaDataDetailsService metaDataDetailsService;
+    private IMetaDataDetailsOldService metaDataDetailsService;
     @Resource
-    private IMetaDataService metaDataService;
+    private IMetaDataOldService metaDataService;
     @Resource
     private IAlgorithmService algorithmService;
     @Resource
@@ -291,11 +291,11 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
 
             // 元数据状态校验
             item.getWorkflowNodeInputReqList().stream().forEach(subItem ->{
-                LambdaQueryWrapper<MetaData> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
-                metaDataLambdaQueryWrapper.eq(MetaData::getMetaDataId, subItem.getDataTableId());
-                metaDataLambdaQueryWrapper.eq(MetaData::getStatus, StatusEnum.VALID.getValue());
-                metaDataLambdaQueryWrapper.eq(MetaData::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
-                MetaData one = metaDataService.getOne(metaDataLambdaQueryWrapper);
+                LambdaQueryWrapper<MetaDataOld> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
+                metaDataLambdaQueryWrapper.eq(MetaDataOld::getMetaDataId, subItem.getDataTableId());
+                metaDataLambdaQueryWrapper.eq(MetaDataOld::getStatus, StatusEnum.VALID.getValue());
+                metaDataLambdaQueryWrapper.eq(MetaDataOld::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
+                MetaDataOld one = metaDataService.getOne(metaDataLambdaQueryWrapper);
                 if(one == null){
                     //无效元数据
                     throw new BusinessException(BIZ_EXCEPTION, StrUtil.format(ErrorMsg.METADATA_UNAVAILABLE_FORMAT.getMsg(), subItem.getDataTableId()));

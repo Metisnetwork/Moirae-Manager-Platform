@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.dto;
 
-import com.moirae.rosettaflow.mapper.domain.MetaDataDetails;
+import com.moirae.rosettaflow.mapper.domain.MetaDataDetailsOld;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,5 +11,5 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MetaDataDetailsDto extends MetaDataDetails {
+public class MetaDataDetailsDto extends MetaDataDetailsOld {
 }

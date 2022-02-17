@@ -3,7 +3,7 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.mapper.domain.Organization;
+import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.req.KeyWorkPageReq;
 import com.moirae.rosettaflow.req.organization.DelIpPortBindReq;
 import com.moirae.rosettaflow.req.organization.IpPortBindReq;
@@ -35,10 +35,19 @@ public class OrganizationController {
     @Resource
     private OrganizationService organizationService;
 
+
+    @GetMapping("istOrgInfoByTotalData")
+    @ApiOperation(value = "查询组织列表（按数据总数）", notes = "查询组织列表（按数据总数）")
+    public ResponseVo<PageVo<OrganizationVo>> istOrgInfoByTotalData(@Valid KeyWorkPageReq keyWorkPageReq) {
+        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByTotalDataDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
+        List<OrganizationVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), OrganizationVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    }
+
     @GetMapping("listOrgInfoByName")
     @ApiOperation(value = "查询组织列表（按名称）", notes = "查询组织列表（按名称）")
     public ResponseVo<PageVo<OrganizationVo>> listOrgInfoByName(@Valid KeyWorkPageReq keyWorkPageReq) {
-        IPage<Organization> page = organizationService.listOrgInfoByName(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
+        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByNameAsc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
         List<OrganizationVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), OrganizationVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
     }
@@ -46,7 +55,7 @@ public class OrganizationController {
     @GetMapping("list")
     @ApiOperation(value = "查询用户绑定的组织列表", notes = "查询用户绑定的组织列表")
     public ResponseVo<List<OrganizationVo>> list() {
-        List<Organization> organizationList = organizationService.getOrganizationListByUser();
+        List<OrganizationDto> organizationList = organizationService.getOrganizationListByUser();
         List<OrganizationVo> organizationVoList = BeanUtil.copyToList(organizationList, OrganizationVo.class);
         return ResponseVo.createSuccess(organizationVoList);
     }

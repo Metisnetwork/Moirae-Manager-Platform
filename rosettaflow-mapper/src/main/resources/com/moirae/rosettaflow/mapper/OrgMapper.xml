@@ -12,6 +12,28 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     </resultMap>
+    <select id="listOrgInfoByNameOrderByTotalDataDesc" resultType="com.moirae.rosettaflow.dto.OrganizationDto">
+        select o.identity_id,
+               o.node_name,
+               o.status,
+               o.update_at,
+               ifnull(df.total_file,0) as total_file,
+               ifnull(df.total_data,0) as total_data
+        from dc_org o
+        left join (
+            select identity_id, count(meta_data_id) as total_file, sum(size) as total_data
+            from dc_meta_data
+            where status = 2
+            group by identity_id
+        ) df on o.identity_id = df.identity_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                o.node_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        order by df.total_data desc
+
+    </select>
 
 
 </mapper>

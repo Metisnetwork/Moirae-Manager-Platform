@@ -1,9 +1,7 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
-import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
 import com.moirae.rosettaflow.grpc.client.AuthServiceClient;
 import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.mapper.domain.Org;
@@ -26,9 +24,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class SyncDcOrgTask {
-
-    @Resource
-    private SysConfig sysConfig;
 
     @Resource
     private AuthServiceClient authServiceClient;
@@ -72,14 +67,12 @@ public class SyncDcOrgTask {
                     org.setNodeName(nodeIdentityDto.getNodeName());
                     org.setImageUrl(nodeIdentityDto.getImageUrl());
                     org.setDetails(nodeIdentityDto.getDetails());
-                    org.setStatus(OrgStatusEnum.getEnum(nodeIdentityDto.getStatus()));
+                    org.setStatus(OrgStatusEnum.find(nodeIdentityDto.getStatus()));
                     org.setUpdateAt(new Date(nodeIdentityDto.getUpdateAt()));
                     return org;
                 })
                 .collect(Collectors.toList());
         //更新
-        BatchExecuteUtil.batchExecute(sysConfig.getBatchSize(), orgList, list -> {
-            organizationService.batchReplace(list);
-        });
+        organizationService.batchReplace(orgList);
     }
 }

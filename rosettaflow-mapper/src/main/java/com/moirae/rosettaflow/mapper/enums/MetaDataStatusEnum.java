@@ -6,17 +6,19 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum OrgStatusEnum {
+public enum MetaDataStatusEnum {
 
-    Normal(1, "正常"),
-    NonNormal(2, "不正常");
+    UNKNOWN(0, "未知"),
+    UNPUBLISHED(1, "未发布"),
+    PUBLISHED(2, "已发布"),
+    REVOKED(3, "已撤销");
 
     @EnumValue
     @JsonValue
     private Integer value;
     private String desc;
 
-    OrgStatusEnum(Integer value, String desc) {
+    MetaDataStatusEnum(Integer value, String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -25,13 +27,13 @@ public enum OrgStatusEnum {
         return value;
     }
 
-    private static Map<Integer,OrgStatusEnum> map = new HashMap<>();
+    private static Map<Integer,MetaDataStatusEnum> map = new HashMap<>();
     static {
-        for (OrgStatusEnum value : OrgStatusEnum.values()) {
+        for (MetaDataStatusEnum value : MetaDataStatusEnum.values()) {
             map.put(value.getValue(),value);
         }
     }
-    public static OrgStatusEnum find(Integer value) {
+    public static MetaDataStatusEnum find(Integer value) {
         return map.get(value);
     }
 }

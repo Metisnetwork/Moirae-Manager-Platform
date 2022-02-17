@@ -1,0 +1,59 @@
+package com.moirae.rosettaflow.mapper.domain;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+@Data
+@TableName(value = "dc_meta_data_column")
+public class MetaDataColumn implements Serializable {
+    /**
+     * 元数据ID,hash
+     */
+    private String metaDataId;
+
+    /**
+     * 字段索引序号
+     */
+    private Integer columnIdx;
+    /**
+     * 字段名称
+     */
+    private String columnName;
+
+    /**
+     * 字段类型
+     */
+    private String columnType;
+
+    /**
+     * 字段大小
+     */
+    private Integer columnSize;
+
+    /**
+     * 字段描述
+     */
+    private String remarks;
+
+    /**
+     * 是否公开的, true/false
+     */
+    private Boolean published;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @TableField(update = "now()")
+    private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
+}

@@ -1,7 +1,5 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -10,10 +8,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
-import com.moirae.rosettaflow.common.enums.MetaDataStateEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
-import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
+import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.service.AuthServiceGrpc;
@@ -25,7 +22,6 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.OrganizationService;
-import com.moirae.rosettaflow.service.utils.UserContext;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -134,7 +130,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public List<Organization> getOrganizationListByUser() {
+    public List<OrganizationDto> getOrganizationListByUser() {
         UserDto userDto = commonService.getCurrentUser();
         return userOrgManager.getOrganizationListByUser(userDto.getAddress());
     }
@@ -199,32 +195,20 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    /**
-     *     select
-     *     <include refid="Base_Column_List" />
-     *     from org_info
-     *     <where>
-     *       <if test="keyword != null and keyword != ''">
-     *         org_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
-     *       </if>
-     *     </where>
-     *     order by org_name
-     *     limit #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-     */
-    public IPage<Organization> listOrgInfoByName(Long current, Long size, String keyword) {
+    public IPage<OrganizationDto> listOrgInfoByNameOrderByNameAsc(Long current, Long size, String keyword) {
         Page<Org> page = new Page<>(current, size);
         LambdaQueryWrapper<Org> wrapper = Wrappers.lambdaQuery();
         wrapper.like(StringUtils.isNotBlank(keyword), Org::getNodeName, keyword);
         wrapper.orderByAsc(Org::getNodeName);
         orgManager.page(page, wrapper);
 
-        Page<Organization> organizationPage = new Page<>();
+        Page<OrganizationDto> organizationPage = new Page<>();
         organizationPage.setCurrent(page.getCurrent());
         organizationPage.setSize(page.getSize());
         organizationPage.setTotal(page.getTotal());
         organizationPage.setRecords(page.getRecords().stream()
                 .map(item -> {
-                    Organization organization = new Organization();
+                    OrganizationDto organization = new OrganizationDto();
                     organization.setIdentityId(item.getIdentityId());
                     organization.setNodeName(item.getNodeName());
                     organization.setStatus(item.getStatus());
@@ -234,6 +218,13 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .collect(Collectors.toList())
         );
         return organizationPage;
+    }
+
+    @Override
+    public IPage<OrganizationDto> listOrgInfoByNameOrderByTotalDataDesc(Long current, Long size, String keyword) {
+        Page<OrganizationDto> page = new Page<>(current, size);
+        orgManager.listOrgInfoByNameOrderByTotalDataDesc(page, keyword);
+        return page;
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.vo.organization;
 
-import cn.hutool.db.DaoTemplate;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -41,4 +40,10 @@ public class OrganizationVo {
     public String getOrgName(){
         return nodeName;
     }
+
+    @ApiModelProperty(value = "总文件数")
+    private Integer totalFile;
+
+    @ApiModelProperty(value = "总文件大小(字节)")
+    private Long totalData;
 }

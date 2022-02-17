@@ -3,7 +3,7 @@ package com.moirae.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
-import com.moirae.rosettaflow.mapper.domain.MetaDataDetails;
+import com.moirae.rosettaflow.mapper.domain.MetaDataDetailsOld;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2021/8/24
  * @description 元数据请情服务
  */
-public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
+public interface IMetaDataDetailsOldService extends IService<MetaDataDetailsOld> {
     /**
      * 清空元数据详情
      */
@@ -43,7 +43,7 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @param metaDataDetailsList 插入列表集合
      * @return 插入记录数
      */
-    int batchInsert(List<MetaDataDetails> metaDataDetailsList);
+    int batchInsert(List<MetaDataDetailsOld> metaDataDetailsList);
 
     /**
      * 根据元数据列id获取元数据列详情
@@ -51,7 +51,7 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @param id 元数据列id
      * @return 元数据列详情
      */
-    MetaDataDetails getColumnIndexById(Long id);
+    MetaDataDetailsOld getColumnIndexById(Long id);
 
     /**
      * 根据t_meta_data_details表id数组查询所有的索引列信息
@@ -67,12 +67,12 @@ public interface IMetaDataDetailsService extends IService<MetaDataDetails> {
      * @param metaDatadetails
      * @return
      */
-    void batchUpdateByMetaDataIdAndColumnIndex(List<MetaDataDetails> metaDatadetails);
+    void batchUpdateByMetaDataIdAndColumnIndex(List<MetaDataDetailsOld> metaDatadetails);
 
     /**
      * 查询已存在的数据
      * @param newMetaDataDetailsList
      * @return
      */
-    List<MetaDataDetails> existMetaDataIdAndColumnList(List<MetaDataDetails> newMetaDataDetailsList);
+    List<MetaDataDetailsOld> existMetaDataIdAndColumnList(List<MetaDataDetailsOld> newMetaDataDetailsList);
 }

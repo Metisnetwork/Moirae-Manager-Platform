@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.Org;
-import com.moirae.rosettaflow.mapper.domain.Organization;
+import com.moirae.rosettaflow.dto.OrganizationDto;
 import io.grpc.ManagedChannel;
 
 import java.util.List;
@@ -75,7 +75,7 @@ public interface OrganizationService {
      *
      * @return
      */
-    List<Organization> getOrganizationListByUser();
+    List<OrganizationDto> getOrganizationListByUser();
 
 
     /**
@@ -95,12 +95,22 @@ public interface OrganizationService {
     void deleteOrganizationByUser(String identityId);
 
     /**
-     * 通过节点名称查询组织列表，排序方式按照名称
+     * 查询组织列表
      *
      * @param current
      * @param size
      * @param keyword
      * @return
      */
-    IPage<Organization> listOrgInfoByName(Long current, Long size, String keyword);
+    IPage<OrganizationDto> listOrgInfoByNameOrderByNameAsc(Long current, Long size, String keyword);
+
+    /**
+     * 查询组织列表
+     *
+     * @param current
+     * @param size
+     * @param keyword
+     * @return
+     */
+    IPage<OrganizationDto> listOrgInfoByNameOrderByTotalDataDesc(Long current, Long size, String keyword);
 }

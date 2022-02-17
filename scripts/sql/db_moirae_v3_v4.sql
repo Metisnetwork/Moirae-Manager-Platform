@@ -66,7 +66,6 @@ CREATE TABLE `dc_meta_data_column` (
     `column_type` varchar(100) NOT NULL COMMENT '字段类型',
     `column_size` int NOT NULL DEFAULT '0' COMMENT '字段大小',
     `remarks` varchar(100) DEFAULT NULL COMMENT '字段描述',
-    `published` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否公开的, true/false',
     `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`meta_data_id`,`column_idx`)

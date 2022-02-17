@@ -1,12 +1,12 @@
 package com.moirae.rosettaflow.manager;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.Org;
-import com.moirae.rosettaflow.mapper.domain.Organization;
-
-import java.util.List;
-import java.util.Set;
 
 public interface OrgManager extends IService<Org> {
 
+    IPage<OrganizationDto> listOrgInfoByNameOrderByTotalDataDesc(Page<OrganizationDto> page, String keyword);
 }
