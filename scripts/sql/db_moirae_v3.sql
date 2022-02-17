@@ -596,3 +596,12 @@ CREATE TABLE `t_workflow_temp_node` (
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='工作流节点模板表';
+
+DROP TABLE IF EXISTS `t_data_sync`;
+
+CREATE TABLE `t_data_sync` (
+  `data_type` varchar(256)  NOT NULL COMMENT '数据类型',
+  `latest_synced` bigint NOT NULL DEFAULT '0' COMMENT '数据最新同步时间戳，精确到毫秒',
+  `info` varchar(50) DEFAULT '' COMMENT '描述',
+  PRIMARY KEY (`data_type`)
+) ENGINE=InnoDB COMMENT='数据同步时间记录';
