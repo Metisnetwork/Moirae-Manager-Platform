@@ -123,7 +123,8 @@ public class SysConstant {
             "projectTemplate/list",
             "testGrpc",
             "redis",
-            "quartz"
+            "quartz",
+            "org/listOrgInfoByName"
     };
 
     /**

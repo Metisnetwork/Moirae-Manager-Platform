@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -45,11 +46,11 @@ public class Organization implements Serializable {
     /**
      * 是否公有可查节点: 0-否，1- 是
      */
-    private Byte publicFlag;
+    private Integer publicFlag;
     /**
      * 状态: 0-未知，1- 正常， 2- 异常
      */
-    private Byte status;
+    private OrgStatusEnum status;
     /**
      * 创建时间
      */
@@ -63,4 +64,6 @@ public class Organization implements Serializable {
      * 是否为默认的链接设置：0-否，1-是
      */
     private Byte defaultConnectFlag;
+
+    private Date updateAt;
 }

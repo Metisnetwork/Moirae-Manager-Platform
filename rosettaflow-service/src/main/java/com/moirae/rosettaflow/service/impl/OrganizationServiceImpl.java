@@ -1,12 +1,18 @@
 package com.moirae.rosettaflow.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.MetaDataStateEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
@@ -14,24 +20,21 @@ import com.moirae.rosettaflow.grpc.service.AuthServiceGrpc;
 import com.moirae.rosettaflow.grpc.service.GetNodeIdentityResponse;
 import com.moirae.rosettaflow.manager.OrgExpandManager;
 import com.moirae.rosettaflow.manager.OrgManager;
-import com.moirae.rosettaflow.manager.UserOrgManager;
-import com.moirae.rosettaflow.mapper.domain.Org;
-import com.moirae.rosettaflow.mapper.domain.OrgExpand;
-import com.moirae.rosettaflow.mapper.domain.Organization;
-import com.moirae.rosettaflow.mapper.domain.UserOrg;
+import com.moirae.rosettaflow.manager.OrgUserManager;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.utils.UserContext;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -47,7 +50,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Resource
     private OrgManager orgManager;
     @Resource
-    private UserOrgManager userOrgManager;
+    private OrgUserManager userOrgManager;
     @Resource
     private CommonService commonService;
 
@@ -173,14 +176,14 @@ public class OrganizationServiceImpl implements OrganizationService {
         // 绑定用户私有组织关系
         UserDto userDto = commonService.getCurrentUser();
         //获取原先的用户组织绑定关系信息，存在则更新，不存在则添加
-        LambdaQueryWrapper<UserOrg> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(UserOrg::getOrgIdentityId, orgExpand.getIdentityId());
-        wrapper.eq(UserOrg::getUserAddress, userDto.getAddress());
-        UserOrg userOrg = userOrgManager.getOne(wrapper);
+        LambdaQueryWrapper<OrgUser> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(OrgUser::getIdentityId, orgExpand.getIdentityId());
+        wrapper.eq(OrgUser::getAddress, userDto.getAddress());
+        OrgUser userOrg = userOrgManager.getOne(wrapper);
         if (null == userOrg) {
-            userOrg = new UserOrg();
-            userOrg.setUserAddress(userDto.getAddress());
-            userOrg.setOrgIdentityId(orgExpand.getIdentityId());
+            userOrg = new OrgUser();
+            userOrg.setAddress(userDto.getAddress());
+            userOrg.setIdentityId(orgExpand.getIdentityId());
             userOrgManager.save(userOrg);
         }
     }
@@ -189,10 +192,48 @@ public class OrganizationServiceImpl implements OrganizationService {
     public void deleteOrganizationByUser(String identityId) {
         // 删除用户组织关系
         UserDto userDto = commonService.getCurrentUser();
-        LambdaUpdateWrapper<UserOrg> wrapper = Wrappers.lambdaUpdate();
-        wrapper.eq(UserOrg::getUserAddress, userDto.getAddress());
-        wrapper.eq(UserOrg::getOrgIdentityId, identityId);
+        LambdaUpdateWrapper<OrgUser> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(OrgUser::getAddress, userDto.getAddress());
+        wrapper.eq(OrgUser::getIdentityId, identityId);
         userOrgManager.remove(wrapper);
+    }
+
+    @Override
+    /**
+     *     select
+     *     <include refid="Base_Column_List" />
+     *     from org_info
+     *     <where>
+     *       <if test="keyword != null and keyword != ''">
+     *         org_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+     *       </if>
+     *     </where>
+     *     order by org_name
+     *     limit #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+     */
+    public IPage<Organization> listOrgInfoByName(Long current, Long size, String keyword) {
+        Page<Org> page = new Page<>(current, size);
+        LambdaQueryWrapper<Org> wrapper = Wrappers.lambdaQuery();
+        wrapper.like(StringUtils.isNotBlank(keyword), Org::getNodeName, keyword);
+        wrapper.orderByAsc(Org::getNodeName);
+        orgManager.page(page, wrapper);
+
+        Page<Organization> organizationPage = new Page<>();
+        organizationPage.setCurrent(page.getCurrent());
+        organizationPage.setSize(page.getSize());
+        organizationPage.setTotal(page.getTotal());
+        organizationPage.setRecords(page.getRecords().stream()
+                .map(item -> {
+                    Organization organization = new Organization();
+                    organization.setIdentityId(item.getIdentityId());
+                    organization.setNodeName(item.getNodeName());
+                    organization.setStatus(item.getStatus());
+                    organization.setUpdateAt(item.getUpdateAt());
+                    return organization;
+                })
+                .collect(Collectors.toList())
+        );
+        return organizationPage;
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

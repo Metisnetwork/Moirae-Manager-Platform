@@ -1,8 +1,12 @@
 package com.moirae.rosettaflow.vo.organization;
 
+import cn.hutool.db.DaoTemplate;
+import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @author hudenian
@@ -24,6 +28,17 @@ public class OrganizationVo {
     @ApiModelProperty(value = "组织的端口")
     private Integer identityPort;
 
+    @ApiModelProperty(value = "组织的状态 状态,1-Normal; 2-NonNormal")
+    private OrgStatusEnum status;
+
+    @ApiModelProperty(value = "组织的最新更新时间")
+    private Date updateAt;
+
     @ApiModelProperty(value = "是否公共可看的：0-否，1-是")
     private Byte publicFlag;
+
+    @ApiModelProperty(value = "组织的身份名称")
+    public String getOrgName(){
+        return nodeName;
+    }
 }

@@ -2,10 +2,14 @@ package com.moirae.rosettaflow.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.Organization;
+import com.moirae.rosettaflow.req.KeyWorkPageReq;
 import com.moirae.rosettaflow.req.organization.DelIpPortBindReq;
 import com.moirae.rosettaflow.req.organization.IpPortBindReq;
 import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.utils.ConvertUtils;
+import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.organization.OrganizationVo;
 import io.swagger.annotations.Api;
@@ -30,6 +34,14 @@ public class OrganizationController {
 
     @Resource
     private OrganizationService organizationService;
+
+    @GetMapping("listOrgInfoByName")
+    @ApiOperation(value = "查询组织列表（按名称）", notes = "查询组织列表（按名称）")
+    public ResponseVo<PageVo<OrganizationVo>> listOrgInfoByName(@Valid KeyWorkPageReq keyWorkPageReq) {
+        IPage<Organization> page = organizationService.listOrgInfoByName(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
+        List<OrganizationVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), OrganizationVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    }
 
     @GetMapping("list")
     @ApiOperation(value = "查询用户绑定的组织列表", notes = "查询用户绑定的组织列表")

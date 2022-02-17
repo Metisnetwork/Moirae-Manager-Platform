@@ -21,14 +21,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 同步组织状态定时任务
- *
- * @author hudenian
- * @date 2021/8/23
+ * 数据中心的组织同步
  */
 @Slf4j
 @Component
-public class SyncOrganizationStatusTask {
+public class SyncDcOrgTask {
 
     @Resource
     private SysConfig sysConfig;
@@ -41,7 +38,7 @@ public class SyncOrganizationStatusTask {
     private IDataSyncService dataSyncService;
 
     @Scheduled(fixedDelay = 5 * 1000)
-    @Lock(keys = "SyncOrganizationStatusTask")
+    @Lock(keys = "SyncDcOrgTask")
     public void run() {
         long begin = DateUtil.current();
         try {

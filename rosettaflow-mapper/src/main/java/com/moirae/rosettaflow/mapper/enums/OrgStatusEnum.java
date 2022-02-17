@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.mapper.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OrgStatusEnum {
 
@@ -8,6 +9,7 @@ public enum OrgStatusEnum {
     NonNormal(2);
 
     @EnumValue
+    @JsonValue
     private Integer value;
     OrgStatusEnum(Integer value) {
         this.value = value;

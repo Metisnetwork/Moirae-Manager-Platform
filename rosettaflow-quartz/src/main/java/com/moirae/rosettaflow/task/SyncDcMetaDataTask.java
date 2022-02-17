@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class SyncMetaDataTask {
+public class SyncDcMetaDataTask {
 
     @Resource
     private SysConfig sysConfig;
@@ -52,7 +52,7 @@ public class SyncMetaDataTask {
     private IDataSyncService dataSyncService;
 
     @Scheduled(fixedDelay = 5 * 1000)
-    @Lock(keys = "SyncMetaDataTask")
+    @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
         try {

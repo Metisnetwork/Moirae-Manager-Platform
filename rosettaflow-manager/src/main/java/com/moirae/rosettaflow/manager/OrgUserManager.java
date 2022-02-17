@@ -2,11 +2,11 @@ package com.moirae.rosettaflow.manager;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.Organization;
-import com.moirae.rosettaflow.mapper.domain.UserOrg;
+import com.moirae.rosettaflow.mapper.domain.OrgUser;
 
 import java.util.List;
 
-public interface UserOrgManager extends IService<UserOrg> {
+public interface OrgUserManager extends IService<OrgUser> {
 
     List<String> getIdentityIdListByUser(String address);
 

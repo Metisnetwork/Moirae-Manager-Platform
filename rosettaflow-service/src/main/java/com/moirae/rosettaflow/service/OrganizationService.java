@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.Organization;
 import io.grpc.ManagedChannel;
@@ -92,4 +93,14 @@ public interface OrganizationService {
      * @param identityId
      */
     void deleteOrganizationByUser(String identityId);
+
+    /**
+     * 通过节点名称查询组织列表，排序方式按照名称
+     *
+     * @param current
+     * @param size
+     * @param keyword
+     * @return
+     */
+    IPage<Organization> listOrgInfoByName(Long current, Long size, String keyword);
 }
