@@ -96,6 +96,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public List<String> getUsableIdentityIdList() {
+        return orgExpandManager.getUsableIdentityIdList();
+    }
+
+    @Override
     public boolean isEffective(String identityId) {
         LambdaQueryWrapper<Org> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(Org::getIdentityId, identityId);

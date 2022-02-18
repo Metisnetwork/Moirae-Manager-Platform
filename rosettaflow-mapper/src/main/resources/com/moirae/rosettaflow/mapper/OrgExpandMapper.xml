@@ -9,6 +9,11 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     </resultMap>
+    <select id="getUsableIdentityIdList" resultType="java.lang.String">
+        select o.identity_id
+        from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
+        where o.status = 1;
+    </select>
 
 
 </mapper>

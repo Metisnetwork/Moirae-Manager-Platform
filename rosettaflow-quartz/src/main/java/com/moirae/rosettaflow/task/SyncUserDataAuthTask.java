@@ -44,7 +44,7 @@ public class SyncUserDataAuthTask {
     @Resource
     private IDataSyncService dataSyncService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncUserDataAuthTask")
     public void run() {
         long begin = DateUtil.current();

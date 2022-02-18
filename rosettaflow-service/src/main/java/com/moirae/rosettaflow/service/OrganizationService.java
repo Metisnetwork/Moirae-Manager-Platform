@@ -24,11 +24,18 @@ public interface OrganizationService {
     ManagedChannel getChannel(String identityId);
 
     /**
-     * 获得可用的组织标识
+     * 获得可用的组织标识(状态正常)
      *
      * @return
      */
     List<String> getEffectiveIdentityIdList();
+
+    /**
+     * 获得可用并可连接的组织标识(状态正常 & 设置ip)
+     *
+     * @return
+     */
+    List<String> getUsableIdentityIdList();
 
     /**
      * 组织是否可用

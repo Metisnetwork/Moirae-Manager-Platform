@@ -3,6 +3,8 @@ package com.moirae.rosettaflow.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
+import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,7 +36,7 @@ public class Task implements Serializable {
     /**
      * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址
      */
-    private Integer userType;
+    private UserTypeEnum userType;
 
     /**
      * 需要的内存, 字节
@@ -104,7 +106,7 @@ public class Task implements Serializable {
     /**
      * 任务状态, 0:未知;1:等待中;2:计算中,3:失败;4:成功
      */
-    private Integer status;
+    private TaskStatusEnum status;
 
     /**
      * 任务状态说明

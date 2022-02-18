@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(AGa8GMvGChjAkY17AmQE4g==)
     password: ENC(bWqYB1AVri0/bQrC7ta4IZme9ib22Bge)
-    url: jdbc:mysql://192.168.120.137:17000/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.10.145:17000/db_moirae_031?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -43,14 +43,14 @@ system:
     batchSize: 1000
     # 公共组织信息
     publicOrgList:
-      - identity: identity:a61ae3d0ec404919b97142e1fc371256
-        host: 39.101.171.59
+      - identity: identity:e9eef460ea9c473993c6477915106eed
+        host: 192.168.10.150
         port: 10033
-      - identity: identity:ead8cf7faddc41afb294d309633dec03
-        host: 39.103.144.123
+      - identity: identity:3ddb63047d214ddd8187438a82841250
+        host: 192.168.10.151
         port: 10033
-      - identity: identity:447160e8e94e4658b090a68e1325a5a3
-        host: 39.101.141.143
+      - identity: identity:f614f8ac21b44fe89926ad4f26ef5b07
+        host: 192.168.10.152
         port: 10033
 grpc:
   client:
@@ -63,7 +63,7 @@ grpc:
 redisson:
   password: 123456
   singleServerConfig:
-    address: 192.168.120.137:17100
+    address: 192.168.10.145:17100
 #集群模式
 #redisson:
 #  model: CLUSTER

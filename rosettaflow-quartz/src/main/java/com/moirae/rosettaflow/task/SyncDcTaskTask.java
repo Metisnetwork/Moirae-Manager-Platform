@@ -1,24 +1,18 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
-import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
-import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
-import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
-import com.moirae.rosettaflow.grpc.service.TaskPowerSupplier;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailShowDto;
 import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
-import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
+import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
+import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
 import com.moirae.rosettaflow.service.IDataSyncService;
-import com.moirae.rosettaflow.service.MetaDataService;
 import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -39,19 +33,19 @@ public class SyncDcTaskTask {
 
     @Resource
     private GrpcTaskService grpcTaskService;
-
     @Resource
     private OrganizationService organizationService;
-
     @Resource
     private IDataSyncService dataSyncService;
+    @Resource
+    private TaskService taskService;
 
     @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcTaskTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<String> identityIdList = organizationService.getEffectiveIdentityIdList();
+            List<String> identityIdList = organizationService.getUsableIdentityIdList();
             for (String identityId : identityIdList) {
                 dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "-" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                         (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
@@ -117,7 +111,7 @@ public class SyncDcTaskTask {
             task.setId(information.getTaskId());
             task.setTaskName(information.getTaskName());
             task.setUserId(information.getUser());
-            task.setUserType(information.getUserType());
+            task.setUserType(UserTypeEnum.find(information.getUserType()));
             task.setRequiredMemory(information.getOperationCost().getMemory());
             task.setRequiredCore(information.getOperationCost().getProcessor());
             task.setRequiredBandwidth(information.getOperationCost().getBandwidth());
@@ -127,10 +121,9 @@ public class SyncDcTaskTask {
             task.setCreateAt(new Date(information.getCreateAt()));
             task.setStartAt(new Date(information.getStartAt()));
             task.setEndAt(information.getEndAt() == null || information.getEndAt() == 0 ? null : new Date(information.getEndAt()));
-            task.setStatus(information.getState());
+            task.setStatus(TaskStatusEnum.find(information.getState()));
             taskList.add(task);
         });
-
-
+        taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);
     }
 }
