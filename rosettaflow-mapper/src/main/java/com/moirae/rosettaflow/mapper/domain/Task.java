@@ -1,0 +1,136 @@
+package com.moirae.rosettaflow.mapper.domain;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * dc_task
+ * @author
+ */
+@Data
+@TableName(value = "dc_task")
+public class Task implements Serializable {
+    /**
+     * 任务ID,hash
+     */
+    @TableId
+    private String id;
+
+    /**
+     * 任务名称
+     */
+    private String taskName;
+
+    /**
+     * 发起任务的用户的信息 (task是属于用户的)
+     */
+    private String userId;
+
+    /**
+     * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址
+     */
+    private Integer userType;
+
+    /**
+     * 需要的内存, 字节
+     */
+    private Long requiredMemory;
+
+    /**
+     * 需要的core
+     */
+    private Integer requiredCore;
+
+    /**
+     * 需要的带宽, bps
+     */
+    private Long requiredBandwidth;
+
+    /**
+     * 需要的时间, milli seconds
+     */
+    private Long requiredDuration;
+
+    /**
+     * 任务创建者组织身份ID
+     */
+    private String ownerIdentityId;
+
+    /**
+     * 任务参与方在本次任务中的唯一识别ID
+     */
+    private String ownerPartyId;
+
+    /**
+     * 任务创建时间，精确到毫秒
+     */
+    private Date createAt;
+
+    /**
+     * 任务开始执行时间，精确到毫秒
+     */
+    private Date startAt;
+
+    /**
+     * 任务结束时间，精确到毫秒
+     */
+    private Date endAt;
+
+    /**
+     * 使用的内存, 字节
+     */
+    private Long usedMemory;
+
+    /**
+     * 使用的core
+     */
+    private Integer usedCore;
+
+    /**
+     * 使用的带宽, bps
+     */
+    private Long usedBandwidth;
+
+    /**
+     * 使用的所有数据大小，字节
+     */
+    private Long usedFileSize;
+
+    /**
+     * 任务状态, 0:未知;1:等待中;2:计算中,3:失败;4:成功
+     */
+    private Integer status;
+
+    /**
+     * 任务状态说明
+     */
+    private String statusDesc;
+
+    /**
+     * 任务描述
+     */
+    private String remarks;
+
+    /**
+     * 任务签名
+     */
+    private String taskSign;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @TableField(update = "now()")
+    private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.TaskMetaDataColumnMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.TaskMetaDataColumn">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <id column="meta_data_id" jdbcType="VARCHAR" property="metaDataId" />
+        <id column="selected_column_idx" jdbcType="INTEGER" property="selectedColumnIdx" />
+    </resultMap>
+
+</mapper>

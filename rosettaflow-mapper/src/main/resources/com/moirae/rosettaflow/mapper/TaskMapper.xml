@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.TaskMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.Task">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="task_name" jdbcType="VARCHAR" property="taskName" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="user_type" jdbcType="INTEGER" property="userType" />
+        <result column="required_memory" jdbcType="BIGINT" property="requiredMemory" />
+        <result column="required_core" jdbcType="INTEGER" property="requiredCore" />
+        <result column="required_bandwidth" jdbcType="BIGINT" property="requiredBandwidth" />
+        <result column="required_duration" jdbcType="BIGINT" property="requiredDuration" />
+        <result column="owner_identity_id" jdbcType="VARCHAR" property="ownerIdentityId" />
+        <result column="owner_party_id" jdbcType="VARCHAR" property="ownerPartyId" />
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt" />
+        <result column="start_at" jdbcType="TIMESTAMP" property="startAt" />
+        <result column="end_at" jdbcType="TIMESTAMP" property="endAt" />
+        <result column="used_memory" jdbcType="BIGINT" property="usedMemory" />
+        <result column="used_core" jdbcType="INTEGER" property="usedCore" />
+        <result column="used_bandwidth" jdbcType="BIGINT" property="usedBandwidth" />
+        <result column="used_file_size" jdbcType="BIGINT" property="usedFileSize" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="status_desc" jdbcType="VARCHAR" property="statusDesc" />
+        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <result column="task_sign" jdbcType="VARCHAR" property="taskSign" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, task_name, user_id, user_type, required_memory, required_core, required_bandwidth,
+    required_duration, owner_identity_id, owner_party_id, create_at, start_at, end_at,
+    used_memory, used_core, used_bandwidth, used_file_size, `status`, status_desc, remarks,
+    task_sign, create_time, update_time
+    </sql>
+</mapper>
