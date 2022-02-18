@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.TaskPowerProviderMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.TaskPowerProvider">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <id column="identity_id" jdbcType="VARCHAR" property="identityId" />
+        <result column="party_id" jdbcType="VARCHAR" property="partyId" />
+        <result column="used_memory" jdbcType="BIGINT" property="usedMemory" />
+        <result column="used_core" jdbcType="INTEGER" property="usedCore" />
+        <result column="used_bandwidth" jdbcType="BIGINT" property="usedBandwidth" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        task_id, identity_id, party_id, used_memory, used_core, used_bandwidth
+    </sql>
+</mapper>

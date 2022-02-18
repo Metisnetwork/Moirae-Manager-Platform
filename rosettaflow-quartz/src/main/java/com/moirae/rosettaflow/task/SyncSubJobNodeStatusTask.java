@@ -36,7 +36,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private OrganizationService organizationService;
 
-    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.queryUnConfirmedWorkflowRunTaskStatus();
@@ -54,7 +54,7 @@ public class SyncSubJobNodeStatusTask {
         //获取所有任务详情
         for (String identityId: channelTaskSetMap.keySet()) {
             Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
-            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "-" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "--" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcTaskService.getTaskDetailList(organizationService.getChannel(identityId), latestSynced);
                     },
