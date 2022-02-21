@@ -32,4 +32,91 @@
     used_memory, used_core, used_bandwidth, used_file_size, `status`, status_desc, remarks,
     task_sign, create_time, update_time
     </sql>
+    <select id="listTaskByIdentityId" resultType="com.moirae.rosettaflow.dto.TaskDto">
+        select t.id,
+               t.task_name,
+               t.start_at,
+               t.end_at,
+               temp.taskSponsor,
+               temp.powerProvider,
+               temp.dataProvider,
+               temp.resultConsumer,
+               temp.algoProvider
+        from dc_task t
+        join
+             (
+                 select tmp.task_id,
+                        sum(tmp.taskSponsor) as taskSponsor,
+                        sum(tmp.powerProvider) as powerProvider ,
+                        sum(tmp.dataProvider) as dataProvider,
+                        sum(tmp.resultConsumer) as resultConsumer,
+                        sum(tmp.algoProvider) as algoProvider
+                 from
+                     (
+                         select tk.owner_identity_id as identity_id,
+                                tk.id as task_id,
+                                true taskSponsor,
+                                false as powerProvider,
+                                false as dataProvider,
+                                false as resultConsumer,
+                                false algoProvider
+                         from dc_task tk
+                         where tk.owner_identity_id = #{identityId,jdbcType=VARCHAR}
+
+                         union
+
+                         select tap.identity_id,
+                                tap.task_id,
+                                false taskSponsor,
+                                false as powerProvider,
+                                false as dataProvider,
+                                false as resultConsumer,
+                                true algoProvider
+                         from dc_task_algo_provider tap
+                         where tap.identity_id = #{identityId,jdbcType=VARCHAR}
+
+                         union
+
+                         select tpp.identity_id,
+                                tpp.task_id,
+                                false taskSponsor,
+                                true as powerProvider,
+                                false as dataProvider,
+                                false as resultConsumer,
+                                false algoProvider
+                         from dc_task_power_provider tpp
+                         WHERE tpp.identity_id= #{identityId,jdbcType=VARCHAR}
+
+                         union
+
+                         select tmd.identity_id,
+                                tmd.task_id,
+                                false taskSponsor,
+                                false as powerProvider,
+                                true as dataProvider,
+                                false as resultConsumer,
+                                false algoProvider
+                         from dc_task_data_provider tmd
+                         where tmd.identity_id= #{identityId,jdbcType=VARCHAR}
+
+
+                         union
+
+                         select distinct trc.consumer_identity_id as identity_id,
+                                         trc.task_id,
+                                         false taskSponsor,
+                                         false as powerProvider,
+                                         false as dataProvider,
+                                         true as resultConsumer,
+                                         false algoProvider
+                         from dc_task_result_consumer trc
+                         where trc.consumer_identity_id = #{identityId,jdbcType=VARCHAR}
+
+                     ) tmp
+                 group by tmp.task_id
+             ) temp on t.id = temp.task_id
+        order by t.create_at desc
+
+
+    </select>
 </mapper>

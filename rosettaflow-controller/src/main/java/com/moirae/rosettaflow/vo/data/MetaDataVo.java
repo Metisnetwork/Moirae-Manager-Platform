@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.vo.data;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -79,4 +78,25 @@ public class MetaDataVo {
 
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "数据文件ID,hash")
+    private String originId;
+
+    @ApiModelProperty(value = "文件名称")
+    private String fileName;
+
+    @ApiModelProperty(value = "发布时间，精确到毫秒")
+    private Date publishedAt;
+
+    @ApiModelProperty(value = "数据描述")
+    private String remarks;
+
+    @ApiModelProperty(value = "元数据的状态 (0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表)")
+    private MetaDataStatusEnum status;
+
+    @ApiModelProperty(value = "(状态)修改时间")
+    private Date updateAt;
+
+    @ApiModelProperty(value = "参与任务的数据")
+    private Integer taskCount;
 }

@@ -11,4 +11,8 @@ public interface OrgMapper extends BaseMapper<Org> {
     IPage<OrganizationDto> listOrgInfoByNameOrderByTotalDataDesc(String keyword, Page<OrganizationDto> page);
 
     IPage<OrganizationDto> listOrgInfoByNameOrderByActivityDesc(String keyword, Page<OrganizationDto> page);
+
+    IPage<OrganizationDto> listOrgInfoByNameOrderByMemoryDesc(String keyword, Page<OrganizationDto> page);
+
+    OrganizationDto findOrgInfoDetail(String identityId);
 }

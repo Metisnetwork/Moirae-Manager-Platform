@@ -1,7 +1,7 @@
 package com.moirae.rosettaflow.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.MetaDataDtoOld;
 import com.moirae.rosettaflow.mapper.domain.MetaDataOld;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,7 +23,7 @@ public interface MetaDataOldMapper extends BaseMapper<MetaDataOld> {
      * @param address address
      * @return 元数据列表
      */
-    List<MetaDataDto> getAllAuthTables(@Param("identityId") String identityId, @Param("address") String address);
+    List<MetaDataDtoOld> getAllAuthTables(@Param("identityId") String identityId, @Param("address") String address);
 
     /**
      * 批量插入元数据信息

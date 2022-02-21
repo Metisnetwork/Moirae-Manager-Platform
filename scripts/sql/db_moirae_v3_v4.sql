@@ -167,3 +167,195 @@ CREATE TABLE `dc_power_server` (
     KEY `update_at` (`update_at`)
 ) ENGINE=InnoDB COMMENT='计算服务信息';
 
+-- 创建首页统计 view
+create or replace view v_global_stats as
+select allOrg.total_org_count, powerOrg.power_org_count, srcFile.data_file_size, usedFile.used_data_file_size,
+       task.task_count, (partner.partner_count + task.task_count) as partner_count, power.total_core, power.total_memory, power.total_bandwidth
+from
+--  总组织数
+(
+    select count(*) as total_org_count
+    from dc_org where status= 1
+) allOrg,
+
+-- 算力参与方数
+(
+    select count(oi.identity_id) as power_org_count
+    from dc_org oi
+    where EXISTS (select 1 from dc_power_server ps where oi.identity_id = ps.identity_id and ps.status in (2, 3))
+      and status = 1
+
+) powerOrg,
+
+-- 上传数据量
+(
+    select IFNULL(sum(size),0) as data_file_size
+    from dc_meta_data where status=2
+) srcFile,
+
+-- 交易数据量
+(
+    select ifnull(sum(df.size),0) as used_data_file_size
+    from dc_task_data_provider tmd
+             left join dc_meta_data df on tmd.meta_data_id = df.meta_data_id
+) usedFile,
+
+-- 完成任务数
+(
+    select count(*) as task_count
+    from dc_task
+) task,
+
+-- 参与任务总人次：发起人（一个任务一个发起人，所以发起人次数就是taskCount），算力提供者，数据提供者，或者结果消费者，算法提供者
+(
+    select ifnull(dataPartner.dataPartnerCount,0) + ifnull(powerPartner.powerPartnerCount,0) + ifnull(algoPartner.algoPartnerCount,0)  + ifnull(resultConsumerPartner.resultConsumerPartnerCount,0) as partner_count
+    from
+        (
+            select count(*) as dataPartnerCount
+            from dc_task_data_provider
+        ) dataPartner,
+        (
+            select count(*) as powerPartnerCount
+            from dc_task_power_provider
+        ) powerPartner,
+        (
+            select count(*) as algoPartnerCount
+            from dc_task_algo_provider
+        ) algoPartner,
+        (
+            select count(*) as resultConsumerPartnerCount
+            from dc_task_result_consumer
+        ) resultConsumerPartner
+
+) as partner,
+
+-- 总算力
+(
+    select ifnull(sum(p.core),0) as total_core, ifnull(sum(p.memory),0) as total_memory, ifnull(sum(p.bandwidth),0) as total_bandwidth
+    from dc_power_server p inner join dc_org o on p.identity_id = o.identity_id
+    where o.`status` = 1 and p.`status` in (2, 3)
+) as power;
+
+-- 组织参与任务数统计 view （统计组织在任务中的角色是：发起人， 算法提供方，算力提供者，数据提供者，结果消费者）
+create or replace view v_org_daily_task_stats as
+select tmp.identity_id, count(tmp.task_id) as task_count, date(t.create_at) as task_date
+from
+    (
+
+        select oi.identity_id, t.id as task_id
+        from dc_org oi, dc_task t
+        WHERE oi.identity_id = t.owner_identity_id
+
+        union
+
+        select oi.identity_id, tap.task_id as task_id
+        from dc_org oi, dc_task_algo_provider tap
+        WHERE oi.identity_id = tap.identity_id
+
+        union
+
+        select oi.identity_id, tpp.task_id
+        from  dc_org oi, dc_task_power_provider tpp
+        WHERE oi.identity_id = tpp.identity_id
+
+        union
+
+        select oi.identity_id, tmd.task_id
+        from dc_org oi, dc_task_data_provider tmd
+        WHERE oi.identity_id = tmd.identity_id
+
+        union
+
+        select oi.identity_id, trc.task_id
+        from dc_org oi, dc_task_result_consumer trc
+        WHERE oi.identity_id = trc.consumer_identity_id
+
+    ) tmp, dc_task t
+where tmp.task_id = t.id
+group by tmp.identity_id, task_date;
+
+
+-- 创建元数据月统计视图
+CREATE OR REPLACE VIEW v_data_file_stats_monthly as
+SELECT a.stats_time, a.month_size, SUM(b.month_size) AS accu_size
+FROM (
+         SELECT DATE_FORMAT(df.published_at, '%Y-%m')  as stats_time, sum(df.size) as month_size
+         FROM dc_meta_data df
+         WHERE df.status=2
+         GROUP BY DATE_FORMAT(df.published_at, '%Y-%m')
+         ORDER BY DATE_FORMAT(df.published_at, '%Y-%m')
+     ) a
+         JOIN (
+    SELECT DATE_FORMAT(df.published_at, '%Y-%m')  as stats_time, sum(df.size) as month_size
+    FROM dc_meta_data df
+    WHERE df.status=2
+    GROUP BY DATE_FORMAT(df.published_at, '%Y-%m')
+    ORDER BY DATE_FORMAT(df.published_at, '%Y-%m')
+) b
+              ON a.stats_time >= b.stats_time
+GROUP BY a.stats_time
+ORDER BY a.stats_time;
+
+-- 创建元数据日统计视图
+CREATE OR REPLACE VIEW v_data_file_stats_daily as
+SELECT a.stats_time, a.day_size, SUM(b.day_size) AS accu_size
+FROM (
+         SELECT DATE(df.published_at) as stats_time, sum(df.size) as day_size
+         FROM dc_meta_data df
+         WHERE df.status=2
+         GROUP BY DATE(df.published_at)
+         ORDER BY DATE(df.published_at)
+     ) a
+         JOIN (
+    SELECT DATE(df.published_at) as stats_time, sum(df.size) as day_size
+    FROM dc_meta_data df
+    WHERE df.status=2
+    GROUP BY DATE(df.published_at)
+    ORDER BY DATE(df.published_at)
+) b
+              ON a.stats_time >= b.stats_time
+GROUP BY a.stats_time
+ORDER BY a.stats_time;
+
+-- 创建算力月统计视图
+CREATE OR REPLACE VIEW v_power_stats_monthly as
+SELECT a.stats_time, a.month_core, a.month_memory, a.month_bandwidth, SUM(b.month_core) AS accu_core, SUM(b.month_memory) AS accu_memory, SUM(b.month_bandwidth) AS accu_bandwidth
+FROM (
+         SELECT DATE_FORMAT(ps.published_at, '%Y-%m')  as stats_time, sum(ps.core) as month_core, sum(ps.memory) as month_memory, sum(ps.bandwidth) as month_bandwidth
+         FROM dc_power_server ps
+         WHERE ps.status=2 or ps.status=3
+         GROUP BY DATE_FORMAT(ps.published_at, '%Y-%m')
+         ORDER BY DATE_FORMAT(ps.published_at, '%Y-%m')
+     ) a
+         JOIN (
+    SELECT DATE_FORMAT(ps.published_at, '%Y-%m')  as stats_time, sum(ps.core) as month_core, sum(ps.memory) as month_memory, sum(ps.bandwidth) as month_bandwidth
+    FROM dc_power_server ps
+    WHERE ps.status=2 or ps.status=3
+    GROUP BY DATE_FORMAT(ps.published_at, '%Y-%m')
+    ORDER BY DATE_FORMAT(ps.published_at, '%Y-%m')
+) b
+              ON a.stats_time >= b.stats_time
+GROUP BY a.stats_time
+ORDER BY a.stats_time;
+
+
+-- 创建算力日统计视图
+CREATE OR REPLACE VIEW v_power_stats_daily as
+SELECT a.stats_time, a.day_core, a.day_memory, a.day_bandwidth, SUM(b.day_core) AS accu_core, SUM(b.day_memory) AS accu_memory, SUM(b.day_bandwidth) AS accu_bandwidth
+FROM (
+         SELECT DATE(ps.published_at)  as stats_time, sum(ps.core) as day_core, sum(ps.memory) as day_memory, sum(ps.bandwidth) as day_bandwidth
+         FROM dc_power_server ps
+         WHERE ps.status=2 or ps.status=3
+         GROUP BY DATE(ps.published_at)
+         ORDER BY DATE(ps.published_at)
+     ) a
+         JOIN (
+    SELECT DATE(ps.published_at)  as stats_time, sum(ps.core) as day_core, sum(ps.memory) as day_memory, sum(ps.bandwidth) as day_bandwidth
+    FROM dc_power_server ps
+    WHERE ps.status=2 or ps.status=3
+    GROUP BY DATE(ps.published_at)
+    ORDER BY DATE(ps.published_at)
+) b
+              ON a.stats_time >= b.stats_time
+GROUP BY a.stats_time
+ORDER BY a.stats_time;

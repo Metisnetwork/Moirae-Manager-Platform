@@ -46,4 +46,11 @@ public class MetaDataColumnsVo {
 
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "列索引")
+    private Integer columnIdx;
+
+    @ApiModelProperty(value = "列描述")
+    private String remarks;
+
 }

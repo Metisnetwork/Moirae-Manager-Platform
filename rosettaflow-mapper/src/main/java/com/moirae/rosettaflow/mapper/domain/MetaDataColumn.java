@@ -40,11 +40,6 @@ public class MetaDataColumn implements Serializable {
     private String remarks;
 
     /**
-     * 是否公开的, true/false
-     */
-    private Boolean published;
-
-    /**
      * 创建时间
      */
     private Date createTime;

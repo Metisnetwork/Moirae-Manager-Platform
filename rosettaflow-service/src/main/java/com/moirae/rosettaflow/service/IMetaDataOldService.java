@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.MetaDataDtoOld;
 import com.moirae.rosettaflow.mapper.domain.MetaDataOld;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public interface IMetaDataOldService extends IService<MetaDataOld> {
      * @param dataName 元数据名称
      * @return 分页数据
      */
-    IPage<MetaDataDto> list(Long current, Long size, String dataName);
+    IPage<MetaDataDtoOld> list(Long current, Long size, String dataName);
 
     /**
      * 获取元数据详情
@@ -35,7 +35,7 @@ public interface IMetaDataOldService extends IService<MetaDataOld> {
      * @param userMetaDataId 用户授权数据表Id
      * @return 元数据详情
      */
-    MetaDataDto detail(Long metaDataPkId, Long userMetaDataId);
+    MetaDataDtoOld detail(Long metaDataPkId, Long userMetaDataId);
 
     /**
      * 获取元数据通过ID
@@ -51,7 +51,7 @@ public interface IMetaDataOldService extends IService<MetaDataOld> {
      * @param identityId identityId
      * @return 元数据列表
      */
-    List<MetaDataDto> getAllAuthTables(String identityId);
+    List<MetaDataDtoOld> getAllAuthTables(String identityId);
 
     /**
      * 批量更新数据

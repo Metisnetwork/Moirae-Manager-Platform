@@ -25,4 +25,59 @@
     `size`, `rows`, `columns`, published_at, has_title, remarks, `status`, update_at,
     create_time, update_time
     </sql>
+    <select id="listDataFileByIdentityId" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select df.meta_data_id,
+               df.origin_id,
+               df.identity_id,
+               df.file_name,
+               df.file_path,
+               df.file_type,
+               df.industry,
+               df.size,
+               df.rows,
+               df.columns,
+               df.published_at,
+               df.has_title,
+               df.remarks,
+               df.status,
+               df.update_at,
+               ifnull(t.task_count,0) task_count
+        from dc_meta_data df
+        left join
+             (
+                 select tmd.meta_data_id,
+                        count(tmd.task_id) as task_count
+                 from dc_task_data_provider tmd
+                 group by tmd.meta_data_id
+             ) t on df.meta_data_id = t.meta_data_id
+        where df.identity_id = #{identityId,jdbcType=VARCHAR} and df.status = 2
+        order by df.published_at desc
+    </select>
+    <select id="getDataFile" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select df.meta_data_id,
+               df.origin_id,
+               df.identity_id,
+               df.file_name,
+               df.file_path,
+               df.file_type,
+               df.industry,
+               df.size,
+               df.rows,
+               df.columns,
+               df.published_at,
+               df.has_title,
+               df.remarks,
+               df.status,
+               df.update_at,
+               ifnull(t.task_count,0) AS task_count
+        from dc_meta_data df
+        left join
+             (
+                 select tmd.meta_data_id,
+                        count(tmd.task_id) as task_count
+                 from dc_task_data_provider tmd
+                 group by tmd.meta_data_id
+             ) t on df.meta_data_id = t.meta_data_id
+        where df.meta_data_id = #{metaDataId,jdbcType=VARCHAR}
+    </select>
 </mapper>

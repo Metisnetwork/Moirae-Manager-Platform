@@ -11,4 +11,8 @@ public interface OrgManager extends IService<Org> {
     IPage<OrganizationDto> listOrgInfoByNameOrderByTotalDataDesc(Page<OrganizationDto> page, String keyword);
 
     IPage<OrganizationDto> listOrgInfoByNameOrderByActivityDesc(Page<OrganizationDto> page, String keyword);
+
+    IPage<OrganizationDto> listOrgInfoByNameOrderByMemoryDesc(Page<OrganizationDto> page, String keyword);
+
+    OrganizationDto findOrgInfoDetail(String identityId);
 }

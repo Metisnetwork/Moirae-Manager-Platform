@@ -34,11 +34,11 @@
         TRUNCATE TABLE t_meta_data
     </update>
 
-    <resultMap id="BaseResultMap_With_Auth" type="com.moirae.rosettaflow.dto.MetaDataDto" extends="BaseResultMap">
+    <resultMap id="BaseResultMap_With_Auth" type="com.moirae.rosettaflow.dto.MetaDataDtoOld" extends="BaseResultMap">
         <result column="auth_status" property="authStatus" jdbcType="TINYINT"/>
     </resultMap>
 
-    <select id="getAllAuthTables" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+    <select id="getAllAuthTables" resultType="com.moirae.rosettaflow.dto.MetaDataDtoOld">
         SELECT DISTINCT
             md.meta_data_id,
             md.identity_id,

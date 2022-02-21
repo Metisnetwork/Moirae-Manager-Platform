@@ -23,4 +23,14 @@ public class OrgManagerImpl extends ServiceImpl<OrgMapper, Org> implements OrgMa
     public IPage<OrganizationDto> listOrgInfoByNameOrderByActivityDesc(Page<OrganizationDto> page, String keyword) {
         return this.baseMapper.listOrgInfoByNameOrderByActivityDesc(keyword, page);
     }
+
+    @Override
+    public IPage<OrganizationDto> listOrgInfoByNameOrderByMemoryDesc(Page<OrganizationDto> page, String keyword) {
+        return this.baseMapper.listOrgInfoByNameOrderByMemoryDesc(keyword, page);
+    }
+
+    @Override
+    public OrganizationDto findOrgInfoDetail(String identityId) {
+        return this.baseMapper.findOrgInfoDetail(identityId);
+    }
 }

@@ -130,4 +130,22 @@ public interface OrganizationService {
      * @return
      */
     IPage<OrganizationDto> listOrgInfoByNameOrderByActivityDesc(Long current, Long size, String keyword);
+
+    /**
+     * 查询组织列表
+     *
+     * @param current
+     * @param size
+     * @param keyword
+     * @return
+     */
+    IPage<OrganizationDto> listOrgInfoByNameOrderByMemoryDesc(Long current, Long size, String keyword);
+
+    /**
+     * 查询组织详情
+     *
+     * @param identityId
+     * @return
+     */
+    OrganizationDto findOrgInfoDetail(String identityId);
 }

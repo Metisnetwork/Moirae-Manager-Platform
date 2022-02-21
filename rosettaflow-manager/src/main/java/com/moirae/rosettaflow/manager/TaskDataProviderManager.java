@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.TaskAlgoProvider;
 import com.moirae.rosettaflow.mapper.domain.TaskDataProvider;
 
+import java.util.List;
+
 public interface TaskDataProviderManager extends IService<TaskDataProvider> {
 
+    List<TaskDataProvider> listByTaskId(String taskId);
 }

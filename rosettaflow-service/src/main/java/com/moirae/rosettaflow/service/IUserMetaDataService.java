@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.MetaDataDtoOld;
 import com.moirae.rosettaflow.dto.UserMetaDataDto;
 import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 
@@ -57,7 +57,7 @@ public interface IUserMetaDataService extends IService<UserMetaData> {
      * @param identityId 机构identityId
      * @return 已授权表
      */
-    List<MetaDataDto> getAllAuthTables(String identityId);
+    List<MetaDataDtoOld> getAllAuthTables(String identityId);
 
     /**
      * 根据metaDataId获取用户元数据

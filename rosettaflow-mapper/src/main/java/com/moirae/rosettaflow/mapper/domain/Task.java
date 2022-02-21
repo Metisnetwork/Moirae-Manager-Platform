@@ -3,12 +3,14 @@ package com.moirae.rosettaflow.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * dc_task
@@ -135,4 +137,34 @@ public class Task implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 任务发起者
+     */
+    @TableField(exist = false)
+    private OrganizationDto sponsor;
+
+    /**
+     * 任务算法提供者
+     */
+    @TableField(exist = false)
+    private TaskAlgoProvider taskAlgoProvider;
+
+    /**
+     * 任务结果接收者
+     */
+    @TableField(exist = false)
+    private List<TaskResultConsumer> taskResultReceiverList;
+
+    /**
+     * 任务算法提供者
+     */
+    @TableField(exist = false)
+    private List<TaskPowerProvider> taskPowerProviderList;
+
+    /**
+     * 任务数据提供者
+     */
+    @TableField(exist = false)
+    private List<TaskDataProvider> taskDataProviderList;
 }

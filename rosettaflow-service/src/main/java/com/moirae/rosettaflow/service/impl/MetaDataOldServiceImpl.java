@@ -11,7 +11,7 @@ import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
-import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.MetaDataDtoOld;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.mapper.MetaDataOldMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaDataOld;
@@ -49,7 +49,7 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
     }
 
     @Override
-    public IPage<MetaDataDto> list(Long current, Long size, String dataName) {
+    public IPage<MetaDataDtoOld> list(Long current, Long size, String dataName) {
         Page<MetaDataOld> page = new Page<>(current, size);
         LambdaQueryWrapper<MetaDataOld> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaDataOld::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
@@ -70,14 +70,14 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
     }
 
     @Override
-    public MetaDataDto detail(Long metaDataPkId, Long userMetaDataId) {
+    public MetaDataDtoOld detail(Long metaDataPkId, Long userMetaDataId) {
         // 查询元数据
         MetaDataOld metaData = this.getMetaDataById(metaDataPkId);
         if (Objects.isNull(metaData)) {
             log.error("query metaData fail by id:{}", metaDataPkId);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_NOT_EXIST.getMsg());
         }
-        MetaDataDto metaDataDto = new MetaDataDto();
+        MetaDataDtoOld metaDataDto = new MetaDataDtoOld();
         BeanCopierUtils.copy(metaData, metaDataDto);
         // 用户没有登录，不处理授权信息
         if (null == userMetaDataId ||  userMetaDataId == 0) {
@@ -120,7 +120,7 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
     }
 
     @Override
-    public List<MetaDataDto> getAllAuthTables(String identityId) {
+    public List<MetaDataDtoOld> getAllAuthTables(String identityId) {
         UserDto userDto = commonService.getCurrentUser();
         String address = userDto.getAddress();
         if (!StrUtil.startWith(address, AddressChangeUtils.HRP_ETH)) {
@@ -135,8 +135,8 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
         this.baseMapper.batchInsert(metaDataList);
     }
 
-    IPage<MetaDataDto> convertToPageDto(Page<MetaDataOld> page, List<UserMetaData> metaDataWithAuthList) {
-        List<MetaDataDto> records = new ArrayList<>();
+    IPage<MetaDataDtoOld> convertToPageDto(Page<MetaDataOld> page, List<UserMetaData> metaDataWithAuthList) {
+        List<MetaDataDtoOld> records = new ArrayList<>();
         Map<String, Byte> authStatusMap = new HashMap<>(metaDataWithAuthList.size());
         Map<String, Byte> authMetaValidMap = new HashMap<>(metaDataWithAuthList.size());
         Map<String, Long> authUserMetaDataPkId = new HashMap<>(metaDataWithAuthList.size());
@@ -146,7 +146,7 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
             authUserMetaDataPkId.put(dataAuth.getMetaDataId(), dataAuth.getId());
         }
         page.getRecords().forEach(r -> {
-            MetaDataDto m = new MetaDataDto();
+            MetaDataDtoOld m = new MetaDataDtoOld();
             BeanCopierUtils.copy(r, m);
             m.setAuthStatus(authStatusMap.containsKey(r.getMetaDataId()) ? authStatusMap.get(r.getMetaDataId()) : UserMetaDataAuditEnum.AUDIT_UNKNOWN.getValue());
             m.setAuthMetadataState(authMetaValidMap.containsKey(r.getMetaDataId()) ? authMetaValidMap.get(r.getMetaDataId()) : UserMetaDataAuthorithStateEnum.UNKNOWN.getValue());
@@ -154,7 +154,7 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
             records.add(m);
         });
 
-        IPage<MetaDataDto> pageDto = new Page<>();
+        IPage<MetaDataDtoOld> pageDto = new Page<>();
         pageDto.setCurrent(page.getCurrent());
         pageDto.setRecords(records);
         pageDto.setSize(page.getSize());

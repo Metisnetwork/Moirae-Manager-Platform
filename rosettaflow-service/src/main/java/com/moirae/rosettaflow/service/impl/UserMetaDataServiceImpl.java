@@ -13,7 +13,7 @@ import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
-import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.MetaDataDtoOld;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.dto.UserMetaDataDto;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
@@ -220,7 +220,7 @@ public class UserMetaDataServiceImpl extends ServiceImpl<UserMetaDataMapper, Use
     }
 
     @Override
-    public List<MetaDataDto> getAllAuthTables(String identityId) {
+    public List<MetaDataDtoOld> getAllAuthTables(String identityId) {
         return metaDataService.getAllAuthTables(identityId);
     }
 

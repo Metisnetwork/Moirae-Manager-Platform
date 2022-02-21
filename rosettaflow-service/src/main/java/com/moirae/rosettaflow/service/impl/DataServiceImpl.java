@@ -1,7 +1,11 @@
 package com.moirae.rosettaflow.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.manager.MetaDataColumnManager;
 import com.moirae.rosettaflow.manager.MetaDataManager;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
@@ -32,5 +36,25 @@ public class DataServiceImpl implements DataService {
         wrapper.in(MetaDataColumn::getMetaDataId, metaDataList.stream().map(MetaData::getMetaDataId).collect(Collectors.toSet()));
         metaDataColumnManager.remove(wrapper);
         metaDataColumnManager.saveBatch(metaDataColumnList);
+    }
+
+    @Override
+    public IPage<MetaDataDto> listDataFileByIdentityId(Long current, Long size, String identityId) {
+        Page<OrganizationDto> page = new Page<>(current, size);
+        return metaDataManager.listDataFileByIdentityId(page, identityId);
+    }
+
+    @Override
+    public MetaDataDto getDataFile(String metaDataId) {
+        return metaDataManager.getDataFile(metaDataId);
+    }
+
+    @Override
+    public IPage<MetaDataColumn> listMetaDataColumn(Long current, Long size, String metaDataId) {
+        Page<MetaDataColumn> page = new Page<>(current, size);
+        LambdaQueryWrapper<MetaDataColumn> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaDataColumn::getMetaDataId, metaDataId);
+        wrapper.orderByAsc(MetaDataColumn::getColumnIdx);
+        return metaDataColumnManager.page(page, wrapper);
     }
 }

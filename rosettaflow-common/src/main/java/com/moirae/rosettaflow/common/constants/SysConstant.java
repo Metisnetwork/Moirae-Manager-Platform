@@ -118,6 +118,9 @@ public class SysConstant {
             "data/pageList",
             "data/detail",
             "data/columnList",
+            "data/listDataFileByIdentityId",
+            "data/getDataFile",
+            "data/listMetaDataColumn",
             "algorithm/list",
             "algorithm/details",
             "projectTemplate/list",
@@ -126,7 +129,10 @@ public class SysConstant {
             "quartz",
             "org/listOrgInfoByName",
             "org/listOrgInfoByTotalData",
-            "org/listOrgInfoByActivity"
+            "org/listOrgInfoByActivity",
+            "org/listOrgInfoByMemory",
+            "org/findOrgInfo",
+            "task/listTaskByIdentityId"
     };
 
     /**

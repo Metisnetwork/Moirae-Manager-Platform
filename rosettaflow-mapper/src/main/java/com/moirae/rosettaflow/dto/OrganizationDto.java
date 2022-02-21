@@ -83,4 +83,29 @@ public class OrganizationDto implements Serializable {
      * 空闲的天数
      */
     private Integer idleDays;
+
+    /**
+     * 计算服务的总共内存
+     */
+    private Long totalMemory;
+
+    /**
+     * 计算服务的总带宽
+     */
+    private Long totalBandwidth;
+
+    /**
+     * 计算服务的总核数
+     */
+    private Integer totalCore;
+
+    /**
+     * 总算法数量
+     */
+    private Integer totalAlgo;
+
+    /**
+     * 参与任务数量
+     */
+    private Integer totalTask;
 }

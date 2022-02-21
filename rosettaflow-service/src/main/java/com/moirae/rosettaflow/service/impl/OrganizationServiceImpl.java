@@ -239,6 +239,18 @@ public class OrganizationServiceImpl implements OrganizationService {
         return page;
     }
 
+    @Override
+    public IPage<OrganizationDto> listOrgInfoByNameOrderByMemoryDesc(Long current, Long size, String keyword) {
+        Page<OrganizationDto> page = new Page<>(current, size);
+        orgManager.listOrgInfoByNameOrderByMemoryDesc(page, keyword);
+        return page;
+    }
+
+    @Override
+    public OrganizationDto findOrgInfoDetail(String identityId) {
+        return orgManager.findOrgInfoDetail(identityId);
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

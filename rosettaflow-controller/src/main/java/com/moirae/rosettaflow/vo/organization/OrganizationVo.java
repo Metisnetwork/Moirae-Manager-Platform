@@ -52,4 +52,19 @@ public class OrganizationVo {
 
     @ApiModelProperty(value = "空闲的天数")
     private Integer idleDays;
+
+    @ApiModelProperty(value = "计算服务的总共内存")
+    private Long totalMemory;
+
+    @ApiModelProperty(value = "计算服务的总带宽")
+    private Long totalBandwidth;
+
+    @ApiModelProperty(value = "计算服务的总核数")
+    private Integer totalCore;
+
+    @ApiModelProperty(value = "总算法数量")
+    private Integer totalAlgo;
+
+    @ApiModelProperty(value = "参与任务数量")
+    private Integer totalTask;
 }

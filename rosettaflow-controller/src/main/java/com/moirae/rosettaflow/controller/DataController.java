@@ -5,13 +5,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
-import com.moirae.rosettaflow.dto.MetaDataDetailsDto;
-import com.moirae.rosettaflow.dto.MetaDataDto;
-import com.moirae.rosettaflow.dto.UserMetaDataDto;
+import com.moirae.rosettaflow.dto.*;
+import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.req.data.*;
+import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.IMetaDataDetailsOldService;
 import com.moirae.rosettaflow.service.IMetaDataOldService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
+import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.data.*;
@@ -44,25 +45,47 @@ public class DataController {
 
     @Resource
     private IMetaDataOldService metaDataService;
-
     @Resource
     private IUserMetaDataService userMetaDataService;
-
     @Resource
     private IMetaDataDetailsOldService metaDataDetailsService;
+    @Resource
+    private DataService dataService;
 
+    @GetMapping("listMetaDataColumn")
+    @ApiOperation(value = "根据元数据ID,查询元数据的列定义", notes = "根据元数据ID,查询元数据的列定义")
+    public ResponseVo<PageVo<MetaDataColumnsVo>> listMetaDataColumn(@Valid MetaDataColumnByIdReq metaDataColumnByIdReq) {
+        IPage<MetaDataColumn> page = dataService.listMetaDataColumn(metaDataColumnByIdReq.getCurrent(), metaDataColumnByIdReq.getSize(), metaDataColumnByIdReq.getMetaDataId());
+        List<MetaDataColumnsVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), MetaDataColumnsVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    }
+
+    @GetMapping("getDataFile")
+    @ApiOperation(value = "根据元数据ID,查询数据文件信息(带参与任务数)", notes = "根据元数据ID,查询数据文件信息(带参与任务数)")
+    public ResponseVo<MetaDataVo> getDataFile(@Valid MetaDataByIdReq metaDataByIdReq) {
+        MetaDataDto metaDataDto = dataService.getDataFile(metaDataByIdReq.getMetaDataId());
+        return ResponseVo.createSuccess(BeanUtil.toBean(metaDataDto, MetaDataVo.class));
+    }
+
+    @GetMapping("listDataFileByIdentityId")
+    @ApiOperation(value = "查询某个组织的数据文件列表(带参与任务数)", notes = "查询某个组织的数据文件列表(带参与任务数)")
+    public ResponseVo<PageVo<MetaDataVo>> listMetadataByIdentityId(@Valid MetaDataByIdentityIdReq metaDataByIdentityIdReq) {
+        IPage<MetaDataDto> page = dataService.listDataFileByIdentityId(metaDataByIdentityIdReq.getCurrent(), metaDataByIdentityIdReq.getSize(), metaDataByIdentityIdReq.getIdentityId());
+        List<MetaDataVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), MetaDataVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    }
 
     @GetMapping("pageList")
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
     public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
-        IPage<MetaDataDto> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
+        IPage<MetaDataDtoOld> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
         return this.convertToMetaDataVo(servicePage);
     }
 
     @GetMapping(value = "detail")
     @ApiOperation(value = "获取元数据详情", notes = "获取元数据详情")
     public ResponseVo<MetaDataDetailVo> detail(@Validated MetaDataDetailDescribeReq detailReq) {
-        MetaDataDto metaDataDto = metaDataService.detail(detailReq.getMetaDataPkId(), detailReq.getUserMetaDataId());
+        MetaDataDtoOld metaDataDto = metaDataService.detail(detailReq.getMetaDataPkId(), detailReq.getUserMetaDataId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(metaDataDto, MetaDataDetailVo.class));
     }
 
@@ -108,7 +131,7 @@ public class DataController {
     @GetMapping("getAllAuthTables")
     @ApiOperation(value = "查询工作流输入表", notes = "查询工作流输入表")
     public ResponseVo<List<MetaDataTablesVo>> getAllAuthTables(@Valid MetaDataAuthTablesReq metaDataAuthTablesReq) {
-        List<MetaDataDto> dtoList = userMetaDataService.getAllAuthTables(metaDataAuthTablesReq.getIdentityId());
+        List<MetaDataDtoOld> dtoList = userMetaDataService.getAllAuthTables(metaDataAuthTablesReq.getIdentityId());
         return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataTablesVo.class));
     }
 
@@ -119,7 +142,7 @@ public class DataController {
         return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataColumnsAuthVo.class));
     }
 
-    private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDto> pageDto) {
+    private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDtoOld> pageDto) {
         List<MetaDataVo> items = new ArrayList<>();
         pageDto.getRecords().forEach(metaDataDto -> {
             MetaDataVo metaDataVo = BeanUtil.copyProperties(metaDataDto, MetaDataVo.class);

@@ -89,6 +89,77 @@
         </where>
         order by task.total_task desc
     </select>
+    <select id="listOrgInfoByNameOrderByMemoryDesc" resultType="com.moirae.rosettaflow.dto.OrganizationDto">
+        select o.identity_id,
+               o.node_name,
+               o.status,
+               o.update_at,
+               ifnull(power.total_core,0) as total_core,
+               ifnull(power.total_memory,0) as total_memory,
+               ifnull(power.total_bandwidth,0) as total_bandwidth
+        from dc_org o
+        left join (
+            select identity_id,
+                   sum(core) as total_core,
+                   sum(memory) as total_memory,
+                   sum(bandwidth) as total_bandwidth
+            from dc_power_server
+            where status = 2 or status = 3
+            group by identity_id
+        ) power on o.identity_id = power.identity_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                o.org_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        order by power.total_memory desc
+    </select>
+    <select id="findOrgInfoDetail" resultType="com.moirae.rosettaflow.dto.OrganizationDto">
+        select o.identity_id,
+               o.node_name,
+               o.status,
+               o.update_at,
+               power.total_core,
+               power.total_memory,
+               power.total_bandwidth,
+               data.total_file,
+               data.total_data,
+               algo.total_algo,
+               task.total_task
+        from dc_org o,
+             (
+                 select identity_id,
+                        sum(core) as total_core,
+                        sum(memory) as total_memory,
+                        sum(bandwidth) as total_bandwidth
+                 from dc_power_server
+                 where identity_id = #{identityId,jdbcType=VARCHAR} and (status = 2 or status = 3)
+             ) power,
+             (
+                 select count(meta_data_id) as total_file,
+                        sum(size) as total_data
+                 from dc_meta_data
+                 where identity_id = #{identityId,jdbcType=VARCHAR} and status = 2
+             ) data,
+             (
+                 select  count(task_id) as total_algo
+                 from dc_task_algo_provider
+                 where identity_id = #{identityId,jdbcType=VARCHAR}
+             ) algo,
+             (
+                 select count(t.task_id) as total_task
+                 from (
+                          select task_id
+                          from dc_task_power_provider
+                          where identity_id = #{identityId,jdbcType=VARCHAR}
 
+                          union
 
+                          select task_id
+                          from dc_task_data_provider
+                          where identity_id = #{identityId,jdbcType=VARCHAR}
+                      ) t
+             ) task
+        where o.identity_id = #{identityId,jdbcType=VARCHAR}
+    </select>
 </mapper>

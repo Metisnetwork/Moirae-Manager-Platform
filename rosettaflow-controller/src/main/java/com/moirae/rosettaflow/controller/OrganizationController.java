@@ -35,6 +35,21 @@ public class OrganizationController {
     @Resource
     private OrganizationService organizationService;
 
+    @GetMapping("findOrgInfo")
+    @ApiOperation(value = "查询组织详细信息", notes = "查询组织详细信息")
+    public ResponseVo<OrganizationVo> findOrgInfo(@RequestParam String identityId) {
+        OrganizationDto organizationDto = organizationService.findOrgInfoDetail(identityId);
+        return ResponseVo.createSuccess(BeanUtil.toBean(organizationDto, OrganizationVo.class));
+    }
+
+    @GetMapping("listOrgInfoByMemory")
+    @ApiOperation(value = "查询组织列表（按算力-内存）", notes = "查询组织列表（按算力-内存）")
+    public ResponseVo<PageVo<OrganizationVo>> listOrgInfoByMemory(@Valid KeyWorkPageReq keyWorkPageReq) {
+        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByMemoryDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
+        List<OrganizationVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), OrganizationVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    }
+
     @GetMapping("listOrgInfoByActivity")
     @ApiOperation(value = "查询组织列表（按活跃度）", notes = "查询组织列表（按活跃度）")
     public ResponseVo<PageVo<OrganizationVo>> listOrgInfoByActivity(@Valid KeyWorkPageReq keyWorkPageReq) {
