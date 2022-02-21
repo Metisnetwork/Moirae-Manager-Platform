@@ -71,6 +71,7 @@ CREATE TABLE `dc_meta_data_column` (
     PRIMARY KEY (`meta_data_id`,`column_idx`)
 ) ENGINE=InnoDB COMMENT='数据文件元数据信息';
 
+DROP TABLE IF EXISTS `dc_task`;
 CREATE TABLE `dc_task` (
     `id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
     `task_name` varchar(100)  NOT NULL COMMENT '任务名称',
@@ -99,8 +100,7 @@ CREATE TABLE `dc_task` (
     KEY `end_at` (`end_at`)
 ) ENGINE=InnoDB COMMENT='任务';
 
-
-
+DROP TABLE IF EXISTS `dc_task_algo_provider`;
 CREATE TABLE `dc_task_algo_provider` (
     `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
     `identity_id` varchar(200)  NOT NULL COMMENT '算法提供者组织身份ID',
@@ -108,6 +108,7 @@ CREATE TABLE `dc_task_algo_provider` (
     PRIMARY KEY (`task_id`)
 ) ENGINE=InnoDB COMMENT='任务算法提供者';
 
+DROP TABLE IF EXISTS `dc_task_data_provider`;
 CREATE TABLE `dc_task_data_provider` (
     `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
     `meta_data_id` varchar(200)  NOT NULL COMMENT '参与任务的元数据ID',
@@ -117,6 +118,7 @@ CREATE TABLE `dc_task_data_provider` (
     PRIMARY KEY (`task_id`,`meta_data_id`)
 ) ENGINE=InnoDB COMMENT='任务数据提供者（数据和模型）';
 
+DROP TABLE IF EXISTS `dc_task_meta_data_column`;
 CREATE TABLE `dc_task_meta_data_column` (
     `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
     `meta_data_id` varchar(200)  NOT NULL COMMENT '参与任务的元数据ID',
@@ -124,6 +126,7 @@ CREATE TABLE `dc_task_meta_data_column` (
     PRIMARY KEY (`task_id`,`meta_data_id`,`selected_column_idx`)
 ) ENGINE=InnoDB COMMENT='任务数据metadata明细';
 
+DROP TABLE IF EXISTS `dc_task_power_provider`;
 CREATE TABLE `dc_task_power_provider` (
     `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
     `identity_id` varchar(200)  NOT NULL COMMENT '算力提供者组织身份ID',
@@ -134,7 +137,7 @@ CREATE TABLE `dc_task_power_provider` (
     PRIMARY KEY (`task_id`,`identity_id`)
 ) ENGINE=InnoDB COMMENT='任务算力提供者';
 
-
+DROP TABLE IF EXISTS `dc_task_result_consumer`;
 CREATE TABLE `dc_task_result_consumer` (
     `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
     `consumer_identity_id` varchar(200)  NOT NULL COMMENT '结果消费者组织身份ID',
@@ -143,3 +146,24 @@ CREATE TABLE `dc_task_result_consumer` (
     `producer_party_id` varchar(200)  DEFAULT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
     PRIMARY KEY (`task_id`,`consumer_identity_id`)
 ) ENGINE=InnoDB COMMENT='任务结果接收者';
+
+DROP TABLE IF EXISTS `dc_power_server`;
+CREATE TABLE `dc_power_server` (
+    `id` varchar(200) NOT NULL COMMENT '计算服务主机ID,hash',
+    `identity_id` varchar(200) NOT NULL COMMENT '组织身份ID',
+    `memory` bigint NOT NULL DEFAULT '0' COMMENT '计算服务内存, 字节',
+    `core` int NOT NULL DEFAULT '0' COMMENT '计算服务core',
+    `bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '计算服务带宽, bps',
+    `used_memory` bigint DEFAULT '0' COMMENT '使用的内存, 字节',
+    `used_core` int DEFAULT '0' COMMENT '使用的core',
+    `used_bandwidth` bigint DEFAULT '0' COMMENT '使用的带宽, bps',
+    `published` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否发布，true/false',
+    `published_at` datetime(3) NOT NULL COMMENT '发布时间，精确到毫秒',
+    `status` int DEFAULT NULL COMMENT '算力的状态 (0: 未知; 1: 还未发布的算力; 2: 已发布的算力(算力未被占用); 3: 已发布的算力(算力正在被占用); 4: 已撤销的算力)',
+    `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `update_at` (`update_at`)
+) ENGINE=InnoDB COMMENT='计算服务信息';
+
