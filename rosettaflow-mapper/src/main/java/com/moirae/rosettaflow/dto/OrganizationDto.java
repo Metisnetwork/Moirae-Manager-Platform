@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.dto;
 
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -72,4 +73,14 @@ public class OrganizationDto implements Serializable {
      * 总文件大小(字节)
      */
     private Long totalData;
+
+    /**
+     * 过去30天内的任务数
+     */
+    private Integer taskCount;
+
+    /**
+     * 空闲的天数
+     */
+    private Integer idleDays;
 }

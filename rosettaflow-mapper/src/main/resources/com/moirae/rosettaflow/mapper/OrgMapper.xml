@@ -34,6 +34,61 @@
         order by df.total_data desc
 
     </select>
+    <select id="listOrgInfoByNameOrderByActivityDesc" resultType="com.moirae.rosettaflow.dto.OrganizationDto">
+        select o.identity_id,
+               o.node_name,
+               o.status,
+               o.update_at,
+               ifnull(idle.idle_days,0) as idle_days,
+               ifnull(task.total_task,0) as task_count
+        from dc_org o
+        left join (
+            select t.identity_id,
+                   datediff(current_date(), max(t.create_at)) as idle_days
+            from (
+                select tpp.identity_id,
+                       max(t.create_at) as create_at
+                from dc_task_power_provider tpp
+                left join dc_task t on tpp.task_id = t.id
+                group by tpp.identity_id
+
+                union
+
+                select tmd.identity_id,
+                       max(t.create_at) as create_at
+                from dc_task_data_provider tmd
+                left join dc_task t on tmd.task_id = t.id
+                group by tmd.identity_id
+        ) t
+        group by t.identity_id
+        ) idle on o.identity_id = idle.identity_id
+        left join (
+            select t.identity_id,
+                   count(t.task_id) as total_task
+            from (
+                select tpp.identity_id,
+                       tpp.task_id
+                from dc_task_power_provider tpp
+                join dc_task t on tpp.task_id = t.id
+                where datediff(current_date(), t.create_at ) <![CDATA[ <= ]]> 30
+
+                union
+
+                select tmd.identity_id,
+                       tmd.task_id
+                from dc_task_data_provider tmd
+                join dc_task t on tmd.task_id = t.id
+                where datediff(current_date(), t.create_at ) <![CDATA[ <= ]]> 30
+        ) t
+        group by t.identity_id
+        ) task on o.identity_id = task.identity_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                o.org_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        order by task.total_task desc
+    </select>
 
 
 </mapper>

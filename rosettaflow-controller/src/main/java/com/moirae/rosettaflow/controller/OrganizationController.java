@@ -35,10 +35,17 @@ public class OrganizationController {
     @Resource
     private OrganizationService organizationService;
 
+    @GetMapping("listOrgInfoByActivity")
+    @ApiOperation(value = "查询组织列表（按活跃度）", notes = "查询组织列表（按活跃度）")
+    public ResponseVo<PageVo<OrganizationVo>> listOrgInfoByActivity(@Valid KeyWorkPageReq keyWorkPageReq) {
+        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByActivityDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
+        List<OrganizationVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), OrganizationVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    }
 
-    @GetMapping("istOrgInfoByTotalData")
+    @GetMapping("listOrgInfoByTotalData")
     @ApiOperation(value = "查询组织列表（按数据总数）", notes = "查询组织列表（按数据总数）")
-    public ResponseVo<PageVo<OrganizationVo>> istOrgInfoByTotalData(@Valid KeyWorkPageReq keyWorkPageReq) {
+    public ResponseVo<PageVo<OrganizationVo>> listOrgInfoByTotalData(@Valid KeyWorkPageReq keyWorkPageReq) {
         IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByTotalDataDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
         List<OrganizationVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), OrganizationVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));

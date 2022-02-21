@@ -125,7 +125,8 @@ public class SysConstant {
             "redis",
             "quartz",
             "org/listOrgInfoByName",
-            "org/istOrgInfoByTotalData"
+            "org/listOrgInfoByTotalData",
+            "org/listOrgInfoByActivity"
     };
 
     /**

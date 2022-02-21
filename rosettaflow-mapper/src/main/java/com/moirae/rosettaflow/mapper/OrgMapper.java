@@ -9,4 +9,6 @@ import com.moirae.rosettaflow.mapper.domain.Org;
 public interface OrgMapper extends BaseMapper<Org> {
 
     IPage<OrganizationDto> listOrgInfoByNameOrderByTotalDataDesc(String keyword, Page<OrganizationDto> page);
+
+    IPage<OrganizationDto> listOrgInfoByNameOrderByActivityDesc(String keyword, Page<OrganizationDto> page);
 }

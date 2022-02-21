@@ -46,4 +46,10 @@ public class OrganizationVo {
 
     @ApiModelProperty(value = "总文件大小(字节)")
     private Long totalData;
+
+    @ApiModelProperty(value = "过去30天内的任务数")
+    private Integer taskCount;
+
+    @ApiModelProperty(value = "空闲的天数")
+    private Integer idleDays;
 }
