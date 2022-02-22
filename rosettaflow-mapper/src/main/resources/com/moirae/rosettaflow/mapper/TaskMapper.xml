@@ -121,4 +121,17 @@
 
 
     </select>
+    <select id="getTaskListOfEventNotSynced" resultType="com.moirae.rosettaflow.mapper.domain.Task">
+        select
+            t.*
+        from dc_task t left join mo_task_expand te on t.id = te.id
+        where (isnull(te.event_synced) or te.event_synced = 0 ) and t.status in (3,4)
+        limit 1000
+    </select>
+    <select id="getTaskOfUnSyncedEvent" resultType="com.moirae.rosettaflow.mapper.domain.Task">
+        select
+            t.*
+        from dc_task t inner join mo_task_expand te on t.id = te.id
+        where t.id = #{taskId,jdbcType=VARCHAR} and te.event_synced = 1
+    </select>
 </mapper>

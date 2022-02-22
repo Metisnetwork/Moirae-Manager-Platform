@@ -2,16 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.TaskEventMapper">
     <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.TaskEvent">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="task_id" jdbcType="VARCHAR" property="taskId"/>
-        <result column="type" jdbcType="VARCHAR" property="type"/>
-        <result column="identity_id" jdbcType="VARCHAR" property="identityId"/>
-        <result column="event_time" jdbcType="TIMESTAMP" property="eventTime"/>
-        <result column="content" jdbcType="VARCHAR" property="content"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="event_type" jdbcType="VARCHAR" property="eventType" />
+        <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
+        <result column="party_id" jdbcType="VARCHAR" property="partyId" />
+        <result column="event_at" jdbcType="TIMESTAMP" property="eventAt" />
+        <result column="event_content" jdbcType="VARCHAR" property="eventContent" />
     </resultMap>
     <sql id="Base_Column_List">
-    id, task_id, `type`, identity_id, event_time, content, create_time, update_time
-  </sql>
+        id, task_id, event_type, identity_id, party_id, event_at, event_content
+    </sql>
 </mapper>

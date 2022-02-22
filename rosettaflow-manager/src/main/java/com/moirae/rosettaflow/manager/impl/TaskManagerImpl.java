@@ -9,6 +9,8 @@ import com.moirae.rosettaflow.mapper.domain.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements TaskManager {
@@ -16,5 +18,15 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     @Override
     public IPage<Task> getOrgTaskListByIdentityId(Page<Task> page, String identityId) {
         return this.baseMapper.getOrgTaskListByIdentityId(page, identityId);
+    }
+
+    @Override
+    public List<Task> getTaskListOfEventNotSynced() {
+        return this.baseMapper.getTaskListOfEventNotSynced();
+    }
+
+    @Override
+    public Task getTaskOfUnSyncedEvent(String taskId) {
+        return this.baseMapper.getTaskOfUnSyncedEvent(taskId);
     }
 }

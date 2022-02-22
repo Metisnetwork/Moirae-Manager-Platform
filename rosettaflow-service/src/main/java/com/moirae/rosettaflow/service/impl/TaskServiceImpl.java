@@ -4,6 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
+import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
+import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.DataService;
@@ -14,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +45,12 @@ public class TaskServiceImpl implements TaskService {
     private TaskPowerProviderManager taskPowerProviderManager;
     @Resource
     private TaskResultConsumerManager taskResultConsumerManager;
+    @Resource
+    private TaskEventManager taskEventManager;
+    @Resource
+    private TaskExpandManager taskExpandManager;
+    @Resource
+    private GrpcTaskService grpcTaskService;
 
     @Override
     @Transactional
@@ -110,5 +122,52 @@ public class TaskServiceImpl implements TaskService {
         });
         task.setResultReceiverList(taskResultConsumerList);
         return task;
+    }
+
+    @Override
+    public List<TaskEvent> getTaskEventList(String taskId) {
+        Task task = taskManager.getTaskOfUnSyncedEvent(taskId);
+        if(task != null){
+            return taskEventManager.listByTaskId(taskId);
+        }else{
+            return this.getTaskEventListFromRemote(taskId, task.getOwnerIdentityId());
+        }
+    }
+
+    @Override
+    public List<Task> getTaskListOfEventNotSynced() {
+        return taskManager.getTaskListOfEventNotSynced();
+    }
+
+    @Override
+    @Transactional
+    public void syncedEvent(String taskId, List<TaskEvent> taskEventList) {
+        TaskExpand taskExpand = new TaskExpand();
+        taskExpand.setId(taskId);
+        taskExpand.setEventSynced(true);
+        taskExpandManager.save(taskExpand);
+        taskEventManager.saveBatch(taskEventList);
+    }
+
+    @Override
+    public List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId) {
+        try {
+            List<TaskEventDto> taskEventShowDtoList = grpcTaskService.getTaskEventList(organizationService.getChannel(identityId), taskId);
+            return taskEventShowDtoList.stream()
+                    .map(item -> {
+                        TaskEvent taskEvent = new TaskEvent();
+                        taskEvent.setTaskId(item.getTaskId());
+                        taskEvent.setIdentityId(item.getOwner().getIdentityId());
+                        taskEvent.setPartyId(item.getPartyId());
+                        taskEvent.setEventType(item.getType());
+                        taskEvent.setEventContent(item.getContent());
+                        taskEvent.setEventAt(new Date(item.getCreateAt()));
+                        return taskEvent;
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("调用rpc接口异常--获取运行日志, taskId:{}, 错误信息:{}", taskId, e);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
+        }
     }
 }

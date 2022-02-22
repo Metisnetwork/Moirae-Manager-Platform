@@ -12,4 +12,12 @@ public interface TaskService {
     IPage<Task> getOrgTaskListByIdentityId(Long current, Long size, String identityId);
 
     Task getTaskDetails(String taskId);
+
+    List<TaskEvent> getTaskEventList(String taskId);
+
+    List<Task> getTaskListOfEventNotSynced();
+
+    void syncedEvent(String taskId, List<TaskEvent> taskEventList);
+
+    List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId);
 }

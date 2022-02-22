@@ -167,6 +167,28 @@ CREATE TABLE `dc_power_server` (
     KEY `update_at` (`update_at`)
 ) ENGINE=InnoDB COMMENT='计算服务信息';
 
+DROP TABLE IF EXISTS `dc_task_event`;
+CREATE TABLE `dc_task_event` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+    `event_type` varchar(20) NOT NULL COMMENT '事件类型',
+    `identity_id` varchar(200) NOT NULL COMMENT '产生事件的组织身份ID',
+    `party_id` varchar(200) NOT NULL COMMENT '产生事件的partyId (单个组织可以担任任务的多个party, 区分是哪一方产生的event)',
+    `event_at` datetime(3) NOT NULL COMMENT '产生事件的时间，精确到毫秒',
+    `event_content` varchar(1024) NOT NULL COMMENT '事件内容',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='任务事件';
+
+DROP TABLE IF EXISTS `mo_task_expand`;
+CREATE TABLE `mo_task_expand` (
+    `id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+    `event_synced` tinyint(1) NOT NULL DEFAULT '0' COMMENT '事件是否同步完成 0-否 1-是',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB  COMMENT='任务扩展表';
+
+
 -- 创建首页统计 view
 create or replace view v_global_stats as
 select allOrg.total_org_count, powerOrg.power_org_count, srcFile.data_file_size, usedFile.used_data_file_size,
