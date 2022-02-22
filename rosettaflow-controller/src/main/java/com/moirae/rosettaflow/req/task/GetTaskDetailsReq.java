@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @ApiModel(value = "任务查询")
-public class TaskByIdReq {
+public class GetTaskDetailsReq {
 
     @ApiModelProperty(value = "任务Id", required = true)
     @NotBlank(message = "{taskresult.id.notNull}")

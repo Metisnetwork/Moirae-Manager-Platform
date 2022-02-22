@@ -1,6 +1,8 @@
 package com.moirae.rosettaflow.mapper.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -43,4 +45,10 @@ public class TaskPowerProvider implements Serializable {
     private Long usedBandwidth;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 组织名称
+     */
+    @TableField(exist = false)
+    private String nodeName;
 }

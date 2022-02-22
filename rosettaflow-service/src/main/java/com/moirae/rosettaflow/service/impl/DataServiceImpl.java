@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,5 +58,10 @@ public class DataServiceImpl implements DataService {
         wrapper.eq(MetaDataColumn::getMetaDataId, metaDataId);
         wrapper.orderByAsc(MetaDataColumn::getColumnIdx);
         return metaDataColumnManager.page(page, wrapper);
+    }
+
+    @Override
+    public Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId) {
+        return metaDataManager.listByIds(metaDataId).stream().collect(Collectors.toMap(MetaData::getMetaDataId, item -> item));
     }
 }

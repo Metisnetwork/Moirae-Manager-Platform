@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -139,32 +140,63 @@ public class Task implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 任务发起者
+     * 该组织在任务中角色-是否任务发方
      */
     @TableField(exist = false)
-    private OrganizationDto sponsor;
+    private Boolean isTaskSponsor;
 
     /**
-     * 任务算法提供者
+     * 该组织在任务中角色-是否算法提供方
      */
     @TableField(exist = false)
-    private TaskAlgoProvider taskAlgoProvider;
+    private Boolean isAlgoProvider;
 
     /**
-     * 任务结果接收者
+     * 该组织在任务中角色-是否数据提供方
      */
     @TableField(exist = false)
-    private List<TaskResultConsumer> taskResultReceiverList;
+    private Boolean isDataProvider;
 
     /**
-     * 任务算法提供者
+     * 该组织在任务中角色-是否算力提供方
      */
     @TableField(exist = false)
-    private List<TaskPowerProvider> taskPowerProviderList;
+    private Boolean isPowerProvider;
 
     /**
-     * 任务数据提供者
+     * 该组织在任务中角色-是否结果接收方
      */
     @TableField(exist = false)
-    private List<TaskDataProvider> taskDataProviderList;
+    private Boolean isResultReceiver;
+
+    /**
+     * 任务发起方
+     */
+    @TableField(exist = false)
+    private Org taskSponsor;
+
+    /**
+     * 算法提供方
+     */
+    @TableField(exist = false)
+    private TaskAlgoProvider algoProvider;
+
+    /**
+     * 数据提供方
+     */
+    @TableField(exist = false)
+    private List<TaskDataProvider> dataProviderList;
+
+    /**
+     * 算力提供方
+     */
+    @TableField(exist = false)
+    private List<TaskPowerProvider> powerProviderList;
+
+    /**
+     * 结果接收方
+     */
+    @TableField(exist = false)
+    private List<TaskResultConsumer> resultReceiverList;
+
 }

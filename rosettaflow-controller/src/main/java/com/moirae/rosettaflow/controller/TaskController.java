@@ -2,14 +2,15 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.dto.TaskDto;
-import com.moirae.rosettaflow.req.task.TaskByIdReq;
-import com.moirae.rosettaflow.req.task.TaskByIdentityIdReq;
+import com.moirae.rosettaflow.mapper.domain.Task;
+import com.moirae.rosettaflow.req.task.GetTaskDetailsReq;
+import com.moirae.rosettaflow.req.task.GetOrgTaskListByIdentityIdReq;
 import com.moirae.rosettaflow.service.TaskService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.task.TaskVo;
+import com.moirae.rosettaflow.vo.task.OrgTaskVo;
+import com.moirae.rosettaflow.vo.task.TaskDetailsVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -32,17 +33,16 @@ public class TaskController {
 
     @GetMapping("getTaskDetails")
     @ApiOperation(value = "查询任务详情", notes = "查询任务详情")
-    public ResponseVo<TaskVo> getTaskDetails(@Valid TaskByIdReq taskByIdReq) {
-        TaskDto page = taskService.getTaskDetails(taskByIdReq.getTaskId());
-        return ResponseVo.createSuccess(BeanUtil.toBean(page, TaskVo.class));
+    public ResponseVo<TaskDetailsVo> getTaskDetails(@Valid GetTaskDetailsReq req) {
+        Task task = taskService.getTaskDetails(req.getTaskId());
+        return ResponseVo.createSuccess(BeanUtil.toBean(task, TaskDetailsVo.class));
     }
 
-    @GetMapping("listTaskByIdentityId")
-    @ApiOperation(value = "根据元数据ID,查询元数据的列定义", notes = "根据元数据ID,查询元数据的列定义")
-    public ResponseVo<PageVo<TaskVo>> listTaskByIdentityId(@Valid TaskByIdentityIdReq taskByIdentityIdReq) {
-        IPage<TaskDto> page = taskService.listTaskByIdentityId(taskByIdentityIdReq.getCurrent(), taskByIdentityIdReq.getSize(), taskByIdentityIdReq.getIdentityId());
-        List<TaskVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), TaskVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+    @GetMapping("getOrgTaskListByIdentityId")
+    @ApiOperation(value = "查询组织的任务列表-通过组织id", notes = "查询组织的任务列表-通过组织id")
+    public ResponseVo<PageVo<OrgTaskVo>> getOrgTaskListByIdentityId(@Valid GetOrgTaskListByIdentityIdReq req) {
+        IPage<Task> page = taskService.getOrgTaskListByIdentityId(req.getCurrent(), req.getSize(), req.getIdentityId());
+        List<OrgTaskVo> orgTaskVoList = BeanUtil.copyToList(page.getRecords(), OrgTaskVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgTaskVoList));
     }
-
 }

@@ -9,5 +9,5 @@ import com.moirae.rosettaflow.mapper.domain.Task;
 
 public interface TaskManager extends IService<Task> {
 
-    IPage<TaskDto> listTaskByIdentityId(Page<OrganizationDto> page, String identityId);
+    IPage<Task> getOrgTaskListByIdentityId(Page<Task> page, String identityId);
 }

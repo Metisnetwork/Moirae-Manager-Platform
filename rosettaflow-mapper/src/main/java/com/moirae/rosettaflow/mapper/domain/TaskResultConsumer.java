@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.mapper.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -20,7 +21,8 @@ public class TaskResultConsumer implements Serializable {
     /**
      * 结果消费者组织身份ID
      */
-    private String consumerIdentityId;
+    @TableField(value = "consumer_identity_id")
+    private String identityId;
 
     /**
      * 任务参与方在本次任务中的唯一识别ID
@@ -38,4 +40,10 @@ public class TaskResultConsumer implements Serializable {
     private String producerPartyId;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 组织名称
+     */
+    @TableField(exist = false)
+    private String nodeName;
 }

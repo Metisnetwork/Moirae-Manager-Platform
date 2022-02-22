@@ -7,6 +7,8 @@ import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface DataService {
 
@@ -31,4 +33,6 @@ public interface DataService {
     MetaDataDto getDataFile(String metaDataId);
 
     IPage<MetaDataColumn> listMetaDataColumn(Long current, Long size, String metaDataId);
+
+    Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId);
 }

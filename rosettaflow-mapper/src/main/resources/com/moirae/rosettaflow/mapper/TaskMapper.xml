@@ -32,16 +32,18 @@
     used_memory, used_core, used_bandwidth, used_file_size, `status`, status_desc, remarks,
     task_sign, create_time, update_time
     </sql>
-    <select id="listTaskByIdentityId" resultType="com.moirae.rosettaflow.dto.TaskDto">
+    <select id="getOrgTaskListByIdentityId" resultType="com.moirae.rosettaflow.mapper.domain.Task">
         select t.id,
                t.task_name,
+               t.create_at,
                t.start_at,
                t.end_at,
-               temp.taskSponsor,
-               temp.powerProvider,
-               temp.dataProvider,
-               temp.resultConsumer,
-               temp.algoProvider
+               t.status,
+               if(temp.taskSponsor > 0, 1 , 0) as isTaskSponsor,
+               if(temp.powerProvider > 0, 1 , 0) as isPowerProvider,
+               if(temp.dataProvider > 0, 1 , 0) as isDataProvider,
+               if(temp.resultConsumer > 0, 1 , 0) as isResultReceiver,
+               if(temp.algoProvider > 0, 1 , 0) as isAlgoProvider
         from dc_task t
         join
              (

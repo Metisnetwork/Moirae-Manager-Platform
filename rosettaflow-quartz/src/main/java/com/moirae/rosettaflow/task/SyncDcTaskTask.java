@@ -103,7 +103,7 @@ public class SyncDcTaskTask {
             information.getReceivers().forEach(subItem ->{
                 TaskResultConsumer taskResultConsumer = new TaskResultConsumer();
                 taskResultConsumer.setTaskId(information.getTaskId());
-                taskResultConsumer.setConsumerIdentityId(subItem.getIdentityId());
+                taskResultConsumer.setIdentityId(subItem.getIdentityId());
                 taskResultConsumer.setConsumerPartyId(subItem.getPartyId());
                 taskResultConsumerList.add(taskResultConsumer);
             });

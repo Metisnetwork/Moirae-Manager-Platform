@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.dto.OrganizationDto;
 import io.grpc.ManagedChannel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface OrganizationService {
@@ -148,4 +149,6 @@ public interface OrganizationService {
      * @return
      */
     OrganizationDto findOrgInfoDetail(String identityId);
+
+    Map<String, Org> getIdentityId2OrgMap();
 }

@@ -251,6 +251,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         return orgManager.findOrgInfoDetail(identityId);
     }
 
+    @Override
+    public Map<String, Org> getIdentityId2OrgMap() {
+        return orgManager.list().stream().collect(Collectors.toMap(Org::getIdentityId, item -> item));
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

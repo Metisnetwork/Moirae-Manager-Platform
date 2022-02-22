@@ -132,7 +132,8 @@ public class SysConstant {
             "org/listOrgInfoByActivity",
             "org/listOrgInfoByMemory",
             "org/findOrgInfo",
-            "task/listTaskByIdentityId"
+            "task/getOrgTaskListByIdentityId",
+            "task/getTaskDetails"
     };
 
     /**

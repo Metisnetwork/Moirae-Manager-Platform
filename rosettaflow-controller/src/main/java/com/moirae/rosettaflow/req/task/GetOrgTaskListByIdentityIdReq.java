@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "元数据列查询")
-public class TaskByIdentityIdReq extends CommonPageReq {
+public class GetOrgTaskListByIdentityIdReq extends CommonPageReq {
 
     @ApiModelProperty(value = "组织的身份标识Id", required = true)
     @NotBlank(message = "{node.identity.id.NotBlank}")

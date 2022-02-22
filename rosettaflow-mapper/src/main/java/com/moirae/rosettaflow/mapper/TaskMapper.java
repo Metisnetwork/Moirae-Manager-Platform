@@ -3,8 +3,6 @@ package com.moirae.rosettaflow.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.moirae.rosettaflow.dto.OrganizationDto;
-import com.moirae.rosettaflow.dto.TaskDto;
 import com.moirae.rosettaflow.mapper.domain.Task;
 
 /**
@@ -13,5 +11,5 @@ import com.moirae.rosettaflow.mapper.domain.Task;
  * @author admin
  */
 public interface TaskMapper extends BaseMapper<Task> {
-    IPage<TaskDto> listTaskByIdentityId(String identityId, Page<OrganizationDto> page);
+    IPage<Task> getOrgTaskListByIdentityId(Page<Task> page, String identityId);
 }
