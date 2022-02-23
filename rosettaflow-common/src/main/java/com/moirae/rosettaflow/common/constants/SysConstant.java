@@ -134,7 +134,9 @@ public class SysConstant {
             "org/findOrgInfo",
             "task/getOrgTaskListByIdentityId",
             "task/getTaskDetails",
-            "task/getTaskEventList"
+            "task/getTaskEventList",
+            "home/dataTrend",
+            "home/globalStats"
     };
 
     /**

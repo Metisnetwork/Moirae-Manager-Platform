@@ -21,12 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * 同步元数据定时任务, 多久同步一次待确认
- *
- * @author hudenian
- * @date 2021/8/23
- */
 @Slf4j
 @Component
 public class SyncDcMetaDataTask {
