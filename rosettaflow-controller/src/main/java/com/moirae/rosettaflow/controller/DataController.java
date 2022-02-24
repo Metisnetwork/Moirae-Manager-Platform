@@ -98,7 +98,7 @@ public class DataController {
 
     @GetMapping("columnList")
     @ApiOperation(value = "获取元数据列分页列表", notes = "获取元数据列分页列表")
-    public ResponseVo<PageVo<MetaDataColumnsVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
+    public ResponseVo<PageVo<MetaDataColumnsOldVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
         IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findByMetaDataId(metaDataDetailReq.getMetaDataId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
         return convertToResponseVo(servicePage);
     }
@@ -198,11 +198,11 @@ public class DataController {
         return 0;
     }
 
-    private ResponseVo<PageVo<MetaDataColumnsVo>> convertToResponseVo(IPage<MetaDataDetailsDto> pageDto) {
-        List<MetaDataColumnsVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataColumnsVo.class)));
+    private ResponseVo<PageVo<MetaDataColumnsOldVo>> convertToResponseVo(IPage<MetaDataDetailsDto> pageDto) {
+        List<MetaDataColumnsOldVo> items = new ArrayList<>();
+        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataColumnsOldVo.class)));
 
-        PageVo<MetaDataColumnsVo> pageVo = new PageVo<>();
+        PageVo<MetaDataColumnsOldVo> pageVo = new PageVo<>();
         BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
         return ResponseVo.createSuccess(pageVo);
