@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.vo.organization;
+package com.moirae.rosettaflow.vo.org;
 
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import io.swagger.annotations.ApiModel;

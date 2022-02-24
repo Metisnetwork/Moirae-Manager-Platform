@@ -1,0 +1,23 @@
+package com.moirae.rosettaflow.vo.org;
+
+import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class BaseOrgVo {
+
+    @ApiModelProperty(value = "组织的身份名称")
+    private String nodeName;
+
+    @ApiModelProperty(value = "组织的身份标识Id")
+    private String identityId;
+
+    @ApiModelProperty(value = "组织的状态 状态,1-Normal; 2-NonNormal")
+    private OrgStatusEnum status;
+
+    @ApiModelProperty(value = "组织的最新更新时间")
+    private Date updateAt;
+}

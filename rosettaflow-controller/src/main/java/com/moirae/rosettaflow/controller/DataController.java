@@ -62,22 +62,22 @@ public class DataController {
 
     @GetMapping("getDataFile")
     @ApiOperation(value = "根据元数据ID,查询数据文件信息(带参与任务数)", notes = "根据元数据ID,查询数据文件信息(带参与任务数)")
-    public ResponseVo<MetaDataVo> getDataFile(@Valid MetaDataByIdReq metaDataByIdReq) {
+    public ResponseVo<MetaDataDetailsVo> getDataFile(@Valid MetaDataByIdReq metaDataByIdReq) {
         MetaDataDto metaDataDto = dataService.getDataFile(metaDataByIdReq.getMetaDataId());
-        return ResponseVo.createSuccess(BeanUtil.toBean(metaDataDto, MetaDataVo.class));
+        return ResponseVo.createSuccess(BeanUtil.toBean(metaDataDto, MetaDataDetailsVo.class));
     }
 
     @GetMapping("listDataFileByIdentityId")
     @ApiOperation(value = "查询某个组织的数据文件列表(带参与任务数)", notes = "查询某个组织的数据文件列表(带参与任务数)")
     public ResponseVo<PageVo<MetaDataVo>> listMetadataByIdentityId(@Valid MetaDataByIdentityIdReq metaDataByIdentityIdReq) {
         IPage<MetaDataDto> page = dataService.listDataFileByIdentityId(metaDataByIdentityIdReq.getCurrent(), metaDataByIdentityIdReq.getSize(), metaDataByIdentityIdReq.getIdentityId());
-        List<MetaDataVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), MetaDataVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
+        List<MetaDataVo> orgMetaDataVoList = BeanUtil.copyToList(page.getRecords(), MetaDataVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgMetaDataVoList));
     }
 
     @GetMapping("pageList")
     @ApiOperation(value = "获取元数据列表", notes = "获取元数据列表")
-    public ResponseVo<PageVo<MetaDataVo>> list(@Valid MetaDataReq metaDataReq) {
+    public ResponseVo<PageVo<MetaDataOldVo>> list(@Valid MetaDataReq metaDataReq) {
         IPage<MetaDataDtoOld> servicePage = metaDataService.list(metaDataReq.getCurrent(), metaDataReq.getSize(), metaDataReq.getDataName());
         return this.convertToMetaDataVo(servicePage);
     }
@@ -142,14 +142,14 @@ public class DataController {
         return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataColumnsAuthVo.class));
     }
 
-    private ResponseVo<PageVo<MetaDataVo>> convertToMetaDataVo(IPage<MetaDataDtoOld> pageDto) {
-        List<MetaDataVo> items = new ArrayList<>();
+    private ResponseVo<PageVo<MetaDataOldVo>> convertToMetaDataVo(IPage<MetaDataDtoOld> pageDto) {
+        List<MetaDataOldVo> items = new ArrayList<>();
         pageDto.getRecords().forEach(metaDataDto -> {
-            MetaDataVo metaDataVo = BeanUtil.copyProperties(metaDataDto, MetaDataVo.class);
+            MetaDataOldVo metaDataVo = BeanUtil.copyProperties(metaDataDto, MetaDataOldVo.class);
             metaDataVo.setAuthStatus(metaDataService.dealAuthStatus(metaDataDto.getAuthStatus(), metaDataDto.getAuthMetadataState()));
             items.add(metaDataVo);
         });
-        PageVo<MetaDataVo> pageVo = new PageVo<>();
+        PageVo<MetaDataOldVo> pageVo = new PageVo<>();
         BeanUtil.copyProperties(pageDto, pageVo);
         pageVo.setItems(items);
         return ResponseVo.createSuccess(pageVo);

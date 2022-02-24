@@ -28,7 +28,7 @@ public class MetaDataDto implements Serializable {
     /**
      * 文件名称
      */
-    private String fileName;
+    private String metaDataName;
 
     /**
      * 文件存储路径
@@ -89,4 +89,9 @@ public class MetaDataDto implements Serializable {
      * 参与任务的数据
      */
     private Integer taskCount;
+
+    /**
+     * 组织名称
+     */
+    private String nodeName;
 }
