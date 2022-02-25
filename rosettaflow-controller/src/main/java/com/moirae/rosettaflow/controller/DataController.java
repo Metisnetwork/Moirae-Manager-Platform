@@ -9,7 +9,6 @@ import com.moirae.rosettaflow.dto.*;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.req.data.*;
 import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.IMetaDataDetailsOldService;
 import com.moirae.rosettaflow.service.IMetaDataOldService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
@@ -47,8 +46,6 @@ public class DataController {
     private IMetaDataOldService metaDataService;
     @Resource
     private IUserMetaDataService userMetaDataService;
-    @Resource
-    private IMetaDataDetailsOldService metaDataDetailsService;
     @Resource
     private DataService dataService;
 
@@ -96,11 +93,13 @@ public class DataController {
         return convertUserMetaDataToResponseVo(servicePage);
     }
 
+    //TODO waitTest
     @GetMapping("columnList")
     @ApiOperation(value = "获取元数据列分页列表", notes = "获取元数据列分页列表")
-    public ResponseVo<PageVo<MetaDataColumnsOldVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
-        IPage<MetaDataDetailsDto> servicePage = metaDataDetailsService.findByMetaDataId(metaDataDetailReq.getMetaDataId(), metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize());
-        return convertToResponseVo(servicePage);
+    public ResponseVo<PageVo<MetaDataColumnsVo>> columnList(@Valid MetaDataDetailReq metaDataDetailReq) {
+        IPage<MetaDataColumn> page = dataService.listMetaDataColumn(metaDataDetailReq.getCurrent(), metaDataDetailReq.getSize(), metaDataDetailReq.getMetaDataId());
+        List<MetaDataColumnsVo> organizationVoList = BeanUtil.copyToList(page.getRecords(), MetaDataColumnsVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
     }
 
     @PostMapping("auth")
@@ -135,11 +134,12 @@ public class DataController {
         return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataTablesVo.class));
     }
 
+    //TODO
     @GetMapping("getAllAuthColumns/{metaDataId}")
     @ApiOperation(value = "查询工作流输入字段", notes = "查询工作流输入字段")
-    public ResponseVo<List<MetaDataColumnsAuthVo>> getAllAuthColumns(@ApiParam(value = "元数据表ID", required = true) @PathVariable String metaDataId) {
-        List<MetaDataDetailsDto> dtoList = metaDataDetailsService.getAllAuthColumns(metaDataId);
-        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataColumnsAuthVo.class));
+    public ResponseVo<List<MetaDataColumnsChooseVo>> getAllAuthColumns(@ApiParam(value = "元数据表ID", required = true) @PathVariable String metaDataId) {
+        List<MetaDataColumn> dtoList = dataService.listMetaDataColumnAll(metaDataId);
+        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataColumnsChooseVo.class));
     }
 
     private ResponseVo<PageVo<MetaDataOldVo>> convertToMetaDataVo(IPage<MetaDataDtoOld> pageDto) {
@@ -197,17 +197,6 @@ public class DataController {
         }
         return 0;
     }
-
-    private ResponseVo<PageVo<MetaDataColumnsOldVo>> convertToResponseVo(IPage<MetaDataDetailsDto> pageDto) {
-        List<MetaDataColumnsOldVo> items = new ArrayList<>();
-        pageDto.getRecords().forEach(u -> items.add(BeanUtil.copyProperties(u, MetaDataColumnsOldVo.class)));
-
-        PageVo<MetaDataColumnsOldVo> pageVo = new PageVo<>();
-        BeanUtil.copyProperties(pageDto, pageVo);
-        pageVo.setItems(items);
-        return ResponseVo.createSuccess(pageVo);
-    }
-
 
     /**
      * 获取转换后数据授权状态(前端展示使用)

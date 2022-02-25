@@ -381,3 +381,38 @@ FROM (
               ON a.stats_time >= b.stats_time
 GROUP BY a.stats_time
 ORDER BY a.stats_time;
+
+
+DROP TABLE `t_user_org`;
+DROP TABLE `t_organization`;
+DROP TABLE `t_job`;
+DROP TABLE `t_meta_data`;
+DROP TABLE `t_meta_data_details`;
+
+DROP TABLE IF EXISTS `dc_meta_data_auth`;
+CREATE TABLE `dc_meta_data_auth` (
+    `meta_data_auth_id` varchar(200) NOT NULL COMMENT '申请数据授权的ID',
+    `user_identity_id` varchar(200) NOT NULL COMMENT '申请用户所属组织身份ID',
+    `user_id` varchar(200) NOT NULL COMMENT '申请数据授权的用户ID',
+    `user_type` int NOT NULL COMMENT '用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址',
+    `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+    `dfs_data_status` int DEFAULT NULL COMMENT '元数据在分布式存储环境中的状态 (0: DataStatus_Unknown ; DataStatus_Normal = 1; DataStatus_Deleted = 2)',
+    `dfs_data_id` varchar(200) DEFAULT NULL COMMENT '元数据在分布式存储环境中的ID',
+    `auth_type` int NOT NULL DEFAULT '0' COMMENT '申请收集授权类型：(0: 未定义; 1: 按照时间段来使用; 2: 按照次数来使用)',
+    `start_at` datetime DEFAULT NULL COMMENT '授权开始时间(auth_type=1时)',
+    `end_at` datetime DEFAULT NULL COMMENT '授权结束时间(auth_type=1时)',
+    `times` int DEFAULT '0' COMMENT '授权次数(auth_type=2时)',
+    `expired` tinyint(1) DEFAULT '0' COMMENT '是否已过期 (当 usage_type 为 1 时才需要的字段)',
+    `used_times` int DEFAULT '0' COMMENT '已经使用的次数 (当 usage_type 为 2 时才需要的字段)',
+    `apply_at` datetime(3) NOT NULL COMMENT '授权申请时间，精确到毫秒',
+    `audit_option` int DEFAULT '0' COMMENT '审核结果，0：等待审核中；1：审核通过；2：审核拒绝',
+    `audit_desc` varchar(256) DEFAULT '' COMMENT '审核意见 (允许""字符)',
+    `audit_at` datetime(3) DEFAULT NULL COMMENT '授权审核时间，精确到毫秒',
+    `auth_sign` varchar(1024) DEFAULT NULL COMMENT '授权签名hex',
+    `auth_status` int DEFAULT '0' COMMENT '数据授权信息的状态 (0: 未知; 1: 还未发布的数据授权; 2: 已发布的数据授权; 3: 已撤销的数据授权 <失效前主动撤回的>; 4: 已经失效的数据授权 <过期or达到使用上限的>)',
+    `update_at` timestamp(3) NOT NULL COMMENT '修改时间',
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`meta_data_auth_id`),
+    KEY `update_at` (`update_at`)
+) ENGINE=InnoDB COMMENT='元数据文件授权信息';

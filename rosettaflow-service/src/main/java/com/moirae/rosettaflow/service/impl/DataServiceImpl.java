@@ -6,9 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.OrganizationDto;
+import com.moirae.rosettaflow.manager.MetaDataAuthManager;
 import com.moirae.rosettaflow.manager.MetaDataColumnManager;
 import com.moirae.rosettaflow.manager.MetaDataManager;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.MetaDataAuth;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.service.DataService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ public class DataServiceImpl implements DataService {
     private MetaDataManager metaDataManager;
     @Resource
     private MetaDataColumnManager metaDataColumnManager;
+    @Resource
+    private MetaDataAuthManager metaDataAuthManager;
 
     @Override
     @Transactional
@@ -63,5 +67,27 @@ public class DataServiceImpl implements DataService {
     @Override
     public Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId) {
         return metaDataManager.listByIds(metaDataId).stream().collect(Collectors.toMap(MetaData::getMetaDataId, item -> item));
+    }
+
+    @Override
+    public List<MetaDataColumn> listMetaDataColumnAll(String metaDataId) {
+        LambdaQueryWrapper<MetaDataColumn> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaDataColumn::getMetaDataId, metaDataId);
+        wrapper.orderByAsc(MetaDataColumn::getColumnIdx);
+        return metaDataColumnManager.list(wrapper);
+    }
+
+    @Override
+    public MetaDataColumn getByKey(String metaDataId, Integer columnIdx) {
+        LambdaQueryWrapper<MetaDataColumn> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaDataColumn::getMetaDataId, metaDataId);
+        queryWrapper.eq(MetaDataColumn::getColumnIdx, columnIdx);
+        return metaDataColumnManager.getOne(queryWrapper);
+    }
+
+    @Override
+    @Transactional
+    public void batchReplaceAuth(List<MetaDataAuth> metaDataAuthList) {
+        metaDataAuthManager.saveOrUpdateBatch(metaDataAuthList);
     }
 }

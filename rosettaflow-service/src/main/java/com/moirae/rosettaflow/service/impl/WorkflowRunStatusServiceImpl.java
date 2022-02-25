@@ -51,8 +51,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private GrpcTaskService grpcTaskService;
     @Resource
-    private IMetaDataDetailsOldService metaDataDetailsService;
-    @Resource
     private IMetaDataOldService metaDataService;
     @Resource
     private IAlgorithmService algorithmService;
@@ -64,6 +62,8 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     private IAlgorithmVariableStructService algorithmVariableStructService;
     @Resource
     private GrpcSysService grpcSysService;
+    @Resource
+    private DataService dataService;
 
     @Override
     public TaskDto assemblyTaskDto(WorkflowDto workflowDto) {
@@ -513,9 +513,9 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 log.error("WorkflowServiceImpl->getDataSupplierList 获取当前工作流节点索引列不存在");
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_INDEX_COLUMN_NOT_EXIST.getMsg());
             }
-            List<Integer> columnIndexList = metaDataDetailsService.getColumnIndexByIds(columnIdsArr);
+            List<Integer> columnIndexList = Arrays.stream(columnIdsArr).map(Integer::valueOf).collect(Collectors.toList());
 
-            taskMetaDataDeclareDto.setKeyColumn(metaDataDetailsService.getColumnIndexById(input.getKeyColumn()).getColumnIndex());
+            taskMetaDataDeclareDto.setKeyColumn(input.getKeyColumn().intValue());
 
             List<Integer> selectedColumns = new ArrayList<>(columnIndexList);
             taskMetaDataDeclareDto.setSelectedColumns(selectedColumns);
@@ -580,8 +580,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
             if (jsonObject.containsKey(AlgorithmConstant.LABEL_COLUMN)) {
                 for (WorkflowNodeInput input : curlWorkflowNode.getWorkflowNodeInputReqList()) {
                     if (input.getDependentVariable() != null) {
-                        jsonObject.put("label_column",
-                                metaDataDetailsService.getColumnIndexById(input.getDependentVariable()).getColumnName());
+                        jsonObject.put("label_column", dataService.getByKey(input.getDataTableId(), input.getDependentVariable().intValue()).getColumnName());
                     }
                 }
             }

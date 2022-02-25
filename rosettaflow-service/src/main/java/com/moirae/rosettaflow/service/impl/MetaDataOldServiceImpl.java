@@ -42,12 +42,6 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
     @Resource
     private CommonService commonService;
 
-
-    @Override
-    public void truncate() {
-        this.baseMapper.truncate();
-    }
-
     @Override
     public IPage<MetaDataDtoOld> list(Long current, Long size, String dataName) {
         Page<MetaDataOld> page = new Page<>(current, size);
@@ -130,11 +124,6 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
         return this.baseMapper.getAllAuthTables(identityId, address);
     }
 
-    @Override
-    public void batchInsert(List<MetaDataOld> metaDataList) {
-        this.baseMapper.batchInsert(metaDataList);
-    }
-
     IPage<MetaDataDtoOld> convertToPageDto(Page<MetaDataOld> page, List<UserMetaData> metaDataWithAuthList) {
         List<MetaDataDtoOld> records = new ArrayList<>();
         Map<String, Byte> authStatusMap = new HashMap<>(metaDataWithAuthList.size());
@@ -177,15 +166,5 @@ public class MetaDataOldServiceImpl extends ServiceImpl<MetaDataOldMapper, MetaD
             return AuthStatusShowEnum.UNKNOWN.getValue();
         }
         return authStatus;
-    }
-
-    @Override
-    public void batchUpdate(List<MetaDataOld> metaDataList) {
-        this.baseMapper.batchUpdate(metaDataList);
-    }
-
-    @Override
-    public List<String> existMetaDataIdList(List<String> metaDataIdList) {
-        return this.baseMapper.existMetaDataIdList(metaDataIdList);
     }
 }

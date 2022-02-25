@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.dto.MetaDataColumnDto;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.MetaDataAuth;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 
@@ -35,4 +36,10 @@ public interface DataService {
     IPage<MetaDataColumn> listMetaDataColumn(Long current, Long size, String metaDataId);
 
     Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId);
+
+    List<MetaDataColumn> listMetaDataColumnAll(String metaDataId);
+
+    MetaDataColumn getByKey(String metaDataId, Integer columnIdx);
+
+    void batchReplaceAuth(List<MetaDataAuth> metaDataAuthList);
 }

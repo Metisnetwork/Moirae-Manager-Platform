@@ -13,10 +13,6 @@ import java.util.List;
  * @description 元数据服务
  */
 public interface IMetaDataOldService extends IService<MetaDataOld> {
-    /**
-     * 清空元数据摘要表
-     */
-    void truncate();
 
     /**
      * 获取元数据摘要列表
@@ -53,12 +49,6 @@ public interface IMetaDataOldService extends IService<MetaDataOld> {
      */
     List<MetaDataDtoOld> getAllAuthTables(String identityId);
 
-    /**
-     * 批量更新数据
-     *
-     * @param metaDataList 批量插入列表
-     */
-    void batchInsert(List<MetaDataOld> metaDataList);
 
     /**
      * 授权状态处理
@@ -68,18 +58,4 @@ public interface IMetaDataOldService extends IService<MetaDataOld> {
      * @return authStatus
      */
     Byte dealAuthStatus(Byte authStatus, Byte authMetadataState);
-
-    /**
-     * 根据metaDataId批量更新数据
-     *
-     * @param metaDataList
-     * @return
-     */
-    void batchUpdate(List<MetaDataOld> metaDataList);
-
-    /**
-     * 查询出已存在的MetaDataIdList
-     * @return
-     */
-    List<String> existMetaDataIdList(List<String> metaDataIdList);
 }
