@@ -15,4 +15,10 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
     IPage<MetaDataDto> listDataFileByIdentityId(String identityId, Page<OrganizationDto> page);
 
     MetaDataDto getDataFile(String metaDataId);
+
+    IPage<MetaDataDto> listByNameAndAuthAddress(Page<MetaDataDto> page, String dataName, String address);
+
+    IPage<MetaDataDto> listMetaDataAuth(Page<MetaDataDto> page, String dataName, String address);
+
+    MetaDataDto getMetaDataAuthDetails(String metaDataAuthId);
 }

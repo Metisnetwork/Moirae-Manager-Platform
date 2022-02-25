@@ -24,4 +24,19 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     public MetaDataDto getDataFile(String metaDataId) {
         return this.baseMapper.getDataFile(metaDataId);
     }
+
+    @Override
+    public IPage<MetaDataDto> listByNameAndAuthAddress(Page<MetaDataDto> page, String dataName, String address) {
+        return this.baseMapper.listByNameAndAuthAddress(page, dataName, address);
+    }
+
+    @Override
+    public IPage<MetaDataDto> listMetaDataAuth(Page<MetaDataDto> page, String dataName, String address) {
+        return this.baseMapper.listMetaDataAuth(page, dataName, address);
+    }
+
+    @Override
+    public MetaDataDto getMetaDataAuthDetails(String metaDataAuthId) {
+        return this.baseMapper.getMetaDataAuthDetails(metaDataAuthId);
+    }
 }

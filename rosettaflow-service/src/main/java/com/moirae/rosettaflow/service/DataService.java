@@ -42,4 +42,10 @@ public interface DataService {
     MetaDataColumn getByKey(String metaDataId, Integer columnIdx);
 
     void batchReplaceAuth(List<MetaDataAuth> metaDataAuthList);
+
+    IPage<MetaDataDto> list(Long current, Long size, String dataName);
+
+    IPage<MetaDataDto> listMetaDataAuth(Long current, Long size, String dataName);
+
+    MetaDataDto getMetaDataAuthDetails(String metaDataAuthId);
 }

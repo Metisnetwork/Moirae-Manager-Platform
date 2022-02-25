@@ -8,6 +8,7 @@ import java.util.Map;
 
 public enum MetaDataAuthOptionEnum {
 
+    UNKNOWN(-1, "未知( 未登录故获取不到授权状态 或 用户未申请使用元数据)"),
     PENDING(0, "等待审核中"),
     PASSED(1, "审核通过"),
     REFUSED(2, "审核拒绝");

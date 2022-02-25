@@ -70,4 +70,77 @@
              ) t on df.meta_data_id = t.meta_data_id
         where df.meta_data_id = #{metaDataId,jdbcType=VARCHAR}
     </select>
+    <select id="listByNameAndAuthAddress" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select df.meta_data_id,
+               df.file_name as metaDataName,
+               df.file_type,
+               df.size,
+               df.published_at,
+               df.status,
+               df.update_at,
+               do.identity_id,
+               do.node_name,
+               <choose>
+                    <when test="address != null and address != ''">
+                        (select dmda.auth_status from dc_meta_data_auth dmda where dmda.meta_data_id = df.meta_data_id and dmda.user_id = #{address,jdbcType=VARCHAR} order by dmda.apply_at desc limit 1) as auth_status,
+                        (select dmda.audit_option from dc_meta_data_auth dmda where dmda.meta_data_id = df.meta_data_id and dmda.user_id = #{address,jdbcType=VARCHAR} order by dmda.apply_at desc limit 1) as audit_option,
+                    </when>
+                    <otherwise>
+                        0 as metaDataAuthStatus,
+                        -1 as metaDataAuthOption,
+                    </otherwise>
+               </choose>
+               df.industry
+        from dc_meta_data df join dc_org do on df.identity_id = do.identity_id
+        <where>
+            df.status = 2 and do.status = 1
+            <if test="dataName != null and dataName != ''">
+                and df.file_name like concat('%', #{dataName, jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+        order by df.published_at
+    </select>
+    <select id="listMetaDataAuth" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select df.meta_data_id,
+               df.status,
+               df.file_name as metaDataName,
+               dmda.meta_data_auth_id,
+               dmda.auth_type,
+               dmda.start_at,
+               dmda.end_at,
+               dmda.times,
+               dmda.apply_at,
+               dmda.audit_option,
+               dmda.auth_status,
+               do.identity_id,
+               do.node_name
+        from dc_meta_data_auth dmda join dc_meta_data df on dmda.meta_data_id = df.meta_data_id join dc_org do on df.identity_id = do.identity_id
+        where dmda.user_id = #{address,jdbcType=VARCHAR}
+        <if test="dataName != null and dataName != ''">
+            and df.file_name like concat('%',#{dataName, jdbcType=VARCHAR},'%')
+        </if>
+        order by dmda.apply_at desc
+    </select>
+    <select id="getMetaDataAuthDetails" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select df.meta_data_id,
+               df.status,
+               df.file_name as metaDataName,
+               df.industry,
+               df.published_at,
+               df.update_at,
+               df.file_type,
+               df.size,
+               df.columns,
+               df.rows,
+               df.remarks,
+               dmda.auth_type,
+               dmda.start_at,
+               dmda.end_at,
+               dmda.times,
+               dmda.apply_at,
+               do.identity_id,
+               do.node_name
+        from dc_meta_data_auth dmda join dc_meta_data df on dmda.meta_data_id = df.meta_data_id join dc_org do on df.identity_id = do.identity_id
+        where dmda.meta_data_auth_id = #{metaDataAuthId, jdbcType=VARCHAR}
+    </select>
 </mapper>

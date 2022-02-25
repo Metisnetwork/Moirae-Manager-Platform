@@ -12,4 +12,10 @@ public interface MetaDataManager extends IService<MetaData> {
     IPage<MetaDataDto> listDataFileByIdentityId(Page<OrganizationDto> page, String identityId);
 
     MetaDataDto getDataFile(String metaDataId);
+
+    IPage<MetaDataDto> listByNameAndAuthAddress(Page<MetaDataDto> page, String dataName, String address);
+
+    IPage<MetaDataDto> listMetaDataAuth(Page<MetaDataDto> page, String dataName, String address);
+
+    MetaDataDto getMetaDataAuthDetails(String metaDataAuthId);
 }

@@ -30,4 +30,14 @@ public class BaseMetaDataVo {
 
     @ApiModelProperty(value = "(状态)修改时间")
     private Date updateAt;
+
+    @ApiModelProperty(value = "发布时间，精确到毫秒")
+    public Date getPublishAt(){
+        return publishedAt;
+    }
+
+    @ApiModelProperty(value = "(状态)修改时间")
+    public Date getUpdateTime(){
+        return updateAt;
+    }
 }

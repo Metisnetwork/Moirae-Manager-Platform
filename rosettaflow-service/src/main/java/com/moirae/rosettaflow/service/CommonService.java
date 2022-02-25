@@ -23,16 +23,6 @@ public class CommonService {
     static final String TASK_NAME_PRE = "task_";
 
     /**
-     * 根据工作流节点id生成任务名称
-     *
-     * @param workflowNodeId 工作流节点id
-     * @return 任务名称
-     */
-    public String generateTaskName(Long workflowNodeId) {
-        return TASK_NAME_PRE + workflowNodeId + "_" + DateUtil.format(new Date(), DATE_TIME_FMT);
-    }
-
-    /**
      * 生成随机uuid
      *
      * @return 返回uuid
@@ -50,7 +40,7 @@ public class CommonService {
         return currentUser;
     }
 
-    public static void main(String[] args) {
-        System.out.println(DateUtil.format(new Date(), DATE_TIME_FMT));
+    public UserDto getCurrentUserOrNull() {
+        return UserContext.get();
     }
 }
