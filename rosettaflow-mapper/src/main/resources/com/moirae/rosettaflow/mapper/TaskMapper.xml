@@ -134,4 +134,15 @@
         from dc_task t inner join mo_task_expand te on t.id = te.id
         where t.id = #{taskId,jdbcType=VARCHAR} and te.event_synced = 1
     </select>
+    <select id="getTaskListByMetaDataId" resultType="com.moirae.rosettaflow.mapper.domain.Task">
+        select t.id,
+               t.task_name,
+               t.create_at,
+               t.start_at,
+               t.end_at,
+               t.status
+        from dc_task t join dc_task_data_provider tmd on t.id = tmd.task_id and tmd.meta_data_id = #{metaDataId,jdbcType=VARCHAR}
+        where t.`status` in (3, 4)
+        order by t.create_at desc
+    </select>
 </mapper>

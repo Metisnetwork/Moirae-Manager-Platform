@@ -56,4 +56,10 @@ public interface DataService {
     List<MetaDataDto> getMetaDataByChoose(String identityId);
 
     void apply(String metaDataId, MetaDataAuthTypeEnum authType, Date startAt, Date endAt, Integer times, String sign);
+
+    void revoke(String metadataAuthId, String sign);
+
+    void checkMetaDataEffective(String metaDataId);
+
+    void checkMetaDataAuthListEffective(Set<String> metaDataIdList);
 }

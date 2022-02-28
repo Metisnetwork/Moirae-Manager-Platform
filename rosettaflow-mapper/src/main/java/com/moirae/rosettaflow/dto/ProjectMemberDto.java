@@ -9,7 +9,7 @@ import java.util.Date;
  * @author houz
  */
 @Data
-public class ProjMemberDto {
+public class ProjectMemberDto {
 
     /**
      * 用户ID

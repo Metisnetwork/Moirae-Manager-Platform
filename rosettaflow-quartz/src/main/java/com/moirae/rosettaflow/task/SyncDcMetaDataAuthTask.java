@@ -1,21 +1,16 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.common.constants.SysConfig;
-import com.moirae.rosettaflow.common.enums.*;
-import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
-import com.moirae.rosettaflow.common.utils.BatchExecuteUtil;
+import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.GetMetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.mapper.domain.MetaDataAuth;
-import com.moirae.rosettaflow.mapper.domain.UserMetaData;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthOptionEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.IDataSyncService;
-import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,8 +20,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 同步用户元数据授权列列表（当用户对元数据做授权申请后，redis记录设置已申请，此定时任务判断有待申请记录就启动同步，否则不同步）

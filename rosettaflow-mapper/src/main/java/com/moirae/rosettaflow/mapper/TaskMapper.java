@@ -18,4 +18,6 @@ public interface TaskMapper extends BaseMapper<Task> {
     List<Task> getTaskListOfEventNotSynced();
 
     Task getTaskOfUnSyncedEvent(String taskId);
+
+    IPage<Task> getTaskListByMetaDataId(Page<Task> page, String metaDataId);
 }

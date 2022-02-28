@@ -2,13 +2,10 @@ package com.moirae.rosettaflow.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.dto.ProjMemberDto;
+import com.moirae.rosettaflow.dto.ProjectMemberDto;
 import com.moirae.rosettaflow.dto.ProjectDto;
-import com.moirae.rosettaflow.dto.ProjectModelDto;
 import com.moirae.rosettaflow.mapper.domain.Project;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * 项目mapper类
@@ -37,7 +34,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @param iPage     分页
      * @return IPage
      */
-    IPage<ProjMemberDto> queryProjMemberList(@Param(value = "projectId") Long projectId,
-                                             @Param(value = "userName") String userName,
-                                             IPage<ProjMemberDto> iPage);
+    IPage<ProjectMemberDto> queryProjMemberList(@Param(value = "projectId") Long projectId,
+                                                @Param(value = "userName") String userName,
+                                                IPage<ProjectMemberDto> iPage);
 }

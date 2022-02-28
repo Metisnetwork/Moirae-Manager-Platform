@@ -29,4 +29,9 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     public Task getTaskOfUnSyncedEvent(String taskId) {
         return this.baseMapper.getTaskOfUnSyncedEvent(taskId);
     }
+
+    @Override
+    public IPage<Task> getTaskListByMetaDataId(Page<Task> page, String metaDataId) {
+        return this.baseMapper.getTaskListByMetaDataId(page, metaDataId);
+    }
 }

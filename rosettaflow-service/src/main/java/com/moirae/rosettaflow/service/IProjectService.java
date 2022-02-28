@@ -2,9 +2,8 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.moirae.rosettaflow.dto.ProjMemberDto;
+import com.moirae.rosettaflow.dto.ProjectMemberDto;
 import com.moirae.rosettaflow.dto.ProjectDto;
-import com.moirae.rosettaflow.dto.ProjectModelDto;
 import com.moirae.rosettaflow.mapper.domain.Project;
 import com.moirae.rosettaflow.mapper.domain.ProjectMember;
 import com.moirae.rosettaflow.mapper.domain.User;
@@ -74,7 +73,7 @@ public interface IProjectService extends IService<Project> {
      * @param size        页条数
      * @return IPage
      */
-    IPage<ProjMemberDto> queryProjMemberPageList(Long projectId, String projectName, Long current, Long size);
+    IPage<ProjectMemberDto> queryProjMemberPageList(Long projectId, String projectName, Long current, Long size);
 
     /**
      * 新增项目成员

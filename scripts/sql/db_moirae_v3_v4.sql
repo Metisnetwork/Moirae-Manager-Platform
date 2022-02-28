@@ -388,6 +388,8 @@ DROP TABLE `t_organization`;
 DROP TABLE `t_job`;
 DROP TABLE `t_meta_data`;
 DROP TABLE `t_meta_data_details`;
+DROP TABLE `t_login_log`;
+DROP TABLE `t_user_meta_data`;
 
 DROP TABLE IF EXISTS `dc_meta_data_auth`;
 CREATE TABLE `dc_meta_data_auth` (

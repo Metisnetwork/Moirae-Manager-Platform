@@ -170,4 +170,10 @@ public class TaskServiceImpl implements TaskService {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.RPC_INTERFACE_FAIL.getMsg());
         }
     }
+
+    @Override
+    public IPage<Task> getTaskListByMetaDataId(Long current, Long size, String metaDataId) {
+        Page<Task> page = new Page<>(current, size);
+        return taskManager.getTaskListByMetaDataId(page, metaDataId);
+    }
 }

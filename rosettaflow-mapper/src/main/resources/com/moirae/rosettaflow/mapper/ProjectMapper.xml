@@ -39,7 +39,7 @@
         order by a.create_time desc
     </select>
     <!-- 查询项目成员列表 -->
-    <select id="queryProjMemberList" resultType="com.moirae.rosettaflow.dto.ProjMemberDto">
+    <select id="queryProjMemberList" resultType="com.moirae.rosettaflow.dto.ProjectMemberDto">
         select
         a.id as memberId,
         a.user_id as userId,

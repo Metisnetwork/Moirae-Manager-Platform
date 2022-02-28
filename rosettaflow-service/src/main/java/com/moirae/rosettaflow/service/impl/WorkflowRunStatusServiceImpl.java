@@ -4,9 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.constants.AlgorithmConstant;
 import com.moirae.rosettaflow.common.constants.SysConstant;
@@ -34,8 +32,6 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.moirae.rosettaflow.common.enums.RespCodeEnum.BIZ_EXCEPTION;
-
 @Slf4j
 @Service
 public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusMapper, WorkflowRunStatus> implements IWorkflowRunStatusService {
@@ -50,8 +46,6 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     private IWorkflowRunTaskResultService workflowRunTaskResultService;
     @Resource
     private GrpcTaskService grpcTaskService;
-    @Resource
-    private IMetaDataOldService metaDataService;
     @Resource
     private IAlgorithmService algorithmService;
     @Resource
@@ -291,15 +285,7 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
 
             // 元数据状态校验
             item.getWorkflowNodeInputReqList().stream().forEach(subItem ->{
-                LambdaQueryWrapper<MetaDataOld> metaDataLambdaQueryWrapper = Wrappers.lambdaQuery();
-                metaDataLambdaQueryWrapper.eq(MetaDataOld::getMetaDataId, subItem.getDataTableId());
-                metaDataLambdaQueryWrapper.eq(MetaDataOld::getStatus, StatusEnum.VALID.getValue());
-                metaDataLambdaQueryWrapper.eq(MetaDataOld::getDataStatus, MetaDataStateEnum.MetaDataState_Released.getValue());
-                MetaDataOld one = metaDataService.getOne(metaDataLambdaQueryWrapper);
-                if(one == null){
-                    //无效元数据
-                    throw new BusinessException(BIZ_EXCEPTION, StrUtil.format(ErrorMsg.METADATA_UNAVAILABLE_FORMAT.getMsg(), subItem.getDataTableId()));
-                }
+                dataService.checkMetaDataEffective(subItem.getDataTableId());
             });
         });
     }

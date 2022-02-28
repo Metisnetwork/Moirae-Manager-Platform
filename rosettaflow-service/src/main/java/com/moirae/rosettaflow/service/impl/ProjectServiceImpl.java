@@ -13,7 +13,7 @@ import com.moirae.rosettaflow.common.enums.ProjectMemberRoleEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.dto.ProjMemberDto;
+import com.moirae.rosettaflow.dto.ProjectMemberDto;
 import com.moirae.rosettaflow.dto.ProjectDto;
 import com.moirae.rosettaflow.mapper.ProjectMapper;
 import com.moirae.rosettaflow.mapper.domain.*;
@@ -210,8 +210,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     @Override
-    public IPage<ProjMemberDto> queryProjMemberPageList(Long projectId, String userName, Long current, Long size) {
-        IPage<ProjMemberDto> iPage = new Page<>(current, size);
+    public IPage<ProjectMemberDto> queryProjMemberPageList(Long projectId, String userName, Long current, Long size) {
+        IPage<ProjectMemberDto> iPage = new Page<>(current, size);
         return this.baseMapper.queryProjMemberList(projectId, userName, iPage);
     }
 

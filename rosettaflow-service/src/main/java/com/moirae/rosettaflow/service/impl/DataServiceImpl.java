@@ -7,9 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.moirae.rosettaflow.common.enums.ErrorMsg;
-import com.moirae.rosettaflow.common.enums.RespCodeEnum;
-import com.moirae.rosettaflow.common.enums.UserTypeEnum;
+import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.OrganizationDto;
@@ -19,15 +17,14 @@ import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.ApplyMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataAuthorityDto;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataUsageRuleDto;
+import com.moirae.rosettaflow.grpc.metadata.req.dto.RevokeMetaDataAuthorityRequestDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.ApplyMetaDataAuthorityResponseDto;
+import com.moirae.rosettaflow.grpc.metadata.resp.dto.RevokeMetadataAuthorityResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcAuthService;
 import com.moirae.rosettaflow.manager.MetaDataAuthManager;
 import com.moirae.rosettaflow.manager.MetaDataColumnManager;
 import com.moirae.rosettaflow.manager.MetaDataManager;
-import com.moirae.rosettaflow.mapper.domain.MetaData;
-import com.moirae.rosettaflow.mapper.domain.MetaDataAuth;
-import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
-import com.moirae.rosettaflow.mapper.domain.Org;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthOptionEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
@@ -39,11 +36,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.moirae.rosettaflow.common.enums.RespCodeEnum.BIZ_EXCEPTION;
 
 @Slf4j
 @Service
@@ -261,5 +257,65 @@ public class DataServiceImpl implements DataService {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_AUTH_SAVE_ERROR.getMsg());
         }
         log.info("元数据授权申请id为：{}", responseDto.getMetaDataAuthId());
+    }
+
+    @Override
+    public void revoke(String metadataAuthId, String sign) {
+        //检查待撤销userMetaData数据
+        MetaDataAuth metaDataAuth = metaDataAuthManager.getById(metadataAuthId);
+        if (Objects.isNull(metaDataAuth)) {
+            log.error("query userMetaData fail by id:{}",metadataAuthId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_NOT_EXIST.getMsg());
+        }
+
+        if (!(metaDataAuth.getAuditOption() == MetaDataAuthOptionEnum.PENDING && metaDataAuth.getAuthStatus() == MetaDataAuthStatusEnum.PUBLISHED)) {
+            log.error("user auth metaData status error,can not revoke,metadataAuthId:{}, auditOption:{}, authStatus:{}", metadataAuthId, metaDataAuth.getAuditOption(), metaDataAuth.getAuthStatus());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_REVOKE_ERROR.getMsg());
+        }
+
+        //撤销元数据授权
+        UserDto userDto = commonService.getCurrentUser();
+        RevokeMetaDataAuthorityRequestDto requestDto = new RevokeMetaDataAuthorityRequestDto();
+        requestDto.setUser(userDto.getAddress());
+        requestDto.setMetadataAuthId(metadataAuthId);
+        requestDto.setSign(sign);
+        requestDto.setUserType(UserTypeEnum.checkUserType(userDto.getAddress()));
+        RevokeMetadataAuthorityResponseDto responseDto = grpcAuthService.revokeMetadataAuthority(requestDto);
+        if (responseDto.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("撤销元数据授权,net处理失败，失败原因：{}", responseDto);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, responseDto.getMsg());
+        }
+        //更新用户授权元数据，状态为已撤销数据授权
+        metaDataAuth.setAuthStatus(MetaDataAuthStatusEnum.REVOKED);
+        if (!metaDataAuthManager.updateById(metaDataAuth)) {
+            log.error("更新用户授权数据信息的状态auth_metadata_state失败,id：{}", metadataAuthId);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_AUTH_METADATA_STATE_UPDATE_FAIL.getMsg());
+        }
+    }
+
+    @Override
+    public void checkMetaDataEffective(String metaDataId) {
+        LambdaQueryWrapper<MetaData> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaData::getMetaDataId, metaDataId);
+        queryWrapper.eq(MetaData::getStatus, com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum.PUBLISHED);
+        int count = metaDataManager.count(queryWrapper);
+        if(count != 1){
+            //无效元数据
+            throw new BusinessException(BIZ_EXCEPTION, StrUtil.format(ErrorMsg.METADATA_UNAVAILABLE_FORMAT.getMsg(), metaDataId));
+        }
+    }
+
+    @Override
+    public void checkMetaDataAuthListEffective(Set<String> metaDataIdList) {
+        LambdaQueryWrapper<MetaDataAuth> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaDataAuth::getAuthStatus, MetaDataAuthStatusEnum.PUBLISHED);
+        queryWrapper.in(MetaDataAuth::getMetaDataId, metaDataIdList);
+        queryWrapper.groupBy(MetaDataAuth::getMetaDataId);
+        int count = metaDataAuthManager.count(queryWrapper);
+        if(count != metaDataIdList.size()){
+            //无效元数据
+            log.error("有授权数据已过期，请检查, metaDataIdList:{}", metaDataIdList);
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
+        }
     }
 }

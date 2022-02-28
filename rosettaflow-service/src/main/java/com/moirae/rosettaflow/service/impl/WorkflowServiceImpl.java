@@ -62,7 +62,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private OrganizationService organizationService;
     @Resource
-    private IUserMetaDataService userMetaDataService;
+    private DataService dataService;
     @Resource
     private IWorkflowRunStatusService workflowRunStatusService;
     @Resource
@@ -472,10 +472,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 .flatMap(workflowNode -> workflowNode.getWorkflowNodeInputReqList().stream())
                 .map(WorkflowNodeInput::getDataTableId)
                 .collect(Collectors.toSet());
-        if(!userMetaDataService.isValid(tableIdList)){
-            log.error("有授权数据已过期，请检查, userAuthDataIdSet:{}", JSON.toJSONString(tableIdList));
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
-        }
+        dataService.checkMetaDataAuthListEffective(tableIdList);
+
         // 算法校验 - 模型输入校验（只有一个算法节点）
         if(reqWorkflow.getWorkflowNodeReqList().get(0).getInputModel() == SysConstant.INT_1
                 && (reqWorkflow.getWorkflowNodeReqList().get(0).getModelId() == null

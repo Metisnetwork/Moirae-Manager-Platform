@@ -2,9 +2,8 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.dto.ProjMemberDto;
+import com.moirae.rosettaflow.dto.ProjectMemberDto;
 import com.moirae.rosettaflow.dto.ProjectDto;
-import com.moirae.rosettaflow.dto.ProjectModelDto;
 import com.moirae.rosettaflow.mapper.domain.Project;
 import com.moirae.rosettaflow.mapper.domain.ProjectMember;
 import com.moirae.rosettaflow.mapper.domain.User;
@@ -91,7 +90,7 @@ public class ProjectController {
     @GetMapping("queryProjMemberPageList")
     @ApiOperation(value = "查询项目成员列表", notes = "查询项目成员列表")
     public ResponseVo<PageVo<ProjMemberListVo>> queryProjMemberList(@Valid ProjMemberListReq listReq) {
-        IPage<ProjMemberDto> iPage = projectService.queryProjMemberPageList(listReq.getProjectId(),
+        IPage<ProjectMemberDto> iPage = projectService.queryProjMemberPageList(listReq.getProjectId(),
                 listReq.getUserName(), listReq.getCurrent(), listReq.getSize());
         List<ProjMemberListVo> items = BeanUtil.copyToList(iPage.getRecords(), ProjMemberListVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(iPage, items));

@@ -2,14 +2,11 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
 import com.moirae.rosettaflow.dto.MetaDataDto;
-import com.moirae.rosettaflow.dto.UserMetaDataDto;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
 import com.moirae.rosettaflow.req.data.*;
 import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -38,8 +35,6 @@ import java.util.List;
 @RequestMapping(value = "data", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DataController {
 
-    @Resource
-    private IUserMetaDataService userMetaDataService;
     @Resource
     private DataService dataService;
 
@@ -100,16 +95,14 @@ public class DataController {
     @PostMapping("auth")
     @ApiOperation(value = "元数据申请授权", notes = "元数据申请授权")
     public ResponseVo<?> auth(@RequestBody @Valid MetaDataAuthReq metaDataAuthReq) {
-        dataService.apply(metaDataAuthReq.getId(), MetaDataAuthTypeEnum.find(metaDataAuthReq.getAuthType().intValue()), metaDataAuthReq.getAuthBeginTime(), metaDataAuthReq.getAuthEndTime(), metaDataAuthReq.getAuthValue(), metaDataAuthReq.getSign());
+        dataService.apply(metaDataAuthReq.getMetaDataId(), MetaDataAuthTypeEnum.find(metaDataAuthReq.getAuthType().intValue()), metaDataAuthReq.getAuthBeginTime(), metaDataAuthReq.getAuthEndTime(), metaDataAuthReq.getAuthValue(), metaDataAuthReq.getSign());
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("revoke")
     @ApiOperation(value = "元数据撤销授权", notes = "元数据撤销授权")
-    public ResponseVo<?> revoke(@RequestBody @Valid MetaDataRevokeReq metaDataRevokeReq) {
-        UserMetaDataDto userMetaDataDto = new UserMetaDataDto();
-        BeanCopierUtils.copy(metaDataRevokeReq, userMetaDataDto);
-        userMetaDataService.revoke(userMetaDataDto);
+    public ResponseVo<?> revoke(@RequestBody @Valid MetaDataRevokeReq req) {
+        dataService.revoke(req.getMetadataAuthId(), req.getSign());
         return ResponseVo.createSuccess();
     }
 

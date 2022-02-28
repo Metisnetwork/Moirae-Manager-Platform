@@ -20,4 +20,6 @@ public interface TaskService {
     void syncedEvent(String taskId, List<TaskEvent> taskEventList);
 
     List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId);
+
+    IPage<Task> getTaskListByMetaDataId(Long current, Long size, String metaDataId);
 }

@@ -133,6 +133,7 @@ public class SysConstant {
             "org/listOrgInfoByMemory",
             "org/findOrgInfo",
             "task/getOrgTaskListByIdentityId",
+            "task/getTaskByMetaDataId",
             "task/getTaskDetails",
             "task/getTaskEventList",
             "home/dataTrend",

@@ -5,6 +5,7 @@ import com.moirae.rosettaflow.common.annotation.CheckAddress;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import jnr.ffi.annotations.In;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -22,15 +23,14 @@ import java.util.Date;
 @ApiModel(value = "元数据授权申请对象")
 public class MetaDataAuthReq {
 
-    @ApiModelProperty(value = "元数据表id", required = true)
     @NotNull(message = "{metadata.id.notNull}")
-    @Positive(message = "{metadata.id.positive}")
-    private String id;
+    @ApiModelProperty(value = "元数据id", required = true)
+    private String metaDataId;
 
     @ApiModelProperty(value = "授权方式: 1-按时间, 2-按次数", required = true, example = "1")
     @NotNull(message = "{metadata.auth.notNull}")
     @Range(min = 1, max = 2, message = "{metadata.auth.type.error}")
-    private Byte authType;
+    private Integer authType;
 
     @ApiModelProperty(value = "授权次数，按次数时,此字段必输,当authType按时间方式时，authValue默认输入0", required = true, example = "100")
     @PositiveOrZero(message = "{metadata.auth.positive}")
@@ -41,10 +41,6 @@ public class MetaDataAuthReq {
 
     @ApiModelProperty(value = "授权结束时间,按时间授权此字段必输", example = "2021-10-27 17:13:47")
     private Date authEndTime;
-
-    @ApiModelProperty(value = "用户钱包地址", required = true)
-    @CheckAddress(message = "{user.address.format}")
-    private String address;
 
     @ApiModelProperty(value = "发起数据授权申请的账户的签名", required = true)
     @NotNull(message = "{metadata.auth.sign.notNull}")
