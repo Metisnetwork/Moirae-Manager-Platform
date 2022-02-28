@@ -6,7 +6,9 @@ import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataAuth;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,4 +50,10 @@ public interface DataService {
     IPage<MetaDataDto> listMetaDataAuth(Long current, Long size, String dataName);
 
     MetaDataDto getMetaDataAuthDetails(String metaDataAuthId);
+
+    List<MetaDataDto> getOrgChooseListByMetaDataAuth();
+
+    List<MetaDataDto> getMetaDataByChoose(String identityId);
+
+    void apply(String metaDataId, MetaDataAuthTypeEnum authType, Date startAt, Date endAt, Integer times, String sign);
 }

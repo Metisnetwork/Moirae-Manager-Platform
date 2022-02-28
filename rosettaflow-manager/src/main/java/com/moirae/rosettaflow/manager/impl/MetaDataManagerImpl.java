@@ -11,6 +11,8 @@ import com.moirae.rosettaflow.mapper.domain.MetaData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> implements MetaDataManager {
@@ -38,5 +40,15 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public MetaDataDto getMetaDataAuthDetails(String metaDataAuthId) {
         return this.baseMapper.getMetaDataAuthDetails(metaDataAuthId);
+    }
+
+    @Override
+    public List<MetaDataDto> getOrgChooseListByMetaDataAuth(String address) {
+        return this.baseMapper.getOrgChooseListByMetaDataAuth(address);
+    }
+
+    @Override
+    public List<MetaDataDto> getMetaDataByChoose(String address, String identityId) {
+        return this.baseMapper.getMetaDataByChoose(address, identityId);
     }
 }

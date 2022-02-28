@@ -40,4 +40,9 @@ public class BaseMetaDataVo {
     public Date getUpdateTime(){
         return updateAt;
     }
+
+    @ApiModelProperty(value = "元数据id")
+    public String getId(){
+        return metaDataId;
+    }
 }

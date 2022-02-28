@@ -143,4 +143,28 @@
         from dc_meta_data_auth dmda join dc_meta_data df on dmda.meta_data_id = df.meta_data_id join dc_org do on df.identity_id = do.identity_id
         where dmda.meta_data_auth_id = #{metaDataAuthId, jdbcType=VARCHAR}
     </select>
+    <select id="getOrgChooseListByMetaDataAuth" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select do.identity_id,
+               do.node_name
+        from dc_meta_data_auth dmda join dc_meta_data df on dmda.meta_data_id = df.meta_data_id join dc_org do on df.identity_id = do.identity_id
+        where dmda.user_id = #{address,jdbcType=VARCHAR}
+          and df.status = 2
+          and dmda.auth_status = 2
+          and do.status = 1
+          and ((dmda.auth_type = 1 AND dmda.expired = 0) or (dmda.auth_type = 2 AND dmda.used_times &lt; dmda.times))
+        group by do.identity_id, do.node_name
+        order by do.node_name
+    </select>
+    <select id="getMetaDataByChoose" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
+        select df.meta_data_id,
+               df.identity_id,
+               df.file_name as metaDataName
+        from dc_meta_data_auth dmda join dc_meta_data df on dmda.meta_data_id = df.meta_data_id join dc_org do on df.identity_id = do.identity_id
+        where dmda.user_id = #{address,jdbcType=VARCHAR}
+            and df.status = 2
+            and dmda.auth_status = 2
+            and do.status = 1
+            and df.identity_id = #{identityId, jdbcType=VARCHAR}
+            and ((dmda.auth_type = 1 AND dmda.expired = 0) or (dmda.auth_type = 2 AND dmda.used_times &lt; dmda.times))
+    </select>
 </mapper>

@@ -151,4 +151,6 @@ public interface OrganizationService {
     OrganizationDto findOrgInfoDetail(String identityId);
 
     Map<String, Org> getIdentityId2OrgMap();
+
+    Org findOrgById(String identityId);
 }

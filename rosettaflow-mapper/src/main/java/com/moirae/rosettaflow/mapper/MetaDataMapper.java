@@ -7,6 +7,8 @@ import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 
+import java.util.List;
+
 /**
  * @author admin
  */
@@ -21,4 +23,8 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
     IPage<MetaDataDto> listMetaDataAuth(Page<MetaDataDto> page, String dataName, String address);
 
     MetaDataDto getMetaDataAuthDetails(String metaDataAuthId);
+
+    List<MetaDataDto> getOrgChooseListByMetaDataAuth(String address);
+
+    List<MetaDataDto> getMetaDataByChoose(String address, String identityId);
 }

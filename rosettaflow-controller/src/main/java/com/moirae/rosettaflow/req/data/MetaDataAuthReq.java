@@ -25,7 +25,7 @@ public class MetaDataAuthReq {
     @ApiModelProperty(value = "元数据表id", required = true)
     @NotNull(message = "{metadata.id.notNull}")
     @Positive(message = "{metadata.id.positive}")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(value = "授权方式: 1-按时间, 2-按次数", required = true, example = "1")
     @NotNull(message = "{metadata.auth.notNull}")

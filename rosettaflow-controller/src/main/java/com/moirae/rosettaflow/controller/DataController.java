@@ -2,19 +2,19 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.common.constants.SysConstant;
-import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.utils.BeanCopierUtils;
-import com.moirae.rosettaflow.dto.*;
+import com.moirae.rosettaflow.dto.MetaDataDto;
+import com.moirae.rosettaflow.dto.UserMetaDataDto;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
+import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
 import com.moirae.rosettaflow.req.data.*;
 import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.IMetaDataOldService;
 import com.moirae.rosettaflow.service.IUserMetaDataService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.data.*;
+import com.moirae.rosettaflow.vo.org.OrgUserChooseVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,11 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
 
 /**
  * @author hudenian
@@ -42,8 +38,6 @@ import java.util.TimeZone;
 @RequestMapping(value = "data", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DataController {
 
-    @Resource
-    private IMetaDataOldService metaDataService;
     @Resource
     private IUserMetaDataService userMetaDataService;
     @Resource
@@ -103,94 +97,40 @@ public class DataController {
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, organizationVoList));
     }
 
-//    @PostMapping("auth")
-//    @ApiOperation(value = "元数据申请授权", notes = "元数据申请授权")
-//    public ResponseVo<?> auth(@RequestBody @Valid MetaDataAuthReq metaDataAuthReq) {
-//        UserMetaDataDto userMetaDataDto = new UserMetaDataDto();
-//        BeanCopierUtils.copy(metaDataAuthReq, userMetaDataDto);
-//        userMetaDataService.auth(userMetaDataDto);
-//        return ResponseVo.createSuccess();
-//    }
+    @PostMapping("auth")
+    @ApiOperation(value = "元数据申请授权", notes = "元数据申请授权")
+    public ResponseVo<?> auth(@RequestBody @Valid MetaDataAuthReq metaDataAuthReq) {
+        dataService.apply(metaDataAuthReq.getId(), MetaDataAuthTypeEnum.find(metaDataAuthReq.getAuthType().intValue()), metaDataAuthReq.getAuthBeginTime(), metaDataAuthReq.getAuthEndTime(), metaDataAuthReq.getAuthValue(), metaDataAuthReq.getSign());
+        return ResponseVo.createSuccess();
+    }
 
-//    @PostMapping("revoke")
-//    @ApiOperation(value = "元数据撤销授权", notes = "元数据撤销授权")
-//    public ResponseVo<?> revoke(@RequestBody @Valid MetaDataRevokeReq metaDataRevokeReq) {
-//        UserMetaDataDto userMetaDataDto = new UserMetaDataDto();
-//        BeanCopierUtils.copy(metaDataRevokeReq, userMetaDataDto);
-//        userMetaDataService.revoke(userMetaDataDto);
-//        return ResponseVo.createSuccess();
-//    }
+    @PostMapping("revoke")
+    @ApiOperation(value = "元数据撤销授权", notes = "元数据撤销授权")
+    public ResponseVo<?> revoke(@RequestBody @Valid MetaDataRevokeReq metaDataRevokeReq) {
+        UserMetaDataDto userMetaDataDto = new UserMetaDataDto();
+        BeanCopierUtils.copy(metaDataRevokeReq, userMetaDataDto);
+        userMetaDataService.revoke(userMetaDataDto);
+        return ResponseVo.createSuccess();
+    }
 
-//    @GetMapping("getAllAuthOrganization")
-//    @ApiOperation(value = "查询工作流输入组织", notes = "查询工作流输入组织")
-//    public ResponseVo<List<UserMetaDataOrgVo>> getAllAuthOrganization() {
-//        List<UserMetaDataDto> dtoList = userMetaDataService.getAllAuthOrganization();
-//        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, UserMetaDataOrgVo.class));
-//    }
+    @GetMapping("getAllAuthOrganization")
+    @ApiOperation(value = "查询工作流输入组织", notes = "查询工作流输入组织")
+    public ResponseVo<List<OrgUserChooseVo>> getAllAuthOrganization() {
+        List<MetaDataDto> metaDataDtoList = dataService.getOrgChooseListByMetaDataAuth();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(metaDataDtoList, OrgUserChooseVo.class));
+    }
 
-//    @GetMapping("getAllAuthTables")
-//    @ApiOperation(value = "查询工作流输入表", notes = "查询工作流输入表")
-//    public ResponseVo<List<MetaDataTablesVo>> getAllAuthTables(@Valid MetaDataAuthTablesReq metaDataAuthTablesReq) {
-//        List<MetaDataDtoOld> dtoList = userMetaDataService.getAllAuthTables(metaDataAuthTablesReq.getIdentityId());
-//        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataTablesVo.class));
-//    }
+    @GetMapping("getAllAuthTables")
+    @ApiOperation(value = "查询工作流输入表", notes = "查询工作流输入表")
+    public ResponseVo<List<MetaDataAuthChooseVo>> getAllAuthTables(@Valid MetaDataAuthTablesReq metaDataAuthTablesReq) {
+        List<MetaDataDto> dtoList = dataService.getMetaDataByChoose(metaDataAuthTablesReq.getIdentityId());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataAuthChooseVo.class));
+    }
 
     @GetMapping("getAllAuthColumns/{metaDataId}")
     @ApiOperation(value = "查询工作流输入字段", notes = "查询工作流输入字段")
     public ResponseVo<List<MetaDataColumnsChooseVo>> getAllAuthColumns(@ApiParam(value = "元数据表ID", required = true) @PathVariable String metaDataId) {
         List<MetaDataColumn> dtoList = dataService.listMetaDataColumnAll(metaDataId);
         return ResponseVo.createSuccess(BeanUtil.copyToList(dtoList, MetaDataColumnsChooseVo.class));
-    }
-
-
-//    private ResponseVo<PageVo<UserMetaDataVo>> convertUserMetaDataToResponseVo(IPage<UserMetaDataDto> pageDto) {
-//        SimpleDateFormat dateFormat = new SimpleDateFormat(SysConstant.DEFAULT_TIME_PATTERN);
-//        dateFormat.setTimeZone(TimeZone.getTimeZone(SysConstant.DEFAULT_TIMEZONE));
-//        List<UserMetaDataVo> items = new ArrayList<>();
-//        pageDto.getRecords().forEach(userMetaDataDto -> {
-//            UserMetaDataVo userMetaDataVo = new UserMetaDataVo();
-//            BeanCopierUtils.copy(userMetaDataDto, userMetaDataVo);
-//            //授权值
-//            String authTime = "";
-//            if(!Objects.isNull(userMetaDataDto.getAuthBeginTime()) && !Objects.isNull(userMetaDataDto.getAuthEndTime())){
-//                authTime = dateFormat.format(userMetaDataDto.getAuthBeginTime()) + "~" + dateFormat.format(userMetaDataDto.getAuthEndTime());
-//            }
-//            userMetaDataVo.setAuthValueStr(userMetaDataDto.getAuthType() == AuthTypeEnum.NUMBER.getValue() ? String.valueOf(userMetaDataDto.getAuthValue()) :  authTime);
-//            //状态
-//            userMetaDataVo.setAuthStatusShow(getAuthStatusShow(userMetaDataDto));
-//            userMetaDataVo.setAuthStatus(metaDataService.dealAuthStatus(userMetaDataDto.getAuthStatus(), userMetaDataDto.getAuthMetadataState()));
-//            userMetaDataVo.setActionShow(getActionShow(userMetaDataVo.getAuthStatus(), userMetaDataDto.getDataStatus()));
-//            items.add(userMetaDataVo);
-//        });
-//
-//        PageVo<UserMetaDataVo> pageVo = new PageVo<>();
-//        BeanUtil.copyProperties(pageDto, pageVo);
-//        pageVo.setItems(items);
-//        return ResponseVo.createSuccess(pageVo);
-//    }
-
-
-    /**
-     * 获取转换后数据授权状态(前端展示使用)
-     * @param userMetaDataDto 用户元数据
-     * @return  授权状态
-     */
-    private Byte getAuthStatusShow (UserMetaDataDto userMetaDataDto) {
-
-        Byte authStatus = userMetaDataDto.getAuthStatus();
-        Byte authMetadataState = userMetaDataDto.getAuthMetadataState();
-        if (authStatus == UserMetaDataAuditEnum.AUDIT_PENDING.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
-            return AuthStatusShowEnum.APPLY.getValue();
-        } else if (authStatus == UserMetaDataAuditEnum.AUDIT_PASSED.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.RELEASED.getValue()) {
-            return AuthStatusShowEnum.AUTHORIZED.getValue();
-        } else if (authStatus == UserMetaDataAuditEnum.AUDIT_REFUSED.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue()) {
-            return AuthStatusShowEnum.REFUSE.getValue();
-        } else if (authStatus == UserMetaDataAuditEnum.AUDIT_PASSED.getValue() && authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue()) {
-            return AuthStatusShowEnum.INVALID.getValue();
-        } else if (authMetadataState == UserMetaDataAuthorithStateEnum.INVALID.getValue() || authMetadataState == UserMetaDataAuthorithStateEnum.REVOKED.getValue()) {
-            return AuthStatusShowEnum.INVALID.getValue();
-        } else {
-            return AuthStatusShowEnum.UNKNOWN.getValue();
-        }
     }
 }

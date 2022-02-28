@@ -256,6 +256,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         return orgManager.list().stream().collect(Collectors.toMap(Org::getIdentityId, item -> item));
     }
 
+    @Override
+    public Org findOrgById(String identityId) {
+        return orgManager.getById(identityId);
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

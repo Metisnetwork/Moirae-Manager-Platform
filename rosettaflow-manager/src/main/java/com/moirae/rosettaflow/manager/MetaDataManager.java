@@ -7,6 +7,8 @@ import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 
+import java.util.List;
+
 public interface MetaDataManager extends IService<MetaData> {
 
     IPage<MetaDataDto> listDataFileByIdentityId(Page<OrganizationDto> page, String identityId);
@@ -18,4 +20,8 @@ public interface MetaDataManager extends IService<MetaData> {
     IPage<MetaDataDto> listMetaDataAuth(Page<MetaDataDto> page, String dataName, String address);
 
     MetaDataDto getMetaDataAuthDetails(String metaDataAuthId);
+
+    List<MetaDataDto> getOrgChooseListByMetaDataAuth(String address);
+
+    List<MetaDataDto> getMetaDataByChoose(String address, String identityId);
 }
