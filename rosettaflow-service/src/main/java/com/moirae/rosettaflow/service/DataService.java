@@ -61,5 +61,5 @@ public interface DataService {
 
     void checkMetaDataEffective(String metaDataId);
 
-    void checkMetaDataAuthListEffective(Set<String> metaDataIdList);
+    void checkMetaDataAuthListEffective(String address, Set<String> metaDataIdList);
 }

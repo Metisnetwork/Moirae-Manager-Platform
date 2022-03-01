@@ -472,7 +472,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
                 .flatMap(workflowNode -> workflowNode.getWorkflowNodeInputReqList().stream())
                 .map(WorkflowNodeInput::getDataTableId)
                 .collect(Collectors.toSet());
-        dataService.checkMetaDataAuthListEffective(tableIdList);
+        UserDto userDto = commonService.getCurrentUser();
+        dataService.checkMetaDataAuthListEffective(userDto.getAddress(), tableIdList);
 
         // 算法校验 - 模型输入校验（只有一个算法节点）
         if(reqWorkflow.getWorkflowNodeReqList().get(0).getInputModel() == SysConstant.INT_1

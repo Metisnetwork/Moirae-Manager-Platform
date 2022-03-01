@@ -269,16 +269,16 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_NOT_OUTPUT_EXIST.getMsg());
             }
             // 组织校验(任务发起发方组织、算法提供方组织、数据提供方组织、结果接收方组织)
-            if(organizationService.isEffective(item.getSenderIdentityId())){
+            if(!organizationService.isEffective(item.getSenderIdentityId())){
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_SENDER.getMsg(),item.getSenderIdentityId()) );
             }
             item.getWorkflowNodeInputReqList().stream().forEach(subItem ->{
-                if(organizationService.isEffective(subItem.getIdentityId())){
+                if(!organizationService.isEffective(subItem.getIdentityId())){
                     throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_DATA_PROVIDED.getMsg(), subItem.getIdentityId()));
                 }
             });
             item.getWorkflowNodeOutputReqList().stream().forEach(subItem ->{
-                if(organizationService.isEffective(subItem.getIdentityId())){
+                if(!organizationService.isEffective(subItem.getIdentityId())){
                     throw new BusinessException(RespCodeEnum.BIZ_FAILED, StrUtil.format(ErrorMsg.ORGANIZATION_UNAVAILABLE_OUTPUT.getMsg(), subItem.getIdentityId()));
                 }
             });

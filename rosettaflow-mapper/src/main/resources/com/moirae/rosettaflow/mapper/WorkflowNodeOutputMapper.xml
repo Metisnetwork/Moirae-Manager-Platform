@@ -22,7 +22,7 @@
                a.store_pattern    as storePattern,
                a.output_content   as outputContent,
                b.node_name        as identityName
-        from t_workflow_node_output a left join t_organization b on a.identity_id = b.identity_id
+        from t_workflow_node_output a left join dc_org b on a.identity_id = b.identity_id
         where a.workflow_node_id = #{workflowNodeId, jdbcType=BIGINT}
     </select>
 

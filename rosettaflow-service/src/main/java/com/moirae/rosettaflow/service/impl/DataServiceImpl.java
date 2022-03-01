@@ -306,11 +306,11 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public void checkMetaDataAuthListEffective(Set<String> metaDataIdList) {
+    public void checkMetaDataAuthListEffective(String address, Set<String> metaDataIdList) {
         LambdaQueryWrapper<MetaDataAuth> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(MetaDataAuth::getAuthStatus, MetaDataAuthStatusEnum.PUBLISHED);
+        queryWrapper.eq(MetaDataAuth::getUserId, address);
         queryWrapper.in(MetaDataAuth::getMetaDataId, metaDataIdList);
-        queryWrapper.groupBy(MetaDataAuth::getMetaDataId);
         int count = metaDataAuthManager.count(queryWrapper);
         if(count != metaDataIdList.size()){
             //无效元数据

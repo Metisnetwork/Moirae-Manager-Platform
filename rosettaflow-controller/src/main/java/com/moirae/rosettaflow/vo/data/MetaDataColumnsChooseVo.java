@@ -18,12 +18,12 @@ public class MetaDataColumnsChooseVo {
     private String columnName;
 
     @ApiModelProperty(value = "列索引-后期调整为 columnIdx")
-    private Integer getColumnIndex(){
+    public Integer getColumnIndex(){
         return columnIdx;
     }
 
     @ApiModelProperty(value = "列标识-后期调整为 columnIdx")
-    private Integer getId(){
+    public Integer getId(){
         return columnIdx;
     }
 }
