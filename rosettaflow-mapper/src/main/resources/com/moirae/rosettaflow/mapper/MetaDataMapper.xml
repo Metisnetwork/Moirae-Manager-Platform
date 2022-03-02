@@ -138,6 +138,7 @@
                dmda.end_at,
                dmda.times,
                dmda.apply_at,
+               dmda.used_times,
                do.identity_id,
                do.node_name
         from dc_meta_data_auth dmda join dc_meta_data df on dmda.meta_data_id = df.meta_data_id join dc_org do on df.identity_id = do.identity_id

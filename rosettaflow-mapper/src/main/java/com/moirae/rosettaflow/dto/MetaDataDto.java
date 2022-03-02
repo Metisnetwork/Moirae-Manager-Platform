@@ -134,4 +134,9 @@ public class MetaDataDto implements Serializable {
      * 授权次数(auth_type=2时)
      */
     private Integer times;
+
+    /**
+     * 使用次数(auth_type=2时)
+     */
+    private Integer usedTimes;
 }

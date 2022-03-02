@@ -49,6 +49,9 @@ public class MetaDataAuthDetailsVo extends BaseMetaDataVo {
     @ApiModelProperty(value = "授权次数(auth_type=2时)")
     private Integer times;
 
+    @ApiModelProperty(value = "使用次数(auth_type=2时)")
+    private Integer usedTimes;
+
     @ApiModelProperty(value = "数据描述")
     public String getDataDesc(){
         return remarks;
