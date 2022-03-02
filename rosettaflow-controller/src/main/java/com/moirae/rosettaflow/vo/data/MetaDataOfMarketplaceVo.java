@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.vo.data;
 
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthOptionEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthStatusEnum;
+import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -45,5 +46,25 @@ public class MetaDataOfMarketplaceVo extends BaseMetaDataVo {
     @ApiModelProperty(value = "组织名称")
     public String getIdentityName(){
         return nodeName;
+    }
+
+    @ApiModelProperty(value = "操作: 0-申请授权, 1-已申请, 2-已授权")
+    public Integer getActionShow(){
+        // 已申请
+        if(auditOption == MetaDataAuthOptionEnum.PENDING
+                && authStatus == MetaDataAuthStatusEnum.PUBLISHED
+                && getStatus() == MetaDataStatusEnum.PUBLISHED){
+            return 1;
+        }
+
+        // 已授权
+        if(auditOption == MetaDataAuthOptionEnum.PASSED
+                && authStatus == MetaDataAuthStatusEnum.PUBLISHED
+                && getStatus() == MetaDataStatusEnum.PUBLISHED){
+            return 2;
+        }
+
+        // 申请授权
+        return 0;
     }
 }
