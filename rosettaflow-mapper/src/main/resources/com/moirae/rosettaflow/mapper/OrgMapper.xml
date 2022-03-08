@@ -26,11 +26,10 @@
             where status = 2
             group by identity_id
         ) df on o.identity_id = df.identity_id
-        <where>
-            <if test="keyword != null and keyword != ''">
-                o.node_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
-            </if>
-        </where>
+        where o.status = 1
+        <if test="keyword != null and keyword != ''">
+            and o.node_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+        </if>
         order by df.total_data desc
 
     </select>
@@ -82,11 +81,10 @@
         ) t
         group by t.identity_id
         ) task on o.identity_id = task.identity_id
-        <where>
-            <if test="keyword != null and keyword != ''">
-                o.org_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
-            </if>
-        </where>
+        where o.status = 1
+        <if test="keyword != null and keyword != ''">
+            and o.node_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+        </if>
         order by task.total_task desc
     </select>
     <select id="listOrgInfoByNameOrderByMemoryDesc" resultType="com.moirae.rosettaflow.dto.OrganizationDto">
@@ -107,11 +105,10 @@
             where status = 2 or status = 3
             group by identity_id
         ) power on o.identity_id = power.identity_id
-        <where>
-            <if test="keyword != null and keyword != ''">
-                o.org_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
-            </if>
-        </where>
+        where o.status = 1
+        <if test="keyword != null and keyword != ''">
+            and o.node_name like concat('%', #{keyword, jdbcType=VARCHAR}, '%')
+        </if>
         order by power.total_memory desc
     </select>
     <select id="findOrgInfoDetail" resultType="com.moirae.rosettaflow.dto.OrganizationDto">

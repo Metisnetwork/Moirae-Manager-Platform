@@ -203,6 +203,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     public IPage<OrganizationDto> listOrgInfoByNameOrderByNameAsc(Long current, Long size, String keyword) {
         Page<Org> page = new Page<>(current, size);
         LambdaQueryWrapper<Org> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Org::getStatus, OrgStatusEnum.Normal);
         wrapper.like(StringUtils.isNotBlank(keyword), Org::getNodeName, keyword);
         wrapper.orderByAsc(Org::getNodeName);
         orgManager.page(page, wrapper);
