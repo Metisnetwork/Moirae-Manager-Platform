@@ -50,7 +50,7 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     @Override
     public void deleteMemberByProjectId(List<Long> projectId) {
         LambdaQueryWrapper<ProjectMember> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(ProjectMember::getProjectId, projectId);
+        queryWrapper.in(ProjectMember::getProjectId, projectId);
         this.remove(queryWrapper);
     }
 }
