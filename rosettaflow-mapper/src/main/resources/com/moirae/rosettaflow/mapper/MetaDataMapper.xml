@@ -164,6 +164,7 @@
         where dmda.user_id = #{address,jdbcType=VARCHAR}
             and df.status = 2
             and dmda.auth_status = 2
+            and dmda.audit_option = 1
             and do.status = 1
             and df.identity_id = #{identityId, jdbcType=VARCHAR}
             and ((dmda.auth_type = 1 AND dmda.expired = 0) or (dmda.auth_type = 2 AND dmda.used_times &lt; dmda.times))
