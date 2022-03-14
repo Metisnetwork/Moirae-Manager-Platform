@@ -54,7 +54,8 @@ public class SyncSubJobNodeStatusTask {
         //获取所有任务详情
         for (String identityId: channelTaskSetMap.keySet()) {
             Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
-            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "--" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            try{
+                dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "--" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcTaskService.getTaskDetailList(organizationService.getChannel(identityId), latestSynced);
                     },
@@ -79,6 +80,9 @@ public class SyncSubJobNodeStatusTask {
                                 .get(grpcResponseList.size() - 1)
                                 .getInformation().getUpdateAt();
                     });
+            } catch (Exception e){
+                log.error("同步更新子作业节点运行中任务失败>>>>", e);
+            }
         }
         log.info("同步更新子作业节点运行中任务结束>>>>");
     }
