@@ -54,31 +54,36 @@ public class SyncSubJobNodeStatusTask {
         //获取所有任务详情
         for (String identityId: channelTaskSetMap.keySet()) {
             Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
-            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "-" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
-                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
-                        return grpcTaskService.getTaskDetailList(netManager.getChannel(identityId), latestSynced);
-                    },
-                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
-                        for (TaskDetailResponseDto taskDetailResponseDto : grpcResponseList) {
-                            String taskId = taskDetailResponseDto.getInformation().getTaskId();
-                            int state = taskDetailResponseDto.getInformation().getState();
-                            long taskStartAt = taskDetailResponseDto.getInformation().getStartAt();
-                            long taskEndAt = taskDetailResponseDto.getInformation().getEndAt();
-                            if (workflowRunTaskStatusMap.containsKey(taskId)) {
-                                try{
-                                    log.info("同步更新子作业节点运行中任务开始 taskId = {}, result = {}", taskId, JSONObject.toJSON(taskDetailResponseDto));
-                                    workflowRunStatusService.taskFinish(workflowRunTaskStatusMap.get(taskId), taskId, state, taskStartAt, taskEndAt);
-                                }catch (Exception e){
-                                    log.error("同步更新子作业节点运行中任务异常 taskId = " + taskId, e);
+            try{
+                dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "-" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+                        (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                            return grpcTaskService.getTaskDetailList(netManager.getChannel(identityId), latestSynced);
+                        },
+                        (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                            for (TaskDetailResponseDto taskDetailResponseDto : grpcResponseList) {
+                                String taskId = taskDetailResponseDto.getInformation().getTaskId();
+                                int state = taskDetailResponseDto.getInformation().getState();
+                                long taskStartAt = taskDetailResponseDto.getInformation().getStartAt();
+                                long taskEndAt = taskDetailResponseDto.getInformation().getEndAt();
+                                if (workflowRunTaskStatusMap.containsKey(taskId)) {
+                                    try{
+                                        log.info("同步更新子作业节点运行中任务开始 taskId = {}, result = {}", taskId, JSONObject.toJSON(taskDetailResponseDto));
+                                        workflowRunStatusService.taskFinish(workflowRunTaskStatusMap.get(taskId), taskId, state, taskStartAt, taskEndAt);
+                                    }catch (Exception e){
+                                        log.error("同步更新子作业节点运行中任务异常 taskId = " + taskId, e);
+                                    }
                                 }
                             }
-                        }
-                    },
-                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
-                        return grpcResponseList
-                                .get(grpcResponseList.size() - 1)
-                                .getInformation().getUpdateAt();
-                    });
+                        },
+                        (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                            return grpcResponseList
+                                    .get(grpcResponseList.size() - 1)
+                                    .getInformation().getUpdateAt();
+                        });
+
+            } catch (Exception e){
+                log.error("同步更新子作业节点运行中任务失败>>>>", e);
+            }
         }
         log.info("同步更新子作业节点运行中任务结束>>>>");
     }
