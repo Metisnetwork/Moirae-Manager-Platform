@@ -114,7 +114,7 @@ public interface IWorkflowService extends IService<Workflow> {
      * @param workflowName
      * @return
      */
-    boolean isExistWorkflowName(String workflowName);
+    boolean isExistWorkflowName(Long projectId,String workflowName);
 
 
     /**

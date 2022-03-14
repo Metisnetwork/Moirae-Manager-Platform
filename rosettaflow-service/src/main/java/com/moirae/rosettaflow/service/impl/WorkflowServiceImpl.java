@@ -113,7 +113,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Override
     public void addWorkflow(Workflow workflow) {
-        if (isExistWorkflowName(workflow.getWorkflowName())) {
+        if (isExistWorkflowName(workflow.getProjectId(), workflow.getWorkflowName())) {
             log.info("addWorkflow--添加工作流名称已存在");
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg());
         }
@@ -133,7 +133,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = this.queryWorkflow(id);
         // 校验是否有编辑权限
         checkEditPermission(workflow.getProjectId());
-        if ((!workflow.getWorkflowName().equalsIgnoreCase(workflowName)) && isExistWorkflowName(workflowName)) {
+        if ((!workflow.getWorkflowName().equalsIgnoreCase(workflowName)) && isExistWorkflowName(workflow.getProjectId(), workflowName)) {
             log.info("editWorkflow--编辑工作流名称已存在,workflowId:{}", id);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg());
         }
@@ -224,8 +224,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public boolean isExistWorkflowName(String workflowName) {
+    public boolean isExistWorkflowName(Long projectId, String workflowName) {
         LambdaQueryWrapper<Workflow> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Workflow::getProjectId, projectId);
         queryWrapper.eq(Workflow::getWorkflowName, workflowName);
         queryWrapper.eq(Workflow::getStatus, StatusEnum.VALID.getValue());
         Workflow workflow = this.getOne(queryWrapper);
