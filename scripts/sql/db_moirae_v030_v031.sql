@@ -422,3 +422,7 @@ CREATE TABLE `dc_meta_data_auth` (
 ALTER TABLE `t_project`
     DROP INDEX `UK_NAME`,
     ADD  UNIQUE INDEX `UK_NAME` (`user_id`, `project_name`, `status`, `del_version`);
+
+ALTER TABLE `t_workflow`
+    DROP INDEX `UK_FLOW_NAME`;
+
