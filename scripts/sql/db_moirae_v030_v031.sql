@@ -418,3 +418,7 @@ CREATE TABLE `dc_meta_data_auth` (
     PRIMARY KEY (`meta_data_auth_id`),
     KEY `update_at` (`update_at`)
 ) ENGINE=InnoDB COMMENT='元数据文件授权信息';
+
+ALTER TABLE `t_project`
+    DROP INDEX `UK_NAME`,
+    ADD  UNIQUE INDEX `UK_NAME` (`user_id`, `project_name`, `status`, `del_version`);

@@ -172,7 +172,7 @@ CREATE TABLE `t_project` (
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_NAME` (`project_name`,`status`,`del_version`),
+    UNIQUE KEY `UK_NAME` (`user_id`, `project_name`,`status`,`del_version`),
     KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB COMMENT='项目表';
 
