@@ -1,4 +1,4 @@
-    use db_moirae;
+    use db_moirae_040;
 
     insert  into `t_algorithm`(`id`,`algorithm_code`,`algorithm_step`,`algorithm_name`,`algorithm_name_en`,`algorithm_desc`,`algorithm_desc_en`,`author`,`max_numbers`,`min_numbers`,`support_language`,`support_os_system`,`algorithm_type`,`cost_mem`,`cost_cpu`,`cost_gpu`,`cost_bandwidth`,`run_time`,`input_model`,`output_model`,`store_pattern`,`data_rows_flag`,`data_columns_flag`,`public_Flag`,`status`) values
     (1,'LogisticRegression',1,'逻辑回归训练','Logistic Regression Training','用于跨组织逻辑回归训练','Used for cross-organization logistic regression training','Rosetta',3,2,'Python','window,linux,mac',3,1073741824,1,2,3145728,180000,0,1,1,1,0,1,1),

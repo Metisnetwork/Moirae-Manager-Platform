@@ -24,6 +24,9 @@ public class AlgDetailsVo {
     @ApiModelProperty(value = "算法描述")
     private String algorithmDesc;
 
+    @ApiModelProperty(value = "算法图片")
+    private String algorithmImageUrl;
+
     @ApiModelProperty(value = "作者")
     private String author;
 

@@ -45,6 +45,11 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
+
+        if(1 == 1){
+            return true;
+        }
+
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }

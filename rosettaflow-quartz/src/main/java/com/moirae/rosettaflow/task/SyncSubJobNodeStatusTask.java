@@ -36,7 +36,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private OrganizationService organizationService;
 
-    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.queryUnConfirmedWorkflowRunTaskStatus();

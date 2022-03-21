@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.req.organization;
+package com.moirae.rosettaflow.req.org;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

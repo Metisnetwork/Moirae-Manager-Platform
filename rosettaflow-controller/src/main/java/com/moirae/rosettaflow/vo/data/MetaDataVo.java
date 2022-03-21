@@ -13,4 +13,5 @@ public class MetaDataVo extends BaseMetaDataVo {
     @ApiModelProperty(value = "参与任务的数据")
     private Integer taskCount;
 
+
 }

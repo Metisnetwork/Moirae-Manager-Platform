@@ -4,14 +4,17 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
+import com.moirae.rosettaflow.mapper.domain.Task;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
 import com.moirae.rosettaflow.req.data.*;
+import com.moirae.rosettaflow.req.task.GetTaskDetailsReq;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.data.*;
 import com.moirae.rosettaflow.vo.org.OrgUserChooseVo;
+import com.moirae.rosettaflow.vo.task.TaskDetailsVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,6 +41,26 @@ public class DataController {
 
     @Resource
     private DataService dataService;
+
+    @GetMapping("getDataStats")
+    @ApiOperation(value = "查询数据统计", notes = "查询数据统计")
+    public ResponseVo<DataStatsVo> getDataStats() {
+        return ResponseVo.createSuccess(new DataStatsVo());
+    }
+
+    @GetMapping("getDataList")
+    @ApiOperation(value = "查询数据列表", notes = "查询数据列表")
+    public ResponseVo<PageVo<DataVo>> getDataList(@Valid GetDataListReq req) {
+        List<DataVo> orgTaskVoList = new ArrayList<>();
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(null, orgTaskVoList));
+    }
+
+    @GetMapping("getDataDetails")
+    @ApiOperation(value = "查询数据详情", notes = "查询数据详情")
+    public ResponseVo<DataDetailsVo> getDataDetails(@Valid GetDataDetailsReq req) {
+        return ResponseVo.createSuccess(new DataDetailsVo());
+    }
+
 
     @GetMapping("listMetaDataColumn")
     @ApiOperation(value = "根据元数据ID,查询元数据的列定义", notes = "根据元数据ID,查询元数据的列定义")

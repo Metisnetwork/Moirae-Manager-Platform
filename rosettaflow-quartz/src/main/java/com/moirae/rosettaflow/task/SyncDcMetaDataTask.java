@@ -34,7 +34,7 @@ public class SyncDcMetaDataTask {
     @Resource
     private IDataSyncService dataSyncService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();

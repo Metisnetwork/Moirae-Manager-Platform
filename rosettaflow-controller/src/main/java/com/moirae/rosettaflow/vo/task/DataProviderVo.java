@@ -13,6 +13,6 @@ public class DataProviderVo extends BaseOrgVo {
     @ApiModelProperty(value = "元数据id")
     private String metaDataId;
 
-    @ApiModelProperty(value = "元数据名称")
-    private String metaDataName;
+    @ApiModelProperty(value = "数据凭证名称")
+    private String dataTokenName;
 }

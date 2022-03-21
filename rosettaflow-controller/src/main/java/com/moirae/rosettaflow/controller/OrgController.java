@@ -4,14 +4,18 @@ package com.moirae.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.dto.OrganizationDto;
+import com.moirae.rosettaflow.mapper.domain.Task;
 import com.moirae.rosettaflow.req.KeyWorkPageReq;
-import com.moirae.rosettaflow.req.organization.DelIpPortBindReq;
-import com.moirae.rosettaflow.req.organization.IpPortBindReq;
+import com.moirae.rosettaflow.req.org.DelIpPortBindReq;
+import com.moirae.rosettaflow.req.org.GetOrgListReq;
+import com.moirae.rosettaflow.req.org.IpPortBindReq;
+import com.moirae.rosettaflow.req.task.GetTaskDetailsReq;
 import com.moirae.rosettaflow.service.OrganizationService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.org.*;
+import com.moirae.rosettaflow.vo.task.TaskDetailsVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,44 +40,29 @@ public class OrgController {
     @Resource
     private OrganizationService organizationService;
 
-    @GetMapping("findOrgInfo")
-    @ApiOperation(value = "查询组织详细信息", notes = "查询组织详细信息")
-    public ResponseVo<OrgDetailsVo> findOrgInfo(@RequestParam String identityId) {
-        OrganizationDto organizationDto = organizationService.findOrgInfoDetail(identityId);
-        return ResponseVo.createSuccess(BeanUtil.toBean(organizationDto, OrgDetailsVo.class));
+    @GetMapping("getOrgStats")
+    @ApiOperation(value = "查询组织统计", notes = "查询组织统计")
+    public ResponseVo<OrgStatsVo> getOrgStats() {
+        return ResponseVo.createSuccess(new OrgStatsVo());
     }
 
-    @GetMapping("listOrgInfoByMemory")
-    @ApiOperation(value = "查询组织列表（按算力-内存）", notes = "查询组织列表（按算力-内存）")
-    public ResponseVo<PageVo<OrgAndMemoryVo>> listOrgInfoByMemory(@Valid KeyWorkPageReq keyWorkPageReq) {
-        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByMemoryDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
-        List<OrgAndMemoryVo> orgAndMemoryVoList = BeanUtil.copyToList(page.getRecords(), OrgAndMemoryVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgAndMemoryVoList));
+    @GetMapping("getOrgList")
+    @ApiOperation(value = "查询组织列表", notes = "查询组织列表")
+    public ResponseVo<PageVo<OrgVo>> getOrgList(@Valid GetOrgListReq req) {
+        List<OrgVo> orgTaskVoList = new ArrayList<>();
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(null, orgTaskVoList));
     }
 
-    @GetMapping("listOrgInfoByActivity")
-    @ApiOperation(value = "查询组织列表（按活跃度）", notes = "查询组织列表（按活跃度）")
-    public ResponseVo<PageVo<OrgAndActivityVo>> listOrgInfoByActivity(@Valid KeyWorkPageReq keyWorkPageReq) {
-        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByActivityDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
-        List<OrgAndActivityVo> orgAndActivityVoList = BeanUtil.copyToList(page.getRecords(), OrgAndActivityVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgAndActivityVoList));
+    @GetMapping("getOrgDetails")
+    @ApiOperation(value = "查询组织详情", notes = "查询组织详情")
+    public ResponseVo<OrgDetailsVo> getTaskDetails(@RequestParam String identityId) {
+        return ResponseVo.createSuccess(new OrgDetailsVo());
     }
 
-    @GetMapping("listOrgInfoByTotalData")
-    @ApiOperation(value = "查询组织列表（按数据总数）", notes = "查询组织列表（按数据总数）")
-    public ResponseVo<PageVo<OrgAndDataVo>> listOrgInfoByTotalData(@Valid KeyWorkPageReq keyWorkPageReq) {
-        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByTotalDataDesc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
-        List<OrgAndDataVo> orgAndDataVoList = BeanUtil.copyToList(page.getRecords(), OrgAndDataVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgAndDataVoList));
-    }
 
-    @GetMapping("listOrgInfoByName")
-    @ApiOperation(value = "查询组织列表（按名称）", notes = "查询组织列表（按名称）")
-    public ResponseVo<PageVo<OrgVo>> listOrgInfoByName(@Valid KeyWorkPageReq keyWorkPageReq) {
-        IPage<OrganizationDto> page = organizationService.listOrgInfoByNameOrderByNameAsc(keyWorkPageReq.getCurrent(), keyWorkPageReq.getSize(), keyWorkPageReq.getKeyword());
-        List<OrgVo> orgVoList = BeanUtil.copyToList(page.getRecords(), OrgVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgVoList));
-    }
+
+
+
 
     @GetMapping("list")
     @ApiOperation(value = "查询用户绑定的组织列表", notes = "查询用户绑定的组织列表")

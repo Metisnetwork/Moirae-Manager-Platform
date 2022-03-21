@@ -1,14 +1,11 @@
 package com.moirae.rosettaflow.controller;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
-import com.moirae.rosettaflow.mapper.domain.GlobalStats;
-import com.moirae.rosettaflow.mapper.domain.StatisticsDataTrend;
+import com.moirae.rosettaflow.req.KeyWorkReq;
+import com.moirae.rosettaflow.req.home.GetLatestModelListReq;
 import com.moirae.rosettaflow.service.StatisticsService;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.home.DataTrendVo;
-import com.moirae.rosettaflow.vo.home.GlobalStatsVo;
+import com.moirae.rosettaflow.vo.home.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -29,19 +28,46 @@ public class HomeController {
     @Resource
     private StatisticsService statisticsService;
 
-    @GetMapping("globalStats")
-    @ApiOperation(value = "查询全网资源概况", notes = "查询全网资源概况")
-    @ApiOperationSupport(order = 2)
-    public ResponseVo<GlobalStatsVo> globalStats() {
-        GlobalStats globalStats = statisticsService.globalStats();
-        return ResponseVo.createSuccess(BeanUtil.toBean(globalStats, GlobalStatsVo.class));
+    @GetMapping("queryNavigation")
+    @ApiOperation(value = "查询导航", notes = "查询导航")
+    public ResponseVo<NavigationVo> queryNavigation(@Valid KeyWorkReq req) {
+        NavigationVo resp = new NavigationVo();
+        return ResponseVo.createSuccess(resp);
     }
 
-    @GetMapping("dataTrend")
-    @ApiOperation(value = "查询全网数据的月走势", notes = "查询全网数据的月走势")
-    @ApiOperationSupport(order = 1)
-    public ResponseVo<List<DataTrendVo>> dataTrend() {
-        List<StatisticsDataTrend> statisticsDataTrendList = statisticsService.listGlobalDataFileStatsTrendMonthly();
-        return ResponseVo.createSuccess(BeanUtil.copyToList(statisticsDataTrendList, DataTrendVo.class));
+    @GetMapping("getLatestModelList")
+    @ApiOperation(value = "获得最新的模型列表", notes = "获得最新的模型列表")
+    public ResponseVo<List<LatestModelVo>> getLatestModel(@Valid GetLatestModelListReq req) {
+        List<LatestModelVo> resp = new ArrayList<>();
+        return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getGlobalStats")
+    @ApiOperation(value = "获得全网统计数据", notes = "获得全网统计数据")
+    public ResponseVo<GlobalStatsVo> globalStats() {
+        GlobalStatsVo resp = new GlobalStatsVo();
+        return ResponseVo.createSuccess(resp);
+    }
+
+
+    @GetMapping("getTaskTrend")
+    @ApiOperation(value = "获得15天隐私计算走势", notes = "获得15天隐私计算走势")
+    public ResponseVo<List<TrendVo>> getTaskTrend() {
+        List<TrendVo> resp = new ArrayList<>();
+        return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getOrgPowerTop")
+    @ApiOperation(value = "获得组织算力排行", notes = "获得组织算力排行")
+    public ResponseVo<List<OrgPowerVo>> getOrgComputingTop() {
+        List<OrgPowerVo> resp = new ArrayList<>();
+        return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getDataTokenUsedTop")
+    @ApiOperation(value = "获得数据凭证使用量排行", notes = "获得数据凭证使用量排行")
+    public ResponseVo<List<DataTokenUsedVo>> getDataTokenUsedTop() {
+        List<DataTokenUsedVo> resp = new ArrayList<>();
+        return ResponseVo.createSuccess(resp);
     }
 }

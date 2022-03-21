@@ -1,19 +1,15 @@
 package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.Task;
-import com.moirae.rosettaflow.mapper.domain.TaskEvent;
-import com.moirae.rosettaflow.req.task.GetOrgTaskListByIdentityIdReq;
 import com.moirae.rosettaflow.req.task.GetTaskDetailsReq;
-import com.moirae.rosettaflow.req.task.GetTaskListByMetaDataIdReq;
+import com.moirae.rosettaflow.req.task.GetTaskListReq;
 import com.moirae.rosettaflow.service.TaskService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.task.OrgTaskVo;
 import com.moirae.rosettaflow.vo.task.TaskDetailsVo;
-import com.moirae.rosettaflow.vo.task.TaskEventVo;
+import com.moirae.rosettaflow.vo.task.TaskStatsVo;
 import com.moirae.rosettaflow.vo.task.TaskVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -35,27 +32,17 @@ public class TaskController {
     @Resource
     private TaskService taskService;
 
-    @GetMapping("getTaskEventList")
-    @ApiOperation(value = "查询任务事件列表", notes = "查询任务事件列表")
-    public ResponseVo<List<TaskEventVo>> getTaskEventList(@Valid GetTaskDetailsReq req) {
-        List<TaskEvent> taskEventList = taskService.getTaskEventList(req.getTaskId());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(taskEventList, TaskEventVo.class));
+    @GetMapping("getTaskStats")
+    @ApiOperation(value = "查询任务统计", notes = "查询任务统计")
+    public ResponseVo<TaskStatsVo> getTaskStats() {
+        return ResponseVo.createSuccess(new TaskStatsVo());
     }
 
-    @GetMapping("getOrgTaskListByIdentityId")
-    @ApiOperation(value = "查询组织的任务列表-通过组织id", notes = "查询组织的任务列表-通过组织id")
-    public ResponseVo<PageVo<OrgTaskVo>> getOrgTaskListByIdentityId(@Valid GetOrgTaskListByIdentityIdReq req) {
-        IPage<Task> page = taskService.getOrgTaskListByIdentityId(req.getCurrent(), req.getSize(), req.getIdentityId());
-        List<OrgTaskVo> orgTaskVoList = BeanUtil.copyToList(page.getRecords(), OrgTaskVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgTaskVoList));
-    }
-
-    @GetMapping("getTaskByMetaDataId")
-    @ApiOperation(value = "查询任务列表-通过元数据", notes = "查询组织的任务列表-通过组织id")
-    public ResponseVo<PageVo<TaskVo>> getTaskListByMetaDataId(@Valid GetTaskListByMetaDataIdReq req) {
-        IPage<Task> page = taskService.getTaskListByMetaDataId(req.getCurrent(), req.getSize(), req.getMetaDataId());
-        List<TaskVo> orgTaskVoList = BeanUtil.copyToList(page.getRecords(), TaskVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, orgTaskVoList));
+    @GetMapping("getTaskList")
+    @ApiOperation(value = "查询任务列表", notes = "查询任务列表")
+    public ResponseVo<PageVo<TaskVo>> getTaskList(@Valid GetTaskListReq req) {
+        List<TaskVo> orgTaskVoList = new ArrayList<>();
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(null, orgTaskVoList));
     }
 
     @GetMapping("getTaskDetails")
@@ -64,4 +51,6 @@ public class TaskController {
         Task task = taskService.getTaskDetails(req.getTaskId());
         return ResponseVo.createSuccess(BeanUtil.toBean(task, TaskDetailsVo.class));
     }
+
+
 }

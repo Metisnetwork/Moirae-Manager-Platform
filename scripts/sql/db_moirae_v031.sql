@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS `db_moirae` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `db_moirae_040` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE `db_moirae`;
+USE `db_moirae_040`;
 
 /*Table structure for table `t_algorithm` */
 
