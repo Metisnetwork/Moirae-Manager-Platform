@@ -43,35 +43,35 @@ public class WorkflowNodeController {
     @Resource
     private IWorkflowRunTaskResultService workflowRunTaskResultService;
 
-    @GetMapping(value = {"queryNodeDetailsList/{id}", "queryNodeDetailsList/{id}/{runningRecordId}"})
-    @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
-    public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id, @ApiParam(value = "运行记录id") @PathVariable(required = false) Long runningRecordId, HttpServletRequest request) {
-        String language = request.getHeader("Accept-Language");
-        Workflow workflow = workflowService.queryWorkflowDetailAndStatus(id, runningRecordId, language);
-        NodeDetailsListVo nodeDetailsListVo = BeanUtil.toBean(workflow, NodeDetailsListVo.class);
-        return ResponseVo.createSuccess(nodeDetailsListVo);
-    }
-
-    @PostMapping("save")
-    @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
-    public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
-        Workflow workflow = BeanUtil.toBean(workflowAllNodeReq, Workflow.class);
-        workflowService.saveWorkflowDetail(workflow);
-        return ResponseVo.createSuccess();
-    }
-
-    @PostMapping("clear")
-    @ApiOperation(value = "清空工作流节点", notes = "清空工作流节点")
-    public ResponseVo<?> clear(@RequestBody @Validated ClearWorkflowNodeReq clearNodeReq) {
-        workflowService.clearWorkflowNode(clearNodeReq.getWorkflowId());
-        return ResponseVo.createSuccess();
-    }
-
-    @GetMapping(value = "getTaskResult/{taskId}")
-    @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
-    public ResponseVo<List<NodeTaskResultVo>> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
-        List<WorkflowRunTaskResult> taskResultList = workflowRunTaskResultService.queryByTaskId(taskId);
-        return ResponseVo.createSuccess(BeanUtil.copyToList(taskResultList, NodeTaskResultVo.class));
-    }
+//    @GetMapping(value = {"queryNodeDetailsList/{id}", "queryNodeDetailsList/{id}/{runningRecordId}"})
+//    @ApiOperation(value = "查询工作流节点详情列表", notes = "查询工作流节点详情列表")
+//    public ResponseVo<NodeDetailsListVo> queryNodeDetailsList(@ApiParam(value = "工作流表主键ID", required = true) @PathVariable Long id, @ApiParam(value = "运行记录id") @PathVariable(required = false) Long runningRecordId, HttpServletRequest request) {
+//        String language = request.getHeader("Accept-Language");
+//        Workflow workflow = workflowService.queryWorkflowDetailAndStatus(id, runningRecordId, language);
+//        NodeDetailsListVo nodeDetailsListVo = BeanUtil.toBean(workflow, NodeDetailsListVo.class);
+//        return ResponseVo.createSuccess(nodeDetailsListVo);
+//    }
+//
+//    @PostMapping("save")
+//    @ApiOperation(value = "保存工作流所有节点数据", notes = "保存工作流所有节点数据")
+//    public ResponseVo<?> save(@RequestBody @Validated WorkflowAllNodeReq workflowAllNodeReq) {
+//        Workflow workflow = BeanUtil.toBean(workflowAllNodeReq, Workflow.class);
+//        workflowService.saveWorkflowDetail(workflow);
+//        return ResponseVo.createSuccess();
+//    }
+//
+//    @PostMapping("clear")
+//    @ApiOperation(value = "清空工作流节点", notes = "清空工作流节点")
+//    public ResponseVo<?> clear(@RequestBody @Validated ClearWorkflowNodeReq clearNodeReq) {
+//        workflowService.clearWorkflowNode(clearNodeReq.getWorkflowId());
+//        return ResponseVo.createSuccess();
+//    }
+//
+//    @GetMapping(value = "getTaskResult/{taskId}")
+//    @ApiOperation(value = "查看运行结果", notes = "查看运行结果")
+//    public ResponseVo<List<NodeTaskResultVo>> queryTaskResultByTaskId(@ApiParam(value = "任务id", required = true) @PathVariable String taskId) {
+//        List<WorkflowRunTaskResult> taskResultList = workflowRunTaskResultService.queryByTaskId(taskId);
+//        return ResponseVo.createSuccess(BeanUtil.copyToList(taskResultList, NodeTaskResultVo.class));
+//    }
 
 }

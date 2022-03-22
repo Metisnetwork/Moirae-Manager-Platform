@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.vo.data;
 
+import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,6 +13,9 @@ import java.util.List;
 @Data
 @ApiModel(value = "元数据详情")
 public class DataDetailsVo extends DataVo {
+
+    @ApiModelProperty(value = "源文件类型: 0-未知，1- CSV类型")
+    private MetaDataFileTypeEnum fileType;
 
     @ApiModelProperty(value = "数据凭证符号")
     private String tokenSymbol;

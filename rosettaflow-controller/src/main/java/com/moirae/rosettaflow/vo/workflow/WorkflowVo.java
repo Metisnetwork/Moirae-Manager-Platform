@@ -1,18 +1,13 @@
 package com.moirae.rosettaflow.vo.workflow;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.moirae.rosettaflow.common.constants.SysConstant;
+import com.moirae.rosettaflow.common.enums.CalculationProcessStepEnum;
+import com.moirae.rosettaflow.common.enums.WorkflowCreateModeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
 
-/**
- * 工作流列表响应对象
- * @author hudenian
- * @date 2021/8/30
- */
 @Data
 @ApiModel(value = "工作流列表响应对象")
 public class WorkflowVo {
@@ -23,16 +18,27 @@ public class WorkflowVo {
     @ApiModelProperty(value = "工作流名称")
     private String workflowName;
 
-    @ApiModelProperty(value = "工作流描述")
-    private String workflowDesc;
+    @ApiModelProperty(value = "工作流算法名称")
+    private String algorithmName;
 
-    @ApiModelProperty(value = "工作流运行状态(运行状态:0-未运行,1-运行中,2-运行成功，3-运行失败)")
-    private Byte runStatus;
+    @ApiModelProperty(value = "工作流算法id")
+    private Integer algorithmId;
+
+    @ApiModelProperty(value = "工作流步骤")
+    private String configAiStepName;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @ApiModelProperty(value = "创建者")
-    private String userName;
+    @ApiModelProperty(value = "最后运行时间")
+    private Date lastRunTime;
 
+    @ApiModelProperty(value = "是否设置完整")
+    private Boolean isCompleted;
+
+    @ApiModelProperty(value = "创建模式（专家模型、向导模式）")
+    private WorkflowCreateModeEnum createMode;
+
+    @ApiModelProperty(value = "向导模式下当前步骤")
+    private CalculationProcessStepEnum curCalculationProcessStep;
 }

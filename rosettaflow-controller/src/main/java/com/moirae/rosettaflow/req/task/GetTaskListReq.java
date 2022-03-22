@@ -29,9 +29,15 @@ public class GetTaskListReq extends CommonPageReq {
     @ApiModelProperty(value = "任务状态")
     private TaskStatusEnum taskStatus;
 
-    @ApiModelProperty(value = "组织关联的")
+    @ApiModelProperty(value = "组织关联的（用于组织详情查询）")
     private String identityId;
 
-    @ApiModelProperty(value = "元文件关联的")
+    @ApiModelProperty(value = "元文件关联的（用于数据详情查询）")
     private String metaDataId;
+
+    @ApiModelProperty(value = "工作流ID（用于工作流子任务列表查询）")
+    private Long workflowId;
+
+    @ApiModelProperty(value = "工作流版本（用于工作流子任务列表查询）")
+    private Long workflowVersion;
 }

@@ -51,6 +51,12 @@ public class TaskDetailsVo extends BaseTaskVo {
     @ApiModelProperty(value = "任务事件")
     private List<TaskEventVo> eventList;
 
+    @ApiModelProperty(value = "任务结果文件")
+    private List<TaskResultVo> taskResultList;
+
+    @ApiModelProperty(value = "任务结果中模型评估")
+    private TaskModelEvaluationVo taskModelEvaluation;
+
     @JsonIgnore
     private String algorithmName;
     @JsonIgnore
