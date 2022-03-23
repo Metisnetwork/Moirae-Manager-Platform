@@ -14,13 +14,10 @@ import javax.validation.constraints.Positive;
  */
 @Data
 @ApiModel
-public class TerminateWorkflowReq {
+public class GetWorkflowResultOfExpertModeReq {
 
-    @ApiModelProperty(value = "工作流ID", required = true)
+    @ApiModelProperty(value = "工作流节点id", required = true)
     @NotNull(message = "{workflow.id.notNull}")
     @Positive(message = "{workflow.id.positive}")
-    private Long workflowId;
-
-    @ApiModelProperty(value = "工作流版本", required = true)
-    private Integer version;
+    private Long workflowNodeId;
 }

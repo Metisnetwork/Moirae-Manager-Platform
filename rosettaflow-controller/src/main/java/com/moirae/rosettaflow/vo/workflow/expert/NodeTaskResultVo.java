@@ -1,7 +1,5 @@
-package com.moirae.rosettaflow.vo.workflow.node;
+package com.moirae.rosettaflow.vo.workflow.expert;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

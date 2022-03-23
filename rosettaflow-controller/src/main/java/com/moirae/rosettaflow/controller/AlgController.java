@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.controller;
 
 import com.moirae.rosettaflow.service.IAlgorithmService;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.algorithm.AlgTreeVo;
+import com.moirae.rosettaflow.vo.alg.AlgTreeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

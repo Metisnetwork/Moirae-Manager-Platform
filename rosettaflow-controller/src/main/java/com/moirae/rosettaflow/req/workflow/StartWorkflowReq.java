@@ -18,7 +18,7 @@ public class StartWorkflowReq {
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流版本", required = true)
-    private Integer version;
+    private Integer workflowVersion;
 
     @ApiModelProperty(value = "用户钱包地址", required = true)
     @NotBlank(message = "{user.address.notBlank}")

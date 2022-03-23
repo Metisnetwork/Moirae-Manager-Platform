@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.vo.algorithm;
+package com.moirae.rosettaflow.vo.alg;
 
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;

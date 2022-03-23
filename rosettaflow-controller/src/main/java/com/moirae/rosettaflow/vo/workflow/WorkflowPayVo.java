@@ -2,6 +2,8 @@ package com.moirae.rosettaflow.vo.workflow;
 
 import com.moirae.rosettaflow.common.enums.CalculationProcessStepEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowCreateModeEnum;
+import com.moirae.rosettaflow.common.enums.WorkflowPayStatusEnum;
+import com.moirae.rosettaflow.common.enums.WorkflowPayTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,16 +12,16 @@ import java.util.Date;
 
 @Data
 @ApiModel(value = "工作流列表响应对象")
-public class WorkflowPaymentVo {
+public class WorkflowPayVo {
 
     @ApiModelProperty(value = "工作流ID")
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流版本")
-    private Integer version;
+    private Integer workflowVersion;
 
     @ApiModelProperty(value = "支付类型（手续费、token）")
-    private String type;
+    private WorkflowPayTypeEnum type;
 
     @ApiModelProperty(value = "支付的目标地址（手续费-发起组织的carrier地址、 token-dataToken拥有者地址）")
     private String to;
@@ -58,5 +60,5 @@ public class WorkflowPaymentVo {
     private String metaDataId;
 
     @ApiModelProperty(value = "支付状态（待支付、 支付已提交、 支付成功、 支付失败、 撤销已提交、 撤销成功、 撤销失败）")
-    private String status;
+    private WorkflowPayStatusEnum status;
 }

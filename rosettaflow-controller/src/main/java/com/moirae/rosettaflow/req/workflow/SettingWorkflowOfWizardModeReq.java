@@ -11,7 +11,7 @@ import javax.validation.constraints.Positive;
 
 @Data
 @ApiModel
-public class SettingOfWizardModeReq {
+public class SettingWorkflowOfWizardModeReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
     @NotNull(message = "{workflow.id.notNull}")

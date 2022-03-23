@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.req.workflow.wizard;
 
+import com.moirae.rosettaflow.vo.model.ModelVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class PredictionInputReq {
     private Integer inputModel;
 
     @ApiModelProperty(value = "工作流当前节点模型ID")
-    private String metaDataId;
+    private ModelVo modelVo;
 
     @ApiModelProperty(value = "元数据输入")
     private List<DataInputItemReq> item;

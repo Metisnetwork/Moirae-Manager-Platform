@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.vo.workflow.node;
+package com.moirae.rosettaflow.vo.workflow.expert;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

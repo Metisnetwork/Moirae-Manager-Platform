@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.req.workflow;
 
+import com.moirae.rosettaflow.common.enums.WorkflowPayTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,10 +18,10 @@ public class PayReq {
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流版本", required = true)
-    private Integer version;
+    private Integer workflowVersion;
 
     @ApiModelProperty(value = "支付类型（手续费、token）")
-    private String type;
+    private WorkflowPayTypeEnum type;
 
     @ApiModelProperty(value = "token-元数据id")
     private String metaDataId;

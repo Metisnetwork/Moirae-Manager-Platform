@@ -18,4 +18,7 @@ public class OutputItemReq {
     @ApiModelProperty(value = "结算输入方组织的身份标识Id", required = true)
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
+
+    @ApiModelProperty(value = "存储形式: 1-明文，2:密文")
+    private Integer storePattern;
 }

@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.vo.algorithm;
+package com.moirae.rosettaflow.vo.alg;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

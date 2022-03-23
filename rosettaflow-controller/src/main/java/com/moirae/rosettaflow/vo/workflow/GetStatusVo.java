@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.vo.workflow;
 
-import com.moirae.rosettaflow.vo.workflow.node.GetNodeStatusVo;
+import com.moirae.rosettaflow.common.enums.WorkflowStatusEnum;
+import com.moirae.rosettaflow.vo.workflow.expert.GetNodeStatusVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,7 +18,7 @@ import java.util.List;
 public class GetStatusVo {
 
     @ApiModelProperty(value = "工作流运行状态:0-未运行,1-运行中,2-运行成功，3-运行失败")
-    private Byte runStatus;
+    private Integer runStatus;
 
     @ApiModelProperty(value = "工作流节点运行状态列表")
     private List<GetNodeStatusVo> getNodeStatusVoList;

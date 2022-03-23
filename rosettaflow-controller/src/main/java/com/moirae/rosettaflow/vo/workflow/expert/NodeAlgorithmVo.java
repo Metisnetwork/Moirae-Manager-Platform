@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.vo.workflow.node;
+package com.moirae.rosettaflow.vo.workflow.expert;
 
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;

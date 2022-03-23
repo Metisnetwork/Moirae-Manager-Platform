@@ -1,10 +1,8 @@
-package com.moirae.rosettaflow.vo.workflow.node;
+package com.moirae.rosettaflow.vo.workflow.expert;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * 工作流节点输入响应参数

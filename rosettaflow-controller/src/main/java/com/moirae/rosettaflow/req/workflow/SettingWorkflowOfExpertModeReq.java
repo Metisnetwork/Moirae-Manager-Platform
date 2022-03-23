@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @ApiModel
-public class SettingOfExpertModeReq {
+public class SettingWorkflowOfExpertModeReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
     @NotNull(message = "{workflow.id.notNull}")

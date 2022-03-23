@@ -21,5 +21,4 @@ public class ModelVo {
 
     @ApiModelProperty(value = "模型名称")
     private String fileName;
-
 }
