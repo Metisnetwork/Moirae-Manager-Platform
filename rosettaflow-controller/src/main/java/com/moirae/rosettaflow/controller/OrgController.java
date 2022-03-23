@@ -1,9 +1,9 @@
 package com.moirae.rosettaflow.controller;
 
 
-import com.moirae.rosettaflow.req.org.DelIpPortBindReq;
 import com.moirae.rosettaflow.req.org.GetOrgListReq;
-import com.moirae.rosettaflow.req.org.IpPortBindReq;
+import com.moirae.rosettaflow.req.org.JoinOrgReq;
+import com.moirae.rosettaflow.req.org.QuitOrgReq;
 import com.moirae.rosettaflow.service.OrganizationService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author hudenian
+ * 组织相关
  * @date 2021/12/15
  */
 @Slf4j
@@ -64,15 +64,15 @@ public class OrgController {
 
     @PostMapping("joinOrg")
     @ApiOperation(value = "用户加入组织", notes = "用户加入组织")
-    public ResponseVo<?> joinOrg(@RequestBody @Valid IpPortBindReq ipPortBindReq) {
-        organizationService.addOrganizationByUser(ipPortBindReq.getIdentityIp(), ipPortBindReq.getIdentityPort());
+    public ResponseVo<?> joinOrg(@RequestBody @Valid JoinOrgReq req) {
+        organizationService.addOrganizationByUser(req.getIdentityIp(), req.getIdentityPort());
         return ResponseVo.createSuccess();
     }
 
     @PostMapping("quitOrg")
-    @ApiOperation(value = "删除用户绑定的组织", notes = "删除用户绑定的组织")
-    public ResponseVo<?> quitOrg(@RequestBody @Valid DelIpPortBindReq delIpPortBindReq) {
-        organizationService.deleteOrganizationByUser(delIpPortBindReq.getIdentityId());
+    @ApiOperation(value = "用户退出组织", notes = "用户退出组织")
+    public ResponseVo<?> quitOrg(@RequestBody @Valid QuitOrgReq req) {
+        organizationService.deleteOrganizationByUser(req.getIdentityId());
         return ResponseVo.createSuccess();
     }
 }

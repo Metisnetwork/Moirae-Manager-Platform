@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.mapper.domain.Algorithm;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 
 import java.util.List;
 import java.util.Map;

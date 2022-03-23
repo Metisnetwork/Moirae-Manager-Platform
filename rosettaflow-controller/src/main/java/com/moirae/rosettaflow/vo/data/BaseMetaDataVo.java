@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.vo.data;
 
 import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

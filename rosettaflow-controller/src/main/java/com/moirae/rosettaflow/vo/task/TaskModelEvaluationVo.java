@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * 工作流节点运行结果
  * @author hudenian
@@ -21,5 +19,7 @@ public class TaskModelEvaluationVo {
 
 
     //TODO 指标定义 动态 还是 固定
+
+
 
 }

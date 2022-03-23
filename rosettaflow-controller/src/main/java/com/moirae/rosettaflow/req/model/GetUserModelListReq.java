@@ -1,21 +1,12 @@
-package com.moirae.rosettaflow.req.project;
-
+package com.moirae.rosettaflow.req.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * 查询当前项目的算法模型请求参数
- * @author houz
- */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @ApiModel(value = "查询当前用户的算法模型")
 public class GetUserModelListReq {
 

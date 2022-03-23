@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.vo.workflow;
 
-import com.moirae.rosettaflow.common.enums.WorkflowStatusEnum;
 import com.moirae.rosettaflow.vo.workflow.expert.GetNodeStatusVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

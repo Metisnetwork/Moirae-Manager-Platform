@@ -7,7 +7,6 @@ import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.mapper.ModelMapper;
 import com.moirae.rosettaflow.mapper.domain.Model;
 import com.moirae.rosettaflow.mapper.domain.User;
-import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.IModelService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.common.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tomcat.util.codec.binary.Base64;

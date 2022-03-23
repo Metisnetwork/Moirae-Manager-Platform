@@ -3,7 +3,6 @@ package com.moirae.rosettaflow.grpc.service;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import io.grpc.ManagedChannel;
 
-import java.nio.channels.Channel;
 import java.util.List;
 
 /**

@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.grpc.data.provider.resp.dto;
 
-import com.moirae.rosettaflow.common.enums.TaskDownloadStatusEnum;
 import lombok.Data;
 
 /**

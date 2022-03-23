@@ -1,17 +1,12 @@
 package com.moirae.rosettaflow.req.data;
 
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
-import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
-import com.moirae.rosettaflow.common.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.req.CommonPageReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

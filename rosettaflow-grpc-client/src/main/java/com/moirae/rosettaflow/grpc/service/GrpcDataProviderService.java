@@ -1,8 +1,7 @@
 package com.moirae.rosettaflow.grpc.service;
 
 import com.moirae.rosettaflow.grpc.data.provider.req.dto.DownloadRequestDto;
-import com.moirae.rosettaflow.grpc.data.provider.resp.dto.DownloadReplyResponseDto;
-import java.util.List;
+
 import java.util.function.Consumer;
 
 /**

@@ -5,12 +5,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.mapper.WorkflowNodeOutputMapper;
 import com.moirae.rosettaflow.mapper.domain.WorkflowNodeOutput;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNodeResource;
 import com.moirae.rosettaflow.service.IWorkflowNodeOutputService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

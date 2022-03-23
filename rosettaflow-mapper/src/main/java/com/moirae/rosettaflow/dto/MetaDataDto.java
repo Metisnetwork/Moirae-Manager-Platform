@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.dto;
 
 import com.moirae.rosettaflow.mapper.enums.*;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;

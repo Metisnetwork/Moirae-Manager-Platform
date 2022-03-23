@@ -16,7 +16,7 @@ import javax.validation.constraints.Pattern;
  */
 @Data
 @ApiModel(value = "创建ip及port与组织绑定关系请求")
-public class IpPortBindReq {
+public class JoinOrgReq {
 
     @ApiModelProperty(value = "组织的ip", required = true)
     @Pattern(regexp = "^((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)$", message = "{organization.ip.error}")

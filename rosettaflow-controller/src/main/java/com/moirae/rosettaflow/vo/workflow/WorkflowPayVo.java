@@ -1,14 +1,10 @@
 package com.moirae.rosettaflow.vo.workflow;
 
-import com.moirae.rosettaflow.common.enums.CalculationProcessStepEnum;
-import com.moirae.rosettaflow.common.enums.WorkflowCreateModeEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowPayStatusEnum;
 import com.moirae.rosettaflow.common.enums.WorkflowPayTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 @ApiModel(value = "工作流列表响应对象")

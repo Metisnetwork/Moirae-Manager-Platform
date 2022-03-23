@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.mapper.domain.Model;
-import com.moirae.rosettaflow.req.project.GetUserModelListReq;
+import com.moirae.rosettaflow.req.model.GetUserModelListReq;
 import com.moirae.rosettaflow.service.IModelService;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.model.ModelVo;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 

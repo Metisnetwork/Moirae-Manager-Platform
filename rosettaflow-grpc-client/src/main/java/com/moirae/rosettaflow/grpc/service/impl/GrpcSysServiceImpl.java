@@ -1,12 +1,10 @@
 package com.moirae.rosettaflow.grpc.service.impl;
 
 import com.moirae.rosettaflow.grpc.client.SysServiceClient;
-import com.moirae.rosettaflow.grpc.client.TaskServiceClient;
 import com.moirae.rosettaflow.grpc.service.GrpcSysService;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

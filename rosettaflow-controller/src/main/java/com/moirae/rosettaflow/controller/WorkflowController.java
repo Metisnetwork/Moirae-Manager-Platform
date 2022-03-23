@@ -1,6 +1,11 @@
 package com.moirae.rosettaflow.controller;
 
 import com.moirae.rosettaflow.req.workflow.*;
+import com.moirae.rosettaflow.req.workflow.expert.CreateWorkflowOfExpertModeReq;
+import com.moirae.rosettaflow.req.workflow.expert.GetWorkflowResultOfExpertModeReq;
+import com.moirae.rosettaflow.req.workflow.expert.SettingWorkflowOfExpertModeReq;
+import com.moirae.rosettaflow.req.workflow.wizard.CreateWorkflowOfWizardModeReq;
+import com.moirae.rosettaflow.req.workflow.wizard.SettingWorkflowOfWizardModeReq;
 import com.moirae.rosettaflow.service.IWorkflowService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;

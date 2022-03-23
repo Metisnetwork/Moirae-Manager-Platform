@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTempNode;
 
 import java.util.List;

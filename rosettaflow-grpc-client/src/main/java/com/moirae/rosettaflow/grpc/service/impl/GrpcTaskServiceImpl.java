@@ -2,7 +2,6 @@ package com.moirae.rosettaflow.grpc.service.impl;
 
 import com.moirae.rosettaflow.grpc.client.TaskServiceClient;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
-import com.moirae.rosettaflow.grpc.metadata.resp.dto.SelfMetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.service.PublishTaskDeclareResponse;
 import com.moirae.rosettaflow.grpc.task.req.dto.*;
@@ -10,7 +9,6 @@ import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

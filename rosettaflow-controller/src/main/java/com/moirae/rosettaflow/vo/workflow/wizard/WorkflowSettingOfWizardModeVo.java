@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.vo.workflow.wizard;
 
-import com.moirae.rosettaflow.req.workflow.SettingWorkflowOfExpertModeReq;
-import com.moirae.rosettaflow.req.workflow.SettingWorkflowOfWizardModeReq;
+import com.moirae.rosettaflow.req.workflow.wizard.SettingWorkflowOfWizardModeReq;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 

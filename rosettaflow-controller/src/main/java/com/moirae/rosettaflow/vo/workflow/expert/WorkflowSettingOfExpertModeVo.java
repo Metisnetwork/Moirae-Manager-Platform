@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.vo.workflow.expert;
 
-import com.moirae.rosettaflow.req.workflow.SettingWorkflowOfExpertModeReq;
+import com.moirae.rosettaflow.req.workflow.expert.SettingWorkflowOfExpertModeReq;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 

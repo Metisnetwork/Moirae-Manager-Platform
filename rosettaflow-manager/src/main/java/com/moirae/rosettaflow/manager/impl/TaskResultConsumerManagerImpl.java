@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.TaskResultConsumerManager;
 import com.moirae.rosettaflow.mapper.TaskResultConsumerMapper;
-import com.moirae.rosettaflow.mapper.domain.TaskPowerProvider;
 import com.moirae.rosettaflow.mapper.domain.TaskResultConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

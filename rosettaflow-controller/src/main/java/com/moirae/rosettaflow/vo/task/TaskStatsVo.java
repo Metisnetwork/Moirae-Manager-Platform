@@ -1,15 +1,8 @@
 package com.moirae.rosettaflow.vo.task;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.moirae.rosettaflow.common.constants.SysConstant;
-import com.moirae.rosettaflow.common.utils.LanguageContext;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import java.util.List;
-import java.util.Objects;
 
 @Data
 @ApiModel(value = "任务统计")

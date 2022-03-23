@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.vo.data;
 
-import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.vo.task.BaseOrgVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

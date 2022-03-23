@@ -2,8 +2,6 @@ package com.moirae.rosettaflow.grpc.data.provider.req.dto;
 
 import lombok.Data;
 
-import java.util.Map;
-
 /**
  * @author juzix
  * @description 任务结果文件下载请求

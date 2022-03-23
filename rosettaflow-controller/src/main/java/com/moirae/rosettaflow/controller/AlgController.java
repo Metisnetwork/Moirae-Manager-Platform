@@ -23,15 +23,15 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @Api(tags = "算法相关接口")
-@RequestMapping(value = "algorithm", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "alg", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AlgController {
 
     @Resource
     private IAlgorithmService algorithmService;
 
-    @GetMapping("queryAlgorithmTreeList")
+    @GetMapping("queryAlgTreeList")
     @ApiOperation(value = "查询算法树列表", notes = "查询算法树列表")
-    public ResponseVo<AlgTreeVo> queryAlgorithmTreeList(HttpServletRequest request) {
+    public ResponseVo<AlgTreeVo> queryAlgTreeList(HttpServletRequest request) {
         String language = request.getHeader("Accept-Language");
         AlgTreeVo algTreeListVo = new AlgTreeVo();
         return ResponseVo.createSuccess(algTreeListVo);

@@ -1,8 +1,8 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.dto.OrganizationDto;
+import com.moirae.rosettaflow.mapper.domain.Org;
 import io.grpc.ManagedChannel;
 
 import java.util.List;

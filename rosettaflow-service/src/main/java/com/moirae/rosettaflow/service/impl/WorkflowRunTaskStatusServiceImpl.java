@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.mapper.WorkflowRunTaskStatusMapper;
-import com.moirae.rosettaflow.mapper.domain.WorkflowNode;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.service.IWorkflowRunTaskStatusService;
 import lombok.extern.slf4j.Slf4j;
