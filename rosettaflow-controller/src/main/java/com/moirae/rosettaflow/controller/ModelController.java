@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.mapper.domain.Model;
-import com.moirae.rosettaflow.req.project.ProjAlgModel;
+import com.moirae.rosettaflow.req.project.GetUserModelListReq;
 import com.moirae.rosettaflow.service.IModelService;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.model.ModelVo;
@@ -27,13 +27,12 @@ public class ModelController {
     @Resource
     private IModelService modelService;
 
-    @GetMapping("queryAvailableModel")
+    @GetMapping("getUserModelList")
     @ApiOperation(value = "查询当前用户的算法模型", notes = "查询当前用户的算法模型")
-    public ResponseVo<List<ModelVo>> queryCurrentProjAlgModel(@Valid ProjAlgModel projAlgModel, HttpServletRequest request) {
+    public ResponseVo<List<ModelVo>> getUserModelList(@Valid GetUserModelListReq req) {
         // 获取语言类型
-        String language = request.getHeader("Accept-Language");
-        List<Model> list =  modelService.queryAvailableModel(projAlgModel.getAlgorithmId(), projAlgModel.getIdentityId(), language);
+        String language = "";
+        List<Model> list =  modelService.queryAvailableModel(req.getAlgorithmId(), req.getIdentityId(), language);
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ModelVo.class));
     }
-
 }

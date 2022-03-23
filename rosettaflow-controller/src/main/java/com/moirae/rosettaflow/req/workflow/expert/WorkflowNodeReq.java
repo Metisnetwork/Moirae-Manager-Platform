@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.req.workflow.node;
+package com.moirae.rosettaflow.req.workflow.expert;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,7 +7,6 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -20,9 +19,9 @@ import java.util.List;
 @ApiModel(value = "工作流详情请求对象")
 public class WorkflowNodeReq {
 
-    @ApiModelProperty(value = "工作流节点任务发启放组织id", required = true)
+    @ApiModelProperty(value = "发起方的组织的身份标识Id", required = true)
     @NotBlank(message = "{workflow.node.sender.NotBlank}")
-    private String workflowNodeSenderIdentityId;
+    private String identityId;
 
     @ApiModelProperty(value = "算法ID", required = true)
     @NotNull(message = "{algorithm.id.notNull}")

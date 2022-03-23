@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum WorkflowCreateModeEnum {
 
-    expert_Mode("expertMode", "专家模式"),
-    wizard_Mode("wizardMode", "向导模式");
+    EXPERT_MODE("expertMode", "专家模式"),
+    WIZARD_MODE("wizardMode", "向导模式");
 
     @JsonValue
     private String value;

@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.req.workflow.node;
+package com.moirae.rosettaflow.req.workflow.wizard;
 
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import io.swagger.annotations.ApiModel;
@@ -17,7 +17,10 @@ import java.math.RoundingMode;
  */
 @Data
 @ApiModel(value = "工作流节点资源请求对象")
-public class WorkflowNodeResourceReq {
+public class ResourceItemReq {
+
+
+
 
     @ApiModelProperty(value = "工作流节点资源内存 (单位: Mb)", required = true)
     @NotNull(message = "{node.cost.memory.notNull}")

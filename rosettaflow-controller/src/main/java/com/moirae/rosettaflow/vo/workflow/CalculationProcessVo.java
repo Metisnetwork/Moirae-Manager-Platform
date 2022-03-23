@@ -14,7 +14,7 @@ public class CalculationProcessVo {
     @ApiModelProperty(value = "配置ID")
     private Long id;
 
-    @ApiModelProperty(value = "配置")
+    @ApiModelProperty(value = "配置名称")
     private String name;
 
     @ApiModelProperty(value = "计算步骤")

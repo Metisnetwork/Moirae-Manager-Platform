@@ -13,7 +13,7 @@ import java.util.Date;
 @ApiModel(value = "任务列表查询")
 public class GetWorkflowListReq extends CommonPageReq {
 
-    @ApiModelProperty(value = "搜索关键字(工作流名称)")
+    @ApiModelProperty(value = "搜索关键字(工作流名称进行模糊查询)")
     private String keyword;
 
     @ApiModelProperty(value = "算法id")

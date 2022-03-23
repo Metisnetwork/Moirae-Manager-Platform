@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.vo.workflow;
 
+import com.moirae.rosettaflow.common.enums.WorkflowStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,10 +12,10 @@ import java.util.Date;
 public class WorkflowVersionVo {
 
     @ApiModelProperty(value = "工作流ID")
-    private Long id;
+    private Long workflowId;
 
     @ApiModelProperty(value = "工作流版本号")
-    private Integer version;
+    private Integer workflowVersion;
 
     @ApiModelProperty(value = "工作流版本名称")
     private String workflowVersionName;
@@ -22,8 +23,8 @@ public class WorkflowVersionVo {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @ApiModelProperty(value = "工作流版本执行状态（未支付、继续支付、已支付、运行中、运行成功、运行失败）")
-    private String status;
+    @ApiModelProperty(value = "工作流版本执行状态（待支付、支付中、已支付、运行中、运行成功、运行失败）")
+    private WorkflowStatusEnum status;
 
     @ApiModelProperty(value = "开始时间")
     private Date beginTime;

@@ -22,13 +22,8 @@ public class AlgTreeItemVo {
     @ApiModelProperty(value = "是否算法")
     private Boolean isAlg;
 
-    private List<AlgVo> ste;
-
-
-
-
-    @ApiModelProperty(value = "算法详情")
-    private AlgVo alg;
+    @ApiModelProperty(value = "算法明细")
+    private List<AlgVo> algItem;
 
     @ApiModelProperty(value = "明细")
     private List<AlgTreeItemVo> child;

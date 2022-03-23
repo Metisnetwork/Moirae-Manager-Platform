@@ -1,5 +1,6 @@
-package com.moirae.rosettaflow.req.workflow.node;
+package com.moirae.rosettaflow.req.workflow;
 
+import com.moirae.rosettaflow.req.workflow.expert.WorkflowNodeReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,20 +9,18 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-/**
- * 保存工作流节点请求对象
- * @author hudenian
- * @date 2021/8/31
- */
 @Data
 @ApiModel
-public class SaveWorkflowNodeReq {
+public class SettingOfExpertModeReq {
 
     @ApiModelProperty(value = "工作流ID", required = true)
     @NotNull(message = "{workflow.id.notNull}")
     @Positive(message = "{workflow.id.positive}")
     private Long workflowId;
 
-    @ApiModelProperty(value = "工作流节点列表", required = true)
+    @ApiModelProperty(value = "工作流最新版本号")
+    private Integer workflowVersion;
+
+    @ApiModelProperty(value = "工作流所有节点列表")
     List<WorkflowNodeReq> workflowNodeReqList;
 }

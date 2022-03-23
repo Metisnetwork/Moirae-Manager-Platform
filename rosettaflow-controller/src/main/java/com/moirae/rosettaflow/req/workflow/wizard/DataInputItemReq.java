@@ -1,4 +1,4 @@
-package com.moirae.rosettaflow.req.workflow.step;
+package com.moirae.rosettaflow.req.workflow.wizard;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,7 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Data
 @ApiModel(value = "工作流节点输入请求对象")

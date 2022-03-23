@@ -9,7 +9,7 @@ import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.AlgorithmDto;
 import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.req.workflow.node.WorkflowNodeReq;
+import com.moirae.rosettaflow.req.workflow.expert.WorkflowNodeReq;
 import com.moirae.rosettaflow.vo.PageVo;
 import org.springframework.beans.BeanUtils;
 

@@ -13,8 +13,8 @@ import lombok.Data;
 @ApiModel(value = "项目模型")
 public class ModelVo {
 
-    @ApiModelProperty(value = "模型主键id")
-    private Long modelId;
+    @ApiModelProperty(value = "模型的元数据id")
+    private String metaDataId;
 
     @ApiModelProperty(value = "模型所属的机构id")
     private String identityId;
