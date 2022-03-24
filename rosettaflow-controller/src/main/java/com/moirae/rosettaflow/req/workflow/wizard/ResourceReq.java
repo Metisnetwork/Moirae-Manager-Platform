@@ -19,4 +19,7 @@ public class ResourceReq {
 
     @ApiModelProperty(value = "预测任务的计算资源")
     private ResourceItemReq prediction;
+
+    @ApiModelProperty(value = "通用任务的计算资源")
+    private ResourceItemReq common;
 }

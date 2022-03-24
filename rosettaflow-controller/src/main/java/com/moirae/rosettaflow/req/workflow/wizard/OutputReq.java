@@ -19,6 +19,6 @@ public class OutputReq {
     @ApiModelProperty(value = "预测任务的结果输出方")
     private OutputItemReq prediction;
 
-    @ApiModelProperty(value = "PSI的结果输出方")
-    private OutputItemReq psi;
+    @ApiModelProperty(value = "通用的结果输出方")
+    private OutputItemReq common;
 }

@@ -10,6 +10,7 @@ DROP TABLE `t_algorithm_auth`;
 DROP TABLE `t_algorithm_code`;
 DROP TABLE `t_algorithm_variable`;
 DROP TABLE `t_algorithm_variable_struct`;
+DROP TABLE `t_data_sync`;
 
 
 ALTER TABLE `dc_meta_data`
@@ -125,7 +126,6 @@ CREATE TABLE `mo_algorithm_code` (
 ) ENGINE=InnoDB COMMENT='算法代码表';
 
 insert  into `mo_algorithm_code`(`algorithm_id`,`edit_type`,`calculate_contract_struct`,`calculate_contract_code`,`data_split_contract_code`) values
-    (1001,2,NULL,'',NULL),
     (2011,2,'{"label_owner":"p0","label_column":"Y","algorithm_parameter":{"epochs":10,"batch_size":256,"learning_rate":0.1,"use_validation_set":true,"validation_set_rate":0.2,"predict_threshold":0.5}}','# coding:utf-8\n\nimport os\nimport sys\nimport math\nimport json\nimport time\nimport logging\nimport shutil\nimport numpy as np\nimport pandas as pd\nimport tensorflow as tf\nimport latticex.rosetta as rtt\nimport channel_sdk\n\n\nnp.set_printoptions(suppress=True)\ntf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)\nos.environ[\'TF_CPP_MIN_LOG_LEVEL\'] = \'2\'\nrtt.set_backend_loglevel(5)  # All(0), Trace(1), Debug(2), Info(3), Warn(4), Error(5), Fatal(6)\nlog = logging.getLogger(__name__)\n\nclass PrivacyLinearRegTrain(object):\n    \'\'\'\n    Privacy linear regression train base on rosetta.\n    \'\'\'\n\n    def __init__(self,\n                 channel_config: str,\n                 cfg_dict: dict,\n                 data_party: list,\n                 result_party: list,\n                 results_dir: str):\n        log.info(f\"channel_config:{channel_config}\")\n        log.info(f\"cfg_dict:{cfg_dict}\")\n        log.info(f\"data_party:{data_party}, result_party:{result_party}, results_dir:{results_dir}\")\n        assert isinstance(channel_config, str), \"type of channel_config must be str\"\n        assert isinstance(cfg_dict, dict), \"type of cfg_dict must be dict\"\n        assert isinstance(data_party, (list, tuple)), \"type of data_party must be list or tuple\"\n        assert isinstance(result_party, (list, tuple)), \"type of result_party must be list or tuple\"\n        assert isinstance(results_dir, str), \"type of results_dir must be str\"\n        \n        self.channel_config = channel_config\n        self.data_party = list(data_party)\n        self.result_party = list(result_party)\n        self.party_id = cfg_dict[\"party_id\"]\n        self.input_file = cfg_dict[\"data_party\"].get(\"input_file\")\n        self.key_column = cfg_dict[\"data_party\"].get(\"key_column\")\n        self.selected_columns = cfg_dict[\"data_party\"].get(\"selected_columns\")\n\n        dynamic_parameter = cfg_dict[\"dynamic_parameter\"]\n        self.label_owner = dynamic_parameter.get(\"label_owner\")\n        if self.party_id == self.label_owner:\n            self.label_column = dynamic_parameter.get(\"label_column\")\n            self.data_with_label = True\n        else:\n            self.label_column = \"\"\n            self.data_with_label = False\n                        \n        algorithm_parameter = dynamic_parameter[\"algorithm_parameter\"]\n        self.epochs = algorithm_parameter.get(\"epochs\", 10)\n        self.batch_size = algorithm_parameter.get(\"batch_size\", 256)\n        self.learning_rate = algorithm_parameter.get(\"learning_rate\", 0.001)\n        self.use_validation_set = algorithm_parameter.get(\"use_validation_set\", True)\n        self.validation_set_rate = algorithm_parameter.get(\"validation_set_rate\", 0.2)\n        self.predict_threshold = algorithm_parameter.get(\"predict_threshold\", 0.5)\n\n        self.output_file = os.path.join(results_dir, \"model\")\n        \n        self.check_parameters()\n\n    def check_parameters(self):\n        log.info(f\"check parameter start.\")        \n        assert self.epochs > 0, \"epochs must be greater 0\"\n        assert self.batch_size > 0, \"batch size must be greater 0\"\n        assert self.learning_rate > 0, \"learning rate must be greater 0\"\n        assert 0 < self.validation_set_rate < 1, \"validattion set rate must be between (0,1)\"\n        assert 0 <= self.predict_threshold <= 1, \"predict threshold must be between [0,1]\"\n        \n        if self.input_file:\n            self.input_file = self.input_file.strip()\n        if self.party_id in self.data_party:\n            if os.path.exists(self.input_file):\n                input_columns = pd.read_csv(self.input_file, nrows=0)\n                input_columns = list(input_columns.columns)\n                if self.key_column:\n                    assert self.key_column in input_columns, f\"key_column:{self.key_column} not in input_file\"\n                if self.selected_columns:\n                    error_col = []\n                    for col in self.selected_columns:\n                        if col not in input_columns:\n                            error_col.append(col)   \n                    assert not error_col, f\"selected_columns:{error_col} not in input_file\"\n                if self.label_column:\n                    assert self.label_column in input_columns, f\"label_column:{self.label_column} not in input_file\"\n            else:\n                raise Exception(f\"input_file is not exist. input_file={self.input_file}\")\n        log.info(f\"check parameter finish.\")\n                        \n        \n    def train(self):\n        \'\'\'\n        Linear regression training algorithm implementation function\n        \'\'\'\n\n        log.info(\"extract feature or label.\")\n        train_x, train_y, val_x, val_y = self.extract_feature_or_label(with_label=self.data_with_label)\n        \n        log.info(\"start create and set channel.\")\n        self.create_set_channel()\n        log.info(\"waiting other party connect...\")\n        rtt.activate(\"SecureNN\")\n        log.info(\"protocol has been activated.\")\n        \n        log.info(f\"start set save model. save to party: {self.result_party}\")\n        rtt.set_saver_model(False, plain_model=self.result_party)\n        # sharing data\n        log.info(f\"start sharing train data. data_owner={self.data_party}, label_owner={self.label_owner}\")\n        shard_x, shard_y = rtt.PrivateDataset(data_owner=self.data_party, label_owner=self.label_owner).load_data(train_x, train_y, header=0)\n        log.info(\"finish sharing train data.\")\n        column_total_num = shard_x.shape[1]\n        log.info(f\"column_total_num = {column_total_num}.\")\n        \n        if self.use_validation_set:\n            log.info(\"start sharing validation data.\")\n            shard_x_val, shard_y_val = rtt.PrivateDataset(data_owner=self.data_party, label_owner=self.label_owner).load_data(val_x, val_y, header=0)\n            log.info(\"finish sharing validation data.\")\n\n        if self.party_id not in self.data_party:  \n            # mean the compute party and result party\n            log.info(\"compute start.\")\n            X = tf.placeholder(tf.float64, [None, column_total_num])\n            Y = tf.placeholder(tf.float64, [None, 1])\n            W = tf.Variable(tf.zeros([column_total_num, 1], dtype=tf.float64))\n            b = tf.Variable(tf.zeros([1], dtype=tf.float64))\n            pred_Y = tf.matmul(X, W) + b\n            loss = tf.square(Y - pred_Y)\n            loss = tf.reduce_mean(loss)\n            # optimizer\n            optimizer = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(loss)\n            init = tf.global_variables_initializer()\n            saver = tf.train.Saver(var_list=None, max_to_keep=5, name=\'v2\')\n            \n            reveal_Y = rtt.SecureReveal(pred_Y)\n            actual_Y = tf.placeholder(tf.float64, [None, 1])\n            reveal_Y_actual = rtt.SecureReveal(actual_Y)\n\n            with tf.Session() as sess:\n                log.info(\"session init.\")\n                sess.run(init)\n                # train\n                log.info(\"train start.\")\n                train_start_time = time.time()\n                batch_num = math.ceil(len(shard_x) / self.batch_size)\n                for e in range(self.epochs):\n                    for i in range(batch_num):\n                        bX = shard_x[(i * self.batch_size): (i + 1) * self.batch_size]\n                        bY = shard_y[(i * self.batch_size): (i + 1) * self.batch_size]\n                        sess.run(optimizer, feed_dict={X: bX, Y: bY})\n                        if (i % 50 == 0) or (i == batch_num - 1):\n                            log.info(f\"epoch:{e + 1}/{self.epochs}, batch:{i + 1}/{batch_num}\")\n                log.info(f\"model save to: {self.output_file}\")\n                saver.save(sess, self.output_file)\n                train_use_time = round(time.time()-train_start_time, 3)\n                log.info(f\"save model success. train_use_time={train_use_time}s\")\n                \n                if self.use_validation_set:\n                    Y_pred = sess.run(reveal_Y, feed_dict={X: shard_x_val})\n                    log.info(f\"Y_pred:\\n {Y_pred[:10]}\")\n                    Y_actual = sess.run(reveal_Y_actual, feed_dict={actual_Y: shard_y_val})\n                    log.info(f\"Y_actual:\\n {Y_actual[:10]}\")\n        \n            running_stats = str(rtt.get_perf_stats(True)).replace(\'\\n\', \'\').replace(\' \', \'\')\n            log.info(f\"running stats: {running_stats}\")\n        else:\n            log.info(\"computing, please waiting for compute finish...\")\n        rtt.deactivate()\n     \n        log.info(\"remove temp dir.\")\n        if self.party_id in (self.data_party + self.result_party):\n            # self.remove_temp_dir()\n            pass\n        else:\n            # delete the model in the compute party.\n            self.remove_output_dir()\n        \n        if (self.party_id in self.result_party) and self.use_validation_set:\n            log.info(\"result_party evaluate model.\")\n            from sklearn.metrics import r2_score, mean_squared_error\n            Y_pred = Y_pred.astype(\"float\").reshape([-1, ])\n            Y_true = Y_actual.astype(\"float\").reshape([-1, ])\n            r2 = r2_score(Y_true, Y_pred)\n            rmse = np.sqrt(mean_squared_error(Y_true, Y_pred))\n            log.info(\"********************\")\n            log.info(f\"R Squared: {round(r2, 6)}\")\n            log.info(f\"RMSE: {round(rmse, 6)}\")\n            log.info(\"********************\")\n        log.info(\"train finish.\")\n    \n    def create_set_channel(self):\n        \'\'\'\n        create and set channel.\n        \'\'\'\n        io_channel = channel_sdk.grpc.APIManager()\n        log.info(\"start create channel\")\n        channel = io_channel.create_channel(self.party_id, self.channel_config)\n        log.info(\"start set channel\")\n        rtt.set_channel(\"\", channel)\n        log.info(\"set channel success.\")\n    \n    def extract_feature_or_label(self, with_label: bool=False):\n        \'\'\'\n        Extract feature columns or label column from input file,\n        and then divide them into train set and validation set.\n        \'\'\'\n        train_x = \"\"\n        train_y = \"\"\n        val_x = \"\"\n        val_y = \"\"\n        temp_dir = self.get_temp_dir()\n        if self.party_id in self.data_party:\n            if self.input_file:\n                if with_label:\n                    usecols = self.selected_columns + [self.label_column]\n                else:\n                    usecols = self.selected_columns\n                \n                input_data = pd.read_csv(self.input_file, usecols=usecols, dtype=\"str\")\n                input_data = input_data[usecols]\n                # only if self.validation_set_rate==0, split_point==input_data.shape[0]\n                split_point = int(input_data.shape[0] * (1 - self.validation_set_rate))\n                assert split_point > 0, f\"train set is empty, because validation_set_rate:{self.validation_set_rate} is too big\"\n                \n                if with_label:\n                    y_data = input_data[self.label_column]\n                    train_y_data = y_data.iloc[:split_point]\n                    train_y = os.path.join(temp_dir, f\"train_y_{self.party_id}.csv\")\n                    train_y_data.to_csv(train_y, header=True, index=False)\n                    if self.use_validation_set:\n                        assert split_point < input_data.shape[0], \\\n                            f\"validation set is empty, because validation_set_rate:{self.validation_set_rate} is too small\"\n                        val_y_data = y_data.iloc[split_point:]\n                        val_y = os.path.join(temp_dir, f\"val_y_{self.party_id}.csv\")\n                        val_y_data.to_csv(val_y, header=True, index=False)\n                    del input_data[self.label_column]\n                \n                x_data = input_data\n                train_x = os.path.join(temp_dir, f\"train_x_{self.party_id}.csv\")\n                x_data.iloc[:split_point].to_csv(train_x, header=True, index=False)\n                if self.use_validation_set:\n                    assert split_point < input_data.shape[0], \\\n                            f\"validation set is empty, because validation_set_rate:{self.validation_set_rate} is too small.\"\n                    val_x = os.path.join(temp_dir, f\"val_x_{self.party_id}.csv\")\n                    x_data.iloc[split_point:].to_csv(val_x, header=True, index=False)\n            else:\n                raise Exception(f\"data_node {self.party_id} not have data. input_file:{self.input_file}\")\n        return train_x, train_y, val_x, val_y\n    \n    def get_temp_dir(self):\n        \'\'\'\n        Get the directory for temporarily saving files\n        \'\'\'\n        temp_dir = os.path.join(os.path.dirname(self.output_file), \'temp\')\n        if not os.path.exists(temp_dir):\n            os.makedirs(temp_dir, exist_ok=True)\n        return temp_dir\n\n    def remove_temp_dir(self):\n        \'\'\'\n        Delete all files in the temporary directory, these files are some temporary data.\n        Only delete temp file.\n        \'\'\'\n        temp_dir = self.get_temp_dir()\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n    \n    def remove_output_dir(self):\n        \'\'\'\n        Delete all files in the temporary directory, these files are some temporary data.\n        This is used to delete all output files of the non-resulting party\n        \'\'\'\n        temp_dir = os.path.dirname(self.output_file)\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n\n\ndef main(channel_config: str, cfg_dict: dict, data_party: list, result_party: list, results_dir: str):\n    \'\'\'\n    This is the entrance to this module\n    \'\'\'\n    privacy_linear_reg = PrivacyLinearRegTrain(channel_config, cfg_dict, data_party, result_party, results_dir)\n    privacy_linear_reg.train()',NULL),
     (2012,2,'{"model_restore_party":"p0","model_path":"file_path","predict_threshold":0.5}','# coding:utf-8\n\nimport os\nimport sys\nimport math\nimport json\nimport time\nimport logging\nimport shutil\nimport numpy as np\nimport pandas as pd\nimport tensorflow as tf\nimport latticex.rosetta as rtt\nimport channel_sdk\n\n\nnp.set_printoptions(suppress=True)\ntf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)\nos.environ[\'TF_CPP_MIN_LOG_LEVEL\'] = \'2\'\nrtt.set_backend_loglevel(5)  # All(0), Trace(1), Debug(2), Info(3), Warn(4), Error(5), Fatal(6)\nlog = logging.getLogger(__name__)\n\nclass PrivacyLinearRegPredict(object):\n    \'\'\'\n    Privacy linear regression predict base on rosetta.\n    \'\'\'\n\n    def __init__(self,\n                 channel_config: str,\n                 cfg_dict: dict,\n                 data_party: list,\n                 result_party: list,\n                 results_dir: str):\n        log.info(f\"channel_config:{channel_config}\")\n        log.info(f\"cfg_dict:{cfg_dict}\")\n        log.info(f\"data_party:{data_party}, result_party:{result_party}, results_dir:{results_dir}\")\n        assert isinstance(channel_config, str), \"type of channel_config must be str\"\n        assert isinstance(cfg_dict, dict), \"type of cfg_dict must be dict\"\n        assert isinstance(data_party, (list, tuple)), \"type of data_party must be list or tuple\"\n        assert isinstance(result_party, (list, tuple)), \"type of result_party must be list or tuple\"\n        assert isinstance(results_dir, str), \"type of results_dir must be str\"\n        \n        self.channel_config = channel_config\n        self.data_party = list(data_party)\n        self.result_party = list(result_party)\n        self.party_id = cfg_dict[\"party_id\"]\n        self.input_file = cfg_dict[\"data_party\"].get(\"input_file\")\n        self.key_column = cfg_dict[\"data_party\"].get(\"key_column\")\n        self.selected_columns = cfg_dict[\"data_party\"].get(\"selected_columns\")\n        dynamic_parameter = cfg_dict[\"dynamic_parameter\"]\n        self.model_restore_party = dynamic_parameter.get(\"model_restore_party\")\n        self.model_path = dynamic_parameter.get(\"model_path\")\n        self.model_file = os.path.join(self.model_path, \"model\")\n        self.predict_threshold = dynamic_parameter.get(\"predict_threshold\", 0.5)        \n        self.output_file = os.path.join(results_dir, \"result\")\n        self.data_party.remove(self.model_restore_party)  # except restore party\n        self.check_parameters()\n\n    def check_parameters(self):\n        log.info(f\"check parameter start.\")        \n        assert 0 <= self.predict_threshold <= 1, \"predict threshold must be between [0,1]\"\n        \n        if self.input_file:\n            self.input_file = self.input_file.strip()\n        if self.party_id in self.data_party:\n            if os.path.exists(self.input_file):\n                input_columns = pd.read_csv(self.input_file, nrows=0)\n                input_columns = list(input_columns.columns)\n                if self.key_column:\n                    assert self.key_column in input_columns, f\"key_column:{self.key_column} not in input_file\"\n                if self.selected_columns:\n                    error_col = []\n                    for col in self.selected_columns:\n                        if col not in input_columns:\n                            error_col.append(col)   \n                    assert not error_col, f\"selected_columns:{error_col} not in input_file\"\n            else:\n                raise Exception(f\"input_file is not exist. input_file={self.input_file}\")\n        if self.party_id == self.model_restore_party:\n            assert os.path.exists(self.model_path), f\"model path not found. model_path={self.model_path}\"\n        log.info(f\"check parameter finish.\")\n       \n\n    def predict(self):\n        \'\'\'\n        Linear regression predict algorithm implementation function\n        \'\'\'\n\n        log.info(\"extract feature or id.\")\n        file_x, id_col = self.extract_feature_or_index()\n        \n        log.info(\"start create and set channel.\")\n        self.create_set_channel()\n        log.info(\"waiting other party connect...\")\n        rtt.activate(\"SecureNN\")\n        log.info(\"protocol has been activated.\")\n        \n        log.info(f\"start set restore model. restore party={self.model_restore_party}\")\n        rtt.set_restore_model(False, plain_model=self.model_restore_party)\n        # sharing data\n        log.info(f\"start sharing data. data_owner={self.data_party}\")\n        shard_x = rtt.PrivateDataset(data_owner=self.data_party).load_X(file_x, header=0)\n        log.info(\"finish sharing data .\")\n        column_total_num = shard_x.shape[1]\n        log.info(f\"column_total_num = {column_total_num}.\")\n\n        X = tf.placeholder(tf.float64, [None, column_total_num])\n        W = tf.Variable(tf.zeros([column_total_num, 1], dtype=tf.float64))\n        b = tf.Variable(tf.zeros([1], dtype=tf.float64))\n        saver = tf.train.Saver(var_list=None, max_to_keep=5, name=\'v2\')\n        init = tf.global_variables_initializer()\n        # predict\n        pred_Y = tf.matmul(X, W) + b\n        reveal_Y = rtt.SecureReveal(pred_Y)  # only reveal to result party\n\n        with tf.Session() as sess:\n            log.info(\"session init.\")\n            sess.run(init)\n            log.info(\"start restore model.\")\n            if self.party_id == self.model_restore_party:\n                if os.path.exists(os.path.join(self.model_path, \"checkpoint\")):\n                    log.info(f\"model restore from: {self.model_file}.\")\n                    saver.restore(sess, self.model_file)\n                else:\n                    raise Exception(\"model not found or model damaged\")\n            else:\n                log.info(\"restore model...\")\n                temp_file = os.path.join(self.get_temp_dir(), \'ckpt_temp_file\')\n                with open(temp_file, \"w\") as f:\n                    pass\n                saver.restore(sess, temp_file)\n            log.info(\"finish restore model.\")\n            \n            # predict\n            log.info(\"predict start.\")\n            predict_start_time = time.time()\n            Y_pred = sess.run(reveal_Y, feed_dict={X: shard_x})\n            log.debug(f\"Y_pred:\\n {Y_pred[:10]}\")\n            predict_use_time = round(time.time() - predict_start_time, 3)\n            log.info(f\"predict success. predict_use_time={predict_use_time}s\")\n        rtt.deactivate()\n        log.info(\"rtt deactivate finish.\")\n        \n        if self.party_id in self.result_party:\n            log.info(\"predict result write to file.\")\n            output_file_predict_prob = os.path.splitext(self.output_file)[0] + \"_predict.csv\"\n            Y_pred = Y_pred.astype(\"float\")\n            Y_result = pd.DataFrame(Y_pred, columns=[\"result\"])\n            Y_result.to_csv(output_file_predict_prob, header=True, index=False)\n        log.info(\"start remove temp dir.\")\n        self.remove_temp_dir()\n        log.info(\"predict finish.\")\n\n    def create_set_channel(self):\n        \'\'\'\n        create and set channel.\n        \'\'\'\n        io_channel = channel_sdk.grpc.APIManager()\n        log.info(\"start create channel\")\n        channel = io_channel.create_channel(self.party_id, self.channel_config)\n        log.info(\"start set channel\")\n        rtt.set_channel(\"\", channel)\n        log.info(\"set channel success.\")\n        \n    def extract_feature_or_index(self):\n        \'\'\'\n        Extract feature columns or index column from input file.\n        \'\'\'\n        file_x = \"\"\n        id_col = None\n        temp_dir = self.get_temp_dir()\n        if self.party_id in self.data_party:\n            if self.input_file:\n                usecols = [self.key_column] + self.selected_columns\n                input_data = pd.read_csv(self.input_file, usecols=usecols, dtype=\"str\")\n                input_data = input_data[usecols]\n                id_col = input_data[self.key_column]\n                file_x = os.path.join(temp_dir, f\"file_x_{self.party_id}.csv\")\n                x_data = input_data.drop(labels=self.key_column, axis=1)\n                x_data.to_csv(file_x, header=True, index=False)\n            else:\n                raise Exception(f\"data_party:{self.party_id} not have data. input_file:{self.input_file}\")\n        return file_x, id_col\n    \n    def get_temp_dir(self):\n        \'\'\'\n        Get the directory for temporarily saving files\n        \'\'\'\n        temp_dir = os.path.join(os.path.dirname(self.output_file), \'temp\')\n        if not os.path.exists(temp_dir):\n            os.makedirs(temp_dir, exist_ok=True)\n        return temp_dir\n\n    def remove_temp_dir(self):\n        \'\'\'\n        Delete all files in the temporary directory, these files are some temporary data.\n        Only delete temp file.\n        \'\'\'\n        temp_dir = self.get_temp_dir()\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n\n\ndef main(channel_config: str, cfg_dict: dict, data_party: list, result_party: list, results_dir: str):\n    \'\'\'\n    This is the entrance to this module\n    \'\'\'\n    privacy_linear_reg = PrivacyLinearRegPredict(channel_config, cfg_dict, data_party, result_party, results_dir)\n    privacy_linear_reg.predict()\n',NULL),
     (2021,2,'{"label_owner":"p0","label_column":"Y","algorithm_parameter":{"epochs":10,"batch_size":256,"learning_rate":0.1,"use_validation_set":true,"validation_set_rate":0.2,"predict_threshold":0.5}}','# coding:utf-8\n\nimport sys\nsys.path.append(\"..\")\nimport os\nimport math\nimport json\nimport time\nimport logging\nimport shutil\nimport numpy as np\nimport pandas as pd\nimport tensorflow as tf\nimport latticex.rosetta as rtt\nimport channel_sdk\n\n\nnp.set_printoptions(suppress=True)\ntf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)\nos.environ[\'TF_CPP_MIN_LOG_LEVEL\'] = \'2\'\nrtt.set_backend_loglevel(5)  # All(0), Trace(1), Debug(2), Info(3), Warn(4), Error(5), Fatal(6)\nlog = logging.getLogger(__name__)\n\nclass PrivacyLRTrain(object):\n    \'\'\'\n    Privacy logistic regression train base on rosetta.\n    \'\'\'\n\n    def __init__(self,\n                 channel_config: str,\n                 cfg_dict: dict,\n                 data_party: list,\n                 result_party: list,\n                 results_dir: str):\n        log.info(f\"channel_config:{channel_config}\")\n        log.info(f\"cfg_dict:{cfg_dict}\")\n        log.info(f\"data_party:{data_party}, result_party:{result_party}, results_dir:{results_dir}\")\n        assert isinstance(channel_config, str), \"type of channel_config must be str\"\n        assert isinstance(cfg_dict, dict), \"type of cfg_dict must be dict\"\n        assert isinstance(data_party, (list, tuple)), \"type of data_party must be list or tuple\"\n        assert isinstance(result_party, (list, tuple)), \"type of result_party must be list or tuple\"\n        assert isinstance(results_dir, str), \"type of results_dir must be str\"\n        \n        self.channel_config = channel_config\n        self.data_party = list(data_party)\n        self.result_party = list(result_party)\n        self.party_id = cfg_dict[\"party_id\"]\n        self.input_file = cfg_dict[\"data_party\"].get(\"input_file\")\n        self.key_column = cfg_dict[\"data_party\"].get(\"key_column\")\n        self.selected_columns = cfg_dict[\"data_party\"].get(\"selected_columns\")\n\n        dynamic_parameter = cfg_dict[\"dynamic_parameter\"]\n        self.label_owner = dynamic_parameter.get(\"label_owner\")\n        if self.party_id == self.label_owner:\n            self.label_column = dynamic_parameter.get(\"label_column\")\n            self.data_with_label = True\n        else:\n            self.label_column = \"\"\n            self.data_with_label = False\n                        \n        algorithm_parameter = dynamic_parameter[\"algorithm_parameter\"]\n        self.epochs = algorithm_parameter.get(\"epochs\", 10)\n        self.batch_size = algorithm_parameter.get(\"batch_size\", 256)\n        self.learning_rate = algorithm_parameter.get(\"learning_rate\", 0.001)\n        self.use_validation_set = algorithm_parameter.get(\"use_validation_set\", True)\n        self.validation_set_rate = algorithm_parameter.get(\"validation_set_rate\", 0.2)\n        self.predict_threshold = algorithm_parameter.get(\"predict_threshold\", 0.5)\n\n        self.output_file = os.path.join(results_dir, \"model\")\n        \n        self.check_parameters()\n\n    def check_parameters(self):\n        log.info(f\"check parameter start.\")        \n        assert self.epochs > 0, \"epochs must be greater 0\"\n        assert self.batch_size > 0, \"batch size must be greater 0\"\n        assert self.learning_rate > 0, \"learning rate must be greater 0\"\n        assert 0 < self.validation_set_rate < 1, \"validattion set rate must be between (0,1)\"\n        assert 0 <= self.predict_threshold <= 1, \"predict threshold must be between [0,1]\"\n        \n        if self.input_file:\n            self.input_file = self.input_file.strip()\n        if self.party_id in self.data_party:\n            if os.path.exists(self.input_file):\n                input_columns = pd.read_csv(self.input_file, nrows=0)\n                input_columns = list(input_columns.columns)\n                if self.key_column:\n                    assert self.key_column in input_columns, f\"key_column:{self.key_column} not in input_file\"\n                if self.selected_columns:\n                    error_col = []\n                    for col in self.selected_columns:\n                        if col not in input_columns:\n                            error_col.append(col)   \n                    assert not error_col, f\"selected_columns:{error_col} not in input_file\"\n                if self.label_column:\n                    assert self.label_column in input_columns, f\"label_column:{self.label_column} not in input_file\"\n            else:\n                raise Exception(f\"input_file is not exist. input_file={self.input_file}\")\n        log.info(f\"check parameter finish.\")\n                        \n        \n    def train(self):\n        \'\'\'\n        Logistic regression training algorithm implementation function\n        \'\'\'\n\n        log.info(\"extract feature or label.\")\n        train_x, train_y, val_x, val_y = self.extract_feature_or_label(with_label=self.data_with_label)\n        \n        log.info(\"start create and set channel.\")\n        self.create_set_channel()\n        log.info(\"waiting other party connect...\")\n        rtt.activate(\"SecureNN\")\n        log.info(\"protocol has been activated.\")\n        \n        log.info(f\"start set save model. save to party: {self.result_party}\")\n        rtt.set_saver_model(False, plain_model=self.result_party)\n        # sharing data\n        log.info(f\"start sharing train data. data_owner={self.data_party}, label_owner={self.label_owner}\")\n        shard_x, shard_y = rtt.PrivateDataset(data_owner=self.data_party, label_owner=self.label_owner).load_data(train_x, train_y, header=0)\n        log.info(\"finish sharing train data.\")\n        column_total_num = shard_x.shape[1]\n        log.info(f\"column_total_num = {column_total_num}.\")\n        \n        if self.use_validation_set:\n            log.info(\"start sharing validation data.\")\n            shard_x_val, shard_y_val = rtt.PrivateDataset(data_owner=self.data_party, label_owner=self.label_owner).load_data(val_x, val_y, header=0)\n            log.info(\"finish sharing validation data.\")\n\n        if self.party_id not in self.data_party:  \n            # mean the compute party and result party\n            log.info(\"compute start.\")\n            X = tf.placeholder(tf.float64, [None, column_total_num])\n            Y = tf.placeholder(tf.float64, [None, 1])\n            W = tf.Variable(tf.zeros([column_total_num, 1], dtype=tf.float64))\n            b = tf.Variable(tf.zeros([1], dtype=tf.float64))\n            logits = tf.matmul(X, W) + b\n            loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=Y, logits=logits)\n            loss = tf.reduce_mean(loss)\n            # optimizer\n            optimizer = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(loss)\n            init = tf.global_variables_initializer()\n            saver = tf.train.Saver(var_list=None, max_to_keep=5, name=\'v2\')\n            \n            pred_Y = tf.sigmoid(tf.matmul(X, W) + b)\n            reveal_Y = rtt.SecureReveal(pred_Y)\n            actual_Y = tf.placeholder(tf.float64, [None, 1])\n            reveal_Y_actual = rtt.SecureReveal(actual_Y)\n\n            with tf.Session() as sess:\n                log.info(\"session init.\")\n                sess.run(init)\n                # train\n                log.info(\"train start.\")\n                train_start_time = time.time()\n                batch_num = math.ceil(len(shard_x) / self.batch_size)\n                for e in range(self.epochs):\n                    for i in range(batch_num):\n                        bX = shard_x[(i * self.batch_size): (i + 1) * self.batch_size]\n                        bY = shard_y[(i * self.batch_size): (i + 1) * self.batch_size]\n                        sess.run(optimizer, feed_dict={X: bX, Y: bY})\n                        if (i % 50 == 0) or (i == batch_num - 1):\n                            log.info(f\"epoch:{e + 1}/{self.epochs}, batch:{i + 1}/{batch_num}\")\n                log.info(f\"model save to: {self.output_file}\")\n                saver.save(sess, self.output_file)\n                train_use_time = round(time.time()-train_start_time, 3)\n                log.info(f\"save model success. train_use_time={train_use_time}s\")\n                \n                if self.use_validation_set:\n                    Y_pred = sess.run(reveal_Y, feed_dict={X: shard_x_val})\n                    log.info(f\"Y_pred:\\n {Y_pred[:10]}\")\n                    Y_actual = sess.run(reveal_Y_actual, feed_dict={actual_Y: shard_y_val})\n                    log.info(f\"Y_actual:\\n {Y_actual[:10]}\")\n        \n            running_stats = str(rtt.get_perf_stats(True)).replace(\'\\n\', \'\').replace(\' \', \'\')\n            log.info(f\"running stats: {running_stats}\")\n        else:\n            log.info(\"computing, please waiting for compute finish...\")\n        rtt.deactivate()\n     \n        log.info(\"remove temp dir.\")\n        if self.party_id in (self.data_party + self.result_party):\n            # self.remove_temp_dir()\n            pass\n        else:\n            # delete the model in the compute party.\n            self.remove_output_dir()\n        \n        if (self.party_id in self.result_party) and self.use_validation_set:\n            log.info(\"result_party evaluate model.\")\n            from sklearn.metrics import roc_auc_score, roc_curve, f1_score, precision_score, recall_score, accuracy_score\n            Y_pred_prob = Y_pred.astype(\"float\").reshape([-1, ])\n            Y_true = Y_actual.astype(\"float\").reshape([-1, ])\n            auc_score = roc_auc_score(Y_true, Y_pred_prob)\n            log.info(f\"AUC: {round(auc_score, 6)}\")\n            Y_pred_class = (Y_pred_prob > self.predict_threshold).astype(\'int64\')  # default threshold=0.5\n            accuracy = accuracy_score(Y_true, Y_pred_class)\n            log.info(f\"ACCURACY: {round(accuracy, 6)}\")\n            f1_score = f1_score(Y_true, Y_pred_class)\n            precision = precision_score(Y_true, Y_pred_class)\n            recall = recall_score(Y_true, Y_pred_class)\n            log.info(\"********************\")\n            log.info(f\"AUC: {round(auc_score, 6)}\")\n            log.info(f\"ACCURACY: {round(accuracy, 6)}\")\n            log.info(f\"F1_SCORE: {round(f1_score, 6)}\")\n            log.info(f\"PRECISION: {round(precision, 6)}\")\n            log.info(f\"RECALL: {round(recall, 6)}\")\n            log.info(\"********************\")\n        log.info(\"train finish.\")\n    \n    def create_set_channel(self):\n        \'\'\'\n        create and set channel.\n        \'\'\'\n        io_channel = channel_sdk.grpc.APIManager()\n        log.info(\"start create channel\")\n        channel = io_channel.create_channel(self.party_id, self.channel_config)\n        log.info(\"start set channel\")\n        rtt.set_channel(\"\", channel)\n        log.info(\"set channel success.\")\n    \n    def extract_feature_or_label(self, with_label: bool=False):\n        \'\'\'\n        Extract feature columns or label column from input file,\n        and then divide them into train set and validation set.\n        \'\'\'\n        train_x = \"\"\n        train_y = \"\"\n        val_x = \"\"\n        val_y = \"\"\n        temp_dir = self.get_temp_dir()\n        if self.party_id in self.data_party:\n            if self.input_file:\n                if with_label:\n                    usecols = self.selected_columns + [self.label_column]\n                else:\n                    usecols = self.selected_columns\n                \n                input_data = pd.read_csv(self.input_file, usecols=usecols, dtype=\"str\")\n                input_data = input_data[usecols]\n                # only if self.validation_set_rate==0, split_point==input_data.shape[0]\n                split_point = int(input_data.shape[0] * (1 - self.validation_set_rate))\n                assert split_point > 0, f\"train set is empty, because validation_set_rate:{self.validation_set_rate} is too big\"\n                \n                if with_label:\n                    y_data = input_data[self.label_column]\n                    train_y = os.path.join(temp_dir, f\"train_y_{self.party_id}.csv\")\n                    y_data.iloc[:split_point].to_csv(train_y, header=True, index=False)\n                    if self.use_validation_set:\n                        assert split_point < input_data.shape[0], \\\n                            f\"validation set is empty, because validation_set_rate:{self.validation_set_rate} is too small\"\n                        val_y = os.path.join(temp_dir, f\"val_y_{self.party_id}.csv\")\n                        y_data.iloc[split_point:].to_csv(val_y, header=True, index=False)\n                    del input_data[self.label_column]\n                \n                x_data = input_data\n                train_x = os.path.join(temp_dir, f\"train_x_{self.party_id}.csv\")\n                x_data.iloc[:split_point].to_csv(train_x, header=True, index=False)\n                if self.use_validation_set:\n                    assert split_point < input_data.shape[0], \\\n                            f\"validation set is empty, because validation_set_rate:{self.validation_set_rate} is too small\"\n                    val_x = os.path.join(temp_dir, f\"val_x_{self.party_id}.csv\")\n                    x_data.iloc[split_point:].to_csv(val_x, header=True, index=False)\n            else:\n                raise Exception(f\"data_node {self.party_id} not have data. input_file:{self.input_file}\")\n        return train_x, train_y, val_x, val_y\n    \n    def get_temp_dir(self):\n        \'\'\'\n        Get the directory for temporarily saving files\n        \'\'\'\n        temp_dir = os.path.join(os.path.dirname(self.output_file), \'temp\')\n        if not os.path.exists(temp_dir):\n            os.makedirs(temp_dir, exist_ok=True)\n        return temp_dir\n\n    def remove_temp_dir(self):\n        \'\'\'\n        Delete all files in the temporary directory, these files are some temporary data.\n        Only delete temp file.\n        \'\'\'\n        temp_dir = self.get_temp_dir()\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n    \n    def remove_output_dir(self):\n        \'\'\'\n        Delete all files in the temporary directory, these files are some temporary data.\n        This is used to delete all output files of the non-resulting party\n        \'\'\'\n        temp_dir = os.path.dirname(self.output_file)\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n\n\ndef main(channel_config: str, cfg_dict: dict, data_party: list, result_party: list, results_dir: str):\n    \'\'\'\n    This is the entrance to this module\n    \'\'\'\n    privacy_lr = PrivacyLRTrain(channel_config, cfg_dict, data_party, result_party, results_dir)\n    privacy_lr.train()\n',NULL),
@@ -141,43 +141,270 @@ DROP TABLE IF EXISTS `mo_algorithm_variable`;
 CREATE TABLE `mo_algorithm_variable` (
     `algorithm_id` bigint(20) NOT NULL COMMENT '算法id',
     `var_key` varchar(128)  NOT NULL COMMENT '变量key',
-    `var_type` tinyint(4)  NOT NULL COMMENT '变量类型. 1-boolean, 2-number, 3-string',
+    `var_type` tinyint(4)  NOT NULL COMMENT '变量类型. 1-boolean, 2-number, 3-string, 4-numberArray, 5-stringArray',
     `var_value` varchar(128)  NOT NULL COMMENT '变量默认值',
-    `var_desc` varchar(512)  DEFAULT NULL COMMENT '变量描述',
+    `var_desc` varchar(512)  DEFAULT NULL COMMENT '变量中文描述',
+    `var_desc_en` varchar(512)  DEFAULT NULL COMMENT '变量英文描述',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`algorithm_id`,`var_key`)
 ) ENGINE=InnoDB COMMENT='算法变量表';
+INSERT INTO `mo_algorithm_variable` (`algorithm_id`, `var_key`, `var_type`, `var_value`) VALUES
+    ( 2011, 'epochs', 2, '10'),
+    ( 2011, 'batch_size', 2, '256'),
+    ( 2011, 'learning_rate', 2, '0.1'),
+    ( 2011, 'use_validation_set', 1, 'true'),
+    ( 2011, 'validation_set_rate', 2, '0.2'),
+    ( 2011, 'predict_threshold', 2, '0.5'),
+    ( 2021, 'epochs', 2, '10'),
+    ( 2021, 'batch_size', 2, '256'),
+    ( 2021, 'learning_rate', 2, '0.1'),
+    ( 2021, 'use_validation_set', 1, 'true'),
+    ( 2021, 'validation_set_rate', 2, '0.2'),
+    ( 2021, 'predict_threshold', 2, '0.5'),
+    ( 2031, 'epochs', 2, '5'),
+    ( 2031, 'batch_size', 2, '256'),
+    ( 2031, 'learning_rate', 2, '0.1'),
+    ( 2031, 'use_validation_set', 1, 'true'),
+    ( 2031, 'validation_set_rate', 2, '0.2'),
+    ( 2031, 'predict_threshold', 2, '0.5'),
+    ( 2032, 'layer_units', 4, '32,128,32,1'),
+    ( 2032, 'layer_activation', 5, '"sigmoid","sigmoid","sigmoid","sigmoid"'),
+    ( 2032, 'use_intercept', 1, 'true'),
+    ( 2032, 'predict_threshold', 2, '0.5'),
+    ( 2041, 'epochs', 2, '10'),
+    ( 2041, 'batch_size', 2, '256'),
+    ( 2041, 'learning_rate', 2, '0.1'),
+    ( 2041, 'use_validation_set', 1, 'true'),
+    ( 2041, 'validation_set_rate', 2, '0.2'),
+    ( 2041, 'predict_threshold', 2, '0.5'),
+    ( 2041, 'num_trees', 2, '3'),
+    ( 2041, 'max_depth', 2, '4'),
+    ( 2041, 'num_bins', 2, '5'),
+    ( 2041, 'num_class', 2, '2'),
+    ( 2041, 'lambd', 2, '1.0'),
+    ( 2041, 'gamma', 2, '0.0'),
+    ( 2042, 'num_trees', 2, '3'),
+    ( 2042, 'max_depth', 2, '4'),
+    ( 2042, 'num_bins', 2, '5'),
+    ( 2042, 'num_class', 2, '2'),
+    ( 2042, 'lambd', 2, '1.0'),
+    ( 2042, 'gamma', 2, '0.0'),
+    ( 2042, 'predict_threshold', 2, '0.5');
 
-INSERT INTO `mo_algorithm_variable` (`algorithm_id`, `var_key`, `var_type`, `var_value`, `var_desc`) VALUES
-    ( 2011, 'epochs', 2, '10', NULL),
-    ( 2011, 'batch_size', 2, '256', NULL),
-    ( 2011, 'learning_rate', 2, '0.1', NULL),
-    ( 2011, 'use_validation_set', 1, 'true', NULL),
-    ( 2011, 'validation_set_rate', 2, '0.2', NULL),
-    ( 2011, 'predict_threshold', 2, '0.5', NULL),
-    ( 2021, 'epochs', 2, '10', NULL),
-    ( 2021, 'batch_size', 2, '256', NULL),
-    ( 2021, 'learning_rate', 2, '0.1', NULL),
-    ( 2021, 'use_validation_set', 1, 'true', NULL),
-    ( 2021, 'validation_set_rate', 2, '0.2', NULL),
-    ( 2021, 'predict_threshold', 2, '0.5', NULL),
-    ( 2031, 'epochs', 2, '5', NULL),
-    ( 2031, 'batch_size', 2, '256', NULL),
-    ( 2031, 'learning_rate', 2, '0.1', NULL),
-    ( 2031, 'use_validation_set', 1, 'true', NULL),
-    ( 2031, 'validation_set_rate', 2, '0.2', NULL),
-    ( 2031, 'predict_threshold', 2, '0.5', NULL),
+DROP TABLE IF EXISTS `mo_data_sync`;
+CREATE TABLE `mo_data_sync` (
+    `data_type` varchar(256) NOT NULL COMMENT '数据类型',
+    `latest_synced` bigint(20) NOT NULL DEFAULT '0' COMMENT '数据最新同步时间戳，精确到毫秒',
+    `info` varchar(50) DEFAULT '' COMMENT '描述',
+    PRIMARY KEY (`data_type`)
+) ENGINE=InnoDB COMMENT='数据同步时间记录';
+
+DROP TABLE IF EXISTS `mo_calculation_process`;
+CREATE TABLE `mo_calculation_process` (
+    `calculation_process_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '计算流程ID',
+    `name` varchar(200)  NOT NULL COMMENT '计算流程中文名字',
+    `name_en` varchar(200)  DEFAULT NULL COMMENT '计算流程英文名字',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`calculation_process_id`)
+) ENGINE=InnoDB COMMENT='计算流程配置表';
+INSERT INTO `mo_calculation_process` (`calculation_process_id`, `name`, `name_en`) VALUES
+    (1, '训练', 'Train'),
+    (2, '预测', 'Predict'),
+    (3, '训练，并预测', 'Train and then predict'),
+    (4, 'PSI', 'PSI');
+
+DROP TABLE IF EXISTS `mo_calculation_process_step`;
+CREATE TABLE `mo_calculation_process_step` (
+    `calculation_process_id` bigint(20) NOT NULL COMMENT '计算流程ID',
+    `step` int NOT NULL COMMENT '步骤. 从0开始',
+    `type` int NOT NULL COMMENT '部署说明. 0-选择训练输入数据, 1-选择预测输入数据, 2-选择PSI输入数据, 3-选择计算环境(通用), 4-选择计算环境(训练&预测), 5-选择结果接收方(通用), 6-选择结果接收方(训练&预测)',
+    PRIMARY KEY (`calculation_process_id`, `step`)
+) ENGINE=InnoDB COMMENT='计算流程配置步骤表';
+INSERT INTO `mo_calculation_process_step` (`calculation_process_id`, `step`, `type`) VALUES
+    (1, 0, 0),
+    (1, 1, 3),
+    (1, 2, 5),
+    (2, 0, 1),
+    (2, 1, 3),
+    (2, 2, 5),
+    (3, 0, 0),
+    (3, 1, 1),
+    (3, 2, 4),
+    (3, 3, 6),
+    (4, 0, 2),
+    (4, 1, 3),
+    (4, 2, 5);
+
+DROP TABLE IF EXISTS `mo_calculation_process_algorithm`;
+CREATE TABLE `mo_calculation_process_algorithm` (
+    `calculation_process_id` bigint(20) NOT NULL COMMENT '计算流程ID',
+    `algorithm_id` bigint(20) NOT NULL COMMENT '算法ID',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`algorithm_id`, `calculation_process_id`)
+) ENGINE=InnoDB COMMENT='计算流程配置和算法关系表';
+INSERT INTO `mo_calculation_process_algorithm` (`calculation_process_id`, `algorithm_id`) VALUES
+    (1, 2010),
+    (1, 2020),
+    (1, 2030),
+    (1, 2040),
+    (2, 2010),
+    (2, 2020),
+    (2, 2030),
+    (2, 2040),
+    (3, 2010),
+    (3, 2020),
+    (3, 2030),
+    (3, 2040),
+    (4, 1001);
+
+
+DROP TABLE IF EXISTS `mo_workflow`;
+CREATE TABLE `mo_workflow` (
+    `workflow_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流ID(自增长)',
+    `create_mode` tinyint(4) NOT NULL COMMENT '创建模式:1-专家模式,2-向导模式',
+    `address` varchar(64)  NOT NULL COMMENT '用户地址',
+    `workflow_name` varchar(60)  NOT NULL COMMENT '工作流名称',
+    `workflow_desc` varchar(200)  DEFAULT NULL COMMENT '工作流描述',
+    `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
+    `algorithm_name` varchar(200) DEFAULT NULL COMMENT '算法名称',
+    `calculation_process_id` bigint(20) DEFAULT NULL COMMENT '计算流程id',
+    `calculation_process_name` varchar(200) DEFAULT NULL COMMENT '计算流程名称',
+    `last_run_time` timestamp(3) NOT NULL COMMENT '最后运行时间',
+    `is_setting_completed` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否设置完成:  0-否  1-是',
+    `calculation_process_step` int NOT NULL COMMENT '向导模式下当前步骤',
+    `is_delete` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否删除: 0-否  1-是',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '当前最大版本号,从1开始',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`),
+    KEY `user_address` (`address`)
+) ENGINE=InnoDB COMMENT='工作流表';
+
+DROP TABLE IF EXISTS `mo_workflow_version`;
+CREATE TABLE `mo_workflow_version` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `workflow_version_name` varchar(200)  DEFAULT NULL COMMENT '工作流版本名称',
+    `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`)
+) ENGINE=InnoDB COMMENT='工作流不同版本设置表';
 
 
 
-    ( 2032, '', 1, '', NULL),
-    ( 2041, '', 1, '', NULL),
-    ( 2042, '', 1, '', NULL)
-
-    ;
 
 
+DROP TABLE IF EXISTS `mo_workflow_version_pay`;
+CREATE TABLE `mo_workflow_version_pay` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `workflow_version_name` varchar(200)  DEFAULT NULL COMMENT '工作流版本名称',
+    `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`)
+) ENGINE=InnoDB COMMENT='工作流支付记录表';
 
 
+
+
+
+
+
+DROP TABLE IF EXISTS `t_workflow_node`;
+CREATE TABLE `t_workflow_node` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
+    `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
+    `workflow_edit_version` int(11) NOT NULL DEFAULT '1' COMMENT '工作流版本号',
+    `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
+    `node_name` varchar(30)  DEFAULT NULL COMMENT '节点名称',
+    `node_step` int(11) DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
+    `input_model` int(11) NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
+    `model_id` bigint(20) DEFAULT NULL COMMENT '工作流节点需要的模型id,对应t_task_result表id',
+    `sender_identity_id` varchar(128)  DEFAULT NULL COMMENT '任务发启放组织id',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UK_NODE_STEP` (`workflow_id`,`workflow_edit_version`,`node_step`)
+) ENGINE=InnoDB COMMENT='工作流节点表';
+
+
+DROP TABLE IF EXISTS `t_workflow_node_code`;
+CREATE TABLE `t_workflow_node_code` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点算法代码表ID(自增长)',
+    `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
+    `edit_type` tinyint(4) DEFAULT NULL COMMENT '编辑类型:1-sql, 2-noteBook',
+    `calculate_contract_code` text  COMMENT '计算合约',
+    `data_split_contract_code` text  COMMENT '数据分片合约',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `workflow_node_id` (`workflow_node_id`)
+) ENGINE=InnoDB COMMENT='工作流节点算法代码表';
+
+
+DROP TABLE IF EXISTS `t_workflow_node_input`;
+CREATE TABLE `t_workflow_node_input` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输入表ID(自增长)',
+    `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '组织的身份标识Id',
+    `data_table_id` varchar(128)  DEFAULT NULL COMMENT '数据表ID',
+    `key_column` bigint(20) DEFAULT NULL COMMENT 'ID列(列索引)(存id值)',
+    `dependent_variable` bigint(20) DEFAULT NULL COMMENT '因变量(标签)(存id值)',
+    `data_column_ids` varchar(1024)  DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
+    `party_id` varchar(64)  DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `workflow_node_id` (`workflow_node_id`)
+) ENGINE=InnoDB COMMENT='工作流节点输入表';
+
+
+DROP TABLE IF EXISTS `t_workflow_node_output`;
+CREATE TABLE `t_workflow_node_output` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点输出表ID(自增长)',
+    `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '协同方组织的身份标识Id',
+    `store_pattern` tinyint(4) DEFAULT '1' COMMENT '存储形式: 1-明文，2:密文',
+    `output_content` text  COMMENT '输出内容',
+    `party_id` varchar(64)  DEFAULT NULL COMMENT '任务里面定义的 (q0 -> qN 方 ...)',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `workflow_node_id` (`workflow_node_id`)
+) ENGINE=InnoDB COMMENT='项目工作流节点输出表';
+
+DROP TABLE IF EXISTS `t_workflow_node_resource`;
+CREATE TABLE `t_workflow_node_resource` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点资源表ID(自增长)',
+    `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
+    `cost_mem` bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+    `cost_cpu` int(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+    `cost_gpu` int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+    `cost_bandwidth` bigint(20) DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
+    `run_time` bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `workflow_node_id` (`workflow_node_id`)
+) ENGINE=InnoDB COMMENT='工作流节点资源表';
+
+DROP TABLE IF EXISTS `t_workflow_node_variable`;
+CREATE TABLE `t_workflow_node_variable` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点变量表ID(自增长)',
+    `workflow_node_id` bigint(20) DEFAULT NULL COMMENT '工作流节点id',
+    `var_node_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '变量类型: 1-自变量, 2-因变量',
+    `var_node_key` varchar(128)  NOT NULL COMMENT '变量key',
+    `var_node_value` varchar(128)  NOT NULL COMMENT '变量值',
+    `var_node_desc` varchar(200)  DEFAULT NULL COMMENT '变量描述',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `workflow_node_id` (`workflow_node_id`)
+) ENGINE=InnoDB COMMENT='工作流节点变量表';
 
