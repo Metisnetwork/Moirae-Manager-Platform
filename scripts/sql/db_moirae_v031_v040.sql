@@ -261,6 +261,7 @@ INSERT INTO `mo_calculation_process_algorithm` (`calculation_process_id`, `algor
     (3, 2040),
     (4, 1001);
 
+-- // TODO
 
 DROP TABLE IF EXISTS `mo_workflow`;
 CREATE TABLE `mo_workflow` (
@@ -295,15 +296,103 @@ CREATE TABLE `mo_workflow_version` (
     PRIMARY KEY (`workflow_id`, `workflow_version`)
 ) ENGINE=InnoDB COMMENT='工作流不同版本设置表';
 
+DROP TABLE IF EXISTS `mo_workflow_task`;
+CREATE TABLE `mo_workflow_task` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+    `algorithm_id` bigint(20) DEFAULT NULL COMMENT '算法id',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '任务发启放组织id',
+    `input_model` int(11) NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
+    `input_model_id` varchar(128) DEFAULT NULL COMMENT '工作流节点需要的模型id',
+    `input_psi` int(11) NOT NULL DEFAULT '0' COMMENT '是否需要输入PSI: 0-否，1:是',
+    `input_psi_id` varchar(128) DEFAULT NULL COMMENT '工作流节点需要的模型id',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`, `step`)
+) ENGINE=InnoDB COMMENT='工作流任务配置表';
+
+DROP TABLE IF EXISTS `mo_workflow_task_input`;
+CREATE TABLE `mo_workflow_task_input` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+    `meta_data_id` varchar(128)  DEFAULT NULL COMMENT '数据表ID',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '组织的身份标识Id',
+    `key_column` bigint(20) DEFAULT NULL COMMENT 'ID列(列索引)(存id值)',
+    `dependent_variable` bigint(20) DEFAULT NULL COMMENT '因变量(标签)(存id值)',
+    `data_column_ids` varchar(1024)  DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
+    `party_id` varchar(64)  DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`, `step`, `meta_data_id`)
+) ENGINE=InnoDB COMMENT='工作流任务输入表';
+
+DROP TABLE IF EXISTS `mo_workflow_task_output`;
+CREATE TABLE `mo_workflow_task_output` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+    `identity_id` varchar(128)  DEFAULT NULL COMMENT '协同方组织的身份标识Id',
+    `store_pattern` tinyint(4) DEFAULT '1' COMMENT '存储形式: 1-明文，2:密文',
+    `output_content` text  COMMENT '输出内容',
+    `party_id` varchar(64)  DEFAULT NULL COMMENT '任务里面定义的 (q0 -> qN 方 ...)',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`, `step`, `identity_id`)
+) ENGINE=InnoDB COMMENT='项目工作流节点输出表';
+
+DROP TABLE IF EXISTS `mo_workflow_task_resource`;
+CREATE TABLE `mo_workflow_task_resource` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+    `cost_mem` bigint(20) DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+    `cost_cpu` int(20) DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+    `cost_gpu` int(11) DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+    `cost_bandwidth` bigint(20) DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
+    `run_time` bigint(20) DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`, `step`)
+) ENGINE=InnoDB COMMENT='工作流任务资源表';
+
+DROP TABLE IF EXISTS `mo_workflow_task_code`;
+CREATE TABLE `mo_workflow_task_code` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+    `calculate_contract_code` text  COMMENT '计算合约',
+    `data_split_contract_code` text  COMMENT '数据分片合约',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`, `step`)
+) ENGINE=InnoDB COMMENT='工作流任务算法代码表';
+
+DROP TABLE IF EXISTS `mo_workflow_task_variable`;
+CREATE TABLE `mo_workflow_task_variable` (
+    `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
+    `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+    `var_key` varchar(128)  NOT NULL COMMENT '变量key',
+    `var_value` varchar(128)  NOT NULL COMMENT '变量值',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`workflow_id`, `workflow_version`, `step`, `var_key`)
+) ENGINE=InnoDB COMMENT='工作流节点变量表';
+
+
+
+
 
 
 
 
 DROP TABLE IF EXISTS `mo_workflow_version_pay`;
 CREATE TABLE `mo_workflow_version_pay` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流节点模板表ID(自增长)',
     `workflow_id` bigint(20) NOT NULL COMMENT '工作流ID',
     `workflow_version` bigint(11) DEFAULT '1' COMMENT '编辑版本标识,从1开始',
-    `workflow_version_name` varchar(200)  DEFAULT NULL COMMENT '工作流版本名称',
     `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
