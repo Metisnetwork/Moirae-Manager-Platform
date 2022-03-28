@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,28 +9,28 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * t_algorithm_code
+ * mo_algorithm_code
  *
  * @author admin
  */
 @Data
-@TableName(value = "t_algorithm_code")
+@TableName(value = "mo_algorithm_code")
 public class AlgorithmCode implements Serializable {
     /**
-     * 算法代码表ID(自增长)
+     * 算法代码表ID
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
-
-    /**
-     * 算法id
-     */
+    @TableId
     private Long algorithmId;
 
     /**
      * 编辑类型:1-sql,2-noteBook
      */
-    private Byte editType;
+    private Integer editType;
+
+    /**
+     * 计算合约变量模板json格式结构
+     */
+    private String calculateContractStruct;
 
     /**
      * 计算合约
@@ -44,12 +43,6 @@ public class AlgorithmCode implements Serializable {
     private String dataSplitContractCode;
 
     /**
-     * 状态: 0-无效，1- 有效
-     */
-    @TableField(value = "`status`")
-    private Byte status;
-
-    /**
      * 创建时间
      */
     private Date createTime;
@@ -57,6 +50,7 @@ public class AlgorithmCode implements Serializable {
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;

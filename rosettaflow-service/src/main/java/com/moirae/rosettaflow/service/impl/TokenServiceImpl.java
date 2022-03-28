@@ -32,7 +32,7 @@ public class TokenServiceImpl implements ITokenService {
     @Resource
     private RedissonClient redissonClient;
 
-    public static String getTokenKey(Long id) {
+    public static String getTokenKey(String id) {
         return SysConstant.REDIS_TOKEN_PREFIX_KEY + id;
     }
 
@@ -47,7 +47,7 @@ public class TokenServiceImpl implements ITokenService {
 
     @Override
     public String setToken(@NotNull UserDto userDto) {
-        String key = getTokenKey(userDto.getId());
+        String key = getTokenKey(userDto.getAddress());
         String token = redissonObject.getValue(key);
         if (StrUtil.isNotEmpty(token)) {
             if (sysConfig.isKickMode()) {
@@ -76,7 +76,7 @@ public class TokenServiceImpl implements ITokenService {
 
     @Override
     public String getToken(@NotNull UserDto userDto) {
-        String key = getTokenKey(userDto.getId());
+        String key = getTokenKey(userDto.getAddress());
         String token = redissonObject.getValue(key);
         if (StrUtil.isNotEmpty(token)) {
             return token;
@@ -104,12 +104,12 @@ public class TokenServiceImpl implements ITokenService {
                 if (null != loginDeviceNum && (Integer) loginDeviceNum > 1) {
                     log.info("current user:{},login in {} device", userDto.getUserName(), redissonClient.getAtomicLong(SysConstant.REDIS_TOKEN_BIND_PREFIX_KEY + token).decrementAndGet());
                 } else {
-                    String tokeKey = getTokenKey(userDto.getId());
+                    String tokeKey = getTokenKey(userDto.getAddress());
                     redissonObject.delete(tokeKey);
                     redissonObject.delete(userKey);
                 }
             } else {
-                String tokeKey = getTokenKey(userDto.getId());
+                String tokeKey = getTokenKey(userDto.getAddress());
                 redissonObject.delete(tokeKey);
                 redissonObject.delete(userKey);
             }
@@ -122,7 +122,7 @@ public class TokenServiceImpl implements ITokenService {
         String userKey = getUserKey(token);
         UserDto userDto = redissonObject.getValue(userKey);
         if (userDto != null) {
-            String tokeKey = getTokenKey(userDto.getId());
+            String tokeKey = getTokenKey(userDto.getAddress());
             redissonObject.getBucket(tokeKey).expire(sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
             redissonObject.getBucket(userKey).expire(sysConfig.getLoginTimeOut(), TimeUnit.MILLISECONDS);
         }

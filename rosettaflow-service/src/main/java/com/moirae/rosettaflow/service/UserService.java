@@ -1,16 +1,12 @@
 package com.moirae.rosettaflow.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.mapper.domain.User;
 
 import java.util.List;
 
-/**
- * @author admin
- * @date 2021/8/16
- */
-public interface IUserService extends IService<User> {
+public interface UserService {
+
 
     /**
      * 根据地址获取用户信息
@@ -29,7 +25,7 @@ public interface IUserService extends IService<User> {
      * @param authenticateSign
      * @return
      */
-    UserDto loginBySign(String hexAddress, String hrpAddress,String authenticateSignMessage, String authenticateSign);
+    UserDto loginBySign(String hexAddress, String hrpAddress, String authenticateSignMessage, String authenticateSign);
 
     /**
      * 登出
@@ -58,12 +54,4 @@ public interface IUserService extends IService<User> {
      * @return nonce
      */
     String getLoginNonce(String address);
-
-    /**
-     * 根据项目id查询所有可以使用的用户信息
-     *
-     * @param projectId 项目id
-     * @return 用户列表
-     */
-    List<User> queryUserByProjectId(Long projectId);
 }

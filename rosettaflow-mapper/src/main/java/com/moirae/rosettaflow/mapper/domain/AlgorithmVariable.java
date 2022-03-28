@@ -10,50 +10,60 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * t_algorithm_variable
+ * mo_algorithm_variable
  *
  * @author admin
  */
 @Data
-@TableName(value = "t_algorithm_variable")
+@TableName(value = "mo_algorithm_variable")
 public class AlgorithmVariable implements Serializable {
-    private static final long serialVersionUID = 1L;
+
     /**
-     * 算法变量表ID(自增长)
+     * 算法id
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
-    /**
-     * 算法表id
-     */
+    @TableId
     private Long algorithmId;
+
     /**
      * 变量key
      */
+    @TableId("var_key")
     private String varKey;
+
     /**
-     * 变量值
+     * 变量类型. 1-boolean, 2-number, 3-string, 4-numberArray, 5-stringArray
      */
+    @TableField("var_type")
+    private Integer varType;
+
+    /**
+     * 变量默认值
+     */
+    @TableField("var_value")
     private String varValue;
+
     /**
-     * 变量类型: 1-自变量, 2-因变量
+     * 变量中文描述
      */
-    private Byte varType;
-    /**
-     * 变量描述
-     */
+    @TableField("var_desc")
     private String varDesc;
+
     /**
-     * 状态: 0-无效，1- 有效
+     * 变量英文描述
      */
-    @TableField(value = "`status`")
-    private Byte status;
+    @TableField("var_desc_en")
+    private String varDescEn;
+
     /**
      * 创建时间
      */
     private Date createTime;
+
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
 }

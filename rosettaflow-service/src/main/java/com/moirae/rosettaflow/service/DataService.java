@@ -14,6 +14,25 @@ import java.util.Set;
 
 public interface DataService {
 
+    /**
+     * 查询有效的数据总数
+     *
+     * @return
+     */
+    int getDataCount();
+
+    /**
+     * 查询数据列表
+     *
+     * @param current
+     * @param size
+     * @param identityId
+     * @return
+     */
+    IPage<MetaData> getDataListByIdentityId(Long current, Long size, String identityId);
+
+
+
     void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList);
 
     /**
@@ -61,4 +80,7 @@ public interface DataService {
     void checkMetaDataEffective(String metaDataId);
 
     void checkMetaDataAuthListEffective(String address, Set<String> metaDataIdList);
+
+
+
 }

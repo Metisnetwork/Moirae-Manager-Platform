@@ -43,8 +43,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private CommonService commonService;
     @Resource
-    private IProjectService projectService;
-    @Resource
     private IAlgorithmService algorithmService;
     @Resource
     private IWorkflowNodeService workflowNodeService;
@@ -85,7 +83,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public IPage<WorkflowDto> queryWorkFlowPageList(Long projectId, String workflowName, Long current, Long size) {
         IPage<WorkflowDto> page = new Page<>(current, size);
-        this.checkAccessPermission(projectId);
         return this.baseMapper.queryWorkFlowAndStatusPageList(projectId, workflowName, page);
     }
 
@@ -117,9 +114,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg());
         }
         try {
-            // 校验是否有编辑权限
-            checkEditPermission(workflow.getProjectId());
-            workflow.setUserId(commonService.getCurrentUser().getId());
+            //TODO
+//            workflow.setUserId(commonService.getCurrentUser().getId());
             this.save(workflow);
         } catch (DuplicateKeyException e) {
             log.info("addWorkflow--添加工作流接口失败:{}", e.getMessage(), e);
@@ -130,8 +126,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public void editWorkflow(Long id, String workflowName, String workflowDesc) {
         Workflow workflow = this.queryWorkflow(id);
-        // 校验是否有编辑权限
-        checkEditPermission(workflow.getProjectId());
         if ((!workflow.getWorkflowName().equalsIgnoreCase(workflowName)) && isExistWorkflowName(workflow.getProjectId(), workflowName)) {
             log.info("editWorkflow--编辑工作流名称已存在,workflowId:{}", id);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg());
@@ -149,8 +143,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public void deleteWorkflow(Long id) {
         Workflow workflow = this.queryWorkflow(id);
-        // 校验是否有编辑权限
-        checkEditPermission(workflow.getProjectId());
         // 逻辑删除工作流，并修改版本标识
         workflow.setStatus(StatusEnum.UN_VALID.getValue());
         this.updateById(workflow);
@@ -200,8 +192,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public void terminate(Long workflowId) {
         Workflow workflow = getWorkflowStatusById(workflowId);
-        // 校验是否有编辑权限
-        checkEditPermission(workflow.getProjectId());
         // 校验是否运行中
         if (workflow.getRunStatus() != WorkflowRunStatusEnum.RUNNING.getValue()) {
             log.error("workflow by id:{} is not running can not terminate", workflowId);
@@ -345,8 +335,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (Objects.isNull(workflow)) {
             return;
         }
-        // 校验是否有编辑权限
-        checkEditPermission(workflow.getProjectId());
         List<WorkflowNode> workflowNodeList = workflowNodeService.queryByWorkflowIdAndVersion(workflowId, workflow.getEditVersion());
         if (null == workflowNodeList || workflowNodeList.size() == 0) {
             return;
@@ -366,7 +354,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     public IPage<WorkflowRunStatus> runningRecordList(Long current, Long size, Long projectId, String workflowName) {
         UserDto userDto = commonService.getCurrentUser();
         IPage<WorkflowRunStatus> page = new Page<>(current, size);
-        return workflowRunStatusService.runningRecordList(userDto.getId(), projectId, workflowName, page);
+        //TODO
+//        return workflowRunStatusService.runningRecordList(userDto.getId(), projectId, workflowName, page);
+        return null;
     }
 
     @Override
@@ -426,28 +416,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     /**
-     * 校验是否有编辑权限
-     */
-    private void checkEditPermission(Long projectId) {
-        Byte role = projectService.getRoleByProjectId(projectId);
-        if (null == role || ProjectMemberRoleEnum.VIEW.getRoleId() == role) {
-            log.error("checkEditPermission error:{}", ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NOT_PERMISSION_ERROR.getMsg());
-        }
-    }
-
-    /**
-     * 校验当前用户是否有访问当前项目权限
-     */
-    private void checkAccessPermission(Long projectId) {
-        Byte role = projectService.getRoleByProjectId(projectId);
-        if (null == role || !ArrayUtils.contains(SysConstant.ROLE_BYTE_ARR, role)) {
-            log.error("您无权访问当前项目--checkAccessPermission, projectId:{}, role:{}", projectId, role);
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_ACCESS_PERMISSION_ERROR.getMsg());
-        }
-    }
-
-    /**
      * 保存工作流设置
      *
      * @param reqWorkflow
@@ -461,7 +429,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         // 编辑权限校验
         Workflow workflow = baseMapper.queryWorkFlowAndStatus(reqWorkflow.getWorkflowId());
-        checkEditPermission(workflow.getProjectId());
         // 工作流运行状态校验
         if (workflow.getRunStatus() == WorkflowRunStatusEnum.RUNNING.getValue()) {
             log.error("saveWorkflowNode--工作流运行中:{}", JSON.toJSONString(workflow));

@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * t_algorithm
@@ -15,36 +15,17 @@ import java.util.Date;
  * @author admin
  */
 @Data
-@TableName(value = "t_algorithm")
+@TableName(value = "mo_algorithm")
 public class Algorithm implements Serializable {
-    /**
-     * 算法表ID(自增长)
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
 
     /**
-     * 算法编码（线性回归、逻辑回归、。。。）
+     * 算法表ID
      */
-    private String algorithmCode;
+    @TableId
+    private Long algorithmId;
 
     /**
-     * 算法编码中步骤（如训练-1, 预测-2）
-     */
-    private Integer algorithmStep;
-
-    /**
-     * 算法名称
-     */
-    private String algorithmName;
-
-    /**
-     * 英文算法名称
-     */
-    private String algorithmNameEn;
-
-    /**
-     * 算法描述
+     * 中文算法描述
      */
     private String algorithmDesc;
 
@@ -79,11 +60,6 @@ public class Algorithm implements Serializable {
     private String supportOsSystem;
 
     /**
-     * 算法所属大类:1-统计分析,2-特征工程,3-机器学习
-     */
-    private Byte algorithmType;
-
-    /**
      * 所需的内存 (单位: byte)
      */
     private Long costMem;
@@ -104,44 +80,34 @@ public class Algorithm implements Serializable {
     private Long costBandwidth;
 
     /**
-     * 所需的运行时长 (单位: ms)
+     * 所需的运行时长,默认1小时 (单位: ms)
      */
     private Long runTime;
 
     /**
      * 是否需要输入模型: 0-否，1:是
      */
-    private Byte inputModel;
+    private Integer inputModel;
 
     /**
      * 是否产生模型: 0-否，1:是
      */
-    private Byte outputModel;
+    private Integer outputModel;
 
     /**
-     * 所需的运行时长 (单位: ms)
+     * 输出存储形式: 1-明文，2:密文
      */
-    private Byte storePattern;
+    private Integer storePattern;
 
     /**
      * 是否判断数据行数: 0-否，1-是
      */
-    private Byte dataRowsFlag;
+    private Integer dataRowsFlag;
 
     /**
      * 是否判断数据列数: 0-否，1-是
      */
-    private Byte dataColumnsFlag;
-
-    /**
-     * 是否是共有算法
-     */
-    private Byte publicFlag;
-
-    /**
-     * 状态: 0-无效，1- 有效
-     */
-    private Byte status;
+    private Integer dataColumnsFlag;
 
     /**
      * 创建时间
@@ -151,23 +117,14 @@ public class Algorithm implements Serializable {
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 算法id
-     */
     @TableField(exist = false)
-    private Long algorithmId;
-    /**
-     * 算法编辑类型:1-sql, 2-noteBook
-     */
+    private AlgorithmCode algorithmCode;
+
     @TableField(exist = false)
-    private Byte editType;
-    /**
-     * 算法代码（计算合约）
-     */
-    @TableField(exist = false)
-    private String calculateContractCode;
+    private List<AlgorithmVariable> algorithmVariableList;
 }

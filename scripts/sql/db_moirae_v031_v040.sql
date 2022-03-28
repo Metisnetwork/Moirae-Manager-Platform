@@ -1,5 +1,13 @@
 USE `db_moirae`;
 
+DROP VIEW `v_data_file_stats_daily`;
+DROP VIEW `v_data_file_stats_monthly`;
+DROP VIEW `v_global_stats`;
+DROP VIEW `v_org_daily_task_stats`;
+DROP VIEW `v_power_stats_daily`;
+DROP VIEW `v_power_stats_monthly`;
+
+
 DROP TABLE `dc_meta_data_auth`;
 DROP TABLE `t_project`;
 DROP TABLE `t_project_member`;
@@ -43,15 +51,20 @@ ALTER TABLE `mo_user`
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (`address`);
 
+ALTER TABLE `mo_user`
+    CHANGE `status` `is_valid` TINYINT DEFAULT 1  NOT NULL   COMMENT '是否有效: 0-否，1-是';
+
+
 DROP TABLE IF EXISTS `mo_user_login`;
 CREATE TABLE `mo_user_login` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '日志表id(自增长)',
     `address` varchar(64) NOT NULL COMMENT '登录地址',
-    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '登录状态: 0-登录失败, 1-登录成功',
+    `is_success` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否成功: 0-否，1-是',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='用户登录日志表';
+
 
 
 DROP TABLE IF EXISTS `mo_algorithm_classify`;
@@ -69,10 +82,11 @@ CREATE TABLE `mo_algorithm_classify` (
     UNIQUE KEY `UK_ALG_NAME` (`name`)
 ) ENGINE=InnoDB COMMENT='算法分类表';
 INSERT INTO `mo_algorithm_classify` (`id`, `parent_id`, `name`, `name_en`, `is_available`, `is_algorithm`, `is_exist_algorithm` ) VALUES
-    (1, 0, '隐私计算', 'Privacy Computing',  1, 0, 0),
-    (1000, 1, '隐私统计分析', 'Privacy Statistics',  1, 0, 0),
+    (1, 0, '计算', 'Computing',  1, 0, 0),
+    (2, 1, '隐私计算', 'Privacy Computing',  1, 0, 0),
+    (1000, 2, '隐私统计分析', 'Privacy Statistics',  1, 0, 0),
     (1001, 1000, '隐私求交集（PSI）', 'Private Set Intersection',  1, 1, 1),
-    (2000, 1, '隐私AI计算', 'Privacy AI Computing',  1, 0, 0),
+    (2000, 2, '隐私AI计算', 'Privacy AI Computing',  1, 0, 0),
     (2010, 2000, '隐私线性回归', 'Private Linear Regression',  1, 1, 0),
     (2011, 2010, '隐私线性回归训练', 'Private Linear Regression Training',  1, 1, 1),
     (2012, 2010, '隐私线性回归预测', 'Private Linear Regression Prediction',  1, 1, 1),
@@ -85,7 +99,7 @@ INSERT INTO `mo_algorithm_classify` (`id`, `parent_id`, `name`, `name_en`, `is_a
     (2040, 2000, '隐私XGBoost', 'Private XGBoost',  1, 1, 0),
     (2041, 2040, '隐私XGBoost训练', 'Private XGBoost Training',  1, 1, 1),
     (2042, 2040, '隐私XGBoost预测', 'Private XGBoost Prediction',  1, 1, 1),
-    (2, 0, '非隐私计算', 'Non-Privacy Computing',  1, 0, 0);
+    (3, 1, '非隐私计算', 'Non-Privacy Computing',  1, 0, 0);
 
 
 DROP TABLE IF EXISTS `mo_algorithm`;
@@ -400,8 +414,8 @@ CREATE TABLE `mo_workflow_task_freeze` (
 ) ENGINE=InnoDB COMMENT='工作流任务冻结记录表';
 
 
-DROP TABLE IF EXISTS `mo_workflow_expert_node`;
-CREATE TABLE `mo_workflow_expert_node` (
+DROP TABLE IF EXISTS `mo_workflow_setting_expert`;
+CREATE TABLE `mo_workflow_setting_expert` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
     `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
     `workflow_version` int(11) NOT NULL DEFAULT '1' COMMENT '工作流版本号',
@@ -415,8 +429,8 @@ CREATE TABLE `mo_workflow_expert_node` (
     UNIQUE KEY `UK_NODE_STEP` (`workflow_id`,`workflow_version`,`node_step`)
 ) ENGINE=InnoDB COMMENT='工作流专家模式节点表';
 
-DROP TABLE IF EXISTS `mo_workflow_wizard_step`;
-CREATE TABLE `mo_workflow_wizard_step` (
+DROP TABLE IF EXISTS `mo_workflow_setting_wizard`;
+CREATE TABLE `mo_workflow_setting_wizard` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流步骤表ID(自增长)',
     `workflow_id` bigint(20) DEFAULT NULL COMMENT '工作流id',
     `workflow_version` int(11) NOT NULL DEFAULT '1' COMMENT '工作流版本号',

@@ -8,7 +8,7 @@ import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.service.ITokenService;
-import com.moirae.rosettaflow.service.IUserService;
+import com.moirae.rosettaflow.service.UserService;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import com.moirae.rosettaflow.utils.IpUtils;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -41,7 +41,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     private ITokenService tokenService;
 
     @Resource
-    private IUserService userService;
+    private UserService userService;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {

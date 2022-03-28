@@ -33,6 +33,7 @@ import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthOptionEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataAuthTypeEnum;
+import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.OrganizationService;
@@ -62,6 +63,13 @@ public class DataServiceImpl implements DataService {
     private OrganizationService organizationService;
     @Resource
     private GrpcAuthService grpcAuthService;
+
+    @Override
+    public int getDataCount() {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaData::getStatus, MetaDataStatusEnum.PUBLISHED);
+        return metaDataManager.count(wrapper);
+    }
 
     @Override
     @Transactional

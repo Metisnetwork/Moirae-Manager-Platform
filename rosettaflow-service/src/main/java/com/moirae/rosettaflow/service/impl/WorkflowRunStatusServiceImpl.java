@@ -47,13 +47,11 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private GrpcTaskService grpcTaskService;
     @Resource
-    private IAlgorithmService algorithmService;
+    private AlgService algService;
     @Resource
     private OrganizationService organizationService;
     @Resource
     private IModelService modelService;
-    @Resource
-    private IAlgorithmVariableStructService algorithmVariableStructService;
     @Resource
     private GrpcSysService grpcSysService;
     @Resource

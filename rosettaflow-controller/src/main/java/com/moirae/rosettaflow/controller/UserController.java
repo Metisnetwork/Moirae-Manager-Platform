@@ -10,7 +10,7 @@ import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.req.user.LoginInReq;
 import com.moirae.rosettaflow.req.user.UpdateNickReq;
 import com.moirae.rosettaflow.req.user.UserDetailsReq;
-import com.moirae.rosettaflow.service.IUserService;
+import com.moirae.rosettaflow.service.UserService;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.user.NonceVo;
 import com.moirae.rosettaflow.vo.user.UserNicknameVo;
@@ -39,7 +39,7 @@ import java.util.List;
 public class UserController {
 
     @Resource
-    private IUserService userService;
+    private UserService userService;
 
     @GetMapping("getLoginNonce/{address}")
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")

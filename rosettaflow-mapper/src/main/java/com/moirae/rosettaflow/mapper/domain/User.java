@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -9,33 +8,23 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * t_user
- *
- * @author admin
- */
 @Data
-@TableName(value = "t_user")
+@TableName(value = "mo_user")
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+
     /**
-     * 用户ID(自增长)
+     * 用户钱包地址
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableId
+    private String address;
     /**
      * 用户名
      */
     private String userName;
     /**
-     * 用户钱包地址0X
+     * 是否有效: 0-否，1-是
      */
-    private String address;
-    /**
-     * 状态: 0-无效，1- 有效
-     */
-    @TableField(value = "`status`")
-    private Byte status;
+    private Boolean isValid;
     /**
      * 默认连接的组织id
      */
@@ -47,5 +36,8 @@ public class User implements Serializable {
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
 }

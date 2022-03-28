@@ -2,27 +2,22 @@ package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
-import com.moirae.rosettaflow.common.enums.StatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.WalletSignUtils;
 import com.moirae.rosettaflow.dto.SignMessageDto;
 import com.moirae.rosettaflow.dto.UserDto;
-import com.moirae.rosettaflow.mapper.UserMapper;
+import com.moirae.rosettaflow.manager.UserManager;
 import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.ITokenService;
-import com.moirae.rosettaflow.service.IUserService;
 import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.UserService;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,37 +29,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-/**
- * 用户服务实现类
- *
- * @author admin
- * @date 2021/8/16
- */
 @Slf4j
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+public class UserServiceImpl implements UserService {
 
     @Resource
     private ITokenService tokenService;
+    @Resource
+    private CommonService commonService;
+    @Resource
+    private OrganizationService organizationService;
+    @Resource
+    private UserManager userManager;
 
     @Resource
     private RedissonObject redissonObject;
-
     @Resource
     private SysConfig sysConfig;
 
-    @Resource
-    private CommonService commonService;
-
-    @Resource
-    private OrganizationService organizationService;
-
     @Override
     public User getByAddress(String address) {
-        LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(User::getAddress, address);
-        wrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
-        return this.getOne(wrapper);
+        return userManager.getValidById(address);
     }
 
     @Override
@@ -98,9 +83,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 保存用户信息
         if(isSave){
-            this.save(user);
+            userManager.save(user);
         } else if(isUpdate){
-            this.updateById(user);
+            userManager.updateById(user);
         }
 
         // 设置用户会话
@@ -123,20 +108,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void updateNickName(String address, String nickName) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(User::getUserName, nickName);
-        queryWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
-        User user = this.getOne(queryWrapper);
+        User user = userManager.getValidByUserName(nickName);
         if (!Objects.isNull(user)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
         }
 
         try {
-            LambdaUpdateWrapper<User> updateWrapper = Wrappers.lambdaUpdate();
-            updateWrapper.eq(User::getAddress, address);
-            updateWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
-            updateWrapper.set(User::getUserName, nickName);
-            this.update(updateWrapper);
+            user = userManager.getValidById(address);
+            user.setUserName(nickName);
+            userManager.updateById(user);
         } catch (Exception e) {
             log.error("updateNickName--修改用户昵称失败, 错误信息:{}", e.getMessage());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.MODIFY_USER_NAME_FAILED.getMsg());
@@ -145,9 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public List<User> queryAllUserNickName() {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(User::getStatus, StatusEnum.VALID.getValue());
-        return this.list(queryWrapper);
+        return userManager.getValidList();
     }
 
     @Override
@@ -155,11 +133,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String nonce = commonService.generateUuid();
         redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce), nonce, sysConfig.getNonceTimeOut());
         return nonce;
-    }
-
-    @Override
-    public List<User> queryUserByProjectId(Long projectId) {
-        return this.baseMapper.queryUserByProjectId(projectId);
     }
 
     private void checkNonceValidity(String signMessage, String address) {
@@ -205,4 +178,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
     }
+
 }
