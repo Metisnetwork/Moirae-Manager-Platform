@@ -30,7 +30,4 @@ public class GetDataListReq extends CommonPageReq {
 
     @ApiModelProperty(value = "数据大小的最大值")
     private Long maxSize;
-
-    @ApiModelProperty(value = "组织相关的（组织关联元数据）")
-    private String identityId;
 }

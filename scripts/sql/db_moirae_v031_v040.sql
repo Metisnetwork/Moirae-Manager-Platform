@@ -548,6 +548,7 @@ CREATE TABLE `mo_token` (
     `symbol` varchar(64) DEFAULT NULL COMMENT '合约符号',
     `total_supply` varchar(128)  DEFAULT NULL COMMENT '总供应量',
     `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
+    `price` varchar(128)  DEFAULT NULL COMMENT 'LAT的价格',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`address`)

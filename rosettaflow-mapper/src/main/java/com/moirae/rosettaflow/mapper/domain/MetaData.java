@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @TableName(value = "dc_meta_data")
@@ -103,4 +105,16 @@ public class MetaData implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+    @TableField(exist = false)
+    private String metaDataName;
+    @TableField(exist = false)
+    private String nodeName;
+    @TableField(exist = false)
+    private String tokenName;
+    @TableField(exist = false)
+    private String tokenPrice;
+    @TableField(exist = false)
+    private String tokenSymbol;
+    @TableField(exist = false)
+    private List<MetaDataColumn> columnsList;
 }

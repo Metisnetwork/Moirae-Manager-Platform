@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 
 import java.util.List;
 
@@ -27,4 +28,12 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
     List<MetaDataDto> getOrgChooseListByMetaDataAuth(String address);
 
     List<MetaDataDto> getMetaDataByChoose(String address, String identityId);
+
+    IPage<MetaData> getDataListByIdentityId(Page<MetaData> page, String identityId);
+
+    IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, String orderBy);
+
+    MetaData getDataDetails(String metaDataId);
+
+    IPage<MetaData> getUserDataList(Page<MetaData> page, String address);
 }

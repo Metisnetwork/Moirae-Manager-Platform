@@ -3,11 +3,13 @@ package com.moirae.rosettaflow.manager.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.dto.MetaDataDto;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.manager.MetaDataManager;
 import com.moirae.rosettaflow.mapper.MetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +52,25 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public List<MetaDataDto> getMetaDataByChoose(String address, String identityId) {
         return this.baseMapper.getMetaDataByChoose(address, identityId);
+    }
+
+    @Override
+    public IPage<MetaData> getDataListByIdentityId(Page<MetaData> page, String identityId) {
+        return this.baseMapper.getDataListByIdentityId(page, identityId);
+    }
+
+    @Override
+    public IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy) {
+        return this.baseMapper.getDataList(page, keyword, industry, fileType, minSize, maxSize, orderBy.getSqlValue());
+    }
+
+    @Override
+    public MetaData getDataDetails(String metaDataId) {
+        return this.baseMapper.getDataDetails(metaDataId);
+    }
+
+    @Override
+    public IPage<MetaData> getUserDataList(Page<MetaData> page, String address) {
+        return this.baseMapper.getUserDataList(page, address);
     }
 }

@@ -169,4 +169,81 @@
             and df.identity_id = #{identityId, jdbcType=VARCHAR}
             and ((dmda.auth_type = 1 AND dmda.expired = 0) or (dmda.auth_type = 2 AND dmda.used_times &lt; dmda.times))
     </select>
+    <select id="getDataListByIdentityId" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
+        select md.meta_data_id,
+               md.file_name as metaDataName,
+               md.identity_id,
+               o.node_name,
+               t.name as tokenName,
+               t.price as tokenPrice
+        from dc_meta_data md
+            inner join dc_org o on md.identity_id = o.identity_id
+            left join mo_token t on md.token_address = t.address
+        where md.status = 2
+            and md.identity_id = #{identityId}
+        order by md.published_at desc
+    </select>
+    <select id="getDataList" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
+        select md.meta_data_id,
+               md.file_name as metaDataName,
+               md.identity_id,
+               o.node_name,
+               t.name as tokenName,
+               t.price as tokenPrice
+        from dc_meta_data md
+                 inner join dc_org o on md.identity_id = o.identity_id
+                 left join mo_token t on md.token_address = t.address
+        where md.status = 2
+            <if test="keyword != null and keyword != ''">
+                and ( md.meta_data_id = #{keyword} or t.name like concat('%', #{keyword}, '%') )
+            </if>
+            <if test="industry != null and industry != ''">
+                and md.industry = #{industry}
+            </if>
+            <if test="fileType != null and fileType != ''">
+                and md.file_type = #{fileType}
+            </if>
+            <if test="minSize != null">
+                and md.size >= #{minSize}
+            </if>
+            <if test="maxSize != null">
+                and md.size >= #{maxSize}
+             </if>
+        order by #{orderBy}
+    </select>
+    <select id="getDataDetails" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
+        select md.meta_data_id,
+               md.file_name as metaDataName,
+               md.identity_id,
+               o.node_name,
+               t.name as tokenName,
+               t.price as tokenPrice,
+               md.file_type,
+               t.symbol as tokenSymbol,
+               md.published_at,
+               md.industry,
+               md.size,
+               md.rows,
+               md.columns,
+               md.remarks
+        from dc_meta_data md
+                 inner join dc_org o on md.identity_id = o.identity_id
+                 left join mo_token t on md.token_address = t.address
+        where md.status = 2
+            and md.meta_data_id = #{metaDataId}
+    </select>
+    <select id="getUserDataList" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
+        select md.meta_data_id,
+               md.file_name as metaDataName,
+               md.identity_id,
+               o.node_name,
+               t.name as tokenName,
+               t.price as tokenPrice
+        from dc_meta_data md
+            inner join dc_org o on md.identity_id = o.identity_id
+            inner join mo_token t on md.token_address = t.address
+            inner join mo_token_holder th on t.address = th.token_address and th.address = #{address}
+        where md.status = 2
+        order by th.balance desc
+    </select>
 </mapper>
