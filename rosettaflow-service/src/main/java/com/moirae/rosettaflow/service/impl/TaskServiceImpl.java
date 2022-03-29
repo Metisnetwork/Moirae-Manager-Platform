@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
@@ -81,7 +82,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public IPage<Task> getOrgTaskListByIdentityId(Long current, Long size, String identityId) {
+    public IPage<Task> getTaskListByOrg(Long current, Long size, String identityId) {
         Page<Task> page = new Page<>(current, size);
         return taskManager.getOrgTaskListByIdentityId(page, identityId);
     }
@@ -172,13 +173,24 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public IPage<Task> getTaskListByMetaDataId(Long current, Long size, String metaDataId) {
+    public IPage<Task> getTaskListByData(Long current, Long size, String metaDataId) {
         Page<Task> page = new Page<>(current, size);
-        return taskManager.getTaskListByMetaDataId(page, metaDataId);
+        return taskManager.getTaskListByData(page, metaDataId);
     }
 
     @Override
     public Task getTask(String keyword) {
         return taskManager.getById(keyword);
+    }
+
+    @Override
+    public int getTaskStats() {
+        return taskManager.count();
+    }
+
+    @Override
+    public IPage<Task> getTaskList(Long current, Long size, String keyword, Date begin, Date end, TaskStatusEnum taskStatus) {
+        Page<Task> page = new Page<>(current, size);
+        return taskManager.getTaskList(page, keyword, begin, end, taskStatus.getValue());
     }
 }

@@ -164,7 +164,7 @@
             and df.identity_id = #{identityId, jdbcType=VARCHAR}
             and ((dmda.auth_type = 1 AND dmda.expired = 0) or (dmda.auth_type = 2 AND dmda.used_times &lt; dmda.times))
     </select>
-    <select id="getDataListByIdentityId" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
+    <select id="getDataListByOrg" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
         select md.meta_data_id,
                md.file_name as metaDataName,
                md.identity_id,

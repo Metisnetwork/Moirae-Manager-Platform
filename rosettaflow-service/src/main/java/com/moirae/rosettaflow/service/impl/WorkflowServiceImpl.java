@@ -42,7 +42,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private CommonService commonService;
     @Resource
-    private IAlgorithmService algorithmService;
+    private AlgService algService;
     @Resource
     private IWorkflowNodeService workflowNodeService;
     @Resource
@@ -231,7 +231,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
         // 获得工作流节点配置的算法信息
         workflow.getWorkflowNodeVoList().forEach(item -> {
-            Algorithm algorithm = algorithmService.queryAlgorithmStepDetails(item.getAlgorithmId());
+            Algorithm algorithm = algService.queryAlgorithmStepDetails(item.getAlgorithmId());
             if (Objects.nonNull(algorithm)) {
                 // 处理国际化语言
                 if (SysConstant.EN_US.equals(language)) {
@@ -453,7 +453,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<Long> algorithmId = reqWorkflow.getWorkflowNodeReqList().stream()
                 .map(WorkflowNode::getAlgorithmId)
                 .collect(Collectors.toList());
-        algorithmService.isValid(algorithmId);
+        algService.isValid(algorithmId);
         // 组织校验
         Set<String> senderOrgId = reqWorkflow.getWorkflowNodeReqList().stream()
                 .map(WorkflowNode::getWorkflowNodeSenderIdentityId)

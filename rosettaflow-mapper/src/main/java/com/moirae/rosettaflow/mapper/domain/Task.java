@@ -3,8 +3,10 @@ package com.moirae.rosettaflow.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -196,5 +198,10 @@ public class Task implements Serializable {
      */
     @TableField(exist = false)
     private List<TaskResultConsumer> resultReceiverList;
+
+    @TableField(exist = false)
+    private String algorithmName;
+    @TableField(exist = false)
+    private String algorithmNameEn;
 
 }

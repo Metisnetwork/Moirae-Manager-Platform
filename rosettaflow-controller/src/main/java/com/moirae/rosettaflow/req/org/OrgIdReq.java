@@ -13,8 +13,8 @@ import javax.validation.constraints.NotNull;
  * @date 2021/12/15
  */
 @Data
-@ApiModel(value = "删除ip及port与组织绑定关系请求")
-public class QuitOrgReq {
+@ApiModel(value = "组织标识")
+public class OrgIdReq {
 
     @ApiModelProperty(value = "组织ID不能为空", required = true)
     @NotNull(message = "{identityId.id.NotBlank}")

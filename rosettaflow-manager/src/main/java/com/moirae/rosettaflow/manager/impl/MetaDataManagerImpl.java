@@ -55,8 +55,8 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public IPage<MetaData> getDataListByIdentityId(Page<MetaData> page, String identityId) {
-        return this.baseMapper.getDataListByIdentityId(page, identityId);
+    public IPage<MetaData> getDataListByOrg(Page<MetaData> page, String identityId) {
+        return this.baseMapper.getDataListByOrg(page, identityId);
     }
 
     @Override

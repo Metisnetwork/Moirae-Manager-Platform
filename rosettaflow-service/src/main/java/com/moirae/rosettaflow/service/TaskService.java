@@ -1,15 +1,17 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.moirae.rosettaflow.common.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.domain.*;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TaskService {
 
     void batchReplace(List<Task> taskList, List<TaskAlgoProvider> taskAlgoProviderList, List<TaskDataProvider> taskDataProviderList, List<TaskMetaDataColumn> taskMetaDataColumnList, List<TaskPowerProvider> taskPowerProviderList, List<TaskResultConsumer> taskResultConsumerList  );
 
-    IPage<Task> getOrgTaskListByIdentityId(Long current, Long size, String identityId);
+    IPage<Task> getTaskListByOrg(Long current, Long size, String identityId);
 
     Task getTaskDetails(String taskId);
 
@@ -21,7 +23,11 @@ public interface TaskService {
 
     List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId);
 
-    IPage<Task> getTaskListByMetaDataId(Long current, Long size, String metaDataId);
+    IPage<Task> getTaskListByData(Long current, Long size, String metaDataId);
 
     Task getTask(String keyword);
+
+    int getTaskStats();
+
+    IPage<Task> getTaskList(Long current, Long size, String keyword, Date begin, Date end, TaskStatusEnum taskStatus);
 }

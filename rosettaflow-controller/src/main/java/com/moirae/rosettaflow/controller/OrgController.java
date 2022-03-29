@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.req.org.GetOrgListReq;
 import com.moirae.rosettaflow.req.org.JoinOrgReq;
-import com.moirae.rosettaflow.req.org.QuitOrgReq;
+import com.moirae.rosettaflow.req.org.OrgIdReq;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
@@ -57,7 +57,7 @@ public class OrgController {
 
     @GetMapping("getOrgDetails")
     @ApiOperation(value = "查询组织详情", notes = "查询组织详情")
-    public ResponseVo<OrgVo> getOrgDetails(@RequestParam QuitOrgReq req) {
+    public ResponseVo<OrgVo> getOrgDetails(@RequestParam OrgIdReq req) {
         Org org = orgService.getOrgDetails(req.getIdentityId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(org, OrgVo.class));
     }
@@ -78,7 +78,7 @@ public class OrgController {
 
     @PostMapping("quitOrg")
     @ApiOperation(value = "用户退出组织", notes = "用户退出组织")
-    public ResponseVo<?> quitOrg(@RequestBody @Valid QuitOrgReq req) {
+    public ResponseVo<?> quitOrg(@RequestBody @Valid OrgIdReq req) {
         orgService.deleteOrganizationByUser(req.getIdentityId());
         return ResponseVo.createSuccess();
     }

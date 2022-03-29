@@ -9,6 +9,7 @@ import com.moirae.rosettaflow.mapper.domain.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -17,7 +18,7 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
 
     @Override
     public IPage<Task> getOrgTaskListByIdentityId(Page<Task> page, String identityId) {
-        return this.baseMapper.getOrgTaskListByIdentityId(page, identityId);
+        return this.baseMapper.getTaskListByOrg(page, identityId);
     }
 
     @Override
@@ -31,7 +32,12 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
-    public IPage<Task> getTaskListByMetaDataId(Page<Task> page, String metaDataId) {
-        return this.baseMapper.getTaskListByMetaDataId(page, metaDataId);
+    public IPage<Task> getTaskListByData(Page<Task> page, String metaDataId) {
+        return this.baseMapper.getTaskListByData(page, metaDataId);
+    }
+
+    @Override
+    public IPage<Task> getTaskList(Page<Task> page, String keyword, Date begin, Date end, Integer status) {
+        return this.baseMapper.getTaskList(page, keyword, begin, end, status);
     }
 }

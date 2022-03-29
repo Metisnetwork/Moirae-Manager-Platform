@@ -27,7 +27,7 @@ public interface MetaDataManager extends IService<MetaData> {
 
     List<MetaDataDto> getMetaDataByChoose(String address, String identityId);
 
-    IPage<MetaData> getDataListByIdentityId(Page<MetaData> page, String identityId);
+    IPage<MetaData> getDataListByOrg(Page<MetaData> page, String identityId);
 
     IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy);
 

@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.req.CommonPageReq;
 import com.moirae.rosettaflow.req.data.GetDataDetailsReq;
-import com.moirae.rosettaflow.req.data.GetDataListByIdentityIdReq;
 import com.moirae.rosettaflow.req.data.GetDataListReq;
+import com.moirae.rosettaflow.req.org.OrgIdPageReq;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
@@ -50,10 +50,10 @@ public class DataController {
         return ResponseVo.createSuccess(dataStatsVo);
     }
 
-    @GetMapping("getDataListByIdentityId")
+    @GetMapping("getDataListByOrg")
     @ApiOperation(value = "查询数据列表通过组织id", notes = "查询数据列表通过组织id")
-    public ResponseVo<PageVo<DataVo>> getDataListByIdentityId(@Valid GetDataListByIdentityIdReq req) {
-        IPage<MetaData> page = dataService.getDataListByIdentityId(req.getCurrent(), req.getSize(), req.getIdentityId());
+    public ResponseVo<PageVo<DataVo>> getDataListByOrg(@Valid OrgIdPageReq req) {
+        IPage<MetaData> page = dataService.getDataListByOrg(req.getCurrent(), req.getSize(), req.getIdentityId());
         List<DataVo> itemList = BeanUtil.copyToList(page.getRecords(), DataVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }

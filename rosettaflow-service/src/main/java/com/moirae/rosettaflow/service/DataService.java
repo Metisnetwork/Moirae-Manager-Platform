@@ -31,7 +31,7 @@ public interface DataService {
      * @param identityId
      * @return
      */
-    IPage<MetaData> getDataListByIdentityId(Long current, Long size, String identityId);
+    IPage<MetaData> getDataListByOrg(Long current, Long size, String identityId);
 
     /**
      * 查询数据列表
