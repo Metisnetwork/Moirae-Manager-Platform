@@ -49,9 +49,9 @@ public class WorkflowRunStatusServiceImpl extends ServiceImpl<WorkflowRunStatusM
     @Resource
     private AlgService algService;
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
     @Resource
-    private IModelService modelService;
+    private ModelService modelService;
     @Resource
     private GrpcSysService grpcSysService;
     @Resource

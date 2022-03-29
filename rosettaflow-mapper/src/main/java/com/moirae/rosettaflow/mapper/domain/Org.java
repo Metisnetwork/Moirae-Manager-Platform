@@ -61,4 +61,41 @@ public class Org implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 数据凭证使用量
+     */
+    @TableField(exist = false)
+    private long dataTokenUsed;
+
+    /**
+     * 参与任务数量
+     */
+    @TableField(exist = false)
+    private Integer totalTask;
+
+    /**
+     * 总文件数
+     */
+    @TableField(exist = false)
+    private Integer totalFile;
+
+    /**
+     * 计算服务的总共内存
+     */
+    @TableField(exist = false)
+    private Long totalMemory;
+
+    /**
+     * 计算服务的总带宽
+     */
+    @TableField(exist = false)
+    private Long totalBandwidth;
+
+    /**
+     * 计算服务的总核数
+     */
+    @TableField(exist = false)
+    private Integer totalCore;
+
 }

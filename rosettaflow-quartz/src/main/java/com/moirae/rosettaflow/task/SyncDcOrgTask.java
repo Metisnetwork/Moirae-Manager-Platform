@@ -7,7 +7,7 @@ import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import com.moirae.rosettaflow.service.IDataSyncService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class SyncDcOrgTask {
     @Resource
     private AuthServiceClient authServiceClient;
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
     @Resource
     private IDataSyncService dataSyncService;
 

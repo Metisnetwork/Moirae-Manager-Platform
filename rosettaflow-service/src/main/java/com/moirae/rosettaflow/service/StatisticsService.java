@@ -1,13 +1,35 @@
 package com.moirae.rosettaflow.service;
 
 
-import com.moirae.rosettaflow.mapper.domain.GlobalStats;
-import com.moirae.rosettaflow.mapper.domain.StatisticsDataTrend;
+import com.moirae.rosettaflow.mapper.domain.*;
+import com.moirae.rosettaflow.service.dto.NavigationDto;
 
 import java.util.List;
 
 public interface StatisticsService {
+
+    /**
+     * 首页导航
+     *
+     * @param keyword  任务id 或 组织标识
+     * @return
+     */
+    NavigationDto queryNavigation(String keyword);
+
+    /**
+     * 全网统计
+     *
+     * @return
+     */
+    StatsGlobal globalStats();
+
+
     List<StatisticsDataTrend> listGlobalDataFileStatsTrendMonthly();
 
-    GlobalStats globalStats();
+
+    List<StatsDay> getTaskTrend(Integer size);
+
+    List<StatsOrg> getOrgComputingTop(Integer size);
+
+    List<StatsData> getDataTokenUsedTop(Integer size);
 }

@@ -12,7 +12,7 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl implements TaskService {
 
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
     @Resource
     private DataService dataService;
     @Resource
@@ -175,5 +175,10 @@ public class TaskServiceImpl implements TaskService {
     public IPage<Task> getTaskListByMetaDataId(Long current, Long size, String metaDataId) {
         Page<Task> page = new Page<>(current, size);
         return taskManager.getTaskListByMetaDataId(page, metaDataId);
+    }
+
+    @Override
+    public Task getTask(String keyword) {
+        return taskManager.getById(keyword);
     }
 }

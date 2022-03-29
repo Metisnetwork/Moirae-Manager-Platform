@@ -7,7 +7,7 @@ import com.moirae.rosettaflow.mapper.WorkflowRunTaskResultMapper;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
 import com.moirae.rosettaflow.service.IWorkflowRunTaskResultService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class WorkflowRunTaskResultServiceImpl extends ServiceImpl<WorkflowRunTaskResultMapper, WorkflowRunTaskResult> implements IWorkflowRunTaskResultService {
 
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
 
     @Override
     public List<WorkflowRunTaskResult> queryByTaskId(String taskId) {

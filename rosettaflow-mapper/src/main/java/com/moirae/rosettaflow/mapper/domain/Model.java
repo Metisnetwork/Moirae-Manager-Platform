@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,31 +9,28 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * t_model
+ * mo_model
  *
  * @author admin
  */
 @Data
-@TableName(value = "t_model")
+@TableName(value = "mo_model")
 public class Model implements Serializable {
-    private static final long serialVersionUID = 1L;
+
     /**
-     * 元数据表ID(自增长)
+     * 元数据id
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableId
+    private String metaDataId;
     /**
      * 所属组织
      */
-    private String orgIdentityId;
+    private String identityId;
     /**
      * 名称
      */
     private String name;
-    /**
-     * 元数据id
-     */
-    private String metaDataId;
+
     /**
      * 源文件ID
      */
@@ -56,15 +52,6 @@ public class Model implements Serializable {
      */
     private String trainUserAddress;
     /**
-     * 模型支持输入的算法id
-     */
-    private Long supportedAlgorithmId;
-    /**
-     * 状态: 0-无效，1- 有效
-     */
-    @TableField(value = "`status`")
-    private Byte status;
-    /**
      * 创建时间
      */
     private Date createTime;
@@ -73,6 +60,8 @@ public class Model implements Serializable {
      */
     @TableField(update = "now()")
     private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 模型主键id
@@ -94,7 +83,10 @@ public class Model implements Serializable {
      */
     @TableField(exist = false)
     private String algorithmName;
-
     @TableField(exist = false)
-    private String identityId;
+    private String algorithmNameEn;
+    @TableField(exist = false)
+    private String nodeName;
+    @TableField(exist = false)
+    private String imageUrl;
 }

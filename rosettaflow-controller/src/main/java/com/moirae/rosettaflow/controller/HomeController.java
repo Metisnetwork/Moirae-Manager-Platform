@@ -1,9 +1,15 @@
 package com.moirae.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.req.KeyWorkReq;
 import com.moirae.rosettaflow.req.home.GetLatestModelListReq;
+import com.moirae.rosettaflow.req.home.GetOrgComputingTopReq;
+import com.moirae.rosettaflow.req.home.GetTaskTrendReq;
+import com.moirae.rosettaflow.service.ModelService;
 import com.moirae.rosettaflow.service.StatisticsService;
+import com.moirae.rosettaflow.service.dto.NavigationDto;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.home.*;
 import io.swagger.annotations.Api;
@@ -27,47 +33,48 @@ import java.util.List;
 public class HomeController {
     @Resource
     private StatisticsService statisticsService;
+    @Resource
+    private ModelService modelService;
 
     @GetMapping("queryNavigation")
     @ApiOperation(value = "查询导航", notes = "查询导航")
     public ResponseVo<NavigationVo> queryNavigation(@Valid KeyWorkReq req) {
-        NavigationVo resp = new NavigationVo();
-        return ResponseVo.createSuccess(resp);
+        NavigationDto navigationDto = statisticsService.queryNavigation(req.getKeyword());
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(navigationDto, NavigationVo.class));
     }
 
     @GetMapping("getLatestModelList")
     @ApiOperation(value = "获得最新的模型列表", notes = "获得最新的模型列表")
     public ResponseVo<List<LatestModelVo>> getLatestModel(@Valid GetLatestModelListReq req) {
-        List<LatestModelVo> resp = new ArrayList<>();
-        return ResponseVo.createSuccess(resp);
+        List<Model> modelList = modelService.getLatestModel(req.getSize());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(modelList, LatestModelVo.class));
     }
 
     @GetMapping("getGlobalStats")
     @ApiOperation(value = "获得全网统计数据", notes = "获得全网统计数据")
-    public ResponseVo<GlobalStatsVo> globalStats() {
-        GlobalStatsVo resp = new GlobalStatsVo();
-        return ResponseVo.createSuccess(resp);
+    public ResponseVo<StatsGlobalVo> globalStats() {
+        StatsGlobal statsGlobal = statisticsService.globalStats();
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(statsGlobal, StatsGlobalVo.class));
     }
-
 
     @GetMapping("getTaskTrend")
     @ApiOperation(value = "获得15天隐私计算走势", notes = "获得15天隐私计算走势")
-    public ResponseVo<List<TrendVo>> getTaskTrend() {
-        List<TrendVo> resp = new ArrayList<>();
-        return ResponseVo.createSuccess(resp);
+    public ResponseVo<List<TrendVo>> getTaskTrend(@Valid GetTaskTrendReq req) {
+        List<StatsDay> statsDayList = statisticsService.getTaskTrend(req.getSize());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(statsDayList, TrendVo.class));
     }
 
     @GetMapping("getOrgPowerTop")
     @ApiOperation(value = "获得组织算力排行", notes = "获得组织算力排行")
-    public ResponseVo<List<OrgPowerVo>> getOrgComputingTop() {
-        List<OrgPowerVo> resp = new ArrayList<>();
-        return ResponseVo.createSuccess(resp);
+    public ResponseVo<List<OrgPowerVo>> getOrgComputingTop(@Valid GetOrgComputingTopReq req) {
+        List<StatsOrg> statsOrgList = statisticsService.getOrgComputingTop(req.getSize());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(statsOrgList, OrgPowerVo.class));
     }
 
     @GetMapping("getDataTokenUsedTop")
     @ApiOperation(value = "获得数据凭证使用量排行", notes = "获得数据凭证使用量排行")
-    public ResponseVo<List<DataTokenUsedVo>> getDataTokenUsedTop() {
-        List<DataTokenUsedVo> resp = new ArrayList<>();
-        return ResponseVo.createSuccess(resp);
+    public ResponseVo<List<DataTokenUsedVo>> getDataTokenUsedTop(@Valid GetOrgComputingTopReq req) {
+        List<StatsData> statsDataList = statisticsService.getDataTokenUsedTop(req.getSize());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(statsDataList, DataTokenUsedVo.class));
     }
 }

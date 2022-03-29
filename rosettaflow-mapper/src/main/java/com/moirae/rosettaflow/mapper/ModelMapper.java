@@ -12,5 +12,7 @@ import java.util.List;
  */
 public interface ModelMapper extends BaseMapper<Model> {
 
-    List<Model> queryAvailableModel(@Param(value = "address") String address, @Param(value = "algorithmId") Long algorithmId, @Param(value = "identityId") String identityId, @Param(value = "language") String language);
+    List<Model> queryAvailableModel(@Param(value = "address") String address, @Param(value = "algorithmId") Long algorithmId, @Param(value = "identityId") String identityId);
+
+    List<Model> getLatestModel(Integer size);
 }

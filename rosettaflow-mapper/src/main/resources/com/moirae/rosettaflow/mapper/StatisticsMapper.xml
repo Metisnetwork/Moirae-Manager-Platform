@@ -26,7 +26,7 @@
         ORDER BY t.stats_time
 
     </select>
-    <select id="globalStats" resultType="com.moirae.rosettaflow.mapper.domain.GlobalStats">
+    <select id="globalStats" resultType="com.moirae.rosettaflow.mapper.domain.StatsGlobal">
         select
             total_org_count, power_org_count, data_file_size, used_data_file_size, task_count, partner_count, total_core, total_memory, total_bandwidth
         from v_global_stats

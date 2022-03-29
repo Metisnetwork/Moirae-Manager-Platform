@@ -18,7 +18,6 @@ import com.moirae.rosettaflow.mapper.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.ArrayUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,13 +56,13 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Resource
     private IWorkflowNodeVariableService workflowNodeVariableService;
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
     @Resource
     private DataService dataService;
     @Resource
     private IWorkflowRunStatusService workflowRunStatusService;
     @Resource
-    private IModelService modelService;
+    private ModelService modelService;
     @Resource
     private IWorkflowRunTaskResultService workflowRunTaskResultService;
 

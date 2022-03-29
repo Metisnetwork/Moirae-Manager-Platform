@@ -9,7 +9,7 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
 import com.moirae.rosettaflow.service.IDataSyncService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class SyncDcTaskTask {
     @Resource
     private GrpcTaskService grpcTaskService;
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
     @Resource
     private IDataSyncService dataSyncService;
     @Resource

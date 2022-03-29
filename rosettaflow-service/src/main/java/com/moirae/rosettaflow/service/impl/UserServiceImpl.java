@@ -16,7 +16,7 @@ import com.moirae.rosettaflow.manager.UserManager;
 import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.ITokenService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.UserService;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Resource
     private CommonService commonService;
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
     @Resource
     private UserManager userManager;
 

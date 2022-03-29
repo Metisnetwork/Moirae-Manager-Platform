@@ -3,15 +3,29 @@
 <mapper namespace="com.moirae.rosettaflow.mapper.ModelMapper">
     <select id="queryAvailableModel" resultType="com.moirae.rosettaflow.mapper.domain.Model">
         select
-            m.id as modelId,
-            m.org_identity_id as identityId,
-            m.name as fileName,
             m.meta_data_id as metaDataId,
+            m.identity_id as identityId,
+            m.name as fileName,
             m.meta_data_id as meta,
             m.file_path as filePath,
             if('en' = #{language, jdbcType=VARCHAR}, a.algorithm_name_en, a.algorithm_name) as algorithmName
-        FROM t_model m INNER JOIN t_algorithm a ON m.train_algorithm_id = a.id
+        FROM mo_model m INNER JOIN mo_algorithm a ON m.train_algorithm_id = a.id
         where m.train_user_address = #{address, jdbcType=VARCHAR} and m.supported_algorithm_id = #{algorithmId, jdbcType=BIGINT}
-            and m.org_identity_id = #{identityId, jdbcType=VARCHAR}
+            and m.identity_id = #{identityId, jdbcType=VARCHAR}
+    </select>
+    <select id="getLatestModel" resultType="com.moirae.rosettaflow.mapper.domain.Model">
+        select
+            m.meta_data_id,
+            m.identity_id,
+            o.node_name,
+            o.image_url,
+            m.name as metaDataName,
+            ac.name as algorithmName,
+            ac.name_en as algorithmNameEn,
+            m.create_time
+        from mo_model m
+            inner join mo_algorithm_classify ac on m.train_algorithm_id = ac.id
+            inner join dc_org o on m.identity_id = o.identity_id
+        order by m.create_time desc limit #{size}
     </select>
 </mapper>

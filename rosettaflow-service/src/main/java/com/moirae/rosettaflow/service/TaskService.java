@@ -22,4 +22,6 @@ public interface TaskService {
     List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId);
 
     IPage<Task> getTaskListByMetaDataId(Long current, Long size, String metaDataId);
+
+    Task getTask(String keyword);
 }

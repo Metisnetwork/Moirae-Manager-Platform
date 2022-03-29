@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.init;
 
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 public class ProcessInit {
 
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
 
     @PostConstruct
     public void init() {

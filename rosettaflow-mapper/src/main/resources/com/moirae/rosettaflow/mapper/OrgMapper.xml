@@ -159,4 +159,38 @@
              ) task
         where o.identity_id = #{identityId,jdbcType=VARCHAR}
     </select>
+    <select id="getOrgList" resultType="com.moirae.rosettaflow.mapper.domain.Org">
+        select o.node_name,
+               o.identity_id,
+               o.status,
+               o.update_at,
+               o.image_url,
+               so.org_total_core as totalCore,
+               so.org_total_memory as totalMemory,
+               so.org_total_bandwidth as totalBandwidth,
+               so.total_file as totalFile,
+               so.total_task as totalTask,
+               so.data_token_used as dataTokenUsed
+        from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
+        where o.status = 1
+        <if test="keyword != null and keyword != ''">
+            and ( o.identity_id = #{keyword} or o.node_name like concat('%', #{keyword}, '%') )
+        </if>
+        order by #{orderBy}
+    </select>
+    <select id="getOrgDetails" resultType="com.moirae.rosettaflow.mapper.domain.Org">
+        select o.node_name,
+               o.identity_id,
+               o.status,
+               o.update_at,
+               o.image_url,
+               so.org_total_core as totalCore,
+               so.org_total_memory as totalMemory,
+               so.org_total_bandwidth as totalBandwidth,
+               so.total_file as totalFile,
+               so.total_task as totalTask,
+               so.data_token_used as dataTokenUsed
+        from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
+        where o.status = 1 and  o.identity_id = #{identityId}
+    </select>
 </mapper>

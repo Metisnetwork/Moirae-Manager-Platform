@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.dto.OrganizationDto;
@@ -18,12 +19,13 @@ import com.moirae.rosettaflow.grpc.service.GetNodeIdentityResponse;
 import com.moirae.rosettaflow.manager.OrgExpandManager;
 import com.moirae.rosettaflow.manager.OrgManager;
 import com.moirae.rosettaflow.manager.OrgUserManager;
+import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.OrgExpand;
 import com.moirae.rosettaflow.mapper.domain.OrgUser;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import com.moirae.rosettaflow.service.CommonService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class OrganizationServiceImpl implements OrganizationService {
+public class OrgServiceImpl implements OrgService {
 
     @Resource
     private SysConfig sysConfig;
@@ -264,6 +266,22 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Org findOrgById(String identityId) {
         return orgManager.getById(identityId);
+    }
+
+    @Override
+    public int getOrgStats() {
+        return orgManager.getOrgStats();
+    }
+
+    @Override
+    public IPage<Org> getOrgList(Long current, Long size, String keyword, OrgOrderByEnum orderBy) {
+        Page<MetaData> page = new Page<>(current, size);
+        return orgManager.getOrgList(page, keyword, orderBy.getSqlValue());
+    }
+
+    @Override
+    public Org getOrgDetails(String identityId) {
+        return orgManager.getOrgDetails(identityId);
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

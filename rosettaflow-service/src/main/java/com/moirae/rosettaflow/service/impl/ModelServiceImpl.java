@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.StatusEnum;
+import com.moirae.rosettaflow.manager.ModelManager;
 import com.moirae.rosettaflow.mapper.ModelMapper;
 import com.moirae.rosettaflow.mapper.domain.Model;
+import com.moirae.rosettaflow.mapper.domain.StatsDay;
 import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.service.CommonService;
-import com.moirae.rosettaflow.service.IModelService;
+import com.moirae.rosettaflow.service.ModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +19,26 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ModelServiceImpl extends ServiceImpl<ModelMapper, Model> implements IModelService {
+public class ModelServiceImpl implements ModelService {
 
     @Resource
     CommonService commonService;
+    @Resource
+    ModelManager modelManager;
 
     @Override
-    public List<Model> queryAvailableModel(Long algorithmId, String identityId, String language) {
+    public List<Model> queryAvailableModel(Long algorithmId, String identityId) {
         User user = commonService.getCurrentUser();
-        return this.baseMapper.queryAvailableModel(user.getAddress(), algorithmId, identityId, language);
+        return this.modelManager.queryAvailableModel(user.getAddress(), algorithmId, identityId);
     }
 
     @Override
-    public Model queryById(Long id) {
-        LambdaQueryWrapper<Model> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Model::getId, id);
-        queryWrapper.eq(Model::getStatus, StatusEnum.VALID.getValue());
-        return getOne(queryWrapper);
+    public Model queryById(String metaDataId) {
+        return modelManager.getById(metaDataId);
+    }
+
+    @Override
+    public List<Model> getLatestModel(Integer size) {
+        return modelManager.getLatestModel(size);
     }
 }

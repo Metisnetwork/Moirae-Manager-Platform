@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import io.grpc.ManagedChannel;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface OrganizationService {
+public interface OrgService {
 
     /**
      * 通过配置文件初始公共组织
@@ -153,4 +154,10 @@ public interface OrganizationService {
     Map<String, Org> getIdentityId2OrgMap();
 
     Org findOrgById(String identityId);
+
+    int getOrgStats();
+
+    IPage<Org> getOrgList(Long current, Long size, String keyword, OrgOrderByEnum orderBy);
+
+    Org getOrgDetails(String identityId);
 }

@@ -8,7 +8,7 @@ import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.moirae.rosettaflow.service.IDataSyncService;
 import com.moirae.rosettaflow.service.IWorkflowRunStatusService;
-import com.moirae.rosettaflow.service.OrganizationService;
+import com.moirae.rosettaflow.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private IDataSyncService dataSyncService;
     @Resource
-    private OrganizationService organizationService;
+    private OrgService organizationService;
 
 //    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")

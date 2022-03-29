@@ -23,7 +23,7 @@ public enum ErrorMsg {
     PARAM_FORMAT_ERROR("参数格式错误", "Param format error"),
     BIZ_FAILED("业务失败", "Business failed"),
     BIZ_EXCEPTION("业务异常", "Business exception"),
-
+    BIZ_QUERY_NOT_EXIST("查询内容不存在", "Query content does not exist"),
 
     /**
      * 用户

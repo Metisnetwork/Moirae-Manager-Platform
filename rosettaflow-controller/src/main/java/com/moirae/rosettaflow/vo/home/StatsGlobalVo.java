@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(value = "全网统计数据")
-public class GlobalStatsVo {
+public class StatsGlobalVo {
 
     @ApiModelProperty(value = "隐私计算总次数(总的任务数,包括成功和失败的)")
     private int taskCount;

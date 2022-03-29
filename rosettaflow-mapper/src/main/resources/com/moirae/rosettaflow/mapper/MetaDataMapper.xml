@@ -20,11 +20,6 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     </resultMap>
-    <sql id="Base_Column_List">
-        meta_data_id, origin_id, identity_id, file_name, file_path, file_type, industry,
-    `size`, `rows`, `columns`, published_at, has_title, remarks, `status`, update_at,
-    create_time, update_time
-    </sql>
     <select id="listDataFileByIdentityId" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
         select df.meta_data_id,
                df.file_name as metaDataName,
@@ -238,7 +233,10 @@
                md.identity_id,
                o.node_name,
                t.name as tokenName,
-               t.price as tokenPrice
+               t.price as tokenPrice,
+               t.symbol as tokenSymbol,
+               t.`decimal` as tokenDecimal,
+               th.balance as tokenBalance
         from dc_meta_data md
             inner join dc_org o on md.identity_id = o.identity_id
             inner join mo_token t on md.token_address = t.address

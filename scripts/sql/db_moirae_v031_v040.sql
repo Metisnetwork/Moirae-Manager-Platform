@@ -565,5 +565,51 @@ CREATE TABLE `mo_token_holder` (
 ) ENGINE=InnoDB COMMENT='token持有表';
 
 
+DROP TABLE IF EXISTS `mo_stats_global`;
+CREATE TABLE `mo_stats_global` (
+    `id` bigint(20) NOT NULL COMMENT 'ID(自增长)',
+    `task_count` int DEFAULT 0 COMMENT '隐私计算总次数(总的任务数,包括成功和失败的)',
+    `address_count_of_task` int DEFAULT 0 COMMENT '参与计算地址总数',
+    `address_count_of_active` int DEFAULT 0 COMMENT '24h活跃地址总数',
+    `data_size` bigint DEFAULT 0 COMMENT '全网数据总量，单位：字节',
+    `data_token_count` int DEFAULT 0 COMMENT '数据凭证数量',
+    `data_token_used` bigint DEFAULT 0 COMMENT '数据凭证使用量',
+    `total_core` int DEFAULT 0 COMMENT '全网目前的算力核心数，单位：个',
+    `total_memory` bigint DEFAULT 0 COMMENT '全网目前的算力内存数，单位：字节',
+    `total_bandwidth` bigint DEFAULT 0 COMMENT '全网目前的带宽，单位：字节',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='全网维度统计';
+INSERT INTO `mo_stats_global` (`id`) VALUES( 1) ;
 
+DROP TABLE IF EXISTS `mo_stats_day`;
+CREATE TABLE `mo_stats_day` (
+    `stats_time` date NOT NULL COMMENT '统计时间',
+    `stats_key` varchar(64) NOT NULL COMMENT '统计可用: taskCount-计算走势',
+    `stats_value` bigint DEFAULT 0 COMMENT '统计值',
+    PRIMARY KEY (`stats_time`, `stats_key`)
+) ENGINE=InnoDB COMMENT='日期维度统计';
+
+DROP TABLE IF EXISTS `mo_stats_org`;
+CREATE TABLE `mo_stats_org` (
+    `identity_id` varchar(200) NOT NULL COMMENT '身份认证标识的id',
+    `org_total_core` int DEFAULT 0 COMMENT '全网目前的算力核心数，单位：个',
+    `org_total_memory` bigint DEFAULT 0 COMMENT '全网目前的算力内存数，单位：字节',
+    `org_total_bandwidth` bigint DEFAULT 0 COMMENT '全网目前的带宽，单位：字节',
+    `data_token_used` bigint DEFAULT 0 COMMENT '数据凭证使用量',
+    `total_task` bigint DEFAULT 0 COMMENT '参与任务数量',
+    `total_file` bigint DEFAULT 0 COMMENT '总文件数',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`identity_id`)
+) ENGINE=InnoDB COMMENT='组织维度统计';
+
+
+DROP TABLE IF EXISTS `mo_stats_data`;
+CREATE TABLE `mo_stats_data` (
+    `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+    `data_token_used` bigint DEFAULT 0 COMMENT '数据凭证使用量',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`meta_data_id`)
+) ENGINE=InnoDB COMMENT='数据维度统计';
 
