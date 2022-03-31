@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.TaskEventMapper">
-    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.TaskEvent">
-        <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="task_id" jdbcType="VARCHAR" property="taskId" />
-        <result column="event_type" jdbcType="VARCHAR" property="eventType" />
-        <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
-        <result column="party_id" jdbcType="VARCHAR" property="partyId" />
-        <result column="event_at" jdbcType="TIMESTAMP" property="eventAt" />
-        <result column="event_content" jdbcType="VARCHAR" property="eventContent" />
-    </resultMap>
-    <sql id="Base_Column_List">
-        id, task_id, event_type, identity_id, party_id, event_at, event_content
-    </sql>
 </mapper>

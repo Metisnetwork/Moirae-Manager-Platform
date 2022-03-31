@@ -23,7 +23,7 @@ public class WorkflowVersionVo {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @ApiModelProperty(value = "工作流版本执行状态（待支付、支付中、已支付、运行中、运行成功、运行失败）")
+    @ApiModelProperty(value = "工作流版本执行状态（待运行、运行中、运行成功、运行失败）")
     private WorkflowStatusEnum status;
 
     @ApiModelProperty(value = "开始时间")

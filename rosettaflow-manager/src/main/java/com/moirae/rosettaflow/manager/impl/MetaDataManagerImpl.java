@@ -1,6 +1,8 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
@@ -10,6 +12,7 @@ import com.moirae.rosettaflow.manager.MetaDataManager;
 import com.moirae.rosettaflow.mapper.MetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
+import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -72,5 +75,12 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public IPage<MetaData> getUserDataList(Page<MetaData> page, String address) {
         return this.baseMapper.getUserDataList(page, address);
+    }
+
+    @Override
+    public int getDataCount() {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaData::getStatus, MetaDataStatusEnum.PUBLISHED);
+        return count(wrapper);
     }
 }

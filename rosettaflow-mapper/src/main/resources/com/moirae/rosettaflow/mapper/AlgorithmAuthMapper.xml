@@ -1,21 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.AlgorithmAuthMapper">
-    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.AlgorithmAuth">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="user_id" jdbcType="BIGINT" property="userId"/>
-        <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId"/>
-        <result column="auth_type" jdbcType="TINYINT" property="authType"/>
-        <result column="auth_value" jdbcType="BIGINT" property="authValue"/>
-        <result column="auth_begin_time" jdbcType="TIMESTAMP" property="authBeginTime"/>
-        <result column="auth_end_time" jdbcType="TIMESTAMP" property="authEndTime"/>
-        <result column="auth_status" jdbcType="TINYINT" property="authStatus"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-    id, user_id, algorithm_id, auth_type, auth_value, auth_begin_time, auth_end_time, 
-    auth_status, `status`, create_time, update_time
-  </sql>
 </mapper>

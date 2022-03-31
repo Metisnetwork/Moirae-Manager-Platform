@@ -10,7 +10,7 @@ import com.moirae.rosettaflow.mapper.enums.StatsDayKeyEnum;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.StatisticsService;
 import com.moirae.rosettaflow.service.TaskService;
-import com.moirae.rosettaflow.service.dto.NavigationDto;
+import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -54,11 +54,6 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
 
         throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.BIZ_QUERY_NOT_EXIST.getMsg());
-    }
-
-    @Override
-    public List<StatisticsDataTrend> listGlobalDataFileStatsTrendMonthly() {
-        return statisticsManager.listGlobalDataFileStatsTrendMonthly();
     }
 
     @Override

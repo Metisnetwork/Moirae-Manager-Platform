@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.dto;
 
-import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.mapper.domain.ZOldWorkflow;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class WorkflowDto extends Workflow {
+public class WorkflowDto extends ZOldWorkflow {
 
     /**
      * 创建者

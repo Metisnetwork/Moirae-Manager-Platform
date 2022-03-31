@@ -1,82 +1,102 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Map;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * <p>
+ * 工作流运行状态
+ * </p>
+ *
+ * @author chendai
+ * @since 2022-03-28
+ */
 @Data
-@TableName(value = "t_workflow_run_status")
+@TableName("mo_workflow_run_status")
 public class WorkflowRunStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+
+
     /**
-     * 项目工作流ID(自增长)
+     * 工作流节点表ID(自增长)
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
     /**
      * 工作流id
      */
+    @TableField("workflow_id")
     private Long workflowId;
+
     /**
      * 工作流版本号
      */
-    private Integer workflowEditVersion;
+    @TableField("workflow_version")
+    private Integer workflowVersion;
+
     /**
      * 发起任务的账户的签名
      */
     private String sign;
+
     /**
      * 发起任务的账户的地址
      */
     private String address;
+
     /**
      * 总步骤
      */
     private Integer step;
+
     /**
      * 当前步骤
      */
+    @TableField("cur_step")
     private Integer curStep;
+
     /**
      * 开始时间
      */
-    private Date beginTime;
+    @TableField("begin_time")
+    private LocalDateTime beginTime;
+
     /**
      * 结束时间
      */
-    private Date endTime;
+    @TableField("end_time")
+    private LocalDateTime endTime;
+
     /**
-     *  运行状态: 1-运行中,2-运行成功,3-运行失败
+     * 运行状态: 1-运行中,2-运行成功,3-运行失败
      */
-    private Byte runStatus;
+    @TableField("run_status")
+    private Integer runStatus;
+
     /**
-     *  取消状态: 1-取消中,2-取消成功,3-取消失败
+     * 取消状态: 1-取消中,2-取消成功,3-取消失败
      */
-    private Byte cancelStatus;
+    @TableField("cancel_status")
+    private Integer cancelStatus;
+
     /**
      * 创建时间
      */
     private Date createTime;
+
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
 
-    /**
-     * 步骤对应的任务状态
-     */
-    @TableField(exist = false)
-    private Map<Integer, WorkflowRunTaskStatus> workflowRunTaskStatusMap;
-    @TableField(exist = false)
-    private Workflow workflow;
-    @TableField(exist = false)
-    private String workflowName;
-    @TableField(exist = false)
-    private Long projectId;
+    private static final long serialVersionUID = 1L;
+
+
 }

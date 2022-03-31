@@ -1,29 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.WorkflowRunStatusMapper">
-    <select id="runningRecordList" resultType="com.moirae.rosettaflow.mapper.domain.WorkflowRunStatus">
-        select
-            twrs.id as id,
-            twrs.workflow_id as workflowId,
-            twrs.workflow_edit_version as workflowEditVersion,
-            twrs.sign as sign,
-            twrs.address as address,
-            twrs.step as step,
-            twrs.cur_step as curStep,
-            twrs.begin_time as beginTime,
-            twrs.end_time as endTime,
-            twrs.run_status as runStatus,
-            twrs.cancel_status as cancelStatus,
-            twrs.create_time as createTime,
-            twrs.update_time as updateTime,
-            tw.workflow_name as workflowName,
-            tw.project_id as projectId
-        from t_workflow_run_status twrs join t_workflow tw on twrs.workflow_id = tw.id
-        where tw.user_id = #{userId, jdbcType=BIGINT} and tw.project_id = #{projectId, jdbcType=BIGINT}
-        <if test="workflowName != null and workflowName != ''">
-            and tw.workflow_name like concat('%',#{workflowName, jdbcType=VARCHAR},'%')
-        </if>
-        order by twrs.id desc
-    </select>
 
 </mapper>

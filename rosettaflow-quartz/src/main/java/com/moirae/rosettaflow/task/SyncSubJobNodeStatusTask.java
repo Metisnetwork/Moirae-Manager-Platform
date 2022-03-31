@@ -5,9 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
-import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
+import com.moirae.rosettaflow.mapper.domain.ZOldWorkflowRunTaskStatus;
 import com.moirae.rosettaflow.service.IDataSyncService;
-import com.moirae.rosettaflow.service.IWorkflowRunStatusService;
+import com.moirae.rosettaflow.service.ZOldIWorkflowRunStatusService;
 import com.moirae.rosettaflow.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class SyncSubJobNodeStatusTask {
     @Resource
     private GrpcTaskService grpcTaskService;
     @Resource
-    private IWorkflowRunStatusService workflowRunStatusService;
+    private ZOldIWorkflowRunStatusService workflowRunStatusService;
     @Resource
     private IDataSyncService dataSyncService;
     @Resource
@@ -38,7 +38,7 @@ public class SyncSubJobNodeStatusTask {
 //    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 60 * 1000)
     @Lock(keys = "SyncSubJobNodeStatusTask")
     public void run() {
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.queryUnConfirmedWorkflowRunTaskStatus();
+        List<ZOldWorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunStatusService.queryUnConfirmedWorkflowRunTaskStatus();
         // 执行取消逻辑
         workflowRunTaskStatusList = workflowRunTaskStatusList.stream()
                 .filter(item -> !workflowRunStatusService.cancel(item))
@@ -49,10 +49,10 @@ public class SyncSubJobNodeStatusTask {
         }
         log.info("同步更新子作业节点运行中任务开始>>>>");
         // 通道 -> List<任务>
-        Map<String, List<WorkflowRunTaskStatus>> channelTaskSetMap = workflowRunTaskStatusList.stream().collect(Collectors.groupingBy(WorkflowRunTaskStatus::getSenderIdentityId));
+        Map<String, List<ZOldWorkflowRunTaskStatus>> channelTaskSetMap = workflowRunTaskStatusList.stream().collect(Collectors.groupingBy(ZOldWorkflowRunTaskStatus::getSenderIdentityId));
         //获取所有任务详情
         for (String identityId: channelTaskSetMap.keySet()) {
-            Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getTaskId, WorkflowRunTaskStatus::getWorkflowRunId));
+            Map<String, Long> workflowRunTaskStatusMap = channelTaskSetMap.get(identityId).stream().collect(Collectors.toMap(ZOldWorkflowRunTaskStatus::getTaskId, ZOldWorkflowRunTaskStatus::getWorkflowRunId));
             try{
                 dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "--" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList

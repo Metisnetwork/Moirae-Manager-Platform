@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum WorkflowStatusEnum {
 
-    PAY_NEED(0, "待支付"),
-    PAY_DOING(1, "支付中"),
-    PAY_SUCCESS(2, "已支付"),
-    RUN_DOING(3, "运行中"),
-    RUN_SUCCESS(4, "运行成功"),
-    RUN_FAIL(5, "运行失败"),
+    RUN_NEED(0, "待运行"),
+    RUN_DOING(1, "运行中"),
+    RUN_SUCCESS(2, "运行成功"),
+    RUN_FAIL(3, "运行失败"),
     ;
 
     @JsonValue

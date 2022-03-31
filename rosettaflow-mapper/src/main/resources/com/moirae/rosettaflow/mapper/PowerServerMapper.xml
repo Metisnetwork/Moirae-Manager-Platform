@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.PowerServerMapper">
-    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.PowerServer">
-        <id column="id" jdbcType="VARCHAR" property="id" />
-        <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
-        <result column="memory" jdbcType="BIGINT" property="memory" />
-        <result column="core" jdbcType="INTEGER" property="core" />
-        <result column="bandwidth" jdbcType="BIGINT" property="bandwidth" />
-        <result column="used_memory" jdbcType="BIGINT" property="usedMemory" />
-        <result column="used_core" jdbcType="INTEGER" property="usedCore" />
-        <result column="used_bandwidth" jdbcType="BIGINT" property="usedBandwidth" />
-        <result column="published" jdbcType="BOOLEAN" property="published" />
-        <result column="published_at" jdbcType="TIMESTAMP" property="publishedAt" />
-        <result column="status" jdbcType="INTEGER" property="status" />
-        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    </resultMap>
 </mapper>

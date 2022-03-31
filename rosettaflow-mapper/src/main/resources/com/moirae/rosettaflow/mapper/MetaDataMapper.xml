@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.MetaDataMapper">
-    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.MetaData">
-        <id column="meta_data_id" jdbcType="VARCHAR" property="metaDataId" />
-        <result column="origin_id" jdbcType="VARCHAR" property="originId" />
-        <result column="identity_id" jdbcType="VARCHAR" property="identityId" />
-        <result column="file_name" jdbcType="VARCHAR" property="fileName" />
-        <result column="file_path" jdbcType="VARCHAR" property="filePath" />
-        <result column="file_type" jdbcType="INTEGER" property="fileType" />
-        <result column="industry" jdbcType="VARCHAR" property="industry" />
-        <result column="size" jdbcType="BIGINT" property="size" />
-        <result column="rows" jdbcType="INTEGER" property="rows" />
-        <result column="columns" jdbcType="INTEGER" property="columns" />
-        <result column="published_at" jdbcType="TIMESTAMP" property="publishedAt" />
-        <result column="has_title" jdbcType="BOOLEAN" property="hasTitle" />
-        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
-        <result column="status" jdbcType="INTEGER" property="status" />
-        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    </resultMap>
     <select id="listDataFileByIdentityId" resultType="com.moirae.rosettaflow.dto.MetaDataDto">
         select df.meta_data_id,
                df.file_name as metaDataName,

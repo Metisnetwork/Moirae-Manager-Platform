@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moirae.rosettaflow.mapper.ZOldWorkflowNodeResourceMapper">
+    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.ZOldWorkflowNodeResource">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="workflow_node_id" jdbcType="BIGINT" property="workflowNodeId"/>
+        <result column="cost_mem" jdbcType="BIGINT" property="costMem"/>
+        <result column="cost_cpu" jdbcType="INTEGER" property="costCpu"/>
+        <result column="cost_gpu" jdbcType="INTEGER" property="costGpu"/>
+        <result column="cost_bandwidth" jdbcType="BIGINT" property="costBandwidth"/>
+        <result column="run_time" jdbcType="BIGINT" property="runTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <insert id="batchInsert">
+        <foreach collection="workflowNodeResourceList" item="r" separator=";">
+            insert into t_workflow_node_resource
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="r.workflowNodeId != null">
+                    workflow_node_id,
+                </if>
+                <if test="r.costMem != null">
+                    cost_mem,
+                </if>
+                <if test="r.costCpu != null">
+                    cost_cpu,
+                </if>
+                <if test="r.costGpu != null">
+                    cost_gpu,
+                </if>
+                <if test="r.costBandwidth != null">
+                    cost_bandwidth,
+                </if>
+                <if test="r.runTime != null">
+                    run_time,
+                </if>
+                <if test="r.createTime != null">
+                    create_time,
+                </if>
+                <if test="r.updateTime != null">
+                    update_time,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="r.workflowNodeId != null">
+                    #{r.workflowNodeId,jdbcType=BIGINT},
+                </if>
+                <if test="r.costMem != null">
+                    #{r.costMem,jdbcType=BIGINT},
+                </if>
+                <if test="r.costCpu != null">
+                    #{r.costCpu,jdbcType=INTEGER},
+                </if>
+                <if test="r.costGpu != null">
+                    #{r.costGpu,jdbcType=INTEGER},
+                </if>
+                <if test="r.costBandwidth != null">
+                    #{r.costBandwidth,jdbcType=BIGINT},
+                </if>
+                <if test="r.runTime != null">
+                    #{r.runTime,jdbcType=BIGINT},
+                </if>
+                <if test="r.createTime != null">
+                    #{r.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="r.updateTime != null">
+                    #{r.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+</mapper>

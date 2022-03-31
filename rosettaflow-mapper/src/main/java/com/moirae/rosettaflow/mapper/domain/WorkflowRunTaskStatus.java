@@ -1,75 +1,104 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * <p>
+ * 工作流任务运行状态
+ * </p>
+ *
+ * @author chendai
+ * @since 2022-03-28
+ */
 @Data
-@TableName(value = "t_workflow_run_task_status")
+@TableName("mo_workflow_run_task_status")
 public class WorkflowRunTaskStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+
+
     /**
-     * 项目工作流ID(自增长)
+     * ID(自增长)
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
     /**
      * 工作流运行状态ID
      */
+    @TableField("workflow_run_id")
     private Long workflowRunId;
+
     /**
-     * 工作流节点配置id
+     * 工作流节点配置ID
      */
-    private Long workflowNodeId;
+    @TableField("workflow_task_id")
+    private Long workflowTaskId;
+
     /**
      * 节点在工作流中序号,从1开始
      */
-    private Integer nodeStep;
+    private Integer step;
+
     /**
      * 开始时间
      */
-    private Date beginTime;
+    @TableField("begin_time")
+    private LocalDateTime beginTime;
+
     /**
      * 结束时间
      */
-    private Date endTime;
+    @TableField("end_time")
+    private LocalDateTime endTime;
+
     /**
-     *  运行状态: 0-未开始 1-运行中,2-运行成功,3-运行失败
+     * 运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败
      */
-    private Byte runStatus;
+    @TableField("run_status")
+    private Integer runStatus;
+
     /**
      * 任务ID,底层处理完成后返回
      */
+    @TableField("task_id")
     private String taskId;
+
     /**
      * 任务处理结果描述
      */
+    @TableField("run_msg")
     private String runMsg;
+
     /**
      * 工作流节点需要的模型id
      */
-    private Long modelId;
+    @TableField("model_id")
+    private String modelId;
+
+    /**
+     * 工作流节点需要的psi的id
+     */
+    @TableField("psi_id")
+    private String psiId;
+
     /**
      * 创建时间
      */
     private Date createTime;
+
     /**
      * 更新时间
      */
+    @TableField(update = "now()")
     private Date updateTime;
 
-    @TableField(exist = false)
-    private Model model;
+    private static final long serialVersionUID = 1L;
 
-    @TableField(exist = false)
-    private String senderIdentityId;
 
-    @TableField(exist = false)
-    private List<WorkflowRunTaskResult> taskResultList;
 }

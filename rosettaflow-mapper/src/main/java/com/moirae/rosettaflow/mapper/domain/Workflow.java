@@ -1,71 +1,108 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
- * t_workflow
+ * <p>
+ * 工作流表
+ * </p>
  *
- * @author admin
+ * @author chendai
+ * @since 2022-03-28
  */
 @Data
-@TableName(value = "t_workflow")
+@TableName("mo_workflow")
 public class Workflow implements Serializable {
-    private static final long serialVersionUID = 1L;
-    /**
-     * 项目工作流ID(自增长)
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+
 
     /**
-     * 项目id
+     * 工作流ID(自增长)
      */
-    private Long projectId;
+    @TableId(value = "workflow_id", type = IdType.AUTO)
+    private Long workflowId;
 
     /**
-     * 用户id(创建方id)
+     * 创建模式:1-专家模式,2-向导模式
      */
-    private Long userId;
+    @TableField("create_mode")
+    private Integer createMode;
+
+    /**
+     * 用户地址
+     */
+    private String address;
 
     /**
      * 工作流名称
      */
+    @TableField("workflow_name")
     private String workflowName;
 
     /**
      * 工作流描述
      */
+    @TableField("workflow_desc")
     private String workflowDesc;
 
     /**
-     * 发起任务的用户钱包地址
+     * 算法id
      */
-    private String address;
-    /**
-     * 发起任务的账户的签名
-     */
-    private String sign;
+    @TableField("algorithm_id")
+    private Long algorithmId;
 
     /**
-     * 编辑版本标识，每次编辑后递增，从1开始
+     * 算法名称
      */
-    private Integer editVersion;
+    @TableField("algorithm_name")
+    private String algorithmName;
 
     /**
-     * 状态: 0-无效，1- 有效
+     * 计算流程id
      */
-    @TableField(value = "`status`")
-    private Byte status;
+    @TableField("calculation_process_id")
+    private Long calculationProcessId;
+
+    /**
+     * 计算流程名称
+     */
+    @TableField("calculation_process_name")
+    private String calculationProcessName;
+
+    /**
+     * 最后运行时间
+     */
+    @TableField("last_run_time")
+    private LocalDateTime lastRunTime;
+
+    /**
+     * 是否设置完成:  0-否  1-是
+     */
+    @TableField("is_setting_completed")
+    private Integer isSettingCompleted;
+
+    /**
+     * 向导模式下当前步骤
+     */
+    @TableField("calculation_process_step")
+    private Integer calculationProcessStep;
+
+    /**
+     * 是否删除: 0-否  1-是
+     */
+    @TableField("is_delete")
+    private Integer isDelete;
+
+    /**
+     * 当前最大版本号,从1开始
+     */
+    @TableField("workflow_version")
+    private Long workflowVersion;
 
     /**
      * 创建时间
@@ -78,41 +115,5 @@ public class Workflow implements Serializable {
     @TableField(update = "now()")
     private Date updateTime;
 
-    /**
-     * 运行状态: 0-未开始 1-运行中,2-运行成功,3-运行失败
-     */
-    @TableField(exist = false)
-    private Byte runStatus;
-    /**
-     * 取消状态: 0-未开始,1-取消中,2-取消成功,3-取消失败
-     */
-    @TableField(exist = false)
-    private Byte cancelStatus;
-
-    @TableField(exist = false)
-    private List<WorkflowNode> getNodeStatusVoList = new ArrayList<>();
-
-    @TableField(exist = false)
-    private List<WorkflowNode> workflowNodeVoList = new ArrayList<>();
-    /**
-     * 工作流ID
-     */
-    @TableField(exist = false)
-    private Long workflowId;
-    /**
-     * 工作流节点列表
-     */
-    @TableField(exist = false)
-    List<WorkflowNode> workflowNodeReqList;
-    /**
-     * 是否需要保存（0：不需要，1：需要）
-     */
-    @TableField(exist = false)
-    private String saveFlag;
-
-    @TableField(exist = false)
-    Map<Integer, WorkflowNode> workflowNodeMap;
-
-    @TableField(exist = false)
-    private Long workflowRunStatusId;
+    private static final long serialVersionUID = 1L;
 }

@@ -17,7 +17,7 @@ public class GetWorkflowListReq extends CommonPageReq {
     private String keyword;
 
     @ApiModelProperty(value = "算法id")
-    private String algorithmId;
+    private Long algorithmId;
 
     @ApiModelProperty(value = "时间的开始")
     private Date begin;

@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.service;
 
 
 import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.service.dto.NavigationDto;
+import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 
 import java.util.List;
 
@@ -22,10 +22,6 @@ public interface StatisticsService {
      * @return
      */
     StatsGlobal globalStats();
-
-
-    List<StatisticsDataTrend> listGlobalDataFileStatsTrendMonthly();
-
 
     List<StatsDay> getTaskTrend(Integer size);
 

@@ -34,4 +34,6 @@ public interface MetaDataManager extends IService<MetaData> {
     MetaData getDataDetails(String metaDataId);
 
     IPage<MetaData> getUserDataList(Page<MetaData> page, String address);
+
+    int getDataCount();
 }

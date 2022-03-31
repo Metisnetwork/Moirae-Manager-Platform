@@ -399,21 +399,6 @@ CREATE TABLE `mo_workflow_task_variable` (
     PRIMARY KEY (`workflow_task_id`, `var_key`)
 ) ENGINE=InnoDB COMMENT='工作流任务变量表';
 
-DROP TABLE IF EXISTS `mo_workflow_task_freeze`;
-CREATE TABLE `mo_workflow_task_freeze` (
-    `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
-    `target_id` varchar(128)  NOT NULL COMMENT '支付目标: 手续费-发起组织的标识、token-元数据id',
-    `type` tinyint NOT NULL COMMENT '支付类型:0-手续费,1-token',
-    `freeze_value` varchar(256) NOT NULL COMMENT '冻结的金额（手续费-lat、 token-token）',
-    `freeze_hash` varchar(256) DEFAULT NULL COMMENT '交易hash',
-    `un_freeze_hash` varchar(256) DEFAULT NULL COMMENT '交易hash',
-    `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-支付成功、3-支付失败、4-撤销中、5-撤销成功、6-撤销失败',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_task_id`, `target_id`)
-) ENGINE=InnoDB COMMENT='工作流任务冻结记录表';
-
-
 DROP TABLE IF EXISTS `mo_workflow_setting_expert`;
 CREATE TABLE `mo_workflow_setting_expert` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
@@ -509,21 +494,11 @@ CREATE TABLE `mo_model` (
     `train_task_id` varchar(256)  NOT NULL COMMENT '训练模型的任务id',
     `train_algorithm_id` bigint(20) DEFAULT NULL COMMENT '训练模型的算法id, 母算法',
     `train_user_address` varchar(64)  DEFAULT NULL COMMENT '训练模型的账户',
+    `evaluate` varchar(2048)  DEFAULT NULL COMMENT '模型评估结果',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`meta_data_id`)
 ) ENGINE=InnoDB COMMENT='模型表';
-
-DROP TABLE IF EXISTS `mo_model_evaluate`;
-CREATE TABLE `mo_model_evaluate` (
-    `meta_data_id` varchar(128) NOT NULL COMMENT '模型元数据id',
-    `identity_id` varchar(128)  NOT NULL COMMENT '所属组织',
-    `key` varchar(128)  DEFAULT NULL COMMENT '标识',
-    `value` varchar(256)  DEFAULT NULL COMMENT '百分比值',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`meta_data_id`)
-) ENGINE=InnoDB COMMENT='模型评估结果表';
 
 
 DROP TABLE IF EXISTS `mo_psi`;

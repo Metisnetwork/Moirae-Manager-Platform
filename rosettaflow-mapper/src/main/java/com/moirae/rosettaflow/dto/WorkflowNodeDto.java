@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class WorkflowNodeDto extends WorkflowNode {
+public class WorkflowNodeDto extends ZOldWorkflowNode {
 
     /**
      * 算法对象
@@ -23,22 +23,22 @@ public class WorkflowNodeDto extends WorkflowNode {
     /**
      * 工作流节点输入列表
      */
-    private List<WorkflowNodeInput> workflowNodeInputList;
+    private List<ZOldWorkflowNodeInput> workflowNodeInputList;
 
     /**
      * 工作流节点输出列表
      */
-    private List<WorkflowNodeOutput> workflowNodeOutputList;
+    private List<ZOldWorkflowNodeOutput> workflowNodeOutputList;
     /**
      * 工作流节点代码请求对象
      */
-    private WorkflowNodeCode workflowNodeCode;
+    private ZOldWorkflowNodeCode workflowNodeCode;
     /**
      * 工作流节点资源请求对象
      */
-    private WorkflowNodeResource workflowNodeResource;
+    private ZOldWorkflowNodeResource workflowNodeResource;
     /**
      * 工作流节点输入变量请求对象
      */
-    private List<WorkflowNodeVariable> workflowNodeVariableList;
+    private List<ZOldWorkflowNodeVariable> workflowNodeVariableList;
 }

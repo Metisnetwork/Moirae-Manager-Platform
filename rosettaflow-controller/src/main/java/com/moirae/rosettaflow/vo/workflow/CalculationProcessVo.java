@@ -12,7 +12,7 @@ import java.util.List;
 public class CalculationProcessVo {
 
     @ApiModelProperty(value = "配置ID")
-    private Long id;
+    private Long calculationProcessId;
 
     @ApiModelProperty(value = "配置名称")
     private String name;

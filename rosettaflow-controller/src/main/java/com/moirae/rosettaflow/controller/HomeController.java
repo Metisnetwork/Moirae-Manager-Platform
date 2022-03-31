@@ -9,7 +9,7 @@ import com.moirae.rosettaflow.req.home.GetOrgComputingTopReq;
 import com.moirae.rosettaflow.req.home.GetTaskTrendReq;
 import com.moirae.rosettaflow.service.ModelService;
 import com.moirae.rosettaflow.service.StatisticsService;
-import com.moirae.rosettaflow.service.dto.NavigationDto;
+import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.home.*;
 import io.swagger.annotations.Api;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j

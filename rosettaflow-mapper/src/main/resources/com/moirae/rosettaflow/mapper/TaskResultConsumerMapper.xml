@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.TaskResultConsumerMapper">
-    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.TaskResultConsumer">
-        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
-        <id column="consumer_identity_id" jdbcType="VARCHAR" property="consumerIdentityId" />
-        <result column="consumer_party_id" jdbcType="VARCHAR" property="consumerPartyId" />
-        <result column="producer_identity_id" jdbcType="VARCHAR" property="producerIdentityId" />
-        <result column="producer_party_id" jdbcType="VARCHAR" property="producerPartyId" />
-    </resultMap>
-    <sql id="Base_Column_List">
-        task_id, consumer_identity_id, consumer_party_id, producer_identity_id, producer_party_id
-    </sql>
 </mapper>

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.OrgUserMapper">
-    <resultMap id="BaseResultMap" type="com.moirae.rosettaflow.mapper.domain.OrgUser">
-        <id column="identity_id" jdbcType="VARCHAR" property="identityId"/>
-        <id column="address" jdbcType="VARCHAR" property="address"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-    </resultMap>
 
     <select id="getIdentityIdListByUser" resultType="java.lang.String">
         SELECT o.`identity_id`

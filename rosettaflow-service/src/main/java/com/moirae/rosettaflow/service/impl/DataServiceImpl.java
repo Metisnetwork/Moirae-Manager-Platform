@@ -13,7 +13,6 @@ import com.moirae.rosettaflow.manager.MetaDataManager;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
-import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
 import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.DataService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +40,7 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public int getDataCount() {
-        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(MetaData::getStatus, MetaDataStatusEnum.PUBLISHED);
-        return metaDataManager.count(wrapper);
+        return metaDataManager.getDataCount();
     }
 
     @Override
