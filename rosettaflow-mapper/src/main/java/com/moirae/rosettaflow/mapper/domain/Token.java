@@ -41,7 +41,7 @@ public class Token implements Serializable {
      * 合约精度
      */
     @TableField("`decimal`")
-    private Integer decimal;
+    private Long decimal;
 
     /**
      * LAT的价格

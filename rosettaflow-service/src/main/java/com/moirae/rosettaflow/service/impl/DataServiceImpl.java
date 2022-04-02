@@ -10,8 +10,10 @@ import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.manager.MetaDataColumnManager;
 import com.moirae.rosettaflow.manager.MetaDataManager;
+import com.moirae.rosettaflow.manager.TokenManager;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
+import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +38,8 @@ public class DataServiceImpl implements DataService {
     private MetaDataManager metaDataManager;
     @Resource
     private MetaDataColumnManager metaDataColumnManager;
+    @Resource
+    private TokenManager tokenManager;
 
     @Override
     public int getDataCount() {
@@ -69,12 +74,17 @@ public class DataServiceImpl implements DataService {
 
     @Override
     @Transactional
-    public void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList) {
+    public void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList) {
         metaDataManager.saveOrUpdateBatch(metaDataList);
         LambdaQueryWrapper<MetaDataColumn> wrapper = Wrappers.lambdaQuery();
         wrapper.in(MetaDataColumn::getMetaDataId, metaDataList.stream().map(MetaData::getMetaDataId).collect(Collectors.toSet()));
         metaDataColumnManager.remove(wrapper);
         metaDataColumnManager.saveBatch(metaDataColumnList);
+        for (Token token: tokenList) {
+            if(tokenManager.getById(token.getAddress()) == null){
+                tokenManager.save(token);
+            }
+        }
     }
 
 
@@ -118,5 +128,15 @@ public class DataServiceImpl implements DataService {
 //            log.error("有授权数据已过期，请检查, metaDataIdList:{}", metaDataIdList);
 //            throw new AppException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
 //        }
+    }
+
+    @Override
+    public List<Token> getNeedSyncedTokenList(int size) {
+        return tokenManager.getNeedSyncedTokenList(size);
+    }
+
+    @Override
+    public boolean updateToken(Token token) {
+        return tokenManager.updateById(token);
     }
 }

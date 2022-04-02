@@ -33,7 +33,7 @@ public class DataTokenTemplateDaoImpl implements DataTokenTemplateDao {
 
     @Override
     public BigInteger allowance(String contractAddress, String account) {
-        return query(contract -> contract.allowance(account, platONProperties.getTokenFactory()), contractAddress);
+        return query(contract -> contract.allowance(account, platONProperties.getMetisPayAddress()), contractAddress);
     }
 
     @Override

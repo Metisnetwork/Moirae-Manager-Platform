@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
+import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
@@ -17,9 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -66,6 +65,36 @@ public class SyncDcMetaDataTask {
     private void batchUpdateMetaData(List<MetaDataDetailResponseDto> metaDataDetailResponseDtoList) {
         List<MetaData> metaDataList = new ArrayList<>();
         List<MetaDataColumn> metaDataColumnList = new ArrayList<>();
+
+        //TODO
+        List<Token> tokenList = new ArrayList<>();
+        tokenList.add(create("lat1px3vf0rqnufqha99gcl4gugztausuz67ghwdym"));
+        tokenList.add(create("lat1qfm3mfchyl7pfkpeyqu7n0tldll2qd9q6l3jg4"));
+        tokenList.add(create("lat1kaynntyhqaggm95maufgsx8rrlhz8fas9dc9vw"));
+        tokenList.add(create("lat1axqxxcsp8e5nqz6xmpfysu0r72m43kwxx8zsqm"));
+        tokenList.add(create("lat1s02hguahwyqg3n5eflzf38mz8kn6un7yaa6g5r"));
+        tokenList.add(create("lat1hmngzrqef4fukl3e9g7gh04js3yv6cjquyp7m0"));
+        tokenList.add(create("lat1gn8sf983zlck8a0ff8qksss8msr8r75sh535ze"));
+        tokenList.add(create("lat1s60zk6guhwfl68lx340gsx064rgjh2wf9ajzml"));
+        tokenList.add(create("lat1r5h8l2lereura9qla6kagf9eyj6lk8d5h7rucz"));
+        tokenList.add(create("lat1j8y9xvte72dyg49l7shje3vxntkd79azuw80mz"));
+        tokenList.add(create("lat17v76ekg0czxe3q7em0wlqe54lzkertd5375g3p"));
+        tokenList.add(create("lat1cra484tah4j80gcnf99xuy56gl0srttxeqvcxx"));
+        tokenList.add(create("lat1p5wrdlla4aquc8m8xa95s9r4xnd3wyh5ecztlx"));
+        tokenList.add(create("lat1mtl4dylql2ahgxnn9vrel084z7gpcegm8zuljf"));
+        tokenList.add(create("lat1cljxtyuta7xj7ex4ldmeh4aj0pkr6vjnplju7u"));
+        tokenList.add(create("lat1377ersdd9f33uxaku2f6ncytn4eleupyfd25ed"));
+        tokenList.add(create("lat1055ussjcd3gu3wz5pz3zyhcsaa0fm395fnsw2q"));
+        tokenList.add(create("lat1hlne24asesu966863cvy6p50s0lp2h8my63h7j"));
+        tokenList.add(create("lat1jgmfza3lpw8tlnk543qk0gdejryjjj98kucmsg"));
+        tokenList.add(create("lat1u4pg37fjp973pnyermxkqq9g2r2qwr93te24ad"));
+        tokenList.add(create("lat1yk9xdtlulxfk4yv8cwqqce2t23nn4sdnuap95l"));
+        tokenList.add(create("lat1m3q2jmdjr0vtjc5pphdna9w2g04rgv77t7wytf"));
+        tokenList.add(create("lat10fgqwrrta4ny3ry6qrzxdz7l4zw0d6uw6kx20w"));
+        tokenList.add(create("lat18ma2qfpd3y6ennnee9w06x9jl5psrk05uk8z2w"));
+        tokenList.add(create("lat1d75vd37065j6wmn7mzkk7a3ujugd95n5l0dp9q"));
+        tokenList.add(create("lat189yc8hac8dsw8tarhkzxa7sxr5kmf6qn743srq"));
+
         metaDataDetailResponseDtoList.stream().forEach(item -> {
             MetaDataSummaryDto dataSummaryDto = item.getMetaDataDetailDto().getMetaDataSummary();
             MetaData metaData = new MetaData();
@@ -97,7 +126,12 @@ public class SyncDcMetaDataTask {
                 metaDataColumnList.add(metaDataColumn);
             });
         });
+        metaDataService.batchReplace(metaDataList, metaDataColumnList, tokenList);
+    }
 
-        metaDataService.batchReplace(metaDataList, metaDataColumnList);
+    private Token create(String address){
+        Token token = new Token();
+        token.setAddress(address);
+        return token;
     }
 }

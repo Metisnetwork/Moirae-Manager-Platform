@@ -522,7 +522,7 @@ CREATE TABLE `mo_token` (
     `address` varchar(64) NOT NULL COMMENT '合约地址',
     `name` varchar(64) DEFAULT NULL COMMENT '合约名称',
     `symbol` varchar(64) DEFAULT NULL COMMENT '合约符号',
-    `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
+    `decimal` bigint DEFAULT NULL COMMENT '合约精度',
     `price` varchar(128)  DEFAULT NULL COMMENT 'LAT的价格',
     `is_add_liquidity` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否添加流动性: 0-否，1-是',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

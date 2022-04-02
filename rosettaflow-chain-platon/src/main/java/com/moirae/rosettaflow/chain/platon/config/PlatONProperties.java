@@ -15,7 +15,7 @@ import java.util.List;
 public class PlatONProperties {
     private long chainId;
     private String hrp;
-    private String tokenFactory;
+    private String metisPayAddress;
     private Web3jProtocolEnum web3jProtocol;
     private List<String> web3jAddresses;
 

@@ -11,6 +11,8 @@ import com.moirae.rosettaflow.req.user.LoginInReq;
 import com.moirae.rosettaflow.req.user.UpdateNickReq;
 import com.moirae.rosettaflow.req.user.UserDetailsReq;
 import com.moirae.rosettaflow.service.UserService;
+import com.moirae.rosettaflow.service.dto.user.NonceDto;
+import com.moirae.rosettaflow.service.dto.user.UserAddressDto;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.user.NonceVo;
 import com.moirae.rosettaflow.vo.user.UserNicknameVo;
@@ -41,10 +43,10 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    @GetMapping("getLoginNonce/{address}")
+    @GetMapping("getLoginNonce")
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
-    public ResponseVo<NonceVo> getLoginNonce(@ApiParam(value = "用户钱包地址", required = true) @PathVariable String address) {
-        return ResponseVo.createSuccess(new NonceVo(userService.getLoginNonce(AddressChangeUtils.convert0xAddress(address))));
+    public ResponseVo<NonceDto> getLoginNonce(UserAddressDto req) {
+        return ResponseVo.createSuccess(userService.getLoginNonce(req));
     }
 
     @PostMapping("login")

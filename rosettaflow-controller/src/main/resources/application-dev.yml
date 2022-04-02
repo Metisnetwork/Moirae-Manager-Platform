@@ -67,7 +67,7 @@ chain:
   platon:
     chainId: 100
     hrp: lat
-    tokenFactory: lat
+    metisPayAddress: lat1aad66x6tcq7l8dkk9l53fc29zf49l7qdqxnyv7
     web3jProtocol: WS
     web3jAddresses: 192.168.120.151:7789,192.168.120.151:7790
 

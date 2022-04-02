@@ -2,6 +2,8 @@ package com.moirae.rosettaflow.service;
 
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.mapper.domain.User;
+import com.moirae.rosettaflow.service.dto.user.NonceDto;
+import com.moirae.rosettaflow.service.dto.user.UserAddressDto;
 
 import java.util.List;
 
@@ -53,5 +55,5 @@ public interface UserService {
      * @param address 用户钱包地址
      * @return nonce
      */
-    String getLoginNonce(String address);
+    NonceDto getLoginNonce(UserAddressDto address);
 }

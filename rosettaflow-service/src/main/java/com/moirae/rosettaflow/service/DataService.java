@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
+import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 
 import java.util.List;
@@ -62,7 +63,7 @@ public interface DataService {
     IPage<MetaData> getUserDataList(Long current, Long size);
 
 
-    void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList);
+    void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList);
 
     Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId);
 
@@ -74,4 +75,7 @@ public interface DataService {
     void checkMetaDataAuthListEffective(String address, Set<String> metaDataIdList);
 
 
+    List<Token> getNeedSyncedTokenList(int size);
+
+    boolean updateToken(Token token);
 }

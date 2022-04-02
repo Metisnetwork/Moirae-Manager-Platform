@@ -17,6 +17,8 @@ import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.service.TokenService;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.UserService;
+import com.moirae.rosettaflow.service.dto.user.NonceDto;
+import com.moirae.rosettaflow.service.dto.user.UserAddressDto;
 import com.moirae.rosettaflow.service.utils.CommonUtils;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import com.zengtengpeng.operation.RedissonObject;
@@ -128,10 +130,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getLoginNonce(String address) {
+    public NonceDto getLoginNonce(UserAddressDto address) {
         String nonce = CommonUtils.generateUuid();
-        redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce), nonce, sysConfig.getNonceTimeOut());
-        return nonce;
+        redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address.getAddress(), nonce), nonce, sysConfig.getNonceTimeOut());
+        NonceDto result = new NonceDto();
+        result.setNonce(nonce);
+        return result;
     }
 
     private void checkNonceValidity(String signMessage, String address) {
