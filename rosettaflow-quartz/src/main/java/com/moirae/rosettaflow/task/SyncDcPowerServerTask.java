@@ -1,11 +1,11 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.grpc.client.PowerServiceClient;
 import com.moirae.rosettaflow.grpc.service.GetGlobalPowerDetailResponse;
 import com.moirae.rosettaflow.mapper.domain.PowerServer;
-import com.moirae.rosettaflow.service.IDataSyncService;
+import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
+import com.moirae.rosettaflow.service.DataSyncService;
 import com.moirae.rosettaflow.service.PowerService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class SyncDcPowerServerTask {
     @Resource
     private PowerServiceClient powerServiceClient;
     @Resource
-    private IDataSyncService dataSyncService;
+    private DataSyncService dataSyncService;
     @Resource
     private PowerService powerService;
 

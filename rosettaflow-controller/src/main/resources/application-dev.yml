@@ -19,6 +19,7 @@ spring:
       pool:
         size: 10
       thread-name-prefix: Moirae-Task-
+
 mybatis-plus:
   configuration:
     call-setters-on-nulls: true
@@ -48,6 +49,7 @@ system:
       - identity: identity:f614f8ac21b44fe89926ad4f26ef5b07
         host: 192.168.10.152
         port: 10033
+
 grpc:
   client:
     carrier-grpc-server:
@@ -55,15 +57,20 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-#单Redis节点模式
+# 单Redis节点模式
 redisson:
   password: 123456
   singleServerConfig:
     address: 192.168.10.145:17100
-#集群模式
-#redisson:
-#  model: CLUSTER
-#  password: gasa123456
-#  multiple-server-config:
-#    node-addresses[0]: 10.10.8.173:6379
-#    node-addresses[1]: 10.10.8.174:6379
+# 节点网络设置
+chain:
+  platon:
+    chainId: 100
+    hrp: lat
+    tokenFactory: lat
+    web3jProtocol: WS
+    web3jAddresses: 192.168.120.151:7789,192.168.120.151:7790
+
+
+
+

@@ -8,4 +8,5 @@ bootJar {
 
 dependencies {
     api project(':rosettaflow-manager')
+    api project(':rosettaflow-chain-platon')
 }

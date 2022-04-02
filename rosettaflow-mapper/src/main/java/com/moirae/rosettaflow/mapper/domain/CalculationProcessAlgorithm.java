@@ -23,17 +23,14 @@ import lombok.EqualsAndHashCode;
 @TableName("mo_calculation_process_algorithm")
 public class CalculationProcessAlgorithm implements Serializable {
 
-
     /**
      * 计算流程ID
      */
-    @TableId
     private Long calculationProcessId;
 
     /**
      * 算法ID
      */
-    @TableId
     private Long algorithmId;
 
     /**

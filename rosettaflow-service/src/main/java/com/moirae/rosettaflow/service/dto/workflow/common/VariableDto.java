@@ -9,12 +9,15 @@ import lombok.Data;
 public class VariableDto {
 
     @ApiModelProperty(value = "变量key", required = true)
-    private String varNodeKey;
+    private String var_key;
 
     @ApiModelProperty(value = "变量值", required = true)
-    private String varNodeValue;
+    private String var_value;
 
     @ApiModelProperty(value = "变量描述")
-    private String varNodeDesc;
+    private String varDesc;
+
+    @ApiModelProperty(value = "变量描述")
+    private String varDescEn;
 
 }

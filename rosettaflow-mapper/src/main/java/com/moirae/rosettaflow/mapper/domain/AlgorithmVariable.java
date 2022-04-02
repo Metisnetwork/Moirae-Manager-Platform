@@ -1,9 +1,8 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.AlgorithmVariableTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -21,20 +20,18 @@ public class AlgorithmVariable implements Serializable {
     /**
      * 算法id
      */
-    @TableId
     private Long algorithmId;
 
     /**
      * 变量key
      */
-    @TableId("var_key")
     private String varKey;
 
     /**
      * 变量类型. 1-boolean, 2-number, 3-string, 4-numberArray, 5-stringArray
      */
     @TableField("var_type")
-    private Integer varType;
+    private AlgorithmVariableTypeEnum varType;
 
     /**
      * 变量默认值

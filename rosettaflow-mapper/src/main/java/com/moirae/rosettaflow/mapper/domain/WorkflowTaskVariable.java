@@ -27,13 +27,11 @@ public class WorkflowTaskVariable implements Serializable {
     /**
      * 工作流任务配置id
      */
-    @TableId("workflow_task_id")
     private Long workflowTaskId;
 
     /**
      * 变量key
      */
-    @TableId("var_key")
     private String varKey;
 
     /**

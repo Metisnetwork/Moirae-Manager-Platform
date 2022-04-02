@@ -4,7 +4,9 @@ import com.moirae.rosettaflow.vo.task.BaseOrgVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "元数据信息")
 public class DataVo extends BaseOrgVo {

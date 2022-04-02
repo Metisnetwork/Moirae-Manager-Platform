@@ -1,17 +1,15 @@
 package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
-import com.moirae.rosettaflow.mapper.DataSyncMapper;
+import com.moirae.rosettaflow.manager.DataSyncManager;
 import com.moirae.rosettaflow.mapper.domain.DataSync;
-import com.moirae.rosettaflow.service.IDataSyncService;
+import com.moirae.rosettaflow.service.DataSyncService;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,34 +22,26 @@ import java.util.function.Function;
  */
 
 @Service
-public class DataSyncServiceImpl extends ServiceImpl<DataSyncMapper, DataSync> implements IDataSyncService {
+public class DataSyncServiceImpl implements DataSyncService {
 
-
-    @Override
-    public DataSync getDataSyncByType(DataSyncTypeEnum typeEnum) {
-        LambdaQueryWrapper<DataSync> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(DataSync::getDataType, typeEnum.getDataType());
-        return this.getOne(wrapper);
-    }
+    @Resource
+    private DataSyncManager dataSyncManager;
 
     @Override
     public DataSync getDataSyncByType(String dataSyncType) {
-        LambdaQueryWrapper<DataSync> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(DataSync::getDataType, dataSyncType);
-        return this.getOne(wrapper);
+        return dataSyncManager.getOneByType(dataSyncType);
     }
 
     @Override
     public boolean updateDataSyncByType(DataSync dataSync) {
         LambdaUpdateWrapper<DataSync> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(DataSync::getDataType, dataSync.getDataType());
-        return update(dataSync, updateWrapper);
+        return dataSyncManager.update(dataSync, updateWrapper);
     }
 
     @Override
     public boolean insertDataSync(DataSync dataSync) {
-        int insert = this.baseMapper.insert(dataSync);
-        return insert > 0;
+        return dataSyncManager.save(dataSync);
     }
 
     /**

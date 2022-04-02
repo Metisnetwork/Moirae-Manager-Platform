@@ -13,8 +13,8 @@ import com.moirae.rosettaflow.manager.MetaDataManager;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
-import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.DataService;
+import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +35,6 @@ public class DataServiceImpl implements DataService {
     private MetaDataManager metaDataManager;
     @Resource
     private MetaDataColumnManager metaDataColumnManager;
-    @Resource
-    private CommonService commonService;
 
     @Override
     public int getDataCount() {
@@ -66,7 +64,7 @@ public class DataServiceImpl implements DataService {
     @Override
     public IPage<MetaData> getUserDataList(Long current, Long size) {
         Page<MetaData> page = new Page<>(current, size);
-        return metaDataManager.getUserDataList(page, commonService.getCurrentUser().getAddress());
+        return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress());
     }
 
     @Override
@@ -118,7 +116,7 @@ public class DataServiceImpl implements DataService {
 //        if(count != metaDataIdList.size()){
 //            //无效元数据
 //            log.error("有授权数据已过期，请检查, metaDataIdList:{}", metaDataIdList);
-//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
+//            throw new AppException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
 //        }
     }
 }

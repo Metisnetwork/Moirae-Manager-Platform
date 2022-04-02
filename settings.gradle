@@ -1,4 +1,5 @@
 rootProject.name = 'rosettaflow'
+include 'rosettaflow-chain-platon'
 include 'rosettaflow-common'
 include 'rosettaflow-mapper'
 include 'rosettaflow-manager'

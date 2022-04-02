@@ -36,8 +36,8 @@ DROP TABLE `t_model`;
 ALTER TABLE `dc_meta_data`
     ADD COLUMN `token_address` VARCHAR(100) NULL   COMMENT 'token合约的地址' AFTER `update_at`;
 
-ALTER TABLE `dc_org`
-    ADD COLUMN `opt_address` VARCHAR(100) NULL   COMMENT '组织操作钱包地址' AFTER `update_at`;
+ALTER TABLE `mo_org_expand`
+    ADD COLUMN `observer_proxy_wallet_address` VARCHAR(100) NULL   COMMENT '当前组织内置系统钱包地址 (见证人代理钱包)' AFTER `is_public`;
 
 ALTER TABLE `dc_meta_data_column`
     DROP COLUMN `create_time`,
@@ -73,6 +73,7 @@ CREATE TABLE `mo_algorithm_classify` (
     `parent_id` bigint(20) NOT NULL COMMENT '父分类id，如果为顶级分类，则为0',
     `name` varchar(30)  DEFAULT NULL COMMENT '分类中文名称',
     `name_en` varchar(60)  DEFAULT NULL COMMENT '英文算法名称',
+    `image_url` varchar(1024)  DEFAULT NULL COMMENT '算法图片url',
     `is_available` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否可用: 0-否，1-是',
     `is_algorithm` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否算法: 0-否，1-是',
     `is_exist_algorithm` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否存在对应算法: 0-否，1-是',
@@ -521,9 +522,9 @@ CREATE TABLE `mo_token` (
     `address` varchar(64) NOT NULL COMMENT '合约地址',
     `name` varchar(64) DEFAULT NULL COMMENT '合约名称',
     `symbol` varchar(64) DEFAULT NULL COMMENT '合约符号',
-    `total_supply` varchar(128)  DEFAULT NULL COMMENT '总供应量',
     `decimal` int(11) DEFAULT NULL COMMENT '合约精度',
     `price` varchar(128)  DEFAULT NULL COMMENT 'LAT的价格',
+    `is_add_liquidity` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否添加流动性: 0-否，1-是',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`address`)
@@ -534,6 +535,7 @@ CREATE TABLE `mo_token_holder` (
     `token_address` varchar(64) NOT NULL COMMENT '合约地址',
     `address` varchar(64) NOT NULL COMMENT '用户地址',
     `balance` varchar(128) DEFAULT NULL COMMENT '地址代币余额, ERC20为金额',
+    `authorize_balance` varchar(128) DEFAULT NULL COMMENT '地址已授权支付助手的代币余额, ERC20为金额',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`token_address`,`address`)

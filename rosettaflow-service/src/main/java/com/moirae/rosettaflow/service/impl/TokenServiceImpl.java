@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.dto.UserDto;
-import com.moirae.rosettaflow.service.ITokenService;
+import com.moirae.rosettaflow.service.TokenService;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-public class TokenServiceImpl implements ITokenService {
+public class TokenServiceImpl implements TokenService {
 
     @Resource
     private SysConfig sysConfig;

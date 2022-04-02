@@ -1,3 +1,12 @@
+### 算法相关-查询算法树
+GET http://127.0.0.1:8234/flow/alg/getAlgTree
+Accept-Language: {{lang}}
+
+### 算法相关-查询算法树详情
+GET http://127.0.0.1:8234/flow/alg/getAlgTreeDetails
+Accept-Language: {{lang}}
+
+
 ###
 GET http://127.0.0.1/flow/model/queryAvailableModel?algorithmId=7&identityId=1
 Accept: application/json

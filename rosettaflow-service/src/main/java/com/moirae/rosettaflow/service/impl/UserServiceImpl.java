@@ -14,10 +14,11 @@ import com.moirae.rosettaflow.dto.SignMessageDto;
 import com.moirae.rosettaflow.dto.UserDto;
 import com.moirae.rosettaflow.manager.UserManager;
 import com.moirae.rosettaflow.mapper.domain.User;
-import com.moirae.rosettaflow.service.CommonService;
-import com.moirae.rosettaflow.service.ITokenService;
+import com.moirae.rosettaflow.service.TokenService;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.UserService;
+import com.moirae.rosettaflow.service.utils.CommonUtils;
+import com.moirae.rosettaflow.service.utils.UserContext;
 import com.zengtengpeng.operation.RedissonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,9 +35,7 @@ import java.util.Random;
 public class UserServiceImpl implements UserService {
 
     @Resource
-    private ITokenService tokenService;
-    @Resource
-    private CommonService commonService;
+    private TokenService tokenService;
     @Resource
     private OrgService organizationService;
     @Resource
@@ -99,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout() {
         try {
-            UserDto userDto = commonService.getCurrentUser();
+            UserDto userDto = UserContext.getCurrentUser();
             tokenService.removeToken(userDto.getToken());
         } catch (BusinessException e) {
             log.info("User not login not need to logout");
@@ -130,7 +129,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getLoginNonce(String address) {
-        String nonce = commonService.generateUuid();
+        String nonce = CommonUtils.generateUuid();
         redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address, nonce), nonce, sysConfig.getNonceTimeOut());
         return nonce;
     }

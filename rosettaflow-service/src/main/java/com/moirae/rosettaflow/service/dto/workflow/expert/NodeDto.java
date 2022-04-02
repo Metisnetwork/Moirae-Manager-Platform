@@ -1,8 +1,7 @@
 package com.moirae.rosettaflow.service.dto.workflow.expert;
 
-import com.moirae.rosettaflow.service.dto.model.ModelDto;
-import com.moirae.rosettaflow.service.dto.workflow.common.*;
-import com.sun.org.apache.regexp.internal.RE;
+import com.moirae.rosettaflow.service.dto.workflow.common.OutputDto;
+import com.moirae.rosettaflow.service.dto.workflow.common.ResourceDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +9,6 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.List;
 
 @Data
 @ApiModel(value = "工作流详情请求对象")

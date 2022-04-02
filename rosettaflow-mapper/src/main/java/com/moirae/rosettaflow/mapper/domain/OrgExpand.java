@@ -33,6 +33,11 @@ public class OrgExpand implements Serializable {
     private Boolean isPublic;
 
     /**
+     * 当前组织内置系统钱包地址 (见证人代理钱包)
+     */
+    private String observerProxyWalletAddress;
+
+    /**
      * 创建时间
      */
     private Date createTime;

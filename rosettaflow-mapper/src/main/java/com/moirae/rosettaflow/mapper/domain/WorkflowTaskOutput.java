@@ -27,13 +27,11 @@ public class WorkflowTaskOutput implements Serializable {
     /**
      * 工作流任务配置id
      */
-    @TableId("workflow_task_id")
     private Long workflowTaskId;
 
     /**
      * 协同方组织的身份标识Id
      */
-    @TableId("identity_id")
     private String identityId;
 
     /**

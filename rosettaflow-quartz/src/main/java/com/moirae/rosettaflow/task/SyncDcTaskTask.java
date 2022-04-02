@@ -1,14 +1,14 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailShowDto;
 import com.moirae.rosettaflow.mapper.domain.*;
+import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
-import com.moirae.rosettaflow.service.IDataSyncService;
+import com.moirae.rosettaflow.service.DataSyncService;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
@@ -35,7 +35,7 @@ public class SyncDcTaskTask {
     @Resource
     private OrgService organizationService;
     @Resource
-    private IDataSyncService dataSyncService;
+    private DataSyncService dataSyncService;
     @Resource
     private TaskService taskService;
 

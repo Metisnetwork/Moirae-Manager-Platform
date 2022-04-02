@@ -7,7 +7,7 @@ import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.dto.UserDto;
-import com.moirae.rosettaflow.service.ITokenService;
+import com.moirae.rosettaflow.service.TokenService;
 import com.moirae.rosettaflow.service.UserService;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import com.moirae.rosettaflow.utils.IpUtils;
@@ -38,13 +38,20 @@ public class LoginInterceptor implements HandlerInterceptor {
     private static final String CONTENT_TYPE = "application/json;charset=utf-8";
 
     @Resource
-    private ITokenService tokenService;
+    private TokenService tokenService;
 
     @Resource
     private UserService userService;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
+
+        addRequestId();
+        LanguageContext.set(request.getHeader("Accept-Language") == null ? SysConstant.ZH_CN : request.getHeader("Accept-Language"));
+        log.info("Request Info: [Method = {}], [URI = {}], [Client-IP = {}], [userAgent = {}]", request.getMethod(),
+                request.getRequestURI(), IpUtils.getIpAddr(request), request.getHeader("user-agent"));
+
+
 
         if(1 == 1){
             return true;
@@ -61,12 +68,9 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
         }
 
-        addRequestId();
 
-        LanguageContext.set(request.getHeader("Accept-Language") == null ? SysConstant.ZH_CN : request.getHeader("Accept-Language"));
 
-        log.info("Request Info: [Method = {}], [URI = {}], [Client-IP = {}], [userAgent = {}]", request.getMethod(),
-                request.getRequestURI(), IpUtils.getIpAddr(request), request.getHeader("user-agent"));
+
 
         String token = request.getHeader(SysConstant.HEADER_TOKEN_KEY);
         UserDto userDto;

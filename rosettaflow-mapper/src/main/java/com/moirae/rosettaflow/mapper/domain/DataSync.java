@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName(value = "t_data_sync")
+@TableName(value = "mo_data_sync")
 public class DataSync {
 
     @TableField("data_type")

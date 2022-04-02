@@ -27,13 +27,11 @@ public class WorkflowTaskInput implements Serializable {
     /**
      * 工作流任务配置id
      */
-    @TableId("workflow_task_id")
     private Long workflowTaskId;
 
     /**
      * 数据表ID
      */
-    @TableId("meta_data_id")
     private String metaDataId;
 
     /**

@@ -1,15 +1,12 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -41,11 +38,6 @@ public class Token implements Serializable {
     private String symbol;
 
     /**
-     * 总供应量
-     */
-    private String totalSupply;
-
-    /**
      * 合约精度
      */
     @TableField("`decimal`")
@@ -55,6 +47,11 @@ public class Token implements Serializable {
      * LAT的价格
      */
     private String price;
+
+    /**
+     * 是否添加流动性: 0-否，1-是
+     */
+    private Boolean isAddLiquidity;
 
     /**
      * 创建时间

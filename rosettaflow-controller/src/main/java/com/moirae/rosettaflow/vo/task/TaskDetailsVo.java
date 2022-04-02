@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.vo.task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
+import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -52,7 +53,7 @@ public class TaskDetailsVo extends BaseTaskVo {
     private List<TaskEventVo> eventList;
 
     @ApiModelProperty(value = "任务结果文件")
-    private List<TaskResultVo> taskResultList;
+    private List<TaskResultDto> taskResultList;
 
     @ApiModelProperty(value = "任务结果中模型评估")
     private TaskModelEvaluationVo taskModelEvaluation;

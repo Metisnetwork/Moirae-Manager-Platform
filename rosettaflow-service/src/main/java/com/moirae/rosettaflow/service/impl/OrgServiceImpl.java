@@ -24,8 +24,8 @@ import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.OrgExpand;
 import com.moirae.rosettaflow.mapper.domain.OrgUser;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
-import com.moirae.rosettaflow.service.CommonService;
 import com.moirae.rosettaflow.service.OrgService;
+import com.moirae.rosettaflow.service.utils.UserContext;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -53,8 +53,6 @@ public class OrgServiceImpl implements OrgService {
     private OrgManager orgManager;
     @Resource
     private OrgUserManager userOrgManager;
-    @Resource
-    private CommonService commonService;
 
     private final Map<String, ManagedChannel> channelMap = new ConcurrentHashMap<>();
 
@@ -142,7 +140,7 @@ public class OrgServiceImpl implements OrgService {
 
     @Override
     public List<OrganizationDto> getOrganizationListByUser() {
-        UserDto userDto = commonService.getCurrentUser();
+        UserDto userDto = UserContext.getCurrentUser();
         return userOrgManager.getOrganizationListByUser(userDto.getAddress());
     }
 
@@ -181,7 +179,7 @@ public class OrgServiceImpl implements OrgService {
             }
         }
         // 绑定用户私有组织关系
-        UserDto userDto = commonService.getCurrentUser();
+        UserDto userDto = UserContext.getCurrentUser();
         //获取原先的用户组织绑定关系信息，存在则更新，不存在则添加
         LambdaQueryWrapper<OrgUser> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(OrgUser::getIdentityId, orgExpand.getIdentityId());
@@ -198,7 +196,7 @@ public class OrgServiceImpl implements OrgService {
     @Override
     public void deleteOrganizationByUser(String identityId) {
         // 删除用户组织关系
-        UserDto userDto = commonService.getCurrentUser();
+        UserDto userDto = UserContext.getCurrentUser();
         LambdaUpdateWrapper<OrgUser> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(OrgUser::getAddress, userDto.getAddress());
         wrapper.eq(OrgUser::getIdentityId, identityId);

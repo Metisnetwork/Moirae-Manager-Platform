@@ -89,6 +89,11 @@ public class MetaData implements Serializable {
     private MetaDataStatusEnum status;
 
     /**
+     * 对应合约的地址
+     */
+    private String tokenAddress;
+
+    /**
      * (状态)修改时间
      */
     private Date updateAt;

@@ -25,13 +25,11 @@ public class WorkflowVersion implements Serializable {
     /**
      * 工作流ID
      */
-    @TableId("workflow_id")
     private Long workflowId;
 
     /**
      * 编辑版本标识,从1开始
      */
-    @TableId("workflow_version")
     private Long workflowVersion;
 
     /**

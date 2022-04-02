@@ -16,11 +16,6 @@ import java.util.List;
 public class WorkflowNodeDto extends ZOldWorkflowNode {
 
     /**
-     * 算法对象
-     */
-    private AlgorithmDto algorithmDto;
-
-    /**
      * 工作流节点输入列表
      */
     private List<ZOldWorkflowNodeInput> workflowNodeInputList;

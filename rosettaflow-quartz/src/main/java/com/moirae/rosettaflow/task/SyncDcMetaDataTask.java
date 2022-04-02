@@ -1,18 +1,19 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.common.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
+import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
 import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.IDataSyncService;
+import com.moirae.rosettaflow.service.DataSyncService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,9 +32,9 @@ public class SyncDcMetaDataTask {
     private DataService metaDataService;
 
     @Resource
-    private IDataSyncService dataSyncService;
+    private DataSyncService dataSyncService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();

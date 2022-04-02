@@ -68,11 +68,11 @@ public class ZOldWorkflowRunStatus implements Serializable {
      */
     private Date updateTime;
 
-    /**
-     * 步骤对应的任务状态
-     */
-    @TableField(exist = false)
-    private Map<Integer, ZOldWorkflowRunTaskStatus> workflowRunTaskStatusMap;
+//    /**
+//     * 步骤对应的任务状态
+//     */
+//    @TableField(exist = false)
+//    private Map<Integer, ZOldWorkflowRunTaskStatus> workflowRunTaskStatusMap;
     @TableField(exist = false)
     private ZOldWorkflow workflow;
     @TableField(exist = false)

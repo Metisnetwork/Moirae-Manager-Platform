@@ -43,6 +43,11 @@ public class AlgorithmClassify implements Serializable {
     private String nameEn;
 
     /**
+     * 算法图片url
+     */
+    private String imageUrl;
+
+    /**
      * 是否可用: 0-否，1-是
      */
     private Boolean isAvailable;

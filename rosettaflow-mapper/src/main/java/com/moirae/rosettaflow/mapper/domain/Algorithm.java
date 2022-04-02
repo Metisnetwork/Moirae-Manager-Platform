@@ -124,7 +124,10 @@ public class Algorithm implements Serializable {
 
     @TableField(exist = false)
     private AlgorithmCode algorithmCode;
-
     @TableField(exist = false)
     private List<AlgorithmVariable> algorithmVariableList;
+    @TableField(exist = false)
+    private String algorithmName;
+    @TableField(exist = false)
+    private String algorithmNameEn;
 }

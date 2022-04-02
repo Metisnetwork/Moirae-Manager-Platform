@@ -2,20 +2,23 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.mapper.domain.CalculationProcess;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
 import com.moirae.rosettaflow.req.workflow.*;
 import com.moirae.rosettaflow.req.workflow.expert.CreateWorkflowOfExpertModeReq;
-import com.moirae.rosettaflow.req.workflow.expert.GetWorkflowResultOfExpertModeReq;
 import com.moirae.rosettaflow.req.workflow.wizard.CreateWorkflowOfWizardModeReq;
 import com.moirae.rosettaflow.service.WorkflowService;
-import com.moirae.rosettaflow.service.dto.workflow.expert.SettingWorkflowOfExpertModeDto;
-import com.moirae.rosettaflow.service.dto.workflow.wizard.SettingWorkflowOfWizardModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.*;
+import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
+import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowDetailsOfWizardModeDto;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.vo.task.TaskResultVo;
+import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import com.moirae.rosettaflow.vo.workflow.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -74,101 +77,113 @@ public class WorkflowController {
 
     @PostMapping("wizard/createWorkflowOfWizardMode")
     @ApiOperation(value = "向导模式下创建工作流", notes = "向导模式下创建工作流")
-    public ResponseVo<WorkflowKeyVo> createWorkflowOfWizardMode(@RequestBody @Validated CreateWorkflowOfWizardModeReq req) {
-        WorkflowVersion workflowVersion = workflowService.createWorkflowOfWizardMode(BeanUtil.copyProperties(req, Workflow.class));
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(workflowVersion,WorkflowKeyVo.class));
+    public ResponseVo<WorkflowVersionKeyDto> createWorkflowOfWizardMode(@RequestBody @Validated CreateWorkflowOfWizardModeReq req) {
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.createWorkflowOfWizardMode(BeanUtil.copyProperties(req, Workflow.class));
+        return ResponseVo.createSuccess(workflowKeyDto);
     }
 
     @PostMapping("wizard/settingWorkflowOfWizardMode")
     @ApiOperation(value = "向导模式设置工作流", notes = "向导模式设置工作流")
-    public ResponseVo<WorkflowKeyVo> settingWorkflowOfWizardMode(@RequestBody @Validated SettingWorkflowOfWizardModeDto req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<WorkflowVersionKeyDto> settingWorkflowOfWizardMode(@RequestBody @Validated WorkflowDetailsOfWizardModeDto req) {
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.settingWorkflowOfWizardMode(req);
+        return ResponseVo.createSuccess(workflowKeyDto);
     }
 
     @GetMapping("wizard/getWorkflowSettingOfWizardMode")
-    @ApiOperation(value = "专家模式下获取工作流设置", notes = "专家模式下获取工作流设置")
-    public ResponseVo<SettingWorkflowOfWizardModeDto> getWorkflowSettingOfWizardMode(@Validated WorkflowKeyVo req) {
-        return ResponseVo.createSuccess(null);
+    @ApiOperation(value = "向导模式下获取工作流设置", notes = "向导模式下获取工作流设置")
+    public ResponseVo<WorkflowDetailsOfWizardModeDto> getWorkflowSettingOfWizardMode(@Validated WorkflowVersionKeyDto req) {
+        WorkflowDetailsOfWizardModeDto resp = workflowService.getWorkflowSettingOfWizardMode(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("expert/createWorkflowOfExpertMode")
     @ApiOperation(value = "专家模式下创建工作流", notes = "专家模式下创建工作流")
-    public ResponseVo<WorkflowKeyVo> createWorkflowOfExpertMode(@RequestBody @Validated CreateWorkflowOfExpertModeReq req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<WorkflowVersionKeyDto> createWorkflowOfExpertMode(@RequestBody @Validated CreateWorkflowOfExpertModeReq req) {
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.createWorkflowOfExpertMode(BeanUtil.copyProperties(req, Workflow.class));
+        return ResponseVo.createSuccess(workflowKeyDto);
     }
 
     @PostMapping("expert/settingWorkflowOfExpertMode")
     @ApiOperation(value = "专家模式设置工作流", notes = "专家模式设置工作流")
-    public ResponseVo<WorkflowKeyVo> settingWorkflowOfExpertMode(@RequestBody @Validated SettingWorkflowOfExpertModeDto req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<WorkflowVersionKeyDto> settingWorkflowOfExpertMode(@RequestBody @Validated WorkflowDetailsOfExpertModeDto req) {
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.settingWorkflowOfExpertMode(req);
+        return ResponseVo.createSuccess(workflowKeyDto);
     }
 
     @GetMapping("expert/getWorkflowSettingOfExpertMode")
     @ApiOperation(value = "专家模式下获取工作流设置", notes = "专家模式下获取工作流设置")
-    public ResponseVo<SettingWorkflowOfExpertModeDto> getWorkflowSettingOfExpertMode(@Validated WorkflowKeyVo req) {
-        return ResponseVo.createSuccess(null);
+    public ResponseVo<WorkflowDetailsOfExpertModeDto> getWorkflowSettingOfExpertMode(@Validated WorkflowVersionKeyDto req) {
+        WorkflowDetailsOfExpertModeDto resp = workflowService.getWorkflowSettingOfExpertMode(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @GetMapping("expert/getWorkflowStatusOfExpertMode")
     @ApiOperation(value = "专家模式下获取工作流状态", notes = "获取工作流状态")
-    public ResponseVo<GetStatusVo> getWorkflowStatusOfExpertMode(@Validated WorkflowVersionIdReq req) {
-
-        return ResponseVo.createSuccess();
+    public ResponseVo<WorkflowStatusOfExpertModeDto> getWorkflowStatusOfExpertMode(@Validated WorkflowVersionKeyDto req) {
+        WorkflowStatusOfExpertModeDto resp = workflowService.getWorkflowStatusOfExpertMode(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @GetMapping("expert/getWorkflowLogOfExpertMode")
     @ApiOperation(value = "专家模式下获取工作流日志", notes = "专家模式下获取工作流日志")
-    public ResponseVo<List<TaskEventVo>> getRunLog(@Validated WorkflowVersionIdReq req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<List<TaskEventDto>> getWorkflowLogOfExpertMode(@Validated WorkflowVersionKeyDto req) {
+        List<TaskEventDto> resp = workflowService.getWorkflowLogOfExpertMode(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @GetMapping(value = "getWorkflowResultOfExpertMode")
     @ApiOperation(value = "专家模式下查看工作流节点结果文件", notes = "专家模式下查看工作流节点结果文件")
-    public ResponseVo<List<TaskResultVo>> getWorkflowNodeResult(@Validated GetWorkflowResultOfExpertModeReq req) {
-
-
-        return ResponseVo.createSuccess();
+    public ResponseVo<List<TaskResultDto>> getWorkflowNodeResult(@Validated WorkflowNodeKeyDto req) {
+        List<TaskResultDto> resp = workflowService.getWorkflowNodeResult(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("copyWorkflow")
     @ApiOperation(value = "复制工作流", notes = "复制工作流，返回工作流id")
-    public ResponseVo<WorkflowKeyVo> copyWorkflow(@RequestBody @Validated WorkflowVersionIdReq req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<WorkflowVersionKeyDto> copyWorkflow(@RequestBody @Validated WorkflowVersionKeyDto req) {
+        WorkflowVersionKeyDto resp = workflowService.copyWorkflow(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("deleteWorkflow")
     @ApiOperation(value = "删除工作流", notes = "删除工作流")
-    public ResponseVo<?> deleteWorkflow(@RequestBody @Validated WorkflowIdReq req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<Boolean> deleteWorkflow(@RequestBody @Validated WorkflowKeyDto req) {
+        Boolean resp = workflowService.deleteWorkflow(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("clearWorkflow")
     @ApiOperation(value = "清空工作流", notes = "清空工作流")
-    public ResponseVo<?> clear(@RequestBody @Validated WorkflowVersionIdReq req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<Boolean> clearWorkflow(@RequestBody @Validated WorkflowVersionKeyDto req) {
+        Boolean resp = workflowService.clearWorkflow(req);
+        return ResponseVo.createSuccess(resp);
     }
 
-    @GetMapping("getWorkflowPayList")
-    @ApiOperation(value = "查询工作流支付列表", notes = "查询工作流支付列表")
-    public ResponseVo<List<WorkflowPayVo>> getWorkflowPaymentList(@Validated WorkflowVersionIdReq req) {
-        return ResponseVo.createSuccess();
-    }
-
-    @PostMapping("pay")
-    @ApiOperation(value = "支付", notes = "支付")
-    public ResponseVo<TxHashVo> pay(@Validated PayReq req) {
-        return ResponseVo.createSuccess();
+    @GetMapping("estimateWorkflowFee")
+    @ApiOperation(value = "估算工作流手续费", notes = "估算工作流手续费")
+    public ResponseVo<List<WorkflowFeeDto>> estimateWorkflowFee(@Validated WorkflowVersionKeyDto req) {
+        List<WorkflowFeeDto> resp = workflowService.estimateWorkflowFee(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("start")
     @ApiOperation(value = "启动工作流", notes = "启动工作流")
-    public ResponseVo<?> start(@RequestBody @Validated StartWorkflowReq startWorkflowReq) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<WorkflowRunKeyDto> start(@RequestBody @Validated WorkflowStartSignatureDto req) {
+        WorkflowRunKeyDto resp = workflowService.start(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("terminate")
     @ApiOperation(value = "终止工作流", notes = "终止工作流")
-    public ResponseVo<?> terminate(@RequestBody @Validated WorkflowVersionIdReq req) {
-        return ResponseVo.createSuccess();
+    public ResponseVo<Boolean> terminate(@RequestBody @Validated WorkflowRunKeyDto req) {
+        Boolean resp = workflowService.terminate(req);
+        return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getWorkflowRunTaskList")
+    @ApiOperation(value = "查询指定工作流的运行任务列表", notes = "查询指定工作流的运行任务列表")
+    public ResponseVo<PageVo<WorkflowRunTaskDto>> getWorkflowRunTaskList(@Valid WorkflowRunKeyDto req) {
+        IPage<WorkflowRunTaskDto> page = workflowService.getWorkflowRunTaskList(req);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, page.getRecords()));
     }
 }
