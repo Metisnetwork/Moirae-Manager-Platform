@@ -11,4 +11,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserLoginManagerImpl extends ServiceImpl<UserLoginMapper, UserLogin> implements UserLoginManager {
 
+    @Override
+    public void successRecord(String hexAddress) {
+        UserLogin userLogin = new UserLogin();
+        userLogin.setAddress(hexAddress);
+        userLogin.setIsSuccess(true);
+        save(userLogin);
+    }
+
+    @Override
+    public void failRecord(String hexAddress) {
+        UserLogin userLogin = new UserLogin();
+        userLogin.setAddress(hexAddress);
+        userLogin.setIsSuccess(false);
+        save(userLogin);
+    }
 }

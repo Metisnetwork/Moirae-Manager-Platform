@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Keys;
 
 import java.nio.charset.StandardCharsets;
 
@@ -34,6 +35,14 @@ public class UserControllerTest {
     private Credentials user1 = Credentials.create("68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f89");
 
     private String accessToken = "16488952050141F9C69601BB84C1CAFBB6F7F140F9CD6";
+
+    @Test
+    public void xxxx() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            user1 = Credentials.create(Keys.createEcKeyPair());
+            login(getNonce());
+        }
+    }
 
     @Test
     public void getLoginNonce() throws Exception {
@@ -56,6 +65,22 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();
         System.out.println(result); //
+    }
+
+    @Test
+    public void updateNickName() throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("address", user1.getAddress());
+        req.put("nickName", "flow1");
+        String result = mvc.perform(post("/user/updateNickName")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(req.toJSONString().getBytes())
+                        .header("Accept-Language","zh")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        System.out.println(result);
     }
 
 

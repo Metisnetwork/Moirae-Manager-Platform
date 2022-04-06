@@ -12,6 +12,7 @@ import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.WalletSignUtils;
 import com.moirae.rosettaflow.dto.SignMessageDto;
 import com.moirae.rosettaflow.dto.UserDto;
+import com.moirae.rosettaflow.manager.UserLoginManager;
 import com.moirae.rosettaflow.manager.UserManager;
 import com.moirae.rosettaflow.mapper.domain.User;
 import com.moirae.rosettaflow.service.TokenService;
@@ -42,11 +43,12 @@ public class UserServiceImpl implements UserService {
     private OrgService organizationService;
     @Resource
     private UserManager userManager;
-
     @Resource
     private RedissonObject redissonObject;
     @Resource
     private SysConfig sysConfig;
+    @Resource
+    private UserLoginManager userLoginManager;
 
     @Override
     public User getByAddress(String address) {
@@ -55,46 +57,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto loginBySign(String hexAddress, String hrpAddress,String authenticateSignMessage, String authenticateSign) {
-        // 检查nonce
-        checkNonceValidity(authenticateSignMessage, hexAddress);
-
-        // 登录校验
-        verifySign(hrpAddress, authenticateSignMessage, authenticateSign);
-
-        // 查询用户信息
-        boolean isSave = false;
-        boolean isUpdate = false;
-
-        User user = this.getByAddress(hexAddress);
-        if (user == null) {
-            user = new User();
-            user.setUserName(hrpAddress);
-            user.setAddress(hexAddress);
-            isSave = true;
+        UserDto userDto;
+        try {
+            userDto = login(hexAddress, hrpAddress, authenticateSignMessage, authenticateSign);
+            userLoginManager.successRecord(hexAddress);
+            return  userDto;
+        } catch (Exception e){
+            userLoginManager.failRecord(hexAddress);
+            throw e;
         }
-
-        // 设置用户组织
-        if(StringUtils.isBlank(user.getOrgIdentityId())){
-            List<String> organizationList = organizationService.getIdentityIdListByUser(hexAddress);
-            if (CollectionUtil.isNotEmpty(organizationList)) {
-                user.setOrgIdentityId(organizationList.get(new Random().nextInt(organizationList.size())));
-                isUpdate = true;
-            }
-        }
-
-        // 保存用户信息
-        if(isSave){
-            userManager.save(user);
-        } else if(isUpdate){
-            userManager.updateById(user);
-        }
-
-        // 设置用户会话
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        userDto.setToken(tokenService.setToken(userDto));
-
-        return  userDto;
     }
 
     @Override
@@ -180,6 +151,49 @@ public class UserServiceImpl implements UserService {
             log.error("User login signature error");
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_SIGN_ERROR.getMsg());
         }
+    }
+
+    private UserDto login(String hexAddress, String hrpAddress,String authenticateSignMessage, String authenticateSign) {
+        // 检查nonce
+        checkNonceValidity(authenticateSignMessage, hexAddress);
+
+        // 登录校验
+        verifySign(hrpAddress, authenticateSignMessage, authenticateSign);
+
+        // 查询用户信息
+        boolean isSave = false;
+        boolean isUpdate = false;
+
+        User user = this.getByAddress(hexAddress);
+        if (user == null) {
+            user = new User();
+            user.setUserName(hrpAddress);
+            user.setAddress(hexAddress);
+            isSave = true;
+        }
+
+        // 设置用户组织
+        if(StringUtils.isBlank(user.getOrgIdentityId())){
+            List<String> organizationList = organizationService.getIdentityIdListByUser(hexAddress);
+            if (CollectionUtil.isNotEmpty(organizationList)) {
+                user.setOrgIdentityId(organizationList.get(new Random().nextInt(organizationList.size())));
+                isUpdate = true;
+            }
+        }
+
+        // 保存用户信息
+        if(isSave){
+            userManager.save(user);
+        } else if(isUpdate){
+            userManager.updateById(user);
+        }
+
+        // 设置用户会话
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(user, userDto);
+        userDto.setToken(tokenService.setToken(userDto));
+
+        return  userDto;
     }
 
 }

@@ -52,11 +52,6 @@ public class LoginInterceptor implements HandlerInterceptor {
                 request.getRequestURI(), IpUtils.getIpAddr(request), request.getHeader("user-agent"));
 
 
-
-        if(1 == 1){
-            return true;
-        }
-
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
@@ -67,10 +62,6 @@ public class LoginInterceptor implements HandlerInterceptor {
                 break;
             }
         }
-
-
-
-
 
         String token = request.getHeader(SysConstant.HEADER_TOKEN_KEY);
         UserDto userDto;

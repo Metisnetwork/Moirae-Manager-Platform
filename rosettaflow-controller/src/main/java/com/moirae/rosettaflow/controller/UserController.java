@@ -71,19 +71,4 @@ public class UserController {
         userService.updateNickName(updateNickReq.get0xAddress(), updateNickReq.getNickName());
         return ResponseVo.create(RespCodeEnum.SUCCESS, ErrorMsg.SUCCESS.getMsg());
     }
-
-    @PostMapping("queryUserDetails")
-    @ApiOperation(value = "查询用户详情", notes = "查询用户详情")
-    public ResponseVo<UserVo> queryUserDetails(@RequestBody @Valid UserDetailsReq userDetailsReq) {
-        User user = userService.getByAddress(userDetailsReq.getAddress());
-        return ResponseVo.createSuccess(BeanUtil.toBean(user, UserVo.class));
-    }
-
-    @GetMapping("queryAllUserNickname")
-    @ApiOperation(value = "查询所有用户昵称", notes = "查询所有用户昵称")
-    public ResponseVo<List<UserNicknameVo>> queryAllUserNickname() {
-        List<User> list = userService.queryAllUserNickName();
-        return ResponseVo.createSuccess(BeanUtil.copyToList(list, UserNicknameVo.class));
-    }
-
 }

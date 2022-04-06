@@ -112,6 +112,11 @@ public class SysConstant {
             "user/getLoginNonce",
             "user/login",
             "user/logout",
+            "user/updateNickName",
+            "alg/getAlgTree",
+            "alg/getAlgTreeDetails",
+
+
             "swagger",
             "error",
             "api-docs",
