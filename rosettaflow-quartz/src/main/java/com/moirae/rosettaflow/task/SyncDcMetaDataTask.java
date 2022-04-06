@@ -34,7 +34,7 @@ public class SyncDcMetaDataTask {
     @Resource
     private DataSyncService dataSyncService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
@@ -69,32 +69,32 @@ public class SyncDcMetaDataTask {
 
         //TODO
         List<Token> tokenList = new ArrayList<>();
-        tokenList.add(create("lat1px3vf0rqnufqha99gcl4gugztausuz67ghwdym"));
-        tokenList.add(create("lat1qfm3mfchyl7pfkpeyqu7n0tldll2qd9q6l3jg4"));
-        tokenList.add(create("lat1kaynntyhqaggm95maufgsx8rrlhz8fas9dc9vw"));
-        tokenList.add(create("lat1axqxxcsp8e5nqz6xmpfysu0r72m43kwxx8zsqm"));
-        tokenList.add(create("lat1s02hguahwyqg3n5eflzf38mz8kn6un7yaa6g5r"));
-        tokenList.add(create("lat1hmngzrqef4fukl3e9g7gh04js3yv6cjquyp7m0"));
-        tokenList.add(create("lat1gn8sf983zlck8a0ff8qksss8msr8r75sh535ze"));
-        tokenList.add(create("lat1s60zk6guhwfl68lx340gsx064rgjh2wf9ajzml"));
-        tokenList.add(create("lat1r5h8l2lereura9qla6kagf9eyj6lk8d5h7rucz"));
-        tokenList.add(create("lat1j8y9xvte72dyg49l7shje3vxntkd79azuw80mz"));
-        tokenList.add(create("lat17v76ekg0czxe3q7em0wlqe54lzkertd5375g3p"));
-        tokenList.add(create("lat1cra484tah4j80gcnf99xuy56gl0srttxeqvcxx"));
-        tokenList.add(create("lat1p5wrdlla4aquc8m8xa95s9r4xnd3wyh5ecztlx"));
-        tokenList.add(create("lat1mtl4dylql2ahgxnn9vrel084z7gpcegm8zuljf"));
-        tokenList.add(create("lat1cljxtyuta7xj7ex4ldmeh4aj0pkr6vjnplju7u"));
-        tokenList.add(create("lat1377ersdd9f33uxaku2f6ncytn4eleupyfd25ed"));
-        tokenList.add(create("lat1055ussjcd3gu3wz5pz3zyhcsaa0fm395fnsw2q"));
-        tokenList.add(create("lat1hlne24asesu966863cvy6p50s0lp2h8my63h7j"));
-        tokenList.add(create("lat1jgmfza3lpw8tlnk543qk0gdejryjjj98kucmsg"));
-        tokenList.add(create("lat1u4pg37fjp973pnyermxkqq9g2r2qwr93te24ad"));
-        tokenList.add(create("lat1yk9xdtlulxfk4yv8cwqqce2t23nn4sdnuap95l"));
-        tokenList.add(create("lat1m3q2jmdjr0vtjc5pphdna9w2g04rgv77t7wytf"));
-        tokenList.add(create("lat10fgqwrrta4ny3ry6qrzxdz7l4zw0d6uw6kx20w"));
-        tokenList.add(create("lat18ma2qfpd3y6ennnee9w06x9jl5psrk05uk8z2w"));
-        tokenList.add(create("lat1d75vd37065j6wmn7mzkk7a3ujugd95n5l0dp9q"));
-        tokenList.add(create("lat189yc8hac8dsw8tarhkzxa7sxr5kmf6qn743srq"));
+        tokenList.add(create("0x3a3b85bfc6b7b8435d713dca5ce308b9c4abe430"));
+        tokenList.add(create("0x282875fd9579367c44a8b2666d65f75f8c589fdb"));
+        tokenList.add(create("0xfc23df226ca45f9a2c527d8313e27395964060fa"));
+        tokenList.add(create("0xb74c8525dfb15598687c80be6615fb243c2eeb25"));
+        tokenList.add(create("0x148d92fc65b04c60840793be11b9f1b558e6eb9e"));
+        tokenList.add(create("0xbb54ec09ec1433fa48716effc94bbe9a950aecef"));
+        tokenList.add(create("0x90d308f5e6ab2d087983ac4d5c8ced533ed7681a"));
+        tokenList.add(create("0xdd4f9e77c206c64343140e25f5bf56dec6d81750"));
+        tokenList.add(create("0xfc4239a8dfe02c0d6db4a2b0c9ce8d11fd80b73c"));
+        tokenList.add(create("0x33f919a0f6312bfd225f797a4808683958660e3a"));
+        tokenList.add(create("0xab94a2338ca24d05e2cc6318ecbd083eabbe473c"));
+        tokenList.add(create("0x4ab735a85751534ce7d2bf733bc083232573fb06"));
+        tokenList.add(create("0xe1b66c3ef7ca24e9b37b0ec38868fdb67881696f"));
+        tokenList.add(create("0x1981e3ab9dd60eae70ae83d3d1b236c2662eae8a"));
+        tokenList.add(create("0xb9ef5fd080839d3eb04809c0f69db709dd9b5f69"));
+        tokenList.add(create("0xfa0bea7347b9b98e068528da5826cf45a9c6075e"));
+        tokenList.add(create("0xcacc4ca37e0cd5d162455a753cf07bcdbc26281b"));
+        tokenList.add(create("0x1e19040bae09c01d06e82ebd83c801308959daed"));
+        tokenList.add(create("0xc91ef95ac29cfafce0b0b714051e5add99b64c87"));
+        tokenList.add(create("0x8e801527c44929da704b7cd3406142f5391fe1f7"));
+        tokenList.add(create("0x2fa1f9217fead87874ff63715c29af10d78f741e"));
+        tokenList.add(create("0x4be1ae0984ddb224c863c1e20fec05c0b86c7d3d"));
+        tokenList.add(create("0xa4f375aa5b51de1510709c8fdfbe20cc4aa8790c"));
+        tokenList.add(create("0xb861eea15a711c19574dde3c582278e4e06a6482"));
+        tokenList.add(create("0x2d0602fd33ff61e24a886060c13a3c619aa6b61e"));
+        tokenList.add(create("0x15950be327f74885f64ec3c5f0367ea643a4a6c9"));
 
         metaDataDetailResponseDtoList.stream().forEach(item -> {
             MetaDataSummaryDto dataSummaryDto = item.getMetaDataDetailDto().getMetaDataSummary();

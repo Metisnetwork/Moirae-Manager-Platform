@@ -26,7 +26,7 @@ public class SyncTokenHolderInfoTask {
     @Resource
     private DataTokenTemplateDao dataTokenTemplateDao;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncTokenHolderInfoTask")
     public void run() {
         long begin = DateUtil.current();

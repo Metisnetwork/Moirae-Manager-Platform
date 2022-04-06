@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.chain.platon;
 
 import com.moirae.rosettaflow.chain.platon.contract.evm.DataTokenFactory;
+import com.platon.bech32.Bech32;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,8 @@ import static org.hamcrest.CoreMatchers.is;
 
 public class DataTokenFactoryTest extends BaseContractTest {
 
-    private String templateAddress = "lat1ekf3l9j6awaccv894hqg2qcav3jntw0h0tgkxq";
-    private String factoryAddress = "lat1aad66x6tcq7l8dkk9l53fc29zf49l7qdqxnyv7";
+    private String templateAddress = "lat1hhfwhezjwdlfx7tv7ss6a7g94r2sgpvpy53cmd";
+    private String factoryAddress = "lat1cma0rlan2e3lfvvmycukc5aeus6cz78zdu2fmc";
 
     private List<String> dataIdList = Arrays.asList("metadata:0xeae5caf8a8fc93139febf6025929627e1960010eae08c5b4b60c37d545702795",
             "metadata:0x3862767893eafc91029689c9eaf6b68fb209b1930e735c25e523d0215e1bda9f",
@@ -63,14 +64,16 @@ public class DataTokenFactoryTest extends BaseContractTest {
     private String creatToken(DataTokenFactory dataTokenFactory, String dataId, Integer index) throws Exception {
         TransactionReceipt transactionReceipt = dataTokenFactory.createToken("DT-N-" + index,"DT-S-" + index, new BigInteger("500000000000000000000000000"), new BigInteger("100000000000000000000000000"), dataId).send();
         List<DataTokenFactory.TokenCreatedEventResponse> eventEvents = dataTokenFactory.getTokenCreatedEvents(transactionReceipt);
-        return eventEvents.get(0).newTokenAddress;
+        return Bech32.addressDecodeHex(eventEvents.get(0).newTokenAddress);
     }
 
     @Test
     public void deploy() throws Exception{
         DataTokenFactory contract = DataTokenFactory.deploy(web3j, credentials, gasProvider, templateAddress).send();
         System.out.println(contract.getContractAddress());
-        // lat1aad66x6tcq7l8dkk9l53fc29zf49l7qdqxnyv7
+        System.out.println(Bech32.addressDecodeHex(contract.getContractAddress()));
+        // lat1cma0rlan2e3lfvvmycukc5aeus6cz78zdu2fmc
+        // 0xc6faf1ffb35663f4b19b26396c53b9e4358178e2
     }
 
     private DataTokenFactory load(){

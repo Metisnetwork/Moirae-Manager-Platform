@@ -3,7 +3,10 @@ package com.moirae.rosettaflow.chain.platon.enums;
 import lombok.Getter;
 
 public enum Web3jProtocolEnum {
-    WS("ws://"),HTTP("http://");
+    WS("ws://"),
+    WSS("wss://"),
+    HTTP("http://"),
+    HTTPS("https://");
     @Getter
     private String head;
     Web3jProtocolEnum(String head){

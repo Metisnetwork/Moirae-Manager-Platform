@@ -64,11 +64,12 @@ redisson:
 # 节点网络设置
 chain:
   platon:
-    chainId: 100
+    chainId: 210309
     hrp: lat
-    metisPayAddress: "0xef5bad1b4bc03df3b6d62fe914e145126a5ff80d"
-    web3jProtocol: WS
-    web3jAddresses: 192.168.120.151:7789,192.168.120.151:7790
+    metisPayAddress: "0x1e94d55639bcafd1bb55f1bad9ce9beaf8f6d749"
+    uniswapV2Router02: "0x26d637e206cc39942628421e7b0d6fb41db0bc06"
+    web3jProtocol: WSS
+    web3jAddresses: devnetopenapi.platon.network/ws
 
 
 

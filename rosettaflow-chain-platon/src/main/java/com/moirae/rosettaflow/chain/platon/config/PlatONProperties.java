@@ -16,6 +16,7 @@ public class PlatONProperties {
     private long chainId;
     private String hrp;
     private String metisPayAddress;
+    private String uniswapV2Router02;
     private Web3jProtocolEnum web3jProtocol;
     private List<String> web3jAddresses;
 
