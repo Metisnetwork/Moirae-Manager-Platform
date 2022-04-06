@@ -27,7 +27,7 @@ public class ModelController {
     private ModelService modelService;
 
     @GetMapping("getUserModelList")
-    @ApiOperation(value = "查询当前用户的算法模型", notes = "查询当前用户的算法模型")
+    @ApiOperation(value = "（开发中）查询当前用户的算法模型", notes = "查询当前用户的算法模型")
     public ResponseVo<List<ModelVo>> getUserModelList(@Valid GetUserModelListReq req) {
         // 获取语言类型
         List<Model> list =  modelService.queryAvailableModel(req.getAlgorithmId(), req.getIdentityId());

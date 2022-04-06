@@ -36,7 +36,7 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping("getTaskStats")
-    @ApiOperation(value = "查询任务统计", notes = "查询任务统计")
+    @ApiOperation(value = "（开发中）查询任务统计", notes = "查询任务统计")
     public ResponseVo<TaskStatsVo> getTaskStats() {
         int taskCount = taskService.getTaskStats();
         TaskStatsVo taskStatsVo = new TaskStatsVo();
@@ -45,7 +45,7 @@ public class TaskController {
     }
 
     @GetMapping("getTaskListByOrg")
-    @ApiOperation(value = "查询任务列表通过组织id", notes = "查询任务列表通过组织id")
+    @ApiOperation(value = "（开发中）查询任务列表通过组织id", notes = "查询任务列表通过组织id")
     public ResponseVo<PageVo<TaskOrgVo>> getTaskListByOrg(@Valid OrgIdPageReq req) {
         IPage<Task> page = taskService.getTaskListByOrg(req.getCurrent(), req.getSize(), req.getIdentityId());
         List<TaskOrgVo> itemList = BeanUtil.copyToList(page.getRecords(), TaskOrgVo.class);
@@ -53,7 +53,7 @@ public class TaskController {
     }
 
     @GetMapping("getTaskListByData")
-    @ApiOperation(value = "查询任务列表通过元数据", notes = "查询任务列表通过元数据")
+    @ApiOperation(value = "（开发中）查询任务列表通过元数据", notes = "查询任务列表通过元数据")
     public ResponseVo<PageVo<TaskVo>> getTaskListByData(@Valid DataIdPageReq req) {
         IPage<Task> page = taskService.getTaskListByData(req.getCurrent(), req.getSize(), req.getMetaDataId());
         List<TaskVo> itemList = BeanUtil.copyToList(page.getRecords(), TaskVo.class);
@@ -61,7 +61,7 @@ public class TaskController {
     }
 
     @GetMapping("getTaskList")
-    @ApiOperation(value = "查询任务列表", notes = "查询任务列表")
+    @ApiOperation(value = "（开发中）查询任务列表", notes = "查询任务列表")
     public ResponseVo<PageVo<TaskVo>> getTaskList(@Valid GetTaskListReq req) {
         IPage<Task> page = taskService.getTaskList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getBegin(), req.getEnd(), req.getTaskStatus());
         List<TaskVo> itemList = BeanUtil.copyToList(page.getRecords(), TaskVo.class);
@@ -69,7 +69,7 @@ public class TaskController {
     }
 
     @GetMapping("getTaskDetails")
-    @ApiOperation(value = "查询任务详情", notes = "查询任务详情")
+    @ApiOperation(value = "（开发中）查询任务详情", notes = "查询任务详情")
     public ResponseVo<TaskDetailsVo> getTaskDetails(@Valid GetTaskDetailsReq req) {
         Task task = taskService.getTaskDetails(req.getTaskId());
         return ResponseVo.createSuccess(BeanUtil.toBean(task, TaskDetailsVo.class));
