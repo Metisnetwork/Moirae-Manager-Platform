@@ -10,10 +10,12 @@ import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.manager.MetaDataColumnManager;
 import com.moirae.rosettaflow.manager.MetaDataManager;
+import com.moirae.rosettaflow.manager.TokenHolderManager;
 import com.moirae.rosettaflow.manager.TokenManager;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
 import com.moirae.rosettaflow.mapper.domain.Token;
+import com.moirae.rosettaflow.mapper.domain.TokenHolder;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
@@ -40,6 +42,8 @@ public class DataServiceImpl implements DataService {
     private MetaDataColumnManager metaDataColumnManager;
     @Resource
     private TokenManager tokenManager;
+    @Resource
+    private TokenHolderManager tokenHolderManager;
 
     @Override
     public int getDataCount() {
@@ -138,5 +142,16 @@ public class DataServiceImpl implements DataService {
     @Override
     public boolean updateToken(Token token) {
         return tokenManager.updateById(token);
+    }
+
+    @Override
+    public List<String> getTokenIdList() {
+        return tokenManager.getTokenIdList();
+    }
+
+    @Override
+    @Transactional
+    public boolean batchInsertOrUpdateTokenHolder(String address, List<TokenHolder> tokenHolderList) {
+        return tokenHolderManager.batchInsertOrUpdateByUser(address, tokenHolderList);
     }
 }

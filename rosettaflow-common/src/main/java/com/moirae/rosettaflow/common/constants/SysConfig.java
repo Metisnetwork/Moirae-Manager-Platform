@@ -15,10 +15,9 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "system.config")
 public class SysConfig {
-    private long loginTimeOut = 1800000000;
+    private long loginTimeOut = 1800000;
     private boolean kickMode = true;
     private long nonceTimeOut = 5 * 60 * 1000;
-    private int batchSize = 500;
     private List<OrgConfig> publicOrgList = new ArrayList<>();
 
     @Data

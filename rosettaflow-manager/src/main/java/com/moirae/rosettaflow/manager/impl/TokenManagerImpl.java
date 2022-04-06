@@ -21,4 +21,11 @@ public class TokenManagerImpl extends ServiceImpl<TokenMapper, Token> implements
         wrapper.last(" limit " + size);
         return list(wrapper);
     }
+
+    @Override
+    public List<String> getTokenIdList() {
+        LambdaQueryWrapper<Token> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(Token::getAddress);
+        return listObjs(wrapper, Object::toString);
+    }
 }

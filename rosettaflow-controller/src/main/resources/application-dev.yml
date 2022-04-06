@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(AGa8GMvGChjAkY17AmQE4g==)
     password: ENC(bWqYB1AVri0/bQrC7ta4IZme9ib22Bge)
-    url: jdbc:mysql://192.168.10.145:17000/db_moirae_040?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.10.145:17000/db_moirae_040_cd?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -31,13 +31,12 @@ mybatis-plus:
 system:
   config:
     # 登录超时时间,单位: 毫秒
-    loginTimeOut: 18000000000
+#    loginTimeOut: 1800000
+    loginTimeOut: 180000000
     # 登录互踢模式： true-是,false-否
     kickMode: false
     # nonce存放时间，单位：秒
     nonceTimeOut: 300000
-    # 数据库数据批量更新
-    batchSize: 1000
     # 公共组织信息
     publicOrgList:
       - identity: identity:e9eef460ea9c473993c6477915106eed
@@ -67,7 +66,7 @@ chain:
   platon:
     chainId: 100
     hrp: lat
-    metisPayAddress: lat1aad66x6tcq7l8dkk9l53fc29zf49l7qdqxnyv7
+    metisPayAddress: "0xef5bad1b4bc03df3b6d62fe914e145126a5ff80d"
     web3jProtocol: WS
     web3jAddresses: 192.168.120.151:7789,192.168.120.151:7790
 

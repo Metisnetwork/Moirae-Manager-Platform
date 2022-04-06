@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.UserMapper">
+    <update id="updateHeartBeat">
+        update mo_user set heart_beat_time = now() where address = #{address}
+    </update>
+    <select id="getOnlineUserIdList" resultType="java.lang.String">
+        select
+            u.address
+        from mo_user u
+        where u.is_valid = 1 and date_add(u.heart_beat_time, interval #{loginTimeOut} second) <![CDATA[ > ]]> now()
+    </select>
 </mapper>

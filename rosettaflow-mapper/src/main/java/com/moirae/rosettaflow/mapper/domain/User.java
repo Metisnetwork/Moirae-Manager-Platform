@@ -30,6 +30,10 @@ public class User implements Serializable {
      */
     private String orgIdentityId;
     /**
+     * 最后的心跳时间
+     */
+    private Date heartBeatTime;
+    /**
      * 创建时间
      */
     private Date createTime;

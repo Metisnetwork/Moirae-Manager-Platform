@@ -1,16 +1,43 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.TokenHolderManager;
-import com.moirae.rosettaflow.manager.TokenManager;
 import com.moirae.rosettaflow.mapper.TokenHolderMapper;
-import com.moirae.rosettaflow.mapper.TokenMapper;
-import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.mapper.domain.TokenHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class TokenHolderManagerImpl extends ServiceImpl<TokenHolderMapper, TokenHolder> implements TokenHolderManager {
+
+    @Override
+    public boolean batchInsertOrUpdateByUser(String address, List<TokenHolder> tokenHolderList) {
+        // 查询用户的账户信息
+        Set<String> tokenAddressSet = getListByUser(address).stream().collect(Collectors.toSet());
+
+        List<TokenHolder> insertList = tokenHolderList.stream().filter(item -> !tokenAddressSet.contains(item.getTokenAddress())).collect(Collectors.toList());
+        List<TokenHolder> updateList = tokenHolderList.stream().filter(item -> tokenAddressSet.contains(item.getTokenAddress())).collect(Collectors.toList());
+
+        if(insertList.size()>0){
+            saveBatch(insertList);
+        }
+
+        if(updateList.size()>0){
+            baseMapper.updateBatch(updateList);
+        }
+        return true;
+    }
+
+    private List<String> getListByUser(String address){
+        LambdaQueryWrapper<TokenHolder> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(TokenHolder::getAddress, address);
+        return listObjs(wrapper, item -> item.toString());
+    }
 }

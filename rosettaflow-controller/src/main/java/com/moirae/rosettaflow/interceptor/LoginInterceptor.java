@@ -77,6 +77,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 }
                 UserContext.set(userDto);
                 tokenService.refreshToken(token);
+                userService.updateHeartBeat(userDto.getAddress());
             } else {
                 log.error("Invalid token: {}", token);
                 printResponse(response, RespCodeEnum.TOKEN_INVALID,ErrorMsg.TOKEN_INVALID.getMsg());

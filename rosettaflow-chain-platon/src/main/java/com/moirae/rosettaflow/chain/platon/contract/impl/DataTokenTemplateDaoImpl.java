@@ -7,6 +7,8 @@ import com.moirae.rosettaflow.chain.platon.contract.evm.DataTokenTemplate;
 import com.moirae.rosettaflow.chain.platon.enums.CodeEnum;
 import com.moirae.rosettaflow.chain.platon.exception.AppException;
 import com.moirae.rosettaflow.chain.platon.function.ExceptionFunction;
+import com.moirae.rosettaflow.chain.platon.utils.AddressUtils;
+import com.platon.bech32.Bech32;
 import com.platon.protocol.core.RemoteCall;
 import com.platon.tx.ReadonlyTransactionManager;
 import com.platon.tx.gas.ContractGasProvider;
@@ -28,12 +30,12 @@ public class DataTokenTemplateDaoImpl implements DataTokenTemplateDao {
 
     @Override
     public BigInteger balanceOf(String contractAddress, String account) {
-        return query(contract -> contract.balanceOf(account), contractAddress);
+        return query(contract -> contract.balanceOf(AddressUtils.hexToBech32(account)), contractAddress);
     }
 
     @Override
     public BigInteger allowance(String contractAddress, String account) {
-        return query(contract -> contract.allowance(account, platONProperties.getMetisPayAddress()), contractAddress);
+        return query(contract -> contract.allowance(AddressUtils.hexToBech32(account), AddressUtils.hexToBech32(platONProperties.getMetisPayAddress())), contractAddress);
     }
 
     @Override
@@ -52,6 +54,7 @@ public class DataTokenTemplateDaoImpl implements DataTokenTemplateDao {
     }
 
     private <R> R query(ExceptionFunction<DataTokenTemplate, RemoteCall<R>> supplier, String contractAddress) {
+        contractAddress = AddressUtils.hexToBech32(contractAddress);
         ReadonlyTransactionManager transactionManager = new ReadonlyTransactionManager(platOnClient.getWeb3j(), contractAddress);
         try {
             DataTokenTemplate dataTokenTemplate = DataTokenTemplate.load(contractAddress, platOnClient.getWeb3j(), transactionManager, new ContractGasProvider(BigInteger.ZERO, BigInteger.ZERO));

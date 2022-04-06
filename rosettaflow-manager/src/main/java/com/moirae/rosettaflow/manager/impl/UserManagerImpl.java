@@ -37,4 +37,14 @@ public class UserManagerImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.eq(User::getIsValid, true);
         return list(wrapper);
     }
+
+    @Override
+    public boolean updateHeartBeat(String address) {
+        return baseMapper.updateHeartBeat(address);
+    }
+
+    @Override
+    public List<String> getOnlineUserIdList(long loginTimeOut) {
+        return baseMapper.getOnlineUserIdList(loginTimeOut);
+    }
 }

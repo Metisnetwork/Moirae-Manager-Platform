@@ -32,7 +32,7 @@ public class SyncDcOrgTask {
     @Resource
     private DataSyncService dataSyncService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcOrgTask")
     public void run() {
         long begin = DateUtil.current();

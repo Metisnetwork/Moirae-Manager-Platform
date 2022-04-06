@@ -54,6 +54,9 @@ ALTER TABLE `mo_user`
 ALTER TABLE `mo_user`
     CHANGE `status` `is_valid` TINYINT DEFAULT 1  NOT NULL   COMMENT '是否有效: 0-否，1-是';
 
+ALTER TABLE `mo_user`
+    ADD COLUMN `heart_beat_time` TIMESTAMP NULL   COMMENT '最后的心跳时间' AFTER `org_identity_id`;
+
 
 DROP TABLE IF EXISTS `mo_user_login`;
 CREATE TABLE `mo_user_login` (

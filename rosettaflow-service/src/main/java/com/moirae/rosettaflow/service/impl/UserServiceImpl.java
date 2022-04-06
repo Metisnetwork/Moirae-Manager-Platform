@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService {
         try {
             userDto = login(hexAddress, hrpAddress, authenticateSignMessage, authenticateSign);
             userLoginManager.successRecord(hexAddress);
+            updateHeartBeat(hexAddress);
             return  userDto;
         } catch (Exception e){
             userLoginManager.failRecord(hexAddress);
@@ -79,14 +80,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateNickName(String address, String nickName) {
+    public void updateNickName(String nickName) {
         User user = userManager.getValidByUserName(nickName);
         if (!Objects.isNull(user)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());
         }
-
         try {
-            user = userManager.getValidById(address);
+            user = userManager.getValidById(UserContext.getCurrentUser().getAddress());
             user.setUserName(nickName);
             userManager.updateById(user);
         } catch (Exception e) {
@@ -96,17 +96,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> queryAllUserNickName() {
-        return userManager.getValidList();
-    }
-
-    @Override
     public NonceDto getLoginNonce(UserAddressDto address) {
         String nonce = CommonUtils.generateUuid();
         redissonObject.setValue(StrUtil.format(SysConstant.REDIS_USER_NONCE_KEY, address.getAddress(), nonce), nonce, sysConfig.getNonceTimeOut());
         NonceDto result = new NonceDto();
         result.setNonce(nonce);
         return result;
+    }
+
+    @Override
+    public boolean updateHeartBeat(String address) {
+        return userManager.updateHeartBeat(address);
+    }
+
+    @Override
+    public List<String> getOnlineUserIdList() {
+        return userManager.getOnlineUserIdList(sysConfig.getLoginTimeOut()/1000);
     }
 
     private void checkNonceValidity(String signMessage, String address) {

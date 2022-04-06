@@ -37,17 +37,9 @@ public interface UserService {
     /**
      * 修改昵称
      *
-     * @param address  钱包地址
      * @param nickName 昵称
      */
-    void updateNickName(String address, String nickName);
-
-    /**
-     * 查询所有用户昵称
-     *
-     * @return User
-     */
-    List<User> queryAllUserNickName();
+    void updateNickName(String nickName);
 
     /**
      * 获取登录nonce
@@ -56,4 +48,18 @@ public interface UserService {
      * @return nonce
      */
     NonceDto getLoginNonce(UserAddressDto address);
+
+    /**
+     * 更新用户心跳时间
+     *
+     * @return
+     */
+    boolean updateHeartBeat(String address);
+
+    /**
+     * 查询所有在线用户地址
+     *
+     * @return
+     */
+    List<String> getOnlineUserIdList();
 }

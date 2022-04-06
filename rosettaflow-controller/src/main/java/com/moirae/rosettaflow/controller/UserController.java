@@ -68,7 +68,7 @@ public class UserController {
     @PostMapping("updateNickName")
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public ResponseVo<?> updateNickName(@RequestBody @Valid UpdateNickReq updateNickReq) {
-        userService.updateNickName(updateNickReq.get0xAddress(), updateNickReq.getNickName());
+        userService.updateNickName(updateNickReq.getNickName());
         return ResponseVo.create(RespCodeEnum.SUCCESS, ErrorMsg.SUCCESS.getMsg());
     }
 }

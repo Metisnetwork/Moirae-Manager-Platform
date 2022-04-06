@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
+import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.grpc.metadata.req.dto.MetaDataSummaryDto;
 import com.moirae.rosettaflow.grpc.metadata.resp.dto.MetaDataDetailResponseDto;
 import com.moirae.rosettaflow.grpc.service.GrpcMetaDataService;
@@ -33,7 +34,7 @@ public class SyncDcMetaDataTask {
     @Resource
     private DataSyncService dataSyncService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
@@ -131,7 +132,7 @@ public class SyncDcMetaDataTask {
 
     private Token create(String address){
         Token token = new Token();
-        token.setAddress(address);
+        token.setAddress( AddressChangeUtils.convert0xAddress(address));
         return token;
     }
 }

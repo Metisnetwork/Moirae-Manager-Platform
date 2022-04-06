@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.Keys;
 
 import java.nio.charset.StandardCharsets;
 
@@ -35,13 +34,6 @@ public class UserControllerTest {
 
     private String accessToken = "16488952050141F9C69601BB84C1CAFBB6F7F140F9CD6";
 
-    @Test
-    public void xxxx() throws Exception {
-        for (int i = 0; i < 10; i++) {
-            user1 = Credentials.create(Keys.createEcKeyPair());
-            login(getNonce());
-        }
-    }
 
     @Test
     public void getLoginNonce() throws Exception {
@@ -69,12 +61,12 @@ public class UserControllerTest {
     @Test
     public void updateNickName() throws Exception {
         JSONObject req = new JSONObject();
-        req.put("address", user1.getAddress());
         req.put("nickName", "flow1");
         String result = mvc.perform(post("/user/updateNickName")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(req.toJSONString().getBytes())
                         .header("Accept-Language","zh")
+                        .header("Access-Token",accessToken)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isOk())
