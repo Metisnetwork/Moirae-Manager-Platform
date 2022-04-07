@@ -8,11 +8,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.manager.OrgManager;
 import com.moirae.rosettaflow.mapper.OrgMapper;
-import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.Org;
+import com.moirae.rosettaflow.mapper.domain.StatsOrg;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -46,12 +48,25 @@ public class OrgManagerImpl extends ServiceImpl<OrgMapper, Org> implements OrgMa
     }
 
     @Override
-    public IPage<Org> getOrgList(Page<MetaData> page, String keyword, String orderBy) {
+    public IPage<Org> getOrgList(Page<Org> page, String keyword, String orderBy) {
         return this.baseMapper.getOrgList(page, keyword, orderBy);
     }
 
     @Override
     public Org getOrgDetails(String identityId) {
         return this.baseMapper.getOrgDetails(identityId);
+    }
+
+    @Override
+    public List<String> getEffectiveOrgIdList() {
+        LambdaQueryWrapper<Org> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(Org::getIdentityId);
+        wrapper.eq(Org::getStatus, OrgStatusEnum.Normal);
+        return listObjs(wrapper, item -> item.toString());
+    }
+
+    @Override
+    public StatsOrg getStatsOrg(String identityId) {
+        return baseMapper.getStatsOrg(identityId);
     }
 }

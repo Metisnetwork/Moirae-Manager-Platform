@@ -5,6 +5,7 @@ import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.OrgExpand;
+import com.moirae.rosettaflow.mapper.domain.StatsOrg;
 import io.grpc.ManagedChannel;
 
 import java.util.List;
@@ -165,4 +166,12 @@ public interface OrgService {
     List<OrgExpand> getOrgExpandList();
 
     void batchUpdateOrgExpand(List<OrgExpand> updateList);
+
+    List<String> getEffectiveOrgIdList();
+
+    void batchInsertOrUpdateStatsOrg(List<StatsOrg> saveList);
+
+    StatsOrg getStatsOrg(String identityId);
+
+    List<Org> getUserOrgList();
 }

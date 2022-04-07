@@ -33,5 +33,20 @@ public class StatsOrg implements Serializable {
      */
     private long orgTotalBandwidth;
 
+    /**
+     * 参与任务数量
+     */
+    private long totalTask;
+
+    /**
+     * 凭证数
+     */
+    private long totalDataToken;
+
+    /**
+     * 数据总数
+     */
+    private long totalData;
+
     private static final long serialVersionUID = 1L;
 }

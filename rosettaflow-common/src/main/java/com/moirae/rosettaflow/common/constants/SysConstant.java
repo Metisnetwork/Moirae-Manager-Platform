@@ -110,10 +110,12 @@ public class SysConstant {
      */
     public static final String[] LOGIN_URIS = {
             "user/login",
+            "user/getLoginNonce",
             "alg/getAlgTree",
             "alg/getAlgTreeDetails",
             "org/getOrgStats",
             "org/getOrgList",
+            "org/getOrgDetails",
 
             "swagger",
             "error",
@@ -130,11 +132,6 @@ public class SysConstant {
             "testGrpc",
             "redis",
             "quartz",
-            "org/listOrgInfoByName",
-            "org/listOrgInfoByTotalData",
-            "org/listOrgInfoByActivity",
-            "org/listOrgInfoByMemory",
-            "org/findOrgInfo",
             "task/getOrgTaskListByIdentityId",
             "task/getTaskByMetaDataId",
             "task/getTaskDetails",

@@ -47,7 +47,7 @@ public class OrgController {
         return ResponseVo.createSuccess(orgStatsVo);
     }
 
-    @GetMapping("（开发中）getOrgList")
+    @GetMapping("getOrgList")
     @ApiOperation(value = "查询组织列表", notes = "查询组织列表")
     public ResponseVo<PageVo<OrgVo>> getOrgList(@Valid GetOrgListReq req) {
         IPage<Org> page = orgService.getOrgList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getOrderBy());
@@ -55,28 +55,28 @@ public class OrgController {
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 
-    @GetMapping("（开发中）getOrgDetails")
+    @GetMapping("getOrgDetails")
     @ApiOperation(value = "查询组织详情", notes = "查询组织详情")
-    public ResponseVo<OrgVo> getOrgDetails(@RequestParam OrgIdReq req) {
+    public ResponseVo<OrgVo> getOrgDetails(@Valid OrgIdReq req) {
         Org org = orgService.getOrgDetails(req.getIdentityId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(org, OrgVo.class));
     }
 
-    @GetMapping("（开发中）getUserOrgList")
+    @GetMapping("getUserOrgList")
     @ApiOperation(value = "查询用户可用的组织列表", notes = "查询用户可用的组织列表")
-    public ResponseVo<PageVo<UserOrgVo>> getUserOrgList() {
-        List<UserOrgVo> orgTaskVoList = new ArrayList<>();
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(null, orgTaskVoList));
+    public ResponseVo<List<UserOrgVo>> getUserOrgList() {
+        List<Org> orgList = orgService.getUserOrgList();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, UserOrgVo.class));
     }
 
-    @PostMapping("（开发中）joinOrg")
+    @PostMapping("joinOrg")
     @ApiOperation(value = "用户加入组织", notes = "用户加入组织")
     public ResponseVo<?> joinOrg(@RequestBody @Valid JoinOrgReq req) {
         orgService.addOrganizationByUser(req.getIdentityIp(), req.getIdentityPort());
         return ResponseVo.createSuccess();
     }
 
-    @PostMapping("（开发中）quitOrg")
+    @PostMapping("quitOrg")
     @ApiOperation(value = "用户退出组织", notes = "用户退出组织")
     public ResponseVo<?> quitOrg(@RequestBody @Valid OrgIdReq req) {
         orgService.deleteOrganizationByUser(req.getIdentityId());

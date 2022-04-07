@@ -155,32 +155,76 @@
                o.status,
                o.update_at,
                o.image_url,
-               so.org_total_core as totalCore,
-               so.org_total_memory as totalMemory,
-               so.org_total_bandwidth as totalBandwidth,
-               so.total_file as totalFile,
-               so.total_task as totalTask,
-               so.data_token_used as dataTokenUsed
+               so.org_total_core,
+               so.org_total_memory,
+               so.org_total_bandwidth,
+               so.total_task,
+               so.total_data_token,
+               so.total_data
         from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
         where o.status = 1
         <if test="keyword != null and keyword != ''">
             and ( o.identity_id = #{keyword} or o.node_name like concat('%', #{keyword}, '%') )
         </if>
-        order by #{orderBy}
+        order by ${orderBy}
     </select>
+
     <select id="getOrgDetails" resultType="com.moirae.rosettaflow.mapper.domain.Org">
         select o.node_name,
                o.identity_id,
                o.status,
                o.update_at,
                o.image_url,
-               so.org_total_core as totalCore,
-               so.org_total_memory as totalMemory,
-               so.org_total_bandwidth as totalBandwidth,
-               so.total_file as totalFile,
-               so.total_task as totalTask,
-               so.data_token_used as dataTokenUsed
+               so.org_total_core,
+               so.org_total_memory,
+               so.org_total_bandwidth,
+               so.total_task,
+               so.total_data_token,
+               so.total_data
         from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
         where o.status = 1 and  o.identity_id = #{identityId}
+    </select>
+    <select id="getStatsOrg" resultType="com.moirae.rosettaflow.mapper.domain.StatsOrg">
+        select o.identity_id,
+               power.total_core as orgTotalCore,
+               power.total_memory as orgTotalMemory,
+               power.total_bandwidth as orgTotalBandwidth,
+               task.total_task as totalTask,
+               token.total_data_token  as totalDataToken,
+               data.total_data as totalData
+        from dc_org o,
+             (
+                 select identity_id,
+                        sum(core) as total_core,
+                        sum(memory) as total_memory,
+                        sum(bandwidth) as total_bandwidth
+                 from dc_power_server
+                 where identity_id = #{identityId,jdbcType=VARCHAR} and (status = 2 or status = 3)
+             ) power,
+             (
+                 select count(meta_data_id) as total_data_token
+                 from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address
+                 where dmd.identity_id = #{identityId,jdbcType=VARCHAR} and dmd.status = 2 and mt.is_add_liquidity = 1
+             ) token,
+             (
+                 select count(meta_data_id) as total_data
+                 from dc_meta_data dmd
+                 where dmd.identity_id = #{identityId,jdbcType=VARCHAR} and dmd.status = 2
+             ) data,
+             (
+                 select count(t.task_id) as total_task
+                 from (
+                          select task_id
+                          from dc_task_power_provider
+                          where identity_id = #{identityId,jdbcType=VARCHAR}
+
+                          union
+
+                          select task_id
+                          from dc_task_data_provider
+                          where identity_id = #{identityId,jdbcType=VARCHAR}
+                      ) t
+             ) task
+        where o.identity_id = #{identityId,jdbcType=VARCHAR}
     </select>
 </mapper>

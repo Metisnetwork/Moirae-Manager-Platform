@@ -13,21 +13,21 @@ public class OrgVo extends BaseOrgVo{
     @ApiModelProperty(value = "组织机构图像url")
     private String imageUrl;
 
-    @ApiModelProperty(value = "数据凭证使用量")
-    private long dataTokenUsed;
-
     @ApiModelProperty(value = "参与任务数量")
     private Integer totalTask;
 
-    @ApiModelProperty(value = "总文件数")
-    private Integer totalFile;
+    @ApiModelProperty(value = "总数据凭证数")
+    private Integer totalDataToken;
+
+    @ApiModelProperty(value = "总数据数")
+    private Integer totalData;
 
     @ApiModelProperty(value = "计算服务的总共内存")
-    private Long totalMemory;
+    private Long orgTotalMemory;
 
     @ApiModelProperty(value = "计算服务的总带宽")
-    private Long totalBandwidth;
+    private Long orgTotalBandwidth;
 
     @ApiModelProperty(value = "计算服务的总核数")
-    private Integer totalCore;
+    private Integer orgTotalCore;
 }

@@ -18,4 +18,17 @@
         FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
         WHERE `status` = 1 AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
     </select>
+    <select id="getUserOrgList" resultType="com.moirae.rosettaflow.mapper.domain.Org">
+        SELECT
+            o.`node_name`,
+            o.`identity_id`,
+            o.`status`,
+            o.update_at,
+            oe.`identity_ip`,
+            oe.observer_proxy_wallet_address,
+            oe.`identity_port`,
+            oe.`is_public` as public_flag
+        FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
+        WHERE `status` = 1 AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
+    </select>
 </mapper>

@@ -19,10 +19,11 @@ import com.moirae.rosettaflow.grpc.service.GetNodeIdentityResponse;
 import com.moirae.rosettaflow.manager.OrgExpandManager;
 import com.moirae.rosettaflow.manager.OrgManager;
 import com.moirae.rosettaflow.manager.OrgUserManager;
-import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.manager.StatsOrgManager;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.domain.OrgExpand;
 import com.moirae.rosettaflow.mapper.domain.OrgUser;
+import com.moirae.rosettaflow.mapper.domain.StatsOrg;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.utils.UserContext;
@@ -53,6 +54,8 @@ public class OrgServiceImpl implements OrgService {
     private OrgManager orgManager;
     @Resource
     private OrgUserManager userOrgManager;
+    @Resource
+    private StatsOrgManager statsOrgManager;
 
     private final Map<String, ManagedChannel> channelMap = new ConcurrentHashMap<>();
 
@@ -273,8 +276,12 @@ public class OrgServiceImpl implements OrgService {
 
     @Override
     public IPage<Org> getOrgList(Long current, Long size, String keyword, OrgOrderByEnum orderBy) {
-        Page<MetaData> page = new Page<>(current, size);
-        return orgManager.getOrgList(page, keyword, orderBy.getSqlValue());
+        Page<Org> page = new Page<>(current, size);
+        if(orderBy == null){
+            orderBy = OrgOrderByEnum.NAME;
+        }
+        orgManager.getOrgList(page, keyword, orderBy.getSqlValue());
+        return page;
     }
 
     @Override
@@ -290,6 +297,26 @@ public class OrgServiceImpl implements OrgService {
     @Override
     public void batchUpdateOrgExpand(List<OrgExpand> updateList) {
         orgExpandManager.updateBatchById(updateList);
+    }
+
+    @Override
+    public List<String> getEffectiveOrgIdList() {
+        return orgManager.getEffectiveOrgIdList();
+    }
+
+    @Override
+    public void batchInsertOrUpdateStatsOrg(List<StatsOrg> saveList) {
+        statsOrgManager.saveOrUpdateBatch(saveList);
+    }
+
+    @Override
+    public StatsOrg getStatsOrg(String identityId) {
+        return orgManager.getStatsOrg(identityId);
+    }
+
+    @Override
+    public List<Org> getUserOrgList() {
+        return userOrgManager.getUserOrgList(UserContext.getCurrentUser().getAddress());
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

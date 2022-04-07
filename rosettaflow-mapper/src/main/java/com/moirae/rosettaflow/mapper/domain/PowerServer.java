@@ -88,4 +88,20 @@ public class PowerServer implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 全网目前的算力核心数，单位：个
+     */
+    @TableField(exist = false)
+    private int orgTotalCore;
+    /**
+     * 全网目前的算力内存数，单位：字节
+     */
+    @TableField(exist = false)
+    private long orgTotalMemory;
+    /**
+     * 全网目前的带宽，单位：字节
+     */
+    @TableField(exist = false)
+    private long orgTotalBandwidth;
 }

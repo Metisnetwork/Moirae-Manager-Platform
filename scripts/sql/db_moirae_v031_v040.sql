@@ -575,9 +575,9 @@ CREATE TABLE `mo_stats_org` (
     `org_total_core` int DEFAULT 0 COMMENT '全网目前的算力核心数，单位：个',
     `org_total_memory` bigint DEFAULT 0 COMMENT '全网目前的算力内存数，单位：字节',
     `org_total_bandwidth` bigint DEFAULT 0 COMMENT '全网目前的带宽，单位：字节',
-    `data_token_used` bigint DEFAULT 0 COMMENT '数据凭证使用量',
     `total_task` bigint DEFAULT 0 COMMENT '参与任务数量',
-    `total_file` bigint DEFAULT 0 COMMENT '总文件数',
+    `total_data` bigint DEFAULT 0 COMMENT '数据数',
+    `total_data_token` bigint DEFAULT 0 COMMENT '凭证数',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`identity_id`)
