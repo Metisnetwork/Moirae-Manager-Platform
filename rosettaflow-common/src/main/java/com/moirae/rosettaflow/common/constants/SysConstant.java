@@ -112,6 +112,8 @@ public class SysConstant {
             "user/login",
             "alg/getAlgTree",
             "alg/getAlgTreeDetails",
+            "org/getOrgStats",
+            "org/getOrgList",
 
             "swagger",
             "error",

@@ -9,6 +9,7 @@ import com.moirae.rosettaflow.service.DataSyncService;
 import com.moirae.rosettaflow.service.PowerService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,7 +28,7 @@ public class SyncDcPowerServerTask {
     @Resource
     private PowerService powerService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcPowerServer")
     public void run() {
         long begin = DateUtil.current();

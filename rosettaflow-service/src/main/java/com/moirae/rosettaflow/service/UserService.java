@@ -39,7 +39,7 @@ public interface UserService {
      *
      * @param nickName 昵称
      */
-    void updateNickName(String nickName);
+    void updateUserName(String nickName);
 
     /**
      * 获取登录nonce

@@ -13,6 +13,7 @@ import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -39,7 +40,7 @@ public class SyncDcTaskTask {
     @Resource
     private TaskService taskService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcTaskTask")
     public void run() {
         long begin = DateUtil.current();

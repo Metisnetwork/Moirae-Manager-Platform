@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateNickName(String nickName) {
+    public void updateUserName(String nickName) {
         User user = userManager.getValidByUserName(nickName);
         if (!Objects.isNull(user)) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.USER_NAME_EXISTED.getMsg());

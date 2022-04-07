@@ -38,7 +38,7 @@ public class OrgController {
     @Resource
     private OrgService orgService;
 
-    @GetMapping("（开发中）getOrgStats")
+    @GetMapping("getOrgStats")
     @ApiOperation(value = "查询组织统计", notes = "查询组织统计")
     public ResponseVo<OrgStatsVo> getOrgStats() {
         int orgCount = orgService.getOrgStats();

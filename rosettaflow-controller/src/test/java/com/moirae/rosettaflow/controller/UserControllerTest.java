@@ -59,10 +59,10 @@ public class UserControllerTest {
     }
 
     @Test
-    public void updateNickName() throws Exception {
+    public void updateUserName() throws Exception {
         JSONObject req = new JSONObject();
-        req.put("nickName", "flow1");
-        String result = mvc.perform(post("/user/updateNickName")
+        req.put("userName", "flow2");
+        String result = mvc.perform(post("/user/updateUserName")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(req.toJSONString().getBytes())
                         .header("Accept-Language","zh")

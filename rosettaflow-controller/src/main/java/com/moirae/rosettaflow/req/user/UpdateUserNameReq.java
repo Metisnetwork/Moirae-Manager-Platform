@@ -13,9 +13,9 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 @ApiModel("修改昵称请求参数")
-public class UpdateNickReq {
+public class UpdateUserNameReq {
 
     @ApiModelProperty(value = "昵称", required = true, example = "用户1")
     @NotBlank(message = "{user.nickname.notBlank}")
-    private String nickName;
+    private String userName;
 }
