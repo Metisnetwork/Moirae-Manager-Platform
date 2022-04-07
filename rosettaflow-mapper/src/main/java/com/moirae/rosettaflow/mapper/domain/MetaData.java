@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -120,6 +119,10 @@ public class MetaData implements Serializable {
     private String tokenPrice;
     @TableField(exist = false)
     private String tokenSymbol;
+    @TableField(exist = false)
+    private String tokenBalance;
+    @TableField(exist = false)
+    private Long tokenDecimal;
     @TableField(exist = false)
     private List<MetaDataColumn> columnsList;
 }

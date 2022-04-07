@@ -116,6 +116,10 @@ public class SysConstant {
             "org/getOrgStats",
             "org/getOrgList",
             "org/getOrgDetails",
+            "data/getDataStats",
+            "data/getDataListByOrg",
+            "data/getDataList",
+            "data/getDataDetails",
 
             "swagger",
             "error",

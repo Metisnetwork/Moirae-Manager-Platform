@@ -63,8 +63,8 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy) {
-        return this.baseMapper.getDataList(page, keyword, industry, fileType, minSize, maxSize, orderBy.getSqlValue());
+    public IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, Integer fileType, Long minSize, Long maxSize, String orderBy) {
+        return this.baseMapper.getDataList(page, keyword, industry, fileType, minSize, maxSize, orderBy);
     }
 
     @Override
@@ -79,8 +79,6 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
 
     @Override
     public int getDataCount() {
-        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(MetaData::getStatus, MetaDataStatusEnum.PUBLISHED);
-        return count(wrapper);
+        return this.baseMapper.getDataCount();
     }
 }

@@ -29,7 +29,7 @@ public interface MetaDataManager extends IService<MetaData> {
 
     IPage<MetaData> getDataListByOrg(Page<MetaData> page, String identityId);
 
-    IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy);
+    IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, Integer fileType, Long minSize, Long maxSize, String orderBy);
 
     MetaData getDataDetails(String metaDataId);
 

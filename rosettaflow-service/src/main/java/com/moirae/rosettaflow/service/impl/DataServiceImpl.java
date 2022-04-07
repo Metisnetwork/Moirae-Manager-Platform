@@ -59,7 +59,7 @@ public class DataServiceImpl implements DataService {
     @Override
     public IPage<MetaData> getDataList(Long current, Long size, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy) {
         Page<MetaData> page = new Page<>(current, size);
-        return metaDataManager.getDataList(page, keyword, industry, fileType, minSize, maxSize, orderBy);
+        return metaDataManager.getDataList(page, keyword, industry, fileType.getValue(), minSize, maxSize, orderBy.getSqlValue());
     }
 
     @Override

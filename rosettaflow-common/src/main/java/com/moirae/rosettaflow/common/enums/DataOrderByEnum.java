@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum DataOrderByEnum {
 
-    PUBLISHED("publishedAt",  " md.published_at desc","发布时间"),
-    TOKEN_NAME("tokenName",  "t.name asc","凭证名称"),
-    TOKEN_PRICE_DESC("tokenPriceDesc", "t.price desc", "凭证价格倒序"),
-    TOKEN_PRICE_ASC("tokenPriceAsc", "t.price asc",  "凭证价格正序");
+    PUBLISHED("publishedAt",  " dmd.published_at desc","发布时间"),
+    TOKEN_NAME("tokenName",  "mt.name","凭证名称"),
+    TOKEN_PRICE_DESC("tokenPriceDesc", "mt.price desc", "凭证价格倒序"),
+    TOKEN_PRICE_ASC("tokenPriceAsc", "mt.price asc",  "凭证价格正序");
 
     @JsonValue
     private String userValue;

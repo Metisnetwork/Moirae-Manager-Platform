@@ -10,7 +10,7 @@ import java.math.BigInteger;
 
 public class DataTokenTemplateTest extends BaseContractTest {
 
-    private String address = AddressUtils.hexToBech32("0x3a3b85bfc6b7b8435d713dca5ce308b9c4abe430");
+    private String address = AddressUtils.hexToBech32("0xfc4239a8dfe02c0d6db4a2b0c9ce8d11fd80b73c");
 
     @Test
     public void deploy() throws Exception{
@@ -31,13 +31,13 @@ public class DataTokenTemplateTest extends BaseContractTest {
     @Test
     public void transfer() throws Exception{
         DataTokenTemplate contract = load();
-        contract.transfer(AddressUtils.hexToBech32("0x6f852ba98639a001a315065ecaf2069c7479f4cc"), new BigInteger("2000000000000000000000")).send();
+        contract.transfer(AddressUtils.hexToBech32("0x6f852ba98639a001a315065ecaf2069c7479f4cc"), new BigInteger("5000000000000000000000")).send();
     }
 
     @Test
     public void approve() throws Exception{
-        DataTokenTemplate contract = load();
-        contract.approve(AddressUtils.hexToBech32("0x26d637e206cc39942628421e7b0d6fb41db0bc06"), new BigInteger("10000000000000000000")).send();
+        DataTokenTemplate contract = load(Credentials.create("68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f89"));
+        contract.approve(AddressUtils.hexToBech32("0x1e94d55639bcafd1bb55f1bad9ce9beaf8f6d749"), new BigInteger("20000000000000000000")).send();
     }
 
     @Test

@@ -146,83 +146,92 @@
             and ((dmda.auth_type = 1 AND dmda.expired = 0) or (dmda.auth_type = 2 AND dmda.used_times &lt; dmda.times))
     </select>
     <select id="getDataListByOrg" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
-        select md.meta_data_id,
-               md.file_name as metaDataName,
-               md.identity_id,
-               o.node_name,
-               t.name as tokenName,
-               t.price as tokenPrice
-        from dc_meta_data md
-            inner join dc_org o on md.identity_id = o.identity_id
-            left join mo_token t on md.token_address = t.address
-        where md.status = 2
-            and md.identity_id = #{identityId}
-        order by md.published_at desc
+        select dmd.meta_data_id,
+               dmd.file_name as metaDataName,
+               dmd.identity_id,
+               do.node_name,
+               mt.name as tokenName,
+               mt.price as tokenPrice
+        from dc_meta_data dmd
+            inner join dc_org do on dmd.identity_id = do.identity_id
+            inner join mo_token mt on dmd.token_address = mt.address
+        where dmd.status = 2
+            and mt.is_add_liquidity = 1
+            and dmd.identity_id = #{identityId}
+        order by dmd.published_at desc
     </select>
     <select id="getDataList" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
-        select md.meta_data_id,
-               md.file_name as metaDataName,
-               md.identity_id,
-               o.node_name,
-               t.name as tokenName,
-               t.price as tokenPrice
-        from dc_meta_data md
-                 inner join dc_org o on md.identity_id = o.identity_id
-                 left join mo_token t on md.token_address = t.address
-        where md.status = 2
+        select dmd.meta_data_id,
+               dmd.file_name as metaDataName,
+               dmd.identity_id,
+               do.node_name,
+               mt.name as tokenName,
+               mt.price as tokenPrice
+        from dc_meta_data dmd
+            inner join dc_org do on dmd.identity_id = do.identity_id
+            inner join mo_token mt on dmd.token_address = mt.address
+        where dmd.status = 2
+            and mt.is_add_liquidity = 1
             <if test="keyword != null and keyword != ''">
-                and ( md.meta_data_id = #{keyword} or t.name like concat('%', #{keyword}, '%') )
+                and ( dmd.meta_data_id = #{keyword} or mt.name like concat('%', #{keyword}, '%') )
             </if>
             <if test="industry != null and industry != ''">
-                and md.industry = #{industry}
+                and dmd.industry = #{industry}
             </if>
-            <if test="fileType != null and fileType != ''">
-                and md.file_type = #{fileType}
+            <if test="fileType != null">
+                and dmd.file_type = #{fileType}
             </if>
             <if test="minSize != null">
-                and md.size >= #{minSize}
+                and dmd.size <![CDATA[>=]]> #{minSize}
             </if>
             <if test="maxSize != null">
-                and md.size >= #{maxSize}
+                and dmd.size <![CDATA[<=]]> #{maxSize}
              </if>
-        order by #{orderBy}
+        order by ${orderBy}
     </select>
     <select id="getDataDetails" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
-        select md.meta_data_id,
-               md.file_name as metaDataName,
-               md.identity_id,
-               o.node_name,
-               t.name as tokenName,
-               t.price as tokenPrice,
-               md.file_type,
-               t.symbol as tokenSymbol,
-               md.published_at,
-               md.industry,
-               md.size,
-               md.rows,
-               md.columns,
-               md.remarks
-        from dc_meta_data md
-                 inner join dc_org o on md.identity_id = o.identity_id
-                 left join mo_token t on md.token_address = t.address
-        where md.status = 2
-            and md.meta_data_id = #{metaDataId}
+        select dmd.meta_data_id,
+               dmd.file_name as metaDataName,
+               dmd.identity_id,
+               do.node_name,
+               mt.name as tokenName,
+               mt.price as tokenPrice,
+               dmd.file_type,
+               mt.symbol as tokenSymbol,
+               dmd.published_at,
+               dmd.industry,
+               dmd.size,
+               dmd.rows,
+               dmd.columns,
+               dmd.remarks
+        from dc_meta_data dmd
+                 inner join dc_org do on dmd.identity_id = do.identity_id
+                 inner join mo_token mt on dmd.token_address = mt.address
+        where dmd.status = 2
+            and mt.is_add_liquidity = 1
+            and dmd.meta_data_id = #{metaDataId}
     </select>
     <select id="getUserDataList" resultType="com.moirae.rosettaflow.mapper.domain.MetaData">
-        select md.meta_data_id,
-               md.file_name as metaDataName,
-               md.identity_id,
-               o.node_name,
-               t.name as tokenName,
-               t.price as tokenPrice,
-               t.symbol as tokenSymbol,
-               t.`decimal` as tokenDecimal,
-               th.balance as tokenBalance
-        from dc_meta_data md
-            inner join dc_org o on md.identity_id = o.identity_id
-            inner join mo_token t on md.token_address = t.address
-            inner join mo_token_holder th on t.address = th.token_address and th.address = #{address}
-        where md.status = 2
-        order by th.balance desc
+        select dmd.meta_data_id,
+               dmd.file_name as metaDataName,
+               dmd.identity_id,
+               do.node_name,
+               mt.name as tokenName,
+               mt.price as tokenPrice,
+               mt.symbol as tokenSymbol,
+               mt.`decimal` as tokenDecimal,
+               mth.balance as tokenBalance
+        from dc_meta_data dmd
+                 inner join dc_org do on dmd.identity_id = do.identity_id
+                 inner join mo_token mt on dmd.token_address = mt.address
+                 inner join mo_token_holder mth on mt.address = mth.token_address and mth.address = #{address}
+        where dmd.status = 2
+          and mt.is_add_liquidity = 1
+        order by mth.balance desc
+    </select>
+    <select id="getDataCount" resultType="java.lang.Integer">
+        select count(1)
+        from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address
+        where  mt.is_add_liquidity = 1 and dmd.status = 2
     </select>
 </mapper>

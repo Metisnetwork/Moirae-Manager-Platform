@@ -31,9 +31,11 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
 
     IPage<MetaData> getDataListByOrg(Page<MetaData> page, String identityId);
 
-    IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, String orderBy);
+    IPage<MetaData> getDataList(Page<MetaData> page, String keyword, String industry, Integer fileType, Long minSize, Long maxSize, String orderBy);
 
     MetaData getDataDetails(String metaDataId);
 
     IPage<MetaData> getUserDataList(Page<MetaData> page, String address);
+
+    int getDataCount();
 }
