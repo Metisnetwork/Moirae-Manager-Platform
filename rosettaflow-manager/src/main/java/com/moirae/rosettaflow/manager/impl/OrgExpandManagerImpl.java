@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.OrgExpandManager;
 import com.moirae.rosettaflow.mapper.OrgExpandMapper;
@@ -20,5 +22,12 @@ public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand
     @Override
     public List<String> getUsableIdentityIdList() {
         return orgExpandMapper.getUsableIdentityIdList();
+    }
+
+    @Override
+    public List<OrgExpand> getOrgExpandList() {
+        LambdaQueryWrapper<OrgExpand> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(OrgExpand::getIdentityId, OrgExpand::getObserverProxyWalletAddress);
+        return list(wrapper);
     }
 }

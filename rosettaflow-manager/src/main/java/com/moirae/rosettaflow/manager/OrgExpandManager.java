@@ -8,4 +8,6 @@ import java.util.List;
 public interface OrgExpandManager extends IService<OrgExpand> {
 
     List<String> getUsableIdentityIdList();
+
+    List<OrgExpand> getOrgExpandList();
 }

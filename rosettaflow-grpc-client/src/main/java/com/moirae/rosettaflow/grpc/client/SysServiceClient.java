@@ -3,10 +3,7 @@ package com.moirae.rosettaflow.grpc.client;
 import cn.hutool.core.bean.BeanUtil;
 import com.google.protobuf.Empty;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
-import com.moirae.rosettaflow.grpc.service.GetTaskResultFileSummaryListResponse;
-import com.moirae.rosettaflow.grpc.service.GetTaskResultFileSummaryRequest;
-import com.moirae.rosettaflow.grpc.service.GetTaskResultFileSummaryResponse;
-import com.moirae.rosettaflow.grpc.service.YarnServiceGrpc;
+import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 import io.grpc.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +25,15 @@ public class SysServiceClient {
     @GrpcClient("carrier-grpc-server")
     YarnServiceGrpc.YarnServiceBlockingStub yarnServiceBlockingStub;
 
-//    /**
-//     * 查询指定任务的结果摘要
-//     *
-//     * @param taskId 任务id
-//     * @return 任务结果文件摘要
-//     */
+    public YarnNodeInfo getNodeInfo(Channel channel){
+        GetNodeInfoResponse response = YarnServiceGrpc.newBlockingStub(channel).getNodeInfo(Empty.newBuilder().build());
+        if (response.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+            return response.getInformation();
+        }
+        return null;
+    }
+
+
 
     /**
      * 查询指定任务的结果摘要

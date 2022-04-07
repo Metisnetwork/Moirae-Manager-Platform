@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
 import com.moirae.rosettaflow.dto.OrganizationDto;
 import com.moirae.rosettaflow.mapper.domain.Org;
+import com.moirae.rosettaflow.mapper.domain.OrgExpand;
 import io.grpc.ManagedChannel;
 
 import java.util.List;
@@ -160,4 +161,8 @@ public interface OrgService {
     IPage<Org> getOrgList(Long current, Long size, String keyword, OrgOrderByEnum orderBy);
 
     Org getOrgDetails(String identityId);
+
+    List<OrgExpand> getOrgExpandList();
+
+    void batchUpdateOrgExpand(List<OrgExpand> updateList);
 }

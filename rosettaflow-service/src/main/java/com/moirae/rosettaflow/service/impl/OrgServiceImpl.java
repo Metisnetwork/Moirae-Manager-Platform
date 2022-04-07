@@ -282,6 +282,16 @@ public class OrgServiceImpl implements OrgService {
         return orgManager.getOrgDetails(identityId);
     }
 
+    @Override
+    public List<OrgExpand> getOrgExpandList() {
+        return orgExpandManager.getOrgExpandList();
+    }
+
+    @Override
+    public void batchUpdateOrgExpand(List<OrgExpand> updateList) {
+        orgExpandManager.updateBatchById(updateList);
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)
