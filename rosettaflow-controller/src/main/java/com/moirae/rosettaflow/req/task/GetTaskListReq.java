@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -22,6 +23,18 @@ public class GetTaskListReq extends CommonPageReq {
 
     @ApiModelProperty(value = "时间的结束")
     private Date end;
+
+    public void setBegin(String begin){
+        if(StringUtils.isNotBlank(begin)){
+            this.begin = new Date(Long.valueOf(begin));
+        }
+    }
+
+    public void setEnd(String end){
+        if(StringUtils.isNotBlank(end)){
+            this.end = new Date(Long.valueOf(end));
+        }
+    }
 
     @ApiModelProperty(value = "任务状态")
     private TaskStatusEnum taskStatus;

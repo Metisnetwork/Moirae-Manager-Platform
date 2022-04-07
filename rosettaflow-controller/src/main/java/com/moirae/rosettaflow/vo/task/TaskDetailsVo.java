@@ -1,8 +1,5 @@
 package com.moirae.rosettaflow.vo.task;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.moirae.rosettaflow.common.constants.SysConstant;
-import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,23 +7,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Objects;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "任务详情")
 public class TaskDetailsVo extends BaseTaskVo {
 
-    @ApiModelProperty(value = "任务类别")
-    public String getTaskType(){
-        if (Objects.nonNull(LanguageContext.get()) && LanguageContext.get().equals(SysConstant.EN_US)) {
-            return algorithmNameEn;
-        }
-        return algorithmName;
-    }
-
     @ApiModelProperty(value = "发起地址")
-    private String address;
+    private String address;    private String userId;
 
     @ApiModelProperty(value = "需要的内存")
     private Long requiredMemory;
@@ -57,9 +45,4 @@ public class TaskDetailsVo extends BaseTaskVo {
 
     @ApiModelProperty(value = "任务结果中模型评估")
     private TaskModelEvaluationVo taskModelEvaluation;
-
-    @JsonIgnore
-    private String algorithmName;
-    @JsonIgnore
-    private String algorithmNameEn;
 }

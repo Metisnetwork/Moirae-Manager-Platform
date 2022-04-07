@@ -121,16 +121,16 @@
                t.start_at,
                t.end_at,
                t.status
-        from dc_task t join dc_task_data_provider tmd on t.id = tmd.task_id and tmd.meta_data_id = #{metaDataId,jdbcType=VARCHAR}
+        from dc_task t
         where 1 = 1
             <if test="keyword != null and keyword != ''">
                 and t.id = #{keyword}
             </if>
             <if test="begin != null">
-                and t.create_at >= #{begin}
+                and t.create_at <![CDATA[>=]]> #{begin}
             </if>
-            <if test="begin != null">
-                and t.create_at >= #{end}
+            <if test="end != null">
+                and t.create_at <![CDATA[<=]]> #{end}
             </if>
             <if test="status != null">
                 and t.status = #{status}

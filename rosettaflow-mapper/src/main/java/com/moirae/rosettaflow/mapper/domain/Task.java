@@ -173,7 +173,7 @@ public class Task implements Serializable {
      * 任务发起方
      */
     @TableField(exist = false)
-    private Org taskSponsor;
+    private Org sponsor;
 
     /**
      * 算法提供方
@@ -199,9 +199,17 @@ public class Task implements Serializable {
     @TableField(exist = false)
     private List<TaskResultConsumer> resultReceiverList;
 
-    @TableField(exist = false)
-    private String algorithmName;
-    @TableField(exist = false)
-    private String algorithmNameEn;
+    public String getAddress(){
+        return userId;
+    }
+
+    @ApiModelProperty(value = "任务事件")
+    private List<TaskEvent> eventList;
+
+    @ApiModelProperty(value = "任务结果文件")
+    private List<WorkflowRunTaskResult> taskResultList;
+
+//    @ApiModelProperty(value = "任务结果中模型评估")
+//    private TaskModelEvaluationVo taskModelEvaluation;
 
 }

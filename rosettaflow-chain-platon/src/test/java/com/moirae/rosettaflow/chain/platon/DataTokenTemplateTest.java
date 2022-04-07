@@ -10,7 +10,7 @@ import java.math.BigInteger;
 
 public class DataTokenTemplateTest extends BaseContractTest {
 
-    private String address = AddressUtils.hexToBech32("0xfc4239a8dfe02c0d6db4a2b0c9ce8d11fd80b73c");
+    private String address = AddressUtils.hexToBech32("0xab94a2338ca24d05e2cc6318ecbd083eabbe473c");
 
     @Test
     public void deploy() throws Exception{
@@ -31,7 +31,7 @@ public class DataTokenTemplateTest extends BaseContractTest {
     @Test
     public void transfer() throws Exception{
         DataTokenTemplate contract = load();
-        contract.transfer(AddressUtils.hexToBech32("0x6f852ba98639a001a315065ecaf2069c7479f4cc"), new BigInteger("5000000000000000000000")).send();
+        contract.transfer(AddressUtils.hexToBech32("0xD1B3D3CDc28A07FBb265ad6b0c3B77f65fE2FD49"), new BigInteger("5000000000000000000000")).send();
     }
 
     @Test

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TaskStatusEnum {
 
-    ALL(0, "全部"),
-    SUCCESS(1, "成功"),
-    FAIL(2, "失败");
+    ALL(null, "全部"),
+    SUCCESS(4, "成功"),
+    FAIL(3, "失败");
 
     @JsonValue
     private Integer value;
