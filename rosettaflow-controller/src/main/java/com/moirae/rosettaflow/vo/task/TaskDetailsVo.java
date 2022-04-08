@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.vo.task;
 
-import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +13,7 @@ import java.util.List;
 public class TaskDetailsVo extends BaseTaskVo {
 
     @ApiModelProperty(value = "发起地址")
-    private String address;    private String userId;
+    private String address;
 
     @ApiModelProperty(value = "需要的内存")
     private Long requiredMemory;
@@ -39,10 +38,4 @@ public class TaskDetailsVo extends BaseTaskVo {
 
     @ApiModelProperty(value = "任务事件")
     private List<TaskEventVo> eventList;
-
-    @ApiModelProperty(value = "任务结果文件")
-    private List<TaskResultDto> taskResultList;
-
-    @ApiModelProperty(value = "任务结果中模型评估")
-    private TaskModelEvaluationVo taskModelEvaluation;
 }

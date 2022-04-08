@@ -20,6 +20,7 @@ import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,8 +94,21 @@ public class DataServiceImpl implements DataService {
 
 
     @Override
-    public Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId) {
-        return metaDataManager.listByIds(metaDataId).stream().collect(Collectors.toMap(MetaData::getMetaDataId, item -> item));
+    public Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataId) {
+        List<MetaData> metaDataList = metaDataManager.listByIds(metaDataId);
+        Set<String> tokenIdList = metaDataList.stream()
+                .filter(item -> StringUtils.isNotBlank(item.getTokenAddress()))
+                .map(MetaData::getTokenAddress)
+                .collect(Collectors.toSet());
+        Map<String, Token> tokenMap = tokenManager.listByIds(tokenIdList).stream().collect(Collectors.toMap(Token::getAddress, item -> item));
+
+        metaDataList.stream().forEach(item -> {
+            if(tokenMap.containsKey(item.getTokenAddress())){
+                item.setTokenName(tokenMap.get(item.getTokenAddress()).getName());
+            }
+        });
+
+        return metaDataList.stream().collect(Collectors.toMap(MetaData::getMetaDataId, item -> item));
     }
 
 

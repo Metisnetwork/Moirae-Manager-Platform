@@ -65,7 +65,7 @@ public interface DataService {
 
     void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList);
 
-    Map<String, MetaData> getMetaDataId2metaDataMap(Set<String> metaDataId);
+    Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataId);
 
     MetaDataColumn getByKey(String metaDataId, Integer columnIdx);
 

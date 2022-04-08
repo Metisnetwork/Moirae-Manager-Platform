@@ -51,4 +51,11 @@ public class TaskDataProvider implements Serializable {
      */
     @TableField(exist = false)
     private String metaDataName;
+
+
+    /**
+     * 元数据代币名称
+     */
+    @TableField(exist = false)
+    private String dataTokenName;
 }

@@ -93,19 +93,20 @@ public class TaskServiceImpl implements TaskService {
         // 任务
         Task task = taskManager.getById(taskId);
         // 任务发起方
-        task.setTaskSponsor(identityId2OrgMap.get(task.getOwnerIdentityId()));
+        task.setSponsor(identityId2OrgMap.get(task.getOwnerIdentityId()));
         // 任务算法提供方
         TaskAlgoProvider taskAlgoProvider = taskAlgoProviderManager.getById(taskId);
         taskAlgoProvider.setNodeName(identityId2OrgMap.get(taskAlgoProvider.getIdentityId()).getNodeName());
         task.setAlgoProvider(taskAlgoProvider);
         // 任务数据提供方
         List<TaskDataProvider> taskDataProviderList = taskDataProviderManager.listByTaskId(taskId);
-        Map<String, MetaData> metaDataId2metaDataMap = dataService.getMetaDataId2metaDataMap(taskDataProviderList.stream().map(TaskDataProvider::getMetaDataId).collect(Collectors.toSet()));
+        Map<String, MetaData> metaDataId2MetaDataMap = dataService.getMetaDataId2MetaDataMap(taskDataProviderList.stream().map(TaskDataProvider::getMetaDataId).collect(Collectors.toSet()));
         task.setDataProviderList(taskDataProviderList.stream()
-                .filter(item -> metaDataId2metaDataMap.containsKey(item.getMetaDataId()))   // 过滤模型
+                .filter(item -> metaDataId2MetaDataMap.containsKey(item.getMetaDataId()))   // 过滤模型
                 .map(item -> {
                     item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
-                    item.setMetaDataName(metaDataId2metaDataMap.get(item.getMetaDataId()).getFileName());
+                    item.setMetaDataName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getFileName());
+                    item.setDataTokenName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getTokenName());
                     return item;
                 })
                 .collect(Collectors.toList())
@@ -122,6 +123,11 @@ public class TaskServiceImpl implements TaskService {
             item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
         });
         task.setResultReceiverList(taskResultConsumerList);
+        // 事件列表
+        task.setEventList(taskEventManager.listByTaskId(taskId));
+        task.getEventList().forEach(item ->{
+            item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
+        });
         return task;
     }
 

@@ -34,7 +34,8 @@ public class Task implements Serializable {
     /**
      * 发起任务的用户的信息 (task是属于用户的)
      */
-    private String userId;
+    @TableField("user_id")
+    private String address;
 
     /**
      * 用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址
@@ -186,30 +187,19 @@ public class Task implements Serializable {
      */
     @TableField(exist = false)
     private List<TaskDataProvider> dataProviderList;
-
     /**
      * 算力提供方
      */
     @TableField(exist = false)
     private List<TaskPowerProvider> powerProviderList;
-
     /**
      * 结果接收方
      */
     @TableField(exist = false)
     private List<TaskResultConsumer> resultReceiverList;
-
-    public String getAddress(){
-        return userId;
-    }
-
-    @ApiModelProperty(value = "任务事件")
+    /**
+     * 任务事件
+     */
+    @TableField(exist = false)
     private List<TaskEvent> eventList;
-
-    @ApiModelProperty(value = "任务结果文件")
-    private List<WorkflowRunTaskResult> taskResultList;
-
-//    @ApiModelProperty(value = "任务结果中模型评估")
-//    private TaskModelEvaluationVo taskModelEvaluation;
-
 }

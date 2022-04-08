@@ -110,7 +110,7 @@ public class SyncDcTaskTask {
             Task task = new Task();
             task.setId(information.getTaskId());
             task.setTaskName(information.getTaskName());
-            task.setUserId(information.getUser());
+            task.setAddress(information.getUser());
             task.setUserType(UserTypeEnum.find(information.getUserType()));
             task.setRequiredMemory(information.getOperationCost().getMemory());
             task.setRequiredCore(information.getOperationCost().getProcessor());

@@ -68,7 +68,7 @@ public class TaskController {
     }
 
     @GetMapping("getTaskDetails")
-    @ApiOperation(value = "（开发中）查询任务详情", notes = "查询任务详情")
+    @ApiOperation(value = "查询任务详情", notes = "查询任务详情")
     public ResponseVo<TaskDetailsVo> getTaskDetails(@Valid GetTaskDetailsReq req) {
         Task task = taskService.getTaskDetails(req.getTaskId());
         return ResponseVo.createSuccess(BeanUtil.toBean(task, TaskDetailsVo.class));
