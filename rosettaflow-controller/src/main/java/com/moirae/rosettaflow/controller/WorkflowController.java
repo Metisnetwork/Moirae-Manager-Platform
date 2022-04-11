@@ -14,7 +14,9 @@ import com.moirae.rosettaflow.service.dto.workflow.*;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.wizard.CalculationProcessDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowDetailsOfWizardModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowWizardStepDto;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -69,31 +71,31 @@ public class WorkflowController {
     }
 
     @GetMapping("wizard/getCalculationProcessList")
-    @ApiOperation(value = "（开发中）查询计算流程列表", notes = "查询计算流程列表")
-    public ResponseVo<List<CalculationProcessVo>> getCalculationProcessList(@Valid GetCalculationProcessListReq req) {
+    @ApiOperation(value = "查询计算流程列表", notes = "查询计算流程列表")
+    public ResponseVo<List<CalculationProcessDto>> getCalculationProcessList(@Valid GetCalculationProcessListReq req) {
         List<CalculationProcess> itemList = workflowService.getCalculationProcessList(req.getAlgorithmId());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(itemList, CalculationProcessVo.class));
+        return ResponseVo.createSuccess(BeanUtil.copyToList(itemList, CalculationProcessDto.class));
     }
 
     @PostMapping("wizard/createWorkflowOfWizardMode")
-    @ApiOperation(value = "（开发中）向导模式下创建工作流", notes = "向导模式下创建工作流")
+    @ApiOperation(value = "向导模式下创建工作流", notes = "向导模式下创建工作流")
     public ResponseVo<WorkflowVersionKeyDto> createWorkflowOfWizardMode(@RequestBody @Validated CreateWorkflowOfWizardModeReq req) {
-        WorkflowVersionKeyDto workflowKeyDto = workflowService.createWorkflowOfWizardMode(BeanUtil.copyProperties(req, Workflow.class));
-        return ResponseVo.createSuccess(workflowKeyDto);
-    }
-
-    @PostMapping("wizard/settingWorkflowOfWizardMode")
-    @ApiOperation(value = "（开发中）向导模式设置工作流", notes = "向导模式设置工作流")
-    public ResponseVo<WorkflowVersionKeyDto> settingWorkflowOfWizardMode(@RequestBody @Validated WorkflowDetailsOfWizardModeDto req) {
-        WorkflowVersionKeyDto workflowKeyDto = workflowService.settingWorkflowOfWizardMode(req);
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.createWorkflowOfWizardMode(req.getWorkflowName(), req.getWorkflowDesc(), req.getAlgorithmId(), req.getCalculationProcessId());
         return ResponseVo.createSuccess(workflowKeyDto);
     }
 
     @GetMapping("wizard/getWorkflowSettingOfWizardMode")
-    @ApiOperation(value = "（开发中）向导模式下获取工作流设置", notes = "向导模式下获取工作流设置")
-    public ResponseVo<WorkflowDetailsOfWizardModeDto> getWorkflowSettingOfWizardMode(@Validated WorkflowVersionKeyDto req) {
+    @ApiOperation(value = "向导模式下获取工作流设置", notes = "向导模式下获取工作流设置")
+    public ResponseVo<WorkflowDetailsOfWizardModeDto> getWorkflowSettingOfWizardMode(@Validated WorkflowWizardStepDto req) {
         WorkflowDetailsOfWizardModeDto resp = workflowService.getWorkflowSettingOfWizardMode(req);
         return ResponseVo.createSuccess(resp);
+    }
+
+    @PostMapping("wizard/settingWorkflowOfWizardMode")
+    @ApiOperation(value = "向导模式设置工作流", notes = "向导模式设置工作流")
+    public ResponseVo<WorkflowVersionKeyDto> settingWorkflowOfWizardMode(@RequestBody @Validated WorkflowDetailsOfWizardModeDto req) {
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.settingWorkflowOfWizardMode(req);
+        return ResponseVo.createSuccess(workflowKeyDto);
     }
 
     @PostMapping("expert/createWorkflowOfExpertMode")

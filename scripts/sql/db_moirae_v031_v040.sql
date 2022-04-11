@@ -593,3 +593,10 @@ CREATE TABLE `mo_stats_data` (
     PRIMARY KEY (`meta_data_id`)
 ) ENGINE=InnoDB COMMENT='数据维度统计';
 
+
+CREATE TABLE `mo_calculation_process_task` (
+    `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
+    `step` int NOT NULL COMMENT '任务步骤',
+    `psi_algorithm_id` bigint DEFAULT NULL COMMENT '训练或预测中PSI的算法id',
+    PRIMARY KEY (`calculation_process_id`,`step`)
+) ENGINE=InnoDB COMMENT='计算流程任务步骤表'

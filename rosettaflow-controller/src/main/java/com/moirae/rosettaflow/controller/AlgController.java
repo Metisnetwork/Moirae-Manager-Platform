@@ -25,14 +25,14 @@ public class AlgController {
     @GetMapping("getAlgTree")
     @ApiOperation(value = "查询算法树", notes = "查询算法树")
     public ResponseVo<AlgTreeDto> getAlgTree() {
-        AlgTreeDto resp = algService.getAlgTree(false);
+        AlgTreeDto resp = algService.getAlgTreeDto(false);
         return ResponseVo.createSuccess(resp);
     }
 
     @GetMapping("getAlgTreeDetails")
     @ApiOperation(value = "查询算法树详情", notes = "查询算法树详情（包含算法代码及变量设置）")
     public ResponseVo<AlgTreeDto> getAlgTreeDetails() {
-        AlgTreeDto resp = algService.getAlgTree(true);
+        AlgTreeDto resp = algService.getAlgTreeDto(true);
         return ResponseVo.createSuccess(resp);
     }
 }

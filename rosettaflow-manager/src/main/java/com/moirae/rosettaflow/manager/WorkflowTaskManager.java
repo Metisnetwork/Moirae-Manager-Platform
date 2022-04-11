@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowTaskManager extends IService<WorkflowTask> {
 
+    WorkflowTask getByStep(Long workflowId, Long workflowVersion, Integer task1Step);
 }

@@ -21,5 +21,5 @@ public class CreateWorkflowOfWizardModeReq {
     private Long algorithmId;
 
     @ApiModelProperty(value = "计算流程id", required = true)
-    private Integer calculationProcessId;
+    private Long calculationProcessId;
 }

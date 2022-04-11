@@ -125,11 +125,10 @@ public class SysConstant {
             "task/getTaskListByData",
             "task/getTaskList",
             "task/getTaskDetails",
+            "workflow/wizard/getCalculationProcessList",
             "swagger",
             "error",
-            "api-docs",
-            "home/dataTrend",
-            "home/globalStats"
+            "api-docs"
     };
 
     /**

@@ -33,16 +33,6 @@ public class CalculationProcessAlgorithm implements Serializable {
      */
     private Long algorithmId;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-    /**
-     * 更新时间
-     */
-    @TableField(update = "now()")
-    private Date updateTime;
-
     private static final long serialVersionUID = 1L;
 
 }

@@ -87,12 +87,17 @@ public class Algorithm implements Serializable {
     /**
      * 是否需要输入模型: 0-否，1:是
      */
-    private Integer inputModel;
+    private Boolean inputModel;
 
     /**
      * 是否产生模型: 0-否，1:是
      */
-    private Integer outputModel;
+    private Boolean outputModel;
+
+    /**
+     * 是否支持默认的psi处理: 0-否，1:是
+     */
+    private Boolean supportDefaultPsi;
 
     /**
      * 输出存储形式: 1-明文，2:密文

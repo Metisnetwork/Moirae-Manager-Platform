@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowSettingWizardManager extends IService<WorkflowSettingWizard> {
 
+    WorkflowSettingWizard getOneByStep(Long workflowId, Long workflowVersion, Integer step);
 }

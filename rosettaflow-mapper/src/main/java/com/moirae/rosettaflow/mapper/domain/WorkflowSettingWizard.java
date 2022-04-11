@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -38,7 +39,7 @@ public class WorkflowSettingWizard implements Serializable {
      * 工作流版本号
      */
     @TableField("workflow_version")
-    private Integer workflowVersion;
+    private Long workflowVersion;
 
     /**
      * 当前步骤,从1开始
@@ -49,37 +50,19 @@ public class WorkflowSettingWizard implements Serializable {
      * 部署说明. 0-选择训练输入数据, 1-选择预测输入数据, 2-选择PSI输入数据, 3-选择计算环境(通用), 4-选择计算环境(训练&预测), 5-选择结果接收方(通用), 6-选择结果接收方(训练&预测)
      */
     @TableField("calculation_process_step_type")
-    private Integer calculationProcessStepType;
+    private CalculationProcessTypeEnum calculationProcessStepType;
 
     /**
-     * 通用的工作流任务配置id
+     * 任务1对应的步骤
      */
-    @TableField("workflow_task_id")
-    private Long workflowTaskId;
+    @TableField("`task_1_step`")
+    private Integer task1Step;
 
     /**
-     * 训练PSI的工作流任务配置id
+     * 任务2对应的步骤
      */
-    @TableField("psi_training_workflow_task_id")
-    private Long psiTrainingWorkflowTaskId;
-
-    /**
-     * 预测PSI的工作流任务配置id
-     */
-    @TableField("psi_prediction_workflow_task_id")
-    private Long psiPredictionWorkflowTaskId;
-
-    /**
-     * 训练的工作流任务配置id
-     */
-    @TableField("training_workflow_task_id")
-    private Long trainingWorkflowTaskId;
-
-    /**
-     * 预测的工作流任务配置id
-     */
-    @TableField("prediction_workflow_task_id")
-    private Long predictionWorkflowTaskId;
+    @TableField("`task_2_step`")
+    private Integer task2Step;
 
     /**
      * 创建时间

@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.service.dto.workflow.wizard;
 
-import com.moirae.rosettaflow.mapper.domain.CalculationProcessStep;
 import com.moirae.rosettaflow.service.dto.workflow.common.OutputDto;
 import com.moirae.rosettaflow.service.dto.workflow.common.ResourceDto;
 import io.swagger.annotations.ApiModel;
@@ -20,10 +19,10 @@ public class WorkflowDetailsOfWizardModeDto {
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流最新版本号")
-    private Integer workflowVersion;
+    private Long workflowVersion;
 
     @ApiModelProperty(value = "计算流程的当前步骤")
-    private CalculationProcessStep calculationProcessStep;
+    private CalculationProcessStepDto calculationProcessStep;
 
 
     @ApiModelProperty(value = "0-选择训练输入数据")

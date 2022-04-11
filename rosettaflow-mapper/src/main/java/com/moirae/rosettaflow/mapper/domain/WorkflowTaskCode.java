@@ -31,6 +31,11 @@ public class WorkflowTaskCode implements Serializable {
     private Long workflowTaskId;
 
     /**
+     * 计算合约变量模板json格式结构
+     */
+    private String calculateContractStruct;
+
+    /**
      * 计算合约
      */
     @TableField("calculate_contract_code")

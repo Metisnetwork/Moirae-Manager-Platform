@@ -59,8 +59,14 @@ public class CalculationProcess implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 计算步骤
+     * 设置步骤
      */
     @TableField(exist = false)
     private List<CalculationProcessStep> stepItem;
+
+    /**
+     * 任务步骤
+     */
+    @TableField(exist = false)
+    private List<CalculationProcessTask> taskItem;
 }

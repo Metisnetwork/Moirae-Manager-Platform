@@ -10,16 +10,16 @@ public class TreeUtils {
     /**
      * 使用递归方法建树
      * @param treeNodes
-     * @param orgId 树根
+     * @param id 树根
      * @return
      */
-    public static AlgorithmClassify buildTreeByRecursive(List<AlgorithmClassify> treeNodes, int orgId) {
+    public static AlgorithmClassify buildTreeByRecursive(List<AlgorithmClassify> treeNodes, Long id) {
     	if(treeNodes == null) {
     		return null;
     	}
 		AlgorithmClassify tree = null;
         for (AlgorithmClassify treeNode : treeNodes) {
-            if (orgId == treeNode.getId()) {
+            if (id == treeNode.getId()) {
             	tree = treeNode;
             	findChildren(tree,treeNodes);
             }
@@ -111,19 +111,22 @@ public class TreeUtils {
     /**
      * 查询子树
      * @param treeNodes
-     * @param orgId
+     * @param id
      * @return
      */
-	public static AlgorithmClassify findSubTree(AlgorithmClassify treeNodes, Integer orgId) {
+	public static AlgorithmClassify findSubTree(AlgorithmClassify treeNodes, Long id) {
 		if (treeNodes == null) {
 			return null;
 		}
-		if (treeNodes.getId().equals(orgId)) {
+		if (treeNodes.getId().equals(id)) {
 			return treeNodes;
 		}
 
+		if(treeNodes.getChildrenList() == null){
+			return null;
+		}
 		for (AlgorithmClassify children : treeNodes.getChildrenList()) {
-			AlgorithmClassify subResult = findSubTree(children, orgId);
+			AlgorithmClassify subResult = findSubTree(children, id);
 			if (subResult != null) {
 				return subResult;
 			}

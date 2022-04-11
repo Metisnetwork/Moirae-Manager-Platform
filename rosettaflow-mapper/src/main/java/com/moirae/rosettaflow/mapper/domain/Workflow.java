@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -31,7 +32,7 @@ public class Workflow implements Serializable {
      * 创建模式:1-专家模式,2-向导模式
      */
     @TableField("create_mode")
-    private Integer createMode;
+    private WorkflowCreateModeEnum createMode;
 
     /**
      * 用户地址

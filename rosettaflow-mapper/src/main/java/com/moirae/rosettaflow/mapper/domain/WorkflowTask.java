@@ -60,7 +60,7 @@ public class WorkflowTask implements Serializable {
      * 是否需要输入模型: 0-否，1:是
      */
     @TableField("input_model")
-    private Integer inputModel;
+    private Boolean inputModel;
 
     /**
      * 工作流节点需要的模型id
@@ -72,7 +72,7 @@ public class WorkflowTask implements Serializable {
      * 是否需要输入PSI: 0-否，1:是
      */
     @TableField("input_psi")
-    private Integer inputPsi;
+    private Boolean inputPsi;
 
     /**
      * 工作流节点需要的模型id

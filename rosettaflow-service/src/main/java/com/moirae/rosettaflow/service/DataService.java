@@ -2,11 +2,9 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
-import com.moirae.rosettaflow.mapper.domain.MetaData;
-import com.moirae.rosettaflow.mapper.domain.MetaDataColumn;
-import com.moirae.rosettaflow.mapper.domain.Token;
-import com.moirae.rosettaflow.mapper.domain.TokenHolder;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
+import com.moirae.rosettaflow.service.dto.model.ModelDto;
 
 import java.util.List;
 import java.util.Map;
@@ -80,4 +78,8 @@ public interface DataService {
     List<String> getTokenIdList();
 
     boolean batchInsertOrUpdateTokenHolder(String address, List<TokenHolder> tokenHolderList);
+
+    List<Model> queryAvailableModel(Long algorithmId, String identityId);
+
+    Model getModelById(String modelId);
 }

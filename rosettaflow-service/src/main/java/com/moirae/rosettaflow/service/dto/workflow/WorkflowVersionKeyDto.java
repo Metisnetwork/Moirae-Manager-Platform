@@ -11,5 +11,5 @@ import lombok.EqualsAndHashCode;
 public class WorkflowVersionKeyDto extends WorkflowKeyDto {
 
     @ApiModelProperty(value = "工作流最新版本号")
-    private Integer workflowVersion;
+    private Long workflowVersion;
 }

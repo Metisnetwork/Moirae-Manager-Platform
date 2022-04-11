@@ -30,7 +30,12 @@ public class AlgServiceImpl implements AlgService {
     private AlgorithmVariableManager algorithmVariableManager;
 
     @Override
-    public AlgTreeDto getAlgTree(boolean isNeedDetails) {
+    public AlgTreeDto getAlgTreeDto(boolean isNeedDetails) {
+        AlgorithmClassify algorithmClassify = getAlgTree(isNeedDetails, 1L);
+        return BeanUtil.copyProperties(algorithmClassify, AlgTreeDto.class);
+    }
+
+    public AlgorithmClassify getAlgTree(boolean isNeedDetails, Long rootId) {
         List<AlgorithmClassify> algorithmClassifyList = algorithmClassifyManager.list();
         algorithmClassifyList.forEach(item->{
             if(item.getIsExistAlgorithm()){
@@ -45,7 +50,11 @@ public class AlgServiceImpl implements AlgService {
                 item.setAlg(algorithm);
             }
         });
-        AlgorithmClassify algorithmClassify = TreeUtils.buildTreeByRecursive(algorithmClassifyList, 1);
-        return BeanUtil.copyProperties(algorithmClassify, AlgTreeDto.class);
+        return TreeUtils.buildTreeByRecursive(algorithmClassifyList, rootId);
+    }
+
+    @Override
+    public Algorithm getAlg(Long algorithmId) {
+        return algorithmManager.getById(algorithmId);
     }
 }

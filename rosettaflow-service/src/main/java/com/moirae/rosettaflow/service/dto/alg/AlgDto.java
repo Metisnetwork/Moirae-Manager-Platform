@@ -65,7 +65,10 @@ public class AlgDto {
     private Long runTime;
 
     @ApiModelProperty(value = "是否需要模型: 0-否，1:是")
-    private Integer inputModel;
+    private Boolean inputModel;
+
+    @ApiModelProperty(value = "是否支持默认的psi处理: 0-否，1:是")
+    private Boolean supportDefaultPsi;
 
     @ApiModelProperty(value = "输出存储形式: 1-明文，2:密文")
     private Integer storePattern;

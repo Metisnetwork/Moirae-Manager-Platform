@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.CalculationProcessMapper">
-    <select id="getCalculationProcessList"
-            resultType="com.moirae.rosettaflow.mapper.domain.CalculationProcess"></select>
+    <select id="getCalculationProcessList" resultType="com.moirae.rosettaflow.mapper.domain.CalculationProcess">
+        select mcp.calculation_process_id,
+               mcp.name,
+               mcp.name_en
+        from mo_calculation_process mcp inner join mo_calculation_process_algorithm mcpa on mcp.calculation_process_id = mcpa.calculation_process_id
+        where mcp.status = 1 and mcpa.algorithm_id = #{algorithmId}
+    </select>
 </mapper>

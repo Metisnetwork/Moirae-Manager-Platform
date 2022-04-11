@@ -3,11 +3,14 @@ package com.moirae.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
+import com.moirae.rosettaflow.mapper.domain.Model;
 import com.moirae.rosettaflow.req.CommonPageReq;
 import com.moirae.rosettaflow.req.data.GetDataDetailsReq;
 import com.moirae.rosettaflow.req.data.GetDataListReq;
+import com.moirae.rosettaflow.req.model.GetUserModelListReq;
 import com.moirae.rosettaflow.req.org.OrgIdPageReq;
 import com.moirae.rosettaflow.service.DataService;
+import com.moirae.rosettaflow.service.ModelService;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -15,6 +18,7 @@ import com.moirae.rosettaflow.vo.data.DataDetailsVo;
 import com.moirae.rosettaflow.vo.data.DataStatsVo;
 import com.moirae.rosettaflow.vo.data.DataVo;
 import com.moirae.rosettaflow.vo.data.UserDataVo;
+import com.moirae.rosettaflow.vo.data.ModelVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -79,5 +83,14 @@ public class DataController {
         IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize());
         List<UserDataVo> itemList = BeanUtil.copyToList(page.getRecords(), UserDataVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
+    }
+
+
+    @GetMapping("getUserModelList")
+    @ApiOperation(value = "（开发中）查询当前用户的模型列表", notes = "查询当前用户的模型列表")
+    public ResponseVo<List<ModelVo>> getUserModelList(@Valid GetUserModelListReq req) {
+        // 获取语言类型
+        List<Model> list =  dataService.queryAvailableModel(req.getAlgorithmId(), req.getIdentityId());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(list, ModelVo.class));
     }
 }

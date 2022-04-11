@@ -11,6 +11,7 @@ import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowDetailsOfWizardModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowWizardStepDto;
 
 import java.util.Date;
 import java.util.List;
@@ -25,11 +26,9 @@ public interface WorkflowService{
 
     List<CalculationProcess> getCalculationProcessList(Long algorithmId);
 
-    WorkflowVersionKeyDto createWorkflowOfWizardMode(Workflow workflow);
-
     WorkflowVersionKeyDto settingWorkflowOfWizardMode(WorkflowDetailsOfWizardModeDto req);
 
-    WorkflowDetailsOfWizardModeDto getWorkflowSettingOfWizardMode(WorkflowVersionKeyDto req);
+    WorkflowDetailsOfWizardModeDto getWorkflowSettingOfWizardMode(WorkflowWizardStepDto req);
 
     WorkflowVersionKeyDto createWorkflowOfExpertMode(Workflow copyProperties);
 
@@ -56,4 +55,6 @@ public interface WorkflowService{
     List<WorkflowFeeDto> estimateWorkflowFee(WorkflowVersionKeyDto req);
 
     IPage<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
+
+    WorkflowVersionKeyDto createWorkflowOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, Long calculationProcessId);
 }
