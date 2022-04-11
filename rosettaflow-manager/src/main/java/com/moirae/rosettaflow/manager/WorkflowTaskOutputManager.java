@@ -16,4 +16,6 @@ import java.util.List;
 public interface WorkflowTaskOutputManager extends IService<WorkflowTaskOutput> {
 
     List<WorkflowTaskOutput> listByWorkflowTaskId(Long workflowTaskId);
+
+    void clearAndSave(Long workflowTaskId, List<WorkflowTaskOutput> workflowTaskOutputList);
 }

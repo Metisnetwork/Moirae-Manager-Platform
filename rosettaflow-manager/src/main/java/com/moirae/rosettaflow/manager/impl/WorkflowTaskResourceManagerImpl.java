@@ -17,4 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowTaskResourceManagerImpl extends ServiceImpl<WorkflowTaskResourceMapper, WorkflowTaskResource> implements WorkflowTaskResourceManager {
 
+    @Override
+    public void clearAndSave(Long workflowTaskId, WorkflowTaskResource workflowTaskResource) {
+        removeById(workflowTaskId);
+        save(workflowTaskResource);
+    }
 }

@@ -27,4 +27,17 @@ public class WorkflowTaskOutputManagerImpl extends ServiceImpl<WorkflowTaskOutpu
         wrapper.eq(WorkflowTaskOutput::getWorkflowTaskId, workflowTaskId);
         return list(wrapper);
     }
+
+    @Override
+    public void clearAndSave(Long workflowTaskId, List<WorkflowTaskOutput> workflowTaskOutputList) {
+        clear(workflowTaskId);
+        saveBatch(workflowTaskOutputList);
+    }
+
+
+    private boolean clear(Long workflowTaskId){
+        LambdaQueryWrapper<WorkflowTaskOutput> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowTaskOutput::getWorkflowTaskId, workflowTaskId);
+        return remove(wrapper);
+    }
 }

@@ -16,4 +16,6 @@ import java.util.List;
 public interface WorkflowTaskInputManager extends IService<WorkflowTaskInput> {
 
     List<WorkflowTaskInput> listByWorkflowTaskId(Long workflowTaskId);
+
+    void clearAndSave(Long workflowTaskId, List<WorkflowTaskInput> trainingWorkflowTaskInputList);
 }

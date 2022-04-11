@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowTaskResourceManager extends IService<WorkflowTaskResource> {
 
+    void clearAndSave(Long workflowTaskId, WorkflowTaskResource workflowTaskResource);
 }

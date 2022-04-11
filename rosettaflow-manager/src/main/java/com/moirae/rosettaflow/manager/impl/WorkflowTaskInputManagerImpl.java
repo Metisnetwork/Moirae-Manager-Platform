@@ -27,4 +27,16 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
         wrapper.eq(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId);
         return list(wrapper);
     }
+
+    @Override
+    public void clearAndSave(Long workflowTaskId, List<WorkflowTaskInput> trainingWorkflowTaskInputList) {
+        clear(workflowTaskId);
+        saveBatch(trainingWorkflowTaskInputList);
+    }
+
+    private boolean clear(Long workflowTaskId){
+        LambdaQueryWrapper<WorkflowTaskInput> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId);
+        return remove(wrapper);
+    }
 }
