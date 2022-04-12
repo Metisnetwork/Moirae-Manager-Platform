@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CalculationProcessStepManager extends IService<CalculationProcessStep> {
     List<CalculationProcessStep> getList(Long calculationProcessId);
+
+    Boolean isEnd(Long calculationProcessId, Integer step);
 }

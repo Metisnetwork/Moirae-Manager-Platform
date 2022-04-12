@@ -65,6 +65,18 @@ public class WorkflowSettingWizard implements Serializable {
     private Integer task2Step;
 
     /**
+     * 任务3对应的步骤
+     */
+    @TableField("`task_3_step`")
+    private Integer task3Step;
+
+    /**
+     * 任务4对应的步骤
+     */
+    @TableField("`task_4_step`")
+    private Integer task4Step;
+
+    /**
      * 创建时间
      */
     private Date createTime;

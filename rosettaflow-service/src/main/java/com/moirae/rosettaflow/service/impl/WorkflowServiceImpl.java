@@ -21,6 +21,7 @@ import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExper
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.*;
+import com.moirae.rosettaflow.service.utils.CommonUtils;
 import com.moirae.rosettaflow.service.utils.TreeUtils;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -156,6 +158,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                     wizard.setStep(item.getStep());
                     wizard.setTask1Step(item.getTask1Step());
                     wizard.setTask2Step(item.getTask2Step());
+                    wizard.setTask3Step(item.getTask3Step());
+                    wizard.setTask4Step(item.getTask4Step());
                     return wizard;
                 })
                 .collect(Collectors.toList());
@@ -237,6 +241,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         result.setWorkflowVersion(req.getWorkflowVersion());
         Integer step = req.getCalculationProcessStep().getStep();
 
+        // 更新工作流设置版本
+        Workflow workflow = workflowManager.getById(req.getWorkflowId());
+        workflowManager.updateStep(workflow.getWorkflowId(), step, calculationProcessStepManager.isEnd(workflow.getCalculationProcessId(), step));
+
+        // 设置参数
         WorkflowSettingWizard wizard = workflowSettingWizardManager.getOneByStep(req.getWorkflowId(), req.getWorkflowVersion(), step);
 
         switch(req.getCalculationProcessStep().getType()){
@@ -247,19 +256,21 @@ public class WorkflowServiceImpl implements WorkflowService {
                 setPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), wizard.getTask2Step(), req.getPredictionInput());
                 break;
             case INPUT_PSI:
-                setPsiInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), req.getPsiInput());
+                setTrainingOrPredictionPsiInputOfWizardMode(req.getWorkflowId(),req.getWorkflowVersion(), wizard.getTask2Step(), req.getPsiInput().getIdentityId(), req.getPsiInput().getItem(), false);
                 break;
             case RESOURCE_COMMON:
-                setCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), req.getCommonResource());
+                setCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), Arrays.asList(wizard.getTask1Step(), wizard.getTask2Step()), req.getCommonResource());
                 break;
             case RESOURCE_TRAINING_PREDICTION:
-                setTrainingAndPredictionResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), wizard.getTask2Step(), req.getTrainingAndPredictionResource());
+                setCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), Arrays.asList(wizard.getTask1Step(), wizard.getTask2Step()), req.getTrainingAndPredictionResource().getTraining());
+                setCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), Arrays.asList(wizard.getTask3Step(), wizard.getTask4Step()), req.getTrainingAndPredictionResource().getPrediction());
                 break;
             case OUTPUT_COMMON:
-                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), req.getCommonOutput());
+                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getCommonOutput());
                 break;
             case OUTPUT_TRAINING_PREDICTION:
-                setTrainingAndPredictionOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), wizard.getTask2Step(), req.getTrainingAndPredictionOutput());
+                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getTrainingAndPredictionOutput().getTraining());
+                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step(), req.getTrainingAndPredictionOutput().getPrediction());
                 break;
         }
         return result;
@@ -286,40 +297,30 @@ public class WorkflowServiceImpl implements WorkflowService {
                 result.setPredictionInput(getPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case INPUT_PSI:
-                result.setPsiInput(getPsiInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step()));
+                result.setPsiInput(getPsiInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case RESOURCE_COMMON:
-                result.setCommonResource(getCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step()));
+                result.setCommonResource(getCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case RESOURCE_TRAINING_PREDICTION:
                 result.setTrainingAndPredictionResource(getTrainingAndPredictionResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), wizard.getTask2Step()));
                 break;
             case OUTPUT_COMMON:
-                result.setCommonOutput(getCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step()));
+                result.setCommonOutput(getCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case OUTPUT_TRAINING_PREDICTION:
-                result.setTrainingAndPredictionOutput(getTrainingAndPredictionOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), wizard.getTask2Step()));
+                TrainingAndPredictionOutputDto trainingAndPredictionOutputDto = new TrainingAndPredictionOutputDto();
+                trainingAndPredictionOutputDto.setTraining(getCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
+                trainingAndPredictionOutputDto.setPrediction(getCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step()));
+                result.setTrainingAndPredictionOutput(trainingAndPredictionOutputDto);
                 break;
         }
         return result;
     }
 
-    private TrainingAndPredictionOutputDto getTrainingAndPredictionOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, Integer task2Step) {
-        TrainingAndPredictionOutputDto trainingAndPredictionOutputDto = new TrainingAndPredictionOutputDto();
-        trainingAndPredictionOutputDto.setTraining(getCommonOutputOfWizardMode(workflowId, workflowVersion, task1Step));
-        trainingAndPredictionOutputDto.setPrediction(getCommonOutputOfWizardMode(workflowId, workflowVersion, task2Step));
-        return trainingAndPredictionOutputDto;
-    }
-
-    private void setTrainingAndPredictionOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, Integer task2Step, TrainingAndPredictionOutputDto trainingAndPredictionOutput) {
-        setCommonOutputOfWizardMode(workflowId, workflowVersion, task1Step, trainingAndPredictionOutput.getTraining());
-        setCommonOutputOfWizardMode(workflowId, workflowVersion, task2Step, trainingAndPredictionOutput.getPrediction());
-    }
-
-
-    private OutputDto getCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step) {
+    private OutputDto getCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer taskStep) {
         OutputDto outputDto = new OutputDto();
-        WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
+        WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, taskStep);
         List<WorkflowTaskOutput> workflowTaskOutputList = workflowTaskOutputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId());
         if(workflowTaskOutputList.size() > 0){
             outputDto.setStorePattern(workflowTaskOutputList.get(0).getStorePattern());
@@ -330,8 +331,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         return outputDto;
     }
 
-    private void setCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, OutputDto commonOutput) {
-        WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
+    private void setCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer taskStep, OutputDto commonOutput) {
+        WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, taskStep);
         List<WorkflowTaskOutput> workflowTaskOutputList = new ArrayList<>();
 
         for (int i = 0; i < commonOutput.getIdentityId().size(); i++) {
@@ -353,25 +354,40 @@ public class WorkflowServiceImpl implements WorkflowService {
         return trainingAndPredictionResourceDto;
     }
 
-    private void setTrainingAndPredictionResourceOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, Integer task2Step, TrainingAndPredictionResourceDto trainingAndPredictionResource) {
-        setCommonResourceOfWizardMode(workflowId, workflowVersion, task1Step, trainingAndPredictionResource.getTraining());
-        setCommonResourceOfWizardMode(workflowId, workflowVersion, task2Step, trainingAndPredictionResource.getPrediction());
-    }
-
     private ResourceDto getCommonResourceOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step) {
         ResourceDto resourceDto = new ResourceDto();
         WorkflowTask resource = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
         WorkflowTaskResource workflowTaskResource = workflowTaskResourceManager.getById(resource.getWorkflowTaskId());
-        BeanUtil.copyProperties(workflowTaskResource, resourceDto);
+
+        resourceDto.setCostCpu(workflowTaskResource.getCostCpu());
+        resourceDto.setCostGpu(workflowTaskResource.getCostGpu());
+        resourceDto.setCostMem(CommonUtils.convert2UserOfCostMem(workflowTaskResource.getCostMem()));
+        resourceDto.setCostBandwidth(CommonUtils.convert2UserOfCostBandwidth(workflowTaskResource.getCostBandwidth()));
+        resourceDto.setRunTime(CommonUtils.convert2UserOfRunTime(workflowTaskResource.getRunTime()));
         return resourceDto;
     }
 
-    private void setCommonResourceOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, ResourceDto commonResource) {
-        WorkflowTask resource = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
-        WorkflowTaskResource workflowTaskResource = new WorkflowTaskResource();
-        workflowTaskResource.setWorkflowTaskId(resource.getWorkflowTaskId());
-        BeanUtil.copyProperties(commonResource, workflowTaskResource);
-        workflowTaskResourceManager.clearAndSave(resource.getWorkflowTaskId(), workflowTaskResource);
+    private void setCommonResourceOfWizardMode(Long workflowId, Long workflowVersion, List<Integer> taskStepList, ResourceDto commonResource) {
+        List<WorkflowTaskResource> workflowTaskResourceList = new ArrayList<>();
+        List<Long> taskIdList = new ArrayList<>();
+        for (Integer taskStep: taskStepList) {
+            // 如果是单独psi，其中一个task为null
+            if(taskStep == null){
+                continue;
+            }
+            WorkflowTask resource = workflowTaskManager.getByStep(workflowId, workflowVersion, taskStep);
+            WorkflowTaskResource workflowTaskResource = new WorkflowTaskResource();
+            workflowTaskResource.setWorkflowTaskId(resource.getWorkflowTaskId());
+            workflowTaskResource.setCostCpu(commonResource.getCostCpu());
+            workflowTaskResource.setCostGpu(commonResource.getCostGpu());
+            workflowTaskResource.setCostMem(CommonUtils.convert2DbOfCostMem(commonResource.getCostMem()));
+            workflowTaskResource.setCostBandwidth(CommonUtils.convert2DbOfCostBandwidth(commonResource.getCostBandwidth()));
+            workflowTaskResource.setRunTime(CommonUtils.convert2DbOfRunTime(commonResource.getRunTime()));
+
+            taskIdList.add(resource.getWorkflowTaskId());
+            workflowTaskResourceList.add(workflowTaskResource);
+        }
+        workflowTaskResourceManager.clearAndSave(taskIdList, workflowTaskResourceList);
     }
 
     private PsiInputDto getPsiInputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step) {
@@ -382,25 +398,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         return psiInputDto;
     }
 
-    private void setPsiInputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, PsiInputDto psiInput) {
-        WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
-        psi.setIdentityId(psiInput.getIdentityId());
-        workflowTaskManager.updateById(psi);
-
-        List<WorkflowTaskInput> psiWorkflowTaskInputList = psiInput.getItem().stream()
-                .map(item -> {
-                    WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
-                    workflowTaskInput.setWorkflowTaskId(psi.getWorkflowTaskId());
-                    workflowTaskInput.setKeyColumn(item.getKeyColumn());
-                    return workflowTaskInput;
-                })
-                .collect(Collectors.toList());
-        workflowTaskInputManager.clearAndSave(psi.getWorkflowTaskId(), psiWorkflowTaskInputList);
-    }
-
-    private PredictionInputDto getPredictionInputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step) {
+    private PredictionInputDto getPredictionInputOfWizardMode(Long workflowId, Long workflowVersion, Integer taskStep) {
         PredictionInputDto predictionInputDto = new PredictionInputDto();
-        WorkflowTask prediction = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
+        WorkflowTask prediction = workflowTaskManager.getByStep(workflowId, workflowVersion, taskStep);
         predictionInputDto.setIdentityId(prediction.getIdentityId());
         predictionInputDto.setIsPsi(prediction.getInputPsi());
         predictionInputDto.setInputModel(prediction.getInputModel());
@@ -411,7 +411,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         return predictionInputDto;
     }
 
-    private void setPredictionInputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, Integer task2Step, PredictionInputDto predictionInput) {
+    private void setPredictionInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, Integer task2Step, PredictionInputDto predictionInput) {
         WorkflowTask prediction = workflowTaskManager.getByStep(workflowId, workflowVersion, task2Step);
         prediction.setIdentityId(predictionInput.getIdentityId());
         prediction.setInputPsi(predictionInput.getIsPsi());
@@ -420,30 +420,19 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
         workflowTaskManager.updateById(prediction);
 
-        List<WorkflowTaskInput> predictionWorkflowTaskInputList = predictionInput.getItem().stream()
-                .map(item -> {
-                    WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
-                    workflowTaskInput.setWorkflowTaskId(prediction.getWorkflowTaskId());
-                    BeanUtil.copyProperties(item, workflowTaskInput);
-                    return workflowTaskInput;
-                })
-                .collect(Collectors.toList());
+        List<WorkflowTaskInput> predictionWorkflowTaskInputList = new ArrayList<>();
+        for (int i = 0; i < predictionInput.getItem().size(); i++) {
+            WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
+            workflowTaskInput.setWorkflowTaskId(prediction.getWorkflowTaskId());
+            workflowTaskInput.setPartyId("p" + i);
+            BeanUtil.copyProperties(predictionInput.getItem().get(i), workflowTaskInput);
+            predictionWorkflowTaskInputList.add(workflowTaskInput);
+        }
+
         workflowTaskInputManager.clearAndSave(prediction.getWorkflowTaskId(), predictionWorkflowTaskInputList);
 
         if(predictionInput.getIsPsi()){
-            WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
-            psi.setIdentityId(predictionInput.getIdentityId());
-            workflowTaskManager.updateById(psi);
-
-            List<WorkflowTaskInput> psiWorkflowTaskInputList = predictionInput.getItem().stream()
-                    .map(item -> {
-                        WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
-                        workflowTaskInput.setWorkflowTaskId(psi.getWorkflowTaskId());
-                        workflowTaskInput.setKeyColumn(item.getKeyColumn());
-                        return workflowTaskInput;
-                    })
-                    .collect(Collectors.toList());
-            workflowTaskInputManager.clearAndSave(prediction.getWorkflowTaskId(), psiWorkflowTaskInputList);
+            setTrainingOrPredictionPsiInputOfWizardMode(workflowId, workflowVersion, psiTaskStep, predictionInput.getIdentityId(), predictionInput.getItem(), true);
         }
     }
 
@@ -457,7 +446,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         return trainingInputDto;
     }
 
-    private void setTrainingInputOfWizardMode(Long workflowId, Long workflowVersion, Integer task1Step, Integer task2Step, TrainingInputDto trainingInput) {
+    private void setTrainingInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, Integer task2Step, TrainingInputDto trainingInput) {
         WorkflowTask training = workflowTaskManager.getByStep(workflowId, workflowVersion, task2Step);
         training.setIdentityId(trainingInput.getIdentityId());
         training.setInputPsi(trainingInput.getIsPsi());
@@ -474,21 +463,44 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowTaskInputManager.clearAndSave(training.getWorkflowTaskId(), trainingWorkflowTaskInputList);
 
         if(trainingInput.getIsPsi()){
-            WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, task1Step);
-            psi.setIdentityId(trainingInput.getIdentityId());
-            workflowTaskManager.updateById(psi);
-
-            List<WorkflowTaskInput> psiWorkflowTaskInputList = new ArrayList<>();
-            for (int i = 0; i < trainingInput.getItem().size(); i++) {
-                WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
-                workflowTaskInput.setPartyId("p" + i);
-                workflowTaskInput.setWorkflowTaskId(psi.getWorkflowTaskId());
-                workflowTaskInput.setKeyColumn(trainingInput.getItem().get(i).getKeyColumn());
-                trainingWorkflowTaskInputList.add(workflowTaskInput);
-            }
-            workflowTaskInputManager.clearAndSave(training.getWorkflowTaskId(), psiWorkflowTaskInputList);
+            setTrainingOrPredictionPsiInputOfWizardMode(workflowId, workflowVersion, psiTaskStep, trainingInput.getIdentityId(), trainingInput.getItem(), true);
         }
     }
+
+    private void setTrainingOrPredictionPsiInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, String senderIdentityId, List<DataInputDto> item, boolean setOut){
+        WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, psiTaskStep);
+        psi.setIdentityId(senderIdentityId);
+        workflowTaskManager.updateById(psi);
+
+        List<WorkflowTaskInput> psiWorkflowTaskInputList = new ArrayList<>();
+        for (int i = 0; i < item.size(); i++) {
+            WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
+            workflowTaskInput.setWorkflowTaskId(psi.getWorkflowTaskId());
+            workflowTaskInput.setMetaDataId(item.get(i).getMetaDataId());
+            workflowTaskInput.setIdentityId(item.get(i).getIdentityId());
+            workflowTaskInput.setKeyColumn(item.get(i).getKeyColumn());
+            workflowTaskInput.setPartyId("p" + i);
+            psiWorkflowTaskInputList.add(workflowTaskInput);
+        }
+        workflowTaskInputManager.clearAndSave(psi.getWorkflowTaskId(), psiWorkflowTaskInputList);
+        if(setOut){
+            setPsiOutputOfWizardMode(psi.getWorkflowTaskId(), item, psi.getAlgorithmId());
+        }
+    }
+
+    private void setPsiOutputOfWizardMode(Long workflowTaskId, List<DataInputDto> inputDtoList, Long algorithmId) {
+        List<WorkflowTaskOutput> workflowTaskOutputList = new ArrayList<>();
+        for (int i = 0; i < inputDtoList.size(); i++) {
+            WorkflowTaskOutput workflowTaskOutput = new WorkflowTaskOutput();
+            workflowTaskOutput.setWorkflowTaskId(workflowTaskId);
+            workflowTaskOutput.setIdentityId(inputDtoList.get(i).getIdentityId());
+            workflowTaskOutput.setStorePattern(algService.getAlg(algorithmId).getStorePattern());
+            workflowTaskOutput.setPartyId("q" + i);
+            workflowTaskOutputList.add(workflowTaskOutput);
+        }
+        workflowTaskOutputManager.clearAndSave(workflowTaskId, workflowTaskOutputList);
+    }
+
 
     @Override
     public WorkflowVersionKeyDto createWorkflowOfExpertMode(Workflow workflow) {

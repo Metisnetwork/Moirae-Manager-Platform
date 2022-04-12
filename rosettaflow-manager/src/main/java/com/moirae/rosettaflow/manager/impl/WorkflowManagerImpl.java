@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,5 +34,14 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public IPage<Workflow> getWorkflowList(Page<Workflow> page, String address, String keyword, Long algorithmId, Date begin, Date end) {
         return baseMapper.getWorkflowList(page, address, keyword, algorithmId, begin, end);
+    }
+
+    @Override
+    public boolean updateStep(Long workflowId, Integer step, Boolean isSettingCompleted) {
+        LambdaUpdateWrapper<Workflow> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(Workflow::getCalculationProcessStep, step);
+        wrapper.set(Workflow::getIsSettingCompleted, isSettingCompleted);
+        wrapper.eq(Workflow::getWorkflowId, workflowId);
+        return update(wrapper);
     }
 }

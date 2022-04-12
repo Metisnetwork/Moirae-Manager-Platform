@@ -21,4 +21,6 @@ public interface WorkflowManager extends IService<Workflow> {
     int getWorkflowCount(String address);
 
     IPage<Workflow> getWorkflowList(Page<Workflow> page, String address, String keyword, Long algorithmId, Date begin, Date end);
+
+    boolean updateStep(Long workflowId, Integer step, Boolean isSettingCompleted);
 }

@@ -20,5 +20,5 @@ public class ModelDto {
     private String identityId;
 
     @ApiModelProperty(value = "模型名称")
-    private String fileName;
+    private String name;
 }

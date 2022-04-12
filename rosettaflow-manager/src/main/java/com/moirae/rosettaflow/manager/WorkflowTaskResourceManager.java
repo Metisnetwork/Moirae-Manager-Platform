@@ -3,6 +3,8 @@ package com.moirae.rosettaflow.manager;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskResource;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 工作流任务资源表 服务类
@@ -13,5 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowTaskResourceManager extends IService<WorkflowTaskResource> {
 
-    void clearAndSave(Long workflowTaskId, WorkflowTaskResource workflowTaskResource);
+    void clearAndSave(List<Long> taskIdList, List<WorkflowTaskResource> workflowTaskResourceList);
 }

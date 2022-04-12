@@ -52,6 +52,18 @@ public class CalculationProcessStep implements Serializable {
     @TableField("`task_2_step`")
     private Integer task2Step;
 
+    /**
+     * 任务3对应的步骤
+     */
+    @TableField("`task_3_step`")
+    private Integer task3Step;
+
+    /**
+     * 任务4对应的步骤
+     */
+    @TableField("`task_4_step`")
+    private Integer task4Step;
+
     private static final long serialVersionUID = 1L;
 
 }

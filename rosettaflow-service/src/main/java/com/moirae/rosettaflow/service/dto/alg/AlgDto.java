@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.service.dto.alg;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
+import com.moirae.rosettaflow.service.utils.CommonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -81,32 +82,17 @@ public class AlgDto {
 
     /** 展示时处理内存单位 */
     public Long getCostMem() {
-        if (null == this.costMem || this.costMem == 0) {
-            return 0L;
-        }
-        return new BigDecimal(this.costMem)
-                .divide(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024),
-                        SysConstant.INT_0, RoundingMode.UP).longValue();
+        return CommonUtils.convert2UserOfCostMem(this.costMem);
     }
 
     /** 展示时处理带宽单位 */
     public Long getCostBandwidth() {
-        if (null == this.costBandwidth || this.costBandwidth == 0) {
-            return 0L;
-        }
-        return new BigDecimal(this.costBandwidth)
-                .divide(BigDecimal.valueOf(SysConstant.INT_1024 * SysConstant.INT_1024),
-                        SysConstant.INT_0, RoundingMode.UP).longValue();
+        return CommonUtils.convert2UserOfCostBandwidth(this.costBandwidth);
     }
 
     /** 展示时最长运行时间单位处理 */
     public Long getRunTime() {
-        if (null == this.runTime || this.runTime == 0) {
-            return 0L;
-        }
-        return new BigDecimal(this.runTime)
-                .divide(BigDecimal.valueOf(SysConstant.INT_60 * SysConstant.INT_1000),
-                        SysConstant.INT_0, RoundingMode.HALF_UP).longValue();
+       return CommonUtils.convert2UserOfRunTime(this.runTime);
     }
 
     public String getAlgorithmName(){

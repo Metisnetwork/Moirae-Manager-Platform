@@ -20,4 +20,13 @@ public class CalculationProcessStepManagerImpl extends ServiceImpl<CalculationPr
         wrapper.eq(CalculationProcessStep::getCalculationProcessId, calculationProcessId);
         return list(wrapper);
     }
+
+    @Override
+    public Boolean isEnd(Long calculationProcessId, Integer step) {
+        LambdaQueryWrapper<CalculationProcessStep> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(CalculationProcessStep::getCalculationProcessId, calculationProcessId);
+        wrapper.orderByDesc(CalculationProcessStep::getStep);
+        wrapper.last(" limit 1");
+        return getOne(wrapper).getStep() == step;
+    }
 }
