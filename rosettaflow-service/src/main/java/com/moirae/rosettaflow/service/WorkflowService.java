@@ -30,8 +30,6 @@ public interface WorkflowService{
 
     WorkflowDetailsOfWizardModeDto getWorkflowSettingOfWizardMode(WorkflowWizardStepDto req);
 
-    WorkflowVersionKeyDto createWorkflowOfExpertMode(Workflow copyProperties);
-
     WorkflowVersionKeyDto settingWorkflowOfExpertMode(WorkflowDetailsOfExpertModeDto req);
 
     WorkflowDetailsOfExpertModeDto getWorkflowSettingOfExpertMode(WorkflowVersionKeyDto req);
@@ -57,4 +55,6 @@ public interface WorkflowService{
     IPage<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
 
     WorkflowVersionKeyDto createWorkflowOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, Long calculationProcessId);
+
+    WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName);
 }

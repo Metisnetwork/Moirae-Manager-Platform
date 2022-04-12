@@ -55,14 +55,14 @@ public class WorkflowSettingExpert implements Serializable {
     /**
      * 工作流任务配置id
      */
-    @TableField("psi_workflow_task_id")
-    private Long psiWorkflowTaskId;
+    @TableField("psi_task_step")
+    private Integer psiTaskStep;
 
     /**
      * 工作流任务配置id
      */
-    @TableField("workflow_task_id")
-    private Long workflowTaskId;
+    @TableField("task_step")
+    private Integer taskStep;
 
     /**
      * 创建时间

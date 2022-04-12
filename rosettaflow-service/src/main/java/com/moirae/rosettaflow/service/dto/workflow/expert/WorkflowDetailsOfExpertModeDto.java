@@ -18,7 +18,7 @@ public class WorkflowDetailsOfExpertModeDto {
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流最新版本号")
-    private Integer workflowVersion;
+    private Long workflowVersion;
 
     @ApiModelProperty(value = "工作流所有节点列表")
     List<NodeDto> workflowNodeList;

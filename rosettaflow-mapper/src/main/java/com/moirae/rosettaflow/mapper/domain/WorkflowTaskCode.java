@@ -8,8 +8,12 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -22,7 +26,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @TableName("mo_workflow_task_code")
 public class WorkflowTaskCode implements Serializable {
-
 
     /**
      * 工作流任务配置id
@@ -48,6 +51,11 @@ public class WorkflowTaskCode implements Serializable {
     private String dataSplitContractCode;
 
     /**
+     * 编辑类型:1-sql, 2-noteBook
+     */
+    private Integer editType;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -59,5 +67,4 @@ public class WorkflowTaskCode implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
 }

@@ -99,10 +99,17 @@ public class WorkflowController {
     }
 
     @PostMapping("expert/createWorkflowOfExpertMode")
-    @ApiOperation(value = "（开发中）专家模式下创建工作流", notes = "专家模式下创建工作流")
+    @ApiOperation(value = "专家模式下创建工作流", notes = "专家模式下创建工作流")
     public ResponseVo<WorkflowVersionKeyDto> createWorkflowOfExpertMode(@RequestBody @Validated CreateWorkflowOfExpertModeReq req) {
-        WorkflowVersionKeyDto workflowKeyDto = workflowService.createWorkflowOfExpertMode(BeanUtil.copyProperties(req, Workflow.class));
+        WorkflowVersionKeyDto workflowKeyDto = workflowService.createWorkflowOfExpertMode(req.getWorkflowName());
         return ResponseVo.createSuccess(workflowKeyDto);
+    }
+
+    @GetMapping("expert/getWorkflowSettingOfExpertMode")
+    @ApiOperation(value = "专家模式下获取工作流设置", notes = "专家模式下获取工作流设置")
+    public ResponseVo<WorkflowDetailsOfExpertModeDto> getWorkflowSettingOfExpertMode(@Validated WorkflowVersionKeyDto req) {
+        WorkflowDetailsOfExpertModeDto resp = workflowService.getWorkflowSettingOfExpertMode(req);
+        return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("expert/settingWorkflowOfExpertMode")
@@ -112,12 +119,6 @@ public class WorkflowController {
         return ResponseVo.createSuccess(workflowKeyDto);
     }
 
-    @GetMapping("expert/getWorkflowSettingOfExpertMode")
-    @ApiOperation(value = "（开发中）专家模式下获取工作流设置", notes = "专家模式下获取工作流设置")
-    public ResponseVo<WorkflowDetailsOfExpertModeDto> getWorkflowSettingOfExpertMode(@Validated WorkflowVersionKeyDto req) {
-        WorkflowDetailsOfExpertModeDto resp = workflowService.getWorkflowSettingOfExpertMode(req);
-        return ResponseVo.createSuccess(resp);
-    }
 
     @GetMapping("expert/getWorkflowStatusOfExpertMode")
     @ApiOperation(value = "（开发中）专家模式下获取工作流状态", notes = "获取工作流状态")

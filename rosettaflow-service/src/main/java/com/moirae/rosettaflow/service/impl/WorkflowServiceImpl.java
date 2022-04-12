@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
+import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
@@ -14,12 +15,8 @@ import com.moirae.rosettaflow.service.WorkflowService;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
-import com.moirae.rosettaflow.service.dto.workflow.common.DataInputDto;
-import com.moirae.rosettaflow.service.dto.workflow.common.OutputDto;
-import com.moirae.rosettaflow.service.dto.workflow.common.ResourceDto;
-import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
-import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
-import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.common.*;
+import com.moirae.rosettaflow.service.dto.workflow.expert.*;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.*;
 import com.moirae.rosettaflow.service.utils.CommonUtils;
 import com.moirae.rosettaflow.service.utils.TreeUtils;
@@ -169,6 +166,32 @@ public class WorkflowServiceImpl implements WorkflowService {
         return result;
     }
 
+    @Override
+    @Transactional
+    public WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName) {
+        WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
+
+        // 创建工作流记录
+        Workflow workflow = new Workflow();
+        workflow.setCreateMode(WorkflowCreateModeEnum.EXPERT_MODE);
+        workflow.setWorkflowName(workflowName);
+        workflow.setWorkflowVersion(1L);
+        workflow.setAddress(UserContext.getCurrentUser().getAddress());
+        workflowManager.save(workflow);
+
+        // 创建工作流版本
+        WorkflowVersion workflowVersion = new WorkflowVersion();
+        workflowVersion.setWorkflowId(workflow.getWorkflowId());
+        workflowVersion.setWorkflowVersion(1L);
+        workflowVersion.setWorkflowVersionName(StringUtils.join(workflowName, "-v1"));
+        workflowVersionManager.save(workflowVersion);
+
+        result.setWorkflowId(workflow.getWorkflowId());
+        result.setWorkflowVersion(workflow.getWorkflowVersion());
+        return result;
+    }
+
+
     private void initWorkflowTaskResourceOfWizardMode(Long workflowTaskId, Algorithm algorithm) {
         WorkflowTaskResource workflowTaskResource = new WorkflowTaskResource();
         workflowTaskResource.setWorkflowTaskId(workflowTaskId);
@@ -191,6 +214,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                     workflowTaskVariable.setWorkflowTaskId(workflowTaskId);
                     workflowTaskVariable.setVarKey(item.getVarKey());
                     workflowTaskVariable.setVarValue(item.getVarValue());
+                    workflowTaskVariable.setVarDesc(item.getVarDesc());
+                    workflowTaskVariable.setVarDescEn(item.getVarDescEn());
                     return workflowTaskVariable;
                 })
                 .collect(Collectors.toList());
@@ -203,6 +228,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
         WorkflowTaskCode workflowTaskCode = new WorkflowTaskCode();
         workflowTaskCode.setWorkflowTaskId(workflowTaskId);
+        workflowTaskCode.setEditType(algorithm.getAlgorithmCode().getEditType());
         workflowTaskCode.setCalculateContractStruct(algorithm.getAlgorithmCode().getCalculateContractStruct());
         workflowTaskCode.setCalculateContractCode(algorithm.getAlgorithmCode().getCalculateContractCode());
         workflowTaskCode.setDataSplitContractCode(algorithm.getAlgorithmCode().getDataSplitContractCode());
@@ -502,10 +528,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
 
-    @Override
-    public WorkflowVersionKeyDto createWorkflowOfExpertMode(Workflow workflow) {
-        return create(workflow, WorkflowCreateModeEnum.EXPERT_MODE);
-    }
 
     @Override
     public WorkflowVersionKeyDto settingWorkflowOfExpertMode(WorkflowDetailsOfExpertModeDto req) {
@@ -514,7 +536,43 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public WorkflowDetailsOfExpertModeDto getWorkflowSettingOfExpertMode(WorkflowVersionKeyDto req) {
-        return null;
+        WorkflowDetailsOfExpertModeDto result = new WorkflowDetailsOfExpertModeDto();
+        result.setWorkflowId(req.getWorkflowId());
+        result.setWorkflowVersion(req.getWorkflowVersion());
+        result.setWorkflowNodeList(getWorkflowNodeList(req.getWorkflowId(), req.getWorkflowVersion()));
+        return result;
+    }
+
+    private List<NodeDto> getWorkflowNodeList(Long workflowId, Long workflowVersion){
+        List<NodeDto> nodeDtoList = workflowSettingExpertManager.listByWorkflowVersion(workflowId, workflowVersion).stream()
+                .map(item -> {
+                    NodeDto nodeDto = new NodeDto();
+                    nodeDto.setWorkflowNodeId(item.getId());
+                    nodeDto.setNodeName(item.getNodeName());
+                    nodeDto.setNodeStep(item.getNodeStep());
+                    WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, item.getTaskStep());
+                    nodeDto.setAlgorithmId(workflowTask.getAlgorithmId());
+                    NodeCodeDto nodeCodeDto = new NodeCodeDto();
+                    nodeCodeDto.setCode(BeanUtil.copyProperties(workflowTaskCodeManager.getById(workflowTask.getWorkflowTaskId()),CodeDto.class));
+                    nodeCodeDto.setVariableList(BeanUtil.copyToList(workflowTaskVariableManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId()), VariableDto.class));
+                    nodeDto.setNodeCode(nodeCodeDto);
+                    NodeInputDto nodeInputDto = new NodeInputDto();
+                    nodeInputDto.setIdentityId(workflowTask.getIdentityId());
+                    nodeInputDto.setInputModel(workflowTask.getInputModel());
+                    if(workflowTask.getInputModel() && StringUtils.isNotBlank(workflowTask.getInputModelId())){
+                        nodeInputDto.setModel(BeanUtil.copyProperties(dataService.getModelById(workflowTask.getInputModelId()), ModelDto.class));
+                    }
+                    //TODO
+//                    nodeInputDto.setIsPsi(workflowTask.getInputPsi());
+//                    nodeInputDto.setDataInputList();
+//                    nodeDto.setNodeInput(nodeInputDto);
+//
+//                    nodeDto.setResource();
+//                    nodeDto.setNodeOutput();
+                    return nodeDto;
+                })
+                .collect(Collectors.toList());
+        return nodeDtoList;
     }
 
     @Override

@@ -21,7 +21,7 @@ public class NodeInputDto {
     private List<DataInputDto> dataInputList;
 
     @ApiModelProperty(value = "是否需要输入模型: 0-否，1:是")
-    private Integer inputModel;
+    private Boolean inputModel;
 
     @ApiModelProperty(value = "工作流当前节点模型ID")
     private ModelDto model;

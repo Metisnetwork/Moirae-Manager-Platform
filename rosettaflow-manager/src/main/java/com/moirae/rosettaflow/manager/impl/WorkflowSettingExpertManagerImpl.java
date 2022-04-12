@@ -1,10 +1,14 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.moirae.rosettaflow.mapper.domain.WorkflowSettingExpert;
 import com.moirae.rosettaflow.mapper.WorkflowSettingExpertMapper;
 import com.moirae.rosettaflow.manager.WorkflowSettingExpertManager;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +21,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowSettingExpertManagerImpl extends ServiceImpl<WorkflowSettingExpertMapper, WorkflowSettingExpert> implements WorkflowSettingExpertManager {
 
+    @Override
+    public List<WorkflowSettingExpert> listByWorkflowVersion(Long workflowId, Long workflowVersion) {
+        LambdaQueryWrapper<WorkflowSettingExpert> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowSettingExpert::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowSettingExpert::getWorkflowVersion, workflowVersion);
+        return list(wrapper);
+    }
 }

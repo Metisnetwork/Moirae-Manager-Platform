@@ -32,23 +32,7 @@ public class WorkFlowControllerTest {
     private String accessToken = "1649658496786C5F36DA324924472826DA92C352EC8C8";
 
 
-    /**
-     * TRUNCATE TABLE `mo_workflow`;
-     * TRUNCATE TABLE `mo_workflow_run_status`;
-     * TRUNCATE TABLE `mo_workflow_run_task_result`;
-     * TRUNCATE TABLE `mo_workflow_run_task_status`;
-     * TRUNCATE TABLE `mo_workflow_setting_expert`;
-     * TRUNCATE TABLE `mo_workflow_setting_wizard`;
-     * TRUNCATE TABLE `mo_workflow_task`;
-     * TRUNCATE TABLE `mo_workflow_task_code`;
-     * TRUNCATE TABLE `mo_workflow_task_input`;
-     * TRUNCATE TABLE `mo_workflow_task_output`;
-     * TRUNCATE TABLE `mo_workflow_task_resource`;
-     * TRUNCATE TABLE `mo_workflow_task_variable`;
-     * TRUNCATE TABLE `mo_workflow_version`;
-     *
-     * @throws Exception
-     */
+    // ----------------------向导模式创建计算流程为训练的工作流----------------------------------------------
     @Test
     public void createWorkflowOfWizardModeCase1() throws Exception {
         JSONObject req = new JSONObject();
@@ -183,6 +167,8 @@ public class WorkFlowControllerTest {
                 .andReturn().getResponse().getContentAsString();
         System.out.println(result);
     }
+
+    // ----------------------向导模式创建计算流程为预测的工作流----------------------------------------------
 
     @Test
     public void createWorkflowOfWizardModeCase2() throws Exception {
@@ -320,6 +306,8 @@ public class WorkFlowControllerTest {
                 .andReturn().getResponse().getContentAsString();
         System.out.println(result);
     }
+
+    // ----------------------向导模式创建计算流程为训练，并预测的工作流----------------------------------------------
 
     @Test
     public void createWorkflowOfWizardModeCase3() throws Exception {
@@ -521,7 +509,7 @@ public class WorkFlowControllerTest {
         System.out.println(result);
     }
 
-
+    // ----------------------向导模式创建计算流程为PSI的工作流----------------------------------------------
     @Test
     public void createWorkflowOfWizardModeCase4() throws Exception {
         JSONObject req = new JSONObject();
@@ -652,7 +640,6 @@ public class WorkFlowControllerTest {
         System.out.println(result);
     }
 
-
     private String getWorkflowOfWizardMode(Long workflowId, Long workflowVersion, Integer step) throws Exception {
         String result = mvc.perform(get("/workflow/wizard/getWorkflowSettingOfWizardMode")
                         .param("workflowId", String.valueOf(workflowId))
@@ -666,4 +653,29 @@ public class WorkFlowControllerTest {
                 .andReturn().getResponse().getContentAsString();
         return result;
     }
+
+    // ----------------------专家模式创建的单节点训练工作流----------------------------------------------
+    @Test
+    public void createWorkflowOfExpertModeCase1() throws Exception {
+        String workflowName = "chendai-flow-5";
+
+        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
+    }
+
+    private String createWorkflowOfExpertMode(String workflowName) throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("workflowName", workflowName);
+        String result = mvc.perform(post("/workflow/expert/createWorkflowOfExpertMode")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(req.toJSONString().getBytes())
+                        .header("Accept-Language","zh")
+                        .header("Access-Token",accessToken)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(MockMvcResultMatchers.status().isOk())
+                        .andReturn().getResponse().getContentAsString();
+        return result;
+    }
+
+
 }
