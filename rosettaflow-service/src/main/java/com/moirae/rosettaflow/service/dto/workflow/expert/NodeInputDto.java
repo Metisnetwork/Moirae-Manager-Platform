@@ -9,8 +9,11 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
+/**
+ * 专家模式节点的输入明细
+ */
 @Data
-@ApiModel(value = "工作流详情请求对象")
+@ApiModel(value = "专家模式节点的输入明细")
 public class NodeInputDto {
 
     @ApiModelProperty(value = "发起方的组织的身份标识Id", required = true)

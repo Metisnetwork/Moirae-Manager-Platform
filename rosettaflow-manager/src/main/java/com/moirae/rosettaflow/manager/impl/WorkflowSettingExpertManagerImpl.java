@@ -28,4 +28,12 @@ public class WorkflowSettingExpertManagerImpl extends ServiceImpl<WorkflowSettin
         wrapper.eq(WorkflowSettingExpert::getWorkflowVersion, workflowVersion);
         return list(wrapper);
     }
+
+    @Override
+    public boolean removeByWorkflowVersion(Long workflowId, Long workflowVersion) {
+        LambdaQueryWrapper<WorkflowSettingExpert> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowSettingExpert::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowSettingExpert::getWorkflowVersion, workflowVersion);
+        return remove(wrapper);
+    }
 }

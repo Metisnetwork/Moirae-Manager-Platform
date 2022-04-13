@@ -10,6 +10,7 @@ import com.platon.crypto.Credentials;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 /**
  * 数据中心的组织同步
  */
+@ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
 public class SyncDcOrgWalletTask {

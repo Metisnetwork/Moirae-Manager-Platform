@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.service.DataService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.List;
 
+@ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
 public class SyncTokenInfoTask {

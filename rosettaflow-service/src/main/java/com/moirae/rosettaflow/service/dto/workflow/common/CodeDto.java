@@ -8,12 +8,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * 添加工作流节点代码请求对象
- * @author hudenian
- * @date 2021/9/28
+ * 工作流算法代码
  */
 @Data
-@ApiModel(value = "工作流节点代码请求对象")
+@ApiModel(value = "工作流算法代码明细")
 public class CodeDto {
 
     @ApiModelProperty(value = "编辑类型:1-sql, 2-noteBook", required = true)

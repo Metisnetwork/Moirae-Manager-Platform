@@ -4,8 +4,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+/**
+ * 工作流算法变量明细
+ */
 @Data
-@ApiModel(value = "工作流节点输入变量请求对象")
+@ApiModel(value = "工作流算法变量明细")
 public class VariableDto {
 
     @ApiModelProperty(value = "变量key", required = true)

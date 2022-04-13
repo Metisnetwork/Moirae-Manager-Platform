@@ -6,12 +6,14 @@ import com.moirae.rosettaflow.mapper.domain.TaskEvent;
 import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
 
+@ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
 public class SyncDcTaskEventTask {

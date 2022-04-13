@@ -8,8 +8,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * 专家模式节点的代码明细
+ */
 @Data
-@ApiModel(value = "工作流详情请求对象")
+@ApiModel(value = "专家模式节点的代码明细")
 public class NodeCodeDto {
 
     @ApiModelProperty(value = "变量", required = true)

@@ -7,13 +7,10 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 /**
- * 添加工作流节点资源请求对象
- *
- * @author hudenian
- * @date 2021/9/28
+ * 工作流资源明细
  */
 @Data
-@ApiModel(value = "工作流节点资源请求对象")
+@ApiModel(value = "工作流资源明细")
 public class ResourceDto {
 
     @ApiModelProperty(value = "工作流节点资源内存 (单位: Mb)", required = true)

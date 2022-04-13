@@ -3,8 +3,8 @@ package com.moirae.rosettaflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
-import com.moirae.rosettaflow.dto.WorkflowNodeDto;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
@@ -67,6 +67,12 @@ public class WorkflowServiceImpl implements WorkflowService {
     private CalculationProcessStepManager calculationProcessStepManager;
     @Resource
     private CalculationProcessTaskManager calculationProcessTaskManager;
+    @Resource
+    private WorkflowRunStatusManager workflowRunStatusManager;
+    @Resource
+    private WorkflowRunTaskStatusManager workflowRunTaskStatusManager;
+    @Resource
+    private WorkflowRunTaskResultManager workflowRunTaskResultManager;
 
     @Override
     public int getWorkflowCount() {
@@ -138,9 +144,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                         workflowTask.setInputPsi(true);
                     }
                     workflowTaskManager.save(workflowTask);
-                    initWorkflowTaskCodeOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
-                    initWorkflowTaskVariableOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
-                    initWorkflowTaskResourceOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
+                    initWorkflowTaskCode(workflowTask.getWorkflowTaskId(), algorithm);
+                    initWorkflowTaskVariable(workflowTask.getWorkflowTaskId(), algorithm);
+                    initWorkflowTaskResource(workflowTask.getWorkflowTaskId(), algorithm);
                     return workflowTask;
                 }
         ).collect(Collectors.toList());
@@ -192,7 +198,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
 
-    private void initWorkflowTaskResourceOfWizardMode(Long workflowTaskId, Algorithm algorithm) {
+    private void initWorkflowTaskResource(Long workflowTaskId, Algorithm algorithm) {
         WorkflowTaskResource workflowTaskResource = new WorkflowTaskResource();
         workflowTaskResource.setWorkflowTaskId(workflowTaskId);
         workflowTaskResource.setCostCpu(algorithm.getCostCpu());
@@ -203,7 +209,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowTaskResourceManager.save(workflowTaskResource);
     }
 
-    private void initWorkflowTaskVariableOfWizardMode(Long workflowTaskId, Algorithm algorithm) {
+    private void initWorkflowTaskVariable(Long workflowTaskId, Algorithm algorithm) {
         if(algorithm.getAlgorithmVariableList().size() == 0){
             return;
         }
@@ -222,7 +228,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowTaskVariableManager.saveBatch(workflowTaskVariableList);
     }
 
-    private void initWorkflowTaskCodeOfWizardMode(Long workflowTaskId, Algorithm algorithm) {
+    private void initWorkflowTaskCode(Long workflowTaskId, Algorithm algorithm) {
         if(algorithm.getAlgorithmCode() == null){
             return;
         }
@@ -246,11 +252,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             default:
                 return selectedTree.getAlg();
         }
-    }
-
-    private WorkflowTask createTask(int step, AlgorithmClassify algorithmClassify, boolean enable) {
-
-        return null;
     }
 
     private CalculationProcess getCalculationProcessDetails(Long calculationProcessId) {
@@ -351,10 +352,23 @@ public class WorkflowServiceImpl implements WorkflowService {
         if(workflowTaskOutputList.size() > 0){
             outputDto.setStorePattern(workflowTaskOutputList.get(0).getStorePattern());
         }else{
-            outputDto.setStorePattern(algService.getAlg(workflowTask.getAlgorithmId()).getStorePattern());
+            outputDto.setStorePattern(algService.getAlg(workflowTask.getAlgorithmId(), false).getStorePattern());
         }
         outputDto.setIdentityId(workflowTaskOutputList.stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toList()));
         return outputDto;
+    }
+
+    private void setNodeOutput(Long workflowTaskId, OutputDto nodeOutput) {
+        List<WorkflowTaskOutput> workflowTaskOutputList = new ArrayList<>();
+        for (int i = 0; i < nodeOutput.getIdentityId().size(); i++) {
+            WorkflowTaskOutput workflowTaskOutput = new WorkflowTaskOutput();
+            workflowTaskOutput.setWorkflowTaskId(workflowTaskId);
+            workflowTaskOutput.setIdentityId(nodeOutput.getIdentityId().get(i));
+            workflowTaskOutput.setStorePattern(nodeOutput.getStorePattern());
+            workflowTaskOutput.setPartyId("q" + i);
+            workflowTaskOutputList.add(workflowTaskOutput);
+        }
+        workflowTaskOutputManager.saveBatch(workflowTaskOutputList);
     }
 
     private void setCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer taskStep, OutputDto commonOutput) {
@@ -392,6 +406,38 @@ public class WorkflowServiceImpl implements WorkflowService {
         resourceDto.setRunTime(CommonUtils.convert2UserOfRunTime(workflowTaskResource.getRunTime()));
         return resourceDto;
     }
+
+
+    private void setNodeResource(Long workflowTaskId, ResourceDto resource, Boolean supportDefaultPsi, Long psiWorkflowTaskId) {
+        List<WorkflowTaskResource> workflowTaskResourceList = new ArrayList<>();
+        List<Long> taskIdList = new ArrayList<>();
+
+        WorkflowTaskResource workflowTaskResource = new WorkflowTaskResource();
+        workflowTaskResource.setWorkflowTaskId(workflowTaskId);
+        workflowTaskResource.setCostCpu(resource.getCostCpu());
+        workflowTaskResource.setCostGpu(resource.getCostGpu());
+        workflowTaskResource.setCostMem(CommonUtils.convert2DbOfCostMem(resource.getCostMem()));
+        workflowTaskResource.setCostBandwidth(CommonUtils.convert2DbOfCostBandwidth(resource.getCostBandwidth()));
+        workflowTaskResource.setRunTime(CommonUtils.convert2DbOfRunTime(resource.getRunTime()));
+        taskIdList.add(workflowTaskId);
+        workflowTaskResourceList.add(workflowTaskResource);
+
+        if(supportDefaultPsi){
+            WorkflowTaskResource psiWorkflowTaskResource = new WorkflowTaskResource();
+            psiWorkflowTaskResource.setWorkflowTaskId(psiWorkflowTaskId);
+            psiWorkflowTaskResource.setCostCpu(resource.getCostCpu());
+            psiWorkflowTaskResource.setCostGpu(resource.getCostGpu());
+            psiWorkflowTaskResource.setCostMem(CommonUtils.convert2DbOfCostMem(resource.getCostMem()));
+            psiWorkflowTaskResource.setCostBandwidth(CommonUtils.convert2DbOfCostBandwidth(resource.getCostBandwidth()));
+            psiWorkflowTaskResource.setRunTime(CommonUtils.convert2DbOfRunTime(resource.getRunTime()));
+            taskIdList.add(psiWorkflowTaskId);
+            workflowTaskResourceList.add(psiWorkflowTaskResource);
+        }
+        workflowTaskResourceManager.saveBatch(workflowTaskResourceList);
+    }
+
+
+
 
     private void setCommonResourceOfWizardMode(Long workflowId, Long workflowVersion, List<Integer> taskStepList, ResourceDto commonResource) {
         List<WorkflowTaskResource> workflowTaskResourceList = new ArrayList<>();
@@ -493,6 +539,45 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
     }
 
+    private void setNodeInput(Long workflowTaskId, List<DataInputDto> dataInputList, boolean hasPis, Long psiWorkflowTaskId, Algorithm psiAlg) {
+        List<WorkflowTaskInput> workflowTaskInputList = new ArrayList<>();
+        for (int i = 0; i < dataInputList.size(); i++) {
+            WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
+            workflowTaskInput.setWorkflowTaskId(workflowTaskId);
+            workflowTaskInput.setPartyId("p" + i);
+            BeanUtil.copyProperties(dataInputList.get(i), workflowTaskInput);
+            workflowTaskInputList.add(workflowTaskInput);
+        }
+        workflowTaskInputManager.saveBatch(workflowTaskInputList);
+
+        if(hasPis){
+            // 设置psi的输入
+            List<WorkflowTaskInput> psiWorkflowTaskInputList = new ArrayList<>();
+            for (int i = 0; i < dataInputList.size(); i++) {
+                WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
+                workflowTaskInput.setWorkflowTaskId(psiWorkflowTaskId);
+                workflowTaskInput.setMetaDataId(dataInputList.get(i).getMetaDataId());
+                workflowTaskInput.setIdentityId(dataInputList.get(i).getIdentityId());
+                workflowTaskInput.setKeyColumn(dataInputList.get(i).getKeyColumn());
+                workflowTaskInput.setPartyId("p" + i);
+                psiWorkflowTaskInputList.add(workflowTaskInput);
+            }
+            workflowTaskInputManager.saveBatch(psiWorkflowTaskInputList);
+
+            // 设置psi的输出
+            List<WorkflowTaskOutput> workflowTaskOutputList = new ArrayList<>();
+            for (int i = 0; i < dataInputList.size(); i++) {
+                WorkflowTaskOutput workflowTaskOutput = new WorkflowTaskOutput();
+                workflowTaskOutput.setWorkflowTaskId(psiWorkflowTaskId);
+                workflowTaskOutput.setIdentityId(dataInputList.get(i).getIdentityId());
+                workflowTaskOutput.setStorePattern(psiAlg.getStorePattern());
+                workflowTaskOutput.setPartyId("q" + i);
+                workflowTaskOutputList.add(workflowTaskOutput);
+            }
+            workflowTaskOutputManager.saveBatch(workflowTaskOutputList);
+        }
+    }
+
     private void setTrainingOrPredictionPsiInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, String senderIdentityId, List<DataInputDto> item, boolean setOut){
         WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, psiTaskStep);
         psi.setIdentityId(senderIdentityId);
@@ -520,19 +605,160 @@ public class WorkflowServiceImpl implements WorkflowService {
             WorkflowTaskOutput workflowTaskOutput = new WorkflowTaskOutput();
             workflowTaskOutput.setWorkflowTaskId(workflowTaskId);
             workflowTaskOutput.setIdentityId(inputDtoList.get(i).getIdentityId());
-            workflowTaskOutput.setStorePattern(algService.getAlg(algorithmId).getStorePattern());
+            workflowTaskOutput.setStorePattern(algService.getAlg(algorithmId, false).getStorePattern());
             workflowTaskOutput.setPartyId("q" + i);
             workflowTaskOutputList.add(workflowTaskOutput);
         }
         workflowTaskOutputManager.clearAndSave(workflowTaskId, workflowTaskOutputList);
     }
 
-
-
     @Override
+    @Transactional
     public WorkflowVersionKeyDto settingWorkflowOfExpertMode(WorkflowDetailsOfExpertModeDto req) {
-        return null;
+        // 清理节点设置
+        clearWorkflowOfExpertMode(req.getWorkflowId(), req.getWorkflowVersion());
+        // 创建工作流任务配置
+        List<WorkflowSettingExpert> workflowSettingExpertList = new ArrayList<>();
+        int taskStep = 1;
+        for (int i = 0; i < req.getWorkflowNodeList().size(); i++) {
+            NodeDto nodeDto = req.getWorkflowNodeList().get(i);
+            WorkflowSettingExpert workflowSettingExpert = new WorkflowSettingExpert();
+            workflowSettingExpert.setWorkflowId(req.getWorkflowId());
+            workflowSettingExpert.setWorkflowVersion(req.getWorkflowVersion());
+            workflowSettingExpert.setNodeStep(nodeDto.getNodeStep());
+            workflowSettingExpert.setNodeName(nodeDto.getNodeName());
+
+            WorkflowTask psiWorkflowTask = new WorkflowTask();
+            psiWorkflowTask.setWorkflowId(req.getWorkflowId());
+            psiWorkflowTask.setWorkflowVersion(req.getWorkflowVersion());
+            psiWorkflowTask.setStep(taskStep++);
+            psiWorkflowTask.setAlgorithmId(1001L);
+            psiWorkflowTask.setIdentityId(nodeDto.getNodeInput().getIdentityId());
+            workflowTaskManager.save(psiWorkflowTask);
+            Algorithm psiAlgorithm = algService.getAlg(psiWorkflowTask.getAlgorithmId(),true);
+            initWorkflowTaskCode(psiWorkflowTask.getWorkflowTaskId(), psiAlgorithm);
+            initWorkflowTaskVariable(psiWorkflowTask.getWorkflowTaskId(), psiAlgorithm);
+
+            WorkflowTask workflowTask = new WorkflowTask();
+            workflowTask.setWorkflowId(req.getWorkflowId());
+            workflowTask.setWorkflowVersion(req.getWorkflowVersion());
+            workflowTask.setStep(taskStep++);
+            workflowTask.setAlgorithmId(nodeDto.getAlgorithmId());
+            Algorithm algorithm = algService.getAlg(workflowTask.getAlgorithmId(), false);
+            workflowTask.setIdentityId(nodeDto.getNodeInput().getIdentityId());
+            workflowTask.setInputModel(nodeDto.getNodeInput().getInputModel());
+            if(nodeDto.getNodeInput().getInputModel() && nodeDto.getNodeInput().getModel() != null){
+                workflowTask.setInputModelId(nodeDto.getNodeInput().getModel().getMetaDataId());
+            }
+            workflowTask.setInputPsi(nodeDto.getNodeInput().getIsPsi());
+            workflowTaskManager.save(workflowTask);
+
+            workflowSettingExpert.setPsiTaskStep(psiWorkflowTask.getStep());
+            workflowSettingExpert.setTaskStep(workflowTask.getStep());
+            workflowSettingExpertList.add(workflowSettingExpert);
+
+            setNodeInput(workflowTask.getWorkflowTaskId(), nodeDto.getNodeInput().getDataInputList(), algorithm.getSupportDefaultPsi(), psiWorkflowTask.getWorkflowTaskId(), psiAlgorithm);
+            setNodeCode(workflowTask.getWorkflowTaskId(), nodeDto.getNodeCode());
+            setNodeOutput(workflowTask.getWorkflowTaskId(),  nodeDto.getNodeOutput());
+            setNodeResource(workflowTask.getWorkflowTaskId(), nodeDto.getResource(), algorithm.getSupportDefaultPsi(), psiWorkflowTask.getWorkflowTaskId());
+        }
+        // 创建节点定义
+        workflowSettingExpertManager.saveBatch(workflowSettingExpertList);
+
+        // 更新工作流状态
+        Workflow workflow = new Workflow();
+        workflow.setWorkflowId(req.getWorkflowId());
+        workflow.setIsSettingCompleted(true);
+        workflowManager.updateById(workflow);
+
+        WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
+        result.setWorkflowId(req.getWorkflowId());
+        result.setWorkflowVersion(req.getWorkflowVersion());
+        return result;
     }
+
+
+
+    private void setNodeCode(Long workflowTaskId, NodeCodeDto nodeCode) {
+        WorkflowTaskCode workflowTaskCode = new WorkflowTaskCode();
+        workflowTaskCode.setWorkflowTaskId(workflowTaskId);
+        workflowTaskCode.setEditType(nodeCode.getCode().getEditType());
+        workflowTaskCode.setCalculateContractCode(nodeCode.getCode().getCalculateContractCode());
+        workflowTaskCode.setDataSplitContractCode(nodeCode.getCode().getDataSplitContractCode());
+        workflowTaskCodeManager.save(workflowTaskCode);
+
+        List<WorkflowTaskVariable> workflowTaskVariableList = nodeCode.getVariableList().stream()
+                .map(item -> {
+                    WorkflowTaskVariable workflowTaskVariable = new WorkflowTaskVariable();
+                    workflowTaskVariable.setWorkflowTaskId(workflowTaskId);
+                    workflowTaskVariable.setVarKey(item.getVarKey());
+                    workflowTaskVariable.setVarValue(item.getVarValue());
+                    workflowTaskVariable.setVarDesc(item.getVarDesc());
+                    workflowTaskVariable.setVarDescEn(item.getVarDescEn());
+                    return workflowTaskVariable;
+                })
+                .collect(Collectors.toList());
+        workflowTaskVariableManager.saveBatch(workflowTaskVariableList);
+    }
+
+
+    private void clearWorkflowOfExpertMode(Long workflowId, Long workflowVersion) {
+        // 清理工作流任务配置
+        List<Long> workflowTaskIdList = workflowTaskManager.listByWorkflowVersion(workflowId, workflowVersion).stream()
+                .map(WorkflowTask::getWorkflowTaskId)
+                .collect(Collectors.toList());
+        if(workflowTaskIdList.size() > 0){
+            workflowTaskManager.removeByIds(workflowTaskIdList);
+            workflowTaskCodeManager.removeByIds(workflowTaskIdList);
+            workflowTaskInputManager.removeByWorkflowTaskIds(workflowTaskIdList);
+            workflowTaskOutputManager.removeByWorkflowTaskIds(workflowTaskIdList);
+            workflowTaskResourceManager.removeByIds(workflowTaskIdList);
+            workflowTaskVariableManager.removeByWorkflowTaskIds(workflowTaskIdList);
+        }
+        // 清理节点定义
+        workflowSettingExpertManager.removeByWorkflowVersion(workflowId, workflowVersion);
+    }
+
+
+    /**
+     *         // 创建工作流任务配置 1-训练  2-预测  3-训练，并预测 4-PSI
+     *         List<WorkflowTask> workflowTaskList = calculationProcess.getTaskItem().stream().map(
+     *                 item -> {
+     *                     WorkflowTask workflowTask = new WorkflowTask();
+     *                     workflowTask.setWorkflowId(workflowVersion.getWorkflowId());
+     *                     workflowTask.setWorkflowVersion(workflowVersion.getWorkflowVersion());
+     *                     workflowTask.setStep(item.getStep());
+     *                     Algorithm algorithm = getAlg(item, rootTree, selectedTree);
+     *                     workflowTask.setAlgorithmId(algorithm.getAlgorithmId());
+     *                     workflowTask.setInputModel(algorithm.getInputModel());
+     *                     if(algorithm.getSupportDefaultPsi()){
+     *                         workflowTask.setInputPsi(true);
+     *                     }
+     *                     workflowTaskManager.save(workflowTask);
+     *                     initWorkflowTaskCodeOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
+     *                     initWorkflowTaskVariableOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
+     *                     initWorkflowTaskResourceOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
+     *                     return workflowTask;
+     *                 }
+     *         ).collect(Collectors.toList());
+     *
+     *         // 创建流程定义
+     *         List<WorkflowSettingWizard> workflowSettingWizardList = calculationProcess.getStepItem().stream()
+     *                 .map(item -> {
+     *                     WorkflowSettingWizard wizard = new WorkflowSettingWizard();
+     *                     wizard.setWorkflowId(workflow.getWorkflowId());
+     *                     wizard.setWorkflowVersion(workflow.getWorkflowVersion());
+     *                     wizard.setCalculationProcessStepType(item.getType());
+     *                     wizard.setStep(item.getStep());
+     *                     wizard.setTask1Step(item.getTask1Step());
+     *                     wizard.setTask2Step(item.getTask2Step());
+     *                     wizard.setTask3Step(item.getTask3Step());
+     *                     wizard.setTask4Step(item.getTask4Step());
+     *                     return wizard;
+     *                 })
+     *                 .collect(Collectors.toList());
+     *         workflowSettingWizardManager.saveBatch(workflowSettingWizardList);
+     */
 
     @Override
     public WorkflowDetailsOfExpertModeDto getWorkflowSettingOfExpertMode(WorkflowVersionKeyDto req) {
@@ -547,9 +773,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<NodeDto> nodeDtoList = workflowSettingExpertManager.listByWorkflowVersion(workflowId, workflowVersion).stream()
                 .map(item -> {
                     NodeDto nodeDto = new NodeDto();
-                    nodeDto.setWorkflowNodeId(item.getId());
-                    nodeDto.setNodeName(item.getNodeName());
                     nodeDto.setNodeStep(item.getNodeStep());
+                    nodeDto.setNodeName(item.getNodeName());
                     WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, item.getTaskStep());
                     nodeDto.setAlgorithmId(workflowTask.getAlgorithmId());
                     NodeCodeDto nodeCodeDto = new NodeCodeDto();
@@ -562,13 +787,19 @@ public class WorkflowServiceImpl implements WorkflowService {
                     if(workflowTask.getInputModel() && StringUtils.isNotBlank(workflowTask.getInputModelId())){
                         nodeInputDto.setModel(BeanUtil.copyProperties(dataService.getModelById(workflowTask.getInputModelId()), ModelDto.class));
                     }
-                    //TODO
-//                    nodeInputDto.setIsPsi(workflowTask.getInputPsi());
-//                    nodeInputDto.setDataInputList();
-//                    nodeDto.setNodeInput(nodeInputDto);
-//
-//                    nodeDto.setResource();
-//                    nodeDto.setNodeOutput();
+                    nodeInputDto.setIsPsi(workflowTask.getInputPsi());
+                    nodeInputDto.setDataInputList(BeanUtil.copyToList(workflowTaskInputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId()), DataInputDto.class));
+                    nodeDto.setNodeInput(nodeInputDto);
+                    nodeDto.setResource(BeanUtil.copyProperties(workflowTaskResourceManager.getById(workflowTask.getWorkflowTaskId()), ResourceDto.class));
+                    OutputDto outputDto = new OutputDto();
+                    List<WorkflowTaskOutput> workflowTaskOutputList = workflowTaskOutputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId());
+                    if(workflowTaskOutputList.size() > 0){
+                        outputDto.setStorePattern(workflowTaskOutputList.get(0).getStorePattern());
+                    }else{
+                        outputDto.setStorePattern(algService.getAlg(workflowTask.getAlgorithmId(), false).getStorePattern());
+                    }
+                    outputDto.setIdentityId(workflowTaskOutputList.stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toList()));
+                    nodeDto.setNodeOutput(outputDto);
                     return nodeDto;
                 })
                 .collect(Collectors.toList());
@@ -577,7 +808,27 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public WorkflowStatusOfExpertModeDto getWorkflowStatusOfExpertMode(WorkflowVersionKeyDto req) {
-        return null;
+        // 查询结构
+        WorkflowStatusOfExpertModeDto result = new WorkflowStatusOfExpertModeDto();
+        result.setWorkflowId(req.getWorkflowId());
+        result.setWorkflowVersion(req.getWorkflowVersion());
+        result.setRunStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
+
+        WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getLatestOneByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        if(workflowRunStatus != null && workflowRunStatus.getRunStatus() != null){
+            result.setRunStatus(workflowRunStatus.getRunStatus());
+        }
+
+        List<WorkflowSettingExpert> workflowSettingExpertList = workflowSettingExpertManager.listByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        result.setWorkflowNodeStatusList(workflowSettingExpertList.stream()
+                .map(item -> {
+                    NodeStatusDto nodeStatusDto = new NodeStatusDto();
+                    nodeStatusDto.setNodeStep(item.getNodeStep());
+                    nodeStatusDto.setRunStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
+                    return nodeStatusDto;
+                })
+                .collect(Collectors.toList()));
+        return result;
     }
 
     @Override

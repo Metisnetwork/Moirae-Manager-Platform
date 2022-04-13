@@ -10,5 +10,5 @@ public interface AlgService{
 
     AlgorithmClassify getAlgTree(boolean isNeedDetails, Long rootId);
 
-    Algorithm getAlg(Long algorithmId);
+    Algorithm getAlg(Long algorithmId,boolean isNeedDetails);
 }

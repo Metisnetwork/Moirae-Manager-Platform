@@ -16,4 +16,6 @@ import java.util.List;
 public interface WorkflowTaskVariableManager extends IService<WorkflowTaskVariable> {
 
     List<WorkflowTaskVariable> listByWorkflowTaskId(Long workflowTaskId);
+
+    boolean removeByWorkflowTaskIds(List<Long> workflowTaskIdList);
 }

@@ -85,7 +85,7 @@ public class Workflow implements Serializable {
      * 是否设置完成:  0-否  1-是
      */
     @TableField("is_setting_completed")
-    private Integer isSettingCompleted;
+    private Boolean isSettingCompleted;
 
     /**
      * 向导模式下当前步骤

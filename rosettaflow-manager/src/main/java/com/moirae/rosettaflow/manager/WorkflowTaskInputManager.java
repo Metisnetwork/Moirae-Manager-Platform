@@ -18,4 +18,6 @@ public interface WorkflowTaskInputManager extends IService<WorkflowTaskInput> {
     List<WorkflowTaskInput> listByWorkflowTaskId(Long workflowTaskId);
 
     void clearAndSave(Long workflowTaskId, List<WorkflowTaskInput> trainingWorkflowTaskInputList);
+
+    boolean removeByWorkflowTaskIds(List<Long> workflowTaskIdList);
 }

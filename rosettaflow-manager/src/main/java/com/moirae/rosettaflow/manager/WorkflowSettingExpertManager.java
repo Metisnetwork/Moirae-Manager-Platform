@@ -16,4 +16,6 @@ import java.util.List;
 public interface WorkflowSettingExpertManager extends IService<WorkflowSettingExpert> {
 
     List<WorkflowSettingExpert> listByWorkflowVersion(Long workflowId, Long workflowVersion);
+
+    boolean removeByWorkflowVersion(Long workflowId, Long workflowVersion);
 }

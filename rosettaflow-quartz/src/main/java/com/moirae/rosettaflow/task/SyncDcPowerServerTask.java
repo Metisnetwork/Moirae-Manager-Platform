@@ -9,6 +9,7 @@ import com.moirae.rosettaflow.service.DataSyncService;
 import com.moirae.rosettaflow.service.PowerService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
 public class SyncDcPowerServerTask {

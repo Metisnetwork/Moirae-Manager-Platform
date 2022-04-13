@@ -38,7 +38,7 @@ public class WorkflowSettingExpert implements Serializable {
      * 工作流版本号
      */
     @TableField("workflow_version")
-    private Integer workflowVersion;
+    private Long workflowVersion;
 
     /**
      * 工作流中节点的顺序,从1开始

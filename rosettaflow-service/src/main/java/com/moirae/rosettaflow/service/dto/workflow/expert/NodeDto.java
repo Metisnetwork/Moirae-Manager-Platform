@@ -10,21 +10,21 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+/**
+ * 专家模式节点的代码明细
+ */
 @Data
-@ApiModel(value = "工作流详情请求对象")
+@ApiModel(value = "专家模式节点明细")
 public class NodeDto {
-
-    @ApiModelProperty(value = "工作流节点主键ID")
-    private Long workflowNodeId;
-
-    @ApiModelProperty(value = "工作流节点名称", required = true)
-    @NotBlank(message = "{workflow.node.name.NotBlank}")
-    private String nodeName;
 
     @ApiModelProperty(value = "工作流节点序号,从1开始", required = true)
     @NotNull(message = "{workflow.node.step.notNull}")
     @Positive(message = "{workflow.node.step.positive}")
     private Integer nodeStep;
+
+    @ApiModelProperty(value = "工作流节点名称", required = true)
+    @NotBlank(message = "{workflow.node.name.NotBlank}")
+    private String nodeName;
 
     @ApiModelProperty(value = "工作流节点算法", required = true)
     @NotNull(message = "{algorithm.id.notNull}")

@@ -30,12 +30,19 @@ public class WorkflowTaskOutputManagerImpl extends ServiceImpl<WorkflowTaskOutpu
 
     @Override
     public void clearAndSave(Long workflowTaskId, List<WorkflowTaskOutput> workflowTaskOutputList) {
-        clear(workflowTaskId);
+        removeByWorkflowTaskId(workflowTaskId);
         saveBatch(workflowTaskOutputList);
     }
 
+    @Override
+    public boolean removeByWorkflowTaskIds(List<Long> workflowTaskIdList) {
+        LambdaQueryWrapper<WorkflowTaskOutput> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(WorkflowTaskOutput::getWorkflowTaskId, workflowTaskIdList);
+        return remove(wrapper);
+    }
 
-    private boolean clear(Long workflowTaskId){
+
+    private boolean removeByWorkflowTaskId(Long workflowTaskId){
         LambdaQueryWrapper<WorkflowTaskOutput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowTaskOutput::getWorkflowTaskId, workflowTaskId);
         return remove(wrapper);

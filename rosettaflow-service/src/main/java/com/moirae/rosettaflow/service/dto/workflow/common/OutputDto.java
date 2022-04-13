@@ -8,12 +8,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
- * 输出请求对象
- * @author hudenian
- * @date 2021/9/28
+ * 工作流输出明细
  */
 @Data
-@ApiModel(value = "工作流节点输出请求对象")
+@ApiModel(value = "工作流输出明细")
 public class OutputDto {
 
     @ApiModelProperty(value = "结算输入方组织的身份标识Id", required = true)

@@ -7,8 +7,11 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * 工作流输入明细
+ */
 @Data
-@ApiModel(value = "工作流节点输入请求对象")
+@ApiModel(value = "工作流输入明细")
 public class DataInputDto {
 
     @ApiModelProperty(value = "数据提供方组织的身份标识Id", required = true)

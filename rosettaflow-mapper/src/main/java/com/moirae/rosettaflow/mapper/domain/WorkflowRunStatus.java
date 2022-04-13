@@ -1,13 +1,14 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * <p>
@@ -65,19 +66,19 @@ public class WorkflowRunStatus implements Serializable {
      * 开始时间
      */
     @TableField("begin_time")
-    private LocalDateTime beginTime;
+    private Date beginTime;
 
     /**
      * 结束时间
      */
     @TableField("end_time")
-    private LocalDateTime endTime;
+    private Date endTime;
 
     /**
      * 运行状态: 1-运行中,2-运行成功,3-运行失败
      */
     @TableField("run_status")
-    private Integer runStatus;
+    private WorkflowTaskRunStatusEnum runStatus;
 
     /**
      * 取消状态: 1-取消中,2-取消成功,3-取消失败

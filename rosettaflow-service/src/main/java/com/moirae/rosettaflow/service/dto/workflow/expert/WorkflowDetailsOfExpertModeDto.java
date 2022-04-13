@@ -8,8 +8,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
+/**
+ * 专家模式工作流详情
+ */
 @Data
-@ApiModel
+@ApiModel(value = "专家模式工作流详情")
 public class WorkflowDetailsOfExpertModeDto {
 
     @ApiModelProperty(value = "工作流ID", required = true)
@@ -20,6 +23,6 @@ public class WorkflowDetailsOfExpertModeDto {
     @ApiModelProperty(value = "工作流最新版本号")
     private Long workflowVersion;
 
-    @ApiModelProperty(value = "工作流所有节点列表")
+    @ApiModelProperty(value = "工作流节点列表")
     List<NodeDto> workflowNodeList;
 }

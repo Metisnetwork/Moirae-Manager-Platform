@@ -29,4 +29,12 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
         wrapper.eq(WorkflowTask::getStep, task1Step);
         return getOne(wrapper);
     }
+
+    @Override
+    public List<WorkflowTask> listByWorkflowVersion(Long workflowId, Long workflowVersion) {
+        LambdaQueryWrapper<WorkflowTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowTask::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowTask::getWorkflowVersion, workflowVersion);
+        return list(wrapper);
+    }
 }
