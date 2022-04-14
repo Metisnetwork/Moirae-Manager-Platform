@@ -44,16 +44,7 @@ public class WorkFlowControllerTest {
         req.put("workflowName", "chendai-flow-1");
         req.put("workflowDesc", "chendai-desc-1");
 
-        String result = mvc.perform(post("/workflow/wizard/createWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(req.toJSONString().getBytes())
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
     }
 
     @Test
@@ -92,16 +83,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -127,16 +109,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -159,16 +132,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     // ----------------------向导模式创建计算流程为预测的工作流----------------------------------------------
@@ -181,16 +145,7 @@ public class WorkFlowControllerTest {
         req.put("workflowName", "chendai-flow-2");
         req.put("workflowDesc", "chendai-desc-2");
 
-        String result = mvc.perform(post("/workflow/wizard/createWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(req.toJSONString().getBytes())
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
     }
 
     @Test
@@ -231,16 +186,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -266,16 +212,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -298,16 +235,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     // ----------------------向导模式创建计算流程为训练，并预测的工作流----------------------------------------------
@@ -320,16 +248,7 @@ public class WorkFlowControllerTest {
         req.put("workflowName", "chendai-flow-3");
         req.put("workflowDesc", "chendai-desc-3");
 
-        String result = mvc.perform(post("/workflow/wizard/createWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(req.toJSONString().getBytes())
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
     }
 
     @Test
@@ -367,17 +286,8 @@ public class WorkFlowControllerTest {
                 "\t\t]\n" +
                 "\t}\n" +
                 "}";
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
     }
 
     @Test
@@ -418,16 +328,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -462,16 +363,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -500,16 +392,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     // ----------------------向导模式创建计算流程为PSI的工作流----------------------------------------------
@@ -521,16 +404,7 @@ public class WorkFlowControllerTest {
         req.put("workflowName", "chendai-flow-4");
         req.put("workflowDesc", "chendai-desc-4");
 
-        String result = mvc.perform(post("/workflow/wizard/createWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(req.toJSONString().getBytes())
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
     }
 
     @Test
@@ -564,16 +438,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -599,16 +464,7 @@ public class WorkFlowControllerTest {
                 "\t}\n" +
                 "}";
 
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
 
     @Test
@@ -619,30 +475,19 @@ public class WorkFlowControllerTest {
     @Test
     public void setWorkflowOfWizardModeCase4Step3() throws Exception {
         String json = "{\n" +
-                "\t\"workflowId\": 4\n" +
+                "\t\"workflowId\": 4,\n" +
                 "\t\"workflowVersion\": 1,\n" +
                 "\t\"calculationProcessStep\": {\n" +
                 "\t\t\t\"step\": 3,\n" +
                 "\t\t\t\"type\": 5\n" +
                 "\t},\n" +
                 "\t\"commonOutput\": {\n" +
-                "\t\t\"identityId\": [\"identity:403931f2e18c4be2915e229b9065a208-xx\",\"identity:07c0119cb39e47f497ff581efd48e342-xx\"],\n" +
+                "\t\t\"identityId\": [\"identity:403931f2e18c4be2915e229b9065a208\",\"identity:07c0119cb39e47f497ff581efd48e342\"],\n" +
                 "\t\t\"storePattern\": 2\n" +
                 "\t}\n" +
                 "}";
-
-        String result = mvc.perform(post("/workflow/wizard/settingWorkflowOfWizardMode")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                        .header("Accept-Language","zh")
-                        .header("Access-Token",accessToken)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        System.out.println(result);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", json));
     }
-
 
 
     // ----------------------专家模式创建的单节点训练工作流----------------------------------------------
@@ -650,19 +495,18 @@ public class WorkFlowControllerTest {
     public void createWorkflowOfExpertModeCase1() throws Exception {
         // 创建
         String workflowName = "chendai-flow-5";
-//        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
+        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
 //        //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1}}
 
-
         // 查询
-        Long workflowId = 1L;
+        Long workflowId = 5L;
         Long workflowVersion = 1L;
 //        System.out.println("result = "  + getWorkflowSettingOfExpertMode(workflowId, workflowVersion));
 //        //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1,"workflowNodeList":[]}}
 
         // 设置
-//        String reqBody = getWorkflowSettingReqBodyOfExpertModeCase1(workflowId, workflowVersion);
-//        System.out.println("result = "  + settingWorkflowOfExpertMode(reqBody));
+        String reqBody = getWorkflowSettingReqBodyOfExpertModeCase1(workflowId, workflowVersion);
+        System.out.println("result = "  + settingWorkflowOfExpertMode(reqBody));
         //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1}}
 
 
@@ -680,24 +524,24 @@ public class WorkFlowControllerTest {
     public void createWorkflowOfExpertModeCase2() throws Exception {
         // 创建
         String workflowName = "chendai-flow-6";
-//        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
+        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
 //        //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1}}
 
 
         // 查询
-        Long workflowId = 2L;
+        Long workflowId = 6L;
         Long workflowVersion = 1L;
 //        System.out.println("result = "  + getWorkflowSettingOfExpertMode(workflowId, workflowVersion));
         //{"code":10000,"msg":"成功","data":{"workflowId":2,"workflowVersion":1,"workflowNodeList":[]}}
 
         // 设置
-//        String reqBody = getWorkflowSettingReqBodyOfExpertModeCase2(workflowId, workflowVersion);
+        String reqBody = getWorkflowSettingReqBodyOfExpertModeCase2(workflowId, workflowVersion);
 //        System.out.println("result = "  + settingWorkflowOfExpertMode(reqBody));
         //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1}}
 
 
         // 查询
-        System.out.println("result = "  + getWorkflowSettingOfExpertMode(workflowId, workflowVersion));
+//        System.out.println("result = "  + getWorkflowSettingOfExpertMode(workflowId, workflowVersion));
 //        //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1,"workflowNodeList":[{"nodeStep":1,"nodeName":"隐私线性回归训练","algorithmId":2011,"nodeInput":{"identityId":"identity:e9eef460ea9c473993c6477915106eed","dataInputList":[{"identityId":"identity:3ddb63047d214ddd8187438a82841250","metaDataId":"metadata:0x4c20858f152b13d36773c588ec9424e2001a4886732005e6edbd301825397bb6","keyColumn":1,"dependentVariable":0,"dataColumnIds":"2,3,4"},{"identityId":"identity:f614f8ac21b44fe89926ad4f26ef5b07","metaDataId":"metadata:0x65b1ae7e819b443413f46dd22c80b3f7bf24f36cf18512c033eee3096a847044","keyColumn":1,"dependentVariable":10,"dataColumnIds":"12,13,14"}],"inputModel":false,"model":null,"isPsi":true},"nodeOutput":{"identityId":["identity:07c0119cb39e47f497ff581efd48e342","identity:403931f2e18c4be2915e229b9065a208"],"storePattern":1},"nodeCode":{"variableList":[{"varKey":"batch_size","varValue":"256","varDesc":"111111111111111","varDescEn":null},{"varKey":"epochs","varValue":"10","varDesc":null,"varDescEn":null},{"varKey":"learning_rate","varValue":"0.1","varDesc":null,"varDescEn":null},{"varKey":"predict_threshold","varValue":"0.5","varDesc":null,"varDescEn":null},{"varKey":"use_validation_set","varValue":"true","varDesc":null,"varDescEn":null},{"varKey":"validation_set_rate","varValue":"0.2","varDesc":null,"varDescEn":null}],"code":{"editType":2,"calculateContractCode":"# coding:utf-8\n\nimport os\nimport sys\nimport math\nimport json\nimport time\nimport logging\nimport shutil\nimport numpy as np\nimport pandas as pd\nimport tensorflow as tf\nimport latticex.rosetta as rtt\nimport channel_sdk\n\n\nnp.set_printoptions(suppress=True)\ntf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)\nos.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'\nrtt.set_backend_loglevel(5)  # All(0), Trace(1), Debug(2), Info(3), Warn(4), Error(5), Fatal(6)\nlog = logging.getLogger(__name__)\n\nclass PrivacyLinearRegTrain(object):\n    '''\n    Privacy linear regression train base on rosetta.\n    '''\n\n    def __init__(self,\n                 channel_config: str,\n                 cfg_dict: dict,\n                 data_party: list,\n                 result_party: list,\n                 results_dir: str):\n        log.info(f\"channel_config:{channel_config}\")\n        log.info(f\"cfg_dict:{cfg_dict}\")\n        log.info(f\"data_party:{data_party}, result_party:{result_party}, results_dir:{results_dir}\")\n        assert isinstance(channel_config, str), \"type of channel_config must be str\"\n        assert isinstance(cfg_dict, dict), \"type of cfg_dict must be dict\"\n        assert isinstance(data_party, (list, tuple)), \"type of data_party must be list or tuple\"\n        assert isinstance(result_party, (list, tuple)), \"type of result_party must be list or tuple\"\n        assert isinstance(results_dir, str), \"type of results_dir must be str\"\n        \n        self.channel_config = channel_config\n        self.data_party = list(data_party)\n        self.result_party = list(result_party)\n        self.party_id = cfg_dict[\"party_id\"]\n        self.input_file = cfg_dict[\"data_party\"].get(\"input_file\")\n        self.key_column = cfg_dict[\"data_party\"].get(\"key_column\")\n        self.selected_columns = cfg_dict[\"data_party\"].get(\"selected_columns\")\n\n        dynamic_parameter = cfg_dict[\"dynamic_parameter\"]\n        self.label_owner = dynamic_parameter.get(\"label_owner\")\n        if self.party_id == self.label_owner:\n            self.label_column = dynamic_parameter.get(\"label_column\")\n            self.data_with_label = True\n        else:\n            self.label_column = \"\"\n            self.data_with_label = False\n                        \n        algorithm_parameter = dynamic_parameter[\"algorithm_parameter\"]\n        self.epochs = algorithm_parameter.get(\"epochs\", 10)\n        self.batch_size = algorithm_parameter.get(\"batch_size\", 256)\n        self.learning_rate = algorithm_parameter.get(\"learning_rate\", 0.001)\n        self.use_validation_set = algorithm_parameter.get(\"use_validation_set\", True)\n        self.validation_set_rate = algorithm_parameter.get(\"validation_set_rate\", 0.2)\n        self.predict_threshold = algorithm_parameter.get(\"predict_threshold\", 0.5)\n\n        self.output_file = os.path.join(results_dir, \"model\")\n        \n        self.check_parameters()\n\n    def check_parameters(self):\n        log.info(f\"check parameter start.\")        \n        assert self.epochs > 0, \"epochs must be greater 0\"\n        assert self.batch_size > 0, \"batch size must be greater 0\"\n        assert self.learning_rate > 0, \"learning rate must be greater 0\"\n        assert 0 < self.validation_set_rate < 1, \"validattion set rate must be between (0,1)\"\n        assert 0 <= self.predict_threshold <= 1, \"predict threshold must be between [0,1]\"\n        \n        if self.input_file:\n            self.input_file = self.input_file.strip()\n        if self.party_id in self.data_party:\n            if os.path.exists(self.input_file):\n                input_columns = pd.read_csv(self.input_file, nrows=0)\n                input_columns = list(input_columns.columns)\n                if self.key_column:\n                    assert self.key_column in input_columns, f\"key_column:{self.key_column} not in input_file\"\n                if self.selected_columns:\n                    error_col = []\n                    for col in self.selected_columns:\n                        if col not in input_columns:\n                            error_col.append(col)   \n                    assert not error_col, f\"selected_columns:{error_col} not in input_file\"\n                if self.label_column:\n                    assert self.label_column in input_columns, f\"label_column:{self.label_column} not in input_file\"\n            else:\n                raise Exception(f\"input_file is not exist. input_file={self.input_file}\")\n        log.info(f\"check parameter finish.\")\n                        \n        \n    def train(self):\n        '''\n        Linear regression training algorithm implementation function\n        '''\n\n        log.info(\"extract feature or label.\")\n        train_x, train_y, val_x, val_y = self.extract_feature_or_label(with_label=self.data_with_label)\n        \n        log.info(\"start create and set channel.\")\n        self.create_set_channel()\n        log.info(\"waiting other party connect...\")\n        rtt.activate(\"SecureNN\")\n        log.info(\"protocol has been activated.\")\n        \n        log.info(f\"start set save model. save to party: {self.result_party}\")\n        rtt.set_saver_model(False, plain_model=self.result_party)\n        # sharing data\n        log.info(f\"start sharing train data. data_owner={self.data_party}, label_owner={self.label_owner}\")\n        shard_x, shard_y = rtt.PrivateDataset(data_owner=self.data_party, label_owner=self.label_owner).load_data(train_x, train_y, header=0)\n        log.info(\"finish sharing train data.\")\n        column_total_num = shard_x.shape[1]\n        log.info(f\"column_total_num = {column_total_num}.\")\n        \n        if self.use_validation_set:\n            log.info(\"start sharing validation data.\")\n            shard_x_val, shard_y_val = rtt.PrivateDataset(data_owner=self.data_party, label_owner=self.label_owner).load_data(val_x, val_y, header=0)\n            log.info(\"finish sharing validation data.\")\n\n        if self.party_id not in self.data_party:  \n            # mean the compute party and result party\n            log.info(\"compute start.\")\n            X = tf.placeholder(tf.float64, [None, column_total_num])\n            Y = tf.placeholder(tf.float64, [None, 1])\n            W = tf.Variable(tf.zeros([column_total_num, 1], dtype=tf.float64))\n            b = tf.Variable(tf.zeros([1], dtype=tf.float64))\n            pred_Y = tf.matmul(X, W) + b\n            loss = tf.square(Y - pred_Y)\n            loss = tf.reduce_mean(loss)\n            # optimizer\n            optimizer = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(loss)\n            init = tf.global_variables_initializer()\n            saver = tf.train.Saver(var_list=None, max_to_keep=5, name='v2')\n            \n            reveal_Y = rtt.SecureReveal(pred_Y)\n            actual_Y = tf.placeholder(tf.float64, [None, 1])\n            reveal_Y_actual = rtt.SecureReveal(actual_Y)\n\n            with tf.Session() as sess:\n                log.info(\"session init.\")\n                sess.run(init)\n                # train\n                log.info(\"train start.\")\n                train_start_time = time.time()\n                batch_num = math.ceil(len(shard_x) / self.batch_size)\n                for e in range(self.epochs):\n                    for i in range(batch_num):\n                        bX = shard_x[(i * self.batch_size): (i + 1) * self.batch_size]\n                        bY = shard_y[(i * self.batch_size): (i + 1) * self.batch_size]\n                        sess.run(optimizer, feed_dict={X: bX, Y: bY})\n                        if (i % 50 == 0) or (i == batch_num - 1):\n                            log.info(f\"epoch:{e + 1}/{self.epochs}, batch:{i + 1}/{batch_num}\")\n                log.info(f\"model save to: {self.output_file}\")\n                saver.save(sess, self.output_file)\n                train_use_time = round(time.time()-train_start_time, 3)\n                log.info(f\"save model success. train_use_time={train_use_time}s\")\n                \n                if self.use_validation_set:\n                    Y_pred = sess.run(reveal_Y, feed_dict={X: shard_x_val})\n                    log.info(f\"Y_pred:\\n {Y_pred[:10]}\")\n                    Y_actual = sess.run(reveal_Y_actual, feed_dict={actual_Y: shard_y_val})\n                    log.info(f\"Y_actual:\\n {Y_actual[:10]}\")\n        \n            running_stats = str(rtt.get_perf_stats(True)).replace('\\n', '').replace(' ', '')\n            log.info(f\"running stats: {running_stats}\")\n        else:\n            log.info(\"computing, please waiting for compute finish...\")\n        rtt.deactivate()\n     \n        log.info(\"remove temp dir.\")\n        if self.party_id in (self.data_party + self.result_party):\n            # self.remove_temp_dir()\n            pass\n        else:\n            # delete the model in the compute party.\n            self.remove_output_dir()\n        \n        if (self.party_id in self.result_party) and self.use_validation_set:\n            log.info(\"result_party evaluate model.\")\n            from sklearn.metrics import r2_score, mean_squared_error\n            Y_pred = Y_pred.astype(\"float\").reshape([-1, ])\n            Y_true = Y_actual.astype(\"float\").reshape([-1, ])\n            r2 = r2_score(Y_true, Y_pred)\n            rmse = np.sqrt(mean_squared_error(Y_true, Y_pred))\n            log.info(\"********************\")\n            log.info(f\"R Squared: {round(r2, 6)}\")\n            log.info(f\"RMSE: {round(rmse, 6)}\")\n            log.info(\"********************\")\n        log.info(\"train finish.\")\n    \n    def create_set_channel(self):\n        '''\n        create and set channel.\n        '''\n        io_channel = channel_sdk.grpc.APIManager()\n        log.info(\"start create channel\")\n        channel = io_channel.create_channel(self.party_id, self.channel_config)\n        log.info(\"start set channel\")\n        rtt.set_channel(\"\", channel)\n        log.info(\"set channel success.\")\n    \n    def extract_feature_or_label(self, with_label: bool=False):\n        '''\n        Extract feature columns or label column from input file,\n        and then divide them into train set and validation set.\n        '''\n        train_x = \"\"\n        train_y = \"\"\n        val_x = \"\"\n        val_y = \"\"\n        temp_dir = self.get_temp_dir()\n        if self.party_id in self.data_party:\n            if self.input_file:\n                if with_label:\n                    usecols = self.selected_columns + [self.label_column]\n                else:\n                    usecols = self.selected_columns\n                \n                input_data = pd.read_csv(self.input_file, usecols=usecols, dtype=\"str\")\n                input_data = input_data[usecols]\n                # only if self.validation_set_rate==0, split_point==input_data.shape[0]\n                split_point = int(input_data.shape[0] * (1 - self.validation_set_rate))\n                assert split_point > 0, f\"train set is empty, because validation_set_rate:{self.validation_set_rate} is too big\"\n                \n                if with_label:\n                    y_data = input_data[self.label_column]\n                    train_y_data = y_data.iloc[:split_point]\n                    train_y = os.path.join(temp_dir, f\"train_y_{self.party_id}.csv\")\n                    train_y_data.to_csv(train_y, header=True, index=False)\n                    if self.use_validation_set:\n                        assert split_point < input_data.shape[0], \\\n                            f\"validation set is empty, because validation_set_rate:{self.validation_set_rate} is too small\"\n                        val_y_data = y_data.iloc[split_point:]\n                        val_y = os.path.join(temp_dir, f\"val_y_{self.party_id}.csv\")\n                        val_y_data.to_csv(val_y, header=True, index=False)\n                    del input_data[self.label_column]\n                \n                x_data = input_data\n                train_x = os.path.join(temp_dir, f\"train_x_{self.party_id}.csv\")\n                x_data.iloc[:split_point].to_csv(train_x, header=True, index=False)\n                if self.use_validation_set:\n                    assert split_point < input_data.shape[0], \\\n                            f\"validation set is empty, because validation_set_rate:{self.validation_set_rate} is too small.\"\n                    val_x = os.path.join(temp_dir, f\"val_x_{self.party_id}.csv\")\n                    x_data.iloc[split_point:].to_csv(val_x, header=True, index=False)\n            else:\n                raise Exception(f\"data_node {self.party_id} not have data. input_file:{self.input_file}\")\n        return train_x, train_y, val_x, val_y\n    \n    def get_temp_dir(self):\n        '''\n        Get the directory for temporarily saving files\n        '''\n        temp_dir = os.path.join(os.path.dirname(self.output_file), 'temp')\n        if not os.path.exists(temp_dir):\n            os.makedirs(temp_dir, exist_ok=True)\n        return temp_dir\n\n    def remove_temp_dir(self):\n        '''\n        Delete all files in the temporary directory, these files are some temporary data.\n        Only delete temp file.\n        '''\n        temp_dir = self.get_temp_dir()\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n    \n    def remove_output_dir(self):\n        '''\n        Delete all files in the temporary directory, these files are some temporary data.\n        This is used to delete all output files of the non-resulting party\n        '''\n        temp_dir = os.path.dirname(self.output_file)\n        if os.path.exists(temp_dir):\n            shutil.rmtree(temp_dir)\n\n\ndef main(channel_config: str, cfg_dict: dict, data_party: list, result_party: list, results_dir: str):\n    '''\n    This is the entrance to this module\n    '''\n    privacy_linear_reg = PrivacyLinearRegTrain(channel_config, cfg_dict, data_party, result_party, results_dir)\n    privacy_linear_reg.train()","dataSplitContractCode":""}},"resource":{"costMem":1073741824,"costCpu":1,"costGpu":2,"costBandwidth":3145728,"runTime":180000}}]}}
     }
 
@@ -707,19 +551,18 @@ public class WorkFlowControllerTest {
     public void createWorkflowOfExpertModeCase3() throws Exception {
         // 创建
         String workflowName = "chendai-flow-7";
-//        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
+        System.out.println("result = "  + createWorkflowOfExpertMode(workflowName));
 //        //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1}}
 
-
         // 查询
-        Long workflowId = 3L;
+        Long workflowId = 7L;
         Long workflowVersion = 1L;
 //        System.out.println("result = "  + getWorkflowSettingOfExpertMode(workflowId, workflowVersion));
         //{"code":10000,"msg":"成功","data":{"workflowId":2,"workflowVersion":1,"workflowNodeList":[]}}
 
         // 设置
-//        String reqBody = getWorkflowSettingReqBodyOfExpertModeCase3(workflowId, workflowVersion);
-//        System.out.println("result = "  + settingWorkflowOfExpertMode(reqBody));
+        String reqBody = getWorkflowSettingReqBodyOfExpertModeCase3(workflowId, workflowVersion);
+        System.out.println("result = "  + settingWorkflowOfExpertMode(reqBody));
         //{"code":10000,"msg":"成功","data":{"workflowId":1,"workflowVersion":1}}
 
 
@@ -734,8 +577,30 @@ public class WorkFlowControllerTest {
 //        System.out.println("result = "  + getWorkflowLogOfExpertMode(workflowId, workflowVersion));
 
         // 查询文件
-        System.out.println("result = "  + getWorkflowResultOfExpertMode(workflowId, workflowVersion, 1));
+//        System.out.println("result = "  + getWorkflowResultOfExpertMode(workflowId, workflowVersion, 1));
+
+        // 复制工作流
+//        System.out.println("result = "  + copyWorkflow(workflowId, workflowVersion, "copy-1"));
+
+        // 删除工作流
+//        System.out.println("result = "  + deleteWorkflow(workflowId));
     }
+
+
+    // ----------------------通用功能----------------------------------------------
+
+    @Test
+    public void getWorkflowStats()throws Exception{
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap();
+        System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowStats", parameters));
+    }
+
+    @Test
+    public void getWorkflowList()throws Exception{
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap();
+        System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowList", parameters));
+    }
+
 
     private String getWorkflowResultOfExpertMode(Long workflowId, Long workflowVersion, Integer nodeStep)throws Exception{
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap();
@@ -776,6 +641,28 @@ public class WorkFlowControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return result;
+    }
+
+    private String deleteWorkflow(Long workflowId) throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("workflowId", workflowId);
+        return commonPostWithToken("/workflow/deleteWorkflow", req.toJSONString());
+    }
+
+    private String copy(Long workflowId, Long workflowVersion, String workflowVersionName) throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("workflowId", workflowId);
+        req.put("workflowVersion", workflowVersion);
+        req.put("workflowVersionName", workflowVersionName);
+        return commonPostWithToken("/workflow/copyWorkflow", req.toJSONString());
+    }
+
+    private String copyWorkflow(Long workflowId, Long workflowVersion, String workflowVersionName) throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("workflowId", workflowId);
+        req.put("workflowVersion", workflowVersion);
+        req.put("workflowVersionName", workflowVersionName);
+        return commonPostWithToken("/workflow/copyWorkflow", req.toJSONString());
     }
 
     private String createWorkflowOfExpertMode(String workflowName) throws Exception {

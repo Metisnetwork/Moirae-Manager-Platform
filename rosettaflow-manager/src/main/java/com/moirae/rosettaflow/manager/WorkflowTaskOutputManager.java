@@ -1,9 +1,12 @@
 package com.moirae.rosettaflow.manager;
 
+import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.mapper.domain.WorkflowTaskInput;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskOutput;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -20,4 +23,8 @@ public interface WorkflowTaskOutputManager extends IService<WorkflowTaskOutput> 
     void clearAndSave(Long workflowTaskId, List<WorkflowTaskOutput> workflowTaskOutputList);
 
     boolean removeByWorkflowTaskIds(List<Long> workflowTaskIdList);
+
+    List<Map<OldAndNewEnum, WorkflowTaskOutput>> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
+
+    List<WorkflowTaskOutput> deleteByWorkflowTaskId(Long workflowTaskId);
 }

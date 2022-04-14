@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -42,7 +43,7 @@ public class WorkflowVersion implements Serializable {
      * 状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败
      */
     @TableField("`status`")
-    private Integer status;
+    private WorkflowTaskRunStatusEnum status;
 
     /**
      * 创建时间
@@ -60,11 +61,13 @@ public class WorkflowVersion implements Serializable {
     /**
      * 开始时间
      */
+    @TableField(exist = false)
     private Date beginTime;
 
     /**
      * 结束时间
      */
+    @TableField(exist = false)
     private Date endTime;
 
 }

@@ -14,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface WorkflowRunStatusManager extends IService<WorkflowRunStatus> {
 
     WorkflowRunStatus getLatestOneByWorkflowVersion(Long workflowId, Long workflowVersion);
+
+    boolean hasBeenRun(Long workflowId);
 }

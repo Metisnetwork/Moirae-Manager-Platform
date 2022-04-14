@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -23,4 +24,8 @@ public interface WorkflowManager extends IService<Workflow> {
     IPage<Workflow> getWorkflowList(Page<Workflow> page, String address, String keyword, Long algorithmId, Date begin, Date end);
 
     boolean updateStep(Long workflowId, Integer step, Boolean isSettingCompleted);
+
+    Workflow increaseVersion(Long workflowId);
+
+    Workflow delete(Long workflowId);
 }

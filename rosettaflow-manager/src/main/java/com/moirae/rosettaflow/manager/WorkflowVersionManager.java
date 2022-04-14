@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 工作流不同版本设置表 服务类
@@ -16,4 +18,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface WorkflowVersionManager extends IService<WorkflowVersion> {
 
     IPage<WorkflowVersion> getWorkflowVersionList(Page<WorkflowVersion> page, Long workflowId);
+
+    WorkflowVersion create(Long workflowId, Long workflowVersion, String workflowVersionName);
+
+    List<WorkflowVersion> deleteByWorkflowId(Long workflowId);
 }

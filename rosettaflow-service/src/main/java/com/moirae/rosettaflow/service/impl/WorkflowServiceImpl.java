@@ -3,11 +3,16 @@ package com.moirae.rosettaflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
+import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.service.*;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
@@ -82,7 +87,18 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public IPage<Workflow> getWorkflowList(Long current, Long size, String keyword, Long algorithmId, Date begin, Date end) {
         Page<Workflow> page = new Page<>(current, size);
-        return workflowManager.getWorkflowList(page, UserContext.getCurrentUser().getAddress(), keyword, algorithmId, begin, end);
+        workflowManager.getWorkflowList(page, UserContext.getCurrentUser().getAddress(), keyword, algorithmId, begin, end);
+
+        page.getRecords().forEach(item -> {
+            if(item.getCalculationProcessStepType() != null && item.getCalculationProcessStep() != null){
+                CalculationProcessStep calculationProcessStep = new CalculationProcessStep();
+                calculationProcessStep.setCalculationProcessId(item.getCalculationProcessId());
+                calculationProcessStep.setStep(item.getCalculationProcessStep());
+                calculationProcessStep.setType(CalculationProcessTypeEnum.find(item.getCalculationProcessStepType()));
+                item.setCalculationProcessStepObject(calculationProcessStep);
+            }
+        });
+        return page;
     }
 
     @Override
@@ -124,11 +140,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowManager.save(workflow);
 
         // 创建工作流版本
-        WorkflowVersion workflowVersion = new WorkflowVersion();
-        workflowVersion.setWorkflowId(workflow.getWorkflowId());
-        workflowVersion.setWorkflowVersion(1L);
-        workflowVersion.setWorkflowVersionName(StringUtils.join(workflowName, "-v1"));
-        workflowVersionManager.save(workflowVersion);
+        WorkflowVersion workflowVersion = workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), StringUtils.join(workflowName, "-v1"));
 
         // 创建工作流任务配置 1-训练  2-预测  3-训练，并预测 4-PSI
         List<WorkflowTask> workflowTaskList = calculationProcess.getTaskItem().stream().map(
@@ -186,11 +198,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowManager.save(workflow);
 
         // 创建工作流版本
-        WorkflowVersion workflowVersion = new WorkflowVersion();
-        workflowVersion.setWorkflowId(workflow.getWorkflowId());
-        workflowVersion.setWorkflowVersion(1L);
-        workflowVersion.setWorkflowVersionName(StringUtils.join(workflowName, "-v1"));
-        workflowVersionManager.save(workflowVersion);
+        workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), StringUtils.join(workflowName, "-v1"));
 
         result.setWorkflowId(workflow.getWorkflowId());
         result.setWorkflowVersion(workflow.getWorkflowVersion());
@@ -901,19 +909,63 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @Transactional
     public WorkflowVersionKeyDto copyWorkflow(WorkflowVersionNameDto req) {
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
-        
+        // 更新工作流对象
+        Workflow workflow = workflowManager.increaseVersion(req.getWorkflowId());
+        // 创建工作流版本
+        workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), req.getWorkflowVersionName());
+        // 复制设置的信息
+        if(workflow.getCreateMode() == WorkflowCreateModeEnum.EXPERT_MODE){
+            workflowSettingExpertManager.copyAndReset(workflow.getWorkflowId(), req.getWorkflowVersion(), workflow.getWorkflowVersion());
+        }else{
+            workflowSettingWizardManager.copyAndReset(workflow.getWorkflowId(), req.getWorkflowVersion(), workflow.getWorkflowVersion());
+        }
+        // 复制任务设置
+        List<Map<OldAndNewEnum, WorkflowTask>> workflowTaskList = workflowTaskManager.copy(workflow.getWorkflowId(), req.getWorkflowVersion(), workflow.getWorkflowVersion());
 
+        workflowTaskList.forEach(item -> {
+            workflowTaskCodeManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
+            workflowTaskInputManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
+            workflowTaskOutputManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
+            workflowTaskResourceManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
+            workflowTaskVariableManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
+        });
 
-
-        return null;
-
+        result.setWorkflowId(workflow.getWorkflowId());
+        result.setWorkflowVersion(workflow.getWorkflowVersion());
+        return result;
     }
 
     @Override
+    @Transactional
     public Boolean deleteWorkflow(WorkflowKeyDto req) {
-        return null;
+        // 检查否存在运行记录
+        if(workflowRunStatusManager.hasBeenRun(req.getWorkflowId())){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_BEEN_RUN.getMsg());
+        }
+        // 删除工作流
+        Workflow workflow = workflowManager.delete(req.getWorkflowId());
+        // 删除工作流版本
+        workflowVersionManager.deleteByWorkflowId(workflow.getWorkflowId());
+        // 删除设置的信息
+        if(workflow.getCreateMode() == WorkflowCreateModeEnum.EXPERT_MODE){
+            workflowSettingExpertManager.deleteWorkflowId(workflow.getWorkflowId());
+        }else{
+            workflowSettingWizardManager.deleteWorkflowId(workflow.getWorkflowId());
+        }
+        // 复制任务设置
+        List<WorkflowTask> workflowTaskList = workflowTaskManager.deleteWorkflowId(workflow.getWorkflowId());
+
+        workflowTaskList.forEach(item -> {
+            workflowTaskCodeManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
+            workflowTaskInputManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
+            workflowTaskOutputManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
+            workflowTaskResourceManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
+            workflowTaskVariableManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
+        });
+        return true;
     }
 
     @Override

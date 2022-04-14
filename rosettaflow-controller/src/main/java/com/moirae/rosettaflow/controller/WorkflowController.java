@@ -46,7 +46,7 @@ public class WorkflowController {
     private WorkflowService workflowService;
 
     @GetMapping("getWorkflowStats")
-    @ApiOperation(value = "（开发中）查询工作流统计", notes = "查询工作流统计")
+    @ApiOperation(value = "查询工作流统计", notes = "查询工作流统计")
     public ResponseVo<WorkflowStatsVo> getWorkflowStats() {
         int workflowCount = workflowService.getWorkflowCount();
         WorkflowStatsVo workflowStatsVo = new WorkflowStatsVo();
@@ -55,7 +55,7 @@ public class WorkflowController {
     }
 
     @GetMapping("getWorkflowList")
-    @ApiOperation(value = "（开发中）查询工作流列表", notes = "查询工作流列表")
+    @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
     public ResponseVo<PageVo<WorkflowVo>> getWorkflowList(@Valid GetWorkflowListReq req) {
         IPage<Workflow> page = workflowService.getWorkflowList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getAlgorithmId(), req.getBegin(), req.getEnd());
         List<WorkflowVo> itemList = BeanUtil.copyToList(page.getRecords(), WorkflowVo.class);
@@ -148,16 +148,9 @@ public class WorkflowController {
     }
 
     @PostMapping("deleteWorkflow")
-    @ApiOperation(value = "（开发中）删除工作流", notes = "删除工作流")
+    @ApiOperation(value = "删除工作流", notes = "删除工作流, 从未运行过的可以删除")
     public ResponseVo<Boolean> deleteWorkflow(@RequestBody @Validated WorkflowKeyDto req) {
         Boolean resp = workflowService.deleteWorkflow(req);
-        return ResponseVo.createSuccess(resp);
-    }
-
-    @PostMapping("clearWorkflow")
-    @ApiOperation(value = "（开发中）清空工作流", notes = "清空工作流")
-    public ResponseVo<Boolean> clearWorkflow(@RequestBody @Validated WorkflowVersionKeyDto req) {
-        Boolean resp = workflowService.clearWorkflow(req);
         return ResponseVo.createSuccess(resp);
     }
 

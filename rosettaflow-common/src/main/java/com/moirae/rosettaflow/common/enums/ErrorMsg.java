@@ -96,6 +96,7 @@ public enum ErrorMsg {
     /**
      * 工作流
      */
+    WORKFLOW_BEEN_RUN("工作流存在运行信息", "Workflow has running information"),
     WORKFLOW_NOT_EXIST("工作流不存在", "Workflow does not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),
     WORKFLOW_COPY_ERROR("复制工作流失败", "Failed to copy workflow"),
@@ -158,9 +159,6 @@ public enum ErrorMsg {
     }
 
     public String getMsg() {
-        if (Objects.nonNull(LanguageContext.get()) && LanguageContext.get().equals(SysConstant.EN_US)) {
-            return this.en;
-        }
-        return this.zh;
+        return LanguageContext.getByLanguage(this.zh, this.en);
     }
 }

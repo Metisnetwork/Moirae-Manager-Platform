@@ -2,13 +2,18 @@ package com.moirae.rosettaflow.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.mapper.domain.WorkflowTaskOutput;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskVariable;
 import com.moirae.rosettaflow.mapper.WorkflowTaskVariableMapper;
 import com.moirae.rosettaflow.manager.WorkflowTaskVariableManager;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -33,5 +38,37 @@ public class WorkflowTaskVariableManagerImpl extends ServiceImpl<WorkflowTaskVar
         LambdaQueryWrapper<WorkflowTaskVariable> wrapper = Wrappers.lambdaQuery();
         wrapper.in(WorkflowTaskVariable::getWorkflowTaskId, workflowTaskIdList);
         return remove(wrapper);
+    }
+
+    @Override
+    public List<Map<OldAndNewEnum, WorkflowTaskVariable>> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId) {
+        List<WorkflowTaskVariable> oldList = listByWorkflowTaskId(oldWorkflowTaskId);
+        List<Map<OldAndNewEnum, WorkflowTaskVariable>> result  = oldList.stream()
+                .map(item -> {
+                    WorkflowTaskVariable newObj =  new WorkflowTaskVariable();
+                    newObj.setWorkflowTaskId(newWorkflowTaskId);
+                    newObj.setVarValue(item.getVarValue());
+                    newObj.setVarKey(item.getVarKey());
+                    newObj.setVarDesc(item.getVarDesc());
+                    newObj.setVarDescEn(item.getVarDescEn());
+                    save(newObj);
+                    Map<OldAndNewEnum, WorkflowTaskVariable> pair = new HashMap<>();
+                    pair.put(OldAndNewEnum.OLD, item);
+                    pair.put(OldAndNewEnum.NEW, newObj);
+                    return pair;
+                })
+                .collect(Collectors.toList());
+        return result;
+    }
+
+    @Override
+    public List<WorkflowTaskVariable> deleteByWorkflowTaskId(Long workflowTaskId) {
+        LambdaQueryWrapper<WorkflowTaskVariable> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowTaskVariable::getWorkflowTaskId, workflowTaskId);
+        List<WorkflowTaskVariable> result = list(wrapper);
+        if(result.size() > 0){
+            remove(wrapper);
+        }
+        return result;
     }
 }

@@ -28,4 +28,11 @@ public class WorkflowRunStatusManagerImpl extends ServiceImpl<WorkflowRunStatusM
         wrapper.last("limit 1");
         return getOne(wrapper);
     }
+
+    @Override
+    public boolean hasBeenRun(Long workflowId) {
+        LambdaQueryWrapper<WorkflowRunStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunStatus::getWorkflowId, workflowId);
+        return count(wrapper) > 0;
+    }
 }

@@ -1,7 +1,7 @@
 package com.moirae.rosettaflow.vo.workflow;
 
-import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
+import com.moirae.rosettaflow.service.dto.workflow.wizard.CalculationProcessStepDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -40,7 +40,10 @@ public class WorkflowVo {
     private WorkflowCreateModeEnum createMode;
 
     @ApiModelProperty(value = "向导模式下当前步骤")
-    private CalculationProcessTypeEnum calculationProcessStep;
+    private CalculationProcessStepDto calculationProcessStepObject;
+
+    @ApiModelProperty(value = "计算流程id")
+    private Long calculationProcessId;
 
     @ApiModelProperty(value = "向导模式下工作流计算流程名称")
     private String calculationProcessName;

@@ -44,4 +44,19 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         wrapper.eq(Workflow::getWorkflowId, workflowId);
         return update(wrapper);
     }
+
+    @Override
+    public Workflow increaseVersion(Long workflowId) {
+        Workflow workflow = getById(workflowId);
+        workflow.setWorkflowVersion(workflow.getWorkflowVersion() + 1);
+        updateById(workflow);
+        return workflow;
+    }
+
+    @Override
+    public Workflow delete(Long workflowId) {
+        Workflow workflow = getById(workflowId);
+        removeById(workflow.getWorkflowId());
+        return workflow;
+    }
 }

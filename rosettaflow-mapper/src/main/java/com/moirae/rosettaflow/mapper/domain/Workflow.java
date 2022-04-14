@@ -79,7 +79,7 @@ public class Workflow implements Serializable {
      * 最后运行时间
      */
     @TableField("last_run_time")
-    private LocalDateTime lastRunTime;
+    private String lastRunTime;
 
     /**
      * 是否设置完成:  0-否  1-是
@@ -117,4 +117,13 @@ public class Workflow implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 向导模式下当前步骤
+     */
+    @TableField(exist = false)
+    private CalculationProcessStep calculationProcessStepObject;
+
+    @TableField(exist = false)
+    private Integer calculationProcessStepType;
 }
