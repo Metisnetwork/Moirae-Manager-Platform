@@ -36,4 +36,13 @@ public class WorkflowSettingExpertManagerImpl extends ServiceImpl<WorkflowSettin
         wrapper.eq(WorkflowSettingExpert::getWorkflowVersion, workflowVersion);
         return remove(wrapper);
     }
+
+    @Override
+    public WorkflowSettingExpert getByWorkflowVersionAndStep(Long workflowId, Long workflowVersion, Integer nodeStep) {
+        LambdaQueryWrapper<WorkflowSettingExpert> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowSettingExpert::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowSettingExpert::getWorkflowVersion, workflowVersion);
+        wrapper.eq(WorkflowSettingExpert::getNodeStep, nodeStep);
+        return getOne(wrapper);
+    }
 }

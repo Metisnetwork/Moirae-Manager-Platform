@@ -1,10 +1,10 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.mapper.domain.CalculationProcess;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
+import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
 import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
@@ -40,7 +40,7 @@ public interface WorkflowService{
 
     List<TaskResultDto> getWorkflowNodeResult(WorkflowNodeKeyDto req);
 
-    WorkflowVersionKeyDto copyWorkflow(WorkflowVersionKeyDto req);
+    WorkflowVersionKeyDto copyWorkflow(WorkflowVersionNameDto req);
 
     Boolean deleteWorkflow(WorkflowKeyDto req);
 

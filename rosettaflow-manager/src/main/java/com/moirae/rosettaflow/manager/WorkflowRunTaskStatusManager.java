@@ -1,7 +1,9 @@
 package com.moirae.rosettaflow.manager;
 
-import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowRunTaskStatusManager extends IService<WorkflowRunTaskStatus> {
 
+    WorkflowRunTaskStatus getByWorkflowRunIdAndStep(Long workflowRunId, Integer taskStep);
+
+    List<WorkflowRunTaskStatus> listByWorkflowRunIdAndHasTaskId(Long workflowRunId);
 }

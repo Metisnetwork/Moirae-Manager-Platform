@@ -1,10 +1,14 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
 import com.moirae.rosettaflow.mapper.WorkflowRunTaskResultMapper;
 import com.moirae.rosettaflow.manager.WorkflowRunTaskResultManager;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +21,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowRunTaskResultManagerImpl extends ServiceImpl<WorkflowRunTaskResultMapper, WorkflowRunTaskResult> implements WorkflowRunTaskResultManager {
 
+    @Override
+    public List<WorkflowRunTaskResult> listByTaskId(String taskId) {
+        LambdaQueryWrapper<WorkflowRunTaskResult> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunTaskResult::getTaskId, taskId);
+        return list(wrapper);
+    }
 }

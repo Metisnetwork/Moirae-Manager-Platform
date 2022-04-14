@@ -3,6 +3,9 @@ package com.moirae.rosettaflow.manager;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * <p>
  * 工作流任务运行状态 服务类
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowRunTaskResultManager extends IService<WorkflowRunTaskResult> {
 
+    List<WorkflowRunTaskResult> listByTaskId(String taskId);
 }

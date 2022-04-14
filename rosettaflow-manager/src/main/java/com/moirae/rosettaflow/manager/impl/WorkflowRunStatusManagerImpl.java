@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.moirae.rosettaflow.mapper.domain.WorkflowRunStatus;
 import com.moirae.rosettaflow.mapper.WorkflowRunStatusMapper;
 import com.moirae.rosettaflow.manager.WorkflowRunStatusManager;
@@ -17,4 +19,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowRunStatusManagerImpl extends ServiceImpl<WorkflowRunStatusMapper, WorkflowRunStatus> implements WorkflowRunStatusManager {
 
+    @Override
+    public WorkflowRunStatus getLatestOneByWorkflowVersion(Long workflowId, Long workflowVersion) {
+        LambdaQueryWrapper<WorkflowRunStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunStatus::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowRunStatus::getWorkflowVersion, workflowVersion);
+        wrapper.orderByDesc(WorkflowRunStatus::getId);
+        wrapper.last("limit 1");
+        return getOne(wrapper);
+    }
 }

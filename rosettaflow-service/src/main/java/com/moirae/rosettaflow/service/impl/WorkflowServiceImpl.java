@@ -5,14 +5,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
-import com.moirae.rosettaflow.service.AlgService;
-import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.WorkflowService;
+import com.moirae.rosettaflow.service.*;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
+import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
+import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
 import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
 import com.moirae.rosettaflow.service.dto.workflow.common.*;
@@ -27,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +37,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     private AlgService algService;
     @Resource
     private DataService dataService;
+    @Resource
+    private TaskService taskService;
+    @Resource
+    private OrgService orgService;
     @Resource
     private WorkflowManager workflowManager;
     @Resource
@@ -825,25 +825,90 @@ public class WorkflowServiceImpl implements WorkflowService {
                     NodeStatusDto nodeStatusDto = new NodeStatusDto();
                     nodeStatusDto.setNodeStep(item.getNodeStep());
                     nodeStatusDto.setRunStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
+                    if(workflowRunStatus != null && workflowRunStatus.getRunStatus() != null){
+                        nodeStatusDto.setRunStatus(getNodeRunStatus(workflowRunStatus.getId(), item.getPsiTaskStep(), item.getTaskStep()));
+                    }
                     return nodeStatusDto;
                 })
                 .collect(Collectors.toList()));
         return result;
     }
 
+    private WorkflowTaskRunStatusEnum getNodeRunStatus(Long id, Integer psiTaskStep, Integer taskStep) {
+        if(psiTaskStep != null){
+           WorkflowRunTaskStatus psiWorkflowRunTaskStatus = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(id, psiTaskStep);
+           if(psiWorkflowRunTaskStatus != null && psiWorkflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL){
+                return WorkflowTaskRunStatusEnum.RUN_FAIL;
+           }
+        }
+        WorkflowRunTaskStatus workflowRunTaskStatus = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(id, taskStep);
+        if(workflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL || workflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_SUCCESS){
+            return workflowRunTaskStatus.getRunStatus();
+        }
+        return WorkflowTaskRunStatusEnum.RUN_DOING;
+    }
+
     @Override
     public List<TaskEventDto> getWorkflowLogOfExpertMode(WorkflowVersionKeyDto req) {
-        return null;
+        List<TaskEventDto> result = new ArrayList<>();
+        WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getLatestOneByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        if(workflowRunStatus == null){
+            return result;
+        }
+
+        Map<String, Org> identityId2OrgMap = orgService.getIdentityId2OrgMap();
+        result = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId()).stream()
+                .map(WorkflowRunTaskStatus::getTaskId)
+                .flatMap(item -> taskService.getTaskEventList(item).stream())
+                .map(item -> {
+                    TaskEventDto taskEventDto = new TaskEventDto();
+                    BeanUtil.copyProperties(item, taskEventDto);
+                    taskEventDto.setNodeName(identityId2OrgMap.get(taskEventDto.getIdentityId()).getNodeName());
+                    return taskEventDto;
+                })
+                .collect(Collectors.toList());
+        return result;
     }
 
     @Override
     public List<TaskResultDto> getWorkflowNodeResult(WorkflowNodeKeyDto req) {
-        return null;
+        List<TaskResultDto> result = new ArrayList<>();
+        WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getLatestOneByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        if(workflowRunStatus == null){
+            return result;
+        }
+
+        WorkflowSettingExpert workflowSettingExpert = workflowSettingExpertManager.getByWorkflowVersionAndStep(req.getWorkflowId(), req.getWorkflowVersion(), req.getNodeStep());
+        Set<Integer> stepSet = new HashSet<>();
+        stepSet.add(workflowSettingExpert.getTaskStep());
+        if(workflowSettingExpert.getPsiTaskStep() != null){
+            stepSet.add(workflowSettingExpert.getPsiTaskStep());
+        }
+
+        Map<String, Org> identityId2OrgMap = orgService.getIdentityId2OrgMap();
+        result = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId()).stream()
+                .filter(item -> stepSet.contains(item.getStep()))
+                .map(WorkflowRunTaskStatus::getTaskId)
+                .flatMap(item -> workflowRunTaskResultManager.listByTaskId(item).stream())
+                .map(item -> {
+                    TaskResultDto taskResultDto = new TaskResultDto();
+                    BeanUtil.copyProperties(item, taskResultDto);
+                    taskResultDto.setOrg(BeanUtil.copyProperties(identityId2OrgMap.get(item.getIdentityId()), OrgNameDto.class));
+                    return taskResultDto;
+                })
+                .collect(Collectors.toList());
+        return result;
     }
 
     @Override
-    public WorkflowVersionKeyDto copyWorkflow(WorkflowVersionKeyDto req) {
+    public WorkflowVersionKeyDto copyWorkflow(WorkflowVersionNameDto req) {
+        WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
+        
+
+
+
         return null;
+
     }
 
     @Override

@@ -18,4 +18,6 @@ public interface WorkflowSettingExpertManager extends IService<WorkflowSettingEx
     List<WorkflowSettingExpert> listByWorkflowVersion(Long workflowId, Long workflowVersion);
 
     boolean removeByWorkflowVersion(Long workflowId, Long workflowVersion);
+
+    WorkflowSettingExpert getByWorkflowVersionAndStep(Long workflowId, Long workflowVersion, Integer nodeStep);
 }

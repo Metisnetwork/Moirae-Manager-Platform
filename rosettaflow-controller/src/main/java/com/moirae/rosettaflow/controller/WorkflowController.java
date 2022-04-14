@@ -2,7 +2,6 @@ package com.moirae.rosettaflow.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.mapper.domain.CalculationProcess;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
@@ -10,6 +9,7 @@ import com.moirae.rosettaflow.req.workflow.*;
 import com.moirae.rosettaflow.req.workflow.expert.CreateWorkflowOfExpertModeReq;
 import com.moirae.rosettaflow.req.workflow.wizard.CreateWorkflowOfWizardModeReq;
 import com.moirae.rosettaflow.service.WorkflowService;
+import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
@@ -127,22 +127,22 @@ public class WorkflowController {
     }
 
     @GetMapping("expert/getWorkflowLogOfExpertMode")
-    @ApiOperation(value = "（开发中）专家模式下获取工作流日志", notes = "专家模式下获取工作流日志")
+    @ApiOperation(value = "专家模式下获取工作流日志", notes = "专家模式下获取工作流日志")
     public ResponseVo<List<TaskEventDto>> getWorkflowLogOfExpertMode(@Validated WorkflowVersionKeyDto req) {
         List<TaskEventDto> resp = workflowService.getWorkflowLogOfExpertMode(req);
         return ResponseVo.createSuccess(resp);
     }
 
-    @GetMapping(value = "getWorkflowResultOfExpertMode")
-    @ApiOperation(value = "（开发中）专家模式下查看工作流节点结果文件", notes = "专家模式下查看工作流节点结果文件")
+    @GetMapping(value = "expert/getWorkflowResultOfExpertMode")
+    @ApiOperation(value = "专家模式下查看工作流节点结果文件", notes = "专家模式下查看工作流节点结果文件")
     public ResponseVo<List<TaskResultDto>> getWorkflowNodeResult(@Validated WorkflowNodeKeyDto req) {
         List<TaskResultDto> resp = workflowService.getWorkflowNodeResult(req);
         return ResponseVo.createSuccess(resp);
     }
 
     @PostMapping("copyWorkflow")
-    @ApiOperation(value = "（开发中）复制工作流", notes = "复制工作流，返回工作流id")
-    public ResponseVo<WorkflowVersionKeyDto> copyWorkflow(@RequestBody @Validated WorkflowVersionKeyDto req) {
+    @ApiOperation(value = "复制工作流", notes = "复制工作流，返回工作流id")
+    public ResponseVo<WorkflowVersionKeyDto> copyWorkflow(@RequestBody @Validated WorkflowVersionNameDto req) {
         WorkflowVersionKeyDto resp = workflowService.copyWorkflow(req);
         return ResponseVo.createSuccess(resp);
     }

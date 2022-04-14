@@ -4,15 +4,14 @@ import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "任务事件")
-public class TaskEventDto {
-
-    @ApiModelProperty(value = "事件组织信息")
-    private OrgNameDto org;
+public class TaskEventDto extends OrgNameDto {
 
     @ApiModelProperty(value = "事件类型")
     private String eventType;

@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.vo.task;
 
+import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -37,5 +38,5 @@ public class TaskDetailsVo extends BaseTaskVo {
     private List<PowerProviderVo> powerProviderList;
 
     @ApiModelProperty(value = "任务事件")
-    private List<TaskEventVo> eventList;
+    private List<TaskEventDto> eventList;
 }

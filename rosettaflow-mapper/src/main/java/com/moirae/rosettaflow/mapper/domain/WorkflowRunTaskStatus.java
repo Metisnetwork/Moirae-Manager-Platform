@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -61,7 +62,7 @@ public class WorkflowRunTaskStatus implements Serializable {
      * 运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败
      */
     @TableField("run_status")
-    private Integer runStatus;
+    private WorkflowTaskRunStatusEnum runStatus;
 
     /**
      * 任务ID,底层处理完成后返回
