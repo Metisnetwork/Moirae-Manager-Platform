@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.vo.workflow;
 
-import com.moirae.rosettaflow.common.enums.WorkflowStatusEnum;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class WorkflowVersionVo {
     private Date createTime;
 
     @ApiModelProperty(value = "工作流版本执行状态（待运行、运行中、运行成功、运行失败）")
-    private WorkflowStatusEnum status;
+    private WorkflowTaskRunStatusEnum status;
 
     @ApiModelProperty(value = "开始时间")
     private Date beginTime;

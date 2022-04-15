@@ -3,7 +3,15 @@
 <mapper namespace="com.moirae.rosettaflow.mapper.WorkflowVersionMapper">
 
     <select id="getWorkflowVersionList" resultType="com.moirae.rosettaflow.mapper.domain.WorkflowVersion">
-
-
+        select
+            mwv.workflow_id,
+            mwv.workflow_version,
+            mwv.workflow_version_name,
+            mwv.create_time,
+            mwv.status,
+            mwrs.begin_time,
+            mwrs.end_time
+        from mo_workflow_version mwv left join mo_workflow_run_status mwrs on (mwv.workflow_id = mwrs.workflow_id and  mwv.workflow_version = mwrs.workflow_version)
+        where mwv.workflow_id = #{workflowId}
     </select>
 </mapper>

@@ -601,6 +601,13 @@ public class WorkFlowControllerTest {
         System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowList", parameters));
     }
 
+    @Test
+    public void getWorkflowVersionList()throws Exception{
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap();
+        parameters.add("workflowId", String.valueOf(1));
+        System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowVersionList", parameters));
+    }
+
 
     private String getWorkflowResultOfExpertMode(Long workflowId, Long workflowVersion, Integer nodeStep)throws Exception{
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap();

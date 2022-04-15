@@ -69,5 +69,4 @@ public class WorkflowVersion implements Serializable {
      */
     @TableField(exist = false)
     private Date endTime;
-
 }

@@ -63,7 +63,7 @@ public class WorkflowController {
     }
 
     @GetMapping("getWorkflowVersionList")
-    @ApiOperation(value = "（开发中）查询指定工作流的版本列表", notes = "查询指定工作流的版本列表")
+    @ApiOperation(value = "查询指定工作流的版本列表", notes = "查询指定工作流的版本列表")
     public ResponseVo<PageVo<WorkflowVersionVo>> getWorkflowVersionList(@Valid GetWorkflowVersionListReq req) {
         IPage<WorkflowVersion> page = workflowService.getWorkflowVersionList(req.getCurrent(), req.getSize(), req.getWorkflowId());
         List<WorkflowVersionVo> itemList = BeanUtil.copyToList(page.getRecords(), WorkflowVersionVo.class);
