@@ -35,6 +35,14 @@ public class TokenHolderManagerImpl extends ServiceImpl<TokenHolderMapper, Token
         return true;
     }
 
+    @Override
+    public TokenHolder getByUser(String userAddress, String metisPayAddress) {
+        LambdaQueryWrapper<TokenHolder> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(TokenHolder::getTokenAddress, metisPayAddress);
+        wrapper.eq(TokenHolder::getAddress, userAddress);
+        return getOne(wrapper);
+    }
+
     private List<String> getListByUser(String address){
         LambdaQueryWrapper<TokenHolder> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(TokenHolder::getAddress, address);

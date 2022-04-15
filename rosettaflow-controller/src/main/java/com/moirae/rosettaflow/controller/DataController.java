@@ -10,7 +10,7 @@ import com.moirae.rosettaflow.req.data.GetDataListReq;
 import com.moirae.rosettaflow.req.model.GetUserModelListReq;
 import com.moirae.rosettaflow.req.org.OrgIdPageReq;
 import com.moirae.rosettaflow.service.DataService;
-import com.moirae.rosettaflow.service.ModelService;
+import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -85,6 +85,12 @@ public class DataController {
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 
+    @GetMapping("getUserMetisLatInfo")
+    @ApiOperation(value = "查询MetisLat代币信息", notes = "查询MetisLat代币信息")
+    public ResponseVo<MetisLatInfoDto> getUserMetisLatInfo() {
+        MetisLatInfoDto resp = dataService.getUserMetisLatInfo();
+        return ResponseVo.createSuccess(resp);
+    }
 
     @GetMapping("getUserModelList")
     @ApiOperation(value = "（开发中）查询当前用户的模型列表", notes = "查询当前用户的模型列表")

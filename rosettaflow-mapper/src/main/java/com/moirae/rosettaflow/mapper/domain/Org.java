@@ -112,5 +112,11 @@ public class Org implements Serializable {
      * 是否公共可看的：0-否，1-是
      */
     @TableField(exist = false)
-    private Byte publicFlag;
+    private Integer publicFlag;
+
+    /**
+     * 是否设置白名单：0-否，1-是
+     */
+    @TableField(exist = false)
+    private Boolean isInWhitelist;
 }

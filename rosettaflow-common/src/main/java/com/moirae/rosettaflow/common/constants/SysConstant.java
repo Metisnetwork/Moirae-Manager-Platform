@@ -126,6 +126,7 @@ public class SysConstant {
             "task/getTaskList",
             "task/getTaskDetails",
             "workflow/wizard/getCalculationProcessList",
+            "sys/getPlatONChainConfig",
             "swagger",
             "error",
             "api-docs"

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
-import com.moirae.rosettaflow.service.dto.model.ModelDto;
+import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 
 import java.util.List;
 import java.util.Map;
@@ -82,4 +82,10 @@ public interface DataService {
     List<Model> queryAvailableModel(Long algorithmId, String identityId);
 
     Model getModelById(String modelId);
+
+    MetisLatInfoDto getUserMetisLatInfo();
+
+    boolean saveToken(Token token);
+
+    Token getTokenById(String weth);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.protobuf.Empty;
+import com.moirae.rosettaflow.chain.platon.contract.MetisPayDao;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
@@ -56,6 +57,8 @@ public class OrgServiceImpl implements OrgService {
     private OrgUserManager userOrgManager;
     @Resource
     private StatsOrgManager statsOrgManager;
+    @Resource
+    private MetisPayDao metisPayDao;
 
     private final Map<String, ManagedChannel> channelMap = new ConcurrentHashMap<>();
 
@@ -316,7 +319,13 @@ public class OrgServiceImpl implements OrgService {
 
     @Override
     public List<Org> getUserOrgList() {
-        return userOrgManager.getUserOrgList(UserContext.getCurrentUser().getAddress());
+        String address = UserContext.getCurrentUser().getAddress();
+        List<Org> orgList = userOrgManager.getUserOrgList(address);
+        Set<String> whiteListSet = metisPayDao.whitelist(address).stream().collect(Collectors.toSet());
+        orgList.forEach(item -> {
+            item.setIsInWhitelist(whiteListSet.contains(item.getObserverProxyWalletAddress())?true:false);
+        });
+        return orgList;
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.controller;
 
-
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -16,4 +15,5 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "授权管理关接口")
 @RequestMapping(value = "auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
+
 }

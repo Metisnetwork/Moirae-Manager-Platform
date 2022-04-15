@@ -1,10 +1,13 @@
 package com.moirae.rosettaflow.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.moirae.rosettaflow.chain.platon.config.PlatONProperties;
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryDao;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.exception.BusinessException;
@@ -12,6 +15,9 @@ import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.DataService;
+import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
+import com.moirae.rosettaflow.service.dto.token.TokenDto;
+import com.moirae.rosettaflow.service.dto.token.TokenHolderDto;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +47,10 @@ public class DataServiceImpl implements DataService {
     private TokenHolderManager tokenHolderManager;
     @Resource
     private ModelManager modelManager;
+    @Resource
+    private PlatONProperties platONProperties;
+    @Resource
+    private IUniswapV2FactoryDao uniswapV2FactoryDao;
 
     @Override
     public int getDataCount() {
@@ -174,5 +184,23 @@ public class DataServiceImpl implements DataService {
     @Override
     public Model getModelById(String modelId) {
         return modelManager.getById(modelId);
+    }
+
+    @Override
+    public MetisLatInfoDto getUserMetisLatInfo() {
+        MetisLatInfoDto result = new MetisLatInfoDto();
+        result.setToken(BeanUtil.copyProperties(tokenManager.getById(uniswapV2FactoryDao.WETH()), TokenDto.class));
+        result.setTokenHolder(BeanUtil.copyProperties(tokenHolderManager.getByUser(UserContext.getCurrentUser().getAddress(), uniswapV2FactoryDao.WETH()), TokenHolderDto.class));
+        return result;
+    }
+
+    @Override
+    public boolean saveToken(Token token) {
+       return tokenManager.save(token);
+    }
+
+    @Override
+    public Token getTokenById(String weth) {
+        return tokenManager.getById(weth);
     }
 }

@@ -66,10 +66,14 @@ chain:
   platon:
     chainId: 210309
     hrp: lat
-    metisPayAddress: "0x1e94d55639bcafd1bb55f1bad9ce9beaf8f6d749"
+    metisPayAddress: "0x7eb718524d1ecceef89196bc8315317bf8b5a05a"
     uniswapV2Router02: "0x26d637e206cc39942628421e7b0d6fb41db0bc06"
     web3jProtocol: WSS
     web3jAddresses: devnetopenapi.platon.network/ws
+    chainName: "PlatON开发网"
+    rpcUrl: https://devnetopenapi.platon.network/rpc
+    symbol: LAT
+    blockExplorerUrl: https://uatscan.platon.network:1443/
 
 
 

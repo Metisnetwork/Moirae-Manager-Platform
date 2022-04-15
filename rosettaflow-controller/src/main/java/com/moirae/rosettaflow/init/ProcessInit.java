@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.init;
 
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryDao;
 import com.moirae.rosettaflow.service.OrgService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,10 +17,14 @@ public class ProcessInit {
 
     @Resource
     private OrgService organizationService;
+    @Resource
+    private IUniswapV2FactoryDao uniswapV2FactoryDao;
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception {
         // 第一次启动时初始化公共组织
         organizationService.initPublicOrg();
+        // 初始化工厂合约地址
+        uniswapV2FactoryDao.initContractAddress();
     }
 }

@@ -20,6 +20,10 @@ public class PlatONProperties {
     private Web3jProtocolEnum web3jProtocol;
     private List<String> web3jAddresses;
 
+    private String chainName;
+    private String rpcUrl;
+    private String blockExplorerUrl;
+    private String symbol;
     @PostConstruct
     public void init(){
         NetworkParameters.init(chainId,hrp);

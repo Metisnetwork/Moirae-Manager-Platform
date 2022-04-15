@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.controller;
 
+import com.moirae.rosettaflow.service.SysService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,15 +13,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 @ActiveProfiles(value = "dev")
 @AutoConfigureMockMvc
-public class AlgControllerTest extends BaseControllerTest {
+public class SysControllerTest extends BaseControllerTest {
 
     @Test
-    public void getAlgTree() throws Exception {
-        System.out.println("result = "  + commonGet("/alg/getAlgTree", emptyParameters));
-    }
-
-    @Test
-    public void getAlgTreeDetails() throws Exception {
-        System.out.println("result = "  + commonGet("/alg/getAlgTreeDetails", emptyParameters));
+    public void getPlatONChainConfig() throws Exception {
+        System.out.println("result = "  + commonGet("/sys/getPlatONChainConfig", emptyParameters));
     }
 }
