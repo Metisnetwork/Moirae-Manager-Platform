@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "组织信息")
+@ApiModel(value = "用户相关的组织信息")
 public class UserOrgVo extends BaseOrgVo{
 
     @ApiModelProperty(value = "组织的ip")

@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "元数据信息")
+@ApiModel(value = "用户相关的元数据信息")
 public class UserDataVo extends DataVo {
 
     @ApiModelProperty(value = "数据凭证余额")
