@@ -189,8 +189,13 @@ public class DataServiceImpl implements DataService {
     @Override
     public MetisLatInfoDto getUserMetisLatInfo() {
         MetisLatInfoDto result = new MetisLatInfoDto();
-        result.setToken(BeanUtil.copyProperties(tokenManager.getById(uniswapV2FactoryDao.WETH()), TokenDto.class));
-        result.setTokenHolder(BeanUtil.copyProperties(tokenHolderManager.getByUser(UserContext.getCurrentUser().getAddress(), uniswapV2FactoryDao.WETH()), TokenHolderDto.class));
+        Token token = tokenManager.getById(uniswapV2FactoryDao.WETH());
+        TokenHolder tokenHolder = tokenHolderManager.getByUser(UserContext.getCurrentUser().getAddress(), uniswapV2FactoryDao.WETH());
+        result.setTokenName(token.getName());
+        result.setTokenSymbol(token.getSymbol());
+        result.setTokenDecimal(token.getDecimal());
+        result.setTokenBalance(tokenHolder.getBalance());
+        result.setAuthorizeBalance(tokenHolder.getAuthorizeBalance());
         return result;
     }
 
