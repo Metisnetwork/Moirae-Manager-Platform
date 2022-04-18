@@ -8,7 +8,8 @@ import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
+import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
+import com.moirae.rosettaflow.grpc.service.TaskEventShow;
 import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
@@ -51,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
     @Resource
     private TaskExpandManager taskExpandManager;
     @Resource
-    private GrpcTaskService grpcTaskService;
+    private GrpcTaskServiceClient grpcTaskService;
 
     @Override
     @Transactional
@@ -105,7 +106,7 @@ public class TaskServiceImpl implements TaskService {
                 .filter(item -> metaDataId2MetaDataMap.containsKey(item.getMetaDataId()))   // 过滤模型
                 .map(item -> {
                     item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
-                    item.setMetaDataName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getFileName());
+                    item.setMetaDataName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getMetaDataName());
                     item.setDataTokenName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getTokenName());
                     return item;
                 })
@@ -159,7 +160,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId) {
         try {
-            List<TaskEventDto> taskEventShowDtoList = grpcTaskService.getTaskEventList(organizationService.getChannel(identityId), taskId);
+            List<TaskEventShow> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
             return taskEventShowDtoList.stream()
                     .map(item -> {
                         TaskEvent taskEvent = new TaskEvent();

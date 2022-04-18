@@ -2,7 +2,7 @@ package com.moirae.rosettaflow.chain.platon.contract;
 
 import java.math.BigInteger;
 
-public interface DataTokenTemplateDao {
+public interface DataTokenTemplateContract {
 
     /**
      * 查询代币余额

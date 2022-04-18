@@ -2,13 +2,12 @@ package com.moirae.rosettaflow.chain.platon.contract.impl;
 
 import com.moirae.rosettaflow.chain.platon.PlatONClient;
 import com.moirae.rosettaflow.chain.platon.config.PlatONProperties;
-import com.moirae.rosettaflow.chain.platon.contract.DataTokenTemplateDao;
+import com.moirae.rosettaflow.chain.platon.contract.DataTokenTemplateContract;
 import com.moirae.rosettaflow.chain.platon.contract.evm.DataTokenTemplate;
 import com.moirae.rosettaflow.chain.platon.enums.CodeEnum;
 import com.moirae.rosettaflow.chain.platon.exception.AppException;
 import com.moirae.rosettaflow.chain.platon.function.ExceptionFunction;
 import com.moirae.rosettaflow.chain.platon.utils.AddressUtils;
-import com.platon.bech32.Bech32;
 import com.platon.protocol.core.RemoteCall;
 import com.platon.tx.ReadonlyTransactionManager;
 import com.platon.tx.gas.ContractGasProvider;
@@ -20,7 +19,7 @@ import java.math.BigInteger;
 import java.net.SocketTimeoutException;
 
 @Component
-public class DataTokenTemplateDaoImpl implements DataTokenTemplateDao {
+public class DataTokenTemplateContractImpl implements DataTokenTemplateContract {
 
     @Resource
     private PlatONClient platOnClient;

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.chain.platon.config.PlatONProperties;
-import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryDao;
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryContract;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.exception.BusinessException;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class DataServiceImpl implements DataService {
     @Resource
     private PlatONProperties platONProperties;
     @Resource
-    private IUniswapV2FactoryDao uniswapV2FactoryDao;
+    private IUniswapV2FactoryContract uniswapV2FactoryDao;
 
     @Override
     public int getDataCount() {

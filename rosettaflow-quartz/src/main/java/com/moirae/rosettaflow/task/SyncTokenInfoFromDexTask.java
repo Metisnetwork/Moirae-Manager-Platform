@@ -1,8 +1,8 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryDao;
-import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2PairDao;
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryContract;
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2PairContract;
 import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.service.DataService;
 import com.platon.tuples.generated.Tuple3;
@@ -26,9 +26,9 @@ public class SyncTokenInfoFromDexTask {
     @Resource
     private DataService dataService;
     @Resource
-    private IUniswapV2FactoryDao uniswapV2FactoryDao;
+    private IUniswapV2FactoryContract uniswapV2FactoryDao;
     @Resource
-    private IUniswapV2PairDao uniswapV2PairDao;
+    private IUniswapV2PairContract uniswapV2PairDao;
 
     @Scheduled(fixedDelay = 60 * 1000)
     @Lock(keys = "SyncTokenInfoFromDexTask")

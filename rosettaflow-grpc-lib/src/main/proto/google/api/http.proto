@@ -13,12 +13,16 @@
 // limitations under the License.
 
 syntax = "proto3";
-//option java_multiple_files = true;
-option java_outer_classname = "HttpProto";
-// 生成类的包名
-option java_package = "com.moirae.rosettaflow.grpc.service";
 
 package google.api;
+
+option cc_enable_arenas = true;
+option go_package = "google.golang.org/genproto/googleapis/api/annotations;annotations";
+option java_multiple_files = true;
+option java_outer_classname = "HttpProto";
+option java_package = "com.google.api";
+option objc_class_prefix = "GAPI";
+
 
 // Defines the HTTP configuration for an API service. It contains a list of
 // [HttpRule][google.api.HttpRule], each specifying the mapping of an RPC method

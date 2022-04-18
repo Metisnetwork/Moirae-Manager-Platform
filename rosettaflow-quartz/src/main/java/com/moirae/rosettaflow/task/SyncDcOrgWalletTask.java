@@ -1,7 +1,7 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.grpc.client.SysServiceClient;
+import com.moirae.rosettaflow.grpc.client.impl.GrpcSysServiceClientImpl;
 import com.moirae.rosettaflow.grpc.service.YarnNodeInfo;
 import com.moirae.rosettaflow.mapper.domain.OrgExpand;
 import com.moirae.rosettaflow.service.OrgService;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class SyncDcOrgWalletTask {
 
     @Resource
-    private SysServiceClient sysServiceClient;
+    private GrpcSysServiceClientImpl sysServiceClient;
     @Resource
     private OrgService organizationService;
 

@@ -2,8 +2,8 @@ package com.moirae.rosettaflow.chain.platon.contract.impl;
 
 import com.moirae.rosettaflow.chain.platon.PlatONClient;
 import com.moirae.rosettaflow.chain.platon.config.PlatONProperties;
-import com.moirae.rosettaflow.chain.platon.contract.MetisPayDao;
-import com.moirae.rosettaflow.chain.platon.contract.evm.MetisPay;
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2Router02Contract;
+import com.moirae.rosettaflow.chain.platon.contract.evm.IUniswapV2Router02;
 import com.moirae.rosettaflow.chain.platon.enums.CodeEnum;
 import com.moirae.rosettaflow.chain.platon.exception.AppException;
 import com.moirae.rosettaflow.chain.platon.function.ExceptionFunction;
@@ -18,11 +18,9 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketTimeoutException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
-public class MetisPayDaoImpl implements MetisPayDao {
+public class UniswapV2Router02ContractImpl implements IUniswapV2Router02Contract {
 
     @Resource
     private PlatONClient platOnClient;
@@ -30,17 +28,20 @@ public class MetisPayDaoImpl implements MetisPayDao {
     private PlatONProperties platONProperties;
 
     @Override
-    public List<String> whitelist(String address) {
-        List<String> result = query(contract -> contract.whitelist(AddressUtils.hexToBech32(address)) , platONProperties.getMetisPayAddress());
-        return result.stream().map(Bech32::addressDecodeHex).collect(Collectors.toList());
+    public String factory() {
+        return Bech32.addressDecodeHex(query(contract -> contract.factory(), platONProperties.getUniswapV2Router02()));
     }
 
+    @Override
+    public String WETH() {
+        return Bech32.addressDecodeHex(query(contract -> contract.WETH(), platONProperties.getUniswapV2Router02()));
+    }
 
-    private <R> R query(ExceptionFunction<MetisPay, RemoteCall<R>> supplier, String contractAddress) {
+    private <R> R query(ExceptionFunction<IUniswapV2Router02, RemoteCall<R>> supplier, String contractAddress) {
         contractAddress = AddressUtils.hexToBech32(contractAddress);
         ReadonlyTransactionManager transactionManager = new ReadonlyTransactionManager(platOnClient.getWeb3j(), contractAddress);
         try {
-            MetisPay dataTokenTemplate = MetisPay.load(contractAddress, platOnClient.getWeb3j(), transactionManager, new ContractGasProvider(BigInteger.ZERO, BigInteger.ZERO));
+            IUniswapV2Router02 dataTokenTemplate = IUniswapV2Router02.load(contractAddress, platOnClient.getWeb3j(), transactionManager, new ContractGasProvider(BigInteger.ZERO, BigInteger.ZERO));
             return supplier.apply(dataTokenTemplate).send();
         }   catch (SocketTimeoutException e) {
             throw new AppException(CodeEnum.CALL_RPC_READ_TIMEOUT,CodeEnum.CALL_RPC_READ_TIMEOUT.getName(),e);

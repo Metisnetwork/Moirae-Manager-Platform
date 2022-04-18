@@ -99,6 +99,26 @@ public class MetaData implements Serializable {
     private Date updateAt;
 
     /**
+     * 表示该元数据是 `普通数据` 还是 `模型数据` 的元数据 (0: 未定义; 1: 普通数据元数据; 2: 模型数据元数据)
+     */
+    private Integer metaDataType;
+
+    /**
+     * 源数据的存储位置类型 (组织本地服务器、远端服务器、云等)：0-未知，1-存储在组织本地服务器上，2-存储在远端服务器上
+     */
+    private Integer locationType;
+
+    /**
+     * 元数据的 nonce (用来标识该元数据在所属组织中的元数据的序号, 从 0 开始递增)
+     */
+    private Long nonce;
+
+    /**
+     * 是否可以被曝光 (1: 可以; 0: 不可以; 如 数据原始内容可以被下载或者支持外域查看时则为1, 默认为0)
+     */
+    private Boolean allowExpose;
+
+    /**
      * 创建时间
      */
     private Date createTime;

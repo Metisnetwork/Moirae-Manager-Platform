@@ -12,7 +12,7 @@
 //import com.moirae.rosettaflow.common.exception.AppException;
 //import com.moirae.rosettaflow.dto.UserDto;
 //import com.moirae.rosettaflow.dto.WorkflowDto;
-//import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
+//import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 //import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 //import com.moirae.rosettaflow.mapper.*;
 //import com.moirae.rosettaflow.mapper.domain.*;
@@ -67,7 +67,7 @@
 //    private ZOldIWorkflowRunTaskResultService workflowRunTaskResultService;
 //
 //    @Resource
-//    private GrpcTaskService grpcTaskService;
+//    private GrpcTaskServiceClient grpcTaskService;
 //    @Resource
 //    private ZOldWorkflowNodeMapper workflowNodeMapper;
 //    @Resource

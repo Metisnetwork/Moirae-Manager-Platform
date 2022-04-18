@@ -1,6 +1,6 @@
 package com.moirae.rosettaflow.chain.platon.contract;
 
-public interface IUniswapV2FactoryDao {
+public interface IUniswapV2FactoryContract {
 
     String WETH();
 

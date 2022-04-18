@@ -1,8 +1,8 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.chain.platon.contract.DataTokenTemplateDao;
-import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryDao;
+import com.moirae.rosettaflow.chain.platon.contract.DataTokenTemplateContract;
+import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryContract;
 import com.moirae.rosettaflow.mapper.domain.Token;
 import com.moirae.rosettaflow.service.DataService;
 import com.zengtengpeng.annotation.Lock;
@@ -23,9 +23,9 @@ public class SyncTokenInfoTask {
     @Resource
     private DataService dataService;
     @Resource
-    private DataTokenTemplateDao dataTokenTemplateDao;
+    private DataTokenTemplateContract dataTokenTemplateDao;
     @Resource
-    private IUniswapV2FactoryDao uniswapV2FactoryDao;
+    private IUniswapV2FactoryContract uniswapV2FactoryDao;
 
     @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncTokenInfoTask")

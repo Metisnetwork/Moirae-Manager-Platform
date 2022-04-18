@@ -1,15 +1,14 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailResponseDto;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskDetailShowDto;
+import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
+import com.moirae.rosettaflow.grpc.service.GetTaskDetail;
+import com.moirae.rosettaflow.grpc.service.TaskDetailShow;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
 import com.moirae.rosettaflow.service.DataSyncService;
-import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +33,7 @@ import java.util.List;
 public class SyncDcTaskTask {
 
     @Resource
-    private GrpcTaskService grpcTaskService;
-    @Resource
-    private OrgService organizationService;
+    private GrpcTaskServiceClient grpcTaskService;
     @Resource
     private DataSyncService dataSyncService;
     @Resource
@@ -47,28 +44,26 @@ public class SyncDcTaskTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<String> identityIdList = organizationService.getUsableIdentityIdList();
-            for (String identityId : identityIdList) {
-                dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType() + "-" + identityId, DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
-                        (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
-                            return grpcTaskService.getTaskDetailList(organizationService.getChannel(identityId), latestSynced);
-                        },
-                        (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
-                            batchUpdateTask(grpcResponseList);
-                        },
-                        (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
-                            return grpcResponseList
-                                    .get(grpcResponseList.size() - 1)
-                                    .getInformation().getUpdateAt();
-                        });
-            }
+            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType(),DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+                    (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
+                        return grpcTaskService.getGlobalTaskDetailList(latestSynced);
+                    },
+                    (grpcResponseList) -> {//3.根据分页列表grpcResponseList实现实际业务逻辑
+                        // 批量更新
+                        this.batchUpdateTask(grpcResponseList);
+                    },
+                    (grpcResponseList) -> {//4.根据分页列表grpcResponseList获取最新的同步时间latestSynced
+                        return grpcResponseList
+                                .get(grpcResponseList.size() - 1)
+                                .getInformation().getUpdateAt();
+                    });
         } catch (Exception e) {
             log.error("任务信息同步,从net同步任务失败,失败原因：{}", e.getMessage(), e);
         }
         log.info("任务信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
-    private void batchUpdateTask(List<TaskDetailResponseDto> taskDetailResponseDtoList) {
+    private void batchUpdateTask(List<GetTaskDetail> taskDetailResponseDtoList) {
         List<Task> taskList = new ArrayList<>();
         List<TaskAlgoProvider> taskAlgoProviderList = new ArrayList<>();
         List<TaskDataProvider> taskDataProviderList = new ArrayList<>();
@@ -76,33 +71,33 @@ public class SyncDcTaskTask {
         List<TaskPowerProvider> taskPowerProviderList = new ArrayList<>();
         List<TaskResultConsumer> taskResultConsumerList = new ArrayList<>();
         taskDetailResponseDtoList.stream().forEach(item ->{
-            TaskDetailShowDto information = item.getInformation();
+            TaskDetailShow information = item.getInformation();
 
             TaskAlgoProvider taskAlgoProvider = new TaskAlgoProvider();
             taskAlgoProvider.setTaskId(information.getTaskId());
-            taskAlgoProvider.setIdentityId(information.getAlgoSupplier().getIdentityId());
-            taskAlgoProvider.setPartyId(information.getAlgoSupplier().getPartyId());
+            taskAlgoProvider.setIdentityId(information.getAlgoSupplier().getOrganization().getIdentityId());
+            taskAlgoProvider.setPartyId(information.getAlgoSupplier().getOrganization().getPartyId());
             taskAlgoProviderList.add(taskAlgoProvider);
 
-            information.getDataSuppliers().forEach(subItem ->{
+            information.getDataSuppliersList().forEach(subItem ->{
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
                 taskDataProvider.setTaskId(information.getTaskId());
-                taskDataProvider.setMetaDataId(subItem.getMetaDataId());
-                taskDataProvider.setIdentityId(subItem.getMemberInfo().getIdentityId());
-                taskDataProvider.setPartyId(subItem.getMemberInfo().getPartyId());
+                taskDataProvider.setMetaDataId(subItem.getMetadataId());
+                taskDataProvider.setIdentityId(subItem.getOrganization().getIdentityId());
+                taskDataProvider.setPartyId(subItem.getOrganization().getPartyId());
                 taskDataProviderList.add(taskDataProvider);
             });
-            information.getPowerSuppliers().forEach(subItem ->{
+            information.getPowerSuppliersList().forEach(subItem ->{
                 TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
                 taskPowerProvider.setTaskId(information.getTaskId());
-                taskPowerProvider.setIdentityId(subItem.getMemberInfo().getIdentityId());
-                taskPowerProvider.setPartyId(subItem.getMemberInfo().getPartyId());
-                taskPowerProvider.setUsedCore(subItem.getResourceUsedInfo().getUsedProcessor());
-                taskPowerProvider.setUsedMemory(subItem.getResourceUsedInfo().getUsedMem());
-                taskPowerProvider.setUsedBandwidth(subItem.getResourceUsedInfo().getUsedBandwidth());
+                taskPowerProvider.setIdentityId(subItem.getOrganization().getIdentityId());
+                taskPowerProvider.setPartyId(subItem.getOrganization().getPartyId());
+                taskPowerProvider.setUsedCore(subItem.getPowerInfo().getUsedProcessor());
+                taskPowerProvider.setUsedMemory(subItem.getPowerInfo().getUsedMem());
+                taskPowerProvider.setUsedBandwidth(subItem.getPowerInfo().getUsedBandwidth());
                 taskPowerProviderList.add(taskPowerProvider);
             });
-            information.getReceivers().forEach(subItem ->{
+            information.getReceiversList().forEach(subItem ->{
                 TaskResultConsumer taskResultConsumer = new TaskResultConsumer();
                 taskResultConsumer.setTaskId(information.getTaskId());
                 taskResultConsumer.setIdentityId(subItem.getIdentityId());
@@ -113,7 +108,7 @@ public class SyncDcTaskTask {
             task.setId(information.getTaskId());
             task.setTaskName(information.getTaskName());
             task.setAddress(information.getUser());
-            task.setUserType(UserTypeEnum.find(information.getUserType()));
+            task.setUserType(UserTypeEnum.find(information.getUserTypeValue()));
             task.setRequiredMemory(information.getOperationCost().getMemory());
             task.setRequiredCore(information.getOperationCost().getProcessor());
             task.setRequiredBandwidth(information.getOperationCost().getBandwidth());
@@ -122,8 +117,8 @@ public class SyncDcTaskTask {
             task.setOwnerPartyId(information.getSender().getPartyId());
             task.setCreateAt(new Date(information.getCreateAt()));
             task.setStartAt(new Date(information.getStartAt()));
-            task.setEndAt(information.getEndAt() == null || information.getEndAt() == 0 ? null : new Date(information.getEndAt()));
-            task.setStatus(TaskStatusEnum.find(information.getState()));
+            task.setEndAt(information.getEndAt() == 0 ? null : new Date(information.getEndAt()));
+            task.setStatus(TaskStatusEnum.find(information.getStateValue()));
             taskList.add(task);
         });
         taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);

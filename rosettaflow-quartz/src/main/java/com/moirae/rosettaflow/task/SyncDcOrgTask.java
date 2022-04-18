@@ -1,8 +1,8 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.moirae.rosettaflow.grpc.client.AuthServiceClient;
-import com.moirae.rosettaflow.grpc.identity.dto.NodeIdentityDto;
+import com.moirae.rosettaflow.grpc.client.impl.GrpcAuthServiceClientImpl;
+import com.moirae.rosettaflow.grpc.service.types.Organization;
 import com.moirae.rosettaflow.mapper.domain.Org;
 import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.OrgStatusEnum;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class SyncDcOrgTask {
 
     @Resource
-    private AuthServiceClient authServiceClient;
+    private GrpcAuthServiceClientImpl authServiceClient;
     @Resource
     private OrgService organizationService;
     @Resource
@@ -61,7 +61,7 @@ public class SyncDcOrgTask {
     /**
      * @param nodeIdentityDtoList 需更新数据
      */
-    private void batchUpdateOrg(List<NodeIdentityDto> nodeIdentityDtoList) {
+    private void batchUpdateOrg(List<Organization> nodeIdentityDtoList) {
         List<Org> orgList = nodeIdentityDtoList.stream().map(nodeIdentityDto -> {
                     Org org = new Org();
                     org.setIdentityId(nodeIdentityDto.getIdentityId());
@@ -69,7 +69,7 @@ public class SyncDcOrgTask {
                     org.setNodeName(nodeIdentityDto.getNodeName());
                     org.setImageUrl(nodeIdentityDto.getImageUrl());
                     org.setDetails(nodeIdentityDto.getDetails());
-                    org.setStatus(OrgStatusEnum.find(nodeIdentityDto.getStatus()));
+                    org.setStatus(OrgStatusEnum.find(nodeIdentityDto.getStatus().getNumber()));
                     org.setUpdateAt(new Date(nodeIdentityDto.getUpdateAt()));
                     return org;
                 })

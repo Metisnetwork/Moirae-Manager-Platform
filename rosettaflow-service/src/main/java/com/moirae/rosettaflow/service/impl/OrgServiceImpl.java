@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.protobuf.Empty;
-import com.moirae.rosettaflow.chain.platon.contract.MetisPayDao;
+import com.moirae.rosettaflow.chain.platon.contract.MetisPayContract;
 import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.OrgOrderByEnum;
@@ -58,7 +58,7 @@ public class OrgServiceImpl implements OrgService {
     @Resource
     private StatsOrgManager statsOrgManager;
     @Resource
-    private MetisPayDao metisPayDao;
+    private MetisPayContract metisPayDao;
 
     private final Map<String, ManagedChannel> channelMap = new ConcurrentHashMap<>();
 
@@ -160,19 +160,19 @@ public class OrgServiceImpl implements OrgService {
         try {
             nodeIdentity = AuthServiceGrpc.newBlockingStub(managedChannel).withDeadlineAfter(10, TimeUnit.SECONDS).getNodeIdentity(empty);
         } catch (Exception e){
-            log.error("AuthServiceClient->addUserOrganization() getNodeIdentity error",e);
+            log.error("GrpcAuthServiceClientImpl->addUserOrganization() getNodeIdentity error",e);
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
         }
 
         if (nodeIdentity.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            log.error("AuthServiceClient->getNodeIdentity() fail reason:{}", nodeIdentity.getMsg());
+            log.error("GrpcAuthServiceClientImpl->getNodeIdentity() fail reason:{}", nodeIdentity.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.ORGANIZATION_INFO_ERROR.getMsg());
         }
         // 添加或更新组织信息
-        OrgExpand orgExpand = orgExpandManager.getById(nodeIdentity.getOwner().getIdentityId());
+        OrgExpand orgExpand = orgExpandManager.getById(nodeIdentity.getInformation().getIdentityId());
         if (null == orgExpand) {
             orgExpand = new OrgExpand();
-            orgExpand.setIdentityId(nodeIdentity.getOwner().getIdentityId());
+            orgExpand.setIdentityId(nodeIdentity.getInformation().getIdentityId());
             orgExpand.setIdentityIp(identityIp);
             orgExpand.setIdentityPort(identityPort);
             orgExpand.setIsPublic(false);

@@ -15,7 +15,7 @@
 //import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 //import com.moirae.rosettaflow.grpc.identity.dto.OrganizationIdentityInfoDto;
 //import com.moirae.rosettaflow.grpc.service.GrpcSysService;
-//import com.moirae.rosettaflow.grpc.service.GrpcTaskService;
+//import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 //import com.moirae.rosettaflow.grpc.sys.resp.dto.GetTaskResultFileSummaryResponseDto;
 //import com.moirae.rosettaflow.grpc.task.req.dto.*;
 //import com.moirae.rosettaflow.grpc.task.resp.dto.PublishTaskDeclareResponseDto;
@@ -45,7 +45,7 @@
 //    @Resource
 //    private ZOldIWorkflowRunTaskResultService workflowRunTaskResultService;
 //    @Resource
-//    private GrpcTaskService grpcTaskService;
+//    private GrpcTaskServiceClient grpcTaskService;
 //    @Resource
 //    private AlgService algService;
 //    @Resource
