@@ -19,6 +19,9 @@ public class DataVo extends BaseOrgVo {
     @ApiModelProperty(value = "元数据名称")
     private String metaDataName;
 
+    @ApiModelProperty(value = "数据凭证合约地址")
+    private String tokenAddress;
+
     @ApiModelProperty(value = "数据凭证名称")
     private String tokenName;
 

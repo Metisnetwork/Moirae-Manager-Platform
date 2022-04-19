@@ -220,6 +220,7 @@
                dmd.file_name as metaDataName,
                dmd.identity_id,
                do.node_name,
+               dmd.token_address,
                mt.name as tokenName,
                mt.price as tokenPrice,
                mt.symbol as tokenSymbol,
