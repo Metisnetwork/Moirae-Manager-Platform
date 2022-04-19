@@ -1,12 +1,10 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.moirae.rosettaflow.chain.platon.config.PlatONProperties;
 import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryContract;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
@@ -16,8 +14,6 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
-import com.moirae.rosettaflow.service.dto.token.TokenDto;
-import com.moirae.rosettaflow.service.dto.token.TokenHolderDto;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +33,8 @@ import static com.moirae.rosettaflow.common.enums.RespCodeEnum.BIZ_EXCEPTION;
 public class DataServiceImpl implements DataService {
 
     @Resource
+    private IUniswapV2FactoryContract uniswapV2FactoryContract;
+    @Resource
     private MetaDataManager metaDataManager;
     @Resource
     private MetaDataColumnManager metaDataColumnManager;
@@ -47,9 +45,8 @@ public class DataServiceImpl implements DataService {
     @Resource
     private ModelManager modelManager;
     @Resource
-    private PlatONProperties platONProperties;
-    @Resource
-    private IUniswapV2FactoryContract uniswapV2FactoryDao;
+    private PsiManager psiManager;
+
 
     @Override
     public int getDataCount() {
@@ -188,8 +185,8 @@ public class DataServiceImpl implements DataService {
     @Override
     public MetisLatInfoDto getUserMetisLatInfo() {
         MetisLatInfoDto result = new MetisLatInfoDto();
-        Token token = tokenManager.getById(uniswapV2FactoryDao.WETH());
-        TokenHolder tokenHolder = tokenHolderManager.getByUser(UserContext.getCurrentUser().getAddress(), uniswapV2FactoryDao.WETH());
+        Token token = tokenManager.getById(uniswapV2FactoryContract.WETH());
+        TokenHolder tokenHolder = tokenHolderManager.getById(uniswapV2FactoryContract.WETH(), UserContext.getCurrentUser().getAddress());
         result.setTokenAddress(token.getAddress());
         result.setTokenName(token.getName());
         result.setTokenSymbol(token.getSymbol());
@@ -205,7 +202,37 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Token getTokenById(String weth) {
-        return tokenManager.getById(weth);
+    public Token getTokenById(String tokenAddress) {
+        return tokenManager.getById(tokenAddress);
+    }
+
+    @Override
+    public Token getMetisToken() {
+        return getTokenById(uniswapV2FactoryContract.WETH());
+    }
+
+    @Override
+    public Token getTokenByMetaDataId(String metaDataId) {
+        return getTokenById(metaDataManager.getById(metaDataId).getTokenAddress());
+    }
+
+    @Override
+    public TokenHolder getTokenHolderById(String tokenAddress, String userAddress) {
+        return tokenHolderManager.getById(tokenAddress, userAddress);
+    }
+
+    @Override
+    public Model getModelByOrgAndTrainTaskId(String identity, String taskId){
+        return modelManager.getModelByOrgAndTrainTaskId(identity, taskId);
+    }
+
+    @Override
+    public List<Psi> listPsiByTrainTaskId(String taskId) {
+        return psiManager.listByTrainTaskId(taskId);
+    }
+
+    @Override
+    public MetaData getDataById(String metaDataId) {
+        return metaDataManager.getById(metaDataId);
     }
 }

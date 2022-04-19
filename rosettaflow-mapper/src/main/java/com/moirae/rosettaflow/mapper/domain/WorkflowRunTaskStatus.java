@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import lombok.Data;
@@ -50,13 +51,13 @@ public class WorkflowRunTaskStatus implements Serializable {
      * 开始时间
      */
     @TableField("begin_time")
-    private LocalDateTime beginTime;
+    private Date beginTime;
 
     /**
      * 结束时间
      */
     @TableField("end_time")
-    private LocalDateTime endTime;
+    private Date endTime;
 
     /**
      * 运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败
@@ -100,6 +101,10 @@ public class WorkflowRunTaskStatus implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
-
+    @TableField(exist = false)
+    private WorkflowTask workflowTask;
+    @TableField(exist = false)
+    private Model model;
+    @TableField(exist = false)
+    private List<Psi> psiList;
 }

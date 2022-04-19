@@ -9,5 +9,5 @@ public interface TokenHolderManager extends IService<TokenHolder> {
 
     boolean batchInsertOrUpdateByUser(String address, List<TokenHolder> tokenHolderList);
 
-    TokenHolder getByUser(String userAddress, String metisPayAddress);
+    TokenHolder getById(String tokenAddress, String userAddress);
 }

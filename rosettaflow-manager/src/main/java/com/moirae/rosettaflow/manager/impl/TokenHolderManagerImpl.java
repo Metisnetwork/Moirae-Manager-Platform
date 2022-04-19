@@ -20,7 +20,7 @@ public class TokenHolderManagerImpl extends ServiceImpl<TokenHolderMapper, Token
     @Override
     public boolean batchInsertOrUpdateByUser(String address, List<TokenHolder> tokenHolderList) {
         // 查询用户的账户信息
-        Set<String> tokenAddressSet = getListByUser(address).stream().collect(Collectors.toSet());
+        Set<String> tokenAddressSet = listByUser(address).stream().collect(Collectors.toSet());
 
         List<TokenHolder> insertList = tokenHolderList.stream().filter(item -> !tokenAddressSet.contains(item.getTokenAddress())).collect(Collectors.toList());
         List<TokenHolder> updateList = tokenHolderList.stream().filter(item -> tokenAddressSet.contains(item.getTokenAddress())).collect(Collectors.toList());
@@ -36,14 +36,14 @@ public class TokenHolderManagerImpl extends ServiceImpl<TokenHolderMapper, Token
     }
 
     @Override
-    public TokenHolder getByUser(String userAddress, String metisPayAddress) {
+    public TokenHolder getById(String tokenAddress, String userAddress) {
         LambdaQueryWrapper<TokenHolder> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(TokenHolder::getTokenAddress, metisPayAddress);
+        wrapper.eq(TokenHolder::getTokenAddress, tokenAddress);
         wrapper.eq(TokenHolder::getAddress, userAddress);
         return getOne(wrapper);
     }
 
-    private List<String> getListByUser(String address){
+    private List<String> listByUser(String address){
         LambdaQueryWrapper<TokenHolder> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(TokenHolder::getAddress, address);
         return listObjs(wrapper, item -> item.toString());

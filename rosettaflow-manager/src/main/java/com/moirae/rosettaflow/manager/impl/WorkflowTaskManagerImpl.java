@@ -1,17 +1,17 @@
 package com.moirae.rosettaflow.manager.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.manager.WorkflowTaskManager;
 import com.moirae.rosettaflow.mapper.WorkflowTaskMapper;
-import com.moirae.rosettaflow.mapper.domain.WorkflowSettingWizard;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTask;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +56,7 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
                     newObj.setInputModel(item.getInputModel());
                     newObj.setInputModelId(item.getInputModelId());
                     newObj.setInputPsi(item.getInputPsi());
-                    newObj.setInputPsiId(item.getInputPsiId());
+//                    newObj.setInputPsiId(item.getInputPsiId());
                     save(newObj);
 
                     Map<OldAndNewEnum, WorkflowTask> pair = new HashMap<>();
@@ -81,13 +81,10 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
 
     @Override
     public List<WorkflowTask> listExecutableByWorkflowVersion(Long workflowId, Long workflowVersion) {
-        List<WorkflowTask> list = listByWorkflowVersion(workflowId, workflowVersion);
-        Set<Integer> enableSet = list.stream().map(WorkflowTask::getStep).collect(Collectors.toSet());
-        list.forEach(item -> {
-            if(!item.getInputPsi() &&  item.getStep() - 1 >= 1){
-                enableSet.remove(item.getStep() - 1);
-            }
-        });
-        return null;
+        LambdaQueryWrapper<WorkflowTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowTask::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowTask::getWorkflowVersion, workflowVersion);
+        wrapper.eq(WorkflowTask::getEnable, true);
+        return list(wrapper);
     }
 }

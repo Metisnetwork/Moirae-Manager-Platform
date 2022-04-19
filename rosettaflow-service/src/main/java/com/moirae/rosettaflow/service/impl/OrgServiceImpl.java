@@ -268,7 +268,7 @@ public class OrgServiceImpl implements OrgService {
     }
 
     @Override
-    public Org findOrgById(String identityId) {
+    public Org getOrgById(String identityId) {
         return orgManager.getById(identityId);
     }
 

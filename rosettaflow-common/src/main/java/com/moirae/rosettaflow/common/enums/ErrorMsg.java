@@ -96,6 +96,7 @@ public enum ErrorMsg {
     /**
      * 工作流
      */
+    WORKFLOW_EXECUTE_VALUE_INSUFFICIENT("工作流执行时账户余额不足", "Insufficient account balance during workflow execution"),
     WORKFLOW_BEEN_RUN("工作流存在运行信息", "Workflow has running information"),
     WORKFLOW_NOT_EXIST("工作流不存在", "Workflow does not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),

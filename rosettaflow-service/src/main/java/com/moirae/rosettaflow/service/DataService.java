@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
+import com.moirae.rosettaflow.grpc.service.types.Metadata;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
@@ -87,5 +88,17 @@ public interface DataService {
 
     boolean saveToken(Token token);
 
-    Token getTokenById(String weth);
+    Token getTokenById(String tokenAddress);
+
+    Token getMetisToken();
+
+    Token getTokenByMetaDataId(String metaDataId);
+
+    TokenHolder getTokenHolderById(String tokenAddress, String userAddress);
+
+    Model getModelByOrgAndTrainTaskId(String identity, String taskId);
+
+    List<Psi> listPsiByTrainTaskId(String taskId);
+
+    MetaData getDataById(String metaDataId);
 }

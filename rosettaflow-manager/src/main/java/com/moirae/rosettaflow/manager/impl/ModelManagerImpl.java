@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.ModelManager;
 import com.moirae.rosettaflow.mapper.ModelMapper;
@@ -20,5 +22,13 @@ public class ModelManagerImpl extends ServiceImpl<ModelMapper, Model> implements
     @Override
     public List<Model> getLatestModel(Integer size) {
         return baseMapper.getLatestModel(size);
+    }
+
+    @Override
+    public Model getModelByOrgAndTrainTaskId(String identity, String taskId) {
+        LambdaQueryWrapper<Model> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Model::getIdentityId, identity);
+        wrapper.eq(Model::getTrainTaskId, taskId);
+        return getOne(wrapper);
     }
 }

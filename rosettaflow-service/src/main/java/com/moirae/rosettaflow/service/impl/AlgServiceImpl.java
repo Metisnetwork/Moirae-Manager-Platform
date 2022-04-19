@@ -56,6 +56,9 @@ public class AlgServiceImpl implements AlgService {
     @Override
     public Algorithm getAlg(Long algorithmId, boolean isNeedDetails) {
         Algorithm algorithm = algorithmManager.getById(algorithmId);
+        AlgorithmClassify algorithmClassify = algorithmClassifyManager.getById(algorithmId);
+        algorithm.setAlgorithmName(algorithmClassify.getName());
+        algorithm.setAlgorithmNameEn(algorithmClassify.getNameEn());
         if(isNeedDetails){
             algorithm.setAlgorithmVariableList(algorithmVariableManager.getByAlgorithmId(algorithmId));
             algorithm.setAlgorithmCode(algorithmCodeManager.getById(algorithmId));

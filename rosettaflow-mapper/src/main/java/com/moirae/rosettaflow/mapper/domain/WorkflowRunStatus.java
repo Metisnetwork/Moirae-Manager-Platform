@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -39,7 +40,7 @@ public class WorkflowRunStatus implements Serializable {
      * 工作流版本号
      */
     @TableField("workflow_version")
-    private Integer workflowVersion;
+    private Long workflowVersion;
 
     /**
      * 发起任务的账户的签名
@@ -98,6 +99,8 @@ public class WorkflowRunStatus implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+    @TableField(exist = false)
+    private List<WorkflowRunTaskStatus> workflowRunTaskStatusList;
 
-
+    private Workflow workflow;
 }

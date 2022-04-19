@@ -89,4 +89,6 @@ public class Model implements Serializable {
     private String nodeName;
     @TableField(exist = false)
     private String imageUrl;
+    @TableField(exist = false)
+    private Org org;
 }

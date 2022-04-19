@@ -155,7 +155,7 @@ public interface OrgService {
 
     Map<String, Org> getIdentityId2OrgMap();
 
-    Org findOrgById(String identityId);
+    Org getOrgById(String identityId);
 
     int getOrgStats();
 

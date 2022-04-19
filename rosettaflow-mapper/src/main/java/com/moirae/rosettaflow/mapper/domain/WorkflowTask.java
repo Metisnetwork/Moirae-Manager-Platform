@@ -1,12 +1,15 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
+import javax.xml.ws.RespectBinding;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -69,16 +72,25 @@ public class WorkflowTask implements Serializable {
     private String inputModelId;
 
     /**
+     * 工作流节点需要的模型产生的步骤
+     */
+    private Integer inputModelStep;
+
+    /**
      * 是否需要输入PSI: 0-否，1:是
      */
     @TableField("input_psi")
     private Boolean inputPsi;
 
     /**
-     * 工作流节点需要的模型id
+     * 工作流节点需要的psi产生步骤
      */
-    @TableField("input_psi_id")
-    private String inputPsiId;
+    private Integer inputPsiStep;
+
+    /**
+     * 是否可用: 0-否，1:是
+     */
+    private Boolean enable;
 
     /**
      * 创建时间
@@ -92,5 +104,18 @@ public class WorkflowTask implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
+    @TableField(exist = false)
+    private WorkflowTaskCode code;
+    @TableField(exist = false)
+    private List<WorkflowTaskInput> inputList;
+    @TableField(exist = false)
+    private List<WorkflowTaskOutput> outputList;
+    @TableField(exist = false)
+    private WorkflowTaskResource resource;
+    @TableField(exist = false)
+    private List<WorkflowTaskVariable> variableList;
+    @TableField(exist = false)
+    private Algorithm algorithm;
+    @TableField(exist = false)
+    private Org org;
 }

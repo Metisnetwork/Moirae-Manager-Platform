@@ -1,15 +1,11 @@
 package com.moirae.rosettaflow.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -76,6 +72,6 @@ public class WorkflowTaskInput implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
-
+    @TableField(exist = false)
+    private Org org;
 }

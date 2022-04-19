@@ -44,8 +44,6 @@ public interface WorkflowService{
 
     Boolean deleteWorkflow(WorkflowKeyDto req);
 
-    Boolean clearWorkflow(WorkflowVersionKeyDto req);
-
     WorkflowRunKeyDto start(WorkflowStartSignatureDto req);
 
     Boolean terminate(WorkflowRunKeyDto req);

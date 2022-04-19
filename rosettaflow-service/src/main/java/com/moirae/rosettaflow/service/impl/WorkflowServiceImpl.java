@@ -1,29 +1,30 @@
 package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.moirae.rosettaflow.common.enums.ErrorMsg;
-import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
-import com.moirae.rosettaflow.common.enums.RespCodeEnum;
-import com.moirae.rosettaflow.common.enums.WorkflowPayTypeEnum;
+import com.moirae.rosettaflow.common.enums.*;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
-import com.moirae.rosettaflow.grpc.service.DataTokenTransferItem;
-import com.moirae.rosettaflow.grpc.service.EstimateTaskGasRequest;
-import com.moirae.rosettaflow.grpc.service.EstimateTaskGasResponse;
+import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
+import com.moirae.rosettaflow.grpc.service.*;
+import com.moirae.rosettaflow.grpc.service.types.TaskOrganization;
+import com.moirae.rosettaflow.grpc.service.types.UserType;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.service.*;
-import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
 import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
 import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
+import com.moirae.rosettaflow.service.dto.token.TokenDto;
+import com.moirae.rosettaflow.service.dto.token.TokenHolderDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
 import com.moirae.rosettaflow.service.dto.workflow.common.*;
 import com.moirae.rosettaflow.service.dto.workflow.expert.*;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -522,6 +524,12 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflowTaskInputManager.clearAndSave(prediction.getWorkflowTaskId(), predictionWorkflowTaskInputList);
 
+        WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, psiTaskStep);
+        if(psi.getEnable() != predictionInput.getIsPsi()){
+            psi.setEnable(predictionInput.getIsPsi());
+            workflowTaskManager.updateById(psi);
+        }
+
         if(predictionInput.getIsPsi()){
             setTrainingOrPredictionPsiInputOfWizardMode(workflowId, workflowVersion, psiTaskStep, predictionInput.getIdentityId(), predictionInput.getItem(), true);
         }
@@ -552,6 +560,12 @@ public class WorkflowServiceImpl implements WorkflowService {
             trainingWorkflowTaskInputList.add(workflowTaskInput);
         }
         workflowTaskInputManager.clearAndSave(training.getWorkflowTaskId(), trainingWorkflowTaskInputList);
+
+        WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, psiTaskStep);
+        if(psi.getEnable() != trainingInput.getIsPsi()){
+            psi.setEnable(trainingInput.getIsPsi());
+            workflowTaskManager.updateById(psi);
+        }
 
         if(trainingInput.getIsPsi()){
             setTrainingOrPredictionPsiInputOfWizardMode(workflowId, workflowVersion, psiTaskStep, trainingInput.getIdentityId(), trainingInput.getItem(), true);
@@ -653,6 +667,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             psiWorkflowTask.setStep(taskStep++);
             psiWorkflowTask.setAlgorithmId(1001L);
             psiWorkflowTask.setIdentityId(nodeDto.getNodeInput().getIdentityId());
+            psiWorkflowTask.setEnable(nodeDto.getNodeInput().getIsPsi());
             workflowTaskManager.save(psiWorkflowTask);
             Algorithm psiAlgorithm = algService.getAlg(psiWorkflowTask.getAlgorithmId(),true);
             initWorkflowTaskCode(psiWorkflowTask.getWorkflowTaskId(), psiAlgorithm);
@@ -939,13 +954,283 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Boolean clearWorkflow(WorkflowVersionKeyDto req) {
-        return null;
+    public List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req) {
+        List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        return convert2WorkflowFee(req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
     }
 
+    @Transactional
     @Override
     public WorkflowRunKeyDto start(WorkflowStartSignatureDto req) {
-        return null;
+        // 生成运行时任务清单明细
+        List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        // 交易-手续费校验
+        List<WorkflowFeeDto> workflowFeeList = convert2WorkflowFee(req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
+        checkFee(workflowFeeList);
+        // 保存运行时信息
+        WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(req.getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
+        // 启动任务
+        executeTask(workflowRunStatus);
+        // 返回
+        WorkflowRunKeyDto result = new WorkflowRunKeyDto();
+        result.setWorkflowRunId(workflowRunStatus.getId());
+        return result;
+    }
+
+    private void executeTask(WorkflowRunStatus workflowRunStatus) {
+        WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
+
+        if(curWorkflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_NEED){
+            // 运行时初始化依赖
+            initModelAndPsi(curWorkflowRunTaskStatus);
+
+            curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
+            curWorkflowRunTaskStatus.setBeginTime(new Date());
+            // 提交任务到 Net
+            PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, curWorkflowRunTaskStatus);
+            try {
+                PublishTaskDeclareResponse response = grpcTaskServiceClient.publishTaskDeclare(orgService.getChannel(curWorkflowRunTaskStatus.getWorkflowTask().getIdentityId()), request);
+                curWorkflowRunTaskStatus.setTaskId(response.getTaskId());
+                curWorkflowRunTaskStatus.setRunMsg(response.getMsg());
+                if (GrpcConstant.GRPC_SUCCESS_CODE != response.getStatus()) {
+                    curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+                    curWorkflowRunTaskStatus.setEndTime(new Date());
+                    workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+                    workflowRunStatus.setEndTime(new Date());
+                }
+                log.info("任务发布结果>>>>工作流id:{},任务名称：{},rosettanet收到处理任务，返回的taskId：{}", workflowRunStatus.getId(), request.getTaskName(), response.getTaskId());
+            } catch (Exception e){
+                log.error("executeTask error! runStatusId = {}  runTaskStatusId = {}", curWorkflowRunTaskStatus.getId());
+                log.error("executeTask error! ", e);
+                curWorkflowRunTaskStatus.setRunMsg(e.getMessage());
+                curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+                curWorkflowRunTaskStatus.setEndTime(new Date());
+                workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+                workflowRunStatus.setEndTime(new Date());
+            }
+            workflowRunStatusManager.updateById(workflowRunStatus);
+            workflowRunTaskStatusManager.updateById(curWorkflowRunTaskStatus);
+        }
+
+    }
+
+    private PublishTaskDeclareRequest assemblyTask(WorkflowRunStatus workflowRunStatus, WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+        PublishTaskDeclareRequest.Builder requestBuild = PublishTaskDeclareRequest.newBuilder()
+                .setTaskName(publishTaskOfGetTaskName(workflowRunStatus, curWorkflowRunTaskStatus))
+                .setUser(workflowRunStatus.getAddress())
+                .setUserType(UserType.User_1)
+                .setSender(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "s0"))
+                .setAlgoSupplier(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "A0"));
+
+        // 设置数据输入组织
+        JSONArray dataPolicyOption = new JSONArray();
+        for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
+            WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
+            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
+            dataPolicyOption.add(createDataPolicyItem(workflowTaskInput));
+        }
+        // 设置模型输入组织
+        if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
+            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1)));
+            dataPolicyOption.add(createDataPolicyItem(curWorkflowRunTaskStatus.getModel()));
+        }
+        // 设置psi输入组织
+        if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
+            for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
+                WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
+                Psi psi = curWorkflowRunTaskStatus.getPsiList().stream()
+                        .filter(item -> workflowTaskInput.getIdentityId().equals(item.getIdentityId()))
+                        .findFirst().get();
+                requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(psi.getOrg(), "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1)));
+            }
+         }
+
+        requestBuild.setDataPolicyType(1);
+        requestBuild.setDataPolicyOption(dataPolicyOption.toJSONString());
+
+        for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().size(); i++) {
+            WorkflowTaskOutput workflowTaskOutput = curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().get(i);
+            requestBuild.addReceivers(publishTaskOfGetTaskOrganization(workflowTaskOutput.getOrg(), workflowTaskOutput.getPartyId()));
+        }
+
+        return requestBuild.build();
+    }
+
+
+
+    private JSONObject createDataPolicyItem(WorkflowTaskInput workflowTaskInput) {
+        JSONObject item = new JSONObject();
+        item.put("partyId", workflowTaskInput.getPartyId());
+        item.put("metadataId", workflowTaskInput.getMetaDataId());
+        item.put("metadataName", dataService.getDataById(workflowTaskInput.getMetaDataId()).getMetaDataName());
+        item.put("keyColumn", workflowTaskInput.getKeyColumn());
+        JSONArray selectedColumns = new JSONArray();
+        Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
+            selectedColumns.add(subItem);
+        });
+        item.put("selectedColumns", selectedColumns);
+        return item;
+    }
+
+    private TaskOrganization publishTaskOfGetTaskOrganization(Org identity, String partyId){
+        TaskOrganization taskOrganization = TaskOrganization.newBuilder()
+                .setPartyId(partyId)
+                .setNodeName(identity.getNodeName())
+                .setNodeId(identity.getNodeId())
+                .setIdentityId(identity.getIdentityId())
+                .build();
+        return taskOrganization;
+    }
+
+    private String publishTaskOfGetTaskName(WorkflowRunStatus workflowRunStatus, WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+        Long id = curWorkflowRunTaskStatus.getId();
+        String address = workflowRunStatus.getAddress();
+        String algorithmName = curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmName();
+        String workflowName = workflowRunStatus.getWorkflow().getWorkflowName();
+        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + workflowName, 100);
+    }
+
+    private WorkflowRunStatus createAndSaveWorkflowRunStatus(String address, String sign, Long workflowId, Long workflowVersion, List<WorkflowTask> workflowTaskList) {
+        WorkflowRunStatus workflowRunStatus = new WorkflowRunStatus();
+        workflowRunStatus.setWorkflowId(workflowId);
+        workflowRunStatus.setWorkflowVersion(workflowVersion);
+        workflowRunStatus.setSign(sign);
+        workflowRunStatus.setAddress(address);
+        workflowRunStatus.setStep(workflowTaskList.get(workflowTaskList.size() - 1).getStep());
+        workflowRunStatus.setCurStep(workflowTaskList.get(0).getStep());
+        workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
+        workflowRunStatusManager.save(workflowRunStatus);
+
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowTaskList.stream()
+                .map(item -> {
+                    WorkflowRunTaskStatus workflowRunTaskStatus = new WorkflowRunTaskStatus();
+                    workflowRunTaskStatus.setWorkflowRunId(workflowRunStatus.getId());
+                    workflowRunTaskStatus.setWorkflowTaskId(item.getWorkflowTaskId());
+                    workflowRunTaskStatus.setStep(item.getStep());
+                    workflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
+                    workflowRunTaskStatus.setModelId(item.getInputModelId());
+                    workflowRunTaskStatus.setPsiId(item.getInputPsiId());
+                    workflowRunTaskStatus.setWorkflowTask(item);
+                    workflowRunTaskStatusManager.save(workflowRunTaskStatus);
+                    return workflowRunTaskStatus;
+                })
+                .collect(Collectors.toList());
+        workflowRunStatus.setWorkflowRunTaskStatusList(workflowRunTaskStatusList);
+        return workflowRunStatus;
+    }
+
+
+    /**
+     * 检验用户账户余额是否足够执行任务
+     *
+     * @param workflowFeeList
+     */
+    private void checkFee(List<WorkflowFeeDto> workflowFeeList) {
+        long count = workflowFeeList.stream()
+                .flatMap(item -> item.getItemList().stream())
+                .filter(item -> !item.getIsEnough()).count();
+        if( count > 0) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg());
+        }
+    }
+
+    private List<WorkflowFeeDto> convert2WorkflowFee(Long workflowId, Long workflowVersion, List<WorkflowTask> workflowTaskList) {
+        return workflowTaskList.stream()
+                .map(item -> {
+                    List<WorkflowTaskFeeItemDto> workflowTaskFeeItemDtoList = new ArrayList<>();
+                    List<DataTokenTransferItem>  dataTokenTransferItemList = new ArrayList<>();
+                    for (WorkflowTaskInput workflowTaskInput : item.getInputList()) {
+                        WorkflowTaskFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, "1000000000000000000", dataService.getTokenByMetaDataId(workflowTaskInput.getMetaDataId()));
+                        workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
+                        DataTokenTransferItem dataTokenTransferItem = DataTokenTransferItem.newBuilder()
+                                .setAddress(workflowTaskFeeItemDto.getToken().getAddress())
+                                .setAmount(Long.valueOf(workflowTaskFeeItemDto.getNeedValue())).build();
+                        dataTokenTransferItemList.add(dataTokenTransferItem);
+                    }
+
+                    EstimateTaskGasRequest request = EstimateTaskGasRequest.newBuilder()
+                            .addAllDataTokenTransferItems(dataTokenTransferItemList)
+                            .build();
+                    EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), request);
+                    WorkflowTaskFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getMetisToken());
+                    workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
+
+                    WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
+                    workflowFeeDto.setWorkflowId(workflowId);
+                    workflowFeeDto.setWorkflowVersion(workflowVersion);
+                    workflowFeeDto.setWorkflowTaskId(item.getWorkflowTaskId());
+                    workflowFeeDto.setItemList(workflowTaskFeeItemDtoList);
+                    return workflowFeeDto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private WorkflowTaskFeeItemDto createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum typeEnum,  String value, Token token){
+        WorkflowTaskFeeItemDto workflowTaskFeeItemDto = new WorkflowTaskFeeItemDto();
+        workflowTaskFeeItemDto.setType(typeEnum);
+        workflowTaskFeeItemDto.setNeedValue(value);
+        workflowTaskFeeItemDto.setToken(BeanUtil.copyProperties(token, TokenDto.class));
+        workflowTaskFeeItemDto.setTokenHolder(BeanUtil.copyProperties(dataService.getTokenHolderById(token.getAddress(), UserContext.getCurrentUser().getAddress()), TokenHolderDto.class));
+        workflowTaskFeeItemDto.setIsEnough(
+                new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue()))>0
+                        && new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue())) >= 0);
+        return workflowTaskFeeItemDto;
+    }
+
+
+    private void initModelAndPsi(WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+        WorkflowTask workflowTask = curWorkflowRunTaskStatus.getWorkflowTask();
+        // 初始化模型
+        if(workflowTask.getInputModel()){
+            if(StringUtils.isBlank(workflowTask.getInputModelId())){
+                // 上步骤动态生成
+                curWorkflowRunTaskStatus.setModel(dataService.getModelByOrgAndTrainTaskId(workflowTask.getIdentityId(), workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(curWorkflowRunTaskStatus.getWorkflowRunId(), workflowTask.getInputModelStep()).getTaskId()));
+            } else {
+                // 用户输入
+                curWorkflowRunTaskStatus.setModel(dataService.getModelById(workflowTask.getInputModelId()));
+            }
+
+            // 模型的组织
+            curWorkflowRunTaskStatus.getModel().setOrg(orgService.getOrgById(curWorkflowRunTaskStatus.getModel().getIdentityId()));
+        }
+
+        // 初始化PSI
+        if(workflowTask.getInputPsi()){
+            curWorkflowRunTaskStatus.setPsiList(dataService.listPsiByTrainTaskId(workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(curWorkflowRunTaskStatus.getWorkflowRunId(), workflowTask.getInputPsiStep()).getTaskId()));
+            // psi的组织
+            curWorkflowRunTaskStatus.getPsiList().forEach(item -> {
+                item.setOrg(orgService.getOrgById(item.getIdentityId()));
+            });
+        }
+    }
+
+    private List<WorkflowTask> listExecutableDetailsByWorkflowVersion(Long workflowId, Long workflowVersion){
+        List<WorkflowTask> workflowTaskList = workflowTaskManager.listExecutableByWorkflowVersion(workflowId, workflowVersion);
+        workflowTaskList.stream().forEach(item ->{
+            // 设置 code
+            item.setCode(workflowTaskCodeManager.getById(item.getWorkflowTaskId()));
+            // 设置 input
+            item.setInputList(workflowTaskInputManager.listByWorkflowTaskId(item.getWorkflowTaskId()));
+            // 设置 output
+            item.setOutputList(workflowTaskOutputManager.listByWorkflowTaskId(item.getWorkflowTaskId()));
+            // 设置 resource
+            item.setResource(workflowTaskResourceManager.getById(item.getWorkflowTaskId()));
+            // 设置 variable
+            item.setVariableList(workflowTaskVariableManager.listByWorkflowTaskId(item.getWorkflowTaskId()));
+            // 设置 算法
+            item.setAlgorithm(algService.getAlg(item.getAlgorithmId(), false));
+            // 设置 发起组织
+            item.setOrg(orgService.getOrgById(item.getIdentityId()));
+            // 设置 input 组织
+            item.getInputList().forEach(subItem -> {
+                subItem.setOrg(orgService.getOrgById(subItem.getIdentityId()));
+            });
+            // 设置 output 组织
+            item.getOutputList().forEach(subItem -> {
+                subItem.setOrg(orgService.getOrgById(subItem.getIdentityId()));
+            });
+        });
+        return workflowTaskList;
     }
 
     @Override
@@ -954,59 +1239,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req) {
-        List<WorkflowTask> workflowTaskList = workflowTaskManager.listExecutableByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
-        return workflowTaskList.stream()
-                .map(item -> {
-                    WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
-                    workflowFeeDto.setWorkflowId(req.getWorkflowId());
-                    workflowFeeDto.setWorkflowVersion(req.getWorkflowVersion());
-                    workflowFeeDto.setWorkflowTaskId(item.getWorkflowTaskId());
-                    List<WorkflowTaskFeeItemDto> workflowTaskFeeItemDtoList = new ArrayList<>();
-                    List<WorkflowTaskInput> workflowTaskInputList = workflowTaskInputManager.listByWorkflowTaskId(item.getWorkflowTaskId());
-
-                    List<DataTokenTransferItem>  dataTokenTransferItemList = new ArrayList<>();
-                    for (WorkflowTaskInput workflowTaskInput : workflowTaskInputList) {
-                        WorkflowTaskFeeItemDto workflowTaskFeeItemDto = new WorkflowTaskFeeItemDto();
-                        workflowTaskFeeItemDto.setType(WorkflowPayTypeEnum.TOKEN);
-                        workflowTaskFeeItemDto.setNeedValue("1000000000000000000");
-                        workflowTaskFeeItemDto.setToken(dataService.getTokenByMetaDataId(workflowTaskInput.getMetaDataId()));
-                        workflowTaskFeeItemDto.setTokenHolder(dataService.getTokenHolderById(workflowTaskFeeItemDto.getToken().getAddress(), UserContext.getCurrentUser().getAddress()));
-                        workflowTaskFeeItemDto.setIsEnough(new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue()))>0
-                                && new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue())) >= 0);
-                        workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
-
-                        DataTokenTransferItem dataTokenTransferItem = DataTokenTransferItem.newBuilder()
-                                        .setAddress(workflowTaskFeeItemDto.getToken().getAddress())
-                                        .setAmount(Long.valueOf(workflowTaskFeeItemDto.getNeedValue())).build();
-                        dataTokenTransferItemList.add(dataTokenTransferItem);
-                    }
-
-
-                    EstimateTaskGasRequest request = EstimateTaskGasRequest.newBuilder()
-                            .addAllDataTokenTransferItems(dataTokenTransferItemList)
-                            .build();
-                    EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), request);
-                    WorkflowTaskFeeItemDto workflowTaskFeeItemDto = new WorkflowTaskFeeItemDto();
-                    workflowTaskFeeItemDto.setType(WorkflowPayTypeEnum.FEE);
-                    workflowTaskFeeItemDto.setNeedValue(BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString());
-                    workflowTaskFeeItemDto.setToken(dataService.getMetisToken());
-                    workflowTaskFeeItemDto.setTokenHolder(dataService.getTokenHolderById(workflowTaskFeeItemDto.getToken().getAddress(), UserContext.getCurrentUser().getAddress()));
-                    workflowTaskFeeItemDto.setIsEnough(new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue()))>0
-                            && new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue())) >= 0);
-                    workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
-                    workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
-                    workflowFeeDto.setItemList(workflowTaskFeeItemDtoList);
-                    return workflowFeeDto;
-                })
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public IPage<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req) {
         return null;
     }
-
-
-
 }

@@ -162,7 +162,7 @@ public class WorkflowController {
     }
 
     @PostMapping("start")
-    @ApiOperation(value = "（开发中）启动工作流", notes = "启动工作流")
+    @ApiOperation(value = "启动工作流", notes = "启动工作流")
     public ResponseVo<WorkflowRunKeyDto> start(@RequestBody @Validated WorkflowStartSignatureDto req) {
         WorkflowRunKeyDto resp = workflowService.start(req);
         return ResponseVo.createSuccess(resp);
