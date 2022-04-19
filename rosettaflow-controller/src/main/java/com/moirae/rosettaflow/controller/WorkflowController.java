@@ -154,10 +154,10 @@ public class WorkflowController {
         return ResponseVo.createSuccess(resp);
     }
 
-    @GetMapping("estimateWorkflowFee")
-    @ApiOperation(value = "（开发中）估算工作流手续费", notes = "估算工作流手续费")
-    public ResponseVo<List<WorkflowFeeDto>> estimateWorkflowFee(@Validated WorkflowVersionKeyDto req) {
-        List<WorkflowFeeDto> resp = workflowService.estimateWorkflowFee(req);
+    @GetMapping("preparationStart")
+    @ApiOperation(value = "启动工作流准备", notes = "启动工作流准备")
+    public ResponseVo<List<WorkflowFeeDto>> preparationStart(@Validated WorkflowVersionKeyDto req) {
+        List<WorkflowFeeDto> resp = workflowService.preparationStart(req);
         return ResponseVo.createSuccess(resp);
     }
 

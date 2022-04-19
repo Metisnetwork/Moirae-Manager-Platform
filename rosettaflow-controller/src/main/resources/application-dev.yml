@@ -39,14 +39,8 @@ system:
     nonceTimeOut: 300000
     # 公共组织信息
     publicOrgList:
-      - identity: identity:e9eef460ea9c473993c6477915106eed
-        host: 192.168.10.150
-        port: 10033
-      - identity: identity:3ddb63047d214ddd8187438a82841250
-        host: 192.168.10.151
-        port: 10033
-      - identity: identity:f614f8ac21b44fe89926ad4f26ef5b07
-        host: 192.168.10.152
+      - identity: identity:6a9df99adf8e48ed94bed3b53f9ea4f7
+        host: 192.168.9.152
         port: 10033
 
 grpc:

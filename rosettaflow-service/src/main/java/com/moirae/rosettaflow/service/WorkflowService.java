@@ -50,7 +50,7 @@ public interface WorkflowService{
 
     Boolean terminate(WorkflowRunKeyDto req);
 
-    List<WorkflowFeeDto> estimateWorkflowFee(WorkflowVersionKeyDto req);
+    List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req);
 
     IPage<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
 

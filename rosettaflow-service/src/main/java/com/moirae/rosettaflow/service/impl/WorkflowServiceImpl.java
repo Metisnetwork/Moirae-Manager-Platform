@@ -6,14 +6,20 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.enums.WorkflowPayTypeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
+import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
+import com.moirae.rosettaflow.grpc.service.DataTokenTransferItem;
+import com.moirae.rosettaflow.grpc.service.EstimateTaskGasRequest;
+import com.moirae.rosettaflow.grpc.service.EstimateTaskGasResponse;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.service.*;
+import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
 import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
@@ -31,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +46,8 @@ import java.util.stream.Collectors;
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 
+    @Resource
+    private GrpcTaskServiceClient grpcTaskServiceClient;
     @Resource
     private AlgService algService;
     @Resource
@@ -484,6 +494,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         predictionInputDto.setIdentityId(prediction.getIdentityId());
         predictionInputDto.setIsPsi(prediction.getInputPsi());
         predictionInputDto.setInputModel(prediction.getInputModel());
+        predictionInputDto.setAlgorithmId(prediction.getAlgorithmId());
         if(prediction.getInputModel() && StringUtils.isNotBlank(prediction.getInputModelId())){
             predictionInputDto.setModel(BeanUtil.copyProperties(dataService.getModelById(prediction.getInputModelId()), ModelDto.class));
         }
@@ -727,47 +738,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowSettingExpertManager.removeByWorkflowVersion(workflowId, workflowVersion);
     }
 
-
-    /**
-     *         // 创建工作流任务配置 1-训练  2-预测  3-训练，并预测 4-PSI
-     *         List<WorkflowTask> workflowTaskList = calculationProcess.getTaskItem().stream().map(
-     *                 item -> {
-     *                     WorkflowTask workflowTask = new WorkflowTask();
-     *                     workflowTask.setWorkflowId(workflowVersion.getWorkflowId());
-     *                     workflowTask.setWorkflowVersion(workflowVersion.getWorkflowVersion());
-     *                     workflowTask.setStep(item.getStep());
-     *                     Algorithm algorithm = getAlg(item, rootTree, selectedTree);
-     *                     workflowTask.setAlgorithmId(algorithm.getAlgorithmId());
-     *                     workflowTask.setInputModel(algorithm.getInputModel());
-     *                     if(algorithm.getSupportDefaultPsi()){
-     *                         workflowTask.setInputPsi(true);
-     *                     }
-     *                     workflowTaskManager.save(workflowTask);
-     *                     initWorkflowTaskCodeOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
-     *                     initWorkflowTaskVariableOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
-     *                     initWorkflowTaskResourceOfWizardMode(workflowTask.getWorkflowTaskId(), algorithm);
-     *                     return workflowTask;
-     *                 }
-     *         ).collect(Collectors.toList());
-     *
-     *         // 创建流程定义
-     *         List<WorkflowSettingWizard> workflowSettingWizardList = calculationProcess.getStepItem().stream()
-     *                 .map(item -> {
-     *                     WorkflowSettingWizard wizard = new WorkflowSettingWizard();
-     *                     wizard.setWorkflowId(workflow.getWorkflowId());
-     *                     wizard.setWorkflowVersion(workflow.getWorkflowVersion());
-     *                     wizard.setCalculationProcessStepType(item.getType());
-     *                     wizard.setStep(item.getStep());
-     *                     wizard.setTask1Step(item.getTask1Step());
-     *                     wizard.setTask2Step(item.getTask2Step());
-     *                     wizard.setTask3Step(item.getTask3Step());
-     *                     wizard.setTask4Step(item.getTask4Step());
-     *                     return wizard;
-     *                 })
-     *                 .collect(Collectors.toList());
-     *         workflowSettingWizardManager.saveBatch(workflowSettingWizardList);
-     */
-
     @Override
     public WorkflowDetailsOfExpertModeDto getWorkflowSettingOfExpertMode(WorkflowVersionKeyDto req) {
         WorkflowDetailsOfExpertModeDto result = new WorkflowDetailsOfExpertModeDto();
@@ -984,8 +954,52 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public List<WorkflowFeeDto> estimateWorkflowFee(WorkflowVersionKeyDto req) {
-        return null;
+    public List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req) {
+        List<WorkflowTask> workflowTaskList = workflowTaskManager.listExecutableByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        return workflowTaskList.stream()
+                .map(item -> {
+                    WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
+                    workflowFeeDto.setWorkflowId(req.getWorkflowId());
+                    workflowFeeDto.setWorkflowVersion(req.getWorkflowVersion());
+                    workflowFeeDto.setWorkflowTaskId(item.getWorkflowTaskId());
+                    List<WorkflowTaskFeeItemDto> workflowTaskFeeItemDtoList = new ArrayList<>();
+                    List<WorkflowTaskInput> workflowTaskInputList = workflowTaskInputManager.listByWorkflowTaskId(item.getWorkflowTaskId());
+
+                    List<DataTokenTransferItem>  dataTokenTransferItemList = new ArrayList<>();
+                    for (WorkflowTaskInput workflowTaskInput : workflowTaskInputList) {
+                        WorkflowTaskFeeItemDto workflowTaskFeeItemDto = new WorkflowTaskFeeItemDto();
+                        workflowTaskFeeItemDto.setType(WorkflowPayTypeEnum.TOKEN);
+                        workflowTaskFeeItemDto.setNeedValue("1000000000000000000");
+                        workflowTaskFeeItemDto.setToken(dataService.getTokenByMetaDataId(workflowTaskInput.getMetaDataId()));
+                        workflowTaskFeeItemDto.setTokenHolder(dataService.getTokenHolderById(workflowTaskFeeItemDto.getToken().getAddress(), UserContext.getCurrentUser().getAddress()));
+                        workflowTaskFeeItemDto.setIsEnough(new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue()))>0
+                                && new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue())) >= 0);
+                        workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
+
+                        DataTokenTransferItem dataTokenTransferItem = DataTokenTransferItem.newBuilder()
+                                        .setAddress(workflowTaskFeeItemDto.getToken().getAddress())
+                                        .setAmount(Long.valueOf(workflowTaskFeeItemDto.getNeedValue())).build();
+                        dataTokenTransferItemList.add(dataTokenTransferItem);
+                    }
+
+
+                    EstimateTaskGasRequest request = EstimateTaskGasRequest.newBuilder()
+                            .addAllDataTokenTransferItems(dataTokenTransferItemList)
+                            .build();
+                    EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), request);
+                    WorkflowTaskFeeItemDto workflowTaskFeeItemDto = new WorkflowTaskFeeItemDto();
+                    workflowTaskFeeItemDto.setType(WorkflowPayTypeEnum.FEE);
+                    workflowTaskFeeItemDto.setNeedValue(BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString());
+                    workflowTaskFeeItemDto.setToken(dataService.getMetisToken());
+                    workflowTaskFeeItemDto.setTokenHolder(dataService.getTokenHolderById(workflowTaskFeeItemDto.getToken().getAddress(), UserContext.getCurrentUser().getAddress()));
+                    workflowTaskFeeItemDto.setIsEnough(new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue()))>0
+                            && new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue())) >= 0);
+                    workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
+                    workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
+                    workflowFeeDto.setItemList(workflowTaskFeeItemDtoList);
+                    return workflowFeeDto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -993,7 +1007,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         return null;
     }
 
-    private WorkflowVersionKeyDto create(Workflow workflow, WorkflowCreateModeEnum createMode){
-        return null;
-    }
+
+
 }

@@ -10,7 +10,7 @@ import lombok.Data;
  * @author hudenian
  */
 @Data
-@ApiModel(value = "项目模型")
+@ApiModel(value = "模型信息")
 public class ModelVo {
 
     @ApiModelProperty(value = "模型的元数据id")

@@ -93,9 +93,8 @@ public class DataController {
     }
 
     @GetMapping("getUserModelList")
-    @ApiOperation(value = "（开发中）查询当前用户的模型列表", notes = "查询当前用户的模型列表")
+    @ApiOperation(value = "查询当前用户的模型列表", notes = "查询当前用户的模型列表")
     public ResponseVo<List<ModelVo>> getUserModelList(@Valid GetUserModelListReq req) {
-        // 获取语言类型
         List<Model> list =  dataService.queryAvailableModel(req.getAlgorithmId(), req.getIdentityId());
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ModelVo.class));
     }

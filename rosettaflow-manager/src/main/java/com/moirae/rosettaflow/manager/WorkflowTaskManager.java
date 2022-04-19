@@ -25,4 +25,6 @@ public interface WorkflowTaskManager extends IService<WorkflowTask> {
     List<Map<OldAndNewEnum, WorkflowTask>> copy(Long workflowId, Long oldVersion, Long newVersion);
 
     List<WorkflowTask> deleteWorkflowId(Long workflowId);
+
+    List<WorkflowTask> listExecutableByWorkflowVersion(Long workflowId, Long workflowVersion);
 }

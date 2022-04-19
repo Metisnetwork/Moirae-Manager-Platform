@@ -23,6 +23,9 @@ public class PredictionInputDto {
     @ApiModelProperty(value = "是否需要输入模型: 0-否，1:是")
     private Boolean inputModel;
 
+    @ApiModelProperty(value = "当前设置的算法id(查询时返回，提交不需要)")
+    private Long algorithmId;
+
     @ApiModelProperty(value = "工作流当前节点模型ID")
     private ModelDto model;
 

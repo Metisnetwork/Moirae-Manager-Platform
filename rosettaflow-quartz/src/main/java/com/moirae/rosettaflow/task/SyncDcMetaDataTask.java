@@ -82,7 +82,7 @@ public class SyncDcMetaDataTask {
             JSONObject metadataOption = JSONObject.parseObject(information.getMetadataOption());
             MetaData metaData = new MetaData();
             metaData.setMetaDataId(information.getMetadataId());
-            metaData.setMetaDataName(information.getMetadataName());
+            metaData.setFileName(information.getMetadataName());
             metaData.setMetaDataType(information.getMetadataTypeValue());
             metaData.setIdentityId(organization.getIdentityId());
             metaData.setRemarks(information.getDesc());

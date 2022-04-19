@@ -30,9 +30,15 @@ public class DataControllerTest extends BaseControllerTest {
         System.out.println("result = "  + commonGetWithToken("/data/getUserDataList", pageParameters));
     }
 
-
     @Test
     public void getUserMetisLatInfo() throws Exception {
         System.out.println("result = "  + commonGetWithToken("/data/getUserMetisLatInfo", emptyParameters));
+    }
+
+    @Test
+    public void getUserModelList() throws Exception {
+        emptyParameters.add("identityId", "identity:3ddb63047d214ddd8187438a82841250");
+        emptyParameters.add("algorithmId", String.valueOf(2021L));
+        System.out.println("result = "  + commonGetWithToken("/data/getUserModelList", emptyParameters));
     }
 }
