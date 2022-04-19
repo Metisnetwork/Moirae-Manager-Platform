@@ -191,6 +191,7 @@ public class DataServiceImpl implements DataService {
         MetisLatInfoDto result = new MetisLatInfoDto();
         Token token = tokenManager.getById(uniswapV2FactoryDao.WETH());
         TokenHolder tokenHolder = tokenHolderManager.getByUser(UserContext.getCurrentUser().getAddress(), uniswapV2FactoryDao.WETH());
+        result.setTokenAddress(token.getAddress());
         result.setTokenName(token.getName());
         result.setTokenSymbol(token.getSymbol());
         result.setTokenDecimal(token.getDecimal());

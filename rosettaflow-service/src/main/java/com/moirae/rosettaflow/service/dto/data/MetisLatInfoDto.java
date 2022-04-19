@@ -8,6 +8,9 @@ import lombok.Data;
 @ApiModel(value = "MetisLat账户信息")
 public class MetisLatInfoDto {
 
+    @ApiModelProperty(value = "数据凭证合约地址")
+    private String tokenAddress;
+
     @ApiModelProperty(value = "数据凭证名称")
     private String tokenName;
 
