@@ -5,6 +5,8 @@ import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.service.types.SimpleResponse;
+import com.moirae.rosettaflow.grpc.service.types.TaskDetail;
+import com.moirae.rosettaflow.grpc.service.types.TaskEvent;
 import io.grpc.Channel;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -28,7 +30,7 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     TaskServiceGrpc.TaskServiceStub taskServiceStub;
 
     @Override
-    public List<GetTaskDetail> getGlobalTaskDetailList(Long latestSynced) {
+    public List<TaskDetail> getGlobalTaskDetailList(Long latestSynced) {
         GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
                 .setLastUpdated(latestSynced)
                 .setPageSize(GrpcConstant.PAGE_SIZE)
@@ -43,7 +45,7 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     }
 
     @Override
-    public List<TaskEventShow> getTaskEventList(String taskId) {
+    public List<TaskEvent> getTaskEventList(String taskId) {
         GetTaskEventListRequest getTaskEventListRequest = GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
         GetTaskEventListResponse response = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
 

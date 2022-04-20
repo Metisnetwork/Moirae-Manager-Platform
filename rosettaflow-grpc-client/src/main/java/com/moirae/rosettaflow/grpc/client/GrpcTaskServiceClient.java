@@ -2,6 +2,8 @@ package com.moirae.rosettaflow.grpc.client;
 
 import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.service.types.SimpleResponse;
+import com.moirae.rosettaflow.grpc.service.types.TaskDetail;
+import com.moirae.rosettaflow.grpc.service.types.TaskEvent;
 import io.grpc.Channel;
 
 import java.util.List;
@@ -13,9 +15,9 @@ import java.util.List;
  */
 public interface GrpcTaskServiceClient {
 
-    List<GetTaskDetail> getGlobalTaskDetailList(Long latestSynced);
+    List<TaskDetail> getGlobalTaskDetailList(Long latestSynced);
 
-    List<TaskEventShow> getTaskEventList(String taskId);
+    List<TaskEvent> getTaskEventList(String taskId);
 
     PublishTaskDeclareResponse publishTaskDeclare(Channel channel, PublishTaskDeclareRequest request);
 

@@ -9,7 +9,6 @@ import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
-import com.moirae.rosettaflow.grpc.service.TaskEventShow;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.DataService;
@@ -159,12 +158,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId) {
         try {
-            List<TaskEventShow> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
+            List<com.moirae.rosettaflow.grpc.service.types.TaskEvent> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
             return taskEventShowDtoList.stream()
                     .map(item -> {
                         TaskEvent taskEvent = new TaskEvent();
                         taskEvent.setTaskId(item.getTaskId());
-                        taskEvent.setIdentityId(item.getOwner().getIdentityId());
+                        taskEvent.setIdentityId(item.getIdentityId());
                         taskEvent.setPartyId(item.getPartyId());
                         taskEvent.setEventType(item.getType());
                         taskEvent.setEventContent(item.getContent());

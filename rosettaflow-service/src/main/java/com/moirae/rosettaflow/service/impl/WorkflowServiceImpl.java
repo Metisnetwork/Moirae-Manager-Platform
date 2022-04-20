@@ -1383,7 +1383,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                         workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
                         DataTokenTransferItem dataTokenTransferItem = DataTokenTransferItem.newBuilder()
                                 .setAddress(workflowTaskFeeItemDto.getToken().getAddress())
-                                .setAmount(Long.valueOf(workflowTaskFeeItemDto.getNeedValue())).build();
+                                .setAmount(workflowTaskFeeItemDto.getNeedValue()).build();
                         dataTokenTransferItemList.add(dataTokenTransferItem);
                     }
 
