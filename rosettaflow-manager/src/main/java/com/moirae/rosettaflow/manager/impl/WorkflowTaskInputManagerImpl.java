@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.manager.WorkflowTaskInputManager;
 import com.moirae.rosettaflow.mapper.WorkflowTaskInputMapper;
-import com.moirae.rosettaflow.mapper.domain.WorkflowTask;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskInput;
 import org.springframework.stereotype.Service;
 

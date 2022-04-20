@@ -1,14 +1,12 @@
 package com.moirae.rosettaflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.moirae.rosettaflow.mapper.domain.CalculationProcess;
-import com.moirae.rosettaflow.mapper.domain.Workflow;
-import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
+import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
 import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
-import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowDetailsOfWizardModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowWizardStepDto;
@@ -50,9 +48,32 @@ public interface WorkflowService{
 
     List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req);
 
-    IPage<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
+    List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
 
     WorkflowVersionKeyDto createWorkflowOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, Long calculationProcessId);
 
     WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName);
+
+    /**
+     * 查询待确认的任务列表
+     *
+     * @return
+     */
+    List<WorkflowRunTaskStatus> listWorkflowRunTaskStatusOfUnConfirmed();
+
+    /**
+     * 取消任务
+     *
+     * @param workflowRunTaskStatus
+     * @return
+     */
+    boolean cancelWorkflowRunTaskStatus(WorkflowRunTaskStatus workflowRunTaskStatus);
+
+    /**
+     * 任务结束
+     *
+     * @param workflowRunTaskStatus
+     * @param task
+     */
+    void taskFinish(WorkflowRunTaskStatus workflowRunTaskStatus, Task task);
 }

@@ -10,7 +10,6 @@ import com.moirae.rosettaflow.common.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 import com.moirae.rosettaflow.grpc.service.TaskEventShow;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.service.DataService;
@@ -186,7 +185,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task getTask(String keyword) {
+    public Task getTaskById(String keyword) {
         return taskManager.getById(keyword);
     }
 

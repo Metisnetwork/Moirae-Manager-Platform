@@ -52,6 +52,14 @@ public class Model implements Serializable {
      */
     private String trainUserAddress;
     /**
+     * 输入模型的算法id
+     */
+    private Long supportedAlgorithmId;
+    /**
+     * 模型评估结果
+     */
+    private String evaluate;
+    /**
      * 创建时间
      */
     private Date createTime;

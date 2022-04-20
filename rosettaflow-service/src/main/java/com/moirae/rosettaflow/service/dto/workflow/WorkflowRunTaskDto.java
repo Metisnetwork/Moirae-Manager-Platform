@@ -16,7 +16,7 @@ import java.util.Objects;
 public class WorkflowRunTaskDto {
 
     @ApiModelProperty(value = "运行任务ID")
-    private Integer id;
+    private Long id;
 
     @JsonIgnore
     private String algorithmName;

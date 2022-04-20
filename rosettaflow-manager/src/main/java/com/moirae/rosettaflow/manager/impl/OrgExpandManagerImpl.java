@@ -20,11 +20,6 @@ public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand
     private OrgExpandMapper orgExpandMapper;
 
     @Override
-    public List<String> getUsableIdentityIdList() {
-        return orgExpandMapper.getUsableIdentityIdList();
-    }
-
-    @Override
     public List<OrgExpand> getOrgExpandList() {
         LambdaQueryWrapper<OrgExpand> wrapper = Wrappers.lambdaQuery();
         wrapper.select(OrgExpand::getIdentityId, OrgExpand::getObserverProxyWalletAddress);

@@ -1,17 +1,13 @@
 package com.moirae.rosettaflow.service.dto.alg;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.service.utils.CommonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @ApiModel(value = "查询算法详情响应参数")

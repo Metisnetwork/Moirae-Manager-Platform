@@ -18,4 +18,8 @@ public interface WorkflowRunTaskStatusManager extends IService<WorkflowRunTaskSt
     WorkflowRunTaskStatus getByWorkflowRunIdAndStep(Long workflowRunId, Integer taskStep);
 
     List<WorkflowRunTaskStatus> listByWorkflowRunIdAndHasTaskId(Long workflowRunId);
+
+    List<WorkflowRunTaskStatus> listOfUnConfirmed();
+
+    List<WorkflowRunTaskStatus> listByWorkflowRunId(Long workflowRunId);
 }

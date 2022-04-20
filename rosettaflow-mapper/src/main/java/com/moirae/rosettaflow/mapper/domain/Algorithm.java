@@ -100,6 +100,11 @@ public class Algorithm implements Serializable {
     private Boolean supportDefaultPsi;
 
     /**
+     * 是否产生psi: 0-否，1:是
+     */
+    private Boolean outputPsi;
+
+    /**
      * 输出存储形式: 1-明文，2:密文
      */
     private Integer storePattern;

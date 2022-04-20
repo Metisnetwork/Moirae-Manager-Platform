@@ -75,16 +75,6 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String getToken(@NotNull UserDto userDto) {
-        String key = getTokenKey(userDto.getAddress());
-        String token = redissonObject.getValue(key);
-        if (StrUtil.isNotEmpty(token)) {
-            return token;
-        }
-        return null;
-    }
-
-    @Override
     public UserDto getUserByToken(@NotNull String token) {
         UserDto userDto = redissonObject.getValue(getUserKey(token));
         if (userDto == null) {

@@ -5,17 +5,25 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.moirae.rosettaflow.common.enums.*;
+import com.google.protobuf.ByteString;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.enums.WorkflowPayTypeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
+import com.moirae.rosettaflow.grpc.client.GrpcSysServiceClient;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
 import com.moirae.rosettaflow.grpc.service.*;
+import com.moirae.rosettaflow.grpc.service.types.SimpleResponse;
 import com.moirae.rosettaflow.grpc.service.types.TaskOrganization;
+import com.moirae.rosettaflow.grpc.service.types.TaskResourceCostDeclare;
 import com.moirae.rosettaflow.grpc.service.types.UserType;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
+import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.service.*;
@@ -40,7 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +57,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Resource
     private GrpcTaskServiceClient grpcTaskServiceClient;
+    @Resource
+    private GrpcSysServiceClient grpcSysServiceClient;
     @Resource
     private AlgService algService;
     @Resource
@@ -200,7 +209,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Transactional
     public WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName) {
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
-
         // 创建工作流记录
         Workflow workflow = new Workflow();
         workflow.setCreateMode(WorkflowCreateModeEnum.EXPERT_MODE);
@@ -208,13 +216,181 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflow.setWorkflowVersion(1L);
         workflow.setAddress(UserContext.getCurrentUser().getAddress());
         workflowManager.save(workflow);
-
         // 创建工作流版本
         workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), StringUtils.join(workflowName, "-v1"));
-
         result.setWorkflowId(workflow.getWorkflowId());
         result.setWorkflowVersion(workflow.getWorkflowVersion());
         return result;
+    }
+
+    @Override
+    public List<WorkflowRunTaskStatus> listWorkflowRunTaskStatusOfUnConfirmed() {
+        return  workflowRunTaskStatusManager.listOfUnConfirmed();
+    }
+
+    @Override
+    @Transactional
+    public boolean cancelWorkflowRunTaskStatus(WorkflowRunTaskStatus workflowRunTaskStatus) {
+        WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(workflowRunTaskStatus.getWorkflowRunId());
+        if(workflowRunStatus.getCancelStatus() != null && workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_NEED){
+            TerminateTaskRequest request = TerminateTaskRequest.newBuilder()
+                    .setUser(workflowRunStatus.getAddress())
+                    .setUserType(UserType.User_1)
+                    .setTaskId(workflowRunTaskStatus.getTaskId())
+                    .setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()))
+                    .build();
+
+            try {
+                SimpleResponse response = grpcTaskServiceClient.terminateTask(orgService.getChannel(workflowTaskManager.getById(workflowRunTaskStatus.getWorkflowTaskId()).getIdentityId()), request);
+                log.info("终止工作流返回， response = {}", response);
+                if (response != null && response.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+                    workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
+                    workflowRunStatusManager.updateById(workflowRunStatus);
+                }else{
+                    log.error("终止工作流失败，失败原因! 原因 = {}", response);
+                    workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+                    workflowRunStatusManager.updateById(workflowRunStatus);
+                }
+            } catch (Exception e) {
+                log.error("终止工作流失败，失败原因!", e);
+                workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+                workflowRunStatusManager.updateById(workflowRunStatus);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void taskFinish(WorkflowRunTaskStatus workflowRunTaskStatus, Task task) {
+        if (task.getStatus() == TaskStatusEnum.SUCCEED || task.getStatus() == TaskStatusEnum.FAILED) {
+            // 生成运行时任务清单明细
+            WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(workflowRunTaskStatus.getWorkflowRunId());
+            List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(workflowRunStatus.getWorkflowId(), workflowRunStatus.getWorkflowVersion());
+            loadWorkflowRunStatus(workflowRunStatus, workflowTaskList);
+            // 如果任务成功
+            if(task.getStatus() == TaskStatusEnum.SUCCEED){
+                taskSuccess(workflowRunStatus,task);
+                if(workflowRunStatus.getCurStep().compareTo(workflowRunStatus.getStep()) < 0) {
+                    workflowRunStatus.setCurStep(workflowRunStatus.getWorkflowRunTaskStatusList().stream()
+                            .map(WorkflowRunTaskStatus::getStep)
+                            .filter(item -> item > workflowRunStatus.getCurStep())
+                            .min(Integer::compareTo)
+                            .get());
+                    executeTask(workflowRunStatus);
+                }
+            }
+            // 如果任务成功
+            if(task.getStatus() == TaskStatusEnum.FAILED){
+                taskFail(workflowRunStatus,task);
+            }
+        }
+    }
+
+    private void taskFail(WorkflowRunStatus workflowRunStatus, Task task) {
+        WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
+
+        if(!task.getId().equals(curWorkflowRunTaskStatus.getTaskId())){
+            log.error("工作流状态错误！ workflowRunStatusId = {}  task = {}", workflowRunStatus.getId(), task.getId());
+        }
+        // 更新状态
+        curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+        curWorkflowRunTaskStatus.setRunMsg("task fail!");
+        curWorkflowRunTaskStatus.setBeginTime(task.getStartAt());
+        curWorkflowRunTaskStatus.setEndTime(task.getEndAt());
+        workflowRunTaskStatusManager.updateById(curWorkflowRunTaskStatus);
+
+        workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+        workflowRunStatus.setEndTime(new Date());
+        workflowRunStatusManager.updateById(workflowRunStatus);
+    }
+
+    private void taskSuccess(WorkflowRunStatus workflowRunStatus, Task task) {
+        WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
+        WorkflowTask workflowTask = curWorkflowRunTaskStatus.getWorkflowTask();
+
+        if(!task.getId().equals(curWorkflowRunTaskStatus.getTaskId())){
+            log.error("工作流状态错误！ workflowRunStatusId = {}  task = {}", workflowRunStatus.getId(), task.getId());
+            return;
+        }
+        // 更新状态
+        curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
+        curWorkflowRunTaskStatus.setBeginTime(task.getStartAt());
+        curWorkflowRunTaskStatus.setEndTime(task.getEndAt());
+        workflowRunTaskStatusManager.updateById(curWorkflowRunTaskStatus);
+
+        // 最后一个任务
+        if(workflowRunStatus.getCurStep().compareTo(workflowRunStatus.getStep()) == 0){
+            workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
+            workflowRunStatus.setEndTime(new Date());
+            workflowRunStatusManager.updateById(workflowRunStatus);
+        }
+
+        // 结果文件
+        Set<String> identityIdSet = workflowTask.getOutputList().stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toSet());
+        Algorithm algorithm = algService.getAlg(workflowTask.getAlgorithmId(), false);
+
+        List<WorkflowRunTaskResult> taskResultList = new ArrayList<>();
+        List<Model> modelList = new ArrayList<>();
+        List<Psi> psiList = new ArrayList<>();
+        for (String identityId : identityIdSet) {
+            GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(orgService.getChannel(identityId), task.getId());
+            if (Objects.isNull(response)) {
+                log.error("WorkflowNodeStatusMockTask获取任务结果失败！ info = {}", response);
+                return;
+            }
+            // 处理结果
+            WorkflowRunTaskResult taskResult = new WorkflowRunTaskResult();
+            taskResult.setIdentityId(identityId);
+            taskResult.setTaskId(task.getId());
+            taskResult.setFileName(response.getMetadataName());
+            taskResult.setMetadataId(response.getMetadataId());
+            taskResult.setOriginId(response.getOriginId());
+            taskResult.setFilePath(response.getDataPath());
+            taskResult.setIp(response.getIp());
+            taskResult.setPort(response.getPort());
+            taskResultList.add(taskResult);
+            // 处理模型
+            if(algorithm.getOutputModel()){
+                Algorithm predictionAlgorithm = algService.getAlgOfRelativelyPrediction(workflowTask.getAlgorithmId(), false);
+                Model model = new Model();
+                model.setMetaDataId(taskResult.getMetadataId());
+                model.setIdentityId(identityId);
+                model.setName(algorithm.getAlgorithmName()+"(" + task.getId() + ")");
+                model.setFileId(taskResult.getOriginId());
+                model.setFilePath(taskResult.getFilePath());
+                model.setTrainTaskId(task.getId());
+                model.setTrainAlgorithmId(workflowTask.getAlgorithmId());
+                model.setTrainUserAddress(workflowRunStatus.getAddress());
+                model.setSupportedAlgorithmId(predictionAlgorithm.getAlgorithmId());
+                model.setEvaluate(response.getExtra());
+                modelList.add(model);
+            }
+
+            if(algorithm.getOutputPsi()){
+                Psi psi = new Psi();
+                psi.setMetaDataId(taskResult.getMetadataId());
+                psi.setIdentityId(identityId);
+                psi.setName(algorithm.getAlgorithmName()+"(" + task.getId() + ")");
+                psi.setFileId(taskResult.getOriginId());
+                psi.setFilePath(taskResult.getFilePath());
+                psi.setTrainTaskId(task.getId());
+                psi.setTrainAlgorithmId(workflowTask.getAlgorithmId());
+                psi.setTrainUserAddress(workflowRunStatus.getAddress());
+                psiList.add(psi);
+            }
+        }
+        if(psiList.size() > 0){
+            dataService.saveBatchPsi(psiList);
+        }
+
+        if(modelList.size() > 0){
+            dataService.saveBatchModel(modelList);
+        }
+
+        if(taskResultList.size() > 0){
+            workflowRunTaskResultManager.saveBatch(taskResultList);
+        }
     }
 
 
@@ -1031,8 +1207,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
         // 设置模型输入组织
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
-            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1)));
-            dataPolicyOption.add(createDataPolicyItem(curWorkflowRunTaskStatus.getModel()));
+            String partyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
+            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), partyId));
+            dataPolicyOption.add(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), partyId));
         }
         // 设置psi输入组织
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
@@ -1041,7 +1218,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                 Psi psi = curWorkflowRunTaskStatus.getPsiList().stream()
                         .filter(item -> workflowTaskInput.getIdentityId().equals(item.getIdentityId()))
                         .findFirst().get();
-                requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(psi.getOrg(), "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1)));
+                String partyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
+                requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(psi.getOrg(), partyId));
+                dataPolicyOption.add(createDataPolicyItem(psi, partyId));
             }
          }
 
@@ -1053,10 +1232,60 @@ public class WorkflowServiceImpl implements WorkflowService {
             requestBuild.addReceivers(publishTaskOfGetTaskOrganization(workflowTaskOutput.getOrg(), workflowTaskOutput.getPartyId()));
         }
 
+        JSONArray powerPolicyOption = new JSONArray();
+        powerPolicyOption.add("y1");
+        powerPolicyOption.add("y2");
+        powerPolicyOption.add("y3");
+        requestBuild.setPowerPolicyType(1);
+        requestBuild.setPowerPolicyOption(powerPolicyOption.toJSONString());
+
+        // data_flow_policy_type & data_flow_policy_option 设置未定义
+        requestBuild.setDataPolicyType(0);
+        requestBuild.setDataFlowPolicyOption("");
+
+        WorkflowTaskResource resource = curWorkflowRunTaskStatus.getWorkflowTask().getResource();
+        TaskResourceCostDeclare taskResourceCostDeclare = TaskResourceCostDeclare.newBuilder()
+                .setMemory(resource.getCostMem())
+                .setProcessor(resource.getCostCpu())
+                .setBandwidth(resource.getCostBandwidth())
+                .setDuration(resource.getRunTime())
+                .build();
+        requestBuild.setOperationCost(taskResourceCostDeclare);
+
+        requestBuild.setAlgorithmCode(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractCode());
+        requestBuild.setMetaAlgorithmId("");
+        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractStruct(), curWorkflowRunTaskStatus.getWorkflowTask().getVariableList()));
+
+
+        requestBuild.setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()));
+        requestBuild.setDesc("");
         return requestBuild.build();
     }
 
+    private String createAlgorithmCodeExtraParams(String calculateContractStruct, List<WorkflowTaskVariable> variableList) {
+        //TODO
 
+        return "";
+    }
+
+
+    private JSONObject createDataPolicyItem(Psi psi, String partyId) {
+        JSONObject item = new JSONObject();
+        item.put("partyId", partyId);
+        item.put("metadataId", psi.getMetaDataId());
+        item.put("metadataName", psi.getName());
+        item.put("keyColumn", 0);
+        return item;
+    }
+
+    private JSONObject createDataPolicyItem(Model model, String partyId) {
+        JSONObject item = new JSONObject();
+        item.put("partyId", partyId);
+        item.put("metadataId", model.getMetaDataId());
+        item.put("metadataName", model.getName());
+        item.put("keyColumn", 0);
+        return item;
+    }
 
     private JSONObject createDataPolicyItem(WorkflowTaskInput workflowTaskInput) {
         JSONObject item = new JSONObject();
@@ -1090,6 +1319,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + workflowName, 100);
     }
 
+    private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId());
+        Map<Long, WorkflowTask> workflowTaskMap = workflowTaskList.stream().collect(Collectors.toMap(WorkflowTask::getWorkflowTaskId, item -> item));
+
+        workflowRunTaskStatusList.stream().forEach(item -> {
+            item.setWorkflowTask(workflowTaskMap.get(item.getWorkflowTaskId()));
+        });
+        workflowRunStatus.setWorkflowRunTaskStatusList(workflowRunTaskStatusList);
+        return workflowRunStatus;
+    }
+
     private WorkflowRunStatus createAndSaveWorkflowRunStatus(String address, String sign, Long workflowId, Long workflowVersion, List<WorkflowTask> workflowTaskList) {
         WorkflowRunStatus workflowRunStatus = new WorkflowRunStatus();
         workflowRunStatus.setWorkflowId(workflowId);
@@ -1109,7 +1349,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                     workflowRunTaskStatus.setStep(item.getStep());
                     workflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
                     workflowRunTaskStatus.setModelId(item.getInputModelId());
-                    workflowRunTaskStatus.setPsiId(item.getInputPsiId());
                     workflowRunTaskStatus.setWorkflowTask(item);
                     workflowRunTaskStatusManager.save(workflowRunTaskStatus);
                     return workflowRunTaskStatus;
@@ -1235,11 +1474,43 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public Boolean terminate(WorkflowRunKeyDto req) {
-        return null;
+        WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(req.getWorkflowRunId());
+        // 校验是否运行中
+        if (workflowRunStatus.getRunStatus() != WorkflowTaskRunStatusEnum.RUN_DOING) {
+            log.error("workflow by id:{} is not running can not terminate", workflowRunStatus.getWorkflowId());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_RUNNING.getMsg());
+        }
+        // 校验取消状态
+        if (workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_NEED) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELING.getMsg());
+        }
+        if (workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_SUCCESS) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELLED_SUCCESS.getMsg());
+        }
+        if (workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELLED_FAIL.getMsg());
+        }
+
+        workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
+        // 更新工作流运行状态
+        return workflowRunStatusManager.updateById(workflowRunStatus);
     }
 
     @Override
-    public IPage<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req) {
-        return null;
+    public List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req) {
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(req.getWorkflowRunId());
+        AlgorithmClassify root = algService.getAlgTree(false, 1L);
+        List<WorkflowRunTaskDto> result = workflowRunTaskStatusList.stream().map(item -> {
+            WorkflowRunTaskDto workflowRunTaskDto = new WorkflowRunTaskDto();
+            workflowRunTaskDto.setId(item.getId());
+            workflowRunTaskDto.setTaskId(item.getTaskId());
+            workflowRunTaskDto.setCreateTime(item.getCreateTime());
+            WorkflowTask workflowTask = workflowTaskManager.getById(item.getId());
+            AlgorithmClassify algorithmClassify = TreeUtils.findSubTree(root, workflowTask.getAlgorithmId());
+            workflowRunTaskDto.setAlgorithmName(algorithmClassify.getName());
+            workflowRunTaskDto.setAlgorithmNameEn(algorithmClassify.getNameEn());
+            return workflowRunTaskDto;
+        }).collect(Collectors.toList());
+        return result;
     }
 }

@@ -1,14 +1,11 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.moirae.rosettaflow.chain.platon.contract.IUniswapV2FactoryContract;
 import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
-import com.moirae.rosettaflow.common.enums.ErrorMsg;
-import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
@@ -25,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.moirae.rosettaflow.common.enums.RespCodeEnum.BIZ_EXCEPTION;
 
 @Slf4j
 @Service
@@ -113,43 +108,6 @@ public class DataServiceImpl implements DataService {
         return metaDataList.stream().collect(Collectors.toMap(MetaData::getMetaDataId, item -> item));
     }
 
-
-    @Override
-    public MetaDataColumn getByKey(String metaDataId, Integer columnIdx) {
-        LambdaQueryWrapper<MetaDataColumn> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(MetaDataColumn::getMetaDataId, metaDataId);
-        queryWrapper.eq(MetaDataColumn::getColumnIdx, columnIdx);
-        return metaDataColumnManager.getOne(queryWrapper);
-    }
-
-
-    @Override
-    public void checkMetaDataEffective(String metaDataId) {
-        LambdaQueryWrapper<MetaData> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(MetaData::getMetaDataId, metaDataId);
-        queryWrapper.eq(MetaData::getStatus, com.moirae.rosettaflow.mapper.enums.MetaDataStatusEnum.PUBLISHED);
-        int count = metaDataManager.count(queryWrapper);
-        if(count != 1){
-            //无效元数据
-            throw new BusinessException(BIZ_EXCEPTION, StrUtil.format(ErrorMsg.METADATA_UNAVAILABLE_FORMAT.getMsg(), metaDataId));
-        }
-    }
-
-    @Override
-    //TODO
-    public void checkMetaDataAuthListEffective(String address, Set<String> metaDataIdList) {
-//        LambdaQueryWrapper<MetaDataAuth> queryWrapper = Wrappers.lambdaQuery();
-//        queryWrapper.eq(MetaDataAuth::getAuthStatus, MetaDataAuthStatusEnum.PUBLISHED);
-//        queryWrapper.eq(MetaDataAuth::getUserId, address);
-//        queryWrapper.in(MetaDataAuth::getMetaDataId, metaDataIdList);
-//        int count = metaDataAuthManager.count(queryWrapper);
-//        if(count != metaDataIdList.size()){
-//            //无效元数据
-//            log.error("有授权数据已过期，请检查, metaDataIdList:{}", metaDataIdList);
-//            throw new AppException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_USER_DATA_EXPIRE.getMsg());
-//        }
-    }
-
     @Override
     public List<Token> getNeedSyncedTokenList(int size) {
         return tokenManager.getNeedSyncedTokenList(size);
@@ -234,5 +192,15 @@ public class DataServiceImpl implements DataService {
     @Override
     public MetaData getDataById(String metaDataId) {
         return metaDataManager.getById(metaDataId);
+    }
+
+    @Override
+    public boolean saveBatchPsi(List<Psi> psiList) {
+        return psiManager.saveBatch(psiList);
+    }
+
+    @Override
+    public boolean saveBatchModel(List<Model> modelList) {
+        return modelManager.saveBatch(modelList);
     }
 }

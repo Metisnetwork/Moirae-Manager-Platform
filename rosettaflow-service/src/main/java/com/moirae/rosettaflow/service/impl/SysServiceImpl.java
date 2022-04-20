@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.chain.platon.config.PlatONProperties;
 import com.moirae.rosettaflow.service.SysService;
 import com.moirae.rosettaflow.service.dto.sys.PlatONPropertiesDto;

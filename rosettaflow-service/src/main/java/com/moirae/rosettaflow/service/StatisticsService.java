@@ -1,7 +1,10 @@
 package com.moirae.rosettaflow.service;
 
 
-import com.moirae.rosettaflow.mapper.domain.*;
+import com.moirae.rosettaflow.mapper.domain.StatsData;
+import com.moirae.rosettaflow.mapper.domain.StatsDay;
+import com.moirae.rosettaflow.mapper.domain.StatsGlobal;
+import com.moirae.rosettaflow.mapper.domain.StatsOrg;
 import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 
 import java.util.List;

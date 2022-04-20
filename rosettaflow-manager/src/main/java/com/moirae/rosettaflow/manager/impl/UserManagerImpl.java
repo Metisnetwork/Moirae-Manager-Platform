@@ -31,12 +31,6 @@ public class UserManagerImpl extends ServiceImpl<UserMapper, User> implements Us
         return this.getOne(wrapper);
     }
 
-    @Override
-    public List<User> getValidList() {
-        LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(User::getIsValid, true);
-        return list(wrapper);
-    }
 
     @Override
     public boolean updateHeartBeat(String address) {

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -64,5 +65,13 @@ public class AlgServiceImpl implements AlgService {
             algorithm.setAlgorithmCode(algorithmCodeManager.getById(algorithmId));
         }
         return algorithm;
+    }
+
+    @Override
+    public Algorithm getAlgOfRelativelyPrediction(Long algorithmId, boolean isNeedDetails) {
+        AlgorithmClassify algorithmClassify = algorithmClassifyManager.getById(algorithmId);
+        List<AlgorithmClassify> algorithmClassifyList = algorithmClassifyManager.listByParentId(algorithmClassify.getParentId());
+        List<Algorithm> algorithmList = algorithmManager.listByIds(algorithmClassifyList.stream().map(AlgorithmClassify::getId).collect(Collectors.toList()));
+        return algorithmList.stream().filter(item -> item.getInputModel()).findFirst().get();
     }
 }

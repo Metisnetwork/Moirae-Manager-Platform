@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.controller;
 
-import com.moirae.rosettaflow.service.SysService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

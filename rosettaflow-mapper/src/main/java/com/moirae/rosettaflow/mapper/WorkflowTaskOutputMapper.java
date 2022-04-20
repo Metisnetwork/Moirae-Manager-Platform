@@ -1,7 +1,7 @@
 package com.moirae.rosettaflow.mapper;
 
-import com.moirae.rosettaflow.mapper.domain.WorkflowTaskOutput;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.moirae.rosettaflow.mapper.domain.WorkflowTaskOutput;
 
 /**
  * <p>

@@ -9,7 +9,6 @@ import com.platon.tx.RawTransactionManager;
 import com.platon.tx.TransactionManager;
 import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.math.BigInteger;

@@ -18,14 +18,6 @@ public interface TokenService {
     String setToken(@NotNull UserDto userDto);
 
     /**
-     * 获取token
-     *
-     * @param userDto 用户讲求对象
-     * @return token
-     */
-    String getToken(@NotNull UserDto userDto);
-
-    /**
      * 根据token获取用户信息
      *
      * @param token token参数

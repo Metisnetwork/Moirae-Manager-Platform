@@ -1,6 +1,5 @@
 package com.moirae.rosettaflow.req.user;
 
-import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

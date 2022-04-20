@@ -11,4 +11,6 @@ public interface AlgService{
     AlgorithmClassify getAlgTree(boolean isNeedDetails, Long rootId);
 
     Algorithm getAlg(Long algorithmId,boolean isNeedDetails);
+
+    Algorithm getAlgOfRelativelyPrediction(Long algorithmId, boolean isNeedDetails);
 }

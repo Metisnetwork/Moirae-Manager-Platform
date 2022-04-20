@@ -1,7 +1,6 @@
 package com.moirae.rosettaflow.service.dto.workflow.wizard;
 
 import com.moirae.rosettaflow.service.dto.workflow.common.OutputDto;
-import com.moirae.rosettaflow.service.dto.workflow.common.ResourceDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

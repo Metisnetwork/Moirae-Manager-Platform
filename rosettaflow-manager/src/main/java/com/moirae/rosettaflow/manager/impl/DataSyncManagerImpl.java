@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.DataSyncManager;
 import com.moirae.rosettaflow.mapper.DataSyncMapper;
 import com.moirae.rosettaflow.mapper.domain.DataSync;
-import com.moirae.rosettaflow.mapper.enums.DataSyncTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

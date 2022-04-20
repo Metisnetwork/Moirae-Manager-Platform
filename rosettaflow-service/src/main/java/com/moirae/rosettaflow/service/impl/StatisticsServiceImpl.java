@@ -39,7 +39,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public NavigationDto queryNavigation(String keyword) {
         NavigationDto result = new NavigationDto();
-        Task task = taskService.getTask(keyword);
+        Task task = taskService.getTaskById(keyword);
         if(task != null){
             result.setType(NavigationTypeEnum.TASK);
             result.setId(task.getId());

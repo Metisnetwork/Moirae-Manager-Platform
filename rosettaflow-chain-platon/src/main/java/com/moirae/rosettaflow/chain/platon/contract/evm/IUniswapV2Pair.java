@@ -2,16 +2,8 @@ package com.moirae.rosettaflow.chain.platon.contract.evm;
 
 import com.platon.abi.solidity.EventEncoder;
 import com.platon.abi.solidity.TypeReference;
-import com.platon.abi.solidity.datatypes.Address;
-import com.platon.abi.solidity.datatypes.Event;
-import com.platon.abi.solidity.datatypes.Function;
-import com.platon.abi.solidity.datatypes.Type;
-import com.platon.abi.solidity.datatypes.Utf8String;
-import com.platon.abi.solidity.datatypes.generated.Bytes32;
-import com.platon.abi.solidity.datatypes.generated.Uint112;
-import com.platon.abi.solidity.datatypes.generated.Uint256;
-import com.platon.abi.solidity.datatypes.generated.Uint32;
-import com.platon.abi.solidity.datatypes.generated.Uint8;
+import com.platon.abi.solidity.datatypes.*;
+import com.platon.abi.solidity.datatypes.generated.*;
 import com.platon.crypto.Credentials;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.DefaultBlockParameter;
@@ -23,14 +15,15 @@ import com.platon.tuples.generated.Tuple3;
 import com.platon.tx.Contract;
 import com.platon.tx.TransactionManager;
 import com.platon.tx.gas.GasProvider;
+import rx.Observable;
+import rx.functions.Func1;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * <p>Auto generated code.

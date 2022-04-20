@@ -2,12 +2,11 @@ package com.moirae.rosettaflow.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
-import com.moirae.rosettaflow.mapper.domain.WorkflowTaskOutput;
-import com.moirae.rosettaflow.mapper.domain.WorkflowTaskVariable;
-import com.moirae.rosettaflow.mapper.WorkflowTaskVariableMapper;
-import com.moirae.rosettaflow.manager.WorkflowTaskVariableManager;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.manager.WorkflowTaskVariableManager;
+import com.moirae.rosettaflow.mapper.WorkflowTaskVariableMapper;
+import com.moirae.rosettaflow.mapper.domain.WorkflowTaskVariable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;

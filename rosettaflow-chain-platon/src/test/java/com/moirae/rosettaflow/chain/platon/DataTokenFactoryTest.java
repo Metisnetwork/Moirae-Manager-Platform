@@ -10,8 +10,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-
 public class DataTokenFactoryTest extends BaseContractTest {
 
     private String templateAddress = "lat1hhfwhezjwdlfx7tv7ss6a7g94r2sgpvpy53cmd";

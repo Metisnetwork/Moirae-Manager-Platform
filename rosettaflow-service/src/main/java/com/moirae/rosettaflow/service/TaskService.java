@@ -25,7 +25,7 @@ public interface TaskService {
 
     IPage<Task> getTaskListByData(Long current, Long size, String metaDataId);
 
-    Task getTask(String keyword);
+    Task getTaskById(String taskId);
 
     int getTaskStats();
 

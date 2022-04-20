@@ -2,8 +2,8 @@ package com.moirae.rosettaflow.manager.impl;
 
 import com.moirae.rosettaflow.manager.StatisticsManager;
 import com.moirae.rosettaflow.mapper.StatisticsMapper;
-import com.moirae.rosettaflow.mapper.domain.StatsGlobal;
 import com.moirae.rosettaflow.mapper.domain.StatisticsDataTrend;
+import com.moirae.rosettaflow.mapper.domain.StatsGlobal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -82,10 +82,10 @@ public class WorkflowRunStatus implements Serializable {
     private WorkflowTaskRunStatusEnum runStatus;
 
     /**
-     * 取消状态: 1-取消中,2-取消成功,3-取消失败
+     * 取消状态: 0-待运行, 1-取消中, 2-取消成功, 3-取消失败
      */
     @TableField("cancel_status")
-    private Integer cancelStatus;
+    private WorkflowTaskRunStatusEnum cancelStatus;
 
     /**
      * 创建时间

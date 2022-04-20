@@ -5,14 +5,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.CalculationProcess;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
-import com.moirae.rosettaflow.req.workflow.*;
+import com.moirae.rosettaflow.req.workflow.GetCalculationProcessListReq;
+import com.moirae.rosettaflow.req.workflow.GetWorkflowListReq;
+import com.moirae.rosettaflow.req.workflow.GetWorkflowVersionListReq;
 import com.moirae.rosettaflow.req.workflow.expert.CreateWorkflowOfExpertModeReq;
 import com.moirae.rosettaflow.req.workflow.wizard.CreateWorkflowOfWizardModeReq;
 import com.moirae.rosettaflow.service.WorkflowService;
 import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
+import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
 import com.moirae.rosettaflow.service.dto.workflow.*;
-import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowDetailsOfExpertModeDto;
+import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowNodeKeyDto;
 import com.moirae.rosettaflow.service.dto.workflow.expert.WorkflowStatusOfExpertModeDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.CalculationProcessDto;
 import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowDetailsOfWizardModeDto;
@@ -20,8 +23,9 @@ import com.moirae.rosettaflow.service.dto.workflow.wizard.WorkflowWizardStepDto;
 import com.moirae.rosettaflow.utils.ConvertUtils;
 import com.moirae.rosettaflow.vo.PageVo;
 import com.moirae.rosettaflow.vo.ResponseVo;
-import com.moirae.rosettaflow.service.dto.task.TaskResultDto;
-import com.moirae.rosettaflow.vo.workflow.*;
+import com.moirae.rosettaflow.vo.workflow.WorkflowStatsVo;
+import com.moirae.rosettaflow.vo.workflow.WorkflowVersionVo;
+import com.moirae.rosettaflow.vo.workflow.WorkflowVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -169,16 +173,16 @@ public class WorkflowController {
     }
 
     @PostMapping("terminate")
-    @ApiOperation(value = "（开发中）终止工作流", notes = "终止工作流")
+    @ApiOperation(value = "终止工作流", notes = "终止工作流")
     public ResponseVo<Boolean> terminate(@RequestBody @Validated WorkflowRunKeyDto req) {
         Boolean resp = workflowService.terminate(req);
         return ResponseVo.createSuccess(resp);
     }
 
     @GetMapping("getWorkflowRunTaskList")
-    @ApiOperation(value = "（开发中）查询指定工作流的运行任务列表", notes = "查询指定工作流的运行任务列表")
-    public ResponseVo<PageVo<WorkflowRunTaskDto>> getWorkflowRunTaskList(@Valid WorkflowRunKeyDto req) {
-        IPage<WorkflowRunTaskDto> page = workflowService.getWorkflowRunTaskList(req);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, page.getRecords()));
+    @ApiOperation(value = "查询指定工作流的运行任务列表", notes = "查询指定工作流的运行任务列表")
+    public ResponseVo<List<WorkflowRunTaskDto>> getWorkflowRunTaskList(@Valid WorkflowRunKeyDto req) {
+        List<WorkflowRunTaskDto> itemList = workflowService.getWorkflowRunTaskList(req);
+        return ResponseVo.createSuccess(itemList);
     }
 }

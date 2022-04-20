@@ -2,12 +2,11 @@ package com.moirae.rosettaflow.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.moirae.rosettaflow.grpc.task.req.dto.TaskEventDto;
-import com.moirae.rosettaflow.mapper.domain.TaskEvent;
-import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
-import com.moirae.rosettaflow.mapper.WorkflowRunTaskStatusMapper;
-import com.moirae.rosettaflow.manager.WorkflowRunTaskStatusManager;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.manager.WorkflowRunTaskStatusManager;
+import com.moirae.rosettaflow.mapper.WorkflowRunTaskStatusMapper;
+import com.moirae.rosettaflow.mapper.domain.WorkflowRunTaskStatus;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,6 +35,22 @@ public class WorkflowRunTaskStatusManagerImpl extends ServiceImpl<WorkflowRunTas
         LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowRunTaskStatus::getWorkflowTaskId, workflowRunId);
         wrapper.isNotNull(WorkflowRunTaskStatus::getTaskId);
+        wrapper.orderByAsc(WorkflowRunTaskStatus::getStep);
+        return list(wrapper);
+    }
+
+    @Override
+    public List<WorkflowRunTaskStatus> listOfUnConfirmed() {
+        LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunTaskStatus::getRunStatus, WorkflowTaskRunStatusEnum.RUN_DOING);
+        wrapper.isNotNull(WorkflowRunTaskStatus::getTaskId);
+        return list(wrapper);
+    }
+
+    @Override
+    public List<WorkflowRunTaskStatus> listByWorkflowRunId(Long workflowRunId) {
+        LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunTaskStatus::getWorkflowTaskId, workflowRunId);
         wrapper.orderByAsc(WorkflowRunTaskStatus::getStep);
         return list(wrapper);
     }

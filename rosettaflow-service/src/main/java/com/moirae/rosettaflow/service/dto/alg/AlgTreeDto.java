@@ -1,14 +1,12 @@
 package com.moirae.rosettaflow.service.dto.alg;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @ApiModel(value = "查询算法树详情响应参数")

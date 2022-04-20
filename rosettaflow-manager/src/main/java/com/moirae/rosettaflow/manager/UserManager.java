@@ -11,9 +11,7 @@ public interface UserManager extends IService<User> {
 
     User getValidByUserName(String userName);
 
-    List<User> getValidList();
-
     boolean updateHeartBeat(String address);
-    
+
     List<String> getOnlineUserIdList(long loginTimeOut);
 }

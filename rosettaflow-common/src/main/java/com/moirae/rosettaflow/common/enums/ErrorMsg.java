@@ -1,9 +1,6 @@
 package com.moirae.rosettaflow.common.enums;
 
-import com.moirae.rosettaflow.common.constants.SysConstant;
 import com.moirae.rosettaflow.common.utils.LanguageContext;
-
-import java.util.Objects;
 
 /**
  * @author hudenian
