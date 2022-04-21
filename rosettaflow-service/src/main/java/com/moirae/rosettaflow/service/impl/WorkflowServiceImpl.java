@@ -147,42 +147,32 @@ public class WorkflowServiceImpl implements WorkflowService {
         CalculationProcess calculationProcess = getCalculationProcessDetails(calculationProcessId);
 
         // 创建工作流记录
-        Workflow workflow = new Workflow();
-        workflow.setCreateMode(WorkflowCreateModeEnum.WIZARD_MODE);
-        workflow.setWorkflowName(workflowName);
-        workflow.setWorkflowDesc(workflowDesc);
-        workflow.setAlgorithmId(algorithmId);
-        workflow.setAlgorithmName(selectedTree.getName());
-        workflow.setCalculationProcessId(calculationProcessId);
-        workflow.setCalculationProcessName(LanguageContext.getByLanguage(calculationProcess.getName(), calculationProcess.getNameEn()));
-        workflow.setCalculationProcessStep(0);
-        workflow.setWorkflowVersion(1L);
-        workflow.setAddress(UserContext.getCurrentUser().getAddress());
-        workflowManager.save(workflow);
+        Workflow workflow = workflowManager.createOfWizardMode(workflowName, workflowDesc,
+                algorithmId, selectedTree.getName(),
+                calculationProcessId, LanguageContext.getByLanguage(calculationProcess.getName(), calculationProcess.getNameEn()),
+                UserContext.getCurrentUser().getAddress());
 
         // 创建工作流版本
         WorkflowVersion workflowVersion = workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), StringUtils.join(workflowName, "-v1"));
 
         // 创建工作流任务配置 1-训练  2-预测  3-训练，并预测 4-PSI
-        List<WorkflowTask> workflowTaskList = calculationProcess.getTaskItem().stream().map(
-                item -> {
-                    WorkflowTask workflowTask = new WorkflowTask();
-                    workflowTask.setWorkflowId(workflowVersion.getWorkflowId());
-                    workflowTask.setWorkflowVersion(workflowVersion.getWorkflowVersion());
-                    workflowTask.setStep(item.getStep());
-                    Algorithm algorithm = getAlg(item, rootTree, selectedTree);
-                    workflowTask.setAlgorithmId(algorithm.getAlgorithmId());
-                    workflowTask.setInputModel(algorithm.getInputModel());
-                    if(algorithm.getSupportDefaultPsi()){
-                        workflowTask.setInputPsi(true);
-                    }
-                    workflowTaskManager.save(workflowTask);
-                    initWorkflowTaskCode(workflowTask.getWorkflowTaskId(), algorithm);
-                    initWorkflowTaskVariable(workflowTask.getWorkflowTaskId(), algorithm);
-                    initWorkflowTaskResource(workflowTask.getWorkflowTaskId(), algorithm);
-                    return workflowTask;
-                }
-        ).collect(Collectors.toList());
+        for (int i = 0; i < calculationProcess.getTaskItem().size(); i++) {
+            CalculationProcessTask calculationProcessStep = calculationProcess.getTaskItem().get(i);
+            WorkflowTask workflowTask = new WorkflowTask();
+            workflowTask.setWorkflowId(workflowVersion.getWorkflowId());
+            workflowTask.setWorkflowVersion(workflowVersion.getWorkflowVersion());
+            workflowTask.setStep(calculationProcessStep.getStep());
+            Algorithm algorithm = getAlg(calculationProcessStep, rootTree, selectedTree);
+            workflowTask.setAlgorithmId(algorithm.getAlgorithmId());
+            workflowTask.setInputModel(algorithm.getInputModel());
+            if(algorithm.getSupportDefaultPsi()){
+                workflowTask.setInputPsi(true);
+            }
+            workflowTaskManager.save(workflowTask);
+            initWorkflowTaskCode(workflowTask.getWorkflowTaskId(), algorithm);
+            initWorkflowTaskVariable(workflowTask.getWorkflowTaskId(), algorithm);
+            initWorkflowTaskResource(workflowTask.getWorkflowTaskId(), algorithm);
+        }
 
         // 创建流程定义
         List<WorkflowSettingWizard> workflowSettingWizardList = calculationProcess.getStepItem().stream()
@@ -504,10 +494,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public WorkflowDetailsOfWizardModeDto getWorkflowSettingOfWizardMode(WorkflowWizardStepDto req) {
         WorkflowDetailsOfWizardModeDto result = new WorkflowDetailsOfWizardModeDto();
+        Workflow workflow = workflowManager.getById(req.getWorkflowId());
         WorkflowSettingWizard wizard = workflowSettingWizardManager.getOneByStep(req.getWorkflowId(), req.getWorkflowVersion(), req.getStep());
 
         result.setWorkflowId(req.getWorkflowId());
         result.setWorkflowVersion(req.getWorkflowVersion());
+        result.setAlgorithmId(workflow.getAlgorithmId());
+        result.setCalculationProcessId(workflow.getCalculationProcessId());
         CalculationProcessStepDto calculationProcessStepDto = new CalculationProcessStepDto();
         calculationProcessStepDto.setStep(wizard.getStep());
         calculationProcessStepDto.setType(wizard.getCalculationProcessStepType());

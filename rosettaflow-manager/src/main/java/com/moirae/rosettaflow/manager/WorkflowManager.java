@@ -26,4 +26,6 @@ public interface WorkflowManager extends IService<Workflow> {
     Workflow increaseVersion(Long workflowId);
 
     Workflow delete(Long workflowId);
+
+    Workflow createOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, String algorithmName, Long calculationProcessId, String calculationProcessName, String address);
 }

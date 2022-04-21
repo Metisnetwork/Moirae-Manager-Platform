@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.WorkflowManager;
 import com.moirae.rosettaflow.mapper.WorkflowMapper;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
+import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -58,5 +59,25 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         Workflow workflow = getById(workflowId);
         removeById(workflow.getWorkflowId());
         return workflow;
+    }
+
+    @Override
+    public Workflow createOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, String algorithmName, Long calculationProcessId, String calculationProcessName, String address) {
+        Workflow workflow = new Workflow();
+        workflow.setCreateMode(WorkflowCreateModeEnum.WIZARD_MODE);
+        workflow.setWorkflowName(workflowName);
+        workflow.setWorkflowDesc(workflowDesc);
+        workflow.setAlgorithmId(algorithmId);
+        workflow.setAlgorithmName(algorithmName);
+        workflow.setCalculationProcessId(calculationProcessId);
+        workflow.setCalculationProcessName(calculationProcessName);
+        workflow.setCalculationProcessStep(0);
+        workflow.setWorkflowVersion(1L);
+        workflow.setAddress(address);
+        if(save(workflow)){
+            return workflow;
+        }else {
+            return null;
+        }
     }
 }

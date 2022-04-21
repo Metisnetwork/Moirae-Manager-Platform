@@ -21,6 +21,12 @@ public class WorkflowDetailsOfWizardModeDto {
     @ApiModelProperty(value = "工作流最新版本号")
     private Long workflowVersion;
 
+    @ApiModelProperty(value = "工作流算法id")
+    private Long algorithmId;
+
+    @ApiModelProperty(value = "计算流程id")
+    private Long calculationProcessId;
+
     @ApiModelProperty(value = "计算流程的当前步骤")
     private CalculationProcessStepDto calculationProcessStep;
 

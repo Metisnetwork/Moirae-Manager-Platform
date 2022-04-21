@@ -39,7 +39,7 @@ system:
     nonceTimeOut: 300000
     # 公共组织信息
     publicOrgList:
-      - identity: identity:6a9df99adf8e48ed94bed3b53f9ea4f7
+      - identity: identity:17c9cc15b6a14f858a96a633c3486f3d
         host: 192.168.9.152
         port: 10033
 
@@ -60,14 +60,14 @@ chain:
   platon:
     chainId: 210309
     hrp: lat
-    metisPayAddress: "0x7eb718524d1ecceef89196bc8315317bf8b5a05a"
-    uniswapV2Router02: "0x26d637e206cc39942628421e7b0d6fb41db0bc06"
+    metisPayAddress: "0x3979ca71ea6b4c0a7cf23a8bf216fd9fc37a4df9"
+    uniswapV2Router02: "0x4378daf745e9053f6048c4f78c803f3bc8829703"
     web3jProtocol: WSS
     web3jAddresses: devnetopenapi.platon.network/ws
     chainName: "PlatON开发网"
     rpcUrl: https://devnetopenapi.platon.network/rpc
     symbol: LAT
-    blockExplorerUrl: https://uatscan.platon.network:1443/
+    blockExplorerUrl: https://devnetscan.platon.network/
 
 
 
