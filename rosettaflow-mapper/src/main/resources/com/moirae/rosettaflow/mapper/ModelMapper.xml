@@ -17,13 +17,9 @@
             m.identity_id,
             o.node_name,
             o.image_url,
-            m.name as metaDataName,
-            ac.name as algorithmName,
-            ac.name_en as algorithmNameEn,
+            m.train_algorithm_id,
             m.create_time
-        from mo_model m
-            inner join mo_algorithm_classify ac on m.train_algorithm_id = ac.id
-            inner join dc_org o on m.identity_id = o.identity_id
+        from mo_model m inner join dc_org o on m.identity_id = o.identity_id
         order by m.create_time desc limit #{size}
     </select>
 </mapper>

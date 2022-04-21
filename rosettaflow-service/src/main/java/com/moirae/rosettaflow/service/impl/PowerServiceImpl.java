@@ -22,4 +22,9 @@ public class PowerServiceImpl implements PowerService {
     public void batchReplace(List<PowerServer> powerServerList) {
         powerServerManager.saveOrUpdateBatch(powerServerList);
     }
+
+    @Override
+    public PowerServer statisticsOfGlobal() {
+        return powerServerManager.statisticsOfGlobal();
+    }
 }

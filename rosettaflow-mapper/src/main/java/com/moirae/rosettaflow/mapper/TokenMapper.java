@@ -7,4 +7,5 @@ import com.moirae.rosettaflow.mapper.domain.Token;
  * @author admin
  */
 public interface TokenMapper extends BaseMapper<Token> {
+    int countOfDataToken();
 }

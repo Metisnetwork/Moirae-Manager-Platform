@@ -114,6 +114,11 @@ public class UserServiceImpl implements UserService {
         return userManager.getOnlineUserIdList(sysConfig.getLoginTimeOut()/1000);
     }
 
+    @Override
+    public int countOfActiveAddress() {
+        return userLoginManager.countOfActiveAddress();
+    }
+
     private void checkNonceValidity(String signMessage, String address) {
 
         SignMessageDto signMessageDto;

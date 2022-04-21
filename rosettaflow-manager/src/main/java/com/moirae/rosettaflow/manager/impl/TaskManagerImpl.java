@@ -1,6 +1,8 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.TaskManager;
@@ -39,5 +41,22 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     @Override
     public IPage<Task> getTaskList(Page<Task> page, String keyword, Date begin, Date end, Integer status) {
         return this.baseMapper.getTaskList(page, keyword, begin, end, status);
+    }
+
+    @Override
+    public int countOfTaskAddress() {
+        LambdaQueryWrapper<Task> wrapper = Wrappers.lambdaQuery();
+        wrapper.groupBy(Task::getAddress);
+        return count(wrapper);
+    }
+
+    @Override
+    public Task statisticsOfGlobal() {
+        return this.baseMapper.statisticsOfGlobal();
+    }
+
+    @Override
+    public List<Task> statisticsOfDay(Date newly) {
+        return this.baseMapper.statisticsOfDay(newly);
     }
 }

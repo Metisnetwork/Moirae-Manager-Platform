@@ -9,7 +9,7 @@ public interface ModelManager extends IService<Model> {
 
     List<Model> queryAvailableModel(String address, Long algorithmId, String identityId);
 
-    List<Model> getLatestModel(Integer size);
+    List<Model> listOfLatest(Integer size);
 
     Model getModelByOrgAndTrainTaskId(String identity, String taskId);
 }

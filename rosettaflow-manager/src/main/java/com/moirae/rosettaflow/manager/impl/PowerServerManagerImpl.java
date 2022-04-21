@@ -11,4 +11,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class PowerServerManagerImpl extends ServiceImpl<PowerServerMapper, PowerServer> implements PowerServerManager {
 
+    @Override
+    public PowerServer statisticsOfGlobal() {
+        return this.baseMapper.statisticsOfGlobal();
+    }
 }

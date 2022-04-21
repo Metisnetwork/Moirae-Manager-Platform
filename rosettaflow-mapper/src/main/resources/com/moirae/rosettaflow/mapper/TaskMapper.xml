@@ -137,4 +137,21 @@
             </if>
         order by t.create_at desc
     </select>
+    <select id="statisticsOfGlobal" resultType="com.moirae.rosettaflow.mapper.domain.Task">
+        select
+            (select count(1) from dc_task) as taskCount,
+            (select count(distinct(user_id)) from dc_task) as addressCount,
+            (select count(1) from dc_task_data_provider) as dataCount
+    </select>
+    <select id="statisticsOfDay" resultType="com.moirae.rosettaflow.mapper.domain.Task">
+        SELECT DATE_FORMAT(`create_at`, '%Y-%m-%d') as statsTime,
+               COUNT(1) as taskCount
+        FROM `dc_task`
+        WHERE 1=1
+            <if test="newly != null">
+                and `create_at` <![CDATA[>=]]>  DATE_ADD(#{newly}, INTERVAL 1 DAY )
+            </if>
+        GROUP BY DATE_FORMAT(`create_at`, '%Y-%m-%d')
+        ORDER BY DATE_FORMAT(`create_at`, '%Y-%m-%d') DESC;
+    </select>
 </mapper>

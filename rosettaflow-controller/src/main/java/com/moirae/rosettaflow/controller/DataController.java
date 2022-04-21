@@ -44,7 +44,7 @@ public class DataController {
     @GetMapping("getDataStats")
     @ApiOperation(value = "查询数据统计", notes = "查询数据统计")
     public ResponseVo<DataStatsVo> getDataStats() {
-        int dataCount = dataService.getDataCount();
+        int dataCount = dataService.countOfData();
         DataStatsVo dataStatsVo = new DataStatsVo();
         dataStatsVo.setDataCount(dataCount);
         return ResponseVo.createSuccess(dataStatsVo);

@@ -9,6 +9,7 @@ import com.moirae.rosettaflow.common.enums.DataOrderByEnum;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
+import com.moirae.rosettaflow.service.AlgService;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 import com.moirae.rosettaflow.service.utils.UserContext;
@@ -30,6 +31,8 @@ public class DataServiceImpl implements DataService {
     @Resource
     private IUniswapV2FactoryContract uniswapV2FactoryContract;
     @Resource
+    private AlgService algService;
+    @Resource
     private MetaDataManager metaDataManager;
     @Resource
     private MetaDataColumnManager metaDataColumnManager;
@@ -44,8 +47,8 @@ public class DataServiceImpl implements DataService {
 
 
     @Override
-    public int getDataCount() {
-        return metaDataManager.getDataCount();
+    public int countOfData() {
+        return metaDataManager.countOfData();
     }
 
     @Override
@@ -202,5 +205,38 @@ public class DataServiceImpl implements DataService {
     @Override
     public boolean saveBatchModel(List<Model> modelList) {
         return modelManager.saveBatch(modelList);
+    }
+
+    @Override
+    public List<Model> listModelOfLatest(Integer size) {
+        List<Model> modelList = modelManager.listOfLatest(size);
+        if(modelList.size() == 0){
+            return modelList;
+        }
+
+        List<AlgorithmClassify> algorithmClassifyList = algService.listAlglassifyByIds(modelList.stream().map(Model::getTrainAlgorithmId).collect(Collectors.toSet()));
+        List<AlgorithmClassify> parentAlgorithmClassifyList = algService.listAlglassifyByIds(algorithmClassifyList.stream().map(AlgorithmClassify::getParentId).collect(Collectors.toSet()));
+        Map<Long, AlgorithmClassify>  algorithmClassifyMap = algorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
+        Map<Long, AlgorithmClassify>  parentAlgorithmClassifyMap = parentAlgorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
+        for (Model model : modelList) {
+            model.setAlgorithmName(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getName());
+            model.setAlgorithmNameEn(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getNameEn());
+        }
+        return modelList;
+    }
+
+    @Override
+    public long sizeOfData() {
+        return metaDataManager.sizeOfData();
+    }
+
+    @Override
+    public int countOfDataToken() {
+        return tokenManager.countOfDataToken();
+    }
+
+    @Override
+    public MetaData statisticsOfGlobal() {
+        return metaDataManager.statisticsOfGlobal();
     }
 }

@@ -38,7 +38,7 @@ public class TaskController {
     @GetMapping("getTaskStats")
     @ApiOperation(value = "查询任务统计", notes = "查询任务统计")
     public ResponseVo<TaskStatsVo> getTaskStats() {
-        int taskCount = taskService.getTaskStats();
+        int taskCount = taskService.countOfTask();
         TaskStatsVo taskStatsVo = new TaskStatsVo();
         taskStatsVo.setTaskCount(taskCount);
         return ResponseVo.createSuccess(taskStatsVo);

@@ -7,4 +7,5 @@ import com.moirae.rosettaflow.mapper.domain.UserLogin;
  * @author admin
  */
 public interface UserLoginMapper extends BaseMapper<UserLogin> {
+    int countOfActiveAddress();
 }

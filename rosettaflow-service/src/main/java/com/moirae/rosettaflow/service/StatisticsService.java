@@ -5,6 +5,7 @@ import com.moirae.rosettaflow.mapper.domain.StatsData;
 import com.moirae.rosettaflow.mapper.domain.StatsDay;
 import com.moirae.rosettaflow.mapper.domain.StatsGlobal;
 import com.moirae.rosettaflow.mapper.domain.StatsOrg;
+import com.moirae.rosettaflow.mapper.enums.StatsDayKeyEnum;
 import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 
 import java.util.List;
@@ -31,4 +32,8 @@ public interface StatisticsService {
     List<StatsOrg> getOrgComputingTop(Integer size);
 
     List<StatsData> getDataTokenUsedTop(Integer size);
+
+    boolean updateStatsGlobal(StatsGlobal global);
+
+    boolean statisticsOfStatsDay(StatsDayKeyEnum taskCount);
 }

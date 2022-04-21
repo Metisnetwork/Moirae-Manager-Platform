@@ -23,4 +23,8 @@ public interface TaskMapper extends BaseMapper<Task> {
     IPage<Task> getTaskListByData(Page<Task> page, String metaDataId);
 
     IPage<Task> getTaskList(Page<Task> page, String keyword, Date begin, Date end, Integer status);
+
+    Task statisticsOfGlobal();
+
+    List<Task> statisticsOfDay(Date newly);
 }

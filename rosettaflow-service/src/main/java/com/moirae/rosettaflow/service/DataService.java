@@ -17,7 +17,7 @@ public interface DataService {
      *
      * @return
      */
-    int getDataCount();
+    int countOfData();
 
     /**
      * 查询数据列表
@@ -98,4 +98,12 @@ public interface DataService {
     boolean saveBatchPsi(List<Psi> psiList);
 
     boolean saveBatchModel(List<Model> modelList);
+
+    List<Model> listModelOfLatest(Integer size);
+
+    long sizeOfData();
+
+    int countOfDataToken();
+
+    MetaData statisticsOfGlobal();
 }

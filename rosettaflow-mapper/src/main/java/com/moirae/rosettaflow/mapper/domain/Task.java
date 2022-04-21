@@ -200,4 +200,12 @@ public class Task implements Serializable {
      */
     @TableField(exist = false)
     private List<TaskEvent> eventList;
+    @TableField(exist = false)
+    private Date statsTime;
+    @TableField(exist = false)
+    private Integer taskCount;
+    @TableField(exist = false)
+    private Integer addressCount;
+    @TableField(exist = false)
+    private Integer dataCount;
 }

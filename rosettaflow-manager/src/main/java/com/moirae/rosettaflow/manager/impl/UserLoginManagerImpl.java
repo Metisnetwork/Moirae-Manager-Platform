@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.UserLoginManager;
 import com.moirae.rosettaflow.mapper.UserLoginMapper;
@@ -25,5 +27,10 @@ public class UserLoginManagerImpl extends ServiceImpl<UserLoginMapper, UserLogin
         userLogin.setAddress(hexAddress);
         userLogin.setIsSuccess(false);
         save(userLogin);
+    }
+
+    @Override
+    public int countOfActiveAddress() {
+        return this.baseMapper.countOfActiveAddress();
     }
 }

@@ -10,4 +10,6 @@ public interface TokenManager extends IService<Token> {
     List<Token> getNeedSyncedTokenList(int size);
 
     List<String> getTokenIdList();
+
+    int countOfDataToken();
 }

@@ -352,7 +352,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             taskResultList.add(taskResult);
             // 处理模型
             if(algorithm.getOutputModel()){
-                Algorithm predictionAlgorithm = algService.getAlgOfRelativelyPrediction(workflowTask.getAlgorithmId(), false);
+                Algorithm predictionAlgorithm = algService.getAlgOfRelativelyPrediction(workflowTask.getAlgorithmId());
                 Model model = new Model();
                 model.setMetaDataId(taskResult.getMetadataId());
                 model.setIdentityId(identityId);

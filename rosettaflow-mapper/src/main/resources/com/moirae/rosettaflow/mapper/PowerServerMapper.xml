@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moirae.rosettaflow.mapper.PowerServerMapper">
+    <select id="statisticsOfGlobal" resultType="com.moirae.rosettaflow.mapper.domain.PowerServer">
+        select ifnull(sum(p.core),0) as orgTotalCore,
+               ifnull(sum(p.memory),0) as orgTotalMemory,
+               ifnull(sum(p.bandwidth),0) as orgTotalBandwidth
+        from dc_power_server p inner join dc_org o on p.identity_id = o.identity_id
+        where o.`status` = 1
+          and p.`status` in (2, 3)
+    </select>
 </mapper>

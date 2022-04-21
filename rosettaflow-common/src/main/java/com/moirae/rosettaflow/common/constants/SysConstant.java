@@ -24,23 +24,6 @@ public class SysConstant {
     public static final int INT_3600 = 3600;
 
     /**
-     * 角色数据
-     */
-    public static final byte[] ROLE_BYTE_ARR = {1, 2, 3};
-
-    /**
-     * 批量处理方式
-     */
-    public static final String INSERT = "INSERT";
-    public static final String UPDATE = "UPDATE";
-
-    /**
-     * 启动工作流前是否需要整体保存：0-否，1-是
-     */
-    public static final String STR_0 = "0";
-    public static final String STR_1 = "1";
-
-    /**
      * 请求头token key值
      */
     public static final String HEADER_TOKEN_KEY = "Access-Token";
@@ -61,41 +44,14 @@ public class SysConstant {
     public static final String REDIS_USER_NONCE_KEY = "Nonce:{}:{}";
 
     /**
-     * redis数据库 用户项目权限 Nonce:{usrId}:{projectId} value:role
-     */
-    public static final String REDIS_USER_PROJECT_ROLE_KEY = "ROLE:USER-{}:PROJECT-{}";
-
-    /**
      * redis数据库 key值 Token前缀
      */
     public static final String REDIS_TOKEN_PREFIX_KEY = "Token:";
 
     /**
-     * redis数据库 key值
-     */
-    public static final String REDIS_SYNC_USER_METADATA_PREFIX_KEY = "sync_user_metadata";
-
-    /**
      * 用户非互踢模式时，token已登录用的用户数前缀
      */
     public static final String REDIS_TOKEN_BIND_PREFIX_KEY = "token-bind:";
-
-    /**
-     * 系统默认日期格式
-     */
-    public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";
-
-    /**
-     * 系统默认时间格式
-     */
-    public static final String DEFAULT_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-    /**
-     * 时区默认东八区北京时间
-     */
-    public static final String DEFAULT_TIMEZONE = "GMT+8";
-
-    public static final String CLASSPATH = "classpath:";
 
     /**
      * 国际化中文
@@ -127,32 +83,14 @@ public class SysConstant {
             "task/getTaskDetails",
             "workflow/wizard/getCalculationProcessList",
             "sys/getPlatONChainConfig",
+            "home/queryNavigation",
+            "home/getLatestModelList",
+            "home/getGlobalStats",
+            "home/getTaskTrend",
+            "home/getOrgPowerTop",
+            "home/getDataTokenUsedTop",
             "swagger",
             "error",
             "api-docs"
     };
-
-    /**
-     * 作业添加队列
-     */
-    public static final String JOB_ADD_QUEUE = "job_add_queue";
-    /**
-     * 作业修改队列
-     */
-    public static final String JOB_EDIT_QUEUE = "job_edit_queue";
-    /**
-     * 作业暂停队列
-     */
-    public static final String JOB_PAUSE_QUEUE = "job_pause_queue";
-
-    /**
-     * 待处理工作流前缀
-     */
-    public static final String REDIS_WORKFLOW_PREFIX_KEY = "workflowDtoTask:";
-
-    /**
-     * 待处理作业节点前缀
-     */
-    public static final String REDIS_SUB_JOB_PREFIX_KEY = "subJobDtoTask:";
-
 }

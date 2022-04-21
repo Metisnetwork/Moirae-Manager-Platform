@@ -147,5 +147,8 @@ public class MetaData implements Serializable {
     private List<MetaDataColumn> columnsList;
     @TableField(exist = false)
     private String authorizeBalance;
-
+    @TableField(exist = false)
+    private Long totalSize;
+    @TableField(exist = false)
+    private Integer totalCount;
 }

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface PowerService {
     void batchReplace(List<PowerServer> powerServerList);
+
+    PowerServer statisticsOfGlobal();
 }

@@ -62,4 +62,6 @@ public interface UserService {
      * @return
      */
     List<String> getOnlineUserIdList();
+
+    int countOfActiveAddress();
 }

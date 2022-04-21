@@ -5,4 +5,5 @@ import com.moirae.rosettaflow.mapper.domain.PowerServer;
 
 public interface PowerServerManager extends IService<PowerServer> {
 
+    PowerServer statisticsOfGlobal();
 }

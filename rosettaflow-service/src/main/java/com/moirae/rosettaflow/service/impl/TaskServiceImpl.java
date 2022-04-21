@@ -189,7 +189,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public int getTaskStats() {
+    public int countOfTask() {
         return taskManager.count();
     }
 
@@ -197,5 +197,25 @@ public class TaskServiceImpl implements TaskService {
     public IPage<Task> getTaskList(Long current, Long size, String keyword, Date begin, Date end, TaskStatusEnum taskStatus) {
         Page<Task> page = new Page<>(current, size);
         return taskManager.getTaskList(page, keyword, begin, end, taskStatus.getValue());
+    }
+
+    @Override
+    public int countOfTaskAddress() {
+        return taskManager.countOfTaskAddress();
+    }
+
+    @Override
+    public long countOfTaskData() {
+        return taskDataProviderManager.count();
+    }
+
+    @Override
+    public Task statisticsOfGlobal() {
+        return taskManager.statisticsOfGlobal();
+    }
+
+    @Override
+    public List<Task> statisticsOfDay(Date newly) {
+        return taskManager.statisticsOfDay(newly);
     }
 }

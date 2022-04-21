@@ -19,4 +19,10 @@ public interface TaskManager extends IService<Task> {
     IPage<Task> getTaskListByData(Page<Task> page, String metaDataId);
 
     IPage<Task> getTaskList(Page<Task> page, String keyword, Date begin, Date end, Integer status);
+
+    int countOfTaskAddress();
+
+    Task statisticsOfGlobal();
+
+    List<Task> statisticsOfDay(Date newly);
 }

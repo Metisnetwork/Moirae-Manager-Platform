@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -71,6 +72,29 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<StatsData> getDataTokenUsedTop(Integer size) {
         return statsDataManager.getDataTokenUsedTop(size);
+    }
+
+    @Override
+    public boolean updateStatsGlobal(StatsGlobal global) {
+        return statsGlobalManager.updateById(global);
+    }
+
+    @Override
+    public boolean statisticsOfStatsDay(StatsDayKeyEnum keyEnum) {
+        Date newly = null;
+        List<StatsDay> newlyList = statsDayManager.getNewestList(keyEnum, 2);
+        if(newlyList.size() == 2){
+            newly = newlyList.get(1).getStatsTime();
+        }
+        List<Task> taskList = taskService.statisticsOfDay(newly);
+        taskList.forEach(item->{
+            StatsDay statsDay = new StatsDay();
+            statsDay.setStatsTime(item.getStatsTime());
+            statsDay.setStatsKey(keyEnum);
+            statsDay.setStatsValue(item.getTaskCount().longValue());
+            statsDayManager.saveOrUpdate(statsDay);
+        });
+        return true;
     }
 
     @Override

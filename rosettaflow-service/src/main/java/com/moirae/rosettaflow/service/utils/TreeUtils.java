@@ -55,40 +55,6 @@ public class TreeUtils {
     }
 
     /**
-     * 查询子树列表
-     * @param treeNodes
-     * @param orgId 树根
-     * @return
-     */
-    public static List<AlgorithmClassify> buildListByRecursive(List<AlgorithmClassify> treeNodes, int orgId) {
-    	if(treeNodes == null) {
-    		return null;
-    	}
-    	List<AlgorithmClassify> result = new ArrayList<>();
-        for (AlgorithmClassify treeNode : treeNodes) {
-            if (orgId == treeNode.getId()) {
-            	result.add(treeNode);
-            	findChildrenList(treeNode,treeNodes,result);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 递归查找子节点
-     * @param treeNodes
-     */
-    public static void findChildrenList(AlgorithmClassify parentNode, List<AlgorithmClassify> treeNodes, List<AlgorithmClassify> result) {
-    	for (AlgorithmClassify treeNode : treeNodes) {
-            if(parentNode.getId().equals( treeNode.getParentId())) {
-            	result.add(treeNode);
-            	findChildrenList(treeNode,treeNodes,result);
-            }
-        }
-    }
-
-
-    /**
      * 递归查找子节点
      * @param tree
      * @param treeNodes
