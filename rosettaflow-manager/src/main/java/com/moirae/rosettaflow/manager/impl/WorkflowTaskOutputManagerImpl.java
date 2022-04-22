@@ -78,6 +78,12 @@ public class WorkflowTaskOutputManagerImpl extends ServiceImpl<WorkflowTaskOutpu
         return result;
     }
 
+    @Override
+    public boolean setWorkflowTaskOutput(Long workflowTaskId, List<WorkflowTaskOutput> workflowTaskOutputList) {
+        removeByWorkflowTaskId(workflowTaskId);
+        return saveBatch(workflowTaskOutputList);
+    }
+
 
     private boolean removeByWorkflowTaskId(Long workflowTaskId){
         LambdaQueryWrapper<WorkflowTaskOutput> wrapper = Wrappers.lambdaQuery();

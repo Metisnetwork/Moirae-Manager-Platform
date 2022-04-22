@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.manager.WorkflowTaskResourceManager;
 import com.moirae.rosettaflow.mapper.WorkflowTaskResourceMapper;
+import com.moirae.rosettaflow.mapper.domain.Algorithm;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskResource;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +58,20 @@ public class WorkflowTaskResourceManagerImpl extends ServiceImpl<WorkflowTaskRes
             removeById(workflowTaskResource.getWorkflowTaskId());
         }
         return workflowTaskResource;
+    }
+
+    @Override
+    public WorkflowTaskResource create(Long workflowTaskId, Algorithm algorithm) {
+        WorkflowTaskResource workflowTaskResource = new WorkflowTaskResource();
+        workflowTaskResource.setWorkflowTaskId(workflowTaskId);
+        workflowTaskResource.setCostCpu(algorithm.getCostCpu());
+        workflowTaskResource.setCostGpu(algorithm.getCostGpu());
+        workflowTaskResource.setCostMem(algorithm.getCostMem());
+        workflowTaskResource.setCostBandwidth(algorithm.getCostBandwidth());
+        workflowTaskResource.setRunTime(algorithm.getRunTime());
+        if(save(workflowTaskResource)){
+            return workflowTaskResource;
+        }
+        return null;
     }
 }

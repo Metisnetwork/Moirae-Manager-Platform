@@ -26,4 +26,6 @@ public interface WorkflowTaskInputManager extends IService<WorkflowTaskInput> {
     List<Map<OldAndNewEnum, WorkflowTaskInput>> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
 
     List<WorkflowTaskInput> deleteByWorkflowTaskId(Long workflowTaskId);
+
+    boolean setWorkflowTaskInput(Long psiWorkflowTaskId, Long workflowTaskId, List<WorkflowTaskInput> workflowTaskInputList);
 }

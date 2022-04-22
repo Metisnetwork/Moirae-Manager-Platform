@@ -9,6 +9,7 @@ import com.moirae.rosettaflow.mapper.WorkflowTaskInputMapper;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskInput;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,28 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
             remove(wrapper);
         }
         return result;
+    }
+
+    @Override
+    public boolean setWorkflowTaskInput(Long psiWorkflowTaskId, Long workflowTaskId, List<WorkflowTaskInput> workflowTaskInputList) {
+        // 删除旧设置
+        LambdaQueryWrapper<WorkflowTaskInput> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(WorkflowTaskInput::getWorkflowTaskId, psiWorkflowTaskId, workflowTaskId);
+        remove(wrapper);
+        // 组装PSI的设置
+        List<WorkflowTaskInput> psiWorkflowTaskInputList = workflowTaskInputList.stream().map(
+            item -> {
+                WorkflowTaskInput psiWorkflowTaskInput = new WorkflowTaskInput();
+                psiWorkflowTaskInput.setWorkflowTaskId(psiWorkflowTaskId);
+                psiWorkflowTaskInput.setMetaDataId(item.getMetaDataId());
+                psiWorkflowTaskInput.setIdentityId(item.getIdentityId());
+                psiWorkflowTaskInput.setKeyColumn(item.getKeyColumn());
+                psiWorkflowTaskInput.setPartyId(item.getPartyId());
+                return psiWorkflowTaskInput;
+            }
+        ).collect(Collectors.toList());
+        psiWorkflowTaskInputList.addAll(workflowTaskInputList);
+        return saveBatch(psiWorkflowTaskInputList);
     }
 
     private boolean removeByWorkflowTaskId(Long workflowTaskId){

@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.manager;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.mapper.domain.Algorithm;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskResource;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface WorkflowTaskResourceManager extends IService<WorkflowTaskResour
     Map<OldAndNewEnum, WorkflowTaskResource> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
 
     WorkflowTaskResource deleteByWorkflowTaskId(Long workflowTaskId);
+
+    WorkflowTaskResource create(Long workflowTaskId, Algorithm algorithm);
 }

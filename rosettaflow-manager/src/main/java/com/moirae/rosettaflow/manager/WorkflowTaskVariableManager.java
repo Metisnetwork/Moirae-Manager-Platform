@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.manager;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskVariable;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface WorkflowTaskVariableManager extends IService<WorkflowTaskVariab
     List<Map<OldAndNewEnum, WorkflowTaskVariable>> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
 
     List<WorkflowTaskVariable> deleteByWorkflowTaskId(Long workflowTaskId);
+
+    boolean create(Long workflowTaskId, List<AlgorithmVariable> algorithmVariableList);
 }

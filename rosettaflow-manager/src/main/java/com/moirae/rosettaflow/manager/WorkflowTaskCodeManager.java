@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.manager;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
+import com.moirae.rosettaflow.mapper.domain.AlgorithmCode;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskCode;
 
 import java.util.Map;
@@ -19,4 +20,6 @@ public interface WorkflowTaskCodeManager extends IService<WorkflowTaskCode> {
     Map<OldAndNewEnum, WorkflowTaskCode> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
 
     WorkflowTaskCode deleteByWorkflowTaskId(Long workflowTaskId);
+
+    WorkflowTaskCode create(Long workflowTaskId, AlgorithmCode algorithmCode);
 }

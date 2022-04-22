@@ -26,4 +26,6 @@ public interface WorkflowTaskOutputManager extends IService<WorkflowTaskOutput> 
     List<Map<OldAndNewEnum, WorkflowTaskOutput>> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
 
     List<WorkflowTaskOutput> deleteByWorkflowTaskId(Long workflowTaskId);
+
+    boolean setWorkflowTaskOutput(Long workflowTaskId, List<WorkflowTaskOutput> workflowTaskOutputList);
 }

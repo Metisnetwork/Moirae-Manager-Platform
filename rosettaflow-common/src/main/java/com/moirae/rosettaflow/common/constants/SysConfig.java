@@ -19,6 +19,7 @@ public class SysConfig {
     private boolean kickMode = true;
     private long nonceTimeOut = 5 * 60 * 1000;
     private List<OrgConfig> publicOrgList = new ArrayList<>();
+    private long defaultPsi = 1001L;
 
     @Data
     public static class OrgConfig {

@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.mapper.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.moirae.rosettaflow.mapper.enums.CalculationProcessTaskAlgorithmSelectEnum;
@@ -32,15 +33,19 @@ public class CalculationProcessTask implements Serializable {
     private Integer step;
 
     /**
-     * 算法选择方式. 0-用户输入母算法; 1-用户输入子训练算法, 2-用户输入子预测算法, 3-内置算法
+     * 算法选择方式. 0-用户输入母算法; 1-用户输入子训练算法, 2-用户输入子预测算法, 3-内置PSI算法
      */
     private CalculationProcessTaskAlgorithmSelectEnum algorithmSelect;
 
     /**
-     * 内置算法id
+     * 工作流节点需要的模型产生的步骤
      */
-    private Long builtInAlgorithmId;
+    private Integer inputModelStep;
 
+    /**
+     * 工作流节点需要的psi产生步骤
+     */
+    private Integer inputPsiStep;
 
     private static final long serialVersionUID = 1L;
 

@@ -1,12 +1,14 @@
 package com.moirae.rosettaflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.moirae.rosettaflow.common.constants.SysConfig;
 import com.moirae.rosettaflow.manager.AlgorithmClassifyManager;
 import com.moirae.rosettaflow.manager.AlgorithmCodeManager;
 import com.moirae.rosettaflow.manager.AlgorithmManager;
 import com.moirae.rosettaflow.manager.AlgorithmVariableManager;
 import com.moirae.rosettaflow.mapper.domain.Algorithm;
 import com.moirae.rosettaflow.mapper.domain.AlgorithmClassify;
+import com.moirae.rosettaflow.mapper.enums.CalculationProcessTaskAlgorithmSelectEnum;
 import com.moirae.rosettaflow.service.AlgService;
 import com.moirae.rosettaflow.service.dto.alg.AlgTreeDto;
 import com.moirae.rosettaflow.service.utils.TreeUtils;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class AlgServiceImpl implements AlgService {
 
     @Resource
+    private SysConfig sysConfig;
+    @Resource
     private AlgorithmClassifyManager algorithmClassifyManager;
     @Resource
     private AlgorithmManager algorithmManager;
@@ -33,8 +37,13 @@ public class AlgServiceImpl implements AlgService {
 
     @Override
     public AlgTreeDto getAlgTreeDto(boolean isNeedDetails) {
-        AlgorithmClassify algorithmClassify = getAlgTree(isNeedDetails, 1L);
+        AlgorithmClassify algorithmClassify = getAlgTree(isNeedDetails);
         return BeanUtil.copyProperties(algorithmClassify, AlgTreeDto.class);
+    }
+
+    @Override
+    public AlgorithmClassify getAlgTree(boolean isNeedDetails) {
+        return getAlgTree(isNeedDetails, 1L);
     }
 
     public AlgorithmClassify getAlgTree(boolean isNeedDetails, Long rootId) {
@@ -79,5 +88,19 @@ public class AlgServiceImpl implements AlgService {
     @Override
     public List<AlgorithmClassify> listAlglassifyByIds(Set<Long> collect) {
         return algorithmClassifyManager.listByIds(collect);
+    }
+
+    @Override
+    public Algorithm findAlg(CalculationProcessTaskAlgorithmSelectEnum algorithmSelect, AlgorithmClassify rootTree, AlgorithmClassify selectedTree) {
+        switch(algorithmSelect){
+            case USER_TRAIN_ALG:
+                return selectedTree.getChildrenList().stream().filter(item -> item.getAlg().getOutputModel()).findFirst().get().getAlg();
+            case USER_PREDICT_ALG:
+                return selectedTree.getChildrenList().stream().filter(item -> item.getAlg().getInputModel()).findFirst().get().getAlg();
+            case BUILD_IN_ALG:
+                return TreeUtils.findSubTree(rootTree, sysConfig.getDefaultPsi()).getAlg();
+            default:
+                return selectedTree.getAlg();
+        }
     }
 }

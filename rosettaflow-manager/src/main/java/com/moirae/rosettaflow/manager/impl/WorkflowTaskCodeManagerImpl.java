@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.manager.WorkflowTaskCodeManager;
 import com.moirae.rosettaflow.mapper.WorkflowTaskCodeMapper;
+import com.moirae.rosettaflow.mapper.domain.AlgorithmCode;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskCode;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +51,19 @@ public class WorkflowTaskCodeManagerImpl extends ServiceImpl<WorkflowTaskCodeMap
             removeById(workflowTaskCode.getWorkflowTaskId());
         }
         return workflowTaskCode;
+    }
+
+    @Override
+    public WorkflowTaskCode create(Long workflowTaskId, AlgorithmCode algorithmCode) {
+        WorkflowTaskCode workflowTaskCode = new WorkflowTaskCode();
+        workflowTaskCode.setWorkflowTaskId(workflowTaskId);
+        workflowTaskCode.setEditType(algorithmCode.getEditType());
+        workflowTaskCode.setCalculateContractStruct(algorithmCode.getCalculateContractStruct());
+        workflowTaskCode.setCalculateContractCode(algorithmCode.getCalculateContractCode());
+        workflowTaskCode.setDataSplitContractCode(algorithmCode.getDataSplitContractCode());
+        if(save(workflowTaskCode)){
+            return workflowTaskCode;
+        }
+        return null;
     }
 }

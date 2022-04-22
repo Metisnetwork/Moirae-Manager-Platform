@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.manager.WorkflowTaskVariableManager;
 import com.moirae.rosettaflow.mapper.WorkflowTaskVariableMapper;
+import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskVariable;
 import org.springframework.stereotype.Service;
 
@@ -69,5 +70,21 @@ public class WorkflowTaskVariableManagerImpl extends ServiceImpl<WorkflowTaskVar
             remove(wrapper);
         }
         return result;
+    }
+
+    @Override
+    public boolean create(Long workflowTaskId, List<AlgorithmVariable> algorithmVariableList) {
+        List<WorkflowTaskVariable> workflowTaskVariableList = algorithmVariableList.stream()
+                .map(item -> {
+                    WorkflowTaskVariable workflowTaskVariable = new WorkflowTaskVariable();
+                    workflowTaskVariable.setWorkflowTaskId(workflowTaskId);
+                    workflowTaskVariable.setVarKey(item.getVarKey());
+                    workflowTaskVariable.setVarValue(item.getVarValue());
+                    workflowTaskVariable.setVarDesc(item.getVarDesc());
+                    workflowTaskVariable.setVarDescEn(item.getVarDescEn());
+                    return workflowTaskVariable;
+                })
+                .collect(Collectors.toList());
+       return saveBatch(workflowTaskVariableList);
     }
 }

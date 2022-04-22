@@ -42,6 +42,8 @@ system:
       - identity: identity:17c9cc15b6a14f858a96a633c3486f3d
         host: 192.168.9.152
         port: 10033
+    # 系统默认的psi算法
+    defaultPsi: 1001
 
 grpc:
   client:
