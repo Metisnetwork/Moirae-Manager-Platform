@@ -80,4 +80,18 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             return null;
         }
     }
+
+    @Override
+    public Workflow createOfExpertMode(String workflowName, String address) {
+        Workflow workflow = new Workflow();
+        workflow.setCreateMode(WorkflowCreateModeEnum.EXPERT_MODE);
+        workflow.setWorkflowName(workflowName);
+        workflow.setWorkflowVersion(1L);
+        workflow.setAddress(address);
+        if(save(workflow)){
+            return workflow;
+        }else {
+            return null;
+        }
+    }
 }

@@ -198,12 +198,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     public WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName) {
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
         // 创建工作流记录
-        Workflow workflow = new Workflow();
-        workflow.setCreateMode(WorkflowCreateModeEnum.EXPERT_MODE);
-        workflow.setWorkflowName(workflowName);
-        workflow.setWorkflowVersion(1L);
-        workflow.setAddress(UserContext.getCurrentUser().getAddress());
-        workflowManager.save(workflow);
+        Workflow workflow = workflowManager.createOfExpertMode(workflowName, UserContext.getCurrentUser().getAddress());
+
         // 创建工作流版本
         workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), StringUtils.join(workflowName, "-v1"));
         result.setWorkflowId(workflow.getWorkflowId());
@@ -425,7 +421,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                         req.getPredictionInput().getIdentityId(), req.getPredictionInput().getIsPsi(), req.getPredictionInput().getItem(), modelId);
                 break;
             case INPUT_PSI:
-                setTrainingOrPredictionPsiInputOfWizardMode(req.getWorkflowId(),req.getWorkflowVersion(), wizard.getTask2Step(), req.getPsiInput().getIdentityId(), req.getPsiInput().getItem(), false);
+                setPsiInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getPsiInput().getIdentityId(), req.getPsiInput().getItem());
                 break;
             case RESOURCE_COMMON:
                 setCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), Arrays.asList(wizard.getTask1Step(), wizard.getTask2Step()), req.getCommonResource());
@@ -473,7 +469,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 result.setCommonResource(getCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case RESOURCE_TRAINING_PREDICTION:
-                result.setTrainingAndPredictionResource(getTrainingAndPredictionResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask1Step(), wizard.getTask2Step()));
+                result.setTrainingAndPredictionResource(getTrainingAndPredictionResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), wizard.getTask4Step()));
                 break;
             case OUTPUT_COMMON:
                 result.setCommonOutput(getCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
@@ -636,6 +632,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         return trainingInputDto;
     }
 
+    private void setPsiInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, String senderIdentityId, List<DataInputDto> dataInputDtoList){
+        WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, psiTaskStep);
+        psi.setIdentityId(senderIdentityId);
+        workflowTaskManager.updateById(psi);
+
+        List<WorkflowTaskInput> psiWorkflowTaskInputList =  convert2WorkflowTaskInput(psi.getWorkflowTaskId(), dataInputDtoList);
+        workflowTaskInputManager.clearAndSave(psi.getWorkflowTaskId(), psiWorkflowTaskInputList);
+    }
+
     private void setInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, Integer taskStep, AlgorithmClassify root, String senderIdentityId, Boolean isPsi,  List<DataInputDto> dataInputDtoList, Optional<String> modelId) {
         // 设置发起方和是否psi
         Map<WorkflowTaskInputTypeEnum, WorkflowTask> workflowTaskMap = workflowTaskManager.setWorkflowTask(workflowId, workflowVersion, psiTaskStep, taskStep, senderIdentityId, isPsi, modelId);
@@ -719,40 +724,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
             workflowTaskOutputManager.saveBatch(workflowTaskOutputList);
         }
-    }
-
-    private void setTrainingOrPredictionPsiInputOfWizardMode(Long workflowId, Long workflowVersion, Integer psiTaskStep, String senderIdentityId, List<DataInputDto> item, boolean setOut){
-        WorkflowTask psi = workflowTaskManager.getByStep(workflowId, workflowVersion, psiTaskStep);
-        psi.setIdentityId(senderIdentityId);
-        workflowTaskManager.updateById(psi);
-
-        List<WorkflowTaskInput> psiWorkflowTaskInputList = new ArrayList<>();
-        for (int i = 0; i < item.size(); i++) {
-            WorkflowTaskInput workflowTaskInput = new WorkflowTaskInput();
-            workflowTaskInput.setWorkflowTaskId(psi.getWorkflowTaskId());
-            workflowTaskInput.setMetaDataId(item.get(i).getMetaDataId());
-            workflowTaskInput.setIdentityId(item.get(i).getIdentityId());
-            workflowTaskInput.setKeyColumn(item.get(i).getKeyColumn());
-            workflowTaskInput.setPartyId("p" + i);
-            psiWorkflowTaskInputList.add(workflowTaskInput);
-        }
-        workflowTaskInputManager.clearAndSave(psi.getWorkflowTaskId(), psiWorkflowTaskInputList);
-        if(setOut){
-            setPsiOutputOfWizardMode(psi.getWorkflowTaskId(), item, psi.getAlgorithmId());
-        }
-    }
-
-    private void setPsiOutputOfWizardMode(Long workflowTaskId, List<DataInputDto> inputDtoList, Long algorithmId) {
-        List<WorkflowTaskOutput> workflowTaskOutputList = new ArrayList<>();
-        for (int i = 0; i < inputDtoList.size(); i++) {
-            WorkflowTaskOutput workflowTaskOutput = new WorkflowTaskOutput();
-            workflowTaskOutput.setWorkflowTaskId(workflowTaskId);
-            workflowTaskOutput.setIdentityId(inputDtoList.get(i).getIdentityId());
-            workflowTaskOutput.setStorePattern(algService.getAlg(algorithmId, false).getStorePattern());
-            workflowTaskOutput.setPartyId("q" + i);
-            workflowTaskOutputList.add(workflowTaskOutput);
-        }
-        workflowTaskOutputManager.clearAndSave(workflowTaskId, workflowTaskOutputList);
     }
 
     @Override
