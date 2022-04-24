@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package rpcapi;
 
-option go_package = "github.com/RosettaFlow/Carrier-Go/lib/api";
+option go_package = "github.com/Metisnetwork/Metis-Carrier/lib/api";
 option java_multiple_files = true;
 option java_package = "com.moirae.rosettaflow.grpc.service";
 

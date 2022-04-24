@@ -44,13 +44,6 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
-    public int countOfTaskAddress() {
-        LambdaQueryWrapper<Task> wrapper = Wrappers.lambdaQuery();
-        wrapper.groupBy(Task::getAddress);
-        return count(wrapper);
-    }
-
-    @Override
     public Task statisticsOfGlobal() {
         return this.baseMapper.statisticsOfGlobal();
     }

@@ -101,9 +101,5 @@ public interface DataService {
 
     List<Model> listModelOfLatest(Integer size);
 
-    long sizeOfData();
-
-    int countOfDataToken();
-
     MetaData statisticsOfGlobal();
 }

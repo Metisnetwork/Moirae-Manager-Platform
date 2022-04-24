@@ -1,7 +1,9 @@
 package com.moirae.rosettaflow.mapper.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -32,6 +34,11 @@ public class StatsOrg implements Serializable {
     private long orgTotalBandwidth;
 
     /**
+     * 算力占比. 万分比。100 = 1%
+     */
+    private Integer computingPowerRatio;
+
+    /**
      * 参与任务数量
      */
     private long totalTask;
@@ -47,4 +54,7 @@ public class StatsOrg implements Serializable {
     private long totalData;
 
     private static final long serialVersionUID = 1L;
+
+    @TableField(exist = false)
+    private String nodeName;
 }

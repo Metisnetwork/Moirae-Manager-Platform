@@ -1194,18 +1194,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflowTaskList.stream()
                 .map(item -> {
                     List<WorkflowTaskFeeItemDto> workflowTaskFeeItemDtoList = new ArrayList<>();
-                    List<DataTokenTransferItem>  dataTokenTransferItemList = new ArrayList<>();
+                    List<String>  dataTokenTransferItemList = new ArrayList<>();
                     for (WorkflowTaskInput workflowTaskInput : item.getInputList()) {
                         WorkflowTaskFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, "1000000000000000000", dataService.getTokenByMetaDataId(workflowTaskInput.getMetaDataId()));
                         workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
-                        DataTokenTransferItem dataTokenTransferItem = DataTokenTransferItem.newBuilder()
-                                .setAddress(workflowTaskFeeItemDto.getToken().getAddress())
-                                .setAmount(workflowTaskFeeItemDto.getNeedValue()).build();
-                        dataTokenTransferItemList.add(dataTokenTransferItem);
+                        dataTokenTransferItemList.add(workflowTaskFeeItemDto.getToken().getAddress());
                     }
 
                     EstimateTaskGasRequest request = EstimateTaskGasRequest.newBuilder()
-                            .addAllDataTokenTransferItems(dataTokenTransferItemList)
+                            .addAllDataTokenAddresses(dataTokenTransferItemList)
                             .build();
                     EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), request);
                     WorkflowTaskFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getMetisToken());

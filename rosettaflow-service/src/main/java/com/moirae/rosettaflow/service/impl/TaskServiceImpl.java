@@ -200,16 +200,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public int countOfTaskAddress() {
-        return taskManager.countOfTaskAddress();
-    }
-
-    @Override
-    public long countOfTaskData() {
-        return taskDataProviderManager.count();
-    }
-
-    @Override
     public Task statisticsOfGlobal() {
         return taskManager.statisticsOfGlobal();
     }

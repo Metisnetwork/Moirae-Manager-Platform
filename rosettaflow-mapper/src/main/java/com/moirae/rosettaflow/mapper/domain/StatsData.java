@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.mapper.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -19,9 +20,11 @@ public class StatsData implements Serializable {
     /**
      * 数据凭证使用量
      */
-    private Long dataTokenUsed;
-
-
+    private Long tokenUsed;
 
     private static final long serialVersionUID = 1L;
+    @TableField(exist = false)
+    private String tokenAddress;
+    @TableField(exist = false)
+    private String tokenName;
 }

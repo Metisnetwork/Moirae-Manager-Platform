@@ -36,4 +36,10 @@ public class HomeControllerTest extends BaseControllerTest {
         emptyParameters.add("size", "15");
         System.out.println("result = "  + commonGet("/home/getTaskTrend", emptyParameters));
     }
+
+    @Test
+    public void getOrgPowerTop() throws Exception {
+        emptyParameters.add("size", "15");
+        System.out.println("result = "  + commonGet("/home/getOrgPowerTop", emptyParameters));
+    }
 }

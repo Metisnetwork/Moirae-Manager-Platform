@@ -226,16 +226,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public long sizeOfData() {
-        return metaDataManager.sizeOfData();
-    }
-
-    @Override
-    public int countOfDataToken() {
-        return tokenManager.countOfDataToken();
-    }
-
-    @Override
     public MetaData statisticsOfGlobal() {
         return metaDataManager.statisticsOfGlobal();
     }

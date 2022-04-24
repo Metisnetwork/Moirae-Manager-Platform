@@ -69,7 +69,7 @@ public class HomeController {
     }
 
     @GetMapping("getDataTokenUsedTop")
-    @ApiOperation(value = "（开发中）获得数据凭证使用量排行", notes = "获得数据凭证使用量排行")
+    @ApiOperation(value = "获得数据凭证使用量排行", notes = "获得数据凭证使用量排行")
     public ResponseVo<List<DataTokenUsedVo>> getDataTokenUsedTop(@Valid GetOrgComputingTopReq req) {
         List<StatsData> statsDataList = statisticsService.getDataTokenUsedTop(req.getSize());
         return ResponseVo.createSuccess(BeanUtil.copyToList(statsDataList, DataTokenUsedVo.class));

@@ -17,7 +17,5 @@ public interface MetaDataManager extends IService<MetaData> {
 
     int countOfData();
 
-    long sizeOfData();
-
     MetaData statisticsOfGlobal();
 }

@@ -31,10 +31,6 @@ public interface TaskService {
 
     IPage<Task> getTaskList(Long current, Long size, String keyword, Date begin, Date end, TaskStatusEnum taskStatus);
 
-    int countOfTaskAddress();
-
-    long countOfTaskData();
-
     Task statisticsOfGlobal();
 
     List<Task> statisticsOfDay(Date newly);

@@ -17,13 +17,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
-
-    @Resource
-    private StatisticsManager statisticsManager;
     @Resource
     private StatsGlobalManager statsGlobalManager;
     @Resource
@@ -64,14 +62,18 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public List<StatsOrg> getOrgComputingTop(Integer size) {
-        StatsGlobal statsGlobal = globalStats();
-        List<StatsOrg> statsOrgList = statsOrgManager.list();
+        List<StatsOrg> statsOrgList = statsOrgManager.listByComputingPowerRatioDesc(size);
+        Map<String, Org> identityId2OrgMap = orgService.getIdentityId2OrgMap();
+        statsOrgList.forEach(item -> {
+            item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
+        });
         return statsOrgList;
     }
 
     @Override
     public List<StatsData> getDataTokenUsedTop(Integer size) {
-        return statsDataManager.getDataTokenUsedTop(size);
+        List<StatsData> statsDataList = statsDataManager.getDataTokenUsedTop(size);
+        return statsDataList;
     }
 
     @Override

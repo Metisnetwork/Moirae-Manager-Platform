@@ -17,9 +17,6 @@ public class StatsDataManagerImpl extends ServiceImpl<StatsDataMapper, StatsData
 
     @Override
     public List<StatsData> getDataTokenUsedTop(Integer size) {
-        LambdaQueryWrapper<StatsData> wrapper = Wrappers.lambdaQuery();
-        wrapper.orderByDesc(StatsData::getDataTokenUsed);
-        wrapper.last(" limit "+ size);
-        return list(wrapper);
+        return this.baseMapper.getDataTokenUsedTop(size);
     }
 }

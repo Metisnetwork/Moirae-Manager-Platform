@@ -28,9 +28,4 @@ public class TokenManagerImpl extends ServiceImpl<TokenMapper, Token> implements
         wrapper.select(Token::getAddress);
         return listObjs(wrapper, Object::toString);
     }
-
-    @Override
-    public int countOfDataToken() {
-        return this.baseMapper.countOfDataToken();
-    }
 }

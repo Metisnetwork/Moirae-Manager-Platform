@@ -39,11 +39,6 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public long sizeOfData() {
-        return this.baseMapper.sizeOfData();
-    }
-
-    @Override
     public MetaData statisticsOfGlobal() {
         return this.baseMapper.statisticsOfGlobal();
     }

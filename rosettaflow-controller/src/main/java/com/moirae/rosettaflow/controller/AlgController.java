@@ -31,7 +31,7 @@ public class AlgController {
 
     @GetMapping("getAlgTreeDetails")
     @ApiOperation(value = "查询算法树详情", notes = "查询算法树详情（包含算法代码及变量设置）")
-    public ResponseVo<AlgTreeDto> getAlgTreeDetails() {
+    public ResponseVo<AlgTreeDto> getAlgTreeD1etails() {
         AlgTreeDto resp = algService.getAlgTreeDto(true);
         return ResponseVo.createSuccess(resp);
     }

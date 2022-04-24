@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package rpcapi;
 
-option go_package = "github.com/RosettaFlow/Carrier-Go/lib/api";
+option go_package = "github.com/Metisnetwork/Metis-Carrier/lib/api";
 option java_multiple_files = true;
 option java_package = "com.moirae.rosettaflow.grpc.service";
 
@@ -81,14 +81,16 @@ message TerminateTaskRequest {
 }
 
 
+/*
 message DataTokenTransferItem {
   string address = 1;       //data token合约地址
   string amount = 2;        //data token转账金额,18位精度
 }
+*/
 
 // 预估gas request
 message EstimateTaskGasRequest {
-  repeated DataTokenTransferItem      data_token_transfer_items = 1;       // 当前任务用到的data token 合约地址和转账金额列表
+  repeated string      data_token_addresses = 1;       // 当前任务用到的data token 合约地址0x开头//缺省转账金额是1
 }
 
 // 预估gas response
