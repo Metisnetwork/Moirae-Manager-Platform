@@ -947,9 +947,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req) {
+    public WorkflowFeeDto preparationStart(WorkflowVersionKeyDto req) {
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
-        return convert2WorkflowFee(req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
+        WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
+        workflowFeeDto.setWorkflowId(req.getWorkflowId());
+        workflowFeeDto.setWorkflowVersion(req.getWorkflowVersion());
+        workflowFeeDto.setItemList(convert2WorkflowFee(workflowTaskList));
+        return workflowFeeDto;
     }
 
     @Transactional
@@ -958,7 +962,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
         // 交易-手续费校验
-        List<WorkflowFeeDto> workflowFeeList = convert2WorkflowFee(req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
+        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList);
         checkFee(workflowFeeList);
         // 保存运行时信息
         WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(req.getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
@@ -1182,53 +1186,58 @@ public class WorkflowServiceImpl implements WorkflowService {
      *
      * @param workflowFeeList
      */
-    private void checkFee(List<WorkflowFeeDto> workflowFeeList) {
+    private void checkFee(List<WorkflowFeeItemDto> workflowFeeList) {
         long count = workflowFeeList.stream()
-                .flatMap(item -> item.getItemList().stream())
                 .filter(item -> !item.getIsEnough()).count();
         if( count > 0) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg());
         }
     }
 
-    private List<WorkflowFeeDto> convert2WorkflowFee(Long workflowId, Long workflowVersion, List<WorkflowTask> workflowTaskList) {
-        return workflowTaskList.stream()
+    private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList) {
+        // token费用
+        Map<String, Long> metaDataId2CountMap = workflowTaskList.stream()
+                .flatMap(item -> item.getInputList().stream())
+                .collect(Collectors.groupingBy(WorkflowTaskInput::getMetaDataId, Collectors.counting()));
+        List<MetaData> metaDataList = dataService.listDataByIds(metaDataId2CountMap.keySet());
+        Map<String, String> metaDataId2TokenAddressMap = metaDataList.stream()
+                .collect(Collectors.toMap(MetaData::getMetaDataId, MetaData::getTokenAddress));
+
+        List<Token> tokenList = dataService.listTokenByIds(metaDataId2TokenAddressMap.values());
+        tokenList.add(dataService.getMetisToken());
+        Map<String, Token> tokenId2TokenMap = tokenList.stream().collect(Collectors.toMap(Token::getAddress, item -> item));
+
+        List<WorkflowFeeItemDto> tokenFeeList =  metaDataId2CountMap.entrySet().stream()
+                .map(item -> createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, new BigInteger(sysConfig.getDefaultTokenValue()).multiply(BigInteger.valueOf(item.getValue())).toString(), tokenId2TokenMap.get(metaDataId2TokenAddressMap.get(item.getKey()))))
+                .collect(Collectors.toList());
+        // 手续费
+        List<WorkflowFeeItemDto> feeList = workflowTaskList.stream()
                 .map(item -> {
-                    List<WorkflowTaskFeeItemDto> workflowTaskFeeItemDtoList = new ArrayList<>();
-                    List<String>  dataTokenTransferItemList = new ArrayList<>();
-                    for (WorkflowTaskInput workflowTaskInput : item.getInputList()) {
-                        WorkflowTaskFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, "1000000000000000000", dataService.getTokenByMetaDataId(workflowTaskInput.getMetaDataId()));
-                        workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
-                        dataTokenTransferItemList.add(workflowTaskFeeItemDto.getToken().getAddress());
-                    }
-
-                    EstimateTaskGasRequest request = EstimateTaskGasRequest.newBuilder()
-                            .addAllDataTokenAddresses(dataTokenTransferItemList)
-                            .build();
-                    EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), request);
-                    WorkflowTaskFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getMetisToken());
-                    workflowTaskFeeItemDtoList.add(workflowTaskFeeItemDto);
-
-                    WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
-                    workflowFeeDto.setWorkflowId(workflowId);
-                    workflowFeeDto.setWorkflowVersion(workflowVersion);
-                    workflowFeeDto.setWorkflowTaskId(item.getWorkflowTaskId());
-                    workflowFeeDto.setItemList(workflowTaskFeeItemDtoList);
-                    return workflowFeeDto;
+                    List<String> tokenIdList = item.getInputList().stream().map(subItem-> metaDataId2TokenAddressMap.get(subItem.getMetaDataId())).collect(Collectors.toList());
+                    EstimateTaskGasRequest.Builder requestBuilder = EstimateTaskGasRequest.newBuilder();
+                    tokenIdList.forEach(subItem -> {
+                        requestBuilder.addDataTokenAddresses(subItem);
+                    });
+                    EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
+                    WorkflowFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getMetisToken());
+                    return workflowTaskFeeItemDto;
                 })
                 .collect(Collectors.toList());
+
+        tokenFeeList.addAll(feeList);
+        return tokenFeeList;
     }
 
-    private WorkflowTaskFeeItemDto createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum typeEnum,  String value, Token token){
-        WorkflowTaskFeeItemDto workflowTaskFeeItemDto = new WorkflowTaskFeeItemDto();
-        workflowTaskFeeItemDto.setType(typeEnum);
-        workflowTaskFeeItemDto.setNeedValue(value);
-        workflowTaskFeeItemDto.setToken(BeanUtil.copyProperties(token, TokenDto.class));
-        workflowTaskFeeItemDto.setTokenHolder(BeanUtil.copyProperties(dataService.getTokenHolderById(token.getAddress(), UserContext.getCurrentUser().getAddress()), TokenHolderDto.class));
-        workflowTaskFeeItemDto.setIsEnough(
-                new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue()))>0
-                        && new BigDecimal(workflowTaskFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowTaskFeeItemDto.getNeedValue())) >= 0);
-        return workflowTaskFeeItemDto;
+    private WorkflowFeeItemDto createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum typeEnum, String value, Token token){
+        WorkflowFeeItemDto workflowFeeItemDto = new WorkflowFeeItemDto();
+        workflowFeeItemDto.setType(typeEnum);
+        workflowFeeItemDto.setNeedValue(value);
+        workflowFeeItemDto.setToken(BeanUtil.copyProperties(token, TokenDto.class));
+        workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(dataService.getTokenHolderById(token.getAddress(), UserContext.getCurrentUser().getAddress()), TokenHolderDto.class));
+        workflowFeeItemDto.setIsEnough(
+                new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue()))>0
+                        && new BigDecimal(workflowFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0);
+        return workflowFeeItemDto;
     }
 
 

@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(value = "工作流列表响应对象")
-public class WorkflowTaskFeeItemDto {
+public class WorkflowFeeItemDto {
 
     @ApiModelProperty(value = "支付类型（手续费、token）")
     private WorkflowPayTypeEnum type;

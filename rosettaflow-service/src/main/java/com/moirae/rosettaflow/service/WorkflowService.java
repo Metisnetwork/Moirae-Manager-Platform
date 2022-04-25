@@ -46,7 +46,7 @@ public interface WorkflowService{
 
     Boolean terminate(WorkflowRunKeyDto req);
 
-    List<WorkflowFeeDto> preparationStart(WorkflowVersionKeyDto req);
+    WorkflowFeeDto preparationStart(WorkflowVersionKeyDto req);
 
     List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
 

@@ -12,9 +12,6 @@ import java.util.List;
 @ApiModel(value = "工作流列表响应对象")
 public class WorkflowFeeDto extends WorkflowVersionKeyDto {
 
-    @ApiModelProperty(value = "工作流任务配置id")
-    private Long workflowTaskId;
-
     @ApiModelProperty(value = "工作流任务费用明细")
-    private List<WorkflowTaskFeeItemDto> itemList;
+    private List<WorkflowFeeItemDto> itemList;
 }

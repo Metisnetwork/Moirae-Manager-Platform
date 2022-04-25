@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -173,8 +171,18 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Token getTokenByMetaDataId(String metaDataId) {
-        return getTokenById(metaDataManager.getById(metaDataId).getTokenAddress());
+    public List<Token> listTokenByMetaDataIds(Set<String> metaDataIds) {
+        List<String> tokenIdList = metaDataManager.listByIds(metaDataIds)
+                .stream()
+                .filter(item -> StringUtils.isNotBlank(item.getTokenAddress()))
+                .map(MetaData::getTokenAddress)
+                .collect(Collectors.toList());
+
+        if(tokenIdList.size() > 0){
+            return tokenManager.listByIds(tokenIdList);
+        }else{
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -228,5 +236,15 @@ public class DataServiceImpl implements DataService {
     @Override
     public MetaData statisticsOfGlobal() {
         return metaDataManager.statisticsOfGlobal();
+    }
+
+    @Override
+    public List<MetaData> listDataByIds(Set<String> keySet) {
+        return metaDataManager.listByIds(keySet);
+    }
+
+    @Override
+    public List<Token> listTokenByIds(Collection<String> tokenIds) {
+        return tokenManager.listByIds(tokenIds);
     }
 }

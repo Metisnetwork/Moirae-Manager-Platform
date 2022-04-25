@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,7 +86,7 @@ public interface DataService {
 
     Token getMetisToken();
 
-    Token getTokenByMetaDataId(String metaDataId);
+    List<Token> listTokenByMetaDataIds(Set<String> metaDataIds);
 
     TokenHolder getTokenHolderById(String tokenAddress, String userAddress);
 
@@ -102,4 +103,8 @@ public interface DataService {
     List<Model> listModelOfLatest(Integer size);
 
     MetaData statisticsOfGlobal();
+
+    List<MetaData> listDataByIds(Set<String> metaDataIds);
+
+    List<Token> listTokenByIds(Collection<String> tokenIds);
 }

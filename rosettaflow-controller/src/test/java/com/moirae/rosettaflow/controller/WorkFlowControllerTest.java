@@ -397,6 +397,18 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         System.out.println("result = "  + getWorkflowStatusOfExpertMode(7L, 1L));
     }
 
+    @Test
+    public void preparationStart()throws Exception{
+        System.out.println("result = "  + preparationStart(7L, 1L));
+    }
+
+
+    private String preparationStart(Long workflowId, Long workflowVersion)throws Exception{
+        emptyParameters.add("workflowId", String.valueOf(workflowId));
+        emptyParameters.add("workflowVersion", String.valueOf(workflowVersion));
+        return commonGetWithToken("/workflow/preparationStart", emptyParameters);
+    }
+
 
     private String getWorkflowResultOfExpertMode(Long workflowId, Long workflowVersion, Integer nodeStep)throws Exception{
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap();
