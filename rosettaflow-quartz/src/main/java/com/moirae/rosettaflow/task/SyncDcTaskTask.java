@@ -86,33 +86,33 @@ public class SyncDcTaskTask {
             taskAlgoProviderList.add(taskAlgoProvider);
 
             Map<String, TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
-            if(information.getDataPolicyType() == 1){
-                List<DataPolicy1> dataPolicy1List = JSONArray.parseArray(information.getDataPolicyOption(), DataPolicy1.class);
-                dataPolicy1List.stream().forEach(subItem ->{
-                    TaskDataProvider taskDataProvider = new TaskDataProvider();
-                    taskDataProvider.setTaskId(information.getTaskId());
-                    taskDataProvider.setMetaDataId(subItem.getMetadataId());
-                    taskDataProvider.setIdentityId(dataMap.get(subItem.getPartyId()).getIdentityId());
-                    taskDataProvider.setPartyId(subItem.getPartyId());
-                    taskDataProviderList.add(taskDataProvider);
-                });
-            }
+//            if(information.getDataPolicyType() == 1){
+//                List<DataPolicy1> dataPolicy1List = JSONArray.parseArray(information.getDataPolicyOption(), DataPolicy1.class);
+//                dataPolicy1List.stream().forEach(subItem ->{
+//                    TaskDataProvider taskDataProvider = new TaskDataProvider();
+//                    taskDataProvider.setTaskId(information.getTaskId());
+//                    taskDataProvider.setMetaDataId(subItem.getMetadataId());
+//                    taskDataProvider.setIdentityId(dataMap.get(subItem.getPartyId()).getIdentityId());
+//                    taskDataProvider.setPartyId(subItem.getPartyId());
+//                    taskDataProviderList.add(taskDataProvider);
+//                });
+//            }
 
             Map<String, TaskPowerResourceOption> resourceMap = information.getPowerResourceOptionsList().stream().collect(Collectors.toMap(TaskPowerResourceOption::getPartyId, resource -> resource));
             Map<String, TaskOrganization> powerMap =  information.getPowerSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
-            if(information.getPowerPolicyType() == 1 || information.getPowerPolicyType() == 2){
-                List<String> powerPolicy1List = JSONArray.parseArray(information.getPowerPolicyOption(), String.class);
-                powerPolicy1List.forEach(subItem ->{
-                    TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
-                    taskPowerProvider.setTaskId(information.getTaskId());
-                    taskPowerProvider.setIdentityId(information.getPowerPolicyType() == 1 ? powerMap.get(subItem).getIdentityId() : dataMap.get(subItem).getIdentityId());
-                    taskPowerProvider.setPartyId(subItem);
-                    taskPowerProvider.setUsedCore(resourceMap.get(subItem).getResourceUsedOverview().getUsedProcessor());
-                    taskPowerProvider.setUsedMemory(resourceMap.get(subItem).getResourceUsedOverview().getUsedMem());
-                    taskPowerProvider.setUsedBandwidth(resourceMap.get(subItem).getResourceUsedOverview().getUsedBandwidth());
-                    taskPowerProviderList.add(taskPowerProvider);
-                });
-            }
+//            if(information.getPowerPolicyType() == 1 || information.getPowerPolicyType() == 2){
+//                List<String> powerPolicy1List = JSONArray.parseArray(information.getPowerPolicyOption(), String.class);
+//                powerPolicy1List.forEach(subItem ->{
+//                    TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
+//                    taskPowerProvider.setTaskId(information.getTaskId());
+//                    taskPowerProvider.setIdentityId(information.getPowerPolicyType() == 1 ? powerMap.get(subItem).getIdentityId() : dataMap.get(subItem).getIdentityId());
+//                    taskPowerProvider.setPartyId(subItem);
+//                    taskPowerProvider.setUsedCore(resourceMap.get(subItem).getResourceUsedOverview().getUsedProcessor());
+//                    taskPowerProvider.setUsedMemory(resourceMap.get(subItem).getResourceUsedOverview().getUsedMem());
+//                    taskPowerProvider.setUsedBandwidth(resourceMap.get(subItem).getResourceUsedOverview().getUsedBandwidth());
+//                    taskPowerProviderList.add(taskPowerProvider);
+//                });
+//            }
 
 
             information.getReceiversList().forEach(subItem ->{

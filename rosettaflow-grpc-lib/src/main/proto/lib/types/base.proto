@@ -92,6 +92,11 @@ enum DataLocationType {
 enum OrigindataType {
   OrigindataType_Unknown = 0;             // 未知
   OrigindataType_CSV = 1;                 // csv
+  OrigindataType_BINARY = 2;              // binary
+  OrigindataType_XLS = 3;                 // xls
+  OrigindataType_XLSX = 4;                // xlsx
+  OrigindataType_TXT = 5;                 // txt
+  OrigindataType_JSON = 6;                // json
   //  OrigindataType_Python = 20001;      // python
 }
 

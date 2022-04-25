@@ -42,4 +42,10 @@ public class HomeControllerTest extends BaseControllerTest {
         emptyParameters.add("size", "15");
         System.out.println("result = "  + commonGet("/home/getOrgPowerTop", emptyParameters));
     }
+
+    @Test
+    public void getDataTokenUsedTop() throws Exception {
+        emptyParameters.add("size", "15");
+        System.out.println("result = "  + commonGet("/home/getDataTokenUsedTop", emptyParameters));
+    }
 }

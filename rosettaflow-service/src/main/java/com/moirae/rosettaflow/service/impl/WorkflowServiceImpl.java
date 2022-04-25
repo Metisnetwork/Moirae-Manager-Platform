@@ -1041,8 +1041,9 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
          }
 
-        requestBuild.setDataPolicyType(1);
-        requestBuild.setDataPolicyOption(dataPolicyOption.toJSONString());
+//        requestBuild.addDataPolicyTypes();
+//        requestBuild.setDataPolicyType(1);
+//        requestBuild.setDataPolicyOption(dataPolicyOption.toJSONString());
 
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().size(); i++) {
             WorkflowTaskOutput workflowTaskOutput = curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().get(i);
@@ -1053,12 +1054,12 @@ public class WorkflowServiceImpl implements WorkflowService {
         powerPolicyOption.add("y1");
         powerPolicyOption.add("y2");
         powerPolicyOption.add("y3");
-        requestBuild.setPowerPolicyType(1);
-        requestBuild.setPowerPolicyOption(powerPolicyOption.toJSONString());
-
-        // data_flow_policy_type & data_flow_policy_option 设置未定义
-        requestBuild.setDataPolicyType(0);
-        requestBuild.setDataFlowPolicyOption("");
+//        requestBuild.setPowerPolicyType(1);
+//        requestBuild.setPowerPolicyOption(powerPolicyOption.toJSONString());
+//
+//        // data_flow_policy_type & data_flow_policy_option 设置未定义
+//        requestBuild.setDataPolicyType(0);
+//        requestBuild.setDataFlowPolicyOption("");
 
         WorkflowTaskResource resource = curWorkflowRunTaskStatus.getWorkflowTask().getResource();
         TaskResourceCostDeclare taskResourceCostDeclare = TaskResourceCostDeclare.newBuilder()
