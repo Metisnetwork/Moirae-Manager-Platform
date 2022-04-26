@@ -29,7 +29,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Resource
     private StatsOrgManager statsOrgManager;
     @Resource
-    private StatsDataManager statsDataManager;
+    private StatsTokenManager statsDataManager;
     @Resource
     private TaskService taskService;
     @Resource
@@ -71,9 +71,9 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<StatsData> getDataTokenUsedTop(Integer size) {
-        List<StatsData> statsDataList = statsDataManager.getDataTokenUsedTop(size);
-        return statsDataList;
+    public List<StatsToken> getDataTokenUsedTop(Integer size) {
+        List<StatsToken> statsTokenList = statsDataManager.getDataTokenUsedTop(size);
+        return statsTokenList;
     }
 
     @Override

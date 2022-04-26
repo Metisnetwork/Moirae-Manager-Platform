@@ -34,4 +34,6 @@ public interface TaskService {
     Task statisticsOfGlobal();
 
     List<Task> statisticsOfDay(Date newly);
+
+    Long countOfTokenUsed(List<String> metaDataIdList);
 }

@@ -3,19 +3,20 @@ package com.moirae.rosettaflow.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@TableName(value = "mo_stats_data")
-public class StatsData implements Serializable {
+@TableName(value = "mo_stats_token")
+public class StatsToken implements Serializable {
 
     /**
-     * 元数据ID,hash
+     * 凭证地址
      */
     @TableId
-    private String metaDataId;
+    private String address;
 
     /**
      * 数据凭证使用量

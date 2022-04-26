@@ -208,4 +208,9 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> statisticsOfDay(Date newly) {
         return taskManager.statisticsOfDay(newly);
     }
+
+    @Override
+    public Long countOfTokenUsed(List<String> metaDataIdList) {
+        return taskDataProviderManager.countOfTokenUsed(metaDataIdList);
+    }
 }

@@ -8,4 +8,6 @@ import java.util.List;
 public interface TaskDataProviderManager extends IService<TaskDataProvider> {
 
     List<TaskDataProvider> listByTaskId(String taskId);
+
+    Long countOfTokenUsed(List<String> metaDataIdList);
 }

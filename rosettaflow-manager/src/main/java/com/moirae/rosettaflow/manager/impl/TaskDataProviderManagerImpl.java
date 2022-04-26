@@ -21,4 +21,11 @@ public class TaskDataProviderManagerImpl extends ServiceImpl<TaskDataProviderMap
         wrapper.eq(TaskDataProvider::getTaskId, taskId);
         return baseMapper.selectList(wrapper);
     }
+
+    @Override
+    public Long countOfTokenUsed(List<String> metaDataIdList) {
+        LambdaQueryWrapper<TaskDataProvider> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(TaskDataProvider::getMetaDataId, metaDataIdList);
+        return Long.valueOf(count(wrapper));
+    }
 }

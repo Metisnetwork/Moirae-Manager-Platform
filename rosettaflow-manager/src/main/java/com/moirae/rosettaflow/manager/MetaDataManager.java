@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 
+import java.util.List;
+
 public interface MetaDataManager extends IService<MetaData> {
 
     IPage<MetaData> getDataListByOrg(Page<MetaData> page, String identityId);
@@ -18,4 +20,6 @@ public interface MetaDataManager extends IService<MetaData> {
     int countOfData();
 
     MetaData statisticsOfGlobal();
+
+    List<MetaData> listDataByTokenAddress(String tokenAddress);
 }

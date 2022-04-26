@@ -42,6 +42,8 @@ public class DataServiceImpl implements DataService {
     private ModelManager modelManager;
     @Resource
     private PsiManager psiManager;
+    @Resource
+    private StatsTokenManager statsTokenManager;
 
 
     @Override
@@ -250,6 +252,16 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public MetaDataColumn getDataColumByIds(String metaDataId, int columnIndex) {
-        return  metaDataColumnManager.getById(metaDataId, columnIndex);
+        return metaDataColumnManager.getById(metaDataId, columnIndex);
+    }
+
+    @Override
+    public List<MetaData> listDataByTokenAddress(String tokenAddress) {
+        return metaDataManager.listDataByTokenAddress(tokenAddress);
+    }
+
+    @Override
+    public boolean batchInsertOrUpdateStatsToken(List<StatsToken> saveList) {
+        return statsTokenManager.saveOrUpdateBatch(saveList);
     }
 }

@@ -110,4 +110,8 @@ public interface DataService {
     List<Token> listTokenByIds(Collection<String> tokenIds);
 
     MetaDataColumn getDataColumByIds(String metaDataId, int columnIndex);
+
+    List<MetaData> listDataByTokenAddress(String tokenAddress);
+
+    boolean batchInsertOrUpdateStatsToken(List<StatsToken> saveList);
 }

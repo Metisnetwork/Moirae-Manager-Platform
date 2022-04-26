@@ -1,6 +1,8 @@
 package com.moirae.rosettaflow.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.manager.MetaDataManager;
@@ -8,6 +10,8 @@ import com.moirae.rosettaflow.mapper.MetaDataMapper;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -41,5 +45,12 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public MetaData statisticsOfGlobal() {
         return this.baseMapper.statisticsOfGlobal();
+    }
+
+    @Override
+    public List<MetaData> listDataByTokenAddress(String tokenAddress) {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaData::getTokenAddress, tokenAddress);
+        return list(wrapper);
     }
 }

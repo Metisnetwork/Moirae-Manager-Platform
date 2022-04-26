@@ -1,7 +1,7 @@
 package com.moirae.rosettaflow.service;
 
 
-import com.moirae.rosettaflow.mapper.domain.StatsData;
+import com.moirae.rosettaflow.mapper.domain.StatsToken;
 import com.moirae.rosettaflow.mapper.domain.StatsDay;
 import com.moirae.rosettaflow.mapper.domain.StatsGlobal;
 import com.moirae.rosettaflow.mapper.domain.StatsOrg;
@@ -31,7 +31,7 @@ public interface StatisticsService {
 
     List<StatsOrg> getOrgComputingTop(Integer size);
 
-    List<StatsData> getDataTokenUsedTop(Integer size);
+    List<StatsToken> getDataTokenUsedTop(Integer size);
 
     boolean updateStatsGlobal(StatsGlobal global);
 

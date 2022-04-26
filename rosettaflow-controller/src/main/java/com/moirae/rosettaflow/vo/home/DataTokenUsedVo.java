@@ -8,9 +8,6 @@ import lombok.Data;
 @ApiModel(value = "数据凭证使用明细")
 public class DataTokenUsedVo {
 
-    @ApiModelProperty(value = "元数据id")
-    private String  metaDataId;;
-
     @ApiModelProperty(value = "数据凭证合约地址")
     private String tokenAddress;
 
