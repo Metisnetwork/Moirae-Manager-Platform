@@ -49,8 +49,6 @@ public class WorkflowTaskVariableManagerImpl extends ServiceImpl<WorkflowTaskVar
                     newObj.setWorkflowTaskId(newWorkflowTaskId);
                     newObj.setVarValue(item.getVarValue());
                     newObj.setVarKey(item.getVarKey());
-                    newObj.setVarDesc(item.getVarDesc());
-                    newObj.setVarDescEn(item.getVarDescEn());
                     save(newObj);
                     Map<OldAndNewEnum, WorkflowTaskVariable> pair = new HashMap<>();
                     pair.put(OldAndNewEnum.OLD, item);
@@ -80,8 +78,6 @@ public class WorkflowTaskVariableManagerImpl extends ServiceImpl<WorkflowTaskVar
                     workflowTaskVariable.setWorkflowTaskId(workflowTaskId);
                     workflowTaskVariable.setVarKey(item.getVarKey());
                     workflowTaskVariable.setVarValue(item.getVarValue());
-                    workflowTaskVariable.setVarDesc(item.getVarDesc());
-                    workflowTaskVariable.setVarDescEn(item.getVarDescEn());
                     return workflowTaskVariable;
                 })
                 .collect(Collectors.toList());

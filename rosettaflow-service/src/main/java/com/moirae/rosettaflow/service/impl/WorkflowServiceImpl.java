@@ -21,11 +21,10 @@ import com.moirae.rosettaflow.grpc.service.types.TaskResourceCostDeclare;
 import com.moirae.rosettaflow.grpc.service.types.UserType;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
+import com.moirae.rosettaflow.mapper.enums.*;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
-import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
-import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.service.*;
+import com.moirae.rosettaflow.service.dto.alg.AlgVariableDto;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
 import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
@@ -73,8 +72,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     private WorkflowVersionManager workflowVersionManager;
     @Resource
     private WorkflowTaskManager workflowTaskManager;
-    @Resource
-    private WorkflowTaskCodeManager workflowTaskCodeManager;
     @Resource
     private WorkflowTaskInputManager workflowTaskInputManager;
     @Resource
@@ -165,9 +162,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                     algorithm.getAlgorithmId(),
                     algorithm.getInputModel(), calculationProcessTask.getInputModelStep(),
                     algorithm.getSupportDefaultPsi(), calculationProcessTask.getInputPsiStep());
-            if(algorithm.getAlgorithmCode() != null){
-                workflowTaskCodeManager.create(workflowTask.getWorkflowTaskId(), algorithm.getAlgorithmCode());
-            }
             if(algorithm.getAlgorithmVariableList().size() > 0){
                 workflowTaskVariableManager.create(workflowTask.getWorkflowTaskId(), algorithm.getAlgorithmVariableList());
             }
@@ -531,7 +525,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
 
-    private void setNodeResource(AlgorithmClassify root, AlgorithmClassify algorithmClassify, WorkflowTask psiWorkflowTask, WorkflowTask workflowTask, ResourceDto resource) {
+    private void setNodeResource(AlgorithmClassify algorithmClassify, WorkflowTask psiWorkflowTask, WorkflowTask workflowTask, ResourceDto resource) {
         List<Long> workflowTaskIdList = new ArrayList<>();
         workflowTaskIdList.add(workflowTask.getWorkflowTaskId());
         if(algorithmClassify.getAlg().getSupportDefaultPsi()){
@@ -660,9 +654,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                         psiAlgorithmClassify.getId(), false, null,
                         false, null);
 
-                if(psiAlgorithmClassify.getAlg().getAlgorithmCode() != null){
-                    workflowTaskCodeManager.create(psiWorkflowTask.getWorkflowTaskId(), psiAlgorithmClassify.getAlg().getAlgorithmCode());
-                }
                 if(psiAlgorithmClassify.getAlg().getAlgorithmVariableList().size() > 0){
                     workflowTaskVariableManager.create(psiWorkflowTask.getWorkflowTaskId(), psiAlgorithmClassify.getAlg().getAlgorithmVariableList());
                 }
@@ -686,9 +677,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
             // 设置输入
             setNodeInput(root, algorithmClassify, psiWorkflowTask, workflowTask, nodeDto.getNodeInput());
-            setNodeCode(algorithmClassify,workflowTask.getWorkflowTaskId(), nodeDto.getNodeCode());
+            setNodeCode(workflowTask.getWorkflowTaskId(), nodeDto.getNodeCode());
             setNodeOutput(workflowTask.getWorkflowTaskId(),  nodeDto.getNodeOutput());
-            setNodeResource(root, algorithmClassify, psiWorkflowTask, workflowTask, nodeDto.getResource());
+            setNodeResource(algorithmClassify, psiWorkflowTask, workflowTask, nodeDto.getResource());
 
             preStep = workflowTask.getStep();
         }
@@ -708,23 +699,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
 
-    private void setNodeCode(AlgorithmClassify algorithmClassify, Long workflowTaskId, NodeCodeDto nodeCode) {
-        WorkflowTaskCode workflowTaskCode = new WorkflowTaskCode();
-        workflowTaskCode.setWorkflowTaskId(workflowTaskId);
-        workflowTaskCode.setEditType(nodeCode.getCode().getEditType());
-        workflowTaskCode.setCalculateContractCode(nodeCode.getCode().getCalculateContractCode());
-        workflowTaskCode.setDataSplitContractCode(nodeCode.getCode().getDataSplitContractCode());
-        workflowTaskCode.setCalculateContractStruct(algorithmClassify.getAlg().getAlgorithmCode().getCalculateContractStruct());
-        workflowTaskCodeManager.save(workflowTaskCode);
-
+    private void setNodeCode(Long workflowTaskId, NodeCodeDto nodeCode) {
         List<WorkflowTaskVariable> workflowTaskVariableList = nodeCode.getVariableList().stream()
                 .map(item -> {
                     WorkflowTaskVariable workflowTaskVariable = new WorkflowTaskVariable();
                     workflowTaskVariable.setWorkflowTaskId(workflowTaskId);
                     workflowTaskVariable.setVarKey(item.getVarKey());
                     workflowTaskVariable.setVarValue(item.getVarValue());
-                    workflowTaskVariable.setVarDesc(item.getVarDesc());
-                    workflowTaskVariable.setVarDescEn(item.getVarDescEn());
                     return workflowTaskVariable;
                 })
                 .collect(Collectors.toList());
@@ -739,7 +720,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .collect(Collectors.toList());
         if(workflowTaskIdList.size() > 0){
             workflowTaskManager.removeByIds(workflowTaskIdList);
-            workflowTaskCodeManager.removeByIds(workflowTaskIdList);
             workflowTaskInputManager.removeByWorkflowTaskIds(workflowTaskIdList);
             workflowTaskOutputManager.removeByWorkflowTaskIds(workflowTaskIdList);
             workflowTaskResourceManager.removeByIds(workflowTaskIdList);
@@ -765,10 +745,27 @@ public class WorkflowServiceImpl implements WorkflowService {
                     nodeDto.setNodeStep(item.getNodeStep());
                     nodeDto.setNodeName(item.getNodeName());
                     WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, item.getTaskStep());
+                    Algorithm algorithm = algService.getAlg(workflowTask.getAlgorithmId(), true);
                     nodeDto.setAlgorithmId(workflowTask.getAlgorithmId());
                     NodeCodeDto nodeCodeDto = new NodeCodeDto();
-                    nodeCodeDto.setCode(BeanUtil.copyProperties(workflowTaskCodeManager.getById(workflowTask.getWorkflowTaskId()),CodeDto.class));
-                    nodeCodeDto.setVariableList(BeanUtil.copyToList(workflowTaskVariableManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId()), VariableDto.class));
+                    nodeCodeDto.setCode(BeanUtil.copyProperties(algorithm.getAlgorithmCode(),CodeDto.class));
+
+                    Map<String,String> variableMap = workflowTaskVariableManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId())
+                            .stream()
+                            .collect(Collectors.toMap(WorkflowTaskVariable::getVarKey, WorkflowTaskVariable::getVarValue));
+                    nodeCodeDto.setVariableList(algorithm.getAlgorithmVariableList().stream()
+                            .map(algorithmVariable -> {
+                                AlgVariableDto algVariableDto = new AlgVariableDto();
+                                algVariableDto.setVarKey(algorithmVariable.getVarKey());
+                                algVariableDto.setVarType(algorithmVariable.getVarType());
+                                algVariableDto.setVarDesc(algorithmVariable.getVarDesc());
+                                algVariableDto.setVarDescEn(algorithmVariable.getVarDescEn());
+                                if(variableMap.containsKey(algorithmVariable.getVarKey())){
+                                    algVariableDto.setVarValue(variableMap.get(algorithmVariable.getVarKey()));
+                                }
+                                return algVariableDto;
+                            })
+                            .collect(Collectors.toList()));
                     nodeDto.setNodeCode(nodeCodeDto);
                     NodeInputDto nodeInputDto = new NodeInputDto();
                     nodeInputDto.setIdentityId(workflowTask.getIdentityId());
@@ -785,7 +782,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     if(workflowTaskOutputList.size() > 0){
                         outputDto.setStorePattern(workflowTaskOutputList.get(0).getStorePattern());
                     }else{
-                        outputDto.setStorePattern(algService.getAlg(workflowTask.getAlgorithmId(), false).getStorePattern());
+                        outputDto.setStorePattern(algorithm.getStorePattern());
                     }
                     outputDto.setIdentityId(workflowTaskOutputList.stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toList()));
                     nodeDto.setNodeOutput(outputDto);
@@ -907,7 +904,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<Map<OldAndNewEnum, WorkflowTask>> workflowTaskList = workflowTaskManager.copy(workflow.getWorkflowId(), req.getWorkflowVersion(), workflow.getWorkflowVersion());
 
         workflowTaskList.forEach(item -> {
-            workflowTaskCodeManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
             workflowTaskInputManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
             workflowTaskOutputManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
             workflowTaskResourceManager.copy(item.get(OldAndNewEnum.OLD).getWorkflowTaskId(), item.get(OldAndNewEnum.NEW).getWorkflowTaskId());
@@ -940,7 +936,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowTask> workflowTaskList = workflowTaskManager.deleteWorkflowId(workflow.getWorkflowId());
 
         workflowTaskList.forEach(item -> {
-            workflowTaskCodeManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
             workflowTaskInputManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
             workflowTaskOutputManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
             workflowTaskResourceManager.deleteByWorkflowTaskId(item.getWorkflowTaskId());
@@ -1078,19 +1073,19 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .build();
         requestBuild.setOperationCost(taskResourceCostDeclare);
 
-        requestBuild.setAlgorithmCode(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractCode());
+        requestBuild.setAlgorithmCode(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmCode().getCalculateContractCode());
         requestBuild.setMetaAlgorithmId("");
-        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractStruct(),
+        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmCode().getCalculateContractStruct(),
                 curWorkflowRunTaskStatus.getWorkflowTask().getVariableList(), curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi(),
                 curWorkflowRunTaskStatus.getWorkflowTask().getInputList().stream().filter(item -> item.getDependentVariable() != null && item.getDependentVariable() > 0
-                ).findFirst().get(), modelPartyId));
+                ).findFirst().get(), modelPartyId, curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm()));
 
         requestBuild.setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()));
         requestBuild.setDesc("");
         return requestBuild.build();
     }
 
-    private String createAlgorithmCodeExtraParams(String calculateContractStruct, List<WorkflowTaskVariable> variableList, Boolean usePsi, WorkflowTaskInput workflowTaskInput, String modelRestoreParty) {
+    private String createAlgorithmCodeExtraParams(String calculateContractStruct, List<WorkflowTaskVariable> variableList, Boolean usePsi, WorkflowTaskInput workflowTaskInput, String modelRestoreParty, Algorithm algorithm) {
         JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
         //是否使用psi
         if(algorithmDynamicParams.containsKey("use_psi")){
@@ -1110,33 +1105,32 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
         if(algorithmDynamicParams.containsKey("hyperparams")){
             JSONObject hyperParams = algorithmDynamicParams.getJSONObject("hyperparams");
-            variableList.forEach(item -> {
-                hyperParams.put(item.getVarKey(), convert2HyperParams(item));
-            });
+            Map<String, AlgorithmVariableTypeEnum> variableTypeEnumMap = algorithm.getAlgorithmVariableList().stream().collect(Collectors.toMap(AlgorithmVariable::getVarKey, AlgorithmVariable::getVarType));
+            variableList.forEach(workflowTaskVariable -> hyperParams.put(workflowTaskVariable.getVarKey(), convert2HyperParams(workflowTaskVariable, variableTypeEnumMap)));
         }
         return algorithmDynamicParams.toJSONString();
     }
 
-    private Object convert2HyperParams(WorkflowTaskVariable item) {
-        switch (item.getVarType()) {
+    private Object convert2HyperParams(WorkflowTaskVariable workflowTaskVariable, Map<String, AlgorithmVariableTypeEnum> variableTypeEnumMap) {
+        switch (variableTypeEnumMap.get(workflowTaskVariable.getVarKey())) {
             case BOOLEAN:
-                return Boolean.valueOf(item.getVarValue());
+                return Boolean.valueOf(workflowTaskVariable.getVarValue());
             case NUMBER:
-                return new BigDecimal(item.getVarValue());
+                return new BigDecimal(workflowTaskVariable.getVarValue());
             case NUMBER_ARRAY:
                 JSONArray numberResult = new JSONArray();
-                Arrays.stream(item.getVarValue().split(",")).forEach(value -> {
+                Arrays.stream(workflowTaskVariable.getVarValue().split(",")).forEach(value -> {
                     numberResult.add(new BigDecimal(value));
                 });
                 return numberResult;
             case STRING_ARRAY:
                 JSONArray stringResult = new JSONArray();
-                Arrays.stream(item.getVarValue().split(",")).forEach(value -> {
+                Arrays.stream(workflowTaskVariable.getVarValue().split(",")).forEach(value -> {
                     stringResult.add(value);
                 });
                 return stringResult;
             default:
-                return item.getVarValue();
+                return workflowTaskVariable.getVarValue();
         }
     }
 
@@ -1319,8 +1313,6 @@ public class WorkflowServiceImpl implements WorkflowService {
     private List<WorkflowTask> listExecutableDetailsByWorkflowVersion(Long workflowId, Long workflowVersion){
         List<WorkflowTask> workflowTaskList = workflowTaskManager.listExecutableByWorkflowVersion(workflowId, workflowVersion);
         workflowTaskList.stream().forEach(item ->{
-            // 设置 code
-            item.setCode(workflowTaskCodeManager.getById(item.getWorkflowTaskId()));
             // 设置 input
             item.setInputList(workflowTaskInputManager.listByWorkflowTaskId(item.getWorkflowTaskId()));
             // 设置 output
@@ -1330,7 +1322,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             // 设置 variable
             item.setVariableList(workflowTaskVariableManager.listByWorkflowTaskId(item.getWorkflowTaskId()));
             // 设置 算法
-            item.setAlgorithm(algService.getAlg(item.getAlgorithmId(), false));
+            item.setAlgorithm(algService.getAlg(item.getAlgorithmId(), true));
             // 设置 发起组织
             item.setOrg(orgService.getOrgById(item.getIdentityId()));
             // 设置 input 组织

@@ -223,6 +223,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         JSONObject trainingAndPredictionResource =  request.getJSONObject("trainingAndPredictionResource");
         trainingAndPredictionResource.put("training", createResource(2,4,2048,6,6));
         trainingAndPredictionResource.put("prediction", createResource(4,8,2048,6,6));
+        System.out.println(request.toJSONString());
         System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
     }
 

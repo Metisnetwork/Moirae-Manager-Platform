@@ -104,8 +104,6 @@ public class WorkflowTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @TableField(exist = false)
-    private WorkflowTaskCode code;
-    @TableField(exist = false)
     private List<WorkflowTaskInput> inputList;
     @TableField(exist = false)
     private List<WorkflowTaskOutput> outputList;
