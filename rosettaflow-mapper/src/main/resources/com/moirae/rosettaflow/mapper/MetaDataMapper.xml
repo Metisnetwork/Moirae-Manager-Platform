@@ -89,6 +89,9 @@
                  inner join mo_token_holder mth on mt.address = mth.token_address and mth.address = #{address}
         where dmd.status = 2
           and mt.is_add_liquidity = 1
+          <if test="identityId != null and identityId != ''">
+            and dmd.identity_id = #{identityId}
+          </if>
         order by mth.balance desc
     </select>
     <select id="countOfData" resultType="java.lang.Integer">

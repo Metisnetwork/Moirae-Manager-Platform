@@ -60,7 +60,7 @@ public interface DataService {
      * @param size
      * @return
      */
-    IPage<MetaData> getUserDataList(Long current, Long size);
+    IPage<MetaData> getUserDataList(Long current, Long size,  String identityId);
 
     void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList);
 

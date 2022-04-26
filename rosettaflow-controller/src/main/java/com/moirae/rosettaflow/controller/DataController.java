@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.Model;
 import com.moirae.rosettaflow.req.CommonPageReq;
 import com.moirae.rosettaflow.req.data.GetDataDetailsReq;
+import com.moirae.rosettaflow.req.data.GetDataListByIdentityIdReq;
 import com.moirae.rosettaflow.req.data.GetDataListReq;
 import com.moirae.rosettaflow.req.model.GetUserModelListReq;
 import com.moirae.rosettaflow.req.org.OrgIdPageReq;
@@ -75,8 +76,8 @@ public class DataController {
 
     @GetMapping("getUserDataList")
     @ApiOperation(value = "查询用户的数据列表", notes = "查询用户的数据列表(存在余额的)")
-    public ResponseVo<PageVo<UserDataVo>> getUserDataList(@Valid CommonPageReq req) {
-        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize());
+    public ResponseVo<PageVo<UserDataVo>> getUserDataList(@Valid GetDataListByIdentityIdReq req) {
+        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize(), req.getIdentityId());
         List<UserDataVo> itemList = BeanUtil.copyToList(page.getRecords(), UserDataVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }

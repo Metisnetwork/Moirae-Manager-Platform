@@ -16,7 +16,7 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
 
     MetaData getDataDetails(String metaDataId);
 
-    IPage<MetaData> getUserDataList(Page<MetaData> page, String address);
+    IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId);
 
     int countOfData();
 

@@ -70,9 +70,9 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public IPage<MetaData> getUserDataList(Long current, Long size) {
+    public IPage<MetaData> getUserDataList(Long current, Long size, String identityId) {
         Page<MetaData> page = new Page<>(current, size);
-        return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress());
+        return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress(), identityId);
     }
 
     @Override

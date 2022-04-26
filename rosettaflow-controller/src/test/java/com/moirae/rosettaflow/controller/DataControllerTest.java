@@ -27,6 +27,7 @@ public class DataControllerTest extends BaseControllerTest {
 
     @Test
     public void getUserDataList() throws Exception {
+        pageParameters.add("identityId", "identity:17c9cc15b6a14f858a96a633c3486f3d");
         System.out.println("result = "  + commonGetWithToken("/data/getUserDataList", pageParameters));
     }
 

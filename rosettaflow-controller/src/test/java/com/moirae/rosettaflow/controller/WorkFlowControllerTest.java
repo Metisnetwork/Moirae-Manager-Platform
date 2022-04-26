@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.mapper.domain.AlgorithmClassify;
@@ -7,6 +8,7 @@ import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.service.AlgService;
 import com.moirae.rosettaflow.service.utils.TreeUtils;
+import io.swagger.annotations.ApiModelProperty;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotBlank;
 import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -266,7 +269,9 @@ public class WorkFlowControllerTest extends BaseControllerTest{
                 "metadata:0x3b4938ff6df23161f7ba77a798b9348ec757b37fb272f2cdc6a0b5998853ffd6",
                 1, null, null));
         psiInput.put("item", itemList);
-        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
+
+        System.out.println(response.toJSONString());
+//        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
     }
 
     @Test
@@ -402,6 +407,19 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         System.out.println("result = "  + preparationStart(7L, 1L));
     }
 
+    @Test
+    public void start()throws Exception{
+        JSONObject req = new JSONObject();
+        req.put("workflowId", 7);
+        req.put("workflowVersion", 1);
+        req.put("sign", getWorkflowJson("xx"));
+        System.out.println("result = "  + commonPostWithToken("/workflow/start", req.toJSONString()));
+    }
+
+    private String getWorkflowJson(String nonce){
+        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
+        return StrUtil.format(json, nonce);
+    }
 
     private String preparationStart(Long workflowId, Long workflowVersion)throws Exception{
         emptyParameters.add("workflowId", String.valueOf(workflowId));

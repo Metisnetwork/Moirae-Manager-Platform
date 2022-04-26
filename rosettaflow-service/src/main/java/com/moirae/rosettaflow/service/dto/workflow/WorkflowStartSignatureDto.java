@@ -12,10 +12,6 @@ import javax.validation.constraints.NotBlank;
 @ApiModel
 public class WorkflowStartSignatureDto extends WorkflowVersionKeyDto {
 
-    @ApiModelProperty(value = "用户钱包地址", required = true)
-    @NotBlank(message = "{user.address.notBlank}")
-    private String address;
-
     @ApiModelProperty(value = "发起任务的账户的签名", required = true)
     @NotBlank(message = "{user.sign.notBlank}")
     private String sign;

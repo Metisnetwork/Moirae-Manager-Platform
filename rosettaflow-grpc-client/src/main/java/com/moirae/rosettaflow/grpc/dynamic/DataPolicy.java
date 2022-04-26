@@ -5,10 +5,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DataPolicy1 {
+public class DataPolicy {
     private String partyId;
     private String metadataId;
     private String metadataName;
-    private Integer keyColumn;
+    private Long keyColumn;
     private List<Integer> selectedColumns;
 }
