@@ -6,6 +6,7 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.MetaDataFileTypeEnum;
 import com.moirae.rosettaflow.service.dto.data.MetisLatInfoDto;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -107,4 +108,6 @@ public interface DataService {
     List<MetaData> listDataByIds(Set<String> metaDataIds);
 
     List<Token> listTokenByIds(Collection<String> tokenIds);
+
+    MetaDataColumn getDataColumByIds(String metaDataId, int columnIndex);
 }

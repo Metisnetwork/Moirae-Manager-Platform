@@ -247,4 +247,9 @@ public class DataServiceImpl implements DataService {
     public List<Token> listTokenByIds(Collection<String> tokenIds) {
         return tokenManager.listByIds(tokenIds);
     }
+
+    @Override
+    public MetaDataColumn getDataColumByIds(String metaDataId, int columnIndex) {
+        return  metaDataColumnManager.getById(metaDataId, columnIndex);
+    }
 }

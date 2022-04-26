@@ -8,4 +8,6 @@ import java.util.List;
 public interface MetaDataColumnManager extends IService<MetaDataColumn> {
 
     List<MetaDataColumn> getList(String metaDataId);
+
+    MetaDataColumn getById(String metaDataId, int columnIndex);
 }

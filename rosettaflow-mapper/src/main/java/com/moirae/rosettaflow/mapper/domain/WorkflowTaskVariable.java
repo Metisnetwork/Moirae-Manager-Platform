@@ -2,6 +2,7 @@ package com.moirae.rosettaflow.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.AlgorithmVariableTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,6 +30,11 @@ public class WorkflowTaskVariable implements Serializable {
      * 变量key
      */
     private String varKey;
+
+    /**
+     * 变量类型
+     */
+    private AlgorithmVariableTypeEnum varType;
 
     /**
      * 变量值

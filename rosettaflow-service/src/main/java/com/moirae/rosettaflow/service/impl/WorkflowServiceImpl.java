@@ -21,8 +21,10 @@ import com.moirae.rosettaflow.grpc.service.types.TaskResourceCostDeclare;
 import com.moirae.rosettaflow.grpc.service.types.UserType;
 import com.moirae.rosettaflow.manager.*;
 import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.mapper.enums.*;
+import com.moirae.rosettaflow.mapper.enums.CalculationProcessTypeEnum;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
+import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
+import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import com.moirae.rosettaflow.service.*;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
@@ -1028,11 +1030,12 @@ public class WorkflowServiceImpl implements WorkflowService {
             requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
         }
         // 设置模型输入组织
+        String modelPartyId = null;
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
-            String partyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
-            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), partyId));
+            modelPartyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
+            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), modelPartyId));
             requestBuild.addDataPolicyTypes(1);
-            requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), partyId));
+            requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
         }
         // 设置psi输入组织
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
@@ -1077,20 +1080,65 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         requestBuild.setAlgorithmCode(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractCode());
         requestBuild.setMetaAlgorithmId("");
-        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractStruct(), curWorkflowRunTaskStatus.getWorkflowTask().getVariableList()));
-
+        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(curWorkflowRunTaskStatus.getWorkflowTask().getCode().getCalculateContractStruct(),
+                curWorkflowRunTaskStatus.getWorkflowTask().getVariableList(), curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi(),
+                curWorkflowRunTaskStatus.getWorkflowTask().getInputList().stream().filter(item -> item.getDependentVariable() != null && item.getDependentVariable() > 0
+                ).findFirst().get(), modelPartyId));
 
         requestBuild.setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()));
         requestBuild.setDesc("");
         return requestBuild.build();
     }
 
-    private String createAlgorithmCodeExtraParams(String calculateContractStruct, List<WorkflowTaskVariable> variableList) {
-        //TODO
-
-        return "";
+    private String createAlgorithmCodeExtraParams(String calculateContractStruct, List<WorkflowTaskVariable> variableList, Boolean usePsi, WorkflowTaskInput workflowTaskInput, String modelRestoreParty) {
+        JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
+        //是否使用psi
+        if(algorithmDynamicParams.containsKey("use_psi")){
+            algorithmDynamicParams.put("use_psi", usePsi);
+        }
+        //标签所在方的party_id
+        if(algorithmDynamicParams.containsKey("label_owner")){
+            algorithmDynamicParams.put("label_owner", workflowTaskInput.getPartyId());
+        }
+        // 因变量(标签)
+        if(algorithmDynamicParams.containsKey("label_column")){
+            algorithmDynamicParams.put("label_column", dataService.getDataColumByIds(workflowTaskInput.getMetaDataId(), workflowTaskInput.getDependentVariable().intValue()).getColumnName());
+        }
+        // 模型所在方
+        if(algorithmDynamicParams.containsKey("model_restore_party")){
+            algorithmDynamicParams.put("model_restore_party", modelRestoreParty);
+        }
+        if(algorithmDynamicParams.containsKey("hyperparams")){
+            JSONObject hyperParams = algorithmDynamicParams.getJSONObject("hyperparams");
+            variableList.forEach(item -> {
+                hyperParams.put(item.getVarKey(), convert2HyperParams(item));
+            });
+        }
+        return algorithmDynamicParams.toJSONString();
     }
 
+    private Object convert2HyperParams(WorkflowTaskVariable item) {
+        switch (item.getVarType()) {
+            case BOOLEAN:
+                return Boolean.valueOf(item.getVarValue());
+            case NUMBER:
+                return new BigDecimal(item.getVarValue());
+            case NUMBER_ARRAY:
+                JSONArray numberResult = new JSONArray();
+                Arrays.stream(item.getVarValue().split(",")).forEach(value -> {
+                    numberResult.add(new BigDecimal(value));
+                });
+                return numberResult;
+            case STRING_ARRAY:
+                JSONArray stringResult = new JSONArray();
+                Arrays.stream(item.getVarValue().split(",")).forEach(value -> {
+                    stringResult.add(value);
+                });
+                return stringResult;
+            default:
+                return item.getVarValue();
+        }
+    }
 
     private String createDataPolicyItem(Psi psi, String partyId) {
         DataPolicy dataPolicy = new DataPolicy();
@@ -1376,3 +1424,5 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflowTaskOutputList;
     }
 }
+
+
