@@ -87,8 +87,6 @@ public interface DataService {
 
     Token getMetisToken();
 
-    List<Token> listTokenByMetaDataIds(Set<String> metaDataIds);
-
     TokenHolder getTokenHolderById(String tokenAddress, String userAddress);
 
     Model getModelByOrgAndTrainTaskId(String identity, String taskId);

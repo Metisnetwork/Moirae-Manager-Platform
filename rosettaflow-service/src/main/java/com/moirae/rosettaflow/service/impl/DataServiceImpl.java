@@ -173,21 +173,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Token> listTokenByMetaDataIds(Set<String> metaDataIds) {
-        List<String> tokenIdList = metaDataManager.listByIds(metaDataIds)
-                .stream()
-                .filter(item -> StringUtils.isNotBlank(item.getTokenAddress()))
-                .map(MetaData::getTokenAddress)
-                .collect(Collectors.toList());
-
-        if(tokenIdList.size() > 0){
-            return tokenManager.listByIds(tokenIdList);
-        }else{
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
     public TokenHolder getTokenHolderById(String tokenAddress, String userAddress) {
         return tokenHolderManager.getById(tokenAddress, userAddress);
     }

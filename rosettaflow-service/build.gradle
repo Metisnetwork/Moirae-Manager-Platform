@@ -9,4 +9,5 @@ bootJar {
 dependencies {
     api project(':rosettaflow-manager')
     api project(':rosettaflow-chain-platon')
+    api 'com.zengtengpeng:redisson-spring-boot-starter:1.0.8'
 }

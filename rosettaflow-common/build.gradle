@@ -7,10 +7,5 @@ bootJar {
 }
 
 dependencies {
-    api group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
-    api 'com.zengtengpeng:redisson-spring-boot-starter:1.0.8'
-    api 'org.apache.commons:commons-pool2:2.10.0'
-    api 'cn.hutool:hutool-all:5.7.15'
-    api 'com.google.guava:guava:31.0.1-jre'
-    api "com.platon.sdk:core:1.1.0.0"
+
 }

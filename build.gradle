@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.6' apply(false)
+    id 'org.springframework.boot' version "$springbootVersion" apply(false)
     id 'io.spring.dependency-management' version '1.0.11.RELEASE' apply(false)
     id 'java'
 }
@@ -54,20 +54,23 @@ subprojects {
     }
 
     dependencies {
-        implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.75'
-        implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+        implementation 'com.alibaba:fastjson:1.2.75'
+        implementation 'com.google.guava:guava:31.0.1-jre'
+        implementation "org.springframework.boot:spring-boot-starter"
         implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'com.zaxxer:HikariCP:3.4.5'
+        implementation 'com.github.xiaoymin:knife4j-spring-boot-starter:3.0.3'
+        implementation 'io.springfox:springfox-boot-starter:3.0.0'
+        implementation 'org.web3j:core:4.8.7'
+        implementation "com.platon.sdk:core:1.1.0.0"
+        implementation 'cn.hutool:hutool-all:5.7.15'
+
         runtimeOnly 'mysql:mysql-connector-java:8.0.25'
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
         annotationProcessor 'org.projectlombok:lombok'
-        implementation 'com.github.xiaoymin:knife4j-spring-boot-starter:3.0.3'
-        implementation 'io.springfox:springfox-boot-starter:3.0.0'
-        implementation 'org.web3j:core:4.8.7'
         testImplementation('org.springframework.boot:spring-boot-starter-test') {
             exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         }
-        implementation 'cn.smallbun.screw:screw-core:1.0.5'
-        implementation 'com.zaxxer:HikariCP:3.4.5'
     }
 }

@@ -451,6 +451,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         calculationProcessStepDto.setStep(wizard.getStep());
         calculationProcessStepDto.setType(wizard.getCalculationProcessStepType());
         result.setCalculationProcessStep(calculationProcessStepDto);
+        result.setWorkflowName(workflow.getWorkflowName());
+        result.setWorkflowDesc(workflow.getWorkflowDesc());
+        result.setIsSettingCompleted(workflow.getIsSettingCompleted());
+        result.setCompletedCalculationProcessStep(workflow.getCalculationProcessStep());
+
         switch(wizard.getCalculationProcessStepType()){
             case INPUT_TRAINING:
                 result.setTrainingInput(getTrainingInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));

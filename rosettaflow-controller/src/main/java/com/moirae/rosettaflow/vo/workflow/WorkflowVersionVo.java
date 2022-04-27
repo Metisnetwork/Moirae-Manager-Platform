@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@ApiModel(value = "工作流列表响应对象")
+@ApiModel(value = "工作流版本列表响应对象")
 public class WorkflowVersionVo {
 
     @ApiModelProperty(value = "工作流ID")

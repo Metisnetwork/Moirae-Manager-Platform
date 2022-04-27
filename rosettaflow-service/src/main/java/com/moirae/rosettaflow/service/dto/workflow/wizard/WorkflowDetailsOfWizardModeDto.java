@@ -21,6 +21,18 @@ public class WorkflowDetailsOfWizardModeDto {
     @ApiModelProperty(value = "工作流最新版本号")
     private Long workflowVersion;
 
+    @ApiModelProperty(value = "工作流名称")
+    private String workflowName;
+
+    @ApiModelProperty(value = "工作流描述")
+    private String workflowDesc;
+
+    @ApiModelProperty(value = "计算流程的已完成的步骤，如果还未设置返回0")
+    private Integer completedCalculationProcessStep;
+
+    @ApiModelProperty(value = "是否设置完成:  0-否  1-是")
+    private Boolean isSettingCompleted;
+
     @ApiModelProperty(value = "工作流算法id")
     private Long algorithmId;
 

@@ -8,5 +8,4 @@ bootJar {
 
 dependencies {
     api group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.3.1'
-
 }

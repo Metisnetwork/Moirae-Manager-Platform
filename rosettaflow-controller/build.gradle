@@ -32,9 +32,7 @@ distZip.dependsOn(bootJar)
 
 dependencies {
     api project(':rosettaflow-quartz')
-
-    implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.0'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
-    runtimeOnly 'mysql:mysql-connector-java:8.0.25'
-    implementation 'org.springframework.boot:spring-boot-starter-aop:2.5.6'
+    implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.0"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
 }
