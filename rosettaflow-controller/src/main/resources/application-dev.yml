@@ -19,6 +19,10 @@ spring:
       pool:
         size: 10
       thread-name-prefix: Moirae-Task-
+  cache:
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=10s
+    type: caffeine
 
 mybatis-plus:
   configuration:
@@ -72,3 +76,4 @@ chain:
     rpcUrl: https://devnetopenapi.platon.network/rpc
     symbol: LAT
     blockExplorerUrl: https://devnetscan.platon.network/
+

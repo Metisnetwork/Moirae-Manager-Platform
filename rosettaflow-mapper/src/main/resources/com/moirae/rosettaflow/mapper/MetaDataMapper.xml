@@ -94,11 +94,6 @@
           </if>
         order by mth.balance desc
     </select>
-    <select id="countOfData" resultType="java.lang.Integer">
-        select count(1)
-        from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address
-        where  mt.is_add_liquidity = 1 and dmd.status = 2
-    </select>
     <select id="sizeOfData" resultType="java.lang.Long">
         select sum(dmd.size)
         from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address

@@ -18,8 +18,6 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
 
     IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId);
 
-    int countOfData();
-
     long sizeOfData();
 
     MetaData statisticsOfGlobal();

@@ -45,29 +45,30 @@ public class DataServiceImpl implements DataService {
     @Resource
     private StatsTokenManager statsTokenManager;
 
-
     @Override
-    public int countOfData() {
-        return metaDataManager.countOfData();
+    public MetaData statisticsOfGlobal() {
+        return metaDataManager.statisticsOfGlobal();
     }
 
     @Override
-    public IPage<MetaData> getDataListByOrg(Long current, Long size, String identityId) {
+    public IPage<MetaData> listMetaDataByOrg(Long current, Long size, String identityId) {
         Page<MetaData> page = new Page<>(current, size);
         return metaDataManager.getDataListByOrg(page, identityId);
     }
 
     @Override
-    public IPage<MetaData> getDataList(Long current, Long size, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy) {
+    public IPage<MetaData> listMetaDataByCondition(Long current, Long size, String keyword, String industry, MetaDataFileTypeEnum fileType, Long minSize, Long maxSize, DataOrderByEnum orderBy) {
         Page<MetaData> page = new Page<>(current, size);
         return metaDataManager.getDataList(page, keyword, industry, fileType.getValue(), minSize, maxSize, orderBy.getSqlValue());
     }
 
     @Override
-    public MetaData getDataDetails(String metaDataId) {
+    public MetaData getMetaDataById(String metaDataId, boolean isNeedDetails) {
         MetaData metaData = metaDataManager.getDataDetails(metaDataId);
-        List<MetaDataColumn> columnList = metaDataColumnManager.getList(metaDataId);
-        metaData.setColumnsList(columnList);
+        if(isNeedDetails){
+            List<MetaDataColumn> columnList = metaDataColumnManager.getList(metaDataId);
+            metaData.setColumnsList(columnList);
+        }
         return metaData;
     }
 
@@ -76,22 +77,6 @@ public class DataServiceImpl implements DataService {
         Page<MetaData> page = new Page<>(current, size);
         return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress(), identityId);
     }
-
-    @Override
-    @Transactional
-    public void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList) {
-        metaDataManager.saveOrUpdateBatch(metaDataList);
-        LambdaQueryWrapper<MetaDataColumn> wrapper = Wrappers.lambdaQuery();
-        wrapper.in(MetaDataColumn::getMetaDataId, metaDataList.stream().map(MetaData::getMetaDataId).collect(Collectors.toSet()));
-        metaDataColumnManager.remove(wrapper);
-        metaDataColumnManager.saveBatch(metaDataColumnList);
-        for (Token token: tokenList) {
-            if(tokenManager.getById(token.getAddress()) == null){
-                tokenManager.save(token);
-            }
-        }
-    }
-
 
     @Override
     public Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataId) {
@@ -112,35 +97,133 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Token> getNeedSyncedTokenList(int size) {
-        return tokenManager.getNeedSyncedTokenList(size);
+    public List<MetaData> listMetaDataByIds(Set<String> metaDataIdList) {
+        return metaDataManager.listByIds(metaDataIdList);
     }
 
     @Override
-    public boolean updateToken(Token token) {
-        return tokenManager.updateById(token);
+    public List<MetaData> listMetaDataByTokenAddress(String tokenAddress) {
+        return metaDataManager.listDataByTokenAddress(tokenAddress);
     }
 
     @Override
-    public List<String> getTokenIdList() {
+    public MetaDataColumn getDataColumnByIds(String metaDataId, int columnIndex) {
+        return metaDataColumnManager.getById(metaDataId, columnIndex);
+    }
+
+    @Override
+    public List<String> listTokenId() {
         return tokenManager.getTokenIdList();
     }
 
     @Override
+    public List<Token> listTokenByIds(Collection<String> tokenIdList) {
+        return tokenManager.listByIds(tokenIdList);
+    }
+
+    @Override
+    public List<Token> listTokenByNeedSyncedInfo(int size) {
+        return tokenManager.getNeedSyncedTokenList(size);
+    }
+
+    @Override
+    public Token getTokenById(String tokenAddress) {
+        return tokenManager.getById(tokenAddress);
+    }
+
+    @Override
+    public Token getMetisToken() {
+        return getTokenById(uniswapV2FactoryContract.WETH());
+    }
+
+    @Override
+    public boolean saveToken(Token token) {
+        return tokenManager.save(token);
+    }
+
+    @Override
+    public boolean updateTokenById(Token token) {
+        return tokenManager.updateById(token);
+    }
+
+    @Override
+    public TokenHolder getTokenHolderById(String tokenAddress, String userAddress) {
+        return tokenHolderManager.getById(tokenAddress, userAddress);
+    }
+
+    @Override
     @Transactional
-    public boolean batchInsertOrUpdateTokenHolder(String address, List<TokenHolder> tokenHolderList) {
+    public boolean saveOrUpdateBatchTokenHolder(String address, List<TokenHolder> tokenHolderList) {
         return tokenHolderManager.batchInsertOrUpdateByUser(address, tokenHolderList);
     }
 
     @Override
-    public List<Model> queryAvailableModel(Long algorithmId, String identityId) {
+    public boolean saveOrUpdateBatchStatsToken(List<StatsToken> saveList) {
+        return statsTokenManager.saveOrUpdateBatch(saveList);
+    }
+
+    @Override
+    public List<Model> listModelByUser(Long algorithmId, String identityId) {
         User user = UserContext.getCurrentUser();
         return modelManager.queryAvailableModel(user.getAddress(), algorithmId, identityId);
     }
 
     @Override
+    public List<Model> listModelOfLatest(Integer size) {
+        List<Model> modelList = modelManager.listOfLatest(size);
+        if(modelList.size() == 0){
+            return modelList;
+        }
+
+        List<AlgorithmClassify> algorithmClassifyList = algService.listAlgorithmClassifyByIds(modelList.stream().map(Model::getTrainAlgorithmId).collect(Collectors.toSet()));
+        List<AlgorithmClassify> parentAlgorithmClassifyList = algService.listAlgorithmClassifyByIds(algorithmClassifyList.stream().map(AlgorithmClassify::getParentId).collect(Collectors.toSet()));
+        Map<Long, AlgorithmClassify>  algorithmClassifyMap = algorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
+        Map<Long, AlgorithmClassify>  parentAlgorithmClassifyMap = parentAlgorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
+        for (Model model : modelList) {
+            model.setAlgorithmName(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getName());
+            model.setAlgorithmNameEn(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getNameEn());
+        }
+        return modelList;
+    }
+
+    @Override
     public Model getModelById(String modelId) {
         return modelManager.getById(modelId);
+    }
+
+    @Override
+    public Model getModelByOrgAndTrainTaskId(String identity, String taskId){
+        return modelManager.getModelByOrgAndTrainTaskId(identity, taskId);
+    }
+
+    @Override
+    public boolean saveBatchModel(List<Model> modelList) {
+        return modelManager.saveBatch(modelList);
+    }
+
+    @Override
+    public List<Psi> listPsiByTrainTaskId(String taskId) {
+        return psiManager.listByTrainTaskId(taskId);
+    }
+
+    @Override
+    public boolean saveBatchPsi(List<Psi> psiList) {
+        return psiManager.saveBatch(psiList);
+    }
+
+    @Override
+    @Transactional
+    public void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList) {
+        metaDataManager.saveOrUpdateBatch(metaDataList);
+        LambdaQueryWrapper<MetaDataColumn> wrapper = Wrappers.lambdaQuery();
+        wrapper.in(MetaDataColumn::getMetaDataId, metaDataList.stream().map(MetaData::getMetaDataId).collect(Collectors.toSet()));
+        metaDataColumnManager.remove(wrapper);
+        metaDataColumnManager.saveBatch(metaDataColumnList);
+        for (Token token: tokenList) {
+            if(tokenManager.getById(token.getAddress()) == null){
+                tokenManager.save(token);
+            }
+        }
     }
 
     @Override
@@ -155,98 +238,5 @@ public class DataServiceImpl implements DataService {
         result.setTokenBalance(tokenHolder.getBalance());
         result.setAuthorizeBalance(tokenHolder.getAuthorizeBalance());
         return result;
-    }
-
-    @Override
-    public boolean saveToken(Token token) {
-       return tokenManager.save(token);
-    }
-
-    @Override
-    public Token getTokenById(String tokenAddress) {
-        return tokenManager.getById(tokenAddress);
-    }
-
-    @Override
-    public Token getMetisToken() {
-        return getTokenById(uniswapV2FactoryContract.WETH());
-    }
-
-    @Override
-    public TokenHolder getTokenHolderById(String tokenAddress, String userAddress) {
-        return tokenHolderManager.getById(tokenAddress, userAddress);
-    }
-
-    @Override
-    public Model getModelByOrgAndTrainTaskId(String identity, String taskId){
-        return modelManager.getModelByOrgAndTrainTaskId(identity, taskId);
-    }
-
-    @Override
-    public List<Psi> listPsiByTrainTaskId(String taskId) {
-        return psiManager.listByTrainTaskId(taskId);
-    }
-
-    @Override
-    public MetaData getDataById(String metaDataId) {
-        return metaDataManager.getById(metaDataId);
-    }
-
-    @Override
-    public boolean saveBatchPsi(List<Psi> psiList) {
-        return psiManager.saveBatch(psiList);
-    }
-
-    @Override
-    public boolean saveBatchModel(List<Model> modelList) {
-        return modelManager.saveBatch(modelList);
-    }
-
-    @Override
-    public List<Model> listModelOfLatest(Integer size) {
-        List<Model> modelList = modelManager.listOfLatest(size);
-        if(modelList.size() == 0){
-            return modelList;
-        }
-
-        List<AlgorithmClassify> algorithmClassifyList = algService.listAlglassifyByIds(modelList.stream().map(Model::getTrainAlgorithmId).collect(Collectors.toSet()));
-        List<AlgorithmClassify> parentAlgorithmClassifyList = algService.listAlglassifyByIds(algorithmClassifyList.stream().map(AlgorithmClassify::getParentId).collect(Collectors.toSet()));
-        Map<Long, AlgorithmClassify>  algorithmClassifyMap = algorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
-        Map<Long, AlgorithmClassify>  parentAlgorithmClassifyMap = parentAlgorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
-        for (Model model : modelList) {
-            model.setAlgorithmName(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getName());
-            model.setAlgorithmNameEn(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getNameEn());
-        }
-        return modelList;
-    }
-
-    @Override
-    public MetaData statisticsOfGlobal() {
-        return metaDataManager.statisticsOfGlobal();
-    }
-
-    @Override
-    public List<MetaData> listDataByIds(Set<String> keySet) {
-        return metaDataManager.listByIds(keySet);
-    }
-
-    @Override
-    public List<Token> listTokenByIds(Collection<String> tokenIds) {
-        return tokenManager.listByIds(tokenIds);
-    }
-
-    @Override
-    public MetaDataColumn getDataColumByIds(String metaDataId, int columnIndex) {
-        return metaDataColumnManager.getById(metaDataId, columnIndex);
-    }
-
-    @Override
-    public List<MetaData> listDataByTokenAddress(String tokenAddress) {
-        return metaDataManager.listDataByTokenAddress(tokenAddress);
-    }
-
-    @Override
-    public boolean batchInsertOrUpdateStatsToken(List<StatsToken> saveList) {
-        return statsTokenManager.saveOrUpdateBatch(saveList);
     }
 }

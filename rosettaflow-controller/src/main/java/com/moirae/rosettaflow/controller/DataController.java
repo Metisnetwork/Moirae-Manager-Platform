@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.MetaData;
 import com.moirae.rosettaflow.mapper.domain.Model;
-import com.moirae.rosettaflow.req.CommonPageReq;
 import com.moirae.rosettaflow.req.data.GetDataDetailsReq;
 import com.moirae.rosettaflow.req.data.GetDataListByIdentityIdReq;
 import com.moirae.rosettaflow.req.data.GetDataListReq;
@@ -45,7 +44,7 @@ public class DataController {
     @GetMapping("getDataStats")
     @ApiOperation(value = "查询数据统计", notes = "查询数据统计")
     public ResponseVo<DataStatsVo> getDataStats() {
-        int dataCount = dataService.countOfData();
+        int dataCount = dataService.statisticsOfGlobal().getTotalCount();
         DataStatsVo dataStatsVo = new DataStatsVo();
         dataStatsVo.setDataCount(dataCount);
         return ResponseVo.createSuccess(dataStatsVo);
@@ -54,7 +53,7 @@ public class DataController {
     @GetMapping("getDataListByOrg")
     @ApiOperation(value = "查询数据列表通过组织id", notes = "查询数据列表通过组织id")
     public ResponseVo<PageVo<DataVo>> getDataListByOrg(@Valid OrgIdPageReq req) {
-        IPage<MetaData> page = dataService.getDataListByOrg(req.getCurrent(), req.getSize(), req.getIdentityId());
+        IPage<MetaData> page = dataService.listMetaDataByOrg(req.getCurrent(), req.getSize(), req.getIdentityId());
         List<DataVo> itemList = BeanUtil.copyToList(page.getRecords(), DataVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
@@ -62,7 +61,7 @@ public class DataController {
     @GetMapping("getDataList")
     @ApiOperation(value = "查询数据列表", notes = "查询数据列表")
     public ResponseVo<PageVo<DataVo>> getDataList(@Valid GetDataListReq req) {
-        IPage<MetaData> page = dataService.getDataList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getIndustry(), req.getFileType(), req.getMinSize(), req.getMaxSize(), req.getOrderBy());
+        IPage<MetaData> page = dataService.listMetaDataByCondition(req.getCurrent(), req.getSize(), req.getKeyword(), req.getIndustry(), req.getFileType(), req.getMinSize(), req.getMaxSize(), req.getOrderBy());
         List<DataVo> itemList = BeanUtil.copyToList(page.getRecords(), DataVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
@@ -70,7 +69,7 @@ public class DataController {
     @GetMapping("getDataDetails")
     @ApiOperation(value = "查询数据详情", notes = "查询数据详情")
     public ResponseVo<DataDetailsVo> getDataDetails(@Valid GetDataDetailsReq req) {
-        MetaData data = dataService.getDataDetails(req.getMetaDataId());
+        MetaData data = dataService.getMetaDataById(req.getMetaDataId(), true);
         return ResponseVo.createSuccess(BeanUtil.copyProperties(data, DataDetailsVo.class));
     }
 
@@ -92,7 +91,7 @@ public class DataController {
     @GetMapping("getUserModelList")
     @ApiOperation(value = "查询当前用户的模型列表", notes = "查询当前用户的模型列表")
     public ResponseVo<List<ModelVo>> getUserModelList(@Valid GetUserModelListReq req) {
-        List<Model> list =  dataService.queryAvailableModel(req.getAlgorithmId(), req.getIdentityId());
+        List<Model> list =  dataService.listModelByUser(req.getAlgorithmId(), req.getIdentityId());
         return ResponseVo.createSuccess(BeanUtil.copyToList(list, ModelVo.class));
     }
 }

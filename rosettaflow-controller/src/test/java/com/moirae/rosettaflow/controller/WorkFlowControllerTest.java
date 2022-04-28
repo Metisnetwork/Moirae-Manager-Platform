@@ -5,10 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.mapper.domain.AlgorithmClassify;
 import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
-import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.service.AlgService;
 import com.moirae.rosettaflow.service.utils.TreeUtils;
-import io.swagger.annotations.ApiModelProperty;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +19,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
 import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -319,7 +316,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void settingWorkflowOfExpertModeCase1Step1() throws Exception {
-        AlgorithmClassify root = algService.getAlgTree(true);
+        AlgorithmClassify root = algService.getAlgorithmClassifyTree(true);
         String responseStr = getWorkflowSettingOfExpertMode(5L, 1L);
         JSONObject response = JSONObject.parseObject(responseStr);
         JSONObject request = response.getJSONObject("data");
@@ -343,7 +340,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void settingWorkflowOfExpertModeCase2Step1() throws Exception {
-        AlgorithmClassify root = algService.getAlgTree(true);
+        AlgorithmClassify root = algService.getAlgorithmClassifyTree(true);
         String responseStr = getWorkflowSettingOfExpertMode(6L, 1L);
         JSONObject response = JSONObject.parseObject(responseStr);
         JSONObject request = response.getJSONObject("data");
@@ -367,7 +364,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void settingWorkflowOfExpertModeCase7Step1() throws Exception {
-        AlgorithmClassify root = algService.getAlgTree(true);
+        AlgorithmClassify root = algService.getAlgorithmClassifyTree(true);
         String responseStr = getWorkflowSettingOfExpertMode(7L, 1L);
         JSONObject response = JSONObject.parseObject(responseStr);
         JSONObject request = response.getJSONObject("data");
@@ -427,6 +424,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         emptyParameters.add("workflowVersion", String.valueOf(workflowVersion));
         return commonGetWithToken("/workflow/preparationStart", emptyParameters);
     }
+
 
 
     private String getWorkflowResultOfExpertMode(Long workflowId, Long workflowVersion, Integer nodeStep)throws Exception{

@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.moirae.rosettaflow.mapper.domain.AlgorithmClassify;
 import com.moirae.rosettaflow.service.AlgService;
 import com.moirae.rosettaflow.service.dto.alg.AlgTreeDto;
 import com.moirae.rosettaflow.vo.ResponseVo;
@@ -25,14 +27,14 @@ public class AlgController {
     @GetMapping("getAlgTree")
     @ApiOperation(value = "查询算法树", notes = "查询算法树")
     public ResponseVo<AlgTreeDto> getAlgTree() {
-        AlgTreeDto resp = algService.getAlgTreeDto(false);
-        return ResponseVo.createSuccess(resp);
+        AlgorithmClassify algorithmClassify = algService.getAlgorithmClassifyTree(false);
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmClassify, AlgTreeDto.class));
     }
 
     @GetMapping("getAlgTreeDetails")
     @ApiOperation(value = "查询算法树详情", notes = "查询算法树详情（包含算法代码及变量设置）")
-    public ResponseVo<AlgTreeDto> getAlgTreeD1etails() {
-        AlgTreeDto resp = algService.getAlgTreeDto(true);
-        return ResponseVo.createSuccess(resp);
+    public ResponseVo<AlgTreeDto> getAlgTreeDetails() {
+        AlgorithmClassify algorithmClassify = algService.getAlgorithmClassifyTree(true);
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(algorithmClassify, AlgTreeDto.class));
     }
 }

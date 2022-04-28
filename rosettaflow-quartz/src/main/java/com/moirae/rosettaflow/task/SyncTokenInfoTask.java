@@ -39,7 +39,7 @@ public class SyncTokenInfoTask {
                 dataService.saveToken(token);
             }
 
-            List<Token> tokenList = dataService.getNeedSyncedTokenList(1000);
+            List<Token> tokenList = dataService.listTokenByNeedSyncedInfo(1000);
 
             tokenList.forEach(item -> {
                 try {
@@ -61,6 +61,6 @@ public class SyncTokenInfoTask {
         if(decimals.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
             token.setDecimal(decimals.longValue());
         }
-        dataService.updateToken(token);
+        dataService.updateTokenById(token);
     }
 }

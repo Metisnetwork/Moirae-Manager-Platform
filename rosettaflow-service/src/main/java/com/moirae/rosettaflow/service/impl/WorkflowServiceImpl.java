@@ -139,7 +139,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     public WorkflowVersionKeyDto createWorkflowOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, Long calculationProcessId) {
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
         // 配置查询
-        AlgorithmClassify rootTree = algService.getAlgTree(true);
+        AlgorithmClassify rootTree = algService.getAlgorithmClassifyTree(true);
         AlgorithmClassify selectedTree = TreeUtils.findSubTree(rootTree, algorithmId);
         CalculationProcess calculationProcess = getCalculationProcessDetails(calculationProcessId);
 
@@ -155,7 +155,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 创建工作流任务配置 1-训练  2-预测  3-训练，并预测 4-PSI
         for (int i = 0; i < calculationProcess.getTaskItem().size(); i++) {
             CalculationProcessTask calculationProcessTask = calculationProcess.getTaskItem().get(i);
-            Algorithm algorithm = algService.findAlg(calculationProcessTask.getAlgorithmSelect(), rootTree, selectedTree);
+            Algorithm algorithm = algService.findAlgorithm(calculationProcessTask.getAlgorithmSelect(), rootTree, selectedTree);
             WorkflowTask workflowTask = workflowTaskManager.createOfWizardMode(
                     workflow.getWorkflowId(), workflow.getWorkflowVersion(),
                     calculationProcessTask.getStep(),
@@ -308,7 +308,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         // 结果文件
         Set<String> identityIdSet = workflowTask.getOutputList().stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toSet());
-        Algorithm algorithm = algService.getAlg(workflowTask.getAlgorithmId(), false);
+        Algorithm algorithm = algService.getAlgorithm(workflowTask.getAlgorithmId(), false);
 
         List<WorkflowRunTaskResult> taskResultList = new ArrayList<>();
         List<Model> modelList = new ArrayList<>();
@@ -332,7 +332,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             taskResultList.add(taskResult);
             // 处理模型
             if(algorithm.getOutputModel()){
-                Algorithm predictionAlgorithm = algService.getAlgOfRelativelyPrediction(workflowTask.getAlgorithmId());
+                Algorithm predictionAlgorithm = algService.getAlgorithmOfRelativelyPrediction(workflowTask.getAlgorithmId());
                 Model model = new Model();
                 model.setMetaDataId(taskResult.getMetadataId());
                 model.setIdentityId(identityId);
@@ -396,7 +396,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowSettingWizard wizard = workflowSettingWizardManager.getOneByStep(req.getWorkflowId(), req.getWorkflowVersion(), step);
 
         // 查询算法树
-        AlgorithmClassify root = algService.getAlgTree(true);
+        AlgorithmClassify root = algService.getAlgorithmClassifyTree(true);
 
         switch(req.getCalculationProcessStep().getType()){
             case INPUT_TRAINING:
@@ -492,7 +492,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if(workflowTaskOutputList.size() > 0){
             outputDto.setStorePattern(workflowTaskOutputList.get(0).getStorePattern());
         }else{
-            outputDto.setStorePattern(algService.getAlg(workflowTask.getAlgorithmId(), false).getStorePattern());
+            outputDto.setStorePattern(algService.getAlgorithm(workflowTask.getAlgorithmId(), false).getStorePattern());
         }
         outputDto.setIdentityId(workflowTaskOutputList.stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toList()));
         return outputDto;
@@ -645,7 +645,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowSettingExpert> workflowSettingExpertList = new ArrayList<>();
         int taskStep = 1;
         int preStep = 0;
-        AlgorithmClassify root = algService.getAlgTree(true);
+        AlgorithmClassify root = algService.getAlgorithmClassifyTree(true);
         AlgorithmClassify psiAlgorithmClassify = TreeUtils.findSubTree(root, sysConfig.getDefaultPsi());
         for (int i = 0; i < req.getWorkflowNodeList().size(); i++) {
             NodeDto nodeDto = req.getWorkflowNodeList().get(i);
@@ -750,7 +750,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     nodeDto.setNodeStep(item.getNodeStep());
                     nodeDto.setNodeName(item.getNodeName());
                     WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, item.getTaskStep());
-                    Algorithm algorithm = algService.getAlg(workflowTask.getAlgorithmId(), true);
+                    Algorithm algorithm = algService.getAlgorithm(workflowTask.getAlgorithmId(), true);
                     nodeDto.setAlgorithmId(workflowTask.getAlgorithmId());
                     NodeCodeDto nodeCodeDto = new NodeCodeDto();
                     nodeCodeDto.setCode(BeanUtil.copyProperties(algorithm.getAlgorithmCode(),CodeDto.class));
@@ -1026,7 +1026,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
             WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
-            requestBuild.addDataPolicyTypes(1);
+            requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.CSV.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
         }
         // 设置模型输入组织
@@ -1034,7 +1034,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
             modelPartyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), modelPartyId));
-            requestBuild.addDataPolicyTypes(1);
+            requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.UNKNOWN.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
         }
         // 设置psi输入组织
@@ -1046,7 +1046,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                         .findFirst().get();
                 String partyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
                 requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(psi.getOrg(), partyId));
-                requestBuild.addDataPolicyTypes(1);
+                requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.UNKNOWN.getValue());
                 requestBuild.addDataPolicyOptions(createDataPolicyItem(psi, partyId));
             }
          }
@@ -1056,14 +1056,11 @@ public class WorkflowServiceImpl implements WorkflowService {
             requestBuild.addReceivers(publishTaskOfGetTaskOrganization(workflowTaskOutput.getOrg(), workflowTaskOutput.getPartyId()));
         }
 
-        JSONArray powerPolicyOption = new JSONArray();
-        powerPolicyOption.add("y1");
+        // TODO 需要调试每种算法
         requestBuild.addPowerPolicyTypes(1);
         requestBuild.addPowerPolicyOptions("y1");
-        powerPolicyOption.add("y2");
         requestBuild.addPowerPolicyTypes(1);
         requestBuild.addPowerPolicyOptions("y2");
-        powerPolicyOption.add("y3");
         requestBuild.addPowerPolicyTypes(1);
         requestBuild.addPowerPolicyOptions("y3");
 
@@ -1102,7 +1099,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
         // 因变量(标签)
         if(algorithmDynamicParams.containsKey("label_column")){
-            algorithmDynamicParams.put("label_column", dataService.getDataColumByIds(workflowTaskInput.getMetaDataId(), workflowTaskInput.getDependentVariable().intValue()).getColumnName());
+            algorithmDynamicParams.put("label_column", dataService.getDataColumnByIds(workflowTaskInput.getMetaDataId(), workflowTaskInput.getDependentVariable().intValue()).getColumnName());
         }
         // 模型所在方
         if(algorithmDynamicParams.containsKey("model_restore_party")){
@@ -1141,6 +1138,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private String createDataPolicyItem(Psi psi, String partyId) {
         DataPolicy dataPolicy = new DataPolicy();
+        dataPolicy.setInputType(2);
         dataPolicy.setPartyId(partyId);
         dataPolicy.setMetadataId(psi.getMetaDataId());
         dataPolicy.setMetadataName(psi.getName());
@@ -1150,6 +1148,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private String createDataPolicyItem(Model model, String partyId) {
         DataPolicy dataPolicy = new DataPolicy();
+        dataPolicy.setInputType(3);
         dataPolicy.setPartyId(partyId);
         dataPolicy.setMetadataId(model.getMetaDataId());
         dataPolicy.setMetadataName(model.getName());
@@ -1159,9 +1158,10 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput) {
         DataPolicy dataPolicy = new DataPolicy();
+        dataPolicy.setInputType(1);
         dataPolicy.setPartyId(workflowTaskInput.getPartyId());
         dataPolicy.setMetadataId(workflowTaskInput.getMetaDataId());
-        dataPolicy.setMetadataName(dataService.getDataById(workflowTaskInput.getMetaDataId()).getMetaDataName());
+        dataPolicy.setMetadataName(dataService.getMetaDataById(workflowTaskInput.getMetaDataId(), false).getMetaDataName());
         dataPolicy.setKeyColumn(workflowTaskInput.getKeyColumn());
         List<Integer> selectedColumns = new ArrayList<>();
         Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
@@ -1247,7 +1247,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Map<String, Long> metaDataId2CountMap = workflowTaskList.stream()
                 .flatMap(item -> item.getInputList().stream())
                 .collect(Collectors.groupingBy(WorkflowTaskInput::getMetaDataId, Collectors.counting()));
-        List<MetaData> metaDataList = dataService.listDataByIds(metaDataId2CountMap.keySet());
+        List<MetaData> metaDataList = dataService.listMetaDataByIds(metaDataId2CountMap.keySet());
         Map<String, String> metaDataId2TokenAddressMap = metaDataList.stream()
                 .collect(Collectors.toMap(MetaData::getMetaDataId, MetaData::getTokenAddress));
 
@@ -1327,7 +1327,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             // 设置 variable
             item.setVariableList(workflowTaskVariableManager.listByWorkflowTaskId(item.getWorkflowTaskId()));
             // 设置 算法
-            item.setAlgorithm(algService.getAlg(item.getAlgorithmId(), true));
+            item.setAlgorithm(algService.getAlgorithm(item.getAlgorithmId(), true));
             // 设置 发起组织
             item.setOrg(orgService.getOrgById(item.getIdentityId()));
             // 设置 input 组织
@@ -1369,7 +1369,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req) {
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(req.getWorkflowRunId());
-        AlgorithmClassify root = algService.getAlgTree(false);
+        AlgorithmClassify root = algService.getAlgorithmClassifyTree(false);
         List<WorkflowRunTaskDto> result = workflowRunTaskStatusList.stream().map(item -> {
             WorkflowRunTaskDto workflowRunTaskDto = new WorkflowRunTaskDto();
             workflowRunTaskDto.setId(item.getId());

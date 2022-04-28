@@ -36,7 +36,7 @@ public class SyncTokenHolderInfoTask {
             //查询所有在线用户地址
             List<String> addressList = userService.getOnlineUserIdList();
             //查询所有数据token地址
-            List<String> tokenList = dataService.getTokenIdList();
+            List<String> tokenList = dataService.listTokenId();
             for (String address: addressList) {
                 try{
                     sync(address, tokenList);
@@ -59,7 +59,7 @@ public class SyncTokenHolderInfoTask {
             }
         }
         if(tokenHolderList.size() > 0){
-            dataService.batchInsertOrUpdateTokenHolder(address, tokenHolderList);
+            dataService.saveOrUpdateBatchTokenHolder(address, tokenHolderList);
         }
     }
 

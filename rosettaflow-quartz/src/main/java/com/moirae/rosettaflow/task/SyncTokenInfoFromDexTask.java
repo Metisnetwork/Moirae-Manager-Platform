@@ -35,7 +35,7 @@ public class SyncTokenInfoFromDexTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<String> tokenList = dataService.getTokenIdList();
+            List<String> tokenList = dataService.listTokenId();
             tokenList.forEach(item -> {
                 try {
                     if(!item.equals(uniswapV2FactoryDao.WETH())){
@@ -66,7 +66,7 @@ public class SyncTokenInfoFromDexTask {
         token.setAddress(tokenAddress);
         token.setIsAddLiquidity(true);
         token.setPrice(getPrice(tuple3.getValue1(), tuple3.getValue2()));
-        dataService.updateToken(token);
+        dataService.updateTokenById(token);
     }
 
     private String getPrice(BigInteger wEth, BigInteger token) {
