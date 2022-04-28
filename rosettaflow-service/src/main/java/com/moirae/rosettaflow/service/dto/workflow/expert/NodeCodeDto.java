@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.service.dto.workflow.expert;
 
 import com.moirae.rosettaflow.service.dto.alg.AlgVariableDto;
+import com.moirae.rosettaflow.service.dto.alg.AlgVariableV2Dto;
 import com.moirae.rosettaflow.service.dto.workflow.common.CodeDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +17,7 @@ import java.util.List;
 public class NodeCodeDto {
 
     @ApiModelProperty(value = "变量", required = true)
-    private List<AlgVariableDto> variableList;
+    private List<AlgVariableV2Dto> variableList;
 
     @ApiModelProperty(value = "代码", required = true)
     private CodeDto code;

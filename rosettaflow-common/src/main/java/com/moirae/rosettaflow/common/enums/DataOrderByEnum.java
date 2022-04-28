@@ -1,6 +1,7 @@
 package com.moirae.rosettaflow.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 
 public enum DataOrderByEnum {
 
@@ -10,21 +11,16 @@ public enum DataOrderByEnum {
     TOKEN_PRICE_ASC("tokenPriceAsc", "mt.price asc",  "凭证价格正序");
 
     @JsonValue
+    @Getter
     private String userValue;
+    @Getter
     private String sqlValue;
+    @Getter
     private String desc;
 
     DataOrderByEnum(String userValue, String sqlValue, String desc) {
         this.userValue = userValue;
         this.sqlValue = sqlValue;
         this.desc = desc;
-    }
-
-    public String getUserValue() {
-        return this.userValue;
-    }
-
-    public String getSqlValue(){
-        return this.sqlValue;
     }
 }

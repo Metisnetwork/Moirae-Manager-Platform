@@ -268,8 +268,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
                 1, null, null));
         psiInput.put("item", itemList);
 
-        System.out.println(response.toJSONString());
-//        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
     }
 
     @Test
@@ -324,6 +323,9 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         JSONObject workflowNode = createWorkflowNode(1, TreeUtils.findSubTree(root, 2011L), false);
         workflowNodeList.add(workflowNode);
         request.put("workflowNodeList", workflowNodeList);
+
+        System.out.println("req = " + request.toJSONString());
+
         System.out.println("result = "  + settingWorkflowOfExpertMode(request.toJSONString()));
     }
 
@@ -374,7 +376,9 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         workflowNodeList.add(workflowNode1);
         workflowNodeList.add(workflowNode2);
         request.put("workflowNodeList", workflowNodeList);
-        System.out.println("result = "  + settingWorkflowOfExpertMode(request.toJSONString()));
+
+        System.out.println(request.toJSONString());
+//        System.out.println("result = "  + settingWorkflowOfExpertMode(request.toJSONString()));
     }
 
     // ----------------------通用功能----------------------------------------------
@@ -424,7 +428,6 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         emptyParameters.add("workflowVersion", String.valueOf(workflowVersion));
         return commonGetWithToken("/workflow/preparationStart", emptyParameters);
     }
-
 
 
     private String getWorkflowResultOfExpertMode(Long workflowId, Long workflowVersion, Integer nodeStep)throws Exception{

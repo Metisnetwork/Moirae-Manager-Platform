@@ -13,7 +13,8 @@ import com.moirae.rosettaflow.common.utils.LanguageContext;
 import com.moirae.rosettaflow.grpc.client.GrpcSysServiceClient;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
-import com.moirae.rosettaflow.grpc.dynamic.DataPolicy;
+import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyCsv;
+import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyUnknown;
 import com.moirae.rosettaflow.grpc.service.*;
 import com.moirae.rosettaflow.grpc.service.types.SimpleResponse;
 import com.moirae.rosettaflow.grpc.service.types.TaskOrganization;
@@ -25,6 +26,7 @@ import com.moirae.rosettaflow.mapper.enums.*;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.service.*;
 import com.moirae.rosettaflow.service.dto.alg.AlgVariableDto;
+import com.moirae.rosettaflow.service.dto.alg.AlgVariableV2Dto;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
 import com.moirae.rosettaflow.service.dto.task.TaskEventDto;
@@ -326,7 +328,8 @@ public class WorkflowServiceImpl implements WorkflowService {
             taskResult.setFileName(response.getMetadataName());
             taskResult.setMetadataId(response.getMetadataId());
             taskResult.setOriginId(response.getOriginId());
-            taskResult.setFilePath(response.getDataPath());
+            taskResult.setDataType(response.getDataTypeValue());
+            taskResult.setMetadataOption(response.getMetadataOption());
             taskResult.setIp(response.getIp());
             taskResult.setPort(response.getPort());
             taskResultList.add(taskResult);
@@ -338,7 +341,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 model.setIdentityId(identityId);
                 model.setName(algorithm.getAlgorithmName()+"(" + task.getId() + ")");
                 model.setFileId(taskResult.getOriginId());
-                model.setFilePath(taskResult.getFilePath());
+                model.setDataType(response.getDataTypeValue());
+                model.setMetadataOption(response.getMetadataOption());
                 model.setTrainTaskId(task.getId());
                 model.setTrainAlgorithmId(workflowTask.getAlgorithmId());
                 model.setTrainUserAddress(workflowRunStatus.getAddress());
@@ -353,7 +357,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 psi.setIdentityId(identityId);
                 psi.setName(algorithm.getAlgorithmName()+"(" + task.getId() + ")");
                 psi.setFileId(taskResult.getOriginId());
-                psi.setFilePath(taskResult.getFilePath());
+                psi.setDataType(response.getDataTypeValue());
+                psi.setMetadataOption(response.getMetadataOption());
                 psi.setTrainTaskId(task.getId());
                 psi.setTrainAlgorithmId(workflowTask.getAlgorithmId());
                 psi.setTrainUserAddress(workflowRunStatus.getAddress());
@@ -760,9 +765,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                             .collect(Collectors.toMap(WorkflowTaskVariable::getVarKey, WorkflowTaskVariable::getVarValue));
                     nodeCodeDto.setVariableList(algorithm.getAlgorithmVariableList().stream()
                             .map(algorithmVariable -> {
-                                AlgVariableDto algVariableDto = new AlgVariableDto();
+                                AlgVariableV2Dto algVariableDto = new AlgVariableV2Dto();
                                 algVariableDto.setVarKey(algorithmVariable.getVarKey());
-                                algVariableDto.setVarType(algorithmVariable.getVarType());
+                                algVariableDto.setVarType(algorithmVariable.getVarType().getValue());
                                 algVariableDto.setVarDesc(algorithmVariable.getVarDesc());
                                 algVariableDto.setVarDescEn(algorithmVariable.getVarDescEn());
                                 if(variableMap.containsKey(algorithmVariable.getVarKey())){
@@ -1137,27 +1142,25 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private String createDataPolicyItem(Psi psi, String partyId) {
-        DataPolicy dataPolicy = new DataPolicy();
+        TaskDataPolicyUnknown dataPolicy = new TaskDataPolicyUnknown();
         dataPolicy.setInputType(2);
         dataPolicy.setPartyId(partyId);
         dataPolicy.setMetadataId(psi.getMetaDataId());
         dataPolicy.setMetadataName(psi.getName());
-        dataPolicy.setKeyColumn(0L);
         return JSONObject.toJSONString(dataPolicy);
     }
 
     private String createDataPolicyItem(Model model, String partyId) {
-        DataPolicy dataPolicy = new DataPolicy();
+        TaskDataPolicyUnknown dataPolicy = new TaskDataPolicyUnknown();
         dataPolicy.setInputType(3);
         dataPolicy.setPartyId(partyId);
         dataPolicy.setMetadataId(model.getMetaDataId());
         dataPolicy.setMetadataName(model.getName());
-        dataPolicy.setKeyColumn(0L);
         return JSONObject.toJSONString(dataPolicy);
     }
 
     private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput) {
-        DataPolicy dataPolicy = new DataPolicy();
+        TaskDataPolicyCsv dataPolicy = new TaskDataPolicyCsv();
         dataPolicy.setInputType(1);
         dataPolicy.setPartyId(workflowTaskInput.getPartyId());
         dataPolicy.setMetadataId(workflowTaskInput.getMetaDataId());

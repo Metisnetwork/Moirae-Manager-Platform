@@ -59,12 +59,6 @@ public class WorkflowRunTaskResult implements Serializable {
     private String originId;
 
     /**
-     * 任务结果文件的完整相对路径名
-     */
-    @TableField("file_path")
-    private String filePath;
-
-    /**
      * 任务结果文件所在的 数据服务内网ip
      */
     private String ip;
@@ -74,6 +68,16 @@ public class WorkflowRunTaskResult implements Serializable {
      */
     @TableField("`port`")
     private String port;
+
+    /**
+     * 原始数据的类型
+     */
+    private Integer dataType;
+
+    /**
+     * 元数据的选项，和 data_type 配套使用
+     */
+    private String metadataOption;
 
     /**
      * 创建时间

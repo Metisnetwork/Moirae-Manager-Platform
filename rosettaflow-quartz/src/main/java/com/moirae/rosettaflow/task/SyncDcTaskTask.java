@@ -3,7 +3,7 @@ package com.moirae.rosettaflow.task;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
-import com.moirae.rosettaflow.grpc.dynamic.DataPolicy;
+import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyUnknown;
 import com.moirae.rosettaflow.grpc.service.types.TaskDetail;
 import com.moirae.rosettaflow.grpc.service.types.TaskDetailSummary;
 import com.moirae.rosettaflow.grpc.service.types.TaskOrganization;
@@ -87,7 +87,7 @@ public class SyncDcTaskTask {
 
             Map<String, TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
             for (int i = 0; i < information.getDataFlowPolicyTypesCount(); i++) {
-                DataPolicy dataPolicy = JSONObject.parseObject(information.getDataFlowPolicyOptions(i), DataPolicy.class);
+                TaskDataPolicyUnknown dataPolicy = JSONObject.parseObject(information.getDataFlowPolicyOptions(i), TaskDataPolicyUnknown.class);
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
                 taskDataProvider.setTaskId(information.getTaskId());
                 taskDataProvider.setMetaDataId(dataPolicy.getMetadataId());
