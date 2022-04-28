@@ -742,8 +742,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public WorkflowDetailsOfExpertModeDto getWorkflowSettingOfExpertMode(WorkflowVersionKeyDto req) {
         WorkflowDetailsOfExpertModeDto result = new WorkflowDetailsOfExpertModeDto();
+        Workflow workflow = workflowManager.getById(req.getWorkflowId());
+        WorkflowVersion workflowVersion = workflowVersionManager.getById(req.getWorkflowId(), req.getWorkflowVersion());
         result.setWorkflowId(req.getWorkflowId());
         result.setWorkflowVersion(req.getWorkflowVersion());
+        result.setWorkflowName(workflow.getWorkflowName());
+        result.setStatus(workflowVersion.getStatus());
+        result.setIsSettingCompleted(workflow.getIsSettingCompleted());
         result.setWorkflowNodeList(getWorkflowNodeList(req.getWorkflowId(), req.getWorkflowVersion()));
         return result;
     }

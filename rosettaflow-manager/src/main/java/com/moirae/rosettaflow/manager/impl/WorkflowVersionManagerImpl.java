@@ -50,4 +50,12 @@ public class WorkflowVersionManagerImpl extends ServiceImpl<WorkflowVersionMappe
         }
         return result;
     }
+
+    @Override
+    public WorkflowVersion getById(Long workflowId, Long workflowVersion) {
+        LambdaQueryWrapper<WorkflowVersion> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowVersion::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowVersion::getWorkflowVersion, workflowVersion);
+        return getOne(wrapper);
+    }
 }

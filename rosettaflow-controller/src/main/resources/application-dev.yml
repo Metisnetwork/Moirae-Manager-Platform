@@ -70,8 +70,8 @@ chain:
     hrp: lat
     metisPayAddress: "0x3979ca71ea6b4c0a7cf23a8bf216fd9fc37a4df9"
     uniswapV2Router02: "0x4378daf745e9053f6048c4f78c803f3bc8829703"
-    web3jProtocol: WSS
-    web3jAddresses: devnetopenapi.platon.network/ws
+    web3jProtocol: WS
+    web3jAddresses: 192.168.10.146:7789
     chainName: "PlatON开发网"
     rpcUrl: https://devnetopenapi.platon.network/rpc
     symbol: LAT

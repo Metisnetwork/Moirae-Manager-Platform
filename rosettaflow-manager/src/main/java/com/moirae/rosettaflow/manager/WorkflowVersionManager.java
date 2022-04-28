@@ -22,4 +22,6 @@ public interface WorkflowVersionManager extends IService<WorkflowVersion> {
     WorkflowVersion create(Long workflowId, Long workflowVersion, String workflowVersionName);
 
     List<WorkflowVersion> deleteByWorkflowId(Long workflowId);
+
+    WorkflowVersion getById(Long workflowId, Long workflowVersion);
 }
