@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moirae.rosettaflow.common.enums.OldAndNewEnum;
 import com.moirae.rosettaflow.manager.WorkflowTaskOutputManager;
 import com.moirae.rosettaflow.mapper.WorkflowTaskOutputMapper;
+import com.moirae.rosettaflow.mapper.domain.WorkflowTaskInput;
 import com.moirae.rosettaflow.mapper.domain.WorkflowTaskOutput;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class WorkflowTaskOutputManagerImpl extends ServiceImpl<WorkflowTaskOutpu
     public List<WorkflowTaskOutput> listByWorkflowTaskId(Long workflowTaskId) {
         LambdaQueryWrapper<WorkflowTaskOutput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowTaskOutput::getWorkflowTaskId, workflowTaskId);
+        wrapper.orderByAsc(WorkflowTaskOutput::getSortKey);
         return list(wrapper);
     }
 
@@ -56,6 +58,7 @@ public class WorkflowTaskOutputManagerImpl extends ServiceImpl<WorkflowTaskOutpu
                     newObj.setStorePattern(item.getStorePattern());
                     newObj.setOutputContent(item.getOutputContent());
                     newObj.setPartyId(item.getPartyId());
+                    newObj.setSortKey(item.getSortKey());
                     save(newObj);
 
                     Map<OldAndNewEnum, WorkflowTaskOutput> pair = new HashMap<>();

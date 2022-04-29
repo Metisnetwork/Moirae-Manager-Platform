@@ -61,6 +61,11 @@ public class WorkflowTaskInput implements Serializable {
     private String partyId;
 
     /**
+     * 用于排序的字段
+     */
+    private Integer sortKey;
+
+    /**
      * 创建时间
      */
     private Date createTime;

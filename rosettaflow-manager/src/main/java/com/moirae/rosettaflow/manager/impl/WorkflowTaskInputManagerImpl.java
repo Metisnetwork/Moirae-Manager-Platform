@@ -30,6 +30,7 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
     public List<WorkflowTaskInput> listByWorkflowTaskId(Long workflowTaskId) {
         LambdaQueryWrapper<WorkflowTaskInput> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId);
+        wrapper.orderByAsc(WorkflowTaskInput::getSortKey);
         return list(wrapper);
     }
 
@@ -59,6 +60,7 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
                     newObj.setDependentVariable(item.getDependentVariable());
                     newObj.setDataColumnIds(item.getDataColumnIds());
                     newObj.setPartyId(item.getPartyId());
+                    newObj.setSortKey(item.getSortKey());
                     save(newObj);
 
                     Map<OldAndNewEnum, WorkflowTaskInput> pair = new HashMap<>();
@@ -96,6 +98,7 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
                 psiWorkflowTaskInput.setIdentityId(item.getIdentityId());
                 psiWorkflowTaskInput.setKeyColumn(item.getKeyColumn());
                 psiWorkflowTaskInput.setPartyId(item.getPartyId());
+                psiWorkflowTaskInput.setSortKey(item.getSortKey());
                 return psiWorkflowTaskInput;
             }
         ).collect(Collectors.toList());

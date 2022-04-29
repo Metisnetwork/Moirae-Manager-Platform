@@ -632,7 +632,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                     psiWorkflowTask.getStep(), workflowTask.getStep(),
                     root, nodeInput.getIdentityId(),
                     nodeInput.getIsPsi(), nodeInput.getDataInputList(),
-                    algorithmClassify.getAlg().getInputModel() && nodeInput.getModel() !=null ? Optional.of(nodeInput.getModel().getMetaDataId()) : Optional.empty()
+                    algorithmClassify.getAlg().getInputModel()
+                            && nodeInput.getModel() !=null
+                            && !"fromPreNodeOutput".equals(nodeInput.getModel().getMetaDataId()) ? Optional.of(nodeInput.getModel().getMetaDataId()) : Optional.empty()
             );
         }else{
             setPsiInputOfWizardMode(workflowTask.getWorkflowId(), workflowTask.getWorkflowVersion(),
@@ -785,9 +787,18 @@ public class WorkflowServiceImpl implements WorkflowService {
                     NodeInputDto nodeInputDto = new NodeInputDto();
                     nodeInputDto.setIdentityId(workflowTask.getIdentityId());
                     nodeInputDto.setInputModel(workflowTask.getInputModel());
-                    if(workflowTask.getInputModel() && StringUtils.isNotBlank(workflowTask.getInputModelId())){
+                    if(workflowTask.getInputModel()
+                            && StringUtils.isNotBlank(workflowTask.getInputModelId())
+                            && !"fromPreNodeOutput".equals(workflowTask.getInputModelId())){
                         nodeInputDto.setModel(BeanUtil.copyProperties(dataService.getModelById(workflowTask.getInputModelId()), ModelDto.class));
                     }
+                    if(workflowTask.getInputModel()
+                            && StringUtils.isBlank(workflowTask.getInputModelId())){
+                        ModelDto modelDto = new ModelDto();
+                        modelDto.setMetaDataId("fromPreNodeOutput");
+                        nodeInputDto.setModel(modelDto);
+                    }
+
                     nodeInputDto.setIsPsi(workflowTask.getInputPsi());
                     nodeInputDto.setDataInputList(BeanUtil.copyToList(workflowTaskInputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId()), DataInputDto.class));
                     nodeDto.setNodeInput(nodeInputDto);
@@ -1402,6 +1413,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowTaskInput.setKeyColumn(dataInputDtoList.get(i).getKeyColumn());
             workflowTaskInput.setDependentVariable(dataInputDtoList.get(i).getDependentVariable());
             workflowTaskInput.setDataColumnIds(dataInputDtoList.get(i).getDataColumnIds());
+            workflowTaskInput.setSortKey(i);
             workflowTaskInput.setPartyId("p" + i);
             workflowTaskInputList.add(workflowTaskInput);
         }
@@ -1423,6 +1435,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowTaskOutput.setWorkflowTaskId(workflowTaskId);
             workflowTaskOutput.setIdentityId(identityIdList.get(i));
             workflowTaskOutput.setStorePattern(storePattern);
+            workflowTaskOutput.setSortKey(i);
             workflowTaskOutput.setPartyId("q" + i);
             workflowTaskOutputList.add(workflowTaskOutput);
         }

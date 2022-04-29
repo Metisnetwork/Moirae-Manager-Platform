@@ -376,9 +376,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         workflowNodeList.add(workflowNode1);
         workflowNodeList.add(workflowNode2);
         request.put("workflowNodeList", workflowNodeList);
-
-        System.out.println(request.toJSONString());
-//        System.out.println("result = "  + settingWorkflowOfExpertMode(request.toJSONString()));
+        System.out.println("result = "  + settingWorkflowOfExpertMode(request.toJSONString()));
     }
 
     // ----------------------通用功能----------------------------------------------
@@ -414,13 +412,13 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         JSONObject req = new JSONObject();
         req.put("workflowId", 7);
         req.put("workflowVersion", 1);
-        req.put("sign", getWorkflowJson("xx"));
+        req.put("sign", getWorkflowJson(user.getAddress()));
         System.out.println("result = "  + commonPostWithToken("/workflow/start", req.toJSONString()));
     }
 
-    private String getWorkflowJson(String nonce){
-        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"key\":\"{}\",\"desc\":\"Welcome to Moirae!\"},\"primaryType\":\"Login\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"Login\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"string\"}]}}";
-        return StrUtil.format(json, nonce);
+    private String getWorkflowJson(String address){
+        String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"{}\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"address\",\"type\":\"string\"}]}}";
+        return StrUtil.format(json, address);
     }
 
     private String preparationStart(Long workflowId, Long workflowVersion)throws Exception{
@@ -548,6 +546,13 @@ public class WorkFlowControllerTest extends BaseControllerTest{
     private JSONObject createModel(String metadataId) {
         JSONObject model = new JSONObject();
         model.put("metaDataId", metadataId);
+        model.put("metaDataId", "fromPreNodeOutput");
+        return model;
+    }
+
+    private JSONObject createEntryModel() {
+        JSONObject model = new JSONObject();
+        model.put("metaDataId", "fromPreNodeOutput");
         return model;
     }
 
@@ -566,7 +571,7 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         for (AlgorithmVariable algorithmVariable : algorithmClassify.getAlg().getAlgorithmVariableList()) {
             JSONObject variable = new JSONObject();
             variable.put("varKey", algorithmVariable.getVarKey());
-            variable.put("varType", algorithmVariable.getVarType());
+            variable.put("varType", algorithmVariable.getVarType().getValue());
             variable.put("varValue", algorithmVariable.getVarValue());
             variable.put("varDesc", algorithmVariable.getVarDesc());
             variableList.add(variable);
@@ -594,6 +599,8 @@ public class WorkFlowControllerTest extends BaseControllerTest{
             nodeInput.put("inputModel", algorithmClassify.getAlg().getInputModel());
             if(!modelInputFromPreStep){
                 nodeInput.put("model", createModel("metadata:0x0e4693a97c213d057cbbb69ae18a217628d943776592996a87e59c594bd095a8"));
+            }else{
+                nodeInput.put("model", createEntryModel());
             }
 
         }
