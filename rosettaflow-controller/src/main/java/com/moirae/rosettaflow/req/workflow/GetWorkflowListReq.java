@@ -13,6 +13,9 @@ import java.util.Date;
 @ApiModel(value = "任务列表查询")
 public class GetWorkflowListReq extends CommonPageReq {
 
+    @ApiModelProperty(value = "创建模式:1-专家模式,2-向导模式")
+    private Integer createMode;
+
     @ApiModelProperty(value = "搜索关键字(工作流名称进行模糊查询)")
     private String keyword;
 

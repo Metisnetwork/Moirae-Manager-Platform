@@ -33,8 +33,8 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public IPage<Workflow> getWorkflowList(Page<Workflow> page, String address, String keyword, Long algorithmId, Date begin, Date end) {
-        return baseMapper.getWorkflowList(page, address, keyword, algorithmId, begin, end);
+    public IPage<Workflow> getWorkflowList(Page<Workflow> page, String address, String keyword, Long algorithmId, Date begin, Date end, Integer createMode) {
+        return baseMapper.getWorkflowList(page, address, keyword, algorithmId, begin, end, createMode);
     }
 
     @Override

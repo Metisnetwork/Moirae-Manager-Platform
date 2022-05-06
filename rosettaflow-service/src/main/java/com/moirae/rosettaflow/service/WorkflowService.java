@@ -18,7 +18,7 @@ public interface WorkflowService{
 
     int getWorkflowCount();
 
-    IPage<Workflow> getWorkflowList(Long current, Long size, String keyword, Long algorithmId, Date begin, Date end);
+    IPage<Workflow> getWorkflowList(Long current, Long size, String keyword, Long algorithmId, Date begin, Date end, Integer createMode);
 
     IPage<WorkflowVersion> getWorkflowVersionList(Long current, Long size, Long workflowId);
 

@@ -61,7 +61,7 @@ public class WorkflowController {
     @GetMapping("getWorkflowList")
     @ApiOperation(value = "查询工作流列表", notes = "查询工作流列表")
     public ResponseVo<PageVo<WorkflowVo>> getWorkflowList(@Valid GetWorkflowListReq req) {
-        IPage<Workflow> page = workflowService.getWorkflowList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getAlgorithmId(), req.getBegin(), req.getEnd());
+        IPage<Workflow> page = workflowService.getWorkflowList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getAlgorithmId(), req.getBegin(), req.getEnd(), req.getCreateMode());
         List<WorkflowVo> itemList = BeanUtil.copyToList(page.getRecords(), WorkflowVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }

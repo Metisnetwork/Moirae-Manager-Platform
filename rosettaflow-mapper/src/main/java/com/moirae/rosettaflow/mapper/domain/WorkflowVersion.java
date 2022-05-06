@@ -2,7 +2,9 @@ package com.moirae.rosettaflow.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -67,4 +69,10 @@ public class WorkflowVersion implements Serializable {
      */
     @TableField(exist = false)
     private Date endTime;
+
+    /**
+     * 创建模式（专家模型、向导模式）
+     */
+    @TableField(exist = false)
+    private WorkflowCreateModeEnum createMode;
 }

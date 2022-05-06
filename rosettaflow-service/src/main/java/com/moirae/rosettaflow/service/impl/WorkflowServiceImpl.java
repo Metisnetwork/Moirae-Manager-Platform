@@ -25,7 +25,6 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.*;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.service.*;
-import com.moirae.rosettaflow.service.dto.alg.AlgVariableDto;
 import com.moirae.rosettaflow.service.dto.alg.AlgVariableV2Dto;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
@@ -105,9 +104,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public IPage<Workflow> getWorkflowList(Long current, Long size, String keyword, Long algorithmId, Date begin, Date end) {
+    public IPage<Workflow> getWorkflowList(Long current, Long size, String keyword, Long algorithmId, Date begin, Date end, Integer createMode) {
         Page<Workflow> page = new Page<>(current, size);
-        workflowManager.getWorkflowList(page, UserContext.getCurrentUser().getAddress(), keyword, algorithmId, begin, end);
+        workflowManager.getWorkflowList(page, UserContext.getCurrentUser().getAddress(), keyword, algorithmId, begin, end, createMode);
 
         page.getRecords().forEach(item -> {
             if(item.getCalculationProcessStepType() != null && item.getCalculationProcessStep() != null){
@@ -388,15 +387,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowVersionKeyDto settingWorkflowOfWizardMode(WorkflowDetailsOfWizardModeDto req) {
-        WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
-        result.setWorkflowId(req.getWorkflowId());
-        result.setWorkflowVersion(req.getWorkflowVersion());
         Integer step = req.getCalculationProcessStep().getStep();
-
-        // 更新工作流设置版本
         Workflow workflow = workflowManager.getById(req.getWorkflowId());
-        workflowManager.updateStep(workflow.getWorkflowId(), step, calculationProcessStepManager.isEnd(workflow.getCalculationProcessId(), step));
-
+        checkWorkFlowOnlyOwner(workflow);
+        // 更新工作流设置版本
+        if(!workflow.getIsSettingCompleted()){
+            workflowManager.updateStep(workflow.getWorkflowId(), step, calculationProcessStepManager.isEnd(workflow.getCalculationProcessId(), step));
+        }
         // 设置参数
         WorkflowSettingWizard wizard = workflowSettingWizardManager.getOneByStep(req.getWorkflowId(), req.getWorkflowVersion(), step);
 
@@ -439,6 +436,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                 setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step(), req.getTrainingAndPredictionOutput().getPrediction());
                 break;
         }
+        WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
+        result.setWorkflowId(req.getWorkflowId());
+        result.setWorkflowVersion(req.getWorkflowVersion());
         return result;
     }
 
@@ -646,6 +646,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowVersionKeyDto settingWorkflowOfExpertMode(WorkflowDetailsOfExpertModeDto req) {
+        Workflow dbWorkflow = workflowManager.getById(req.getWorkflowId());
+        checkWorkFlowOnlyOwner(dbWorkflow);
+
         // 清理节点设置
         clearWorkflowOfExpertMode(req.getWorkflowId(), req.getWorkflowVersion());
         // 创建工作流任务配置
@@ -1364,24 +1367,27 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public Boolean terminate(WorkflowRunKeyDto req) {
         WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(req.getWorkflowRunId());
-        // 校验是否运行中
+        Workflow workflow = workflowManager.getById(workflowRunStatus.getWorkflowId());
+        // 只有拥有者才可以终止
+        checkWorkFlowOnlyOwner(workflow);
+        // 只有运行中的才可以终止
         if (workflowRunStatus.getRunStatus() != WorkflowTaskRunStatusEnum.RUN_DOING) {
-            log.error("workflow by id:{} is not running can not terminate", workflowRunStatus.getWorkflowId());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NOT_RUNNING.getMsg());
         }
-        // 校验取消状态
+        // 工作流取消中
         if (workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_NEED) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELING.getMsg());
         }
+        // 工作流已取消
         if (workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_SUCCESS) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELLED_SUCCESS.getMsg());
         }
+        // 工作流已取消
         if (workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL) {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_CANCELLED_FAIL.getMsg());
         }
-
-        workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
         // 更新工作流运行状态
+        workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
         return workflowRunStatusManager.updateById(workflowRunStatus);
     }
 
@@ -1401,6 +1407,13 @@ public class WorkflowServiceImpl implements WorkflowService {
             return workflowRunTaskDto;
         }).collect(Collectors.toList());
         return result;
+    }
+
+    private void checkWorkFlowOnlyOwner(Workflow workflow){
+        // 只有拥有者才可以终止
+        if(!workflow.getAddress().equals(UserContext.getCurrentUser().getAddress())){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ONLY_OWNER_OPERATE.getMsg());
+        }
     }
 
     private List<WorkflowTaskInput> convert2WorkflowTaskInput(Long workflowTaskId, List<DataInputDto> dataInputDtoList){

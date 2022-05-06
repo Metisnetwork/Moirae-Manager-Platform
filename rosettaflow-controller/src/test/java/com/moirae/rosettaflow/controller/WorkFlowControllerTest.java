@@ -388,7 +388,8 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void getWorkflowList()throws Exception{
-        System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowList", emptyParameters));
+        pageParameters.add("createMode", "1");
+        System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowList", pageParameters));
     }
 
     @Test

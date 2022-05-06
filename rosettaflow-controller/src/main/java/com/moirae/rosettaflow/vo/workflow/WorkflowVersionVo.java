@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.vo.workflow;
 
+import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,7 +24,10 @@ public class WorkflowVersionVo {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @ApiModelProperty(value = "工作流版本执行状态（待运行、运行中、运行成功、运行失败）")
+    @ApiModelProperty(value = "创建模式（专家模型、向导模式）")
+    private WorkflowCreateModeEnum createMode;
+
+    @ApiModelProperty(value = "工作流版本执行状态（0-待运行、1-运行中、2-运行成功、3-运行失败）")
     private WorkflowTaskRunStatusEnum status;
 
     @ApiModelProperty(value = "开始时间")

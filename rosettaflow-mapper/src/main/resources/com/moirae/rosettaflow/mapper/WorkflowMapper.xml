@@ -31,5 +31,8 @@
         <if test="end != null">
             and mw.create_time <![CDATA[<=]]> #{end}
         </if>
+        <if test="createMode != null">
+            and mw.create_mode = #{createMode}
+        </if>
     </select>
 </mapper>

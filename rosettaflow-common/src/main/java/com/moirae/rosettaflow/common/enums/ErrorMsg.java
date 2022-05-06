@@ -131,6 +131,7 @@ public enum ErrorMsg {
     WORKFLOW_FILE_DOWNLOAD_FAIL("工作流节点输入模型文件下载失败", "Workflow node model file download fail"),
     WORKFLOW_FILE_DOWNLOAD_TIMEOUT("工作流节点输入模型文件下载超时", "Workflow node model file download timeout"),
     WORKFLOW_FILE_DOWNLOAD_COMPRESSTYPE_ERROR("工作流节点输入模型文件下载压缩格式错误", "Workflow node model file download compressType error"),
+    WORKFLOW_ONLY_OWNER_OPERATE("只有拥有者才可以操作该工作流", "Only the owner can operate the workflow"),
 
 
     /**
