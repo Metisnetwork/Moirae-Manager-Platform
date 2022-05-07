@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.service.dto.workflow.expert;
 
+import com.moirae.rosettaflow.service.dto.alg.AlgDto;
 import com.moirae.rosettaflow.service.dto.workflow.common.OutputDto;
 import com.moirae.rosettaflow.service.dto.workflow.common.ResourceDto;
 import io.swagger.annotations.ApiModel;
@@ -42,4 +43,7 @@ public class NodeDto {
 
     @ApiModelProperty(value = "工作流节点环境", required = true)
     private ResourceDto resource;
+
+    @ApiModelProperty(value = "算法明细，返回时有，提交时不需要")
+    private AlgDto alg;
 }

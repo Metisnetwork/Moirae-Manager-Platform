@@ -5,15 +5,18 @@ import com.moirae.rosettaflow.chain.platon.contract.evm.IUniswapV2Pair;
 import com.moirae.rosettaflow.chain.platon.contract.evm.IUniswapV2Router02;
 import com.moirae.rosettaflow.chain.platon.utils.AddressUtils;
 import com.platon.bech32.Bech32;
+import com.platon.tuples.generated.Tuple3;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 public class UniswapTest extends BaseContractTest {
 
-    private String address = AddressUtils.hexToBech32("0x26d637e206cc39942628421e7b0d6fb41db0bc06");
+    private String address = AddressUtils.hexToBech32("0x4378daf745e9053f6048c4f78c803f3bc8829703");
 
 
     /**
@@ -33,12 +36,32 @@ public class UniswapTest extends BaseContractTest {
 //        //Tuple3{value1=20000000000000000000, value2=20000000000000000000, value3=4255551100}
 //        System.out.println(pair.getReserves().send());
 
-
         IUniswapV2Router02 router = loadRouter();
+
         IUniswapV2Factory factory = loadFactory(router.factory().send());
-        IUniswapV2Pair pair = loadPair(factory.getPair(router.WETH().send(), Bech32.addressEncode(hrp,"0x3a3b85bfc6b7b8435d713dca5ce308b9c4abe430")).send());
+        IUniswapV2Pair pair = loadPair(factory.getPair(router.WETH().send(), Bech32.addressEncode(hrp,"0x355b39ad02068e7e0189b5df2df1818ad72dc64b")).send());
         //Tuple3{value1=20000000000000000000, value2=20000000000000000000, value3=4255551100}
-        System.out.println(pair.getReserves().send());
+
+        Tuple3<BigInteger, BigInteger, BigInteger> tuple3 = pair.getReserves().send();
+
+        System.out.println("0x355b39ad02068e7e0189b5df2df1818ad72dc64b".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
+        System.out.println("0xad716b2d1adb6d8a508326a7c2e328db8b154da0".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
+        System.out.println("0xe19cfd8f9173155c26149818abd5decaa6f705f3".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
+        System.out.println("0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
+
+//        System.out.println(getPrice(tuple3.getValue1(), tuple3.getValue2()));
+//        System.out.println(pair.price0CumulativeLast().send());
+//        System.out.println(pair.price1CumulativeLast().send());
+
+//        System.out.println(router.getAmountIn(pair.getReserves().send().getValue1(), pair.getReserves().send().getValue2(), new BigInteger("10000000000000000")).send());
+    }
+
+    private String getPrice(BigInteger wEth, BigInteger token) {
+        BigDecimal reserve0 = new BigDecimal(wEth);
+        BigDecimal reserve1 = new BigDecimal(token);
+        System.out.println("reserve0 = " + reserve0);
+        System.out.println("reserve1 = " + reserve1);
+        return reserve0.divide(reserve1, 18,  RoundingMode.HALF_DOWN).toString();
     }
 
 

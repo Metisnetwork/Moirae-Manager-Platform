@@ -30,7 +30,7 @@ public class SyncDcOrgWalletTask {
     @Resource
     private OrgService organizationService;
 
-    @Scheduled(fixedDelay = 60 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcOrgWalletTask")
     public void run() {
         long begin = DateUtil.current();
@@ -47,7 +47,9 @@ public class SyncDcOrgWalletTask {
                     log.error("组织钱包信息同步, 明细失败：{}",org.getIdentityId(), e);
                 }
             }
-            organizationService.batchUpdateOrgExpand(updateList);
+            if(updateList.size()>0){
+                organizationService.batchUpdateOrgExpand(updateList);
+            }
         } catch (Exception e) {
             log.error("组织钱包信息同步,从net同步元数据失败,失败原因：{}", e.getMessage(), e);
         }
@@ -57,10 +59,12 @@ public class SyncDcOrgWalletTask {
     private OrgExpand syncOrgWallet(OrgExpand org) {
         YarnNodeInfo yarnNodeInfo = sysServiceClient.getNodeInfo(organizationService.getChannel(org.getIdentityId()));
         if(yarnNodeInfo != null){
-            if(StringUtils.isBlank(yarnNodeInfo.getObserverProxyWalletAddress())){
+            String rawAddress =  yarnNodeInfo.getObserverProxyWalletAddress();
+            if(StringUtils.isBlank(rawAddress) || StringUtils.equalsAnyIgnoreCase(rawAddress, "0x0000000000000000000000000000000000000000")){
                 return null;
             }
-            String address = AddressChangeUtils.convert0xAddress(org.getObserverProxyWalletAddress());
+            rawAddress = rawAddress.toLowerCase();
+            String address = AddressChangeUtils.convert0xAddress(rawAddress);
             if(!address.equals(org.getObserverProxyWalletAddress())){
                 org.setObserverProxyWalletAddress(address);
                 return org;

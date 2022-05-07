@@ -7,6 +7,7 @@ import com.moirae.rosettaflow.mapper.domain.AlgorithmClassify;
 import com.moirae.rosettaflow.mapper.domain.AlgorithmVariable;
 import com.moirae.rosettaflow.service.AlgService;
 import com.moirae.rosettaflow.service.utils.TreeUtils;
+import com.platon.bech32.Bech32;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -243,8 +244,10 @@ public class WorkFlowControllerTest extends BaseControllerTest{
     // ----------------------向导模式创建计算流程为PSI的工作流----------------------------------------------
     @Test
     public void createWorkflowOfWizardModeCase4() throws Exception {
-        JSONObject req = createWorkflow("chendai-flow-4", "chendai-desc-4", 1001L, 4L);
-        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
+        System.out.println(Bech32.addressDecodeHex("lat19yzlxy2np0e6zxhshm7rsm5guwqavqxqtuuzha"));
+
+//        JSONObject req = createWorkflow("chendai-flow-4", "chendai-desc-4", 1001L, 4L);
+//        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
     }
 
     @Test

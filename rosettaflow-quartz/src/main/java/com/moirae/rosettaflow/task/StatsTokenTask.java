@@ -26,7 +26,7 @@ public class StatsTokenTask {
     @Resource
     private TaskService taskService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "StatsTokenTask")
     public void run() {
         long begin = DateUtil.current();

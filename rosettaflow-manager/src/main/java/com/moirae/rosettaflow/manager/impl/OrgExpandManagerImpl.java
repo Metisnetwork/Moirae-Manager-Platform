@@ -23,6 +23,7 @@ public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand
     public List<OrgExpand> getOrgExpandList() {
         LambdaQueryWrapper<OrgExpand> wrapper = Wrappers.lambdaQuery();
         wrapper.select(OrgExpand::getIdentityId, OrgExpand::getObserverProxyWalletAddress);
+        wrapper.isNull(OrgExpand::getObserverProxyWalletAddress);
         return list(wrapper);
     }
 }

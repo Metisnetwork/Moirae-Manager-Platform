@@ -25,6 +25,8 @@ import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.mapper.enums.*;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.service.*;
+import com.moirae.rosettaflow.service.dto.alg.AlgDto;
+import com.moirae.rosettaflow.service.dto.alg.AlgTreeDto;
 import com.moirae.rosettaflow.service.dto.alg.AlgVariableV2Dto;
 import com.moirae.rosettaflow.service.dto.model.ModelDto;
 import com.moirae.rosettaflow.service.dto.org.OrgNameDto;
@@ -767,6 +769,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, item.getTaskStep());
                     Algorithm algorithm = algService.getAlgorithm(workflowTask.getAlgorithmId(), true);
                     nodeDto.setAlgorithmId(workflowTask.getAlgorithmId());
+                    nodeDto.setAlg(BeanUtil.copyProperties(algorithm, AlgDto.class));
                     NodeCodeDto nodeCodeDto = new NodeCodeDto();
                     nodeCodeDto.setCode(BeanUtil.copyProperties(algorithm.getAlgorithmCode(),CodeDto.class));
 

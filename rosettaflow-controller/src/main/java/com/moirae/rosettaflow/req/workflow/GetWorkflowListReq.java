@@ -10,7 +10,7 @@ import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "任务列表查询")
+@ApiModel(value = "工作流列表查询")
 public class GetWorkflowListReq extends CommonPageReq {
 
     @ApiModelProperty(value = "创建模式:1-专家模式,2-向导模式")

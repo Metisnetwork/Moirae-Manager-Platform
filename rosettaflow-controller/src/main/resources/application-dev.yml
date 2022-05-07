@@ -43,8 +43,14 @@ system:
     nonceTimeOut: 300000
     # 公共组织信息
     publicOrgList:
-      - identity: identity:17c9cc15b6a14f858a96a633c3486f3d
-        host: 192.168.9.152
+      - identity: identity:4d7b5f1f114b43b682d9c73d6d2bc18e
+        host: 192.168.10.147
+        port: 10033
+      - identity: identity:8003323d0d1248719be0d50e98e9666e
+        host: 192.168.10.148
+        port: 10033
+      - identity: identity:7008f843ae69476590c3aab9fc888ec4
+        host: 192.168.10.149
         port: 10033
     # 系统默认的psi算法
     defaultPsi: 1001

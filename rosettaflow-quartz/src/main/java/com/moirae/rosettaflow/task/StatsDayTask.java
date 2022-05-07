@@ -19,7 +19,7 @@ public class StatsDayTask {
     @Resource
     private StatisticsService statisticsService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "StatsDayTask")
     public void run() {
         long begin = DateUtil.current();

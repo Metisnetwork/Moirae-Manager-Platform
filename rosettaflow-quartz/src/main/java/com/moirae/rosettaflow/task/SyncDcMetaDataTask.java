@@ -1,10 +1,10 @@
 package com.moirae.rosettaflow.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.common.utils.AddressChangeUtils;
 import com.moirae.rosettaflow.grpc.client.GrpcMetaDataServiceClient;
+import com.moirae.rosettaflow.grpc.dynamic.MetadataOptionCsv;
 import com.moirae.rosettaflow.grpc.service.GetGlobalMetadataDetail;
 import com.moirae.rosettaflow.grpc.service.types.MetadataSummary;
 import com.moirae.rosettaflow.grpc.service.types.Organization;
@@ -42,7 +42,7 @@ public class SyncDcMetaDataTask {
     @Resource
     private DataSyncService dataSyncService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
@@ -79,7 +79,8 @@ public class SyncDcMetaDataTask {
         getGlobalMetadataDetailList.stream().forEach(item -> {
             Organization organization = item.getOwner();
             MetadataSummary information = item.getInformation().getMetadataSummary();
-            JSONObject metadataOption = JSONObject.parseObject(information.getMetadataOption());
+            MetadataOptionCsv metadataOptionCsv = JSONObject.parseObject(information.getMetadataOption(), MetadataOptionCsv.class);
+
             MetaData metaData = new MetaData();
             metaData.setMetaDataId(information.getMetadataId());
             metaData.setFileName(information.getMetadataName());
@@ -95,31 +96,47 @@ public class SyncDcMetaDataTask {
             metaData.setNonce(information.getNonce());
             metaData.setAllowExpose(information.getAllowExpose());
             metaData.setTokenAddress(information.getTokenAddress());
-            metaData.setOriginId(metadataOption.getString("originId"));
-            metaData.setFilePath(metadataOption.getString("dataPath"));
-            metaData.setSize(metadataOption.getLong("size"));
-            metaData.setRows(metadataOption.getInteger("rows"));
-            metaData.setColumns(metadataOption.getInteger("columns"));
-            metaData.setHasTitle(metadataOption.getBoolean("hasTitle"));
+            metaData.setOriginId(metadataOptionCsv.getOriginId());
+            metaData.setFilePath(metadataOptionCsv.getDataPath());
+            metaData.setSize(metadataOptionCsv.getSize().longValue());
+            metaData.setRows(metadataOptionCsv.getRows());
+            metaData.setColumns(metadataOptionCsv.getColumns());
+            metaData.setHasTitle(metadataOptionCsv.getHasTitle());
+
+            if(metaData.getMetaDataId().equals("metadata:0x5432ed28f3e61f1067f6f88a63a71b33076c8a686a574fe1312f99b56c2da9c8")){
+                metaData.setTokenAddress("0xe19cfd8f9173155c26149818abd5decaa6f705f3");
+            }
+            if(metaData.getMetaDataId().equals("metadata:0x6f2ebb118c49e344c94b4e403703b1d8367c8f12d6b72eae495b2c3c3d0ee4b3")){
+                metaData.setTokenAddress("0x355b39ad02068e7e0189b5df2df1818ad72dc64b");
+            }
+            if(metaData.getMetaDataId().equals("metadata:0x905e8163b76b661ef0b5b36231c07cc403a4a25af5d3746eb314613d4590d7e5")){
+                metaData.setTokenAddress("0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4");
+            }
+            if(metaData.getMetaDataId().equals("metadata:0xd3886be7f8cca8a9bdcb0057c56b8e3da2d83886a9d3c68981b9ff6093d71899")){
+                metaData.setTokenAddress("0xad716b2d1adb6d8a508326a7c2e328db8b154da0");
+            }
+
             metaDataList.add(metaData);
 
-            JSONArray metadataColumns = metadataOption.getJSONArray("metadataColumns");
-            for (int i = 0; i < metadataColumns.size(); i++) {
-                JSONObject metadataColumn = metadataColumns.getJSONObject(i);
+            for (MetadataOptionCsv.CsvColumns csvColumns: metadataOptionCsv.getMetadataColumns()) {
                 MetaDataColumn metaDataColumn = new MetaDataColumn();
                 metaDataColumn.setMetaDataId(metaData.getMetaDataId());
-                metaDataColumn.setColumnIdx(metadataColumn.getInteger("index"));
-                metaDataColumn.setColumnName(metadataColumn.getString("name"));
-                metaDataColumn.setColumnType(metadataColumn.getString("type"));
-                metaDataColumn.setColumnSize(metadataColumn.getInteger("size"));
-                metaDataColumn.setRemarks(metadataColumn.getString("comment"));
+                metaDataColumn.setColumnIdx(csvColumns.getIndex());
+                metaDataColumn.setColumnName(csvColumns.getName());
+                metaDataColumn.setColumnType(csvColumns.getType());
+                metaDataColumn.setColumnSize(csvColumns.getSize());
+                metaDataColumn.setRemarks(csvColumns.getComment());
                 metaDataColumnList.add(metaDataColumn);
             }
-
             if(StringUtils.isNotBlank(information.getTokenAddress())){
-                tokenList.add(create(information.getTokenAddress()));
+                tokenList.add(create(information.getTokenAddress().toLowerCase()));
             }
         });
+        // TODO mock
+        tokenList.add(create("0xe19cfd8f9173155c26149818abd5decaa6f705f3".toLowerCase()));
+        tokenList.add(create("0X355b39ad02068e7e0189b5df2df1818ad72dc64b".toLowerCase()));
+        tokenList.add(create("0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4".toLowerCase()));
+        tokenList.add(create("0xad716b2d1adb6D8A508326a7c2e328db8b154Da0".toLowerCase()));
         metaDataService.batchReplace(metaDataList, metaDataColumnList, tokenList);
     }
 

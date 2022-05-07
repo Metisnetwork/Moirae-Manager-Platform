@@ -30,7 +30,7 @@ public class SyncTokenInfoFromDexTask {
     @Resource
     private IUniswapV2PairContract uniswapV2PairDao;
 
-    @Scheduled(fixedDelay = 60 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncTokenInfoFromDexTask")
     public void run() {
         long begin = DateUtil.current();
@@ -57,15 +57,15 @@ public class SyncTokenInfoFromDexTask {
             return;
         }
 
-        Tuple3<BigInteger, BigInteger, BigInteger>  tuple3 = uniswapV2PairDao.getReserves(pairAddress);
+        Tuple3<BigInteger, BigInteger, BigInteger> tuple3 = uniswapV2PairDao.getReserves(pairAddress);
         if(tuple3.getValue1().compareTo(BigInteger.ZERO) == 0 || tuple3.getValue2().compareTo(BigInteger.ZERO) == 0){
             return;
         }
-
         Token token = new Token();
         token.setAddress(tokenAddress);
         token.setIsAddLiquidity(true);
-        token.setPrice(getPrice(tuple3.getValue1(), tuple3.getValue2()));
+        token.setPrice(getPrice(tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue1() : tuple3.getValue2(),
+                tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue2() : tuple3.getValue1()));
         dataService.updateTokenById(token);
     }
 
