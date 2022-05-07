@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 public class MetisPlayTest extends BaseContractTest {
 
-    private String address = AddressUtils.hexToBech32("0x7eB718524D1eCcEeF89196BC8315317bf8B5a05a");
+    private String address = AddressUtils.hexToBech32("0x3979ca71ea6b4c0a7cf23a8bf216fd9fc37a4df9");
 
     @Test
     public void addWhitelist() throws Exception{
@@ -27,7 +27,7 @@ public class MetisPlayTest extends BaseContractTest {
     @Test
     public void whitelist() throws Exception{
         MetisPay contract = load();
-        System.out.println(contract.whitelist("lat1cy2uat0eukfrxv897s5s8lnljfka5ewjtnrfhx").send());
+        System.out.println(contract.whitelist("lat1d7zjh2vx8xsqrgc4qe0v4usxn368naxvlpu70r").send());
     }
 
     @Test
@@ -40,6 +40,6 @@ public class MetisPlayTest extends BaseContractTest {
     }
 
     private MetisPay load(){
-        return MetisPay.load(address, web3j, credentials, gasProvider);
+        return MetisPay.load(address, web3j, user, gasProvider);
     }
 }

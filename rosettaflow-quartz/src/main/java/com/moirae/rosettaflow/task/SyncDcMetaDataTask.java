@@ -102,20 +102,6 @@ public class SyncDcMetaDataTask {
             metaData.setRows(metadataOptionCsv.getRows());
             metaData.setColumns(metadataOptionCsv.getColumns());
             metaData.setHasTitle(metadataOptionCsv.getHasTitle());
-
-            if(metaData.getMetaDataId().equals("metadata:0x5432ed28f3e61f1067f6f88a63a71b33076c8a686a574fe1312f99b56c2da9c8")){
-                metaData.setTokenAddress("0xe19cfd8f9173155c26149818abd5decaa6f705f3");
-            }
-            if(metaData.getMetaDataId().equals("metadata:0x6f2ebb118c49e344c94b4e403703b1d8367c8f12d6b72eae495b2c3c3d0ee4b3")){
-                metaData.setTokenAddress("0x355b39ad02068e7e0189b5df2df1818ad72dc64b");
-            }
-            if(metaData.getMetaDataId().equals("metadata:0x905e8163b76b661ef0b5b36231c07cc403a4a25af5d3746eb314613d4590d7e5")){
-                metaData.setTokenAddress("0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4");
-            }
-            if(metaData.getMetaDataId().equals("metadata:0xd3886be7f8cca8a9bdcb0057c56b8e3da2d83886a9d3c68981b9ff6093d71899")){
-                metaData.setTokenAddress("0xad716b2d1adb6d8a508326a7c2e328db8b154da0");
-            }
-
             metaDataList.add(metaData);
 
             for (MetadataOptionCsv.CsvColumns csvColumns: metadataOptionCsv.getMetadataColumns()) {
@@ -132,11 +118,6 @@ public class SyncDcMetaDataTask {
                 tokenList.add(create(information.getTokenAddress().toLowerCase()));
             }
         });
-        // TODO mock
-        tokenList.add(create("0xe19cfd8f9173155c26149818abd5decaa6f705f3".toLowerCase()));
-        tokenList.add(create("0X355b39ad02068e7e0189b5df2df1818ad72dc64b".toLowerCase()));
-        tokenList.add(create("0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4".toLowerCase()));
-        tokenList.add(create("0xad716b2d1adb6D8A508326a7c2e328db8b154Da0".toLowerCase()));
         metaDataService.batchReplace(metaDataList, metaDataColumnList, tokenList);
     }
 

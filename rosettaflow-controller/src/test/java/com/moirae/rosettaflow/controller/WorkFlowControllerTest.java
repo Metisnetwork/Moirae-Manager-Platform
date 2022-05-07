@@ -244,30 +244,28 @@ public class WorkFlowControllerTest extends BaseControllerTest{
     // ----------------------向导模式创建计算流程为PSI的工作流----------------------------------------------
     @Test
     public void createWorkflowOfWizardModeCase4() throws Exception {
-        System.out.println(Bech32.addressDecodeHex("lat19yzlxy2np0e6zxhshm7rsm5guwqavqxqtuuzha"));
-
-//        JSONObject req = createWorkflow("chendai-flow-4", "chendai-desc-4", 1001L, 4L);
-//        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
+        JSONObject req = createWorkflow("chendai-flow-4", "chendai-desc-4", 1001L, 4L);
+        System.out.println("result = " + commonPostWithToken("/workflow/wizard/createWorkflowOfWizardMode", req.toJSONString()));
     }
 
     @Test
     public void getWorkflowOfWizardModeCase4Step1() throws Exception {
-        System.out.println("result = " + getWorkflowOfWizardMode(4L, 1L, 1));
+        System.out.println("result = " + getWorkflowOfWizardMode(1L, 1L, 1));
     }
 
     @Test
     public void setWorkflowOfWizardModeCase4Step1() throws Exception {
-        String responseStr = getWorkflowOfWizardMode(4L, 1L, 1);
+        String responseStr = getWorkflowOfWizardMode(1L, 1L, 1);
         JSONObject response = JSONObject.parseObject(responseStr);
         JSONObject request = response.getJSONObject("data");
         JSONObject psiInput = request.getJSONObject("psiInput");
-        psiInput.put("identityId", "identity:17c9cc15b6a14f858a96a633c3486f3d");
+        psiInput.put("identityId", "identity:4d7b5f1f114b43b682d9c73d6d2bc18e");
         JSONArray itemList = new JSONArray();
-        itemList.add(createInputData("identity:17c9cc15b6a14f858a96a633c3486f3d",
-                "metadata:0x48a648e1b728e3e61eeb148c827cec3bc22a197995706e89c1e5c23c5be4fb3b",
+        itemList.add(createInputData("identity:4d7b5f1f114b43b682d9c73d6d2bc18e",
+                "metadata:0x905e8163b76b661ef0b5b36231c07cc403a4a25af5d3746eb314613d4590d7e5",
                 1, null, null));
-        itemList.add(createInputData("identity:6a9df99adf8e48ed94bed3b53f9ea4f7",
-                "metadata:0x3b4938ff6df23161f7ba77a798b9348ec757b37fb272f2cdc6a0b5998853ffd6",
+        itemList.add(createInputData("identity:8003323d0d1248719be0d50e98e9666e",
+                "metadata:0x5432ed28f3e61f1067f6f88a63a71b33076c8a686a574fe1312f99b56c2da9c8",
                 1, null, null));
         psiInput.put("item", itemList);
 
@@ -276,29 +274,29 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void getWorkflowOfWizardModeCase4Step2() throws Exception {
-        System.out.println("result = " + getWorkflowOfWizardMode(4L, 1L, 2));
+        System.out.println("result = " + getWorkflowOfWizardMode(1L, 1L, 2));
     }
 
     @Test
     public void setWorkflowOfWizardModeCase4Step2() throws Exception {
-        String responseStr = getWorkflowOfWizardMode(4L, 1L, 2);
+        String responseStr = getWorkflowOfWizardMode(1L, 1L, 2);
         JSONObject response = JSONObject.parseObject(responseStr);
         JSONObject request = response.getJSONObject("data");
-        request.put("commonResource", createResource(1,4,2048,6,3));
+        request.put("commonResource", createResource(2,2,2048,6,5));
         System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
     }
 
     @Test
     public void getWorkflowOfWizardModeCase4Step3() throws Exception {
-        System.out.println("result = " + getWorkflowOfWizardMode(4L, 1L, 3));
+        System.out.println("result = " + getWorkflowOfWizardMode(1L, 1L, 3));
     }
 
     @Test
     public void setWorkflowOfWizardModeCase4Step3() throws Exception {
-        String responseStr = getWorkflowOfWizardMode(4L, 1L, 3);
+        String responseStr = getWorkflowOfWizardMode(1L, 1L, 3);
         JSONObject response = JSONObject.parseObject(responseStr);
         JSONObject request = response.getJSONObject("data");
-        request.put("commonOutput", createOutput(1, "identity:17c9cc15b6a14f858a96a633c3486f3d", "identity:6a9df99adf8e48ed94bed3b53f9ea4f7"));
+        request.put("commonOutput", createOutput(1, "identity:8003323d0d1248719be0d50e98e9666e", "identity:4d7b5f1f114b43b682d9c73d6d2bc18e"));
         System.out.println("result = " + commonPostWithToken("/workflow/wizard/settingWorkflowOfWizardMode", request.toJSONString()));
     }
 
@@ -408,13 +406,13 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void preparationStart()throws Exception{
-        System.out.println("result = "  + preparationStart(7L, 1L));
+        System.out.println("result = "  + preparationStart(1L, 1L));
     }
 
     @Test
     public void start()throws Exception{
         JSONObject req = new JSONObject();
-        req.put("workflowId", 7);
+        req.put("workflowId", 1);
         req.put("workflowVersion", 1);
         req.put("sign", getWorkflowJson(user.getAddress()));
         System.out.println("result = "  + commonPostWithToken("/workflow/start", req.toJSONString()));

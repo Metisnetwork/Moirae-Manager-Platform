@@ -68,6 +68,11 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
 
     @Override
     public EstimateTaskGasResponse estimateTaskGas(Channel channel, EstimateTaskGasRequest request) {
-        return TaskServiceGrpc.newBlockingStub(channel).estimateTaskGas(request);
+        EstimateTaskGasResponse response = TaskServiceGrpc.newBlockingStub(channel).estimateTaskGas(request);
+        if (response.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
+            log.error("GrpcTaskServiceClientImpl->estimateTaskGas() fail reason:{}", response.getMsg());
+            throw new BusinessException(response.getStatus(), response.getMsg());
+        }
+        return response;
     }
 }

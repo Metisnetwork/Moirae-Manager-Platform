@@ -808,7 +808,15 @@ public class WorkflowServiceImpl implements WorkflowService {
                     nodeInputDto.setIsPsi(workflowTask.getInputPsi());
                     nodeInputDto.setDataInputList(BeanUtil.copyToList(workflowTaskInputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId()), DataInputDto.class));
                     nodeDto.setNodeInput(nodeInputDto);
-                    nodeDto.setResource(BeanUtil.copyProperties(workflowTaskResourceManager.getById(workflowTask.getWorkflowTaskId()), ResourceDto.class));
+
+                    WorkflowTaskResource workflowTaskResource = workflowTaskResourceManager.getById(workflowTask.getWorkflowTaskId());
+                    ResourceDto resourceDto = new ResourceDto();
+                    resourceDto.setCostCpu(workflowTaskResource.getCostCpu());
+                    resourceDto.setCostGpu(workflowTaskResource.getCostGpu());
+                    resourceDto.setCostMem(CommonUtils.convert2UserOfCostMem(workflowTaskResource.getCostMem()));
+                    resourceDto.setCostBandwidth(CommonUtils.convert2UserOfCostBandwidth(workflowTaskResource.getCostBandwidth()));
+                    resourceDto.setRunTime(CommonUtils.convert2UserOfRunTime(workflowTaskResource.getRunTime()));
+                    nodeDto.setResource(resourceDto);
                     OutputDto outputDto = new OutputDto();
                     List<WorkflowTaskOutput> workflowTaskOutputList = workflowTaskOutputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId());
                     if(workflowTaskOutputList.size() > 0){
@@ -991,9 +999,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     public WorkflowRunKeyDto start(WorkflowStartSignatureDto req) {
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
-        // 交易-手续费校验
-        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList);
-        checkFee(workflowFeeList);
+//        // 交易-手续费校验 //TODO
+//        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList);
+//        checkFee(workflowFeeList);
         // 保存运行时信息
         WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(UserContext.getCurrentUser().getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
         // 启动任务
@@ -1015,6 +1023,10 @@ public class WorkflowServiceImpl implements WorkflowService {
             curWorkflowRunTaskStatus.setBeginTime(new Date());
             // 提交任务到 Net
             PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, curWorkflowRunTaskStatus);
+            if(1==1){
+                return;
+            }
+
             try {
                 PublishTaskDeclareResponse response = grpcTaskServiceClient.publishTaskDeclare(orgService.getChannel(curWorkflowRunTaskStatus.getWorkflowTask().getIdentityId()), request);
                 curWorkflowRunTaskStatus.setTaskId(response.getTaskId());
@@ -1059,7 +1071,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 设置模型输入组织
         String modelPartyId = null;
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
-            modelPartyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
+            modelPartyId = "m" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), modelPartyId));
             requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.UNKNOWN.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
@@ -1189,9 +1201,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         dataPolicy.setMetadataName(dataService.getMetaDataById(workflowTaskInput.getMetaDataId(), false).getMetaDataName());
         dataPolicy.setKeyColumn(workflowTaskInput.getKeyColumn());
         List<Integer> selectedColumns = new ArrayList<>();
-        Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
-            selectedColumns.add(Integer.valueOf(subItem));
-        });
+        if(StringUtils.isNotBlank(workflowTaskInput.getDataColumnIds())){
+            Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
+                selectedColumns.add(Integer.valueOf(subItem));
+            });
+        }
         dataPolicy.setSelectedColumns(selectedColumns);
         return JSONObject.toJSONString(dataPolicy);
     }
@@ -1234,6 +1248,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowRunStatus.setStep(workflowTaskList.get(workflowTaskList.size() - 1).getStep());
         workflowRunStatus.setCurStep(workflowTaskList.get(0).getStep());
         workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
+        workflowRunStatus.setWorkflow(workflowManager.getById(workflowId));
         workflowRunStatusManager.save(workflowRunStatus);
 
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowTaskList.stream()
@@ -1268,6 +1283,21 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList) {
+        // 白名单校验
+        Set<String> senderSet = workflowTaskList.stream().map(WorkflowTask::getIdentityId).collect(Collectors.toSet());
+        Map<String, Org> userOrgMap = orgService.getUserOrgList().stream()
+                .filter(item -> senderSet.contains(item.getIdentityId()))
+                .collect(Collectors.toMap(Org::getIdentityId, me -> me));
+        List<String> errorList = new ArrayList<>();
+        for (String sender : senderSet){
+            if(!userOrgMap.containsKey(sender) || ! userOrgMap.get(sender).getIsInWhitelist()){
+                errorList.add(sender);
+            }
+        }
+        if(errorList.size() > 0){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.ORGANIZATION_NOT_IN_WHITE_LIST.getMsg(), "{}", errorList.toString()));
+        }
+
         // token费用
         Map<String, Long> metaDataId2CountMap = workflowTaskList.stream()
                 .flatMap(item -> item.getInputList().stream())
@@ -1275,11 +1305,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<MetaData> metaDataList = dataService.listMetaDataByIds(metaDataId2CountMap.keySet());
         Map<String, String> metaDataId2TokenAddressMap = metaDataList.stream()
                 .collect(Collectors.toMap(MetaData::getMetaDataId, MetaData::getTokenAddress));
-
         List<Token> tokenList = dataService.listTokenByIds(metaDataId2TokenAddressMap.values());
         tokenList.add(dataService.getMetisToken());
         Map<String, Token> tokenId2TokenMap = tokenList.stream().collect(Collectors.toMap(Token::getAddress, item -> item));
-
         List<WorkflowFeeItemDto> tokenFeeList =  metaDataId2CountMap.entrySet().stream()
                 .map(item -> createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, new BigInteger(sysConfig.getDefaultTokenValue()).multiply(BigInteger.valueOf(item.getValue())).toString(), tokenId2TokenMap.get(metaDataId2TokenAddressMap.get(item.getKey()))))
                 .collect(Collectors.toList());

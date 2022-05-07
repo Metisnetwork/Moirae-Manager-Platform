@@ -147,6 +147,7 @@ public enum ErrorMsg {
     ORGANIZATION_UNAVAILABLE_SENDER("任务的发起方组织不可用 {}", "The originating organization of the task is unavailable {}"),
     ORGANIZATION_UNAVAILABLE_DATA_PROVIDED("任务的数据提供方组织不可用 {}", "The data provider organization for the task is unavailable {}"),
     ORGANIZATION_UNAVAILABLE_OUTPUT("任务的结果输出方组织不可用 {}", "The result exporter organization of the task is unavailable {}"),
+    ORGANIZATION_NOT_IN_WHITE_LIST("机构未设置到白名单中 {}", "Organization is not whitelisted {}"),
     ;
 
     private final String zh;
