@@ -82,4 +82,5 @@ chain:
     rpcUrl: https://devnetopenapi.platon.network/rpc
     symbol: LAT
     blockExplorerUrl: https://devnetscan.platon.network/
+    dexUrl: http://10.10.8.181:8080/
 

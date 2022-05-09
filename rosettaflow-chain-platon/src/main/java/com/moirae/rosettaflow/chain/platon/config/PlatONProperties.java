@@ -23,6 +23,7 @@ public class PlatONProperties {
     private String chainName;
     private String rpcUrl;
     private String blockExplorerUrl;
+    private String dexUrl;
     private String symbol;
     @PostConstruct
     public void init(){

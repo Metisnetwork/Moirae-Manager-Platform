@@ -25,6 +25,7 @@ public class SysServiceImpl implements SysService {
         result.setBlockExplorerUrl(platONProperties.getBlockExplorerUrl());
         result.setMetisPayAddress(platONProperties.getMetisPayAddress());
         result.setUniswapV2Router02(platONProperties.getUniswapV2Router02());
+        result.setDexUrl(platONProperties.getDexUrl());
         return result;
     }
 }

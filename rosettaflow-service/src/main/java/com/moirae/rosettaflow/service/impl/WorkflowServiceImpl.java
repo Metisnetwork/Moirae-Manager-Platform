@@ -998,11 +998,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Transactional
     @Override
     public WorkflowRunKeyDto start(WorkflowStartSignatureDto req) {
+        // 工作流启动
+        // TODO XXX
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
-//        // 交易-手续费校验 //TODO
-//        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList);
-//        checkFee(workflowFeeList);
+        // 交易-手续费校验
+        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList);
+        checkFee(workflowFeeList);
         // 保存运行时信息
         WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(UserContext.getCurrentUser().getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
         // 启动任务
@@ -1063,7 +1065,15 @@ public class WorkflowServiceImpl implements WorkflowService {
             WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
             requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.CSV.getValue());
-            requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
+            if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
+                Psi psi = curWorkflowRunTaskStatus.getPsiList().stream()
+                        .filter(item -> workflowTaskInput.getIdentityId().equals(item.getIdentityId()))
+                        .findFirst().get();
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, psi));
+            }else{
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
+
+            }
         }
         // 设置模型输入组织
         String modelPartyId = null;
@@ -1073,19 +1083,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.UNKNOWN.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
         }
-        // 设置psi输入组织
-        if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
-            for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
-                WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
-                Psi psi = curWorkflowRunTaskStatus.getPsiList().stream()
-                        .filter(item -> workflowTaskInput.getIdentityId().equals(item.getIdentityId()))
-                        .findFirst().get();
-                String partyId = "p" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
-                requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(psi.getOrg(), partyId));
-                requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.UNKNOWN.getValue());
-                requestBuild.addDataPolicyOptions(createDataPolicyItem(psi, partyId));
-            }
-         }
 
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().size(); i++) {
             WorkflowTaskOutput workflowTaskOutput = curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().get(i);
@@ -1138,6 +1135,21 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private String createAlgorithmCodeExtraParamsForPsi(String calculateContractStruct, List<WorkflowTaskInput> workflowTaskInputList,  List<WorkflowTaskOutput> workflowTaskOutputList) {
         JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
+
+        if(algorithmDynamicParams.containsKey("use_alignment")){
+            boolean useAlignment =  workflowTaskInputList.stream()
+                    .filter(item-> StringUtils.isNotBlank(item.getDataColumnIds()))
+                    .count() > 0 ? true : false;
+            algorithmDynamicParams.put("use_alignment", useAlignment);
+        }
+
+        workflowTaskInputList.stream()
+            .filter(item -> item.getDependentVariable() != null && item.getDependentVariable() > 0)
+            .findFirst().ifPresent(item -> {
+                algorithmDynamicParams.put("label_owner", item.getPartyId());
+                algorithmDynamicParams.put("label_column", dataService.getDataColumnByIds(item.getMetaDataId(), item.getDependentVariable().intValue()).getColumnName());
+        });
+
         if(algorithmDynamicParams.containsKey("data_flow_restrict")){
             JSONObject dataFlowRestrict = new JSONObject();
             // 输入
@@ -1235,6 +1247,23 @@ public class WorkflowServiceImpl implements WorkflowService {
         dataPolicy.setPartyId(partyId);
         dataPolicy.setMetadataId(model.getMetaDataId());
         dataPolicy.setMetadataName(model.getName());
+        return JSONObject.toJSONString(dataPolicy);
+    }
+
+    private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput, Psi psi) {
+        TaskDataPolicyCsv dataPolicy = new TaskDataPolicyCsv();
+        dataPolicy.setInputType(1);
+        dataPolicy.setPartyId(workflowTaskInput.getPartyId());
+        dataPolicy.setMetadataId(psi.getMetaDataId());
+        dataPolicy.setMetadataName(psi.getName());
+        dataPolicy.setKeyColumn(workflowTaskInput.getKeyColumn());
+        List<Integer> selectedColumns = new ArrayList<>();
+        if(StringUtils.isNotBlank(workflowTaskInput.getDataColumnIds())){
+            Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
+                selectedColumns.add(Integer.valueOf(subItem));
+            });
+        }
+        dataPolicy.setSelectedColumns(selectedColumns);
         return JSONObject.toJSONString(dataPolicy);
     }
 
@@ -1361,9 +1390,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .map(item -> {
                     List<String> tokenIdList = item.getInputList().stream().map(subItem-> metaDataId2TokenAddressMap.get(subItem.getMetaDataId())).collect(Collectors.toList());
                     EstimateTaskGasRequest.Builder requestBuilder = EstimateTaskGasRequest.newBuilder();
-                    tokenIdList.forEach(subItem -> {
-                        requestBuilder.addDataTokenAddresses(subItem);
-                    });
+                    requestBuilder.setTaskSponsorAddress(UserContext.getCurrentUser().getAddress());
+                    tokenIdList.forEach(subItem -> requestBuilder.addDataTokenAddresses(subItem));
                     EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
                     WorkflowFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getMetisToken());
                     return workflowTaskFeeItemDto;

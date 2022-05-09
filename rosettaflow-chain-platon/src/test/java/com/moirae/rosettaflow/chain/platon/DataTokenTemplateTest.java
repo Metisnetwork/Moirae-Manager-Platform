@@ -45,8 +45,8 @@ public class DataTokenTemplateTest extends BaseContractTest {
         String tokenList = "0x355b39ad02068e7e0189b5df2df1818ad72dc64b\n" +
                 "0xad716b2d1adb6d8a508326a7c2e328db8b154da0\n" +
                 "0xe19cfd8f9173155c26149818abd5decaa6f705f3\n" +
+                "0xa0c63fac4e5425f4721ff3258c3fa5b381152f73\n" +
                 "0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4";
-
         String[] tokenArray = tokenList.split("\n");
 
         for (String token: tokenArray) {

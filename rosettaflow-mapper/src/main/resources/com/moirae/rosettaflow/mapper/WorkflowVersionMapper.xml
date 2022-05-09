@@ -8,7 +8,7 @@
             mwv.workflow_version,
             mwv.workflow_version_name,
             mwv.create_time,
-            mwv.status,
+            mwrs.run_status as status,
             mwrs.begin_time,
             mwrs.end_time,
             mw.create_mode

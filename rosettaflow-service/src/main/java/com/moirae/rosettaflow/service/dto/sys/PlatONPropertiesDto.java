@@ -21,4 +21,7 @@ public class PlatONPropertiesDto {
     private String metisPayAddress;
     @ApiModelProperty(value = "DEX路由合约地址")
     private String uniswapV2Router02;
+    @ApiModelProperty(value = "dex地址")
+    private String dexUrl;
+
 }
