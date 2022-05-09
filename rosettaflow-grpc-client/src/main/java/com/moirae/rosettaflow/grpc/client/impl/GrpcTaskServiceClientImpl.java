@@ -1,5 +1,6 @@
 package com.moirae.rosettaflow.grpc.client.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 import com.moirae.rosettaflow.grpc.constant.GrpcConstant;
@@ -58,7 +59,10 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
 
     @Override
     public PublishTaskDeclareResponse publishTaskDeclare(Channel channel, PublishTaskDeclareRequest request) {
-        return TaskServiceGrpc.newBlockingStub(channel).publishTaskDeclare(request);
+        log.info("publishTaskDeclare req = {}", request);
+        PublishTaskDeclareResponse response = TaskServiceGrpc.newBlockingStub(channel).publishTaskDeclare(request);
+        log.info("publishTaskDeclare resp = {}", response);
+        return response;
     }
 
     @Override

@@ -98,6 +98,8 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
                 psiWorkflowTaskInput.setIdentityId(item.getIdentityId());
                 psiWorkflowTaskInput.setKeyColumn(item.getKeyColumn());
                 psiWorkflowTaskInput.setPartyId(item.getPartyId());
+                psiWorkflowTaskInput.setDataColumnIds(item.getDataColumnIds());
+                psiWorkflowTaskInput.setDependentVariable(item.getDependentVariable());
                 psiWorkflowTaskInput.setSortKey(item.getSortKey());
                 return psiWorkflowTaskInput;
             }
