@@ -998,8 +998,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Transactional
     @Override
     public WorkflowRunKeyDto start(WorkflowStartSignatureDto req) {
-        // 工作流启动
-        // TODO XXX
+        // 工作流启动校验
+//        // 1. 运行状态校验
+//        WorkflowRunStatus lastWorkflowRunStatus = workflowRunStatusManager.getLatestOneByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+//        if(lastWorkflowRunStatus != null && lastWorkflowRunStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_DOING){
+//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
+//        }
+
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
         // 交易-手续费校验

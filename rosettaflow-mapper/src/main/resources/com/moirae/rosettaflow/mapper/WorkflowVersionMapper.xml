@@ -8,12 +8,26 @@
             mwv.workflow_version,
             mwv.workflow_version_name,
             mwv.create_time,
-            mwrs.run_status as status,
-            mwrs.begin_time,
-            mwrs.end_time,
+            wimwrs.run_status as status,
+            wimwrs.begin_time,
+            wimwrs.end_time,
             mw.create_mode
-        from mo_workflow_version mwv left join mo_workflow_run_status mwrs on (mwv.workflow_id = mwrs.workflow_id and  mwv.workflow_version = mwrs.workflow_version)
-            inner join mo_workflow mw on mw.workflow_id = mwv.workflow_id
+        from mo_workflow_version mwv inner join mo_workflow mw on mw.workflow_id = mwv.workflow_id
+            left join
+        (
+            select mwrs.workflow_id,
+                   mwrs.workflow_version,
+                   mwrs.run_status,
+                   mwrs.begin_time,
+                   mwrs.end_time
+            from mo_workflow_run_status mwrs
+            where mwrs.id in (
+                select max(mwrs.id) as id
+                from mo_workflow_run_status mwrs
+                where mwrs.workflow_id = #{workflowId}
+                group by mwrs.workflow_version
+            )
+        ) wimwrs on (wimwrs.workflow_id = mwv.workflow_id and wimwrs.workflow_version = mwv.workflow_version)
         where mwv.workflow_id = #{workflowId}
     </select>
 </mapper>

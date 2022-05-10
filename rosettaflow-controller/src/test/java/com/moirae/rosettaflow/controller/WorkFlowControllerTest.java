@@ -417,13 +417,25 @@ public class WorkFlowControllerTest extends BaseControllerTest{
 
     @Test
     public void start()throws Exception{
-
         JSONObject req = new JSONObject();
         req.put("workflowId", 1);
         req.put("workflowVersion", 1);
         req.put("sign",  WalletSignUtils.signTypedDataV4(getWorkflowJson(user.getAddress()) , user.getEcKeyPair()));
         System.out.println("result = "  + commonPostWithToken("/workflow/start", req.toJSONString()));
     }
+
+    @Test
+    public void copy() throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("workflowId", 1);
+        req.put("workflowVersion", 1);
+        req.put("workflowVersionName", "chendai-v2");
+        System.out.println("result = "  + commonPostWithToken("/workflow/copyWorkflow", req.toJSONString()));
+    }
+
+
+
+
 
     private String getWorkflowJson(String address){
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"{}\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"address\",\"type\":\"string\"}]}}";
@@ -435,7 +447,6 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         emptyParameters.add("workflowVersion", String.valueOf(workflowVersion));
         return commonGetWithToken("/workflow/preparationStart", emptyParameters);
     }
-
 
     private String getWorkflowResultOfExpertMode(Long workflowId, Long workflowVersion, Integer nodeStep)throws Exception{
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap();
@@ -470,22 +481,6 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         JSONObject req = new JSONObject();
         req.put("workflowId", workflowId);
         return commonPostWithToken("/workflow/deleteWorkflow", req.toJSONString());
-    }
-
-    private String copy(Long workflowId, Long workflowVersion, String workflowVersionName) throws Exception {
-        JSONObject req = new JSONObject();
-        req.put("workflowId", workflowId);
-        req.put("workflowVersion", workflowVersion);
-        req.put("workflowVersionName", workflowVersionName);
-        return commonPostWithToken("/workflow/copyWorkflow", req.toJSONString());
-    }
-
-    private String copyWorkflow(Long workflowId, Long workflowVersion, String workflowVersionName) throws Exception {
-        JSONObject req = new JSONObject();
-        req.put("workflowId", workflowId);
-        req.put("workflowVersion", workflowVersion);
-        req.put("workflowVersionName", workflowVersionName);
-        return commonPostWithToken("/workflow/copyWorkflow", req.toJSONString());
     }
 
     private String createWorkflowOfExpertMode(String workflowName) throws Exception {
