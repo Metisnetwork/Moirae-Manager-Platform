@@ -1005,11 +1005,11 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public WorkflowRunKeyDto start(WorkflowStartSignatureDto req) {
         // 工作流启动校验
-//        // 1. 运行状态校验
-//        WorkflowRunStatus lastWorkflowRunStatus = workflowRunStatusManager.getLatestOneByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
-//        if(lastWorkflowRunStatus != null && lastWorkflowRunStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_DOING){
-//            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
-//        }
+        // 1. 运行状态校验
+        WorkflowRunStatus lastWorkflowRunStatus = workflowRunStatusManager.getLatestOneByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
+        if(lastWorkflowRunStatus != null && lastWorkflowRunStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_DOING){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_RUNNING_EXIST.getMsg());
+        }
 
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
@@ -1166,13 +1166,18 @@ public class WorkflowServiceImpl implements WorkflowService {
             // 输入
             Map<String, WorkflowTaskInput> workflowTaskInputMap = new HashMap<>();
             for (WorkflowTaskInput workflowTaskInput : workflowTaskInputList) {
-                dataFlowRestrict.put(workflowTaskInput.getPartyId(), StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
+                JSONArray value1 = new JSONArray();
+                value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
+                dataFlowRestrict.put(workflowTaskInput.getPartyId(),value1 );
                 workflowTaskInputMap.put(workflowTaskInput.getIdentityId(), workflowTaskInput);
             }
             // 输出
             for (WorkflowTaskOutput workflowTaskOutput: workflowTaskOutputList) {
                 WorkflowTaskInput workflowTaskInput = workflowTaskInputMap.get(workflowTaskOutput.getIdentityId());
-                dataFlowRestrict.put(workflowTaskOutput.getPartyId(), StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
+
+                JSONArray value1 = new JSONArray();
+                value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
+                dataFlowRestrict.put(workflowTaskOutput.getPartyId(), value1);
             }
             algorithmDynamicParams.put("data_flow_restrict", dataFlowRestrict);
         }

@@ -24,6 +24,21 @@ public class TaskDataProvider implements Serializable {
     private String metaDataId;
 
     /**
+     * 元数据名称
+     */
+    private String metaDataName;
+
+    /**
+     * 存储的策略类型. 0: 未知原始数据格式， 1: csv格式原始数据， 2: dir格式 (目录)， 3: binary格式 (普通的二进制数据, 没有明确说明后缀的二进制文件)
+     */
+    private Integer policyType;
+
+    /**
+     * 输入数据的类型. 0: unknown, 1: origin_data, 2: model
+     */
+    private Integer inputType;
+
+    /**
      * (冗余)参与任务的元数据的所属组织的identity_id
      */
     private String identityId;
@@ -38,6 +53,11 @@ public class TaskDataProvider implements Serializable {
      */
     private Integer keyColumnIdx;
 
+    /**
+     * 元数据选择列
+     */
+    private String selectedColumns;
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -45,13 +65,6 @@ public class TaskDataProvider implements Serializable {
      */
     @TableField(exist = false)
     private String nodeName;
-
-    /**
-     * 元数据名称
-     */
-    @TableField(exist = false)
-    private String metaDataName;
-
 
     /**
      * 元数据代币名称

@@ -11,11 +11,13 @@
             wimwrs.run_status as status,
             wimwrs.begin_time,
             wimwrs.end_time,
+            wimwrs.id as workflowRunId,
             mw.create_mode
         from mo_workflow_version mwv inner join mo_workflow mw on mw.workflow_id = mwv.workflow_id
             left join
         (
-            select mwrs.workflow_id,
+            select mwrs.id,
+                   mwrs.workflow_id,
                    mwrs.workflow_version,
                    mwrs.run_status,
                    mwrs.begin_time,

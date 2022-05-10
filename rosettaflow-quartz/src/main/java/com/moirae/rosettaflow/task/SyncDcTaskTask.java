@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.task;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
+import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyCsv;
 import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyUnknown;
 import com.moirae.rosettaflow.grpc.service.types.TaskDetail;
 import com.moirae.rosettaflow.grpc.service.types.TaskDetailSummary;
@@ -16,15 +17,13 @@ import com.moirae.rosettaflow.service.DataSyncService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -86,20 +85,27 @@ public class SyncDcTaskTask {
             taskAlgoProviderList.add(taskAlgoProvider);
 
             Map<String, TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
-            for (int i = 0; i < information.getDataFlowPolicyTypesCount(); i++) {
-                TaskDataPolicyUnknown dataPolicy = JSONObject.parseObject(information.getDataFlowPolicyOptions(i), TaskDataPolicyUnknown.class);
+            for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
+                TaskDataPolicyCsv dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyCsv.class);
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
                 taskDataProvider.setTaskId(information.getTaskId());
                 taskDataProvider.setMetaDataId(dataPolicy.getMetadataId());
+                taskDataProvider.setMetaDataName(dataPolicy.getMetadataName());
+                taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));
+                taskDataProvider.setInputType(dataPolicy.getInputType());
                 taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
                 taskDataProvider.setPartyId(dataPolicy.getPartyId());
+                taskDataProvider.setKeyColumnIdx(dataPolicy.getKeyColumn().intValue());
+                if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
+                    taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
+                }
                 taskDataProviderList.add(taskDataProvider);
             }
 
             Map<String, TaskPowerResourceOption> resourceMap = information.getPowerResourceOptionsList().stream().collect(Collectors.toMap(TaskPowerResourceOption::getPartyId, resource -> resource));
             Map<String, TaskOrganization> powerMap =  information.getPowerSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
 
-            for (int i = 0; i < information.getPowerPolicyTypesCount(); i++) {
+            for (int i = 0; i < information.getPowerPolicyTypesList().size(); i++) {
                 String partId = information.getPowerPolicyOptions(i);
                 TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
                 taskPowerProvider.setTaskId(information.getTaskId());
@@ -136,5 +142,12 @@ public class SyncDcTaskTask {
             taskList.add(task);
         });
         taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);
+    }
+
+    public static void main(String[] args) {
+        List<String> dataList = new ArrayList<>();
+        dataList.add("A");
+        dataList.add("B");
+        System.out.println(StringUtils.join(dataList, ","));
     }
 }

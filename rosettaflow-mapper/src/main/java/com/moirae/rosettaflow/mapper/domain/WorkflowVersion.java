@@ -75,4 +75,10 @@ public class WorkflowVersion implements Serializable {
      */
     @TableField(exist = false)
     private WorkflowCreateModeEnum createMode;
+
+    /**
+     * 工作流运行记录id
+     */
+    @TableField(exist = false)
+    private Long workflowRunId;
 }

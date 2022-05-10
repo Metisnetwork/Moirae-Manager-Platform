@@ -24,6 +24,9 @@ public class WorkflowVersionVo {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @ApiModelProperty(value = "工作流运行记录id")
+    private Long workflowRunId;
+
     @ApiModelProperty(value = "创建模式（专家模型、向导模式）")
     private WorkflowCreateModeEnum createMode;
 
