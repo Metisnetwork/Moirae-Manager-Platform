@@ -28,7 +28,7 @@ public class StatsOrgTask {
     @Resource
     private StatisticsService statisticsService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "StatsOrgTask")
     public void run() {
         long begin = DateUtil.current();
@@ -60,6 +60,9 @@ public class StatsOrgTask {
     }
 
     private Integer computingPowerRatio(int totalCore, long totalMemory, long totalBandwidth, int orgTotalCore, long orgTotalMemory, long orgTotalBandwidth) {
+        if(totalCore == 0 || totalMemory == 0 || totalBandwidth == 0 || orgTotalCore == 0 || orgTotalMemory == 0 ||  orgTotalBandwidth == 0) {
+            return 0;
+        }
         BigDecimal totalCoreBD = BigDecimal.valueOf(totalCore);
         BigDecimal totalMemoryBD = BigDecimal.valueOf(totalMemory);
         BigDecimal totalBandwidthBD = BigDecimal.valueOf(totalBandwidth);
@@ -69,7 +72,7 @@ public class StatsOrgTask {
         BigDecimal molecularOfCore = orgTotalCoreBD.multiply(totalMemoryBD).multiply(totalBandwidthBD);
         BigDecimal molecularOfMemory = orgTotalMemoryBD.multiply(totalCoreBD).multiply(totalBandwidthBD);
         BigDecimal molecularOfBandwidth = orgTotalBandwidthBD.multiply(totalMemoryBD).multiply(totalCoreBD);
-        BigDecimal molecular = molecularOfCore.add(molecularOfMemory).add(molecularOfBandwidth).divide(BigDecimal.valueOf(3));
+        BigDecimal molecular = molecularOfCore.add(molecularOfMemory).add(molecularOfBandwidth).divide(BigDecimal.valueOf(3), 0, BigDecimal.ROUND_HALF_UP);
         BigDecimal denominator = totalCoreBD.multiply(totalMemoryBD).multiply(totalBandwidthBD);
         if(denominator.compareTo(BigDecimal.ZERO) > 0){
           return molecular.divide(denominator, 4, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(10000L)).intValue();

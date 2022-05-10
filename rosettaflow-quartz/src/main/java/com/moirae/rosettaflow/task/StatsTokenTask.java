@@ -26,7 +26,7 @@ public class StatsTokenTask {
     @Resource
     private TaskService taskService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "StatsTokenTask")
     public void run() {
         long begin = DateUtil.current();
@@ -40,7 +40,10 @@ public class StatsTokenTask {
                     List<MetaData> metaDataList = dataService.listMetaDataByTokenAddress(tokenAddress);
                     if(metaDataList.size() > 0){
                         save.setTokenUsed(taskService.countOfTokenUsed(metaDataList.stream().map(MetaData::getMetaDataId).collect(Collectors.toList())));
+                    }else {
+                        save.setTokenUsed(0L);
                     }
+                    saveList.add(save);
                 } catch (Exception e){
                     log.error("StatsTokenTask, 明细失败：{}",tokenAddress, e);
                 }

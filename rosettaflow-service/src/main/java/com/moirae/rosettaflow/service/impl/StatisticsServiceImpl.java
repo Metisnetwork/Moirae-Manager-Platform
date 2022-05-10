@@ -101,6 +101,21 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public StatsGlobal globalStats() {
-        return statsGlobalManager.getById(1);
+        StatsGlobal statsGlobal = statsGlobalManager.getById(1);
+        if(statsGlobal == null){
+            statsGlobal = new StatsGlobal();
+            statsGlobal.setId(1);
+            statsGlobal.setTotalMemory(0);
+            statsGlobal.setTotalBandwidth(0);
+            statsGlobal.setTotalCore(0);
+            statsGlobal.setDataSize(0);
+            statsGlobal.setDataTokenUsed(0);
+            statsGlobal.setDataTokenCount(0);
+            statsGlobal.setAddressCountOfActive(0);
+            statsGlobal.setAddressCountOfTask(0);
+            statsGlobal.setTaskCount(0);
+            statsGlobalManager.save(statsGlobal);
+        }
+        return statsGlobal;
     }
 }
