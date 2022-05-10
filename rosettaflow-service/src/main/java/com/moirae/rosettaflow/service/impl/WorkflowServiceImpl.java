@@ -126,7 +126,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public IPage<WorkflowVersion> getWorkflowVersionList(Long current, Long size, Long workflowId) {
         Page<WorkflowVersion> page = new Page<>(current, size);
-        return workflowVersionManager.getWorkflowVersionList(page, workflowId);
+        IPage<WorkflowVersion> result = workflowVersionManager.getWorkflowVersionList(page, workflowId);
+        result.getRecords().stream().forEach(item -> {
+            if(item.getStatus() == null){
+                item.setStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
+            }
+        });
+        return result;
     }
 
     @Override
