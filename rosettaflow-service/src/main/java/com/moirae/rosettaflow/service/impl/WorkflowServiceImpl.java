@@ -341,6 +341,8 @@ public class WorkflowServiceImpl implements WorkflowService {
             taskResult.setIp(response.getIp());
             taskResult.setPort(response.getPort());
             taskResultList.add(taskResult);
+
+            String filePath = JSONObject.parseObject(response.getMetadataOption()).getString("dataPath");
             // 处理模型
             if(algorithm.getOutputModel()){
                 Algorithm predictionAlgorithm = algService.getAlgorithmOfRelativelyPrediction(workflowTask.getAlgorithmId());
@@ -356,6 +358,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 model.setTrainUserAddress(workflowRunStatus.getAddress());
                 model.setSupportedAlgorithmId(predictionAlgorithm.getAlgorithmId());
                 model.setEvaluate(response.getExtra());
+                model.setFilePath(filePath);
                 modelList.add(model);
             }
 
@@ -370,6 +373,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 psi.setTrainTaskId(task.getId());
                 psi.setTrainAlgorithmId(workflowTask.getAlgorithmId());
                 psi.setTrainUserAddress(workflowRunStatus.getAddress());
+                psi.setFilePath(filePath);
                 psiList.add(psi);
             }
         }
@@ -1319,12 +1323,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId());
-        Map<Long, WorkflowTask> workflowTaskMap = workflowTaskList.stream().collect(Collectors.toMap(WorkflowTask::getWorkflowTaskId, item -> item));
-
-        workflowRunTaskStatusList.stream().forEach(item -> {
-            item.setWorkflowTask(workflowTaskMap.get(item.getWorkflowTaskId()));
-        });
+        Map<Long, WorkflowTask> workflowTaskMap = workflowTaskList.stream().collect(Collectors.toMap(WorkflowTask::getWorkflowTaskId, me -> me));
+        workflowRunStatus.setWorkflow(workflowManager.getById(workflowRunStatus.getWorkflowId()));
+        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(workflowRunStatus.getId());
+        workflowRunTaskStatusList
+                .forEach(item -> {
+                    item.setWorkflowTask(workflowTaskMap.get(item.getWorkflowTaskId()));
+                });
         workflowRunStatus.setWorkflowRunTaskStatusList(workflowRunTaskStatusList);
         return workflowRunStatus;
     }

@@ -9,6 +9,4 @@ import java.util.List;
 public interface StatsDayManager extends IService<StatsDay> {
 
     List<StatsDay> getNewestList(StatsDayKeyEnum key, Integer size);
-
-    boolean saveOrUpdate(StatsDay statsDay);
 }

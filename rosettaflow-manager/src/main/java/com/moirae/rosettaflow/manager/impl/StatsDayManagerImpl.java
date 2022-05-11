@@ -25,19 +25,4 @@ public class StatsDayManagerImpl extends ServiceImpl<StatsDayMapper, StatsDay> i
         wrapper.last(" limit " + size);
         return list(wrapper);
     }
-    @Override
-    public boolean saveOrUpdate(StatsDay statsDay){
-        LambdaQueryWrapper<StatsDay> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(StatsDay::getStatsTime, statsDay.getStatsTime());
-        wrapper.eq(StatsDay::getStatsKey, statsDay.getStatsKey());
-        if(count(wrapper) == 1){
-            LambdaUpdateWrapper<StatsDay> updateWrapper = Wrappers.lambdaUpdate();
-            updateWrapper.set(StatsDay::getStatsValue, statsDay.getStatsValue());
-            updateWrapper.eq(StatsDay::getStatsTime, statsDay.getStatsTime());
-            updateWrapper.eq(StatsDay::getStatsKey, statsDay.getStatsKey());
-            return update(updateWrapper);
-        }else{
-            return save(statsDay);
-        }
-    }
 }
