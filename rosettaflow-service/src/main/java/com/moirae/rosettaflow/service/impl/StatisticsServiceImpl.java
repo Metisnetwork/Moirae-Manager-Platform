@@ -14,6 +14,7 @@ import com.moirae.rosettaflow.service.StatisticsService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +63,32 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public List<StatsDay> getTaskTrend(Integer size) {
-        return statsDayManager.getNewestList(StatsDayKeyEnum.TASK_COUNT, size);
+        List<StatsDay> statsDayList = statsDayManager.getNewestList(StatsDayKeyEnum.TASK_COUNT, size);
+        int pending = size - statsDayList.size();
+        if(pending > 0){
+            Date last;
+            if(statsDayList.size() > 0){
+                last = statsDayList.get(statsDayList.size() - 1).getStatsTime();
+            }else{
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String s = sdf.format(new Date());
+                try {
+                    last =  sdf.parse(s);
+                } catch (ParseException e) {
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.EXCEPTION.getMsg());
+                }
+            }
+
+            for (int i = 0; i < pending; i++) {
+                StatsDay statsDay = new StatsDay();
+                statsDay.setStatsTime(last);
+                statsDay.setStatsKey(StatsDayKeyEnum.TASK_COUNT);
+                statsDay.setStatsValue(0L);
+                statsDayList.add(statsDay);
+                last = DateUtils.addDays(last, -1);
+            }
+        }
+        return statsDayList;
     }
 
     @Override
