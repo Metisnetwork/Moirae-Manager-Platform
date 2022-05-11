@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.moirae.rosettaflow.grpc.client.GrpcTaskServiceClient;
 import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyCsv;
 import com.moirae.rosettaflow.grpc.dynamic.TaskDataPolicyUnknown;
+import com.moirae.rosettaflow.grpc.dynamic.TaskPowerPolicy2;
 import com.moirae.rosettaflow.grpc.service.types.TaskDetail;
 import com.moirae.rosettaflow.grpc.service.types.TaskDetailSummary;
 import com.moirae.rosettaflow.grpc.service.types.TaskOrganization;
@@ -44,7 +45,7 @@ public class SyncDcTaskTask {
     @Resource
     private TaskService taskService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcTaskTask")
     public void run() {
         long begin = DateUtil.current();
@@ -106,14 +107,31 @@ public class SyncDcTaskTask {
             Map<String, TaskOrganization> powerMap =  information.getPowerSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
 
             for (int i = 0; i < information.getPowerPolicyTypesList().size(); i++) {
-                String partId = information.getPowerPolicyOptions(i);
+                Integer type = information.getPowerPolicyTypes(i);
+                String partyId;
+                String providerPartyId = null;
+                if(type == 2){
+                    TaskPowerPolicy2 taskPowerPolicy2 = JSONObject.parseObject(information.getPowerPolicyOptions(i), TaskPowerPolicy2.class);
+                    partyId = taskPowerPolicy2.getPowerPartyId();
+                    providerPartyId = taskPowerPolicy2.getProviderPartyId();
+                }else{
+                    partyId = information.getPowerPolicyOptions(i);
+                }
                 TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
                 taskPowerProvider.setTaskId(information.getTaskId());
-                taskPowerProvider.setIdentityId(powerMap.get(partId).getIdentityId());
-                taskPowerProvider.setPartyId(partId);
-                taskPowerProvider.setUsedCore(resourceMap.get(partId).getResourceUsedOverview().getUsedProcessor());
-                taskPowerProvider.setUsedMemory(resourceMap.get(partId).getResourceUsedOverview().getUsedMem());
-                taskPowerProvider.setUsedBandwidth(resourceMap.get(partId).getResourceUsedOverview().getUsedBandwidth());
+                //TODO
+//                taskPowerProvider.setIdentityId(powerMap.get(partyId).getIdentityId());
+                if(type == 2){
+                    taskPowerProvider.setIdentityId(dataMap.get(providerPartyId).getIdentityId());
+                }else{
+                    taskPowerProvider.setIdentityId(powerMap.get(partyId).getIdentityId());
+                }
+                taskPowerProvider.setPartyId(partyId);
+                taskPowerProvider.setProviderPartyId(providerPartyId);
+                taskPowerProvider.setPolicyType(type);
+                taskPowerProvider.setUsedCore(resourceMap.get(partyId).getResourceUsedOverview().getUsedProcessor());
+                taskPowerProvider.setUsedMemory(resourceMap.get(partyId).getResourceUsedOverview().getUsedMem());
+                taskPowerProvider.setUsedBandwidth(resourceMap.get(partyId).getResourceUsedOverview().getUsedBandwidth());
                 taskPowerProviderList.add(taskPowerProvider);
             }
 

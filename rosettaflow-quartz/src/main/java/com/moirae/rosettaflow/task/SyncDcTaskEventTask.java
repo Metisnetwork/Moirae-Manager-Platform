@@ -21,7 +21,7 @@ public class SyncDcTaskEventTask {
     @Resource
     private TaskService taskService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcTaskEventTask")
     public void run() {
         long begin = DateUtil.current();
@@ -32,9 +32,9 @@ public class SyncDcTaskEventTask {
                 batchUpdateTask(taskEventList, task.getId());
             }
         } catch (Exception e) {
-            log.error("任务信息同步,从net同步任务失败,失败原因：{}", e.getMessage(), e);
+            log.error("SyncDcTaskEventTask 任务失败,失败原因：{}", e.getMessage(), e);
         }
-        log.info("任务信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
+        log.info("SyncDcTaskEventTask 任务结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
     private void batchUpdateTask(List<TaskEvent> taskEventList, String taskId) {

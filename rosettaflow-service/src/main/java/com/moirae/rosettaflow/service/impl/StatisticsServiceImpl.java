@@ -1,5 +1,7 @@
 package com.moirae.rosettaflow.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.NavigationTypeEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
@@ -12,9 +14,12 @@ import com.moirae.rosettaflow.service.StatisticsService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -86,15 +91,33 @@ public class StatisticsServiceImpl implements StatisticsService {
         Date newly = null;
         List<StatsDay> newlyList = statsDayManager.getNewestList(keyEnum, 2);
         if(newlyList.size() == 2){
-            newly = newlyList.get(1).getStatsTime();
+            newly = newlyList.get(0).getStatsTime();
         }
         List<Task> taskList = taskService.statisticsOfDay(newly);
+        Date finalNewly = newly;
         taskList.forEach(item->{
-            StatsDay statsDay = new StatsDay();
-            statsDay.setStatsTime(item.getStatsTime());
-            statsDay.setStatsKey(keyEnum);
-            statsDay.setStatsValue(item.getTaskCount().longValue());
-            statsDayManager.saveOrUpdate(statsDay);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String s = sdf.format(item.getStatsTime());
+            try {
+                Date date =  sdf.parse(s);
+                StatsDay statsDay = new StatsDay();
+                statsDay.setStatsTime(date);
+                statsDay.setStatsKey(keyEnum);
+                statsDay.setStatsValue(item.getTaskCount().longValue());
+                if(finalNewly != null && finalNewly.compareTo(date) == 0){
+                    LambdaUpdateWrapper<StatsDay> updateWrapper = Wrappers.lambdaUpdate();
+                    updateWrapper.set(StatsDay::getStatsValue, statsDay.getStatsValue());
+                    updateWrapper.eq(StatsDay::getStatsTime, date);
+                    updateWrapper.eq(StatsDay::getStatsKey, statsDay.getStatsKey());
+                    statsDayManager.update(updateWrapper);
+                }else{
+                    statsDayManager.save(statsDay);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
         });
         return true;
     }
