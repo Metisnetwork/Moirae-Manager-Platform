@@ -169,24 +169,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Model> listModelOfLatest(Integer size) {
-        List<Model> modelList = modelManager.listOfLatest(size);
-        if(modelList.size() == 0){
-            return modelList;
-        }
-
-        List<AlgorithmClassify> algorithmClassifyList = algService.listAlgorithmClassifyByIds(modelList.stream().map(Model::getTrainAlgorithmId).collect(Collectors.toSet()));
-        List<AlgorithmClassify> parentAlgorithmClassifyList = algService.listAlgorithmClassifyByIds(algorithmClassifyList.stream().map(AlgorithmClassify::getParentId).collect(Collectors.toSet()));
-        Map<Long, AlgorithmClassify>  algorithmClassifyMap = algorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
-        Map<Long, AlgorithmClassify>  parentAlgorithmClassifyMap = parentAlgorithmClassifyList.stream().collect(Collectors.toMap(AlgorithmClassify::getId, item -> item));
-        for (Model model : modelList) {
-            model.setAlgorithmName(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getName());
-            model.setAlgorithmNameEn(parentAlgorithmClassifyMap.get(algorithmClassifyMap.get(model.getTrainAlgorithmId()).getParentId()).getNameEn());
-        }
-        return modelList;
-    }
-
-    @Override
     public Model getModelById(String modelId) {
         return modelManager.getById(modelId);
     }

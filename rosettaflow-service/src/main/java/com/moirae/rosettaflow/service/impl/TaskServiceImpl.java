@@ -213,4 +213,9 @@ public class TaskServiceImpl implements TaskService {
     public Long countOfTokenUsed(List<String> metaDataIdList) {
         return taskDataProviderManager.countOfTokenUsed(metaDataIdList);
     }
+
+    @Override
+    public List<Task> listTaskOfLatest(Integer size) {
+        return taskManager.listTaskOfLatest(size);
+    }
 }

@@ -84,7 +84,7 @@ public class SysConstant {
             "workflow/wizard/getCalculationProcessList",
             "sys/getPlatONChainConfig",
             "home/queryNavigation",
-            "home/getLatestModelList",
+            "home/getLatestTaskList",
             "home/getGlobalStats",
             "home/getTaskTrend",
             "home/getOrgPowerTop",

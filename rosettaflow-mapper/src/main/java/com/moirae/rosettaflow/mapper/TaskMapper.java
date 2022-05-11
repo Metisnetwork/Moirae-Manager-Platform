@@ -27,4 +27,6 @@ public interface TaskMapper extends BaseMapper<Task> {
     Task statisticsOfGlobal();
 
     List<Task> statisticsOfDay(Date newly);
+
+    List<Task> listTaskOfLatest(Integer size);
 }

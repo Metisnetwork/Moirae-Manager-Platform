@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.moirae.rosettaflow.mapper.enums.TaskStatusEnum;
 import com.moirae.rosettaflow.mapper.enums.UserTypeEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -208,4 +209,19 @@ public class Task implements Serializable {
     private Integer addressCount;
     @TableField(exist = false)
     private Integer dataCount;
+    /**
+     * 发起方组织的身份标识id
+     */
+    @TableField(exist = false)
+    private String identityId;
+    /**
+     * 发起方组织的身份名称
+     */
+    @TableField(exist = false)
+    private String nodeName;
+    /**
+     * 发起方组织机构图像url
+     */
+    @TableField(exist = false)
+    private String imageUrl;
 }

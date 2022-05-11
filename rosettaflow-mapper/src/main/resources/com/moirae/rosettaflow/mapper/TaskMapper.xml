@@ -154,4 +154,17 @@
         GROUP BY DATE_FORMAT(`create_at`, '%Y-%m-%d')
         ORDER BY DATE_FORMAT(`create_at`, '%Y-%m-%d') DESC;
     </select>
+    <select id="listTaskOfLatest" resultType="com.moirae.rosettaflow.mapper.domain.Task">
+        select t.id,
+               t.task_name,
+               t.create_at,
+               t.start_at,
+               t.end_at,
+               t.status,
+               o.identity_id,
+               o.node_name,
+               o.image_url
+        from dc_task t inner join dc_org o on t.owner_identity_id = o.identity_id
+        order by t.create_at desc limit #{size}
+    </select>
 </mapper>

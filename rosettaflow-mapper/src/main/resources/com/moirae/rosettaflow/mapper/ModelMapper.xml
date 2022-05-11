@@ -11,15 +11,4 @@
         where m.train_user_address = #{address, jdbcType=VARCHAR} and m.supported_algorithm_id = #{algorithmId, jdbcType=BIGINT}
             and m.identity_id = #{identityId, jdbcType=VARCHAR}
     </select>
-    <select id="getLatestModel" resultType="com.moirae.rosettaflow.mapper.domain.Model">
-        select
-            m.meta_data_id,
-            m.identity_id,
-            o.node_name,
-            o.image_url,
-            m.train_algorithm_id,
-            m.create_time
-        from mo_model m inner join dc_org o on m.identity_id = o.identity_id
-        order by m.create_time desc limit #{size}
-    </select>
 </mapper>

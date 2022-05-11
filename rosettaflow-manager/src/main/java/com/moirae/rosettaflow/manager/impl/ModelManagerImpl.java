@@ -20,11 +20,6 @@ public class ModelManagerImpl extends ServiceImpl<ModelMapper, Model> implements
     }
 
     @Override
-    public List<Model> listOfLatest(Integer size) {
-        return baseMapper.getLatestModel(size);
-    }
-
-    @Override
     public Model getModelByOrgAndTrainTaskId(String identity, String taskId) {
         LambdaQueryWrapper<Model> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(Model::getIdentityId, identity);

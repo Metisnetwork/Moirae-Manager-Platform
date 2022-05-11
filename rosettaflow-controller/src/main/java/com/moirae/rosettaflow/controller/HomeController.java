@@ -3,11 +3,12 @@ package com.moirae.rosettaflow.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.moirae.rosettaflow.mapper.domain.*;
 import com.moirae.rosettaflow.req.KeyWorkReq;
-import com.moirae.rosettaflow.req.home.GetLatestModelListReq;
+import com.moirae.rosettaflow.req.home.GetLatestTaskListReq;
 import com.moirae.rosettaflow.req.home.GetOrgComputingTopReq;
 import com.moirae.rosettaflow.req.home.GetTaskTrendReq;
 import com.moirae.rosettaflow.service.DataService;
 import com.moirae.rosettaflow.service.StatisticsService;
+import com.moirae.rosettaflow.service.TaskService;
 import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import com.moirae.rosettaflow.vo.ResponseVo;
 import com.moirae.rosettaflow.vo.home.*;
@@ -32,6 +33,8 @@ public class HomeController {
     private StatisticsService statisticsService;
     @Resource
     private DataService dataService;
+    @Resource
+    private TaskService taskService;
 
     @GetMapping("queryNavigation")
     @ApiOperation(value = "查询导航", notes = "查询导航")
@@ -40,11 +43,11 @@ public class HomeController {
         return ResponseVo.createSuccess(BeanUtil.copyProperties(navigationDto, NavigationVo.class));
     }
 
-    @GetMapping("getLatestModelList")
-    @ApiOperation(value = "获得最新的模型列表", notes = "获得最新的模型列表")
-    public ResponseVo<List<LatestModelVo>> getLatestModel(@Valid GetLatestModelListReq req) {
-        List<Model> modelList = dataService.listModelOfLatest(req.getSize());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(modelList, LatestModelVo.class));
+    @GetMapping("getLatestTaskList")
+    @ApiOperation(value = "获得最新的任务列表", notes = "获得最新的任务列表")
+    public ResponseVo<List<LatestTaskVo>> getLatestTaskList(@Valid GetLatestTaskListReq req) {
+        List<Task> modelList = taskService.listTaskOfLatest(req.getSize());
+        return ResponseVo.createSuccess(BeanUtil.copyToList(modelList, LatestTaskVo.class));
     }
 
     @GetMapping("getGlobalStats")

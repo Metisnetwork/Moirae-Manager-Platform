@@ -187,14 +187,6 @@ public interface DataService {
     List<Model> listModelByUser(Long algorithmId, String identityId);
 
     /**
-     * 查询最新训练的模型
-     *
-     * @param size
-     * @return
-     */
-    List<Model> listModelOfLatest(Integer size);
-
-    /**
      * 查询模型信息
      *
      * @param modelId 模型元数据id

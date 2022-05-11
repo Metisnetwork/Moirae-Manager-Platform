@@ -36,4 +36,6 @@ public interface TaskService {
     List<Task> statisticsOfDay(Date newly);
 
     Long countOfTokenUsed(List<String> metaDataIdList);
+
+    List<Task> listTaskOfLatest(Integer size);
 }
