@@ -117,22 +117,18 @@ public class SyncDcTaskTask {
                 }else{
                     partyId = information.getPowerPolicyOptions(i);
                 }
-                TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
-                taskPowerProvider.setTaskId(information.getTaskId());
-                //TODO
-//                taskPowerProvider.setIdentityId(powerMap.get(partyId).getIdentityId());
-                if(type == 2){
-                    taskPowerProvider.setIdentityId(dataMap.get(providerPartyId).getIdentityId());
-                }else{
+                if(powerMap.containsKey(partyId)){
+                    TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
+                    taskPowerProvider.setTaskId(information.getTaskId());
                     taskPowerProvider.setIdentityId(powerMap.get(partyId).getIdentityId());
+                    taskPowerProvider.setPartyId(partyId);
+                    taskPowerProvider.setProviderPartyId(providerPartyId);
+                    taskPowerProvider.setPolicyType(type);
+                    taskPowerProvider.setUsedCore(resourceMap.get(partyId).getResourceUsedOverview().getUsedProcessor());
+                    taskPowerProvider.setUsedMemory(resourceMap.get(partyId).getResourceUsedOverview().getUsedMem());
+                    taskPowerProvider.setUsedBandwidth(resourceMap.get(partyId).getResourceUsedOverview().getUsedBandwidth());
+                    taskPowerProviderList.add(taskPowerProvider);
                 }
-                taskPowerProvider.setPartyId(partyId);
-                taskPowerProvider.setProviderPartyId(providerPartyId);
-                taskPowerProvider.setPolicyType(type);
-                taskPowerProvider.setUsedCore(resourceMap.get(partyId).getResourceUsedOverview().getUsedProcessor());
-                taskPowerProvider.setUsedMemory(resourceMap.get(partyId).getResourceUsedOverview().getUsedMem());
-                taskPowerProvider.setUsedBandwidth(resourceMap.get(partyId).getResourceUsedOverview().getUsedBandwidth());
-                taskPowerProviderList.add(taskPowerProvider);
             }
 
             information.getReceiversList().forEach(subItem ->{
