@@ -60,10 +60,6 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     @Override
     public PublishTaskDeclareResponse publishTaskDeclare(Channel channel, PublishTaskDeclareRequest request) {
         log.info("publishTaskDeclare req = {}", request);
-//        if(1 == 1){
-//            return null;
-//        }
-
         PublishTaskDeclareResponse response = TaskServiceGrpc.newBlockingStub(channel).publishTaskDeclare(request);
         log.info("publishTaskDeclare resp = {}", response);
         return response;

@@ -1072,8 +1072,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .setTaskName(publishTaskOfGetTaskName(workflowRunStatus, curWorkflowRunTaskStatus))
                 .setUser(workflowRunStatus.getAddress())
                 .setUserType(UserType.User_1)
-                .setSender(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "s0"))
-                .setAlgoSupplier(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "a0"));
+                .setSender(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "sender1"))
+                .setAlgoSupplier(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "algo1"));
 
         // 设置数据输入组织
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
@@ -1093,7 +1093,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 设置模型输入组织
         String modelPartyId = null;
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
-            modelPartyId = "m" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
+            modelPartyId = "data" + (requestBuild.getDataSuppliersBuilderList().size() - 1);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), modelPartyId));
             requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.UNKNOWN.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
@@ -1115,7 +1115,18 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
-        // data_flow_policy_type & data_flow_policy_option 设置未定义
+        // data_flow_policy_type & data_flow_policy_option
+        if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
+            // psi 需要指定
+            requestBuild.addDataFlowPolicyTypes(2);
+            requestBuild.addDataFlowPolicyOptions(createDataFlowPolicy2(curWorkflowRunTaskStatus.getWorkflowTask().getInputList(), curWorkflowRunTaskStatus.getWorkflowTask().getOutputList()));
+        }else{
+            // 其他全连接
+            requestBuild.addDataFlowPolicyTypes(1);
+            requestBuild.addDataFlowPolicyOptions(createDataFlowPolicy1());
+        }
+
+
         WorkflowTaskResource resource = curWorkflowRunTaskStatus.getWorkflowTask().getResource();
         TaskResourceCostDeclare taskResourceCostDeclare = TaskResourceCostDeclare.newBuilder()
                 .setMemory(resource.getCostMem())
@@ -1147,6 +1158,35 @@ public class WorkflowServiceImpl implements WorkflowService {
         return requestBuild.build();
     }
 
+    private String createDataFlowPolicy1() {
+        return "{}";
+    }
+
+    private String createDataFlowPolicy2(List<WorkflowTaskInput> inputList, List<WorkflowTaskOutput> outputList) {
+        JSONObject connectPolicy = new JSONObject();
+        // data -> compute 连接
+        Map<String, WorkflowTaskInput> workflowTaskInputMap = new HashMap<>();
+        for (WorkflowTaskInput workflowTaskInput : inputList) {
+            JSONArray value1 = new JSONArray();
+            value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
+            connectPolicy.put(workflowTaskInput.getPartyId(),value1 );
+            workflowTaskInputMap.put(workflowTaskInput.getIdentityId(), workflowTaskInput);
+        }
+        // compute -> compute  compute -> result 连接
+        Map<String, WorkflowTaskOutput> workflowTaskOutputMap = outputList.stream().collect(Collectors.toMap(WorkflowTaskOutput::getIdentityId, me -> me));
+        for (WorkflowTaskInput workflowTaskInput : inputList) {
+            JSONArray value1 = new JSONArray();
+            workflowTaskInputMap.keySet().stream().filter(item -> ! workflowTaskInput.getIdentityId().equals(item)).forEach(item -> {
+                value1.add(StringUtils.replace(workflowTaskInputMap.get(item).getPartyId(), "data", "compute"));
+            });
+            if(workflowTaskOutputMap.containsKey(workflowTaskInput.getIdentityId())){
+                value1.add(workflowTaskOutputMap.get(workflowTaskInput.getIdentityId()).getPartyId());
+            }
+            connectPolicy.put(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"),value1);
+        }
+        return connectPolicy.toJSONString();
+    }
+
 
     private String createAlgorithmCodeExtraParamsForPsi(String calculateContractStruct, List<WorkflowTaskInput> workflowTaskInputList,  List<WorkflowTaskOutput> workflowTaskOutputList) {
         JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
@@ -1171,17 +1211,17 @@ public class WorkflowServiceImpl implements WorkflowService {
             Map<String, WorkflowTaskInput> workflowTaskInputMap = new HashMap<>();
             for (WorkflowTaskInput workflowTaskInput : workflowTaskInputList) {
                 JSONArray value1 = new JSONArray();
-                value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
-                dataFlowRestrict.put(workflowTaskInput.getPartyId(),value1 );
+                value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
+                dataFlowRestrict.put(workflowTaskInput.getPartyId(), value1 );
                 workflowTaskInputMap.put(workflowTaskInput.getIdentityId(), workflowTaskInput);
             }
-            // 输出
+            // 计算
             for (WorkflowTaskOutput workflowTaskOutput: workflowTaskOutputList) {
                 WorkflowTaskInput workflowTaskInput = workflowTaskInputMap.get(workflowTaskOutput.getIdentityId());
 
                 JSONArray value1 = new JSONArray();
-                value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
-                dataFlowRestrict.put(workflowTaskOutput.getPartyId(), value1);
+                value1.add(workflowTaskOutput.getPartyId());
+                dataFlowRestrict.put(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"), value1);
             }
             algorithmDynamicParams.put("data_flow_restrict", dataFlowRestrict);
         }
@@ -1248,17 +1288,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     private String createPowerPolicy2Item(WorkflowTaskInput workflowTaskInput) {
         TaskPowerPolicy2 taskPowerPolicy2 = new TaskPowerPolicy2();
         taskPowerPolicy2.setProviderPartyId(workflowTaskInput.getPartyId());
-        taskPowerPolicy2.setPowerPartyId(StringUtils.replace(workflowTaskInput.getPartyId(), "p", "y"));
+        taskPowerPolicy2.setPowerPartyId(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
         return JSONObject.toJSONString(taskPowerPolicy2);
-    }
-
-    private String createDataPolicyItem(Psi psi, String partyId) {
-        TaskDataPolicyUnknown dataPolicy = new TaskDataPolicyUnknown();
-        dataPolicy.setInputType(2);
-        dataPolicy.setPartyId(partyId);
-        dataPolicy.setMetadataId(psi.getMetaDataId());
-        dataPolicy.setMetadataName(psi.getName());
-        return JSONObject.toJSONString(dataPolicy);
     }
 
     private String createDataPolicyItem(Model model, String partyId) {
@@ -1552,7 +1583,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowTaskInput.setDependentVariable(dataInputDtoList.get(i).getDependentVariable());
             workflowTaskInput.setDataColumnIds(dataInputDtoList.get(i).getDataColumnIds());
             workflowTaskInput.setSortKey(i);
-            workflowTaskInput.setPartyId("p" + i);
+            workflowTaskInput.setPartyId("data" + (i + 1));
             workflowTaskInputList.add(workflowTaskInput);
         }
         return workflowTaskInputList;
@@ -1574,7 +1605,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowTaskOutput.setIdentityId(identityIdList.get(i));
             workflowTaskOutput.setStorePattern(storePattern);
             workflowTaskOutput.setSortKey(i);
-            workflowTaskOutput.setPartyId("q" + i);
+            workflowTaskOutput.setPartyId("result" + (i + 1));
             workflowTaskOutputList.add(workflowTaskOutput);
         }
         return workflowTaskOutputList;
