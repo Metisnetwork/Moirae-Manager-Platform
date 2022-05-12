@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.TimeZone;
 
 /**
  * 进程初始化
@@ -22,6 +23,7 @@ public class ProcessInit {
 
     @PostConstruct
     public void init() throws Exception {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         // 第一次启动时初始化公共组织
         organizationService.initPublicOrg();
         // 初始化工厂合约地址

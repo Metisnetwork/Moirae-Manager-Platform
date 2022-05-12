@@ -53,7 +53,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Org org = orgService.getOrgById(keyword);
         if(org != null){
-            result.setType(NavigationTypeEnum.TASK);
+            result.setType(NavigationTypeEnum.ORG);
             result.setId(org.getIdentityId());
             return result;
         }

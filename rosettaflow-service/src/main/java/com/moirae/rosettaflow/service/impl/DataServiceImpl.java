@@ -217,8 +217,13 @@ public class DataServiceImpl implements DataService {
         result.setTokenName(token.getName());
         result.setTokenSymbol(token.getSymbol());
         result.setTokenDecimal(token.getDecimal());
-        result.setTokenBalance(tokenHolder.getBalance());
-        result.setAuthorizeBalance(tokenHolder.getAuthorizeBalance());
+        if(tokenHolder != null){
+            result.setTokenBalance(tokenHolder.getBalance());
+            result.setAuthorizeBalance(tokenHolder.getAuthorizeBalance());
+        }else{
+            result.setTokenBalance("0");
+            result.setAuthorizeBalance("0");
+        }
         return result;
     }
 }

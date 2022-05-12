@@ -1099,20 +1099,35 @@ public class WorkflowServiceImpl implements WorkflowService {
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
         }
 
+        // 接收方策略
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().size(); i++) {
             WorkflowTaskOutput workflowTaskOutput = curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().get(i);
             requestBuild.addReceivers(publishTaskOfGetTaskOrganization(workflowTaskOutput.getOrg(), workflowTaskOutput.getPartyId()));
-            requestBuild.addReceiverPolicyTypes(2);
-            requestBuild.addReceiverPolicyOptions(createPowerPolicy2Item(workflowTaskOutput, curWorkflowRunTaskStatus.getWorkflowTask().getInputList()));
+            if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
+                requestBuild.addReceiverPolicyTypes(2);
+                requestBuild.addReceiverPolicyOptions(createPowerPolicy2Item(workflowTaskOutput, curWorkflowRunTaskStatus.getWorkflowTask().getInputList()));
+            } else {
+                requestBuild.addReceiverPolicyTypes(1);
+                requestBuild.addReceiverPolicyOptions(workflowTaskOutput.getPartyId());
+            }
         }
 
-        // 如果是psi算法，指定数据节点提供算力策略
+        // 算力策略
         if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
+            // 如果是psi算法，指定数据节点提供算力策略
             for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
                 WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
                 requestBuild.addPowerPolicyTypes(2);
                 requestBuild.addPowerPolicyOptions(createPowerPolicy2Item(workflowTaskInput));
             }
+        }else{
+            // 随机算力
+            requestBuild.addPowerPolicyTypes(1);
+            requestBuild.addPowerPolicyOptions("compute1");
+            requestBuild.addPowerPolicyTypes(1);
+            requestBuild.addPowerPolicyOptions("compute2");
+            requestBuild.addPowerPolicyTypes(1);
+            requestBuild.addPowerPolicyOptions("compute3");
         }
 
         // data_flow_policy_type & data_flow_policy_option
@@ -1485,7 +1500,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         // 初始化PSI
         if(workflowTask.getInputPsi()){
-            curWorkflowRunTaskStatus.setPsiList(dataService.listPsiByTrainTaskId(workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(curWorkflowRunTaskStatus.getWorkflowRunId(), workflowTask.getInputPsiStep()).getTaskId()));
+            String taskId = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(curWorkflowRunTaskStatus.getWorkflowRunId(), workflowTask.getInputPsiStep()).getTaskId();
+            List<Psi> psiList = dataService.listPsiByTrainTaskId(taskId);
+            curWorkflowRunTaskStatus.setPsiList(psiList);
             // psi的组织
             curWorkflowRunTaskStatus.getPsiList().forEach(item -> {
                 item.setOrg(orgService.getOrgById(item.getIdentityId()));

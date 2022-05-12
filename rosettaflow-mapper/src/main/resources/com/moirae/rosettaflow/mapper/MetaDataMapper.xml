@@ -24,6 +24,7 @@
                dmd.published_at,
                dmd.identity_id,
                do.node_name,
+               dmd.token_address,
                mt.name as tokenName,
                mt.symbol as tokenSymbol,
                mt.price as tokenPrice
