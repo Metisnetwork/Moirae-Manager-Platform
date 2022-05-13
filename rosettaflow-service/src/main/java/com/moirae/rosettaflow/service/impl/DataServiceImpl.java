@@ -229,4 +229,9 @@ public class DataServiceImpl implements DataService {
         }
         return result;
     }
+
+    @Override
+    public List<MetaDataColumn> listMetaDataColumnByIdAndIndex(String metaDataId, List<Integer> selectedColumnsV2) {
+        return metaDataColumnManager.listByIdAndIndex(metaDataId, selectedColumnsV2);
+    }
 }

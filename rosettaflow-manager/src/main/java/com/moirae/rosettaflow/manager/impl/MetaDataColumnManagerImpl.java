@@ -29,4 +29,12 @@ public class MetaDataColumnManagerImpl extends ServiceImpl<MetaDataColumnMapper,
         wrappers.eq(MetaDataColumn::getColumnIdx, columnIndex);
         return getOne(wrappers);
     }
+
+    @Override
+    public List<MetaDataColumn> listByIdAndIndex(String metaDataId, List<Integer> selectedColumnsV2) {
+        LambdaQueryWrapper<MetaDataColumn> wrappers = Wrappers.lambdaQuery();
+        wrappers.eq(MetaDataColumn::getMetaDataId, metaDataId);
+        wrappers.in(MetaDataColumn::getColumnIdx, selectedColumnsV2);
+        return list(wrappers);
+    }
 }

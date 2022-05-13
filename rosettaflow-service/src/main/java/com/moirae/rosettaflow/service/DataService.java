@@ -242,4 +242,6 @@ public interface DataService {
      * @return
      */
     MetisLatInfoDto getUserMetisLatInfo();
+
+    List<MetaDataColumn> listMetaDataColumnByIdAndIndex(String metaDataId, List<Integer> selectedColumnsV2);
 }
