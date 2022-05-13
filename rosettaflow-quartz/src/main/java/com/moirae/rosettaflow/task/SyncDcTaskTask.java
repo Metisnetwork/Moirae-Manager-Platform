@@ -96,7 +96,7 @@ public class SyncDcTaskTask {
                 taskDataProvider.setInputType(dataPolicy.getInputType());
                 taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
                 taskDataProvider.setPartyId(dataPolicy.getPartyId());
-                taskDataProvider.setKeyColumnIdx(dataPolicy.getKeyColumn().intValue());
+                taskDataProvider.setKeyColumnIdx(dataPolicy.getKeyColumn() == null ? null : dataPolicy.getKeyColumn().intValue());
                 if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
                     taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
                 }
