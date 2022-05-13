@@ -81,6 +81,9 @@ public class DataServiceImpl implements DataService {
     @Override
     public Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataId) {
         List<MetaData> metaDataList = metaDataManager.listByIds(metaDataId);
+        if(metaDataList.size() == 0){
+            return new HashMap<>();
+        }
         Set<String> tokenIdList = metaDataList.stream()
                 .filter(item -> StringUtils.isNotBlank(item.getTokenAddress()))
                 .map(MetaData::getTokenAddress)

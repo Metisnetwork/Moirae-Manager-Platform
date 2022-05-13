@@ -101,11 +101,14 @@ public class TaskServiceImpl implements TaskService {
         List<TaskDataProvider> taskDataProviderList = taskDataProviderManager.listByTaskId(taskId);
         Map<String, MetaData> metaDataId2MetaDataMap = dataService.getMetaDataId2MetaDataMap(taskDataProviderList.stream().map(TaskDataProvider::getMetaDataId).collect(Collectors.toSet()));
         task.setDataProviderList(taskDataProviderList.stream()
-                .filter(item -> metaDataId2MetaDataMap.containsKey(item.getMetaDataId()))   // 过滤模型
                 .map(item -> {
                     item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
-                    item.setMetaDataName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getMetaDataName());
-                    item.setDataTokenName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getTokenName());
+                    item.setMetaDataName(item.getMetaDataName());
+                    if(metaDataId2MetaDataMap.containsKey(item.getMetaDataId())){
+                        item.setDataTokenName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getTokenName());
+                    }else{
+                        item.setDataTokenName("");
+                    }
                     return item;
                 })
                 .collect(Collectors.toList())
