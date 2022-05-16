@@ -27,4 +27,12 @@ public class GetWorkflowListReq extends CommonPageReq {
 
     @ApiModelProperty(value = "时间的结束")
     private Date end;
+
+    public void setBegin(long begin){
+        this.begin = new Date(begin);
+    }
+
+    public void setEnd(long end){
+        this.end = new Date(end);
+    }
 }
