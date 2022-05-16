@@ -1591,7 +1591,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req) {
+        WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(req.getWorkflowRunId());
         List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(req.getWorkflowRunId());
+        WorkflowVersion workflowVersion = workflowVersionManager.getById(workflowRunStatus.getWorkflowId(), workflowRunStatus.getWorkflowVersion());
         AlgorithmClassify root = algService.getAlgorithmClassifyTree(false);
         List<WorkflowRunTaskDto> result = workflowRunTaskStatusList.stream().map(item -> {
             WorkflowRunTaskDto workflowRunTaskDto = new WorkflowRunTaskDto();
@@ -1602,6 +1604,8 @@ public class WorkflowServiceImpl implements WorkflowService {
             AlgorithmClassify algorithmClassify = TreeUtils.findSubTree(root, workflowTask.getAlgorithmId());
             workflowRunTaskDto.setAlgorithmName(algorithmClassify.getName());
             workflowRunTaskDto.setAlgorithmNameEn(algorithmClassify.getNameEn());
+            workflowRunTaskDto.setStatus(item.getRunStatus());
+            workflowRunTaskDto.setWorkflowVersionName(workflowVersion.getWorkflowVersionName());
             return workflowRunTaskDto;
         }).collect(Collectors.toList());
         return result;

@@ -60,7 +60,7 @@ public class WorkflowRunTaskStatus implements Serializable {
     private Date endTime;
 
     /**
-     * 运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败
+     * 运行状态: 0-未开始 1-运行中,2-运行成功,3-运行失败
      */
     @TableField("run_status")
     private WorkflowTaskRunStatusEnum runStatus;
