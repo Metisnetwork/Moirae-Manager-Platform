@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel(value = "计算流程步骤响应对象")
+@ApiModel
 public class CalculationProcessStepDto {
 
     @ApiModelProperty(value = "步骤. 从1开始")

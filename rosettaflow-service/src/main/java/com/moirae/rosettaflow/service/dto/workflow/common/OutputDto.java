@@ -11,7 +11,7 @@ import java.util.List;
  * 工作流输出明细
  */
 @Data
-@ApiModel(value = "工作流输出明细")
+@ApiModel
 public class OutputDto {
 
     @ApiModelProperty(value = "结算输入方组织的身份标识Id", required = true)

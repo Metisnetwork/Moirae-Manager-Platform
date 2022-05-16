@@ -12,12 +12,12 @@ import lombok.Data;
  * @date 2021/9/28
  */
 @Data
-@ApiModel(value = "工作流节点资源请求对象")
+@ApiModel
 public class TrainingAndPredictionOutputDto {
 
-    @ApiModelProperty(value = "训练任务的计算资源")
+    @ApiModelProperty(value = "向导模式下训练任务的计算资源")
     private OutputDto training;
 
-    @ApiModelProperty(value = "预测任务的计算资源")
+    @ApiModelProperty(value = "向导模式下预测任务的计算资源")
     private OutputDto prediction;
 }

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
-@ApiModel(value = "工作流节点输入请求对象")
+@ApiModel
 public class PredictionInputDto {
 
     @ApiModelProperty(value = "发起方的组织的身份标识Id", required = true)
@@ -26,9 +26,9 @@ public class PredictionInputDto {
     @ApiModelProperty(value = "当前设置的算法id(查询时返回，提交不需要)")
     private Long algorithmId;
 
-    @ApiModelProperty(value = "工作流当前节点模型ID")
+    @ApiModelProperty(value = "向导模式下预测的模型输入")
     private ModelDto model;
 
-    @ApiModelProperty(value = "元数据输入")
+    @ApiModelProperty(value = "向导模式下预测元数据输入")
     private List<DataInputDto> item;
 }

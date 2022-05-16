@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
-@ApiModel(value = "工作流节点输入请求对象")
+@ApiModel
 public class TrainingInputDto {
 
     @ApiModelProperty(value = "发起方的组织的身份标识Id", required = true)
@@ -19,6 +19,6 @@ public class TrainingInputDto {
     @ApiModelProperty(value = "是否需要做psi")
     private Boolean isPsi;
 
-    @ApiModelProperty(value = "元数据输入")
+    @ApiModelProperty(value = "向导模式下训练元数据输入")
     private List<DataInputDto> item;
 }

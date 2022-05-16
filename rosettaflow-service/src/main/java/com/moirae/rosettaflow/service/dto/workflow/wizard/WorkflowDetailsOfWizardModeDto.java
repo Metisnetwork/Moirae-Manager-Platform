@@ -39,9 +39,8 @@ public class WorkflowDetailsOfWizardModeDto {
     @ApiModelProperty(value = "计算流程id")
     private Long calculationProcessId;
 
-    @ApiModelProperty(value = "计算流程的当前步骤")
+    @ApiModelProperty(value = "向导模式下计算流程的当前步骤")
     private CalculationProcessStepDto calculationProcessStep;
-
 
     @ApiModelProperty(value = "0-选择训练输入数据")
     private TrainingInputDto trainingInput;

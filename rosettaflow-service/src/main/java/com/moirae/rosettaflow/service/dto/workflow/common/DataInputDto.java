@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  * 工作流输入明细
  */
 @Data
-@ApiModel(value = "工作流输入明细")
+@ApiModel
 public class DataInputDto {
 
     @ApiModelProperty(value = "数据提供方组织的身份标识Id", required = true)

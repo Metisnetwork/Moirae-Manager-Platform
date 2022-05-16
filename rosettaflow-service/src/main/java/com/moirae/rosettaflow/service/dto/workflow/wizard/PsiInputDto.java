@@ -16,6 +16,6 @@ public class PsiInputDto {
     @NotBlank(message = "{node.identity.id.NotBlank}")
     private String identityId;
 
-    @ApiModelProperty(value = "元数据输入")
+    @ApiModelProperty(value = "向导模式下PSI元数据输入")
     private List<DataInputDto> item;
 }

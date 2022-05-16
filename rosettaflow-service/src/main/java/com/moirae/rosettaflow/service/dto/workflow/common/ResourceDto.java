@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  * 工作流资源明细
  */
 @Data
-@ApiModel(value = "工作流资源明细")
+@ApiModel
 public class ResourceDto {
 
     @ApiModelProperty(value = "工作流节点资源内存 (单位: Mb)", required = true)
