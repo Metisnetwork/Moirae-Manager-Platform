@@ -66,6 +66,7 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
                     newObj.setIdentityId(item.getIdentityId());
                     newObj.setInputModel(item.getInputModel());
                     newObj.setInputModelId(item.getInputModelId());
+                    newObj.setInputModelStep(item.getInputModelStep());
                     newObj.setInputPsi(item.getInputPsi());
                     newObj.setInputPsiStep(item.getInputPsiStep());
                     save(newObj);

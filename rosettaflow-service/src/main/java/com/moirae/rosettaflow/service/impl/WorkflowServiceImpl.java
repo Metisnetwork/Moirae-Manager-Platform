@@ -652,7 +652,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     nodeInput.getIsPsi(), nodeInput.getDataInputList(),
                     algorithmClassify.getAlg().getInputModel()
                             && nodeInput.getModel() !=null
-                            && !"fromPreNodeOutput".equals(nodeInput.getModel().getMetaDataId()) ? Optional.of(nodeInput.getModel().getMetaDataId()) : Optional.empty()
+                            && !"frontNodeOutput".equals(nodeInput.getModel().getMetaDataId()) ? Optional.of(nodeInput.getModel().getMetaDataId()) : Optional.empty()
             );
         }else{
             setPsiInputOfWizardMode(workflowTask.getWorkflowId(), workflowTask.getWorkflowVersion(),
@@ -695,7 +695,9 @@ public class WorkflowServiceImpl implements WorkflowService {
             // 创建任务
             WorkflowTask workflowTask = workflowTaskManager.createOfWizardMode(
                     req.getWorkflowId(), req.getWorkflowVersion(), taskStep++,
-                    algorithmClassify.getId(), algorithmClassify.getAlg().getInputModel(), algorithmClassify.getAlg().getInputModel() && nodeDto.getNodeInput().getModel() == null ? preStep : null,
+                    //TODO
+                    algorithmClassify.getId(), algorithmClassify.getAlg().getInputModel(),
+                    algorithmClassify.getAlg().getInputModel() && ( nodeDto.getNodeInput().getModel() == null || "frontNodeOutput".equals(nodeDto.getNodeInput().getModel().getMetaDataId())) ? preStep : null,
                     nodeDto.getNodeInput().getIsPsi(), algorithmClassify.getAlg().getSupportDefaultPsi() ? psiWorkflowTask.getStep() : null);
 
             // 创建设置
