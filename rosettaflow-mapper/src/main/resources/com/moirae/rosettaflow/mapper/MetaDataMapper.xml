@@ -90,6 +90,9 @@
                  inner join mo_token_holder mth on mt.address = mth.token_address and mth.address = #{address}
         where dmd.status = 2
           and mt.is_add_liquidity = 1
+          <if test="keyword != null and keyword != ''">
+            and ( dmd.file_name like concat('%', #{keyword}, '%') or mt.name like concat('%', #{keyword}, '%') )
+          </if>
           <if test="identityId != null and identityId != ''">
             and dmd.identity_id = #{identityId}
           </if>

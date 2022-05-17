@@ -15,7 +15,7 @@ public interface MetaDataManager extends IService<MetaData> {
 
     MetaData getDataDetails(String metaDataId);
 
-    IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId);
+    IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId, String keyword);
 
     MetaData statisticsOfGlobal();
 

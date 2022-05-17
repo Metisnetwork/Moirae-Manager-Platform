@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value = "任务列表查询")
 public class GetDataListReq extends CommonPageReq {
 
-    @ApiModelProperty(value = "搜索关键字(凭证名称、元数据名称)")
+    @ApiModelProperty(value = "搜索关键字(凭证名称或元数据名称关键字)")
     private String keyword;
 
     @ApiModelProperty(value = "排序字段")

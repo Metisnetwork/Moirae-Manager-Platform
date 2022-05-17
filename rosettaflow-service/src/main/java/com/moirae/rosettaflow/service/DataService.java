@@ -60,9 +60,10 @@ public interface DataService {
      * @param current    页数
      * @param size       大小
      * @param identityId  组织id
+     * @param keyword
      * @return
      */
-    IPage<MetaData> getUserDataList(Long current, Long size, String identityId);
+    IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword);
 
     /**
      *  查询给定元数据id对应元数据集合，返回map结构

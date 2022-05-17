@@ -13,4 +13,7 @@ public class GetDataListByIdentityIdReq extends CommonPageReq {
 
     @ApiModelProperty(value = "组织相关的（组织关联元数据）")
     private String identityId;
+
+    @ApiModelProperty(value = "搜索关键字(凭证名称或元数据名称关键字)")
+    private String keyword;
 }
