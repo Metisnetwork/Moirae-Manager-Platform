@@ -44,4 +44,7 @@ public class WorkflowRunTaskDto {
 
     @ApiModelProperty(value = "工作流版本名称")
     private String workflowVersionName;
+
+    @ApiModelProperty(value = "是否产生模型: 0-否，1:是")
+    private Boolean outputModel;
 }

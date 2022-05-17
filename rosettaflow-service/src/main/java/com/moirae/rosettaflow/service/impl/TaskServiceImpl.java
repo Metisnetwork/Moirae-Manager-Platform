@@ -208,8 +208,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> statisticsOfDay(Date newly) {
-        return taskManager.statisticsOfDay(newly);
+    public List<Task> statisticsOfDay(Integer size) {
+        return taskManager.statisticsOfDay(size);
     }
 
     @Override

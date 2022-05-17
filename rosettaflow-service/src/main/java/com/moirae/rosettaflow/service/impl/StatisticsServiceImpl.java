@@ -16,14 +16,17 @@ import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -62,8 +65,24 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
+    @Cacheable("getTaskTrend-1")
     public List<StatsDay> getTaskTrend(Integer size) {
-        List<StatsDay> statsDayList = statsDayManager.getNewestList(StatsDayKeyEnum.TASK_COUNT, size);
+        List<Task> taskList = taskService.statisticsOfDay(size);
+        List<StatsDay> statsDayList = new ArrayList<>();
+        for (Task task: taskList) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String s = sdf.format(task.getStatsTime());
+            try {
+                Date date =  sdf.parse(s);
+                StatsDay statsDay = new StatsDay();
+                statsDay.setStatsTime(date);
+                statsDay.setStatsValue(task.getTaskCount().longValue());
+                statsDayList.add(statsDay);
+            } catch (ParseException e) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.BIZ_QUERY_NOT_EXIST.getMsg(), e);
+            }
+        }
+
         int pending = size - statsDayList.size();
         if(pending > 0){
             Date last;
@@ -82,7 +101,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             for (int i = 0; i < pending; i++) {
                 StatsDay statsDay = new StatsDay();
                 statsDay.setStatsTime(last);
-                statsDay.setStatsKey(StatsDayKeyEnum.TASK_COUNT);
                 statsDay.setStatsValue(0L);
                 statsDayList.add(statsDay);
                 last = DateUtils.addDays(last, -1);
@@ -110,42 +128,6 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public boolean updateStatsGlobal(StatsGlobal global) {
         return statsGlobalManager.updateById(global);
-    }
-
-    @Override
-    public boolean statisticsOfStatsDay(StatsDayKeyEnum keyEnum) {
-        Date newly = null;
-        List<StatsDay> newlyList = statsDayManager.getNewestList(keyEnum, 2);
-        if(newlyList.size() == 2){
-            newly = newlyList.get(0).getStatsTime();
-        }
-        List<Task> taskList = taskService.statisticsOfDay(newly);
-        Date finalNewly = newly;
-        taskList.forEach(item->{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String s = sdf.format(item.getStatsTime());
-            try {
-                Date date =  sdf.parse(s);
-                StatsDay statsDay = new StatsDay();
-                statsDay.setStatsTime(date);
-                statsDay.setStatsKey(keyEnum);
-                statsDay.setStatsValue(item.getTaskCount().longValue());
-                if(finalNewly != null && finalNewly.compareTo(date) == 0){
-                    LambdaUpdateWrapper<StatsDay> updateWrapper = Wrappers.lambdaUpdate();
-                    updateWrapper.set(StatsDay::getStatsValue, statsDay.getStatsValue());
-                    updateWrapper.eq(StatsDay::getStatsTime, date);
-                    updateWrapper.eq(StatsDay::getStatsKey, statsDay.getStatsKey());
-                    statsDayManager.update(updateWrapper);
-                }else{
-                    statsDayManager.save(statsDay);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-        });
-        return true;
     }
 
     @Override

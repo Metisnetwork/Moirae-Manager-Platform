@@ -49,8 +49,8 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     }
 
     @Override
-    public List<Task> statisticsOfDay(Date newly) {
-        return this.baseMapper.statisticsOfDay(newly);
+    public List<Task> statisticsOfDay(Integer size) {
+        return this.baseMapper.statisticsOfDay(size);
     }
 
     @Override

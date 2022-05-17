@@ -21,7 +21,7 @@ spring:
       thread-name-prefix: Moirae-Task-
   cache:
     caffeine:
-      spec: maximumSize=100,expireAfterWrite=10s
+      spec: maximumSize=100,expireAfterWrite=5s
     type: caffeine
 
 mybatis-plus:
@@ -74,7 +74,7 @@ chain:
   platon:
     chainId: 210309
     hrp: lat
-    metisPayAddress: "0x58950a32f121763ddf82a6db228132dbb315a5b9"
+    metisPayAddress: "0x263b1d39843bf2e1da27d827e749992fbd1f1577"
     uniswapV2Router02: "0x4378daf745e9053f6048c4f78c803f3bc8829703"
     web3jProtocol: WS
     web3jAddresses: 192.168.10.146:7789

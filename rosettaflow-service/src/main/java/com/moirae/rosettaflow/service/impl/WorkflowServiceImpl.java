@@ -695,7 +695,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             // 创建任务
             WorkflowTask workflowTask = workflowTaskManager.createOfWizardMode(
                     req.getWorkflowId(), req.getWorkflowVersion(), taskStep++,
-                    //TODO
                     algorithmClassify.getId(), algorithmClassify.getAlg().getInputModel(),
                     algorithmClassify.getAlg().getInputModel() && ( nodeDto.getNodeInput().getModel() == null || "frontNodeOutput".equals(nodeDto.getNodeInput().getModel().getMetaDataId())) ? preStep : null,
                     nodeDto.getNodeInput().getIsPsi(), algorithmClassify.getAlg().getSupportDefaultPsi() ? psiWorkflowTask.getStep() : null);
@@ -1390,7 +1389,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         String address = workflowRunStatus.getAddress();
         String algorithmName = curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmName();
         String workflowName = workflowRunStatus.getWorkflow().getWorkflowName();
-        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + workflowName, 100);
+        WorkflowCreateModeEnum createModeEnum = workflowRunStatus.getWorkflow().getCreateMode();
+        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + createModeEnum.getValue() + "_" + workflowName, 100);
     }
 
     private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {
@@ -1606,6 +1606,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowRunTaskDto.setAlgorithmNameEn(algorithmClassify.getNameEn());
             workflowRunTaskDto.setStatus(item.getRunStatus());
             workflowRunTaskDto.setWorkflowVersionName(workflowVersion.getWorkflowVersionName());
+            workflowRunTaskDto.setOutputModel(algorithmClassify.getAlg().getOutputModel());
             return workflowRunTaskDto;
         }).collect(Collectors.toList());
         return result;

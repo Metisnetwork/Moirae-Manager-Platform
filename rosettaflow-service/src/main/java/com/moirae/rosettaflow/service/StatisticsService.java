@@ -34,6 +34,4 @@ public interface StatisticsService {
     List<StatsToken> getDataTokenUsedTop(Integer size);
 
     boolean updateStatsGlobal(StatsGlobal global);
-
-    boolean statisticsOfStatsDay(StatsDayKeyEnum taskCount);
 }

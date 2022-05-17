@@ -33,7 +33,7 @@ public interface TaskService {
 
     Task statisticsOfGlobal();
 
-    List<Task> statisticsOfDay(Date newly);
+    List<Task> statisticsOfDay(Integer size);
 
     Long countOfTokenUsed(List<String> metaDataIdList);
 
