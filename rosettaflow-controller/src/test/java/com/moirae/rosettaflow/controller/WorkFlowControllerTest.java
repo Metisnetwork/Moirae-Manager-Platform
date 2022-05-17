@@ -437,6 +437,12 @@ public class WorkFlowControllerTest extends BaseControllerTest{
         System.out.println("result = "  + commonPostWithToken("/workflow/copyWorkflow", req.toJSONString()));
     }
 
+    @Test
+    public void getWorkflowRunTaskList()throws Exception{
+        emptyParameters.add("workflowRunId", "14");
+        System.out.println("result = "  + commonGetWithToken("/workflow/getWorkflowRunTaskList", emptyParameters));
+    }
+
 
     private String getWorkflowJson(String address){
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"{}\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"address\",\"type\":\"string\"}]}}";

@@ -64,14 +64,25 @@ public class SyncTokenInfoFromDexTask {
         Token token = new Token();
         token.setAddress(tokenAddress);
         token.setIsAddLiquidity(true);
-        token.setPrice(getPrice(tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue1() : tuple3.getValue2(),
-                tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue2() : tuple3.getValue1()));
+        token.setPrice(getPrice(tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue2() : tuple3.getValue1(),
+                tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue1() : tuple3.getValue2()));
         dataService.updateTokenById(token);
     }
 
     private String getPrice(BigInteger wEth, BigInteger token) {
+        BigDecimal one = BigDecimal.ONE;
         BigDecimal reserve0 = new BigDecimal(wEth);
         BigDecimal reserve1 = new BigDecimal(token);
-        return reserve0.divide(reserve1, 3,  RoundingMode.HALF_DOWN).toString();
+        BigDecimal inputAmount = new BigDecimal("1000000000000000000");
+        BigDecimal feesD = new BigDecimal("10000");
+        BigDecimal feesN = new BigDecimal("9975");
+        BigDecimal numerator = reserve0.multiply(inputAmount).multiply(feesD);
+        BigDecimal denominator = reserve1.subtract(inputAmount).multiply(feesN);
+        BigDecimal result = numerator.divide(denominator, 10,  RoundingMode.HALF_DOWN).add(one).divide(inputAmount, 10,  RoundingMode.HALF_DOWN);
+        if(result.signum() == 1){
+            return result.toPlainString();
+        }else {
+            return BigDecimal.ZERO.toPlainString();
+        }
     }
 }

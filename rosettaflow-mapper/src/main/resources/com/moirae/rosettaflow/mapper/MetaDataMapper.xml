@@ -34,7 +34,7 @@
         where dmd.status = 2
             and mt.is_add_liquidity = 1
             <if test="keyword != null and keyword != ''">
-                and ( dmd.meta_data_id = #{keyword} or mt.name like concat('%', #{keyword}, '%') )
+                and ( dmd.file_name like concat('%', #{keyword}, '%') or mt.name like concat('%', #{keyword}, '%') )
             </if>
             <if test="industry != null and industry != ''">
                 and dmd.industry = #{industry}

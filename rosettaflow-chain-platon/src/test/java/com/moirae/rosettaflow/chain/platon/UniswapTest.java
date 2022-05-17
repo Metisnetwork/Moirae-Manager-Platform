@@ -39,30 +39,65 @@ public class UniswapTest extends BaseContractTest {
         IUniswapV2Router02 router = loadRouter();
 
         IUniswapV2Factory factory = loadFactory(router.factory().send());
-        IUniswapV2Pair pair = loadPair(factory.getPair(router.WETH().send(), Bech32.addressEncode(hrp,"0x355b39ad02068e7e0189b5df2df1818ad72dc64b")).send());
+        IUniswapV2Pair pair = loadPair(factory.getPair(router.WETH().send(), Bech32.addressEncode(hrp,"0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4")).send());
         //Tuple3{value1=20000000000000000000, value2=20000000000000000000, value3=4255551100}
 
         Tuple3<BigInteger, BigInteger, BigInteger> tuple3 = pair.getReserves().send();
 
-        System.out.println("0x355b39ad02068e7e0189b5df2df1818ad72dc64b".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
-        System.out.println("0xad716b2d1adb6d8a508326a7c2e328db8b154da0".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
-        System.out.println("0xe19cfd8f9173155c26149818abd5decaa6f705f3".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
-        System.out.println("0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4".compareTo("0xa0c63fac4e5425f4721ff3258c3fa5b381152f73"));
+//        pair.price0CumulativeLast()
 
-//        System.out.println(getPrice(tuple3.getValue1(), tuple3.getValue2()));
+        System.out.println(getPrice(tuple3.getValue1(), tuple3.getValue2()));
 //        System.out.println(pair.price0CumulativeLast().send());
 //        System.out.println(pair.price1CumulativeLast().send());
 
 //        System.out.println(router.getAmountIn(pair.getReserves().send().getValue1(), pair.getReserves().send().getValue2(), new BigInteger("10000000000000000")).send());
     }
 
+    // 0.000130385
+
+    // 0.0000003259
+    // 0.0000003259
+//    private String getPrice(BigInteger wEth, BigInteger token) {
+//        BigDecimal reserve0 = new BigDecimal(wEth);
+//        BigDecimal reserve1 = new BigDecimal(token);
+//        BigDecimal fee = reserve0.divide(reserve1, 18,  RoundingMode.HALF_DOWN);
+//        System.out.println(fee.toPlainString());
+//        System.out.println(reserve0.divide(reserve1, 18,  RoundingMode.HALF_DOWN).subtract(fee).toPlainString());
+//        return "";
+//    }
+
+
+    // 0.000130385
+
+    // 0.0000003259
+    // 0.0000003259
     private String getPrice(BigInteger wEth, BigInteger token) {
+        BigDecimal one = BigDecimal.ONE;
         BigDecimal reserve0 = new BigDecimal(wEth);
         BigDecimal reserve1 = new BigDecimal(token);
-        System.out.println("reserve0 = " + reserve0);
-        System.out.println("reserve1 = " + reserve1);
-        return reserve0.divide(reserve1, 18,  RoundingMode.HALF_DOWN).toString();
+        BigDecimal inputAmount = new BigDecimal("1000000000000000000");
+        BigDecimal feesD = new BigDecimal("10000");
+        BigDecimal feesN = new BigDecimal("9975");
+        BigDecimal numerator = reserve0.multiply(inputAmount).multiply(feesD);
+        BigDecimal denominator = reserve1.subtract(inputAmount).multiply(feesN);
+        return numerator.divide(denominator, 10,  RoundingMode.HALF_DOWN).add(one).divide(inputAmount, 10,  RoundingMode.HALF_DOWN).toPlainString();
     }
+
+
+//    private String getPrice(BigInteger wEth, BigInteger token, BigInteger total) {
+//        BigDecimal reserve0 = new BigDecimal(wEth);
+//        reserve0 = reserve0.add(reserve0.multiply(new BigDecimal("0.0025")));
+//        BigDecimal reserve1 = new BigDecimal(token);
+//        BigDecimal price = reserve0.divide(reserve1, 10,  RoundingMode.HALF_DOWN);
+//        BigDecimal fee = price.multiply(new BigDecimal("0.0025")).setScale(10, RoundingMode.HALF_DOWN);
+//        System.out.println(fee.toPlainString());
+//        System.out.println(price.add(fee).toPlainString());
+//
+//        BigDecimal fee2 = price.multiply(new BigDecimal("0.0030")).setScale(10, RoundingMode.HALF_DOWN);
+//        BigDecimal price2 = new BigDecimal(wEth).divide(reserve1, 10,  RoundingMode.HALF_DOWN);
+//        System.out.println(price2.add(fee2).toPlainString());
+//        return "";
+//    }
 
 
     @Test
