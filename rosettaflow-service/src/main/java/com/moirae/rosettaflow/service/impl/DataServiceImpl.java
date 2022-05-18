@@ -234,4 +234,9 @@ public class DataServiceImpl implements DataService {
     public List<MetaDataColumn> listMetaDataColumnByIdAndIndex(String metaDataId, List<Integer> selectedColumnsV2) {
         return metaDataColumnManager.listByIdAndIndex(metaDataId, selectedColumnsV2);
     }
+
+    @Override
+    public Model getModelByTaskId(String taskId) {
+        return modelManager.getModelByTaskId(taskId);
+    }
 }

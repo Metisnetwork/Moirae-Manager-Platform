@@ -92,5 +92,8 @@ public class WorkflowRunTaskResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @TableField(exist = false)
+    private Org org;
+    @TableField(exist = false)
+    private String filePath;
 }

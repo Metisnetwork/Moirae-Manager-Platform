@@ -50,6 +50,8 @@ public interface WorkflowService{
 
     List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
 
+    WorkflowRunTaskResultDto getWorkflowRunTaskResult(String taskId);
+
     WorkflowVersionKeyDto createWorkflowOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, Long calculationProcessId);
 
     WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName);
@@ -76,4 +78,5 @@ public interface WorkflowService{
      * @param task
      */
     void taskFinish(WorkflowRunTaskStatus workflowRunTaskStatus, Task task);
+
 }

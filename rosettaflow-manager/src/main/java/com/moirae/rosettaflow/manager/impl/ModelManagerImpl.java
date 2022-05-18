@@ -26,4 +26,12 @@ public class ModelManagerImpl extends ServiceImpl<ModelMapper, Model> implements
         wrapper.eq(Model::getTrainTaskId, taskId);
         return getOne(wrapper);
     }
+
+    @Override
+    public Model getModelByTaskId(String taskId) {
+        LambdaQueryWrapper<Model> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Model::getTrainTaskId, taskId);
+        wrapper.last("limit 1");
+        return getOne(wrapper);
+    }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.moirae.rosettaflow.mapper.domain.CalculationProcess;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
+import com.moirae.rosettaflow.req.task.GetTaskDetailsReq;
 import com.moirae.rosettaflow.req.workflow.GetCalculationProcessListReq;
 import com.moirae.rosettaflow.req.workflow.GetWorkflowListReq;
 import com.moirae.rosettaflow.req.workflow.GetWorkflowVersionListReq;
@@ -185,5 +186,12 @@ public class WorkflowController {
     public ResponseVo<List<WorkflowRunTaskDto>> getWorkflowRunTaskList(@Valid WorkflowRunKeyDto req) {
         List<WorkflowRunTaskDto> itemList = workflowService.getWorkflowRunTaskList(req);
         return ResponseVo.createSuccess(itemList);
+    }
+
+    @GetMapping("getWorkflowRunTaskResult")
+    @ApiOperation(value = "查询指定工作流的运行任务结果", notes = "查询指定工作流的运行任务结果")
+    public ResponseVo<WorkflowRunTaskResultDto> getWorkflowRunTaskResult(@Valid GetTaskDetailsReq req) {
+        WorkflowRunTaskResultDto result = workflowService.getWorkflowRunTaskResult(req.getTaskId());
+        return ResponseVo.createSuccess(result);
     }
 }

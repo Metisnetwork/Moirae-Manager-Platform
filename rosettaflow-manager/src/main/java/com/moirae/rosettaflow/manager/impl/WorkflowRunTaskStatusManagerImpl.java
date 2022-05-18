@@ -54,4 +54,11 @@ public class WorkflowRunTaskStatusManagerImpl extends ServiceImpl<WorkflowRunTas
         wrapper.orderByAsc(WorkflowRunTaskStatus::getStep);
         return list(wrapper);
     }
+
+    @Override
+    public WorkflowRunTaskStatus getByTaskId(String taskId) {
+        LambdaQueryWrapper<WorkflowRunTaskStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunTaskStatus::getTaskId, taskId);
+        return getOne(wrapper);
+    }
 }

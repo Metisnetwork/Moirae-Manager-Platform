@@ -10,4 +10,6 @@ public interface ModelManager extends IService<Model> {
     List<Model> queryAvailableModel(String address, Long algorithmId, String identityId);
 
     Model getModelByOrgAndTrainTaskId(String identity, String taskId);
+
+    Model getModelByTaskId(String taskId);
 }

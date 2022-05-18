@@ -126,21 +126,27 @@ public class TaskServiceImpl implements TaskService {
         });
         task.setResultReceiverList(taskResultConsumerList);
         // 事件列表
-        task.setEventList(taskEventManager.listByTaskId(taskId));
-        task.getEventList().forEach(item ->{
-            item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
-        });
+        task.setEventList(listTaskEventByTaskId(taskId));
         return task;
     }
 
     @Override
-    public List<TaskEvent> getTaskEventList(String taskId) {
+    public List<TaskEvent> listTaskEventByTaskId(String taskId) {
         Task task = taskManager.getTaskOfUnSyncedEvent(taskId);
+        List<TaskEvent> result;
         if(task != null){
-            return taskEventManager.listByTaskId(taskId);
+            result = taskEventManager.listByTaskId(taskId);
         }else{
-            return this.getTaskEventListFromRemote(taskId, task.getOwnerIdentityId());
+            result = this.getTaskEventListFromRemote(taskId, task.getOwnerIdentityId());
         }
+        // 补充组织名称
+        Map<String, Org> identityId2OrgMap = organizationService.getIdentityId2OrgMap();
+        result.forEach(item ->{
+            if(identityId2OrgMap.containsKey(item.getIdentityId())){
+                item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
+            }
+        });
+        return result;
     }
 
     @Override

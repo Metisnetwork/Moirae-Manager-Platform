@@ -41,6 +41,7 @@ import com.moirae.rosettaflow.service.utils.TreeUtils;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -902,7 +903,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Map<String, Org> identityId2OrgMap = orgService.getIdentityId2OrgMap();
         result = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId()).stream()
                 .map(WorkflowRunTaskStatus::getTaskId)
-                .flatMap(item -> taskService.getTaskEventList(item).stream())
+                .flatMap(item -> taskService.listTaskEventByTaskId(item).stream())
                 .map(item -> {
                     TaskEventDto taskEventDto = new TaskEventDto();
                     BeanUtil.copyProperties(item, taskEventDto);
@@ -1611,6 +1612,57 @@ public class WorkflowServiceImpl implements WorkflowService {
         }).collect(Collectors.toList());
         return result;
     }
+
+    @Override
+    public WorkflowRunTaskResultDto getWorkflowRunTaskResult(String taskId) {
+        WorkflowRunTaskResultDto resultDto = new WorkflowRunTaskResultDto();
+        WorkflowRunTaskStatus workflowRunTaskStatus = workflowRunTaskStatusManager.getByTaskId(taskId);
+        resultDto.setId(workflowRunTaskStatus.getId());
+        resultDto.setTaskId(workflowRunTaskStatus.getTaskId());
+        resultDto.setCreateTime(workflowRunTaskStatus.getCreateTime());
+        WorkflowTask workflowTask = workflowTaskManager.getById(workflowRunTaskStatus.getWorkflowTaskId());
+        Algorithm algorithm = algService.getAlgorithm(workflowTask.getAlgorithmId(), false);
+        WorkflowVersion workflowVersion = workflowVersionManager.getById(workflowTask.getWorkflowId(), workflowTask.getWorkflowVersion());
+        resultDto.setAlgorithmName(algorithm.getAlgorithmName());
+        resultDto.setAlgorithmNameEn(algorithm.getAlgorithmNameEn());
+        resultDto.setStatus(workflowRunTaskStatus.getRunStatus());
+        resultDto.setWorkflowVersionName(workflowVersion.getWorkflowVersionName());
+        resultDto.setOutputModel(algorithm.getOutputModel());
+        resultDto.setEndAt(workflowRunTaskStatus.getEndTime());
+        resultDto.setTaskResultList(BeanUtil.copyToList(listWorkflowRunTaskResultByTaskId(resultDto.getTaskId()), TaskResultDto.class));
+        resultDto.setEventList(BeanUtil.copyToList(taskService.listTaskEventByTaskId(resultDto.getTaskId()), TaskEventDto.class));
+        if(algorithm.getOutputModel()){
+            Model model = dataService.getModelByTaskId(resultDto.getTaskId());
+            if(model != null){
+                resultDto.setModelEvaluate(model.getEvaluate());
+            }
+        }
+        return resultDto;
+    }
+
+    private List<WorkflowRunTaskResult> listWorkflowRunTaskResultByTaskId(String taskId){
+        List<WorkflowRunTaskResult> workflowRunTaskResultList = workflowRunTaskResultManager.listByTaskId(taskId);
+        if(workflowRunTaskResultList.size() == 0){
+            return workflowRunTaskResultList;
+        }
+
+        Map<String, Org> orgMap = orgService.getIdentityId2OrgMap();
+        workflowRunTaskResultList.forEach(item -> {
+            if(orgMap.containsKey(item.getIdentityId())){
+                item.setOrg(orgMap.get(item.getIdentityId()));
+            }
+            JSONObject o = JSONObject.parseObject(item.getMetadataOption());
+            if(o.containsKey("dataPath")){
+                item.setFilePath(o.getString("dataPath"));
+            }
+            if(o.containsKey("dirPath")){
+                item.setFilePath(o.getString("dirPath"));
+            }
+        });
+
+        return workflowRunTaskResultList;
+    }
+
 
     private void checkWorkFlowOnlyOwner(Workflow workflow){
         // 只有拥有者才可以终止
