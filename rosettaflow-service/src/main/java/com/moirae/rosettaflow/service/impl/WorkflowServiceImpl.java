@@ -1435,7 +1435,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflowRunStatus;
     }
 
-
     /**
      * 检验用户账户余额是否足够执行任务
      *
@@ -1478,6 +1477,10 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowFeeItemDto> tokenFeeList =  metaDataId2CountMap.entrySet().stream()
                 .map(item -> createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, new BigInteger(sysConfig.getDefaultTokenValue()).multiply(BigInteger.valueOf(item.getValue())).toString(), tokenId2TokenMap.get(metaDataId2TokenAddressMap.get(item.getKey()))))
                 .collect(Collectors.toList());
+
+        // 校验下
+        checkFee(tokenFeeList);
+
         // 手续费
         List<WorkflowFeeItemDto> feeList = workflowTaskList.stream()
                 .map(item -> {

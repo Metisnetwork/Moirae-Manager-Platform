@@ -93,7 +93,7 @@ public enum ErrorMsg {
     /**
      * 工作流
      */
-    WORKFLOW_EXECUTE_VALUE_INSUFFICIENT("工作流执行时账户余额不足", "Insufficient account balance during workflow execution"),
+    WORKFLOW_EXECUTE_VALUE_INSUFFICIENT("执行工作流所需余额或授权金额不足", "Insufficient balance or authorization amount required to execute the workflow"),
     WORKFLOW_BEEN_RUN("工作流存在运行信息", "Workflow has running information"),
     WORKFLOW_NOT_EXIST("工作流不存在", "Workflow does not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),
@@ -147,7 +147,7 @@ public enum ErrorMsg {
     ORGANIZATION_UNAVAILABLE_SENDER("任务的发起方组织不可用 {}", "The originating organization of the task is unavailable {}"),
     ORGANIZATION_UNAVAILABLE_DATA_PROVIDED("任务的数据提供方组织不可用 {}", "The data provider organization for the task is unavailable {}"),
     ORGANIZATION_UNAVAILABLE_OUTPUT("任务的结果输出方组织不可用 {}", "The result exporter organization of the task is unavailable {}"),
-    ORGANIZATION_NOT_IN_WHITE_LIST("机构未设置到白名单中 {}", "Organization is not whitelisted {}"),
+    ORGANIZATION_NOT_IN_WHITE_LIST("未授权的节点： {}", "unauthorized node: {}"),
     ;
 
     private final String zh;
