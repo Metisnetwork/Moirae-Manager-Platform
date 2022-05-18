@@ -15,7 +15,7 @@ public interface TaskService {
 
     Task getTaskDetails(String taskId);
 
-    List<TaskEvent> listTaskEventByTaskId(String taskId);
+    List<TaskEvent> listTaskEventByTaskId(String taskId, String identityId);
 
     List<Task> getTaskListOfEventNotSynced();
 

@@ -902,8 +902,10 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         Map<String, Org> identityId2OrgMap = orgService.getIdentityId2OrgMap();
         result = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId()).stream()
-                .map(WorkflowRunTaskStatus::getTaskId)
-                .flatMap(item -> taskService.listTaskEventByTaskId(item).stream())
+                .flatMap(item -> {
+                    WorkflowTask workflowTask = workflowTaskManager.getById(item.getWorkflowTaskId());
+                   return taskService.listTaskEventByTaskId(item.getTaskId(),  workflowTask.getIdentityId()).stream();
+                })
                 .map(item -> {
                     TaskEventDto taskEventDto = new TaskEventDto();
                     BeanUtil.copyProperties(item, taskEventDto);
@@ -1605,7 +1607,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             WorkflowRunTaskDto workflowRunTaskDto = new WorkflowRunTaskDto();
             workflowRunTaskDto.setId(item.getId());
             workflowRunTaskDto.setTaskId(item.getTaskId());
-            workflowRunTaskDto.setCreateTime(item.getCreateTime());
+            workflowRunTaskDto.setCreateTime(item.getBeginTime());
             WorkflowTask workflowTask = workflowTaskManager.getById(item.getWorkflowTaskId());
             AlgorithmClassify algorithmClassify = TreeUtils.findSubTree(root, workflowTask.getAlgorithmId());
             workflowRunTaskDto.setAlgorithmName(algorithmClassify.getName());
@@ -1635,7 +1637,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         resultDto.setOutputModel(algorithm.getOutputModel());
         resultDto.setEndAt(workflowRunTaskStatus.getEndTime());
         resultDto.setTaskResultList(BeanUtil.copyToList(listWorkflowRunTaskResultByTaskId(resultDto.getTaskId()), TaskResultDto.class));
-        resultDto.setEventList(BeanUtil.copyToList(taskService.listTaskEventByTaskId(resultDto.getTaskId()), TaskEventDto.class));
+        resultDto.setEventList(BeanUtil.copyToList(taskService.listTaskEventByTaskId(resultDto.getTaskId(), workflowTask.getIdentityId()), TaskEventDto.class));
         if(algorithm.getOutputModel()){
             Model model = dataService.getModelByTaskId(resultDto.getTaskId());
             if(model != null){

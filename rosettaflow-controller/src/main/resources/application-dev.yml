@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(AGa8GMvGChjAkY17AmQE4g==)
     password: ENC(bWqYB1AVri0/bQrC7ta4IZme9ib22Bge)
-    url: jdbc:mysql://192.168.10.145:17000/db_moirae_040_cd?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.10.145:17000/db_moirae_040?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -72,14 +72,14 @@ redisson:
 # 节点网络设置
 chain:
   platon:
-    chainId: 210309
+    chainId: 2203181
     hrp: lat
     metisPayAddress: "0x263b1d39843bf2e1da27d827e749992fbd1f1577"
     uniswapV2Router02: "0x4378daf745e9053f6048c4f78c803f3bc8829703"
     web3jProtocol: WS
     web3jAddresses: 192.168.10.146:7789
     chainName: "PlatON开发网"
-    rpcUrl: https://devnetopenapi.platon.network/rpc
+    rpcUrl: https://devnetopenapi2.platon.network/rpc
     symbol: LAT
     blockExplorerUrl: https://devnetscan.platon.network/
     dexUrl: http://10.10.8.181:8080/
