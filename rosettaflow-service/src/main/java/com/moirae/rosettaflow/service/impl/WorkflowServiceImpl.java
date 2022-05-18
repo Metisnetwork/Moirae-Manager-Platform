@@ -1606,7 +1606,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowRunTaskDto.setId(item.getId());
             workflowRunTaskDto.setTaskId(item.getTaskId());
             workflowRunTaskDto.setCreateTime(item.getCreateTime());
-            WorkflowTask workflowTask = workflowTaskManager.getById(item.getId());
+            WorkflowTask workflowTask = workflowTaskManager.getById(item.getWorkflowTaskId());
             AlgorithmClassify algorithmClassify = TreeUtils.findSubTree(root, workflowTask.getAlgorithmId());
             workflowRunTaskDto.setAlgorithmName(algorithmClassify.getName());
             workflowRunTaskDto.setAlgorithmNameEn(algorithmClassify.getNameEn());
