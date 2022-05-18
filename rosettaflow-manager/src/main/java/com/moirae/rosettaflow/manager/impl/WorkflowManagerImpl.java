@@ -94,4 +94,9 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             return null;
         }
     }
+
+    @Override
+    public void updateLastRunTime(Long workflowId) {
+        this.baseMapper.updateLastRunTime(workflowId);
+    }
 }

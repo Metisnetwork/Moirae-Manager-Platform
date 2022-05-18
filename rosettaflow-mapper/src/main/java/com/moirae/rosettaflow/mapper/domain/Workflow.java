@@ -80,7 +80,7 @@ public class Workflow implements Serializable {
      * 最后运行时间
      */
     @TableField("last_run_time")
-    private String lastRunTime;
+    private Date lastRunTime;
 
     /**
      * 是否设置完成:  0-否  1-是

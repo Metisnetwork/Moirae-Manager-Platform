@@ -1029,6 +1029,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         checkFee(workflowFeeList);
         // 保存运行时信息
         WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(UserContext.getCurrentUser().getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
+        // 更新运行时间
+        workflowManager.updateLastRunTime(workflowRunStatus.getWorkflowId());
         // 启动任务
         executeTask(workflowRunStatus);
         // 返回

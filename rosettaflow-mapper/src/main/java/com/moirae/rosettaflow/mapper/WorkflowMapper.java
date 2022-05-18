@@ -18,4 +18,6 @@ import java.util.Date;
 public interface WorkflowMapper extends BaseMapper<Workflow> {
 
     IPage<Workflow> getWorkflowList(Page<Workflow> page, String address, String keyword, Long algorithmId, Date begin, Date end, Integer createMode);
+
+    void updateLastRunTime(Long workflowId);
 }

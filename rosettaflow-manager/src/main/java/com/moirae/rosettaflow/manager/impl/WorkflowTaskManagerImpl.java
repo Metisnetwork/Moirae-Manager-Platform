@@ -69,6 +69,7 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
                     newObj.setInputModelStep(item.getInputModelStep());
                     newObj.setInputPsi(item.getInputPsi());
                     newObj.setInputPsiStep(item.getInputPsiStep());
+                    newObj.setEnable(item.getEnable());
                     save(newObj);
                     Map<OldAndNewEnum, WorkflowTask> pair = new HashMap<>();
                     pair.put(OldAndNewEnum.OLD, item);
