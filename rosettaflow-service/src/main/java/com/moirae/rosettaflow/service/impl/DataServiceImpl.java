@@ -29,8 +29,6 @@ public class DataServiceImpl implements DataService {
     @Resource
     private IUniswapV2FactoryContract uniswapV2FactoryContract;
     @Resource
-    private AlgService algService;
-    @Resource
     private MetaDataManager metaDataManager;
     @Resource
     private MetaDataColumnManager metaDataColumnManager;

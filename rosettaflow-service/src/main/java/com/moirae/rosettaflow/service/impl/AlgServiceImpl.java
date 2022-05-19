@@ -41,11 +41,6 @@ public class AlgServiceImpl implements AlgService {
     }
 
     @Override
-    public List<AlgorithmClassify> listAlgorithmClassifyByIds(Set<Long> algorithmIdList) {
-        return algorithmClassifyManager.listByIds(algorithmIdList);
-    }
-
-    @Override
     @Cacheable("getAlgorithm-1")
     public Algorithm getAlgorithm(Long algorithmId, boolean isNeedDetails) {
         AlgorithmClassify algorithmClassify = algorithmClassifyManager.getById(algorithmId);

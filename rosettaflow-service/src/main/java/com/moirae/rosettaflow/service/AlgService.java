@@ -16,13 +16,6 @@ public interface AlgService{
      */
     AlgorithmClassify getAlgorithmClassifyTree(boolean isNeedDetails);
 
-    /**
-     * 查询算法分类列表
-     *
-     * @param algorithmIdList 分类id
-     * @return
-     */
-    List<AlgorithmClassify> listAlgorithmClassifyByIds(Set<Long> algorithmIdList);
 
     /**
      * 查询算法信息

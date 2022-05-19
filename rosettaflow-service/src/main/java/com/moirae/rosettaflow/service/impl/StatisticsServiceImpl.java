@@ -1,20 +1,18 @@
 package com.moirae.rosettaflow.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.moirae.rosettaflow.common.enums.ErrorMsg;
 import com.moirae.rosettaflow.common.enums.NavigationTypeEnum;
 import com.moirae.rosettaflow.common.enums.RespCodeEnum;
 import com.moirae.rosettaflow.common.exception.BusinessException;
-import com.moirae.rosettaflow.manager.*;
+import com.moirae.rosettaflow.manager.StatsGlobalManager;
+import com.moirae.rosettaflow.manager.StatsOrgManager;
+import com.moirae.rosettaflow.manager.StatsTokenManager;
 import com.moirae.rosettaflow.mapper.domain.*;
-import com.moirae.rosettaflow.mapper.enums.StatsDayKeyEnum;
 import com.moirae.rosettaflow.service.OrgService;
 import com.moirae.rosettaflow.service.StatisticsService;
 import com.moirae.rosettaflow.service.TaskService;
 import com.moirae.rosettaflow.service.dto.statistics.NavigationDto;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -26,15 +24,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
     @Resource
     private StatsGlobalManager statsGlobalManager;
-    @Resource
-    private StatsDayManager statsDayManager;
     @Resource
     private StatsOrgManager statsOrgManager;
     @Resource
