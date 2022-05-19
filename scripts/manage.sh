@@ -34,7 +34,7 @@ function _echo_green() {
     echo -e "${GREEN}$1${RES}"
 }
 
-# Shell Info 
+# Shell Info
 function _usage() {
     _echo_green "Usage: sh `basename ${0}` [APP_ENV] [start|stop|restart|status|debug]"
     exit 1
@@ -43,7 +43,7 @@ function _usage() {
 function _is_exist() {
     cd ${HOME_DIR} || _echo_red "Failed to change to ${HOME_DIR} directory"
 
-    if [[ ! -f ${JRE_HOME}/bin/java ]]; then 
+    if [[ ! -f ${JRE_HOME}/bin/java ]]; then
         _echo_red "Java binary not found"
         exit 1
     fi
@@ -73,18 +73,19 @@ function start() {
     if [[ $? -eq "0" ]]; then
         _echo_green "${APP_NAME} is already running, PID=${PID}"
     else
-        if [[ ${APP_NAME} =~ browser-agent.*$ ]]; then
-            sed -i 's/status=.*/status=RUNNING/g' ${STATUS_FILE}
-        fi
+        read -s -p "Please input salt password: " salt
+        export JASYPT_ENCRYPTOR_PASSWORD=${salt}
 
         nohup ${JRE_HOME}/bin/java ${JAVA_OPTS} -jar -Xmx4G -Xms4G -Xmn2G ${APP_NAME} --spring.profiles.active=${APP_ENV} > /dev/null 2>&1 &
-        _echo_green "${APP_NAME} start success, PID=$!"
+        _echo_green "\n${APP_NAME} start success, PID=$!"
+
+        unset JASYPT_ENCRYPTOR_PASSWORD
     fi
 }
 
 function stop() {
     _is_exist
-    
+
     if [[ $? -eq "0" ]]; then
         if [[ ${APP_NAME} =~ browser-agent.*$ ]]; then
             sed -i 's/status=.*/status=SHUTDOWN/g' ${STATUS_FILE}
@@ -92,7 +93,7 @@ function stop() {
             kill ${PID}
             _echo_green "${APP_NAME} process stop, PID=${PID}"
         fi
-    else    
+    else
         _echo_red "There is no process of ${APP_NAME}"
     fi
 }
@@ -105,26 +106,26 @@ function restart() {
 
 function status() {
     _is_exist
-    
+
     if [[ $? -eq "0" ]]; then
         _echo_green "${APP_NAME} is running, PID=${PID}"
-    else    
+    else
         _echo_red "There is no process of ${APP_NAME}"
     fi
 }
 
 function debug() {
     _is_exist
-    
+
     if [[ $? -eq "0" ]]; then
         _echo_green "${APP_NAME} is already running, PID=${PID}, Please kill ${APP_NAME} first to debug"
-    else    
+    else
         ${JRE_HOME}/bin/java ${JAVA_OPTS} -jar ${APP_NAME} --spring.profiles.active=${APP_ENV}
     fi
 }
 
 case ${APP_ACT} in
-    "start") 
+    "start")
         start
         ;;
     "stop")
