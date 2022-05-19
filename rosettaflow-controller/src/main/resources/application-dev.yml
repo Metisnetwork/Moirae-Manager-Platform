@@ -5,7 +5,7 @@ spring:
   datasource:
     username: ENC(AGa8GMvGChjAkY17AmQE4g==)
     password: ENC(bWqYB1AVri0/bQrC7ta4IZme9ib22Bge)
-    url: jdbc:mysql://192.168.10.145:17000/db_moirae_v1?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.10.145:17000/db_moirae_040?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
 
 # 系统参数配置
 system:

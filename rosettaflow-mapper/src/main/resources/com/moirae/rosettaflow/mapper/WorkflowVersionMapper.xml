@@ -31,5 +31,6 @@
             )
         ) wimwrs on (wimwrs.workflow_id = mwv.workflow_id and wimwrs.workflow_version = mwv.workflow_version)
         where mwv.workflow_id = #{workflowId}
+        order by mwv.create_time desc
     </select>
 </mapper>

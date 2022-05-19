@@ -8,6 +8,7 @@ jar {
 
 bootJar {
     enabled = true
+    exclude('application-dev.yml')
 }
 
 distributions {

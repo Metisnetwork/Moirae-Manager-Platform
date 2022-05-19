@@ -1,71 +1,45 @@
 server:
   port: 8234
-  servlet:
-    context-path: /rosettaflow
-    encoding:
-      charset: UTF-8
 
 spring:
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(AGa8GMvGChjAkY17AmQE4g==)
     password: ENC(bWqYB1AVri0/bQrC7ta4IZme9ib22Bge)
-    url: jdbc:mysql://192.168.120.137:16000/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-      connection-timeout: 3000
-      max-lifetime: 1800000
-      idle-timeout: 600000
-  task:
-    scheduling:
-      pool:
-        size: 10
-      thread-name-prefix: Moirae-Task-
-mybatis-plus:
-  configuration:
-    call-setters-on-nulls: true
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    url: jdbc:mysql://192.168.10.145:17000/db_moirae?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+
 # 系统参数配置
 system:
   config:
-    # 登录超时时间,单位: 毫秒
-    loginTimeOut: 18000000000
-    # 登录互踢模式： true-是,false-否
-    kickMode: false
-    # nonce存放时间，单位：秒
-    nonceTimeOut: 300000
-    # 数据库数据批量更新
-    batchSize: 1000
     # 公共组织信息
     publicOrgList:
-      - identity: identity:a61ae3d0ec404919b97142e1fc371256
-        host: 39.101.171.59
+      - identity: identity:4d7b5f1f114b43b682d9c73d6d2bc18e
+        host: 192.168.10.147
         port: 10033
-      - identity: identity:ead8cf7faddc41afb294d309633dec03
-        host: 39.103.144.123
+      - identity: identity:8003323d0d1248719be0d50e98e9666e
+        host: 192.168.10.148
         port: 10033
-      - identity: identity:447160e8e94e4658b090a68e1325a5a3
-        host: 39.101.141.143
+      - identity: identity:7008f843ae69476590c3aab9fc888ec4
+        host: 192.168.10.149
         port: 10033
-grpc:
-  client:
-    carrier-grpc-server:
-      address: 'static://${system.config.publicOrgList[0].host}:${system.config.publicOrgList[0].port}'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext
-#单Redis节点模式
+
+# 单Redis节点模式
 redisson:
   password: 123456
   singleServerConfig:
-    address: 192.168.120.137:16100
-#集群模式
-#redisson:
-#  model: CLUSTER
-#  password: gasa123456
-#  multiple-server-config:
-#    node-addresses[0]: 10.10.8.173:6379
-#    node-addresses[1]: 10.10.8.174:6379
+    address: 192.168.10.145:17100
+
+# 节点网络设置
+chain:
+  platon:
+    chainId: 2203181
+    hrp: lat
+    metisPayAddress: "0x263b1d39843bf2e1da27d827e749992fbd1f1577"
+    uniswapV2Router02: "0x4378daf745e9053f6048c4f78c803f3bc8829703"
+    web3jProtocol: WS
+    web3jAddresses: 192.168.10.146:7789
+    chainName: "PlatON开发网"
+    rpcUrl: https://devnetopenapi2.platon.network/rpc
+    symbol: LAT
+    blockExplorerUrl: https://devnetscan.platon.network/
+    dexUrl: http://10.10.8.181:8080/
+
