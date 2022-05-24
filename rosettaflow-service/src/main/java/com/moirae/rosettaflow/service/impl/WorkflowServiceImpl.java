@@ -1514,7 +1514,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowFeeItemDto.setToken(BeanUtil.copyProperties(token, TokenDto.class));
         workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(dataService.getTokenHolderById(token.getAddress(), UserContext.getCurrentUser().getAddress()), TokenHolderDto.class));
         workflowFeeItemDto.setIsEnough(
-                new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue()))>0
+                new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0
                         && new BigDecimal(workflowFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0);
         return workflowFeeItemDto;
     }
