@@ -94,11 +94,11 @@ public class StatisticsServiceImpl implements StatisticsService {
             }
 
             for (int i = 0; i < pending; i++) {
+                last = DateUtils.addDays(last, -1);
                 StatsDay statsDay = new StatsDay();
                 statsDay.setStatsTime(last);
                 statsDay.setStatsValue(0L);
                 statsDayList.add(statsDay);
-                last = DateUtils.addDays(last, -1);
             }
         }
         return statsDayList;
