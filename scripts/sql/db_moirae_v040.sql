@@ -636,6 +636,7 @@ CREATE TABLE `mo_workflow` (
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`workflow_id`),
+    UNIQUE KEY `uk_address_name` (`address`,`workflow_name`),
     KEY `user_address` (`address`)
 ) ENGINE=InnoDB  COMMENT='工作流表';
 
@@ -858,7 +859,8 @@ CREATE TABLE `mo_workflow_version` (
     `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_id`,`workflow_version`)
+    PRIMARY KEY (`workflow_id`,`workflow_version`),
+    UNIQUE KEY `UK_id_name` (`workflow_id`,`workflow_version_name`)
 ) ENGINE=InnoDB  COMMENT='工作流不同版本设置表';
 
 /*Data for the table `mo_workflow_version` */

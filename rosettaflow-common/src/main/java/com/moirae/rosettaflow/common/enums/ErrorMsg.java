@@ -100,6 +100,7 @@ public enum ErrorMsg {
     WORKFLOW_COPY_ERROR("复制工作流失败", "Failed to copy workflow"),
     WORKFLOW_EXIST("工作流已存在", "Workflow already exists"),
     WORKFLOW_NAME_EXIST("工作流名称已存在", "Workflow name already exists"),
+    WORKFLOW_VERSION_NAME_EXIST("工作流版本名称已存在", "Workflow version name already exists"),
     WORKFLOW_RUNNING_EXIST("工作流正在运行中", "Workflow is running"),
     WORKFLOW_NOT_RUNNING("工作流已结束不能终止", "Workflow has ended and cannot be terminated"),
     WORKFLOW_CANCELING("工作流取消中", "Workflow is canceling"),

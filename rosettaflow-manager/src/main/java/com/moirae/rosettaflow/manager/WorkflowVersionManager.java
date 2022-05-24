@@ -3,6 +3,7 @@ package com.moirae.rosettaflow.manager;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface WorkflowVersionManager extends IService<WorkflowVersion> {
     List<WorkflowVersion> deleteByWorkflowId(Long workflowId);
 
     WorkflowVersion getById(Long workflowId, Long workflowVersion);
+
+    List<WorkflowVersion> listByNameAndId(Long workflowId, String workflowVersionName);
 }

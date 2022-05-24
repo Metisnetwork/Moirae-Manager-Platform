@@ -5,10 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.manager.WorkflowVersionManager;
 import com.moirae.rosettaflow.mapper.WorkflowVersionMapper;
+import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.domain.WorkflowVersion;
 import com.moirae.rosettaflow.mapper.enums.WorkflowTaskRunStatusEnum;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,8 +41,16 @@ public class WorkflowVersionManagerImpl extends ServiceImpl<WorkflowVersionMappe
         workflowVersion.setWorkflowVersion(workflowVersionNumber);
         workflowVersion.setWorkflowVersionName(workflowVersionName);
         workflowVersion.setStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
-        save(workflowVersion);
-        return workflowVersion;
+
+        try{
+            if(save(workflowVersion)){
+                return workflowVersion;
+            }else {
+                return null;
+            }
+        }catch (DuplicateKeyException e) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_VERSION_NAME_EXIST.getMsg(),e);
+        }
     }
 
     @Override
@@ -57,5 +70,13 @@ public class WorkflowVersionManagerImpl extends ServiceImpl<WorkflowVersionMappe
         wrapper.eq(WorkflowVersion::getWorkflowId, workflowId);
         wrapper.eq(WorkflowVersion::getWorkflowVersion, workflowVersion);
         return getOne(wrapper);
+    }
+
+    @Override
+    public List<WorkflowVersion> listByNameAndId(Long workflowId, String workflowVersionName) {
+        LambdaQueryWrapper<WorkflowVersion> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowVersion::getWorkflowId, workflowId);
+        wrapper.eq(WorkflowVersion::getWorkflowVersionName, workflowVersionName);
+        return list(wrapper);
     }
 }

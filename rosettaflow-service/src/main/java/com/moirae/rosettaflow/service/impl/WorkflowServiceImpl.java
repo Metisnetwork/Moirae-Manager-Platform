@@ -41,7 +41,6 @@ import com.moirae.rosettaflow.service.utils.TreeUtils;
 import com.moirae.rosettaflow.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,6 +144,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowVersionKeyDto createWorkflowOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, Long calculationProcessId) {
+        checkWorkFlowName(workflowName);
+
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
         // 配置查询
         AlgorithmClassify rootTree = algService.getAlgorithmClassifyTree(true);
@@ -200,6 +201,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName) {
+        checkWorkFlowName(workflowName);
+
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
         // 创建工作流记录
         Workflow workflow = workflowManager.createOfExpertMode(workflowName, UserContext.getCurrentUser().getAddress());
@@ -949,9 +952,11 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional
     public WorkflowVersionKeyDto copyWorkflow(WorkflowVersionNameDto req) {
+        checkWorkFlowVersionName(req.getWorkflowId(), req.getWorkflowVersionName());
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
         // 更新工作流对象
         Workflow workflow = workflowManager.increaseVersion(req.getWorkflowId());
+        checkWorkFlowOnlyOwner(workflow);
         // 创建工作流版本
         workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), req.getWorkflowVersionName());
         // 复制设置的信息
@@ -1675,6 +1680,20 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 只有拥有者才可以终止
         if(!workflow.getAddress().equals(UserContext.getCurrentUser().getAddress())){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_ONLY_OWNER_OPERATE.getMsg());
+        }
+    }
+
+    private void checkWorkFlowName(String workflowName){
+        List<Workflow> workflowList = workflowManager.listByNameAndAddress(UserContext.getCurrentUser().getAddress(), workflowName);
+        if(workflowList.size() > 0){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg());
+        }
+    }
+
+    private void checkWorkFlowVersionName(Long workflowId, String workflowVersionName) {
+        List<WorkflowVersion> workflowVersionList = workflowVersionManager.listByNameAndId(workflowId, workflowVersionName);
+        if(workflowVersionList.size() > 0){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_VERSION_NAME_EXIST.getMsg());
         }
     }
 

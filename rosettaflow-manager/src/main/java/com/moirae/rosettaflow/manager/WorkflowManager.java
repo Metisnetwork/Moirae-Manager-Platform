@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -32,4 +33,6 @@ public interface WorkflowManager extends IService<Workflow> {
     Workflow createOfExpertMode(String workflowName, String address);
 
     void updateLastRunTime(Long workflowId);
+
+    List<Workflow> listByNameAndAddress(String address, String workflowName);
 }

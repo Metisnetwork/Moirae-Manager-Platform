@@ -6,13 +6,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moirae.rosettaflow.common.enums.ErrorMsg;
+import com.moirae.rosettaflow.common.enums.RespCodeEnum;
+import com.moirae.rosettaflow.common.exception.BusinessException;
 import com.moirae.rosettaflow.manager.WorkflowManager;
 import com.moirae.rosettaflow.mapper.WorkflowMapper;
 import com.moirae.rosettaflow.mapper.domain.Workflow;
 import com.moirae.rosettaflow.mapper.enums.WorkflowCreateModeEnum;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -74,11 +79,7 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         workflow.setCalculationProcessStep(0);
         workflow.setWorkflowVersion(1L);
         workflow.setAddress(address);
-        if(save(workflow)){
-            return workflow;
-        }else {
-            return null;
-        }
+        return create(workflow);
     }
 
     @Override
@@ -88,15 +89,31 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         workflow.setWorkflowName(workflowName);
         workflow.setWorkflowVersion(1L);
         workflow.setAddress(address);
-        if(save(workflow)){
-            return workflow;
-        }else {
-            return null;
+        return create(workflow);
+    }
+
+    private Workflow create(Workflow workflow){
+        try{
+            if(save(workflow)){
+                return workflow;
+            }else {
+                return null;
+            }
+        }catch (DuplicateKeyException e) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NAME_EXIST.getMsg(),e);
         }
     }
 
     @Override
     public void updateLastRunTime(Long workflowId) {
         this.baseMapper.updateLastRunTime(workflowId);
+    }
+
+    @Override
+    public List<Workflow> listByNameAndAddress(String address, String workflowName) {
+        LambdaQueryWrapper<Workflow> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Workflow::getAddress, address);
+        wrapper.eq(Workflow::getWorkflowName, workflowName);
+        return list(wrapper);
     }
 }
