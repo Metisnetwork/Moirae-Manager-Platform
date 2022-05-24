@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -63,7 +60,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Cacheable("getTaskTrend-1")
     public List<StatsDay> getTaskTrend(Integer size) {
         List<Task> taskList = taskService.statisticsOfDay(size);
-        List<StatsDay> statsDayList = new ArrayList<>();
+        Map<Date, StatsDay> statsDayMap = new HashMap<>();
         for (Task task: taskList) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String s = sdf.format(task.getStatsTime());
@@ -72,34 +69,30 @@ public class StatisticsServiceImpl implements StatisticsService {
                 StatsDay statsDay = new StatsDay();
                 statsDay.setStatsTime(date);
                 statsDay.setStatsValue(task.getTaskCount().longValue());
-                statsDayList.add(statsDay);
+                statsDayMap.put(date, statsDay);
             } catch (ParseException e) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.BIZ_QUERY_NOT_EXIST.getMsg(), e);
             }
         }
 
-        int pending = size - statsDayList.size();
-        if(pending > 0){
-            Date last;
-            if(statsDayList.size() > 0){
-                last = statsDayList.get(statsDayList.size() - 1).getStatsTime();
-            }else{
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String s = sdf.format(new Date());
-                try {
-                    last =  sdf.parse(s);
-                } catch (ParseException e) {
-                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.EXCEPTION.getMsg());
-                }
-            }
+        Date now;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String dataStr = sdf.format(new Date());
+            now =  sdf.parse(dataStr);
+        } catch (ParseException e) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.EXCEPTION.getMsg());
+        }
 
-            for (int i = 0; i < pending; i++) {
-                last = DateUtils.addDays(last, -1);
+        List<StatsDay> statsDayList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            statsDayList.add(statsDayMap.computeIfAbsent(now, item -> {
                 StatsDay statsDay = new StatsDay();
-                statsDay.setStatsTime(last);
+                statsDay.setStatsTime(item);
                 statsDay.setStatsValue(0L);
-                statsDayList.add(statsDay);
-            }
+                return statsDay;
+            }));
+            now = DateUtils.addDays(now, -1);
         }
         return statsDayList;
     }
