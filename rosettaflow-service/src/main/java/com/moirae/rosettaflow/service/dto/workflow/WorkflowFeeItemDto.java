@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel(value = "工作流列表响应对象")
+@ApiModel
 public class WorkflowFeeItemDto {
 
     @ApiModelProperty(value = "支付类型（手续费、token）")

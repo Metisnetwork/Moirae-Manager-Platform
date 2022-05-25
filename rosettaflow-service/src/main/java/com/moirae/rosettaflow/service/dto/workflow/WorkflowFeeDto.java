@@ -9,7 +9,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "工作流列表响应对象")
+@ApiModel
 public class WorkflowFeeDto extends WorkflowVersionKeyDto {
 
     @ApiModelProperty(value = "工作流任务费用明细")
