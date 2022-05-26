@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.WorkflowVersionMapper">
+
+    <select id="getWorkflowVersionList" resultType="com.datum.platform.mapper.domain.WorkflowVersion">
+        select
+            mwv.workflow_id,
+            mwv.workflow_version,
+            mwv.workflow_version_name,
+            mwv.create_time,
+            wimwrs.run_status as status,
+            wimwrs.begin_time,
+            wimwrs.end_time,
+            wimwrs.id as workflowRunId,
+            mw.create_mode
+        from mo_workflow_version mwv inner join mo_workflow mw on mw.workflow_id = mwv.workflow_id
+            left join
+        (
+            select mwrs.id,
+                   mwrs.workflow_id,
+                   mwrs.workflow_version,
+                   mwrs.run_status,
+                   mwrs.begin_time,
+                   mwrs.end_time
+            from mo_workflow_run_status mwrs
+            where mwrs.id in (
+                select max(mwrs.id) as id
+                from mo_workflow_run_status mwrs
+                where mwrs.workflow_id = #{workflowId}
+                group by mwrs.workflow_version
+            )
+        ) wimwrs on (wimwrs.workflow_id = mwv.workflow_id and wimwrs.workflow_version = mwv.workflow_version)
+        where mwv.workflow_id = #{workflowId}
+        order by mwv.create_time desc
+    </select>
+</mapper>

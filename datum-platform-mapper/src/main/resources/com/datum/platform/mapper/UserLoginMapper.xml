@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.UserLoginMapper">
+    <select id="countOfActiveAddress" resultType="java.lang.Integer">
+        select count(distinct(address))
+        from mo_user_login
+        where `create_time` >  DATE_SUB(NOW(), INTERVAL 1 DAY )
+    </select>
+</mapper>

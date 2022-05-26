@@ -1,0 +1,13 @@
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api project(':datum-platform-manager')
+    api project(':datum-platform-chain-platon')
+    api 'com.zengtengpeng:redisson-spring-boot-starter:1.0.8'
+}

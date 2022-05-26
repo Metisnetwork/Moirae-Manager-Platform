@@ -1,0 +1,25 @@
+package com.datum.platform.manager.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.datum.platform.manager.StatsOrgManager;
+import com.datum.platform.mapper.StatsOrgMapper;
+import com.datum.platform.mapper.domain.StatsOrg;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Slf4j
+@Service
+public class StatsOrgManagerImpl extends ServiceImpl<StatsOrgMapper, StatsOrg> implements StatsOrgManager {
+
+    @Override
+    public List<StatsOrg> listByComputingPowerRatioDesc(Integer size) {
+        LambdaQueryWrapper<StatsOrg> wrapper = Wrappers.lambdaQuery();
+        wrapper.orderByDesc(StatsOrg::getComputingPowerRatio);
+        wrapper.last("limit " + size );
+        return list(wrapper);
+    }
+}

@@ -1,0 +1,39 @@
+plugins {
+    id 'distribution'
+}
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    enabled = true
+    exclude('application-dev.yml')
+}
+
+distributions {
+    main {
+        contents {
+            from("$rootDir/scripts") {
+                include 'application-prod.yml'
+                include 'manage.sh'
+                include 'jasypt.properties'
+                include 'lib/*'
+                include 'sql/*'
+            }
+            from('build/libs') {
+                include '*.jar'
+            }
+        }
+    }
+}
+
+distTar.dependsOn(bootJar)
+distZip.dependsOn(bootJar)
+
+dependencies {
+    api project(':datum-platform-quartz')
+    implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.0"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+}

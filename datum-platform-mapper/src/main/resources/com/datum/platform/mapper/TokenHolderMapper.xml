@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.TokenHolderMapper">
+    <update id="updateBatch">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update mo_token_holder th
+            set th.balance = #{item.balance},
+                th.authorize_balance = #{item.authorizeBalance}
+            where address = #{item.address} and token_address = #{item.tokenAddress}
+        </foreach>
+    </update>
+</mapper>

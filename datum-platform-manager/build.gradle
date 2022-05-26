@@ -1,0 +1,13 @@
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    api project(':datum-platform-common')
+    api project(':datum-platform-mapper')
+    api project(':datum-platform-grpc-client')
+}

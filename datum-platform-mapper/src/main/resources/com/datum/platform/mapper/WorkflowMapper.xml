@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.WorkflowMapper">
+    <update id="updateLastRunTime">
+        update mo_workflow set last_run_time = now() where workflow_id = #{workflowId}
+    </update>
+
+    <select id="getWorkflowList" resultType="com.datum.platform.mapper.domain.Workflow">
+        select
+            mw.workflow_id,
+            mw.workflow_version,
+            mw.workflow_name,
+            mw.algorithm_name,
+            mw.algorithm_id,
+            mw.create_time,
+            mw.last_run_time,
+            mw.is_setting_completed,
+            mw.create_mode,
+            mw.calculation_process_step,
+            mw.calculation_process_id,
+            mw.calculation_process_name,
+            (select mcps.type from mo_calculation_process_step mcps where mcps.calculation_process_id = mw.calculation_process_id and mcps.step = mw.calculation_process_step ) as calculation_process_step_type
+        from mo_workflow mw
+        where mw.address =  #{address}
+        <if test="keyword != null and keyword != ''">
+            and mw.workflow_name like concat('%', #{keyword}, '%')
+        </if>
+        <if test="algorithmId != null">
+            and mw.algorithm_id = #{algorithmId}
+        </if>
+        <if test="begin != null">
+            and mw.create_time <![CDATA[>=]]> #{begin}
+        </if>
+        <if test="end != null">
+            and mw.create_time <![CDATA[<=]]> #{end}
+        </if>
+        <if test="createMode != null">
+            and mw.create_mode = #{createMode}
+        </if>
+        order by mw.create_time desc
+    </select>
+</mapper>

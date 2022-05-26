@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.TaskMapper">
+    <select id="getTaskListByOrg" resultType="com.datum.platform.mapper.domain.Task">
+        select t.id,
+               t.task_name,
+               t.create_at,
+               t.start_at,
+               t.end_at,
+               t.status,
+               if(temp.taskSponsor > 0, 1 , 0) as isTaskSponsor,
+               if(temp.powerProvider > 0, 1 , 0) as isPowerProvider,
+               if(temp.dataProvider > 0, 1 , 0) as isDataProvider,
+               if(temp.resultConsumer > 0, 1 , 0) as isResultReceiver,
+               if(temp.algoProvider > 0, 1 , 0) as isAlgoProvider
+        from dc_task t
+        join
+             (
+                 select tmp.task_id,
+                        sum(tmp.taskSponsor) as taskSponsor,
+                        sum(tmp.powerProvider) as powerProvider ,
+                        sum(tmp.dataProvider) as dataProvider,
+                        sum(tmp.resultConsumer) as resultConsumer,
+                        sum(tmp.algoProvider) as algoProvider
+                 from
+                     (
+                         select tk.owner_identity_id as identity_id,
+                                tk.id as task_id,
+                                true taskSponsor,
+                                false as powerProvider,
+                                false as dataProvider,
+                                false as resultConsumer,
+                                false algoProvider
+                         from dc_task tk
+                         where tk.owner_identity_id = #{identityId,jdbcType=VARCHAR}
+
+                         union
+
+                         select tap.identity_id,
+                                tap.task_id,
+                                false taskSponsor,
+                                false as powerProvider,
+                                false as dataProvider,
+                                false as resultConsumer,
+                                true algoProvider
+                         from dc_task_algo_provider tap
+                         where tap.identity_id = #{identityId,jdbcType=VARCHAR}
+
+                         union
+
+                         select tpp.identity_id,
+                                tpp.task_id,
+                                false taskSponsor,
+                                true as powerProvider,
+                                false as dataProvider,
+                                false as resultConsumer,
+                                false algoProvider
+                         from dc_task_power_provider tpp
+                         WHERE tpp.identity_id= #{identityId,jdbcType=VARCHAR}
+
+                         union
+
+                         select tmd.identity_id,
+                                tmd.task_id,
+                                false taskSponsor,
+                                false as powerProvider,
+                                true as dataProvider,
+                                false as resultConsumer,
+                                false algoProvider
+                         from dc_task_data_provider tmd
+                         where tmd.identity_id= #{identityId,jdbcType=VARCHAR}
+
+
+                         union
+
+                         select distinct trc.consumer_identity_id as identity_id,
+                                         trc.task_id,
+                                         false taskSponsor,
+                                         false as powerProvider,
+                                         false as dataProvider,
+                                         true as resultConsumer,
+                                         false algoProvider
+                         from dc_task_result_consumer trc
+                         where trc.consumer_identity_id = #{identityId,jdbcType=VARCHAR}
+
+                     ) tmp
+                 group by tmp.task_id
+             ) temp on t.id = temp.task_id
+        order by t.create_at desc
+
+
+    </select>
+    <select id="getTaskListOfEventNotSynced" resultType="com.datum.platform.mapper.domain.Task">
+        select
+            t.*
+        from dc_task t left join mo_task_expand te on t.id = te.id
+        where (isnull(te.event_synced) or te.event_synced = 0 ) and t.status in (3,4)
+        limit 1000
+    </select>
+    <select id="getTaskOfUnSyncedEvent" resultType="com.datum.platform.mapper.domain.Task">
+        select
+            t.*
+        from dc_task t inner join mo_task_expand te on t.id = te.id
+        where t.id = #{taskId,jdbcType=VARCHAR} and te.event_synced = 1
+    </select>
+    <select id="getTaskListByData" resultType="com.datum.platform.mapper.domain.Task">
+        select t.id,
+               t.task_name,
+               t.create_at,
+               t.start_at,
+               t.end_at,
+               t.status
+        from dc_task t join dc_task_data_provider tmd on t.id = tmd.task_id and tmd.meta_data_id = #{metaDataId,jdbcType=VARCHAR}
+        where t.`status` in (3, 4)
+        order by t.create_at desc
+    </select>
+    <select id="getTaskList" resultType="com.datum.platform.mapper.domain.Task">
+        select t.id,
+               t.task_name,
+               t.create_at,
+               t.start_at,
+               t.end_at,
+               t.status
+        from dc_task t
+        where 1 = 1
+            <if test="keyword != null and keyword != ''">
+                and t.id = #{keyword}
+            </if>
+            <if test="begin != null">
+                and t.create_at <![CDATA[>=]]> #{begin}
+            </if>
+            <if test="end != null">
+                and t.create_at <![CDATA[<=]]> #{end}
+            </if>
+            <if test="status != null">
+                and t.status = #{status}
+            </if>
+        order by t.create_at desc
+    </select>
+    <select id="statisticsOfGlobal" resultType="com.datum.platform.mapper.domain.Task">
+        select
+            (select count(1) from dc_task) as taskCount,
+            (select count(distinct(user_id)) from dc_task) as addressCount,
+            (select count(1) from dc_task_data_provider) as dataCount
+    </select>
+    <select id="statisticsOfDay" resultType="com.datum.platform.mapper.domain.Task">
+        select DATE_FORMAT(`create_at`, '%Y-%m-%d') as statsTime,
+               count(1) as taskCount
+        from `dc_task`
+        group by DATE_FORMAT(`create_at`, '%Y-%m-%d')
+        order by DATE_FORMAT(`create_at`, '%Y-%m-%d') desc
+        limit  #{size};
+    </select>
+    <select id="listTaskOfLatest" resultType="com.datum.platform.mapper.domain.Task">
+        select t.id,
+               t.task_name,
+               t.create_at,
+               t.start_at,
+               t.end_at,
+               t.status,
+               o.identity_id,
+               o.node_name,
+               o.image_url
+        from dc_task t inner join dc_org o on t.owner_identity_id = o.identity_id
+        order by t.create_at desc limit #{size}
+    </select>
+</mapper>

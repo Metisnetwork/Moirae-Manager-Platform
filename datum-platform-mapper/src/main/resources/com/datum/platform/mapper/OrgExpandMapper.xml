@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.OrgExpandMapper">
+    <select id="getUsableIdentityIdList" resultType="java.lang.String">
+        select o.identity_id
+        from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
+        where o.status = 1;
+    </select>
+
+</mapper>
