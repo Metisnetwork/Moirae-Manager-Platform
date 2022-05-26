@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.StatsOrgMapper">
+    <select id="listByComputingPowerRatioDesc" resultType="com.datum.platform.mapper.domain.StatsOrg">
+        select
+            mso.identity_id,
+            mso.org_total_core,
+            mso.org_total_memory,
+            mso.org_total_bandwidth,
+            mso.computing_power_ratio,
+            mso.total_task,
+            mso.total_data,
+            mso.total_data_token,
+            mso.create_time,
+            mso.update_time
+        from mo_stats_org mso inner join dc_org do on mso.identity_id = do.identity_id
+        where do.status = 1
+        order by mso.computing_power_ratio desc
+        limit #{size}
+    </select>
+</mapper>

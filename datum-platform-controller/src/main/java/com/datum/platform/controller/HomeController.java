@@ -32,8 +32,6 @@ public class HomeController {
     @Resource
     private StatisticsService statisticsService;
     @Resource
-    private DataService dataService;
-    @Resource
     private TaskService taskService;
 
     @GetMapping("queryNavigation")

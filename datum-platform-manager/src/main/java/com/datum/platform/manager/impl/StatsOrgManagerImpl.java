@@ -17,9 +17,6 @@ public class StatsOrgManagerImpl extends ServiceImpl<StatsOrgMapper, StatsOrg> i
 
     @Override
     public List<StatsOrg> listByComputingPowerRatioDesc(Integer size) {
-        LambdaQueryWrapper<StatsOrg> wrapper = Wrappers.lambdaQuery();
-        wrapper.orderByDesc(StatsOrg::getComputingPowerRatio);
-        wrapper.last("limit " + size );
-        return list(wrapper);
+        return baseMapper.listByComputingPowerRatioDesc(size);
     }
 }
