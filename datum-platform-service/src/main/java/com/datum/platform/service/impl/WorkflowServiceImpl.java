@@ -1398,9 +1398,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         Long id = curWorkflowRunTaskStatus.getId();
         String address = workflowRunStatus.getAddress();
         String algorithmName = curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmName();
-        String workflowName = workflowRunStatus.getWorkflow().getWorkflowName();
+        String workflowVersionName = workflowVersionManager.getById(workflowRunStatus.getWorkflowId(), workflowRunStatus.getWorkflowVersion()).getWorkflowVersionName();
         WorkflowCreateModeEnum createModeEnum = workflowRunStatus.getWorkflow().getCreateMode();
-        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + createModeEnum.getValue() + "_" + workflowName, 100);
+        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + createModeEnum.getValue() + "_" + workflowVersionName, 100);
     }
 
     private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {
