@@ -93,7 +93,7 @@ public enum ErrorMsg {
     /**
      * 工作流
      */
-    WORKFLOW_EXECUTE_VALUE_INSUFFICIENT("执行工作流所需余额或授权金额不足", "Insufficient balance or authorization amount required to execute the workflow"),
+    WORKFLOW_EXECUTE_VALUE_INSUFFICIENT("执行工作流所需余额或授权金额不足 {}", "Insufficient balance or authorization amount required to execute the workflow {}"),
     WORKFLOW_BEEN_RUN("工作流存在运行信息", "Workflow has running information"),
     WORKFLOW_NOT_EXIST("工作流不存在", "Workflow does not exist"),
     WORKFLOW_ORIGIN_NOT_EXIST("原工作流不存在", "Origin workflow does not exist"),

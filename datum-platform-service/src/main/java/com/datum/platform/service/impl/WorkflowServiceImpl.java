@@ -1450,10 +1450,12 @@ public class WorkflowServiceImpl implements WorkflowService {
      * @param workflowFeeList
      */
     private void checkFee(List<WorkflowFeeItemDto> workflowFeeList) {
-        long count = workflowFeeList.stream()
-                .filter(item -> !item.getIsEnough()).count();
-        if( count > 0) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg());
+        List<String> tokenNameList = workflowFeeList.stream()
+                .filter(item -> !item.getIsEnough())
+                .map(item -> item.getToken().getName())
+                .collect(Collectors.toList());
+        if( tokenNameList.size() > 0) {
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg(), "{}",tokenNameList.toString()));
         }
     }
 
@@ -1466,7 +1468,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<String> errorList = new ArrayList<>();
         for (String sender : senderSet){
             if(!userOrgMap.containsKey(sender) || ! userOrgMap.get(sender).getIsInWhitelist()){
-                errorList.add(sender);
+                if(userOrgMap.containsKey(sender)){
+                    errorList.add(userOrgMap.get(sender).getNodeName());
+                }else{
+                    errorList.add(sender);
+                }
             }
         }
         if(errorList.size() > 0){
