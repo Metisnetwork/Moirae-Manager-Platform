@@ -247,4 +247,6 @@ public interface DataService {
     List<MetaDataColumn> listMetaDataColumnByIdAndIndex(String metaDataId, List<Integer> selectedColumnsV2);
 
     Model getModelByTaskId(String taskId);
+
+    boolean existTokeHolder(String address, String token);
 }

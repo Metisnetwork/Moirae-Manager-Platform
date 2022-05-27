@@ -66,7 +66,7 @@ public class SyncTokenHolderInfoTask {
     private TokenHolder syncUser(String address, String token){
         BigInteger balance = dataTokenTemplateDao.balanceOf(token, address);
         BigInteger allowance = dataTokenTemplateDao.allowance(token, address);
-        if(balance.compareTo(BigInteger.ZERO) > 0 || allowance.compareTo(BigInteger.ZERO) > 0){
+        if(balance.compareTo(BigInteger.ZERO) > 0 || allowance.compareTo(BigInteger.ZERO) > 0 || dataService.existTokeHolder(address, token)){
             TokenHolder tokenHolder = new TokenHolder();
             tokenHolder.setTokenAddress(token);
             tokenHolder.setAddress(address);

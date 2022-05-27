@@ -236,4 +236,9 @@ public class DataServiceImpl implements DataService {
     public Model getModelByTaskId(String taskId) {
         return modelManager.getModelByTaskId(taskId);
     }
+
+    @Override
+    public boolean existTokeHolder(String address, String token) {
+        return tokenHolderManager.getById(token, address) != null;
+    }
 }
