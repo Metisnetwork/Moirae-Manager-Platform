@@ -134,6 +134,8 @@ public enum ErrorMsg {
     WORKFLOW_FILE_DOWNLOAD_COMPRESSTYPE_ERROR("工作流节点输入模型文件下载压缩格式错误", "Workflow node model file download compressType error"),
     WORKFLOW_ONLY_OWNER_OPERATE("只有拥有者才可以操作该工作流", "Only the owner can operate the workflow"),
 
+    WORKFLOW_FEE_ESTIMATE_FAIL("估算手续费失败，请检查手续费凭证是否足够", "Failed to estimate the handling fee, please check whether the handling fee certificate is sufficient"),
+
 
     /**
      * rpc接口异常

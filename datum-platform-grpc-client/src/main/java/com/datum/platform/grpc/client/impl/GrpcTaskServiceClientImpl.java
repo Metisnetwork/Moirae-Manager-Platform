@@ -1,5 +1,7 @@
 package com.datum.platform.grpc.client.impl;
 
+import com.datum.platform.common.enums.ErrorMsg;
+import com.datum.platform.common.enums.RespCodeEnum;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.constant.GrpcConstant;
@@ -73,8 +75,8 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     public EstimateTaskGasResponse estimateTaskGas(Channel channel, EstimateTaskGasRequest request) {
         EstimateTaskGasResponse response = TaskServiceGrpc.newBlockingStub(channel).estimateTaskGas(request);
         if (response.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
-            log.error("GrpcTaskServiceClientImpl->estimateTaskGas() fail reason:{}", response.getMsg());
-            throw new BusinessException(response.getStatus(), response.getMsg());
+            log.error("GrpcTaskServiceClientImpl->estimateTaskGas() fail reason: code={} msg={}",response.getStatus(), response.getMsg());
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FEE_ESTIMATE_FAIL.getMsg());
         }
         return response;
     }
