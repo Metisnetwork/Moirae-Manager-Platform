@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -15,6 +15,6 @@ import javax.validation.constraints.NotNull;
 public class DataIdPageReq extends CommonPageReq {
 
     @ApiModelProperty(value = "元数据列表字段metaDataId", required = true)
-    @NotNull(message = "{metadata.metadataid.notNull}")
+    @NotBlank(message = "{metadata.metadataid.notNull}")
     private String metaDataId;
 }
