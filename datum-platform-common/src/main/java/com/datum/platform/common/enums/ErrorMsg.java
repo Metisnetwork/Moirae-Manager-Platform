@@ -135,6 +135,7 @@ public enum ErrorMsg {
     WORKFLOW_ONLY_OWNER_OPERATE("只有拥有者才可以操作该工作流", "Only the owner can operate the workflow"),
 
     WORKFLOW_FEE_ESTIMATE_FAIL("估算手续费失败，请检查手续费凭证是否足够", "Failed to estimate the handling fee, please check whether the handling fee certificate is sufficient"),
+    WORKFLOW_SETTING_PSI_OUTERROR("PSI的输出组织设置必须限制在数据输入组织内，不合法的组织 = {}", "The output organization setting of PSI must be limited to the data input organization, and the illegal organization = {}"),
 
 
     /**

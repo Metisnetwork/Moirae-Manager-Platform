@@ -451,11 +451,11 @@ public class WorkflowServiceImpl implements WorkflowService {
                 setCommonResourceOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), Arrays.asList(wizard.getTask3Step(), wizard.getTask4Step()), req.getTrainingAndPredictionResource().getPrediction());
                 break;
             case OUTPUT_COMMON:
-                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getCommonOutput());
+                setCommonOutputOfWizardMode(sysConfig.getDefaultPsi() == workflow.getAlgorithmId(), req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getCommonOutput());
                 break;
             case OUTPUT_TRAINING_PREDICTION:
-                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getTrainingAndPredictionOutput().getTraining());
-                setCommonOutputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step(), req.getTrainingAndPredictionOutput().getPrediction());
+                setCommonOutputOfWizardMode(false, req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step(), req.getTrainingAndPredictionOutput().getTraining());
+                setCommonOutputOfWizardMode(false, req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step(), req.getTrainingAndPredictionOutput().getPrediction());
                 break;
         }
         WorkflowVersionKeyDto result = new WorkflowVersionKeyDto();
@@ -530,9 +530,23 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowTaskOutputManager.saveBatch(workflowTaskOutputList);
     }
 
-    private void setCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer taskStep, OutputDto commonOutput) {
+    private void setCommonOutputOfWizardMode(boolean checkPsi, Long workflowId, Long workflowVersion, Integer taskStep, OutputDto commonOutput) {
         WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, taskStep);
         List<WorkflowTaskOutput> workflowTaskOutputList = convert2WorkflowTaskOutput(workflowTask.getWorkflowTaskId(), commonOutput);
+        // 如果是psi，输出必须包含在输入
+        if(checkPsi){
+            Set<String> inputIdSet = workflowTaskInputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId())
+                    .stream()
+                    .map(WorkflowTaskInput::getIdentityId)
+                    .collect(Collectors.toSet());
+
+            Set<String> outputIdSet = workflowTaskOutputList.stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toSet());
+            List<String> complement = outputIdSet.stream().filter(i -> !inputIdSet.contains(i))
+                    .map(item -> orgService.getOrgById(item).getNodeName()).collect(Collectors.toList());
+            if( complement.size() > 0) {
+                throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.WORKFLOW_SETTING_PSI_OUTERROR.getMsg(), "{}",complement.toString()));
+            }
+        }
         workflowTaskOutputManager.clearAndSave(workflowTask.getWorkflowTaskId(), workflowTaskOutputList);
     }
 
@@ -681,6 +695,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         AlgorithmClassify psiAlgorithmClassify = TreeUtils.findSubTree(root, sysConfig.getDefaultPsi());
         for (int i = 0; i < req.getWorkflowNodeList().size(); i++) {
             NodeDto nodeDto = req.getWorkflowNodeList().get(i);
+            if(sysConfig.getDefaultPsi() == nodeDto.getAlgorithmId()){
+                Set<String> inputIdSet = nodeDto.getNodeInput().getDataInputList()
+                        .stream()
+                        .map(DataInputDto::getIdentityId)
+                        .collect(Collectors.toSet());
+                List<String> outputIdSet = nodeDto.getNodeOutput().getIdentityId();
+                List<String> complement = outputIdSet.stream().filter(subI -> !inputIdSet.contains(subI)).map(item -> orgService.getOrgById(item).getNodeName()).collect(Collectors.toList());
+                if( complement.size() > 0) {
+                    throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.WORKFLOW_SETTING_PSI_OUTERROR.getMsg(), "{}",complement.toString()));
+                }
+            }
             AlgorithmClassify algorithmClassify = TreeUtils.findSubTree(root, nodeDto.getAlgorithmId());
             // 创建psi任务
             WorkflowTask psiWorkflowTask = null;
