@@ -1508,6 +1508,14 @@ public class WorkflowServiceImpl implements WorkflowService {
         Map<String, Long> metaDataId2CountMap = workflowTaskList.stream()
                 .flatMap(item -> item.getInputList().stream())
                 .collect(Collectors.groupingBy(WorkflowTaskInput::getMetaDataId, Collectors.counting()));
+        for (int i = 0; i < workflowTaskList.size(); i++) {
+            if(workflowTaskList.get(i).getInputPsi() && workflowTaskList.get(i-1) != null && workflowTaskList.get(i-1).getAlgorithmId() == sysConfig.getDefaultPsi() ){
+                for (WorkflowTaskInput workflowTaskInput : workflowTaskList.get(i).getInputList()) {
+                    metaDataId2CountMap.put(workflowTaskInput.getMetaDataId(), metaDataId2CountMap.get(workflowTaskInput.getMetaDataId()) - 1);
+                }
+            }
+        }
+
         List<MetaData> metaDataList = dataService.listMetaDataByIds(metaDataId2CountMap.keySet());
         Map<String, String> metaDataId2TokenAddressMap = metaDataList.stream()
                 .collect(Collectors.toMap(MetaData::getMetaDataId, MetaData::getTokenAddress));
