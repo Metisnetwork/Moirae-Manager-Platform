@@ -1,11 +1,10 @@
 package com.datum.platform.grpc.client;
 
-import com.datum.platform.grpc.service.GetTaskResultFileSummary;
-import com.datum.platform.grpc.service.YarnNodeInfo;
+import carrier.api.SysRpcApi;
 import io.grpc.Channel;
 
 public interface GrpcSysServiceClient {
-    YarnNodeInfo getNodeInfo(Channel channel);
+    SysRpcApi.YarnNodeInfo getNodeInfo(Channel channel);
 
     /**
      * 查询指定任务的结果摘要
@@ -14,5 +13,5 @@ public interface GrpcSysServiceClient {
      * @param taskId  任务id
      * @return 任务结果文件摘要
      */
-    GetTaskResultFileSummary getTaskResultFileSummary(Channel channel, String taskId);
+    SysRpcApi.GetTaskResultFileSummary getTaskResultFileSummary(Channel channel, String taskId);
 }

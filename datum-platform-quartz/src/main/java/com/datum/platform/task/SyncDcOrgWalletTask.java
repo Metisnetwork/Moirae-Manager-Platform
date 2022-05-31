@@ -1,9 +1,9 @@
 package com.datum.platform.task;
 
+import carrier.api.SysRpcApi;
 import cn.hutool.core.date.DateUtil;
 import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.impl.GrpcSysServiceClientImpl;
-import com.datum.platform.grpc.service.YarnNodeInfo;
 import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
@@ -57,7 +57,7 @@ public class SyncDcOrgWalletTask {
     }
 
     private OrgExpand syncOrgWallet(OrgExpand org) {
-        YarnNodeInfo yarnNodeInfo = sysServiceClient.getNodeInfo(organizationService.getChannel(org.getIdentityId()));
+        SysRpcApi.YarnNodeInfo yarnNodeInfo = sysServiceClient.getNodeInfo(organizationService.getChannel(org.getIdentityId()));
         if(yarnNodeInfo != null){
             String rawAddress =  yarnNodeInfo.getObserverProxyWalletAddress();
             if(StringUtils.isBlank(rawAddress) || StringUtils.equalsAnyIgnoreCase(rawAddress, "0x0000000000000000000000000000000000000000")){

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/carrier/types";
+
+package carrier.types;
+
+
+message SimpleResponse {
+  // the code for response
+  int32 status = 1;
+  // the message for response
+  string msg = 2;
+}

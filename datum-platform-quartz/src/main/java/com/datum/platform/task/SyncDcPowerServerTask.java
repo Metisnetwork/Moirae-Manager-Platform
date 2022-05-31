@@ -1,10 +1,10 @@
 package com.datum.platform.task;
 
+import carrier.api.PowerRpcApi;
+import carrier.types.Identitydata;
+import carrier.types.Resourcedata;
 import cn.hutool.core.date.DateUtil;
 import com.datum.platform.grpc.client.impl.GrpcPowerServiceClientImpl;
-import com.datum.platform.grpc.service.GetGlobalPowerDetail;
-import com.datum.platform.grpc.service.types.Organization;
-import com.datum.platform.grpc.service.types.PowerUsageDetail;
 import com.datum.platform.mapper.domain.PowerServer;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.service.DataSyncService;
@@ -57,12 +57,12 @@ public class SyncDcPowerServerTask {
         log.info("算力信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
-    private void batchUpdatePower(List<GetGlobalPowerDetail> getGlobalPowerDetailResponseList) {
+    private void batchUpdatePower(List<PowerRpcApi.GetGlobalPowerDetail> getGlobalPowerDetailResponseList) {
         List<PowerServer> powerServerList = new ArrayList<>();
 
         getGlobalPowerDetailResponseList.stream().forEach(item->{
-            Organization owner = item.getOwner();
-            PowerUsageDetail information = item.getInformation();
+            Identitydata.Organization owner = item.getOwner();
+            Resourcedata.PowerUsageDetail information = item.getInformation();
             PowerServer powerServer = new PowerServer();
             powerServer.setId(item.getPowerId());
             powerServer.setIdentityId(owner.getIdentityId());

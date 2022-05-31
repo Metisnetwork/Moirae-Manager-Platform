@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/carrier/types";
+
+package carrier.types;
+
+message HeaderPb {
+  bytes  parent_hash = 1;
+  uint64 version = 2;
+  uint64 timestamp = 3;
+  bytes  extra = 4;
+}

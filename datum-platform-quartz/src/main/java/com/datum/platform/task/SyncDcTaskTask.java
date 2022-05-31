@@ -1,15 +1,11 @@
 package com.datum.platform.task;
 
+import carrier.types.Taskdata;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.dynamic.TaskDataPolicyCsv;
-import com.datum.platform.grpc.dynamic.TaskDataPolicyUnknown;
 import com.datum.platform.grpc.dynamic.TaskPowerPolicy2;
-import com.datum.platform.grpc.service.types.TaskDetail;
-import com.datum.platform.grpc.service.types.TaskDetailSummary;
-import com.datum.platform.grpc.service.types.TaskOrganization;
-import com.datum.platform.grpc.service.types.TaskPowerResourceOption;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
@@ -24,7 +20,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +68,7 @@ public class SyncDcTaskTask {
         log.info("任务信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
-    private void batchUpdateTask(List<TaskDetail> taskDetailResponseDtoList) {
+    private void batchUpdateTask(List<Taskdata.TaskDetail> taskDetailResponseDtoList) {
         List<Task> taskList = new ArrayList<>();
         List<TaskAlgoProvider> taskAlgoProviderList = new ArrayList<>();
         List<TaskDataProvider> taskDataProviderList = new ArrayList<>();
@@ -77,7 +76,7 @@ public class SyncDcTaskTask {
         List<TaskPowerProvider> taskPowerProviderList = new ArrayList<>();
         List<TaskResultConsumer> taskResultConsumerList = new ArrayList<>();
         taskDetailResponseDtoList.stream().forEach(item ->{
-            TaskDetailSummary information = item.getInformation();
+            Taskdata.TaskDetailSummary information = item.getInformation();
 
             TaskAlgoProvider taskAlgoProvider = new TaskAlgoProvider();
             taskAlgoProvider.setTaskId(information.getTaskId());
@@ -85,7 +84,7 @@ public class SyncDcTaskTask {
             taskAlgoProvider.setPartyId(information.getAlgoSupplier().getPartyId());
             taskAlgoProviderList.add(taskAlgoProvider);
 
-            Map<String, TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
+            Map<String, Taskdata.TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
             for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
                 TaskDataPolicyCsv dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyCsv.class);
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
@@ -103,8 +102,8 @@ public class SyncDcTaskTask {
                 taskDataProviderList.add(taskDataProvider);
             }
 
-            Map<String, TaskPowerResourceOption> resourceMap = information.getPowerResourceOptionsList().stream().collect(Collectors.toMap(TaskPowerResourceOption::getPartyId, resource -> resource));
-            Map<String, TaskOrganization> powerMap =  information.getPowerSuppliersList().stream().collect(Collectors.toMap(TaskOrganization::getPartyId, org -> org));
+            Map<String, Taskdata.TaskPowerResourceOption> resourceMap = information.getPowerResourceOptionsList().stream().collect(Collectors.toMap(Taskdata.TaskPowerResourceOption::getPartyId, resource -> resource));
+            Map<String, Taskdata.TaskOrganization> powerMap =  information.getPowerSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
 
             for (int i = 0; i < information.getPowerPolicyTypesList().size(); i++) {
                 Integer type = information.getPowerPolicyTypes(i);

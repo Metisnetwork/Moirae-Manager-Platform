@@ -1,14 +1,14 @@
 package com.datum.platform.grpc.client.impl;
 
+import carrier.api.TaskRpcApi;
+import carrier.api.TaskServiceGrpc;
+import carrier.types.Common;
+import carrier.types.Taskdata;
 import com.datum.platform.common.enums.ErrorMsg;
 import com.datum.platform.common.enums.RespCodeEnum;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.constant.GrpcConstant;
-import com.datum.platform.grpc.service.*;
-import com.datum.platform.grpc.service.types.SimpleResponse;
-import com.datum.platform.grpc.service.types.TaskDetail;
-import com.datum.platform.grpc.service.types.TaskEvent;
 import io.grpc.Channel;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -32,12 +32,12 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     TaskServiceGrpc.TaskServiceStub taskServiceStub;
 
     @Override
-    public List<TaskDetail> getGlobalTaskDetailList(Long latestSynced) {
-        GetTaskDetailListRequest request = GetTaskDetailListRequest.newBuilder()
+    public List<Taskdata.TaskDetail> getGlobalTaskDetailList(Long latestSynced) {
+        TaskRpcApi.GetTaskDetailListRequest request = TaskRpcApi.GetTaskDetailListRequest.newBuilder()
                 .setLastUpdated(latestSynced)
                 .setPageSize(GrpcConstant.PAGE_SIZE)
                 .build();
-        GetTaskDetailListResponse response = taskServiceBlockingStub.getGlobalTaskDetailList(request);
+        TaskRpcApi.GetTaskDetailListResponse response = taskServiceBlockingStub.getGlobalTaskDetailList(request);
 
         if (response.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("GrpcTaskServiceClientImpl->getTaskDetailList() fail reason:{}", response.getMsg());
@@ -47,9 +47,9 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     }
 
     @Override
-    public List<TaskEvent> getTaskEventList(String taskId) {
-        GetTaskEventListRequest getTaskEventListRequest = GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
-        GetTaskEventListResponse response = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
+    public List<Taskdata.TaskEvent> getTaskEventList(String taskId) {
+        TaskRpcApi.GetTaskEventListRequest getTaskEventListRequest = TaskRpcApi.GetTaskEventListRequest.newBuilder().setTaskId(taskId).build();
+        TaskRpcApi.GetTaskEventListResponse response = taskServiceBlockingStub.getTaskEventList(getTaskEventListRequest);
 
         if (response.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("GrpcTaskServiceClientImpl->getTaskDetailList() fail reason:{}", response.getMsg());
@@ -59,21 +59,21 @@ public class GrpcTaskServiceClientImpl implements GrpcTaskServiceClient {
     }
 
     @Override
-    public PublishTaskDeclareResponse publishTaskDeclare(Channel channel, PublishTaskDeclareRequest request) {
+    public TaskRpcApi.PublishTaskDeclareResponse publishTaskDeclare(Channel channel, TaskRpcApi.PublishTaskDeclareRequest request) {
         log.info("publishTaskDeclare req = {}", request);
-        PublishTaskDeclareResponse response = TaskServiceGrpc.newBlockingStub(channel).publishTaskDeclare(request);
+        TaskRpcApi.PublishTaskDeclareResponse response = TaskServiceGrpc.newBlockingStub(channel).publishTaskDeclare(request);
         log.info("publishTaskDeclare resp = {}", response);
         return response;
     }
 
     @Override
-    public SimpleResponse terminateTask(Channel channel, TerminateTaskRequest request) {
+    public Common.SimpleResponse terminateTask(Channel channel, TaskRpcApi.TerminateTaskRequest request) {
         return TaskServiceGrpc.newBlockingStub(channel).terminateTask(request);
     }
 
     @Override
-    public EstimateTaskGasResponse estimateTaskGas(Channel channel, EstimateTaskGasRequest request) {
-        EstimateTaskGasResponse response = TaskServiceGrpc.newBlockingStub(channel).estimateTaskGas(request);
+    public TaskRpcApi.EstimateTaskGasResponse estimateTaskGas(Channel channel, TaskRpcApi.EstimateTaskGasRequest request) {
+        TaskRpcApi.EstimateTaskGasResponse response = TaskServiceGrpc.newBlockingStub(channel).estimateTaskGas(request);
         if (response.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {
             log.error("GrpcTaskServiceClientImpl->estimateTaskGas() fail reason: code={} msg={}",response.getStatus(), response.getMsg());
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FEE_ESTIMATE_FAIL.getMsg());

@@ -1,8 +1,8 @@
 package com.datum.platform.task;
 
+import carrier.types.Identitydata;
 import cn.hutool.core.date.DateUtil;
 import com.datum.platform.grpc.client.impl.GrpcAuthServiceClientImpl;
-import com.datum.platform.grpc.service.types.Organization;
 import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
@@ -61,7 +61,7 @@ public class SyncDcOrgTask {
     /**
      * @param nodeIdentityDtoList 需更新数据
      */
-    private void batchUpdateOrg(List<Organization> nodeIdentityDtoList) {
+    private void batchUpdateOrg(List<Identitydata.Organization> nodeIdentityDtoList) {
         List<Org> orgList = nodeIdentityDtoList.stream().map(nodeIdentityDto -> {
                     Org org = new Org();
                     org.setIdentityId(nodeIdentityDto.getIdentityId());

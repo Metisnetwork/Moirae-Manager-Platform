@@ -1,9 +1,9 @@
 package com.datum.platform.grpc.client;
 
-import com.datum.platform.grpc.service.types.Organization;
+import carrier.types.Identitydata;
 
 import java.util.List;
 
 public interface GrpcAuthServiceClient {
-    List<Organization> getIdentityList(Long latestSynced);
+    List<Identitydata.Organization> getIdentityList(Long latestSynced);
 }

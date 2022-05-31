@@ -1,5 +1,10 @@
 package com.datum.platform.service.impl;
 
+import carrier.api.SysRpcApi;
+import carrier.api.TaskRpcApi;
+import carrier.types.Common;
+import carrier.types.Resourcedata;
+import carrier.types.Taskdata;
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -14,11 +19,6 @@ import com.datum.platform.grpc.client.GrpcSysServiceClient;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.constant.GrpcConstant;
 import com.datum.platform.grpc.dynamic.*;
-import com.datum.platform.grpc.service.*;
-import com.datum.platform.grpc.service.types.SimpleResponse;
-import com.datum.platform.grpc.service.types.TaskOrganization;
-import com.datum.platform.grpc.service.types.TaskResourceCostDeclare;
-import com.datum.platform.grpc.service.types.UserType;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.*;
@@ -39,6 +39,7 @@ import com.datum.platform.service.dto.workflow.wizard.*;
 import com.datum.platform.service.utils.CommonUtils;
 import com.datum.platform.service.utils.TreeUtils;
 import com.datum.platform.service.utils.UserContext;
+import common.constant.CarrierEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -224,15 +225,15 @@ public class WorkflowServiceImpl implements WorkflowService {
     public boolean cancelWorkflowRunTaskStatus(WorkflowRunTaskStatus workflowRunTaskStatus) {
         WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(workflowRunTaskStatus.getWorkflowRunId());
         if(workflowRunStatus.getCancelStatus() != null && workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_NEED){
-            TerminateTaskRequest request = TerminateTaskRequest.newBuilder()
+            TaskRpcApi.TerminateTaskRequest request = TaskRpcApi.TerminateTaskRequest.newBuilder()
                     .setUser(workflowRunStatus.getAddress())
-                    .setUserType(UserType.User_1)
+                    .setUserType(CarrierEnum.UserType.User_1)
                     .setTaskId(workflowRunTaskStatus.getTaskId())
                     .setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()))
                     .build();
 
             try {
-                SimpleResponse response = grpcTaskServiceClient.terminateTask(orgService.getChannel(workflowTaskManager.getById(workflowRunTaskStatus.getWorkflowTaskId()).getIdentityId()), request);
+                Common.SimpleResponse response = grpcTaskServiceClient.terminateTask(orgService.getChannel(workflowTaskManager.getById(workflowRunTaskStatus.getWorkflowTaskId()).getIdentityId()), request);
                 log.info("终止工作流返回， response = {}", response);
                 if (response != null && response.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
                     workflowRunStatus.setCancelStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
@@ -325,7 +326,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<Model> modelList = new ArrayList<>();
         List<Psi> psiList = new ArrayList<>();
         for (String identityId : identityIdSet) {
-            GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(orgService.getChannel(identityId), task.getId());
+            SysRpcApi.GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(orgService.getChannel(identityId), task.getId());
             if (Objects.isNull(response)) {
                 log.error("WorkflowNodeStatusMockTask获取任务结果失败！ info = {}", response);
                 return;
@@ -1081,9 +1082,9 @@ public class WorkflowServiceImpl implements WorkflowService {
             curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
             curWorkflowRunTaskStatus.setBeginTime(new Date());
             // 提交任务到 Net
-            PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, curWorkflowRunTaskStatus);
+            TaskRpcApi.PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, curWorkflowRunTaskStatus);
             try {
-                PublishTaskDeclareResponse response = grpcTaskServiceClient.publishTaskDeclare(orgService.getChannel(curWorkflowRunTaskStatus.getWorkflowTask().getIdentityId()), request);
+                TaskRpcApi.PublishTaskDeclareResponse response = grpcTaskServiceClient.publishTaskDeclare(orgService.getChannel(curWorkflowRunTaskStatus.getWorkflowTask().getIdentityId()), request);
                 curWorkflowRunTaskStatus.setTaskId(response.getTaskId());
                 curWorkflowRunTaskStatus.setRunMsg(response.getMsg());
                 if (GrpcConstant.GRPC_SUCCESS_CODE != response.getStatus()) {
@@ -1108,11 +1109,11 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     }
 
-    private PublishTaskDeclareRequest assemblyTask(WorkflowRunStatus workflowRunStatus, WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
-        PublishTaskDeclareRequest.Builder requestBuild = PublishTaskDeclareRequest.newBuilder()
+    private TaskRpcApi.PublishTaskDeclareRequest assemblyTask(WorkflowRunStatus workflowRunStatus, WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+        TaskRpcApi.PublishTaskDeclareRequest.Builder requestBuild = TaskRpcApi.PublishTaskDeclareRequest.newBuilder()
                 .setTaskName(publishTaskOfGetTaskName(workflowRunStatus, curWorkflowRunTaskStatus))
                 .setUser(workflowRunStatus.getAddress())
-                .setUserType(UserType.User_1)
+                .setUserType(CarrierEnum.UserType.User_1)
                 .setSender(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "sender1"))
                 .setAlgoSupplier(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "algo1"));
 
@@ -1184,7 +1185,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
 
         WorkflowTaskResource resource = curWorkflowRunTaskStatus.getWorkflowTask().getResource();
-        TaskResourceCostDeclare taskResourceCostDeclare = TaskResourceCostDeclare.newBuilder()
+        Resourcedata.TaskResourceCostDeclare taskResourceCostDeclare = Resourcedata.TaskResourceCostDeclare.newBuilder()
                 .setMemory(resource.getCostMem())
                 .setProcessor(resource.getCostCpu())
                 .setBandwidth(resource.getCostBandwidth())
@@ -1409,8 +1410,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         return JSONObject.toJSONString(dataPolicy);
     }
 
-    private TaskOrganization publishTaskOfGetTaskOrganization(Org identity, String partyId){
-        TaskOrganization taskOrganization = TaskOrganization.newBuilder()
+    private Taskdata.TaskOrganization publishTaskOfGetTaskOrganization(Org identity, String partyId){
+        Taskdata.TaskOrganization taskOrganization = Taskdata.TaskOrganization.newBuilder()
                 .setPartyId(partyId)
                 .setNodeName(identity.getNodeName())
                 .setNodeId(identity.getNodeId())
@@ -1533,10 +1534,10 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowFeeItemDto> feeList = workflowTaskList.stream()
                 .map(item -> {
                     List<String> tokenIdList = item.getInputList().stream().map(subItem-> metaDataId2TokenAddressMap.get(subItem.getMetaDataId())).collect(Collectors.toList());
-                    EstimateTaskGasRequest.Builder requestBuilder = EstimateTaskGasRequest.newBuilder();
+                    TaskRpcApi.EstimateTaskGasRequest.Builder requestBuilder = TaskRpcApi.EstimateTaskGasRequest.newBuilder();
                     requestBuilder.setTaskSponsorAddress(UserContext.getCurrentUser().getAddress());
                     tokenIdList.forEach(subItem -> requestBuilder.addDataTokenAddresses(subItem));
-                    EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
+                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
                     WorkflowFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getDatumNetworkToken());
                     return workflowTaskFeeItemDto;
                 })

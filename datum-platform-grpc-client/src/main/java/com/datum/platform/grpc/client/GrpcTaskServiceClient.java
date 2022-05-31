@@ -1,9 +1,8 @@
 package com.datum.platform.grpc.client;
 
-import com.datum.platform.grpc.service.*;
-import com.datum.platform.grpc.service.types.SimpleResponse;
-import com.datum.platform.grpc.service.types.TaskDetail;
-import com.datum.platform.grpc.service.types.TaskEvent;
+import carrier.api.TaskRpcApi;
+import carrier.types.Common;
+import carrier.types.Taskdata;
 import io.grpc.Channel;
 
 import java.util.List;
@@ -15,13 +14,13 @@ import java.util.List;
  */
 public interface GrpcTaskServiceClient {
 
-    List<TaskDetail> getGlobalTaskDetailList(Long latestSynced);
+    List<Taskdata.TaskDetail> getGlobalTaskDetailList(Long latestSynced);
 
-    List<TaskEvent> getTaskEventList(String taskId);
+    List<Taskdata.TaskEvent> getTaskEventList(String taskId);
 
-    PublishTaskDeclareResponse publishTaskDeclare(Channel channel, PublishTaskDeclareRequest request);
+    TaskRpcApi.PublishTaskDeclareResponse publishTaskDeclare(Channel channel, TaskRpcApi.PublishTaskDeclareRequest request);
 
-    SimpleResponse terminateTask(Channel channel, TerminateTaskRequest request);
+    Common.SimpleResponse terminateTask(Channel channel, TaskRpcApi.TerminateTaskRequest request);
 
-    EstimateTaskGasResponse estimateTaskGas(Channel channel, EstimateTaskGasRequest request);
+    TaskRpcApi.EstimateTaskGasResponse estimateTaskGas(Channel channel, TaskRpcApi.EstimateTaskGasRequest request);
 }

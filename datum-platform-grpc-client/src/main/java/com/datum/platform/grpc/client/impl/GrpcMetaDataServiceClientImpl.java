@@ -1,12 +1,10 @@
 package com.datum.platform.grpc.client.impl;
 
+import carrier.api.MetadataRpcApi;
+import carrier.api.MetadataServiceGrpc;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.grpc.client.GrpcMetaDataServiceClient;
 import com.datum.platform.grpc.constant.GrpcConstant;
-import com.datum.platform.grpc.service.GetGlobalMetadataDetail;
-import com.datum.platform.grpc.service.GetGlobalMetadataDetailListRequest;
-import com.datum.platform.grpc.service.GetGlobalMetadataDetailListResponse;
-import com.datum.platform.grpc.service.MetadataServiceGrpc;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -31,13 +29,13 @@ public class GrpcMetaDataServiceClientImpl implements GrpcMetaDataServiceClient 
      *
      * @return 获取所有元数据列表
      */
-    public List<GetGlobalMetadataDetail> getGlobalMetadataDetailList(@NonNull Long latestSynced) {
+    public List<MetadataRpcApi.GetGlobalMetadataDetail> getGlobalMetadataDetailList(@NonNull Long latestSynced) {
 
-        GetGlobalMetadataDetailListRequest request = GetGlobalMetadataDetailListRequest.newBuilder()
+        MetadataRpcApi.GetGlobalMetadataDetailListRequest request = MetadataRpcApi.GetGlobalMetadataDetailListRequest.newBuilder()
                 .setLastUpdated(latestSynced)
                 .setPageSize(GrpcConstant.PAGE_SIZE)
                 .build();
-        GetGlobalMetadataDetailListResponse globalMetadataDetailList = metaDataServiceBlockingStub.getGlobalMetadataDetailList(request);
+        MetadataRpcApi.GetGlobalMetadataDetailListResponse globalMetadataDetailList = metaDataServiceBlockingStub.getGlobalMetadataDetailList(request);
 
 
         if (globalMetadataDetailList.getStatus() != GrpcConstant.GRPC_SUCCESS_CODE) {

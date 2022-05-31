@@ -1,13 +1,13 @@
 package com.datum.platform.task;
 
+import carrier.api.MetadataRpcApi;
+import carrier.types.Identitydata;
+import carrier.types.Metadata;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.GrpcMetaDataServiceClient;
 import com.datum.platform.grpc.dynamic.MetadataOptionCsv;
-import com.datum.platform.grpc.service.GetGlobalMetadataDetail;
-import com.datum.platform.grpc.service.types.MetadataSummary;
-import com.datum.platform.grpc.service.types.Organization;
 import com.datum.platform.mapper.domain.MetaData;
 import com.datum.platform.mapper.domain.MetaDataColumn;
 import com.datum.platform.mapper.domain.Token;
@@ -71,14 +71,14 @@ public class SyncDcMetaDataTask {
     /**
      * @param getGlobalMetadataDetailList 需更新数据
      */
-    private void batchUpdateMetaData(List<GetGlobalMetadataDetail> getGlobalMetadataDetailList) {
+    private void batchUpdateMetaData(List<MetadataRpcApi.GetGlobalMetadataDetail> getGlobalMetadataDetailList) {
         List<MetaData> metaDataList = new ArrayList<>();
         List<MetaDataColumn> metaDataColumnList = new ArrayList<>();
         List<Token> tokenList = new ArrayList<>();
 
         getGlobalMetadataDetailList.stream().forEach(item -> {
-            Organization organization = item.getOwner();
-            MetadataSummary information = item.getInformation().getMetadataSummary();
+            Identitydata.Organization organization = item.getOwner();
+            Metadata.MetadataSummary information = item.getInformation().getMetadataSummary();
             MetadataOptionCsv metadataOptionCsv = JSONObject.parseObject(information.getMetadataOption(), MetadataOptionCsv.class);
 
             MetaData metaData = new MetaData();

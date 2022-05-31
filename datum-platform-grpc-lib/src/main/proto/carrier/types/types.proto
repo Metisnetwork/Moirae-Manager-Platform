@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/carrier/types";
+
+package carrier.types;
+
+import "carrier/types/header.proto";
+import "carrier/types/metadata.proto";
+import "carrier/types/resourcedata.proto";
+import "carrier/types/taskdata.proto";
+import "carrier/types/identitydata.proto";
+
+// Metadata body data struct.
+message BlockData {
+  HeaderPb              header = 1;
+  repeated MetadataPB     metadata = 2;
+  repeated ResourcePB resourcedata = 3;
+  repeated IdentityPB identitydata = 4;
+  repeated TaskPB     taskdata = 5;
+
+  //
+  uint64 receivedAt = 6;
+  string receivedFrom = 7;
+}
+
+message BodyData {
+  repeated MetadataPB     metadata = 1;
+  repeated ResourcePB resourcedata = 2;
+  repeated IdentityPB identitydata = 3;
+  repeated TaskPB     taskdata = 4;
+  bytes                       extraData = 5;
+}
+
+// MetadataLookupEntry is a positional metadata to help looking up the data content of
+// a metadata given only its dataId.
+message DataLookupEntry {
+  bytes  blockHash = 1;
+  uint64 blockIndex = 2;
+  uint64 index = 3;
+  string nodeId = 4;
+  string type = 5;
+}
+
+
+
+

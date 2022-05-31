@@ -1,5 +1,7 @@
 package com.datum.platform.service.impl;
 
+import carrier.api.AuthRpcApi;
+import carrier.api.AuthServiceGrpc;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,8 +16,6 @@ import com.datum.platform.common.enums.RespCodeEnum;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.dto.UserDto;
 import com.datum.platform.grpc.constant.GrpcConstant;
-import com.datum.platform.grpc.service.AuthServiceGrpc;
-import com.datum.platform.grpc.service.GetNodeIdentityResponse;
 import com.datum.platform.manager.OrgExpandManager;
 import com.datum.platform.manager.OrgManager;
 import com.datum.platform.manager.OrgUserManager;
@@ -111,7 +111,7 @@ public class OrgServiceImpl implements OrgService {
         // 查询组织信息
         ManagedChannel managedChannel = assemblyChannel(identityIp, identityPort);
         Empty empty = Empty.newBuilder().build();
-        GetNodeIdentityResponse nodeIdentity = null;
+        AuthRpcApi.GetNodeIdentityResponse nodeIdentity = null;
         try {
             nodeIdentity = AuthServiceGrpc.newBlockingStub(managedChannel).withDeadlineAfter(10, TimeUnit.SECONDS).getNodeIdentity(empty);
         } catch (Exception e){

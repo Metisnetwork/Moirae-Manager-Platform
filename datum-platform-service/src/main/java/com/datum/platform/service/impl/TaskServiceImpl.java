@@ -1,5 +1,6 @@
 package com.datum.platform.service.impl;
 
+import carrier.types.Taskdata;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -167,7 +168,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskEvent> getTaskEventListFromRemote(String taskId, String identityId) {
         try {
-            List<com.datum.platform.grpc.service.types.TaskEvent> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
+            List<Taskdata.TaskEvent> taskEventShowDtoList = grpcTaskService.getTaskEventList(taskId);
             return taskEventShowDtoList.stream()
                     .map(item -> {
                         TaskEvent taskEvent = new TaskEvent();

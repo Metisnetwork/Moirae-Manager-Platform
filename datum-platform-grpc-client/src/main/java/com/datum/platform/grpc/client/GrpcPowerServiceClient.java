@@ -1,9 +1,9 @@
 package com.datum.platform.grpc.client;
 
-import com.datum.platform.grpc.service.GetGlobalPowerDetail;
+import carrier.api.PowerRpcApi;
 
 import java.util.List;
 
 public interface GrpcPowerServiceClient {
-    List<GetGlobalPowerDetail> getGlobalPowerDetailList(Long latestSynced);
+    List<PowerRpcApi.GetGlobalPowerDetail> getGlobalPowerDetailList(Long latestSynced);
 }

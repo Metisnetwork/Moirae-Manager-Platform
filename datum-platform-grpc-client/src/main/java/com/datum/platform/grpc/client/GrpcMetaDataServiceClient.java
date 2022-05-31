@@ -1,9 +1,9 @@
 package com.datum.platform.grpc.client;
 
-import com.datum.platform.grpc.service.GetGlobalMetadataDetail;
+import carrier.api.MetadataRpcApi;
 
 import java.util.List;
 
 public interface GrpcMetaDataServiceClient {
-     List<GetGlobalMetadataDetail> getGlobalMetadataDetailList(Long latestSynced);
+     List<MetadataRpcApi.GetGlobalMetadataDetail> getGlobalMetadataDetailList(Long latestSynced);
 }

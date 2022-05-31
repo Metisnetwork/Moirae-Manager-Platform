@@ -1,13 +1,12 @@
 syntax = "proto3";
 
-package rpcapi;
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/carrier/api";
 
-option go_package = "github.com/datumtechs/datum-network-carrier/lib/api";
-option java_multiple_files = true;
-option java_package = "com.datum.platform.grpc.service";
+package carrier.api;
 
-import "lib/types/base.proto";
-import "lib/types/resourcedata.proto";
+import "carrier/types/common.proto";
+import "carrier/types/identitydata.proto";
+import "carrier/types/resourcedata.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
@@ -15,8 +14,8 @@ import "google/protobuf/empty.proto";
 
 // 单个组织的总算力信息
 message GetGlobalPowerSummary {
-  types.Organization        owner = 1;                  // 算力拥有者信息
-  types.PowerUsageDetail    information = 2;            // 算力单个摘要
+  carrier.types.Organization        owner = 1;                  // 算力拥有者信息
+  carrier.types.PowerUsageDetail    information = 2;            // 算力单个摘要
 }
 
 // 查看全网各个组织的总算力(累加)详情列表 resp
@@ -28,9 +27,9 @@ message GetGlobalPowerSummaryListResponse {
 
 // 单个组织的各个算力信息
 message GetGlobalPowerDetail {
-  types.Organization        owner = 1;                  // 算力拥有者信息
-  types.PowerUsageDetail    information = 2;            // 算力总详细
-  string                    power_id = 3;               // 算力id
+  carrier.types.Organization          owner = 1;                  // 算力拥有者信息
+  carrier.types.PowerUsageDetail      information = 2;            // 算力总详细
+  string                              power_id = 3;               // 算力id
 }
 
 message GetGlobalPowerDetailListRequest {
@@ -47,10 +46,10 @@ message GetGlobalPowerDetailListResponse {
 
 // 本组织的单个(宿主机)算力信息 (包含【未发布】和【已发布】的) resp
 message GetLocalPowerDetail {
-  types.Organization        owner = 1;                  // 算力拥有者信息
-  types.PowerUsageDetail    power = 2;                  // 算力单个摘要
-  string                    job_node_id = 3;            // 计算服务id (单个宿主机的id)
-  string                    power_id = 4;               // 算力id (对于未发布的算力, powerId为"")
+  carrier.types.Organization          owner = 1;                  // 算力拥有者信息
+  carrier.types.PowerUsageDetail      power = 2;                  // 算力单个摘要
+  string                              job_node_id = 3;            // 计算服务id (单个宿主机的id)
+  string                              power_id = 4;               // 算力id (对于未发布的算力, powerId为"")
 }
 
 message GetLocalPowerDetailListRequest {
@@ -117,7 +116,7 @@ service PowerService {
   }
 
   // 停用算力 (撤销算力)
-  rpc RevokePower (RevokePowerRequest) returns (types.SimpleResponse) {
+  rpc RevokePower (RevokePowerRequest) returns (carrier.types.SimpleResponse) {
     option (google.api.http) = {
       post: "/carrier/v1/power/revoke"
       body: "*"
