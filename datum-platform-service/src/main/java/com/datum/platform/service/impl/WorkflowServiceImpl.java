@@ -1671,7 +1671,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowRunTaskStatus workflowRunTaskStatus = workflowRunTaskStatusManager.getByTaskId(taskId);
         resultDto.setId(workflowRunTaskStatus.getId());
         resultDto.setTaskId(workflowRunTaskStatus.getTaskId());
-        resultDto.setCreateTime(workflowRunTaskStatus.getCreateTime());
+        resultDto.setCreateTime(workflowRunTaskStatus.getBeginTime());
         WorkflowTask workflowTask = workflowTaskManager.getById(workflowRunTaskStatus.getWorkflowTaskId());
         Algorithm algorithm = algService.getAlgorithm(workflowTask.getAlgorithmId(), false);
         WorkflowVersion workflowVersion = workflowVersionManager.getById(workflowTask.getWorkflowId(), workflowTask.getWorkflowVersion());
