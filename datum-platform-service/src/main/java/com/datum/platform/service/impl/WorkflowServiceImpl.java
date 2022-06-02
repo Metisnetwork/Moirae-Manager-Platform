@@ -842,13 +842,13 @@ public class WorkflowServiceImpl implements WorkflowService {
                     nodeInputDto.setInputModel(workflowTask.getInputModel());
                     if(workflowTask.getInputModel()
                             && StringUtils.isNotBlank(workflowTask.getInputModelId())
-                            && !"fromPreNodeOutput".equals(workflowTask.getInputModelId())){
+                            && !"frontNodeOutput".equals(workflowTask.getInputModelId())){
                         nodeInputDto.setModel(BeanUtil.copyProperties(dataService.getModelById(workflowTask.getInputModelId()), ModelDto.class));
                     }
                     if(workflowTask.getInputModel()
                             && StringUtils.isBlank(workflowTask.getInputModelId())){
                         ModelDto modelDto = new ModelDto();
-                        modelDto.setMetaDataId("fromPreNodeOutput");
+                        modelDto.setMetaDataId("frontNodeOutput");
                         nodeInputDto.setModel(modelDto);
                     }
 
