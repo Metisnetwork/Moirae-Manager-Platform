@@ -5,13 +5,13 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.req.org.GetOrgListReq;
-import com.datum.platform.req.org.GetUserOrgListReq;
 import com.datum.platform.req.org.JoinOrgReq;
 import com.datum.platform.req.org.OrgIdReq;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.utils.ConvertUtils;
 import com.datum.platform.vo.PageVo;
 import com.datum.platform.vo.ResponseVo;
+import com.datum.platform.vo.org.BaseOrgVo;
 import com.datum.platform.vo.org.OrgStatsVo;
 import com.datum.platform.vo.org.OrgVo;
 import com.datum.platform.vo.org.UserOrgVo;
@@ -64,9 +64,16 @@ public class OrgController {
 
     @GetMapping("getUserOrgList")
     @ApiOperation(value = "查询用户可用的组织列表", notes = "查询用户可用的组织列表")
-    public ResponseVo<List<UserOrgVo>> getUserOrgList(@Valid GetUserOrgListReq req) {
-        List<Org> orgList = orgService.getUserOrgList(req.getIncludeData());
+    public ResponseVo<List<UserOrgVo>> getUserOrgList() {
+        List<Org> orgList = orgService.getUserOrgList();
         return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, UserOrgVo.class));
+    }
+
+    @GetMapping("getBaseOrgList")
+    @ApiOperation(value = "查询基本组织列表-用户有可用数据的", notes = "查询基本组织列表-用户有可用数据的")
+    public ResponseVo<List<BaseOrgVo>> getBaseOrgList() {
+        List<Org> orgList = orgService.getBaseOrgList();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, BaseOrgVo.class));
     }
 
     @PostMapping("joinOrg")

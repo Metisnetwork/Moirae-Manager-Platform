@@ -223,19 +223,24 @@ public class OrgServiceImpl implements OrgService {
     }
 
     @Override
-    public List<Org> getUserOrgList(Boolean includeData) {
+    public List<Org> getUserOrgList(){
         String address = UserContext.getCurrentUser().getAddress();
         List<Org> orgList = userOrgManager.getUserOrgList(address);
         Set<String> whiteListSet = datumNetworkPayDao.whitelist(address).stream().collect(Collectors.toSet());
         orgList.forEach(item -> {
             item.setIsInWhitelist(whiteListSet.contains(item.getObserverProxyWalletAddress())?true:false);
         });
-
-        if(includeData){
-            List<String> dataOrgIdList = dataService.listMetaDataOrgIdByUser(address);
-            orgList = orgList.stream().filter(item -> dataOrgIdList.contains(item.getIdentityId())).collect(Collectors.toList());
-        }
         return orgList;
+    }
+
+    @Override
+    public List<Org> getBaseOrgList() {
+        String address = UserContext.getCurrentUser().getAddress();
+        List<String> orgIdList = dataService.listMetaDataOrgIdByUser(address);
+        Map<String, Org> orgMap = getIdentityId2OrgMap();
+        return orgIdList.stream()
+                .map(item -> orgMap.get(item) )
+                .collect(Collectors.toList());
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

@@ -1488,7 +1488,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList) {
         // 白名单校验
         Set<String> senderSet = workflowTaskList.stream().map(WorkflowTask::getIdentityId).collect(Collectors.toSet());
-        Map<String, Org> userOrgMap = orgService.getUserOrgList(false).stream()
+        Map<String, Org> userOrgMap = orgService.getUserOrgList().stream()
                 .filter(item -> senderSet.contains(item.getIdentityId()))
                 .collect(Collectors.toMap(Org::getIdentityId, me -> me));
         List<String> errorList = new ArrayList<>();
