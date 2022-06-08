@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.mapper.domain.MetaData;
 
+import java.util.List;
+
 /**
  * @author admin
  */
@@ -21,4 +23,6 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
     long sizeOfData();
 
     MetaData statisticsOfGlobal();
+
+    List<String> listDataOrgIdByUser(String address);
 }

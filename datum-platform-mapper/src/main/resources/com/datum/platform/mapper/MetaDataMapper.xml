@@ -109,4 +109,15 @@
         from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address
         where  mt.is_add_liquidity = 1 and dmd.status = 2
     </select>
+
+    <select id="listDataOrgIdByUser" resultType="string">
+        select distinct
+        dmd.identity_id
+        from dc_meta_data dmd
+        inner join dc_org do on dmd.identity_id = do.identity_id
+        inner join mo_token mt on dmd.token_address = mt.address
+        inner join mo_token_holder mth on mt.address = mth.token_address and mth.address = #{address}
+        where dmd.status = 2
+        and mt.is_add_liquidity = 1
+    </select>
 </mapper>

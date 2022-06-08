@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.req.org.GetOrgListReq;
+import com.datum.platform.req.org.GetUserOrgListReq;
 import com.datum.platform.req.org.JoinOrgReq;
 import com.datum.platform.req.org.OrgIdReq;
 import com.datum.platform.service.OrgService;
@@ -63,8 +64,8 @@ public class OrgController {
 
     @GetMapping("getUserOrgList")
     @ApiOperation(value = "查询用户可用的组织列表", notes = "查询用户可用的组织列表")
-    public ResponseVo<List<UserOrgVo>> getUserOrgList() {
-        List<Org> orgList = orgService.getUserOrgList();
+    public ResponseVo<List<UserOrgVo>> getUserOrgList(@Valid GetUserOrgListReq req) {
+        List<Org> orgList = orgService.getUserOrgList(req.getIncludeData());
         return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, UserOrgVo.class));
     }
 

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datum.platform.service.DataService;
 import com.google.protobuf.Empty;
 import com.datum.platform.chain.platon.contract.DatumNetworkPayContract;
 import com.datum.platform.common.constants.SysConfig;
@@ -46,6 +47,8 @@ public class OrgServiceImpl implements OrgService {
 
     @Resource
     private SysConfig sysConfig;
+    @Resource
+    private DataService dataService;
     @Resource
     private OrgExpandManager orgExpandManager;
     @Resource
@@ -220,13 +223,18 @@ public class OrgServiceImpl implements OrgService {
     }
 
     @Override
-    public List<Org> getUserOrgList() {
+    public List<Org> getUserOrgList(Boolean includeData) {
         String address = UserContext.getCurrentUser().getAddress();
         List<Org> orgList = userOrgManager.getUserOrgList(address);
         Set<String> whiteListSet = datumNetworkPayDao.whitelist(address).stream().collect(Collectors.toSet());
         orgList.forEach(item -> {
             item.setIsInWhitelist(whiteListSet.contains(item.getObserverProxyWalletAddress())?true:false);
         });
+
+        if(includeData){
+            List<String> dataOrgIdList = dataService.listMetaDataOrgIdByUser(address);
+            orgList = orgList.stream().filter(item -> dataOrgIdList.contains(item.getIdentityId())).collect(Collectors.toList());
+        }
         return orgList;
     }
 

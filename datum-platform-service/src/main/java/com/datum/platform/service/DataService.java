@@ -90,6 +90,14 @@ public interface DataService {
     List<MetaData> listMetaDataByTokenAddress(String tokenAddress);
 
     /**
+     * 查询给定用户地址对应元数据的组织列表
+     *
+     * @param address
+     * @return
+     */
+    List<String> listMetaDataOrgIdByUser(String address);
+
+    /**
      * 查询给的元数据列
      *
      * @param metaDataId  元数据id

@@ -77,5 +77,11 @@ public interface OrgService {
 
     StatsOrg getStatsOrg(String identityId);
 
-    List<Org> getUserOrgList();
+    /**
+     * 查询用户可用的组织列表
+     *
+     * @param includeData  返回组织中是否存在元数据
+     * @return
+     */
+    List<Org> getUserOrgList(Boolean includeData);
 }

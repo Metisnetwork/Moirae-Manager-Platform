@@ -107,6 +107,11 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
+    public List<String> listMetaDataOrgIdByUser(String address) {
+        return metaDataManager.listDataOrgIdByUser(address);
+    }
+
+    @Override
     public MetaDataColumn getDataColumnByIds(String metaDataId, int columnIndex) {
         return metaDataColumnManager.getById(metaDataId, columnIndex);
     }

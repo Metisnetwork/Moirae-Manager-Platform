@@ -20,4 +20,6 @@ public interface MetaDataManager extends IService<MetaData> {
     MetaData statisticsOfGlobal();
 
     List<MetaData> listDataByTokenAddress(String tokenAddress);
+
+    List<String> listDataOrgIdByUser(String address);
 }
