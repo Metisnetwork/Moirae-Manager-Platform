@@ -144,7 +144,7 @@ public class TaskServiceImpl implements TaskService {
         Map<String, Org> identityId2OrgMap = organizationService.getIdentityId2OrgMap();
         result.forEach(item ->{
             if(identityId2OrgMap.containsKey(item.getIdentityId())){
-                item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
+                item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName() + " (" + item.getPartyId() + ")");
             }
         });
         return result;
