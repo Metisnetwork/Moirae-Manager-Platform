@@ -40,6 +40,7 @@ import com.datum.platform.service.utils.CommonUtils;
 import com.datum.platform.service.utils.TreeUtils;
 import com.datum.platform.service.utils.UserContext;
 import common.constant.CarrierEnum;
+import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -326,9 +327,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<Model> modelList = new ArrayList<>();
         List<Psi> psiList = new ArrayList<>();
         for (String identityId : identityIdSet) {
-            SysRpcApi.GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(orgService.getChannel(identityId), task.getId());
+            ManagedChannel managedChannel = null;
+            try {
+                managedChannel = orgService.getChannel(identityId);
+            } catch (BusinessException businessException){
+                log.error("任务结果输出不存在！ identityId = {}", identityId);
+                continue;
+            }
+
+            SysRpcApi.GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(managedChannel, task.getId());
             if (Objects.isNull(response)) {
-                log.error("WorkflowNodeStatusMockTask获取任务结果失败！ info = {}", response);
+                log.error("获取任务结果失败！ info = {}", response);
                 return;
             }
             // 处理结果
@@ -1121,15 +1130,13 @@ public class WorkflowServiceImpl implements WorkflowService {
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
             WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
-            requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.CSV.getValue());
-            if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
-                Psi psi = curWorkflowRunTaskStatus.getPsiList().stream()
-                        .filter(item -> workflowTaskInput.getIdentityId().equals(item.getIdentityId()))
-                        .findFirst().get();
-                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, psi));
-            }else{
-                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
 
+            if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
+                requestBuild.addDataPolicyTypes(30001);
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, curWorkflowRunTaskStatus.getPreStepTaskId()));
+            }else{
+                requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.CSV.getValue());
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
             }
         }
         // 设置模型输入组织
@@ -1363,33 +1370,33 @@ public class WorkflowServiceImpl implements WorkflowService {
         return JSONObject.toJSONString(dataPolicy);
     }
 
-    private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput, Psi psi) {
-        TaskDataPolicyCsv dataPolicy = new TaskDataPolicyCsv();
+    private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput, String preStepTaskId) {
+        TaskDataPolicy30001 dataPolicy = new TaskDataPolicy30001();
         dataPolicy.setInputType(1);
         dataPolicy.setPartyId(workflowTaskInput.getPartyId());
-        dataPolicy.setMetadataId(psi.getMetaDataId());
-        dataPolicy.setMetadataName(psi.getName());
-        dataPolicy.setKeyColumn(workflowTaskInput.getKeyColumn());
-        List<Integer> selectedColumns = new ArrayList<>();
-        if(StringUtils.isNotBlank(workflowTaskInput.getDataColumnIds())){
-            MetadataOptionCsv metadataOptionCsv = JSONObject.parseObject(psi.getMetadataOption(), MetadataOptionCsv.class);
-            Map<String, MetadataOptionCsv.CsvColumns> stringCsvColumnsMap = metadataOptionCsv
-                    .getMetadataColumns()
-                    .stream()
-                    .collect(Collectors.toMap(MetadataOptionCsv.CsvColumns::getName, me -> me));
+        dataPolicy.setTaskId(preStepTaskId);
 
-            List<Integer> selectedColumnsV2 = new ArrayList<>();
+        List<Integer> selectedColumnsV2 = new ArrayList<>();
+        List<Integer> userSelect = new ArrayList<>();
+        userSelect.add(workflowTaskInput.getKeyColumn().intValue());
+        if(StringUtils.isNotBlank(workflowTaskInput.getDataColumnIds())){
             Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
+                userSelect.add(Integer.valueOf(subItem));
                 selectedColumnsV2.add(Integer.valueOf(subItem));
             });
-            List<MetaDataColumn> metaDataColumnList = dataService.listMetaDataColumnByIdAndIndex(workflowTaskInput.getMetaDataId(), selectedColumnsV2);
-            Map<Integer, MetaDataColumn> metaDataColumnMap = metaDataColumnList.stream().collect(Collectors.toMap(MetaDataColumn::getColumnIdx, me -> me));
-
-            selectedColumnsV2.forEach(item -> {
-                selectedColumns.add(stringCsvColumnsMap.get(metaDataColumnMap.get(item).getColumnName()).getIndex());
-            });
         }
-        dataPolicy.setSelectedColumns(selectedColumns);
+
+        List<MetaDataColumn> metaDataColumnList = dataService.listMetaDataColumnByIdAndIndex(workflowTaskInput.getMetaDataId(), userSelect);
+        Map<Integer, MetaDataColumn> metaDataColumnMap = metaDataColumnList.stream().collect(Collectors.toMap(MetaDataColumn::getColumnIdx, me -> me));
+
+        dataPolicy.setKeyColumnName(metaDataColumnMap.get(workflowTaskInput.getKeyColumn().intValue()).getColumnName());
+
+        List<String> selectedColumnsName = new ArrayList<>();
+        selectedColumnsV2.forEach(item -> {
+            selectedColumnsName.add(metaDataColumnMap.get(item).getColumnName());
+        });
+
+        dataPolicy.setSelectedColumnNames(selectedColumnsName);
         return JSONObject.toJSONString(dataPolicy);
     }
 
@@ -1579,12 +1586,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 初始化PSI
         if(workflowTask.getInputPsi()){
             String taskId = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(curWorkflowRunTaskStatus.getWorkflowRunId(), workflowTask.getInputPsiStep()).getTaskId();
-            List<Psi> psiList = dataService.listPsiByTrainTaskId(taskId);
-            curWorkflowRunTaskStatus.setPsiList(psiList);
-            // psi的组织
-            curWorkflowRunTaskStatus.getPsiList().forEach(item -> {
-                item.setOrg(orgService.getOrgById(item.getIdentityId()));
-            });
+            curWorkflowRunTaskStatus.setPreStepTaskId(taskId);
         }
     }
 

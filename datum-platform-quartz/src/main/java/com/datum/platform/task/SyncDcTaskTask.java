@@ -4,6 +4,7 @@ import carrier.types.Taskdata;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
+import com.datum.platform.grpc.dynamic.TaskDataPolicy30001;
 import com.datum.platform.grpc.dynamic.TaskDataPolicyCsv;
 import com.datum.platform.grpc.dynamic.TaskPowerPolicy2;
 import com.datum.platform.mapper.domain.*;
@@ -20,10 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -86,19 +84,30 @@ public class SyncDcTaskTask {
 
             Map<String, Taskdata.TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
             for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
-                TaskDataPolicyCsv dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyCsv.class);
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
-                taskDataProvider.setTaskId(information.getTaskId());
-                taskDataProvider.setMetaDataId(dataPolicy.getMetadataId());
-                taskDataProvider.setMetaDataName(dataPolicy.getMetadataName());
-                taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));
-                taskDataProvider.setInputType(dataPolicy.getInputType());
-                taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
-                taskDataProvider.setPartyId(dataPolicy.getPartyId());
-                taskDataProvider.setKeyColumnIdx(dataPolicy.getKeyColumn() == null ? null : dataPolicy.getKeyColumn().intValue());
-                if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
-                    taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
+                if(information.getDataPolicyTypesList().get(i) == 30001){
+                    TaskDataPolicyCsv dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyCsv.class);
+                    taskDataProvider.setTaskId(information.getTaskId());
+                    taskDataProvider.setMetaDataId(dataPolicy.getMetadataId());
+                    taskDataProvider.setMetaDataName(dataPolicy.getMetadataName());
+                    taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));
+                    taskDataProvider.setInputType(dataPolicy.getInputType());
+                    taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
+                    taskDataProvider.setPartyId(dataPolicy.getPartyId());
+                    taskDataProvider.setKeyColumnIdx(dataPolicy.getKeyColumn() == null ? null : dataPolicy.getKeyColumn().intValue());
+                    if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
+                        taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
+                    }
+                }else{
+                    TaskDataPolicy30001 dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicy30001.class);
+                    taskDataProvider.setTaskId(information.getTaskId());
+                    taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
+                    taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));
+                    taskDataProvider.setInputType(dataPolicy.getInputType());
+                    taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
+                    taskDataProvider.setPartyId(dataPolicy.getPartyId());
                 }
+
                 taskDataProviderList.add(taskDataProvider);
             }
 

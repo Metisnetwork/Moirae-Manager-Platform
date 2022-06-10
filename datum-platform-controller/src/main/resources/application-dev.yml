@@ -5,7 +5,7 @@ spring:
   datasource:
     username: ENC(AGa8GMvGChjAkY17AmQE4g==)
     password: ENC(bWqYB1AVri0/bQrC7ta4IZme9ib22Bge)
-    url: jdbc:mysql://192.168.10.145:17000/db_moirae_040?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.10.145:17000/datum_platform?useServerPrepStmts=true&rewriteBatchedStatements=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
 
 # 系统参数配置
 system:
@@ -33,10 +33,10 @@ chain:
   platon:
     chainId: 2203181
     hrp: lat
-    datumNetworkPayAddress: "0x263b1d39843bf2e1da27d827e749992fbd1f1577"
-    uniswapV2Router02: "0x4378daf745e9053f6048c4f78c803f3bc8829703"
+    datumNetworkPayAddress: "0X263B1D39843BF2E1DA27D827E749992FBD1F1577"
+    uniswapV2Router02: "0X4378DAF745E9053F6048C4F78C803F3BC8829703"
     web3jProtocol: WS
-    web3jAddresses: 192.168.10.146:7789
+    web3jAddresses: 8.219.126.197:6790
     chainName: "PlatON开发网"
     rpcUrl: https://devnetopenapi2.platon.network/rpc
     symbol: LAT

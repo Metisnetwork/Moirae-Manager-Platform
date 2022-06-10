@@ -106,5 +106,5 @@ public class WorkflowRunTaskStatus implements Serializable {
     @TableField(exist = false)
     private Model model;
     @TableField(exist = false)
-    private List<Psi> psiList;
+    private String preStepTaskId;
 }
