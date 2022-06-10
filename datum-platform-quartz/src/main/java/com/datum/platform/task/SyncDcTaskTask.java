@@ -86,6 +86,14 @@ public class SyncDcTaskTask {
             for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
                 if(information.getDataPolicyTypesList().get(i) == 30001){
+                    TaskDataPolicy30001 dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicy30001.class);
+                    taskDataProvider.setTaskId(information.getTaskId());
+                    taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
+                    taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));
+                    taskDataProvider.setInputType(dataPolicy.getInputType());
+                    taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
+                    taskDataProvider.setPartyId(dataPolicy.getPartyId());
+                }else{
                     TaskDataPolicyCsv dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyCsv.class);
                     taskDataProvider.setTaskId(information.getTaskId());
                     taskDataProvider.setMetaDataId(dataPolicy.getMetadataId());
@@ -98,14 +106,6 @@ public class SyncDcTaskTask {
                     if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
                         taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
                     }
-                }else{
-                    TaskDataPolicy30001 dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicy30001.class);
-                    taskDataProvider.setTaskId(information.getTaskId());
-                    taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
-                    taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));
-                    taskDataProvider.setInputType(dataPolicy.getInputType());
-                    taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
-                    taskDataProvider.setPartyId(dataPolicy.getPartyId());
                 }
 
                 taskDataProviderList.add(taskDataProvider);
