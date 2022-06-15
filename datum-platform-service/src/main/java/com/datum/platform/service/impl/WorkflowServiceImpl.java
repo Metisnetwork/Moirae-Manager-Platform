@@ -1085,14 +1085,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
 
         if(curWorkflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_NEED){
-            // 运行时初始化依赖
-            initModelAndPsi(curWorkflowRunTaskStatus);
-
-            curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
-            curWorkflowRunTaskStatus.setBeginTime(new Date());
-            // 提交任务到 Net
-            TaskRpcApi.PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, curWorkflowRunTaskStatus);
             try {
+                // 运行时初始化依赖
+                initModelAndPsi(curWorkflowRunTaskStatus);
+
+                curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
+                curWorkflowRunTaskStatus.setBeginTime(new Date());
+                // 提交任务到 Net
+                TaskRpcApi.PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, curWorkflowRunTaskStatus);
+
                 TaskRpcApi.PublishTaskDeclareResponse response = grpcTaskServiceClient.publishTaskDeclare(orgService.getChannel(curWorkflowRunTaskStatus.getWorkflowTask().getIdentityId()), request);
                 curWorkflowRunTaskStatus.setTaskId(response.getTaskId());
                 curWorkflowRunTaskStatus.setRunMsg(response.getMsg());
