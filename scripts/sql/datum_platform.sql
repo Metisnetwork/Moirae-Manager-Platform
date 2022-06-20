@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS `datum_platform` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `datum_platform_0.5.0` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE `datum_platform`;
+USE `datum_platform_0.5.0`;
 
 /*Table structure for table `dc_meta_data` */
 

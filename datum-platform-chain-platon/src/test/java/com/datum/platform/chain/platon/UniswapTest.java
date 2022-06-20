@@ -39,6 +39,7 @@ public class UniswapTest extends BaseContractTest {
         IUniswapV2Router02 router = loadRouter();
 
         IUniswapV2Factory factory = loadFactory(router.factory().send());
+
         IUniswapV2Pair pair = loadPair(factory.getPair(router.WETH().send(), Bech32.addressEncode(hrp,"0xe88695d3a3ba03ee6bb2130ffd7869a8e368a0b4")).send());
         //Tuple3{value1=20000000000000000000, value2=20000000000000000000, value3=4255551100}
 

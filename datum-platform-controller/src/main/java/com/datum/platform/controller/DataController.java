@@ -4,13 +4,16 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.mapper.domain.MetaData;
 import com.datum.platform.mapper.domain.Model;
+import com.datum.platform.req.data.GetAttributeCredentialListReq;
 import com.datum.platform.req.data.GetDataDetailsReq;
 import com.datum.platform.req.data.GetDataListByIdentityIdReq;
 import com.datum.platform.req.data.GetDataListReq;
 import com.datum.platform.req.model.GetUserModelListReq;
 import com.datum.platform.req.org.OrgIdPageReq;
 import com.datum.platform.service.DataService;
+import com.datum.platform.service.dto.data.AttributeCredentialDto;
 import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
+import com.datum.platform.service.dto.data.NoAttributeCredentialDto;
 import com.datum.platform.utils.ConvertUtils;
 import com.datum.platform.vo.PageVo;
 import com.datum.platform.vo.ResponseVo;
@@ -66,6 +69,22 @@ public class DataController {
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 
+    @GetMapping("getDataListByUser")
+    @ApiOperation(value = "查询用户的数据列表", notes = "查询用户的数据列表")
+    public ResponseVo<PageVo<DataVo>> getDataListByUser(@Valid GetDataListByIdentityIdReq req) {
+        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize(), req.getIdentityId(), req.getKeyword());
+        List<DataVo> itemList = BeanUtil.copyToList(page.getRecords(), DataVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
+    }
+
+    @GetMapping("getUserAuthDataList")
+    @ApiOperation(value = "查询用户的数据列表", notes = "查询用户的数据列表(存在余额的)")
+    public ResponseVo<PageVo<UserAuthDataVo>> getUserAuthDataList(@Valid GetDataListByIdentityIdReq req) {
+        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize(), req.getIdentityId(), req.getKeyword());
+        List<UserAuthDataVo> itemList = BeanUtil.copyToList(page.getRecords(), UserAuthDataVo.class);
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
+    }
+
     @GetMapping("getDataDetails")
     @ApiOperation(value = "查询数据详情", notes = "查询数据详情")
     public ResponseVo<DataDetailsVo> getDataDetails(@Valid GetDataDetailsReq req) {
@@ -73,12 +92,18 @@ public class DataController {
         return ResponseVo.createSuccess(BeanUtil.copyProperties(data, DataDetailsVo.class));
     }
 
-    @GetMapping("getUserDataList")
-    @ApiOperation(value = "查询用户的数据列表", notes = "查询用户的数据列表(存在余额的)")
-    public ResponseVo<PageVo<UserDataVo>> getUserDataList(@Valid GetDataListByIdentityIdReq req) {
-        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize(), req.getIdentityId(), req.getKeyword());
-        List<UserDataVo> itemList = BeanUtil.copyToList(page.getRecords(), UserDataVo.class);
-        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
+    @GetMapping("getNoAttributeCredential")
+    @ApiOperation(value = "查询数据关联的无属性凭证", notes = "查询数据关联的无属性凭证")
+    public ResponseVo<NoAttributeCredentialDto> getNoAttributeCredential(@Valid GetDataDetailsReq req) {
+        NoAttributeCredentialDto resp = dataService.getNoAttributeCredential(req.getMetaDataId());
+        return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getAttributeCredentialList")
+    @ApiOperation(value = "查询数据关联的有属性凭证列表", notes = "查询数据关联的有属性凭证列表")
+    public ResponseVo<PageVo<AttributeCredentialDto>> getAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
+        IPage<AttributeCredentialDto> page = dataService.listAttributeCredential(req.getCurrent(), req.getSize(), req.getMetaDataId());
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, page.getRecords()));
     }
 
     @GetMapping("getUserDatumNetworkLatInfo")
@@ -86,6 +111,20 @@ public class DataController {
     public ResponseVo<DatumNetworkLatInfoDto> getUserDatumNetworkLatInfo() {
         DatumNetworkLatInfoDto resp = dataService.getUserDatumNetworkLatInfo();
         return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getUserNoAttributeCredential")
+    @ApiOperation(value = "查询用户数据关联的无属性凭证", notes = "查询用户数据关联的无属性凭证")
+    public ResponseVo<NoAttributeCredentialDto> getUserNoAttributeCredential(@Valid GetDataDetailsReq req) {
+        NoAttributeCredentialDto resp = dataService.getNoAttributeCredential(req.getMetaDataId());
+        return ResponseVo.createSuccess(resp);
+    }
+
+    @GetMapping("getUserAttributeCredentialList")
+    @ApiOperation(value = "查询用户数据关联的有属性凭证列表", notes = "查询用户数据关联的有属性凭证列表")
+    public ResponseVo<PageVo<AttributeCredentialDto>> getUserAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
+        IPage<AttributeCredentialDto> page = dataService.listAttributeCredential(req.getCurrent(), req.getSize(), req.getMetaDataId());
+        return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, page.getRecords()));
     }
 
     @GetMapping("getUserModelList")

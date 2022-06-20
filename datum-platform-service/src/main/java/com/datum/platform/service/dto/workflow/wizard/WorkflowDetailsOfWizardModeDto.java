@@ -62,4 +62,10 @@ public class WorkflowDetailsOfWizardModeDto {
 
     @ApiModelProperty(value = "6-选择结果接收方(训练&预测)")
     private TrainingAndPredictionOutputDto trainingAndPredictionOutput;
+
+    @ApiModelProperty(value = "7-选择明文算法训练输入数据")
+    private TrainingInputDto plTrainingInput;
+
+    @ApiModelProperty(value = "8-选择明文算法预测输入数据")
+    private PredictionInputDto plPredictionInput;
 }

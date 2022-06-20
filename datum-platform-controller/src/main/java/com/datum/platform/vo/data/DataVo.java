@@ -19,18 +19,12 @@ public class DataVo extends BaseOrgVo {
     @ApiModelProperty(value = "元数据名称")
     private String metaDataName;
 
-    @ApiModelProperty(value = "数据凭证合约地址")
-    private String tokenAddress;
-
-    @ApiModelProperty(value = "数据凭证名称")
-    private String tokenName;
-
-    @ApiModelProperty(value = "数据凭证符号")
-    private String tokenSymbol;
-
-    @ApiModelProperty(value = "数据凭证价格")
-    private String tokenPrice;
-
     @ApiModelProperty(value = "发布时间，精确到毫秒")
     private Date publishedAt;
+
+    @ApiModelProperty(value = "源文件的大小 (单位: byte)")
+    private Long size;
+
+    @ApiModelProperty(value = "是否支持明文算法: true-是 false-否")
+    private Boolean isSupportPtAlg;
 }
