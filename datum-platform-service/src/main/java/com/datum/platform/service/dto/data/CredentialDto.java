@@ -3,13 +3,12 @@ package com.datum.platform.service.dto.data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "无属性凭证信息")
-public class NoAttributeCredentialDto {
-
-    @ApiModelProperty(value = "数据凭证合约地址")
-    private String tokenAddress;
+@ApiModel
+public class CredentialDto extends CredentialKeyDto {
 
     @ApiModelProperty(value = "数据凭证名称")
     private String tokenName;
@@ -22,4 +21,10 @@ public class NoAttributeCredentialDto {
 
     @ApiModelProperty(value = "数据凭证余额")
     private String tokenBalance;
+
+    @ApiModelProperty(value = "tokenId名称")
+    private String tokenIdName;
+
+    @ApiModelProperty(value = "tokenId 对应特性值，如有效期")
+    private String characteristic;
 }

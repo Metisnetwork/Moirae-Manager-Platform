@@ -58,9 +58,9 @@ public class SwaggerConfiguration {
     private ApiInfo apiInfoApiInfo() {
 
         return new ApiInfoBuilder()
-                .title("RosettaFlow管理后台接口文档")
-                .description("本文档主要提供RosettaFlow对外开放的接口功能，用于描述清楚调用方需要传递的参数信息及响应的数据。")
-                .contact(new Contact("RosettaFlow", "www.rosettaflow.com", "moirae@rosettaflow.com"))
+                .title("datum-platform 管理后台接口文档")
+                .description("本文档主要提供 datum-platform 对外开放的接口功能，用于描述清楚调用方需要传递的参数信息及响应的数据。")
+                .contact(new Contact("datum-platform", "", ""))
                 .version("1.0.0")
                 .build();
     }

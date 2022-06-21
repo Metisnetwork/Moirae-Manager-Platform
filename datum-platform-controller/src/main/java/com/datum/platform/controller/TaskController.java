@@ -15,6 +15,8 @@ import com.datum.platform.vo.task.TaskDetailsVo;
 import com.datum.platform.vo.task.TaskOrgVo;
 import com.datum.platform.vo.task.TaskStatsVo;
 import com.datum.platform.vo.task.TaskVo;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
+import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "任务相关接口")
+@ApiSupport(order = 600)
 @RequestMapping(value = "task", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TaskController {
     @Resource
@@ -37,6 +40,7 @@ public class TaskController {
 
     @GetMapping("getTaskStats")
     @ApiOperation(value = "查询任务统计", notes = "查询任务统计")
+    @ApiOperationSupport(order = 1)
     public ResponseVo<TaskStatsVo> getTaskStats() {
         int taskCount = taskService.countOfTask();
         TaskStatsVo taskStatsVo = new TaskStatsVo();
@@ -46,6 +50,7 @@ public class TaskController {
 
     @GetMapping("getTaskListByOrg")
     @ApiOperation(value = "查询任务列表通过组织id", notes = "查询任务列表通过组织id")
+    @ApiOperationSupport(order = 2)
     public ResponseVo<PageVo<TaskOrgVo>> getTaskListByOrg(@Valid OrgIdPageReq req) {
         IPage<Task> page = taskService.getTaskListByOrg(req.getCurrent(), req.getSize(), req.getIdentityId());
         List<TaskOrgVo> itemList = BeanUtil.copyToList(page.getRecords(), TaskOrgVo.class);
@@ -54,6 +59,7 @@ public class TaskController {
 
     @GetMapping("getTaskListByData")
     @ApiOperation(value = "查询任务列表通过元数据", notes = "查询任务列表通过元数据")
+    @ApiOperationSupport(order = 3)
     public ResponseVo<PageVo<TaskVo>> getTaskListByData(@Valid DataIdPageReq req) {
         IPage<Task> page = taskService.getTaskListByData(req.getCurrent(), req.getSize(), req.getMetaDataId());
         List<TaskVo> itemList = BeanUtil.copyToList(page.getRecords(), TaskVo.class);
@@ -62,6 +68,7 @@ public class TaskController {
 
     @GetMapping("getTaskList")
     @ApiOperation(value = "查询任务列表", notes = "查询任务列表")
+    @ApiOperationSupport(order = 4)
     public ResponseVo<PageVo<TaskVo>> getTaskList(@Valid GetTaskListReq req) {
         IPage<Task> page = taskService.getTaskList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getBegin(), req.getEnd(), req.getTaskStatus());
         List<TaskVo> itemList = BeanUtil.copyToList(page.getRecords(), TaskVo.class);
@@ -70,6 +77,7 @@ public class TaskController {
 
     @GetMapping("getTaskDetails")
     @ApiOperation(value = "查询任务详情", notes = "查询任务详情")
+    @ApiOperationSupport(order = 5)
     public ResponseVo<TaskDetailsVo> getTaskDetails(@Valid GetTaskDetailsReq req) {
         Task task = taskService.getTaskDetails(req.getTaskId());
         return ResponseVo.createSuccess(BeanUtil.toBean(task, TaskDetailsVo.class));

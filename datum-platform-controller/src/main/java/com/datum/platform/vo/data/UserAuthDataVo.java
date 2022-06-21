@@ -1,6 +1,5 @@
 package com.datum.platform.vo.data;
 
-import com.datum.platform.vo.task.BaseOrgVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

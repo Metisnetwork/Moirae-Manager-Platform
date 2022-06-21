@@ -1,8 +1,7 @@
 package com.datum.platform.vo.data;
 
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
-import com.datum.platform.service.dto.data.AttributeCredentialDto;
-import com.datum.platform.service.dto.data.NoAttributeCredentialDto;
+import com.datum.platform.service.dto.data.CredentialDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -38,8 +37,8 @@ public class DataDetailsVo extends DataVo {
     private List<DataColumnsVo> columnsList;
 
     @ApiModelProperty(value = "无属性凭证")
-    private NoAttributeCredentialDto noAttributeCredential;
+    private CredentialDto noAttributeCredential;
 
     @ApiModelProperty(value = "有属性凭证列表")
-    private List<AttributeCredentialDto> attributeCredentialList;
+    private List<CredentialDto> attributeCredentialList;
 }

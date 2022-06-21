@@ -280,6 +280,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
     }
 
+    @Override
+    public List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req) {
+        return null;
+    }
+
     private void taskFail(WorkflowRunStatus workflowRunStatus, Task task) {
         WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
 

@@ -32,7 +32,7 @@ server:
       charset: UTF-8
 
 dev:
-  quartz: true
+  quartz: false
 
 spring:
   datasource:
@@ -82,3 +82,7 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
+knife4j:
+  # 开启增强配置
+  enable: true

@@ -79,4 +79,5 @@ public interface WorkflowService{
      */
     void taskFinish(WorkflowRunTaskStatus workflowRunTaskStatus, Task task);
 
+    List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req);
 }

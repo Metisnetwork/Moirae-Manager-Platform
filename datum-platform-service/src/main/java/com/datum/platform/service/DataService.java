@@ -4,9 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
-import com.datum.platform.service.dto.data.AttributeCredentialDto;
+import com.datum.platform.service.dto.data.CredentialDto;
 import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
-import com.datum.platform.service.dto.data.NoAttributeCredentialDto;
 
 import java.util.Collection;
 import java.util.List;
@@ -260,7 +259,7 @@ public interface DataService {
 
     boolean existTokeHolder(String address, String token);
 
-    NoAttributeCredentialDto getNoAttributeCredential(String metaDataId);
+    CredentialDto getNoAttributeCredential(String metaDataId);
 
-    IPage<AttributeCredentialDto> listAttributeCredential(Long current, Long size, String metaDataId);
+    IPage<CredentialDto> listAttributeCredential(Long current, Long size, String metaDataId);
 }

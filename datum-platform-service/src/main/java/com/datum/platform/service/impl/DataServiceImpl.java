@@ -10,9 +10,8 @@ import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.service.DataService;
-import com.datum.platform.service.dto.data.AttributeCredentialDto;
+import com.datum.platform.service.dto.data.CredentialDto;
 import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
-import com.datum.platform.service.dto.data.NoAttributeCredentialDto;
 import com.datum.platform.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -250,12 +249,12 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public NoAttributeCredentialDto getNoAttributeCredential(String metaDataId) {
+    public CredentialDto getNoAttributeCredential(String metaDataId) {
         return null;
     }
 
     @Override
-    public IPage<AttributeCredentialDto> listAttributeCredential(Long current, Long size, String metaDataId) {
+    public IPage<CredentialDto> listAttributeCredential(Long current, Long size, String metaDataId) {
         return null;
     }
 }

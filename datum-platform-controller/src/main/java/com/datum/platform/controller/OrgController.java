@@ -15,6 +15,8 @@ import com.datum.platform.vo.org.BaseOrgVo;
 import com.datum.platform.vo.org.OrgStatsVo;
 import com.datum.platform.vo.org.OrgVo;
 import com.datum.platform.vo.org.UserOrgVo;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
+import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "组织管理关接口")
+@ApiSupport(order = 300)
 @RequestMapping(value = "org", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrgController {
 
@@ -39,6 +42,7 @@ public class OrgController {
     private OrgService orgService;
 
     @GetMapping("getOrgStats")
+    @ApiOperationSupport(order = 1)
     @ApiOperation(value = "查询组织统计", notes = "查询组织统计")
     public ResponseVo<OrgStatsVo> getOrgStats() {
         int orgCount = orgService.getOrgStats();
@@ -48,6 +52,7 @@ public class OrgController {
     }
 
     @GetMapping("getOrgList")
+    @ApiOperationSupport(order = 2)
     @ApiOperation(value = "查询组织列表", notes = "查询组织列表")
     public ResponseVo<PageVo<OrgVo>> getOrgList(@Valid GetOrgListReq req) {
         IPage<Org> page = orgService.getOrgList(req.getCurrent(), req.getSize(), req.getKeyword(), req.getOrderBy());
@@ -56,6 +61,7 @@ public class OrgController {
     }
 
     @GetMapping("getOrgDetails")
+    @ApiOperationSupport(order = 3)
     @ApiOperation(value = "查询组织详情", notes = "查询组织详情")
     public ResponseVo<OrgVo> getOrgDetails(@Valid OrgIdReq req) {
         Org org = orgService.getOrgDetails(req.getIdentityId());
@@ -63,6 +69,7 @@ public class OrgController {
     }
 
     @GetMapping("getUserOrgList")
+    @ApiOperationSupport(order = 4)
     @ApiOperation(value = "查询用户可用的组织列表", notes = "查询用户可用的组织列表")
     public ResponseVo<List<UserOrgVo>> getUserOrgList() {
         List<Org> orgList = orgService.getUserOrgList();
@@ -70,13 +77,15 @@ public class OrgController {
     }
 
     @GetMapping("getBaseOrgList")
-    @ApiOperation(value = "查询基本组织列表-用户有可用数据的", notes = "查询基本组织列表-用户有可用数据的")
+    @ApiOperationSupport(order = 5)
+    @ApiOperation(value = "查询存在用户数据的基本组织信息列表", notes = "查询存在用户数据的基本组织信息列表")
     public ResponseVo<List<BaseOrgVo>> getBaseOrgList() {
         List<Org> orgList = orgService.getBaseOrgList();
         return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, BaseOrgVo.class));
     }
 
     @PostMapping("joinOrg")
+    @ApiOperationSupport(order = 6)
     @ApiOperation(value = "用户加入组织", notes = "用户加入组织")
     public ResponseVo<?> joinOrg(@RequestBody @Valid JoinOrgReq req) {
         orgService.addOrganizationByUser(req.getIdentityIp(), req.getIdentityPort());
@@ -84,6 +93,7 @@ public class OrgController {
     }
 
     @PostMapping("quitOrg")
+    @ApiOperationSupport(order = 7)
     @ApiOperation(value = "用户退出组织", notes = "用户退出组织")
     public ResponseVo<?> quitOrg(@RequestBody @Valid OrgIdReq req) {
         orgService.deleteOrganizationByUser(req.getIdentityId());

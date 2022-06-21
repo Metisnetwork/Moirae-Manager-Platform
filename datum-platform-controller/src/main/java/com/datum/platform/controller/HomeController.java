@@ -12,6 +12,7 @@ import com.datum.platform.service.TaskService;
 import com.datum.platform.service.dto.statistics.NavigationDto;
 import com.datum.platform.vo.ResponseVo;
 import com.datum.platform.vo.home.*;
+import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "首页相关接口")
+@ApiSupport(order = 200)
 @RequestMapping(value = "home", produces = MediaType.APPLICATION_JSON_VALUE)
 public class HomeController {
     @Resource

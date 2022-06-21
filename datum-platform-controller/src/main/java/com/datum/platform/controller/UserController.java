@@ -12,6 +12,8 @@ import com.datum.platform.service.dto.user.NonceDto;
 import com.datum.platform.service.dto.user.UserAddressDto;
 import com.datum.platform.vo.ResponseVo;
 import com.datum.platform.vo.user.UserVo;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
+import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 @Api(tags = "用户管理关接口")
+@ApiSupport(order = 101)
 @RequestMapping(value = "user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
@@ -37,12 +40,14 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("getLoginNonce")
+    @ApiOperationSupport(order = 1)
     @ApiOperation(value = "获取登录Nonce", notes = "获取登录Nonce")
     public ResponseVo<NonceDto> getLoginNonce(UserAddressDto req) {
         return ResponseVo.createSuccess(userService.getLoginNonce(req));
     }
 
     @PostMapping("login")
+    @ApiOperationSupport(order = 2)
     @ApiOperation(value = "用户登录", notes = "用户登录")
     public ResponseVo<UserVo> login(@RequestBody @Validated LoginInReq loginInReq) {
         UserDto userDto = userService.loginBySign(loginInReq.getAddress(), loginInReq.getHrpAddress(), loginInReq.getSignMessage(), loginInReq.getSign());
@@ -51,6 +56,7 @@ public class UserController {
     }
 
     @PostMapping("logout")
+    @ApiOperationSupport(order = 3)
     @ApiOperation(value = "用户登出", notes = "用户登出")
     public ResponseVo<?> logout(HttpServletResponse httpServletResponse) {
         userService.logout();
@@ -59,6 +65,7 @@ public class UserController {
     }
 
     @PostMapping("updateUserName")
+    @ApiOperationSupport(order = 4)
     @ApiOperation(value = "修改昵称", notes = "修改昵称")
     public ResponseVo<?> updateUserName(@RequestBody @Valid UpdateUserNameReq req) {
         userService.updateUserName(req.getUserName());
