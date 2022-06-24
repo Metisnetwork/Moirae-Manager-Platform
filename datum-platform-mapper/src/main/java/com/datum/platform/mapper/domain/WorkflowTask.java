@@ -92,6 +92,16 @@ public class WorkflowTask implements Serializable {
     private Boolean enable;
 
     /**
+     * 算力提供方式 0-随机 1-指定
+     */
+    private Integer powerType;
+
+    /**
+     * 算力提供组织
+     */
+    private String powerIdentityId;
+
+    /**
      * 创建时间
      */
     private Date createTime;

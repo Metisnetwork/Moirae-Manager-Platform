@@ -20,8 +20,8 @@ import java.util.List;
  * @since 2022-03-28
  */
 @Data
-@TableName("mo_workflow_run_task_status")
-public class WorkflowRunTaskStatus implements Serializable {
+@TableName("mo_workflow_run_status_task")
+public class WorkflowRunStatusTask implements Serializable {
 
 
     /**

@@ -96,7 +96,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Resource
     private WorkflowRunStatusManager workflowRunStatusManager;
     @Resource
-    private WorkflowRunTaskStatusManager workflowRunTaskStatusManager;
+    private WorkflowRunStatusTaskManager workflowRunTaskStatusManager;
     @Resource
     private WorkflowRunTaskResultManager workflowRunTaskResultManager;
 
@@ -217,13 +217,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public List<WorkflowRunTaskStatus> listWorkflowRunTaskStatusOfUnConfirmed() {
+    public List<WorkflowRunStatusTask> listWorkflowRunTaskStatusOfUnConfirmed() {
         return  workflowRunTaskStatusManager.listOfUnConfirmed();
     }
 
     @Override
     @Transactional
-    public boolean cancelWorkflowRunTaskStatus(WorkflowRunTaskStatus workflowRunTaskStatus) {
+    public boolean cancelWorkflowRunTaskStatus(WorkflowRunStatusTask workflowRunTaskStatus) {
         WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(workflowRunTaskStatus.getWorkflowRunId());
         if(workflowRunStatus.getCancelStatus() != null && workflowRunStatus.getCancelStatus() == WorkflowTaskRunStatusEnum.RUN_NEED){
             TaskRpcApi.TerminateTaskRequest request = TaskRpcApi.TerminateTaskRequest.newBuilder()
@@ -255,7 +255,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public void taskFinish(WorkflowRunTaskStatus workflowRunTaskStatus, Task task) {
+    public void taskFinish(WorkflowRunStatusTask workflowRunTaskStatus, Task task) {
         if (task.getStatus() == TaskStatusEnum.SUCCEED || task.getStatus() == TaskStatusEnum.FAILED) {
             // 生成运行时任务清单明细
             WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(workflowRunTaskStatus.getWorkflowRunId());
@@ -266,7 +266,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 taskSuccess(workflowRunStatus,task);
                 if(workflowRunStatus.getCurStep().compareTo(workflowRunStatus.getStep()) < 0) {
                     workflowRunStatus.setCurStep(workflowRunStatus.getWorkflowRunTaskStatusList().stream()
-                            .map(WorkflowRunTaskStatus::getStep)
+                            .map(WorkflowRunStatusTask::getStep)
                             .filter(item -> item > workflowRunStatus.getCurStep())
                             .min(Integer::compareTo)
                             .get());
@@ -286,7 +286,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private void taskFail(WorkflowRunStatus workflowRunStatus, Task task) {
-        WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
+        WorkflowRunStatusTask curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunStatusTask::getStep, item -> item)).get(workflowRunStatus.getCurStep());
 
         if(!task.getId().equals(curWorkflowRunTaskStatus.getTaskId())){
             log.error("工作流状态错误！ workflowRunStatusId = {}  task = {}", workflowRunStatus.getId(), task.getId());
@@ -304,7 +304,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private void taskSuccess(WorkflowRunStatus workflowRunStatus, Task task) {
-        WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
+        WorkflowRunStatusTask curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunStatusTask::getStep, item -> item)).get(workflowRunStatus.getCurStep());
         WorkflowTask workflowTask = curWorkflowRunTaskStatus.getWorkflowTask();
 
         if(!task.getId().equals(curWorkflowRunTaskStatus.getTaskId())){
@@ -923,12 +923,12 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private WorkflowTaskRunStatusEnum getNodeRunStatus(Long id, Integer psiTaskStep, Integer taskStep) {
         if(psiTaskStep != null){
-           WorkflowRunTaskStatus psiWorkflowRunTaskStatus = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(id, psiTaskStep);
+           WorkflowRunStatusTask psiWorkflowRunTaskStatus = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(id, psiTaskStep);
            if(psiWorkflowRunTaskStatus != null && psiWorkflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL){
                 return WorkflowTaskRunStatusEnum.RUN_FAIL;
            }
         }
-        WorkflowRunTaskStatus workflowRunTaskStatus = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(id, taskStep);
+        WorkflowRunStatusTask workflowRunTaskStatus = workflowRunTaskStatusManager.getByWorkflowRunIdAndStep(id, taskStep);
         if(workflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL || workflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_SUCCESS){
             return workflowRunTaskStatus.getRunStatus();
         }
@@ -977,7 +977,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Map<String, Org> identityId2OrgMap = orgService.getIdentityId2OrgMap();
         result = workflowRunTaskStatusManager.listByWorkflowRunIdAndHasTaskId(workflowRunStatus.getId()).stream()
                 .filter(item -> stepSet.contains(item.getStep()))
-                .map(WorkflowRunTaskStatus::getTaskId)
+                .map(WorkflowRunStatusTask::getTaskId)
                 .flatMap(item -> workflowRunTaskResultManager.listByTaskId(item).stream())
                 .map(item -> {
                     TaskResultDto taskResultDto = new TaskResultDto();
@@ -1087,7 +1087,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private void executeTask(WorkflowRunStatus workflowRunStatus) {
-        WorkflowRunTaskStatus curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunTaskStatus::getStep, item -> item)).get(workflowRunStatus.getCurStep());
+        WorkflowRunStatusTask curWorkflowRunTaskStatus = workflowRunStatus.getWorkflowRunTaskStatusList().stream().collect(Collectors.toMap(WorkflowRunStatusTask::getStep, item -> item)).get(workflowRunStatus.getCurStep());
 
         if(curWorkflowRunTaskStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_NEED){
             try {
@@ -1124,7 +1124,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     }
 
-    private TaskRpcApi.PublishTaskDeclareRequest assemblyTask(WorkflowRunStatus workflowRunStatus, WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+    private TaskRpcApi.PublishTaskDeclareRequest assemblyTask(WorkflowRunStatus workflowRunStatus, WorkflowRunStatusTask curWorkflowRunTaskStatus) {
         TaskRpcApi.PublishTaskDeclareRequest.Builder requestBuild = TaskRpcApi.PublishTaskDeclareRequest.newBuilder()
                 .setTaskName(publishTaskOfGetTaskName(workflowRunStatus, curWorkflowRunTaskStatus))
                 .setUser(workflowRunStatus.getAddress())
@@ -1433,7 +1433,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         return taskOrganization;
     }
 
-    private String publishTaskOfGetTaskName(WorkflowRunStatus workflowRunStatus, WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+    private String publishTaskOfGetTaskName(WorkflowRunStatus workflowRunStatus, WorkflowRunStatusTask curWorkflowRunTaskStatus) {
         Long id = curWorkflowRunTaskStatus.getId();
         String address = workflowRunStatus.getAddress();
         String algorithmName = curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmName();
@@ -1445,7 +1445,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {
         Map<Long, WorkflowTask> workflowTaskMap = workflowTaskList.stream().collect(Collectors.toMap(WorkflowTask::getWorkflowTaskId, me -> me));
         workflowRunStatus.setWorkflow(workflowManager.getById(workflowRunStatus.getWorkflowId()));
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(workflowRunStatus.getId());
+        List<WorkflowRunStatusTask> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(workflowRunStatus.getId());
         workflowRunTaskStatusList
                 .forEach(item -> {
                     item.setWorkflowTask(workflowTaskMap.get(item.getWorkflowTaskId()));
@@ -1466,9 +1466,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowRunStatus.setWorkflow(workflowManager.getById(workflowId));
         workflowRunStatusManager.save(workflowRunStatus);
 
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowTaskList.stream()
+        List<WorkflowRunStatusTask> workflowRunTaskStatusList = workflowTaskList.stream()
                 .map(item -> {
-                    WorkflowRunTaskStatus workflowRunTaskStatus = new WorkflowRunTaskStatus();
+                    WorkflowRunStatusTask workflowRunTaskStatus = new WorkflowRunStatusTask();
                     workflowRunTaskStatus.setWorkflowRunId(workflowRunStatus.getId());
                     workflowRunTaskStatus.setWorkflowTaskId(item.getWorkflowTaskId());
                     workflowRunTaskStatus.setStep(item.getStep());
@@ -1573,7 +1573,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
 
-    private void initModelAndPsi(WorkflowRunTaskStatus curWorkflowRunTaskStatus) {
+    private void initModelAndPsi(WorkflowRunStatusTask curWorkflowRunTaskStatus) {
         WorkflowTask workflowTask = curWorkflowRunTaskStatus.getWorkflowTask();
         // 初始化模型
         if(workflowTask.getInputModel()){
@@ -1653,7 +1653,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req) {
         WorkflowRunStatus workflowRunStatus = workflowRunStatusManager.getById(req.getWorkflowRunId());
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(req.getWorkflowRunId());
+        List<WorkflowRunStatusTask> workflowRunTaskStatusList = workflowRunTaskStatusManager.listByWorkflowRunId(req.getWorkflowRunId());
         WorkflowVersion workflowVersion = workflowVersionManager.getById(workflowRunStatus.getWorkflowId(), workflowRunStatus.getWorkflowVersion());
         AlgorithmClassify root = algService.getAlgorithmClassifyTree(false);
         List<WorkflowRunTaskDto> result = workflowRunTaskStatusList.stream().map(item -> {
@@ -1676,7 +1676,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public WorkflowRunTaskResultDto getWorkflowRunTaskResult(String taskId) {
         WorkflowRunTaskResultDto resultDto = new WorkflowRunTaskResultDto();
-        WorkflowRunTaskStatus workflowRunTaskStatus = workflowRunTaskStatusManager.getByTaskId(taskId);
+        WorkflowRunStatusTask workflowRunTaskStatus = workflowRunTaskStatusManager.getByTaskId(taskId);
         resultDto.setId(workflowRunTaskStatus.getId());
         resultDto.setTaskId(workflowRunTaskStatus.getTaskId());
         resultDto.setCreateTime(workflowRunTaskStatus.getBeginTime());

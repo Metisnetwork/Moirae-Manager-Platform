@@ -10,27 +10,32 @@ import java.util.Date;
 
 /**
  * <p>
- * token信息
+ * tokenId持有者信息
  * </p>
  *
  * @author chendai
  * @since 2022-03-28
  */
 @Data
-@TableName("mo_token")
-public class Token implements Serializable {
+@TableName("mo_token_inventory")
+public class TokenInventory implements Serializable {
 
 
     /**
      * 合约地址
      */
     @TableId
-    private String address;
+    private String tokenAddress;
 
     /**
-     * 合约类型: 0-erc20,1-erc721
+     * token id
      */
-    private Integer type;
+    private String tokenId;
+
+    /**
+     * token id 对应持有者地址
+     */
+    private String owner;
 
     /**
      * 对应元数据ID,hash
@@ -38,30 +43,9 @@ public class Token implements Serializable {
     private String metaDataId;
 
     /**
-     * 合约名称
+     * token id 对应特性值，如有效期
      */
-    private String name;
-
-    /**
-     * 合约符号
-     */
-    private String symbol;
-
-    /**
-     * 合约精度
-     */
-    @TableField("`decimal`")
-    private Long decimal;
-
-    /**
-     * erc20对应LAT的价格
-     */
-    private String price;
-
-    /**
-     * erc20是否添加流动性: 0-否，1-是
-     */
-    private Boolean isAddLiquidity;
+    private String characteristic;
 
     /**
      * 创建时间

@@ -1,5 +1,6 @@
 package com.datum.platform.mapper.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -7,30 +8,31 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
- * token信息
+ * 工作流运行状态对应支付方式
  * </p>
  *
  * @author chendai
  * @since 2022-03-28
  */
 @Data
-@TableName("mo_token")
-public class Token implements Serializable {
+@TableName("mo_workflow_run_status_payment_method")
+public class WorkflowRunStatusPaymentMethod implements Serializable {
 
 
     /**
-     * 合约地址
+     * ID(自增长)
      */
-    @TableId
-    private String address;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
-     * 合约类型: 0-erc20,1-erc721
+     * 工作流运行状态ID
      */
-    private Integer type;
+    private Long workflowRunId;
 
     /**
      * 对应元数据ID,hash
@@ -38,30 +40,19 @@ public class Token implements Serializable {
     private String metaDataId;
 
     /**
-     * 合约名称
+     * 合约类型: 0-erc20,1-erc721
      */
-    private String name;
+    private Integer type;
 
     /**
-     * 合约符号
+     * 合约地址
      */
-    private String symbol;
+    private String tokenAddress;
 
     /**
-     * 合约精度
+     * 721下合约token id
      */
-    @TableField("`decimal`")
-    private Long decimal;
-
-    /**
-     * erc20对应LAT的价格
-     */
-    private String price;
-
-    /**
-     * erc20是否添加流动性: 0-否，1-是
-     */
-    private Boolean isAddLiquidity;
+    private String tokenId;
 
     /**
      * 创建时间
@@ -75,5 +66,8 @@ public class Token implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
+    @TableField(exist = false)
+    private List<WorkflowRunStatusTask> workflowRunTaskStatusList;
+    @TableField(exist = false)
+    private Workflow workflow;
 }

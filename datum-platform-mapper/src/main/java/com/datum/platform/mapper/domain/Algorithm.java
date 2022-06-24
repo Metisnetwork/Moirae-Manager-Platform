@@ -120,6 +120,11 @@ public class Algorithm implements Serializable {
     private Integer dataColumnsFlag;
 
     /**
+     * 算法类别：0-密文算法，1-明文算法
+     */
+    private Integer type;
+
+    /**
      * 创建时间
      */
     private Date createTime;

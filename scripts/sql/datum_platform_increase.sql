@@ -19,10 +19,12 @@ CREATE TABLE `mo_token_inventory` (
 
 ALTER TABLE `dc_meta_data`
     DROP COLUMN `token_address`,
-    ADD COLUMN `is_support_pt_alg` TINYINT DEFAULT 0  NOT NULL  COMMENT '是否支持明文算法' AFTER `has_title`;
+    ADD COLUMN `is_support_pt_alg` TINYINT DEFAULT 0  NOT NULL  COMMENT '是否支持明文算法' AFTER `has_title`,
+    ADD COLUMN `is_support_ct_alg` TINYINT DEFAULT 0  NOT NULL  COMMENT '是否支持密文算法' AFTER `is_support_pt_alg`,
+    ADD COLUMN `owner_address` VARCHAR(64) NOT NULL   COMMENT '数据拥有者地址' AFTER `is_support_ct_alg`;
 
 ALTER TABLE `mo_algorithm`
-    ADD COLUMN `is_pt_alg` TINYINT DEFAULT 0  NOT NULL   COMMENT '是否为明文算法：0-否，1-是' AFTER `data_columns_flag`;
+    ADD COLUMN `type` TINYINT DEFAULT 0  NOT NULL  COMMENT '算法类别：0-密文算法，1-明文算法' AFTER `data_columns_flag`;
 
 CREATE TABLE `mo_workflow_run_status_payment_method` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',

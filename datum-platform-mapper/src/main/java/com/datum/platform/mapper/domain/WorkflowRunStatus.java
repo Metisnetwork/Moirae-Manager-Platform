@@ -100,7 +100,7 @@ public class WorkflowRunStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @TableField(exist = false)
-    private List<WorkflowRunTaskStatus> workflowRunTaskStatusList;
+    private List<WorkflowRunStatusTask> workflowRunTaskStatusList;
     @TableField(exist = false)
     private Workflow workflow;
 }

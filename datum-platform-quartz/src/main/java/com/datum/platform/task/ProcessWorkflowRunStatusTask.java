@@ -2,7 +2,7 @@ package com.datum.platform.task;
 
 import cn.hutool.core.collection.CollUtil;
 import com.datum.platform.mapper.domain.Task;
-import com.datum.platform.mapper.domain.WorkflowRunTaskStatus;
+import com.datum.platform.mapper.domain.WorkflowRunStatusTask;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
 import com.datum.platform.service.TaskService;
 import com.datum.platform.service.WorkflowService;
@@ -33,7 +33,7 @@ public class ProcessWorkflowRunStatusTask {
     @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "ProcessWorkflowRunStatusTask")
     public void run() {
-        List<WorkflowRunTaskStatus> workflowRunTaskStatusList =  workflowService.listWorkflowRunTaskStatusOfUnConfirmed();
+        List<WorkflowRunStatusTask> workflowRunTaskStatusList =  workflowService.listWorkflowRunTaskStatusOfUnConfirmed();
         // 执行取消逻辑
         workflowRunTaskStatusList = workflowRunTaskStatusList.stream()
                 .filter(item -> !workflowService.cancelWorkflowRunTaskStatus(item))

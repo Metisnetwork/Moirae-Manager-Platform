@@ -88,11 +88,6 @@ public class MetaData implements Serializable {
     private MetaDataStatusEnum status;
 
     /**
-     * 对应合约的地址
-     */
-    private String tokenAddress;
-
-    /**
      * (状态)修改时间
      */
     private Date updateAt;
@@ -116,6 +111,21 @@ public class MetaData implements Serializable {
      * 是否可以被曝光 (1: 可以; 0: 不可以; 如 数据原始内容可以被下载或者支持外域查看时则为1, 默认为0)
      */
     private Boolean allowExpose;
+
+    /**
+     * 是否支持明文算法
+     */
+    private Boolean isSupportPtAlg;
+
+    /**
+     * 是否支持密文算法
+     */
+    private Boolean isSupportCtAlg;
+
+    /**
+     * 数据拥有者地址
+     */
+    private String tokenAddress;
 
     /**
      * 创建时间

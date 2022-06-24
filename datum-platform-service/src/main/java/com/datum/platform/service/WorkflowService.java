@@ -61,7 +61,7 @@ public interface WorkflowService{
      *
      * @return
      */
-    List<WorkflowRunTaskStatus> listWorkflowRunTaskStatusOfUnConfirmed();
+    List<WorkflowRunStatusTask> listWorkflowRunTaskStatusOfUnConfirmed();
 
     /**
      * 取消任务
@@ -69,7 +69,7 @@ public interface WorkflowService{
      * @param workflowRunTaskStatus
      * @return
      */
-    boolean cancelWorkflowRunTaskStatus(WorkflowRunTaskStatus workflowRunTaskStatus);
+    boolean cancelWorkflowRunTaskStatus(WorkflowRunStatusTask workflowRunTaskStatus);
 
     /**
      * 任务结束
@@ -77,7 +77,7 @@ public interface WorkflowService{
      * @param workflowRunTaskStatus
      * @param task
      */
-    void taskFinish(WorkflowRunTaskStatus workflowRunTaskStatus, Task task);
+    void taskFinish(WorkflowRunStatusTask workflowRunTaskStatus, Task task);
 
     List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req);
 }
