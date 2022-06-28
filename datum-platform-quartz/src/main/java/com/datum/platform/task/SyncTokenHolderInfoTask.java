@@ -36,7 +36,7 @@ public class SyncTokenHolderInfoTask {
             //查询所有在线用户地址
             List<String> addressList = userService.getOnlineUserIdList();
             //查询所有数据token地址
-            List<String> tokenList = dataService.listTokenId();
+            List<String> tokenList = dataService.listERC20TokenAddress();
             for (String address: addressList) {
                 try{
                     sync(address, tokenList);

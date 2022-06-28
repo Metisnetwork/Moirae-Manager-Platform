@@ -42,6 +42,8 @@ public class DataServiceImpl implements DataService {
     private PsiManager psiManager;
     @Resource
     private StatsTokenManager statsTokenManager;
+    @Resource
+    private TokenInventoryManager tokenInventoryManager;
 
     @Override
     public MetaData statisticsOfGlobal() {
@@ -118,8 +120,13 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<String> listTokenId() {
-        return tokenManager.getTokenIdList();
+    public List<String> listERC20TokenAddress() {
+        return tokenManager.getERC20TokenAddressList();
+    }
+
+    @Override
+    public List<Token> listERC721Token() {
+        return tokenManager.listERC721Token();
     }
 
     @Override
@@ -256,5 +263,11 @@ public class DataServiceImpl implements DataService {
     @Override
     public IPage<CredentialDto> listAttributeCredential(Long current, Long size, String metaDataId) {
         return null;
+    }
+
+    @Override
+    @Transactional
+    public boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList) {
+        return tokenInventoryManager.saveOrUpdateBatchByTokenAddress(address, tokenInventoryList);
     }
 }

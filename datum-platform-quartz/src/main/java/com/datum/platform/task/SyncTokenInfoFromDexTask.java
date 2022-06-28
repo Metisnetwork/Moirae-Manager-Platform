@@ -35,7 +35,7 @@ public class SyncTokenInfoFromDexTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<String> tokenList = dataService.listTokenId();
+            List<String> tokenList = dataService.listERC20TokenAddress();
             tokenList.forEach(item -> {
                 try {
                     if(!item.equals(uniswapV2FactoryDao.WETH())){

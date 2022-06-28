@@ -31,7 +31,7 @@ public class StatsTokenTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<String> tokenAddressList = dataService.listTokenId();
+            List<String> tokenAddressList = dataService.listERC20TokenAddress();
             List<StatsToken> saveList = new ArrayList<>();
             for (String tokenAddress: tokenAddressList) {
                 try {

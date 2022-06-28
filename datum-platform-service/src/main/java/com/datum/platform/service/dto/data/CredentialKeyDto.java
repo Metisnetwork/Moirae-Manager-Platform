@@ -11,7 +11,7 @@ public class CredentialKeyDto {
     @ApiModelProperty(value = "元数据id")
     private String metaDataId;
 
-    @ApiModelProperty(value = "凭证类型: 0-erc20,1-erc721")
+    @ApiModelProperty(value = "凭证类型: 0-无属性,1-有属性")
     private Integer type;
 
     @ApiModelProperty(value = "数据凭证合约地址")

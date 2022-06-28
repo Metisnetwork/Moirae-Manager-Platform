@@ -9,6 +9,7 @@ import com.platon.abi.solidity.datatypes.Function;
 import com.platon.abi.solidity.datatypes.Type;
 import com.platon.abi.solidity.datatypes.Utf8String;
 import com.platon.abi.solidity.datatypes.generated.Uint256;
+import com.platon.abi.solidity.datatypes.generated.Uint8;
 import com.platon.crypto.Credentials;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.DefaultBlockParameter;
@@ -16,6 +17,8 @@ import com.platon.protocol.core.RemoteCall;
 import com.platon.protocol.core.methods.request.PlatonFilter;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tuples.generated.Tuple2;
+import com.platon.tuples.generated.Tuple3;
 import com.platon.tx.Contract;
 import com.platon.tx.TransactionManager;
 import com.platon.tx.gas.GasProvider;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -77,9 +81,13 @@ public class ERC721Template extends Contract {
 
     public static final String FUNC_ADMIN = "admin";
 
+    public static final String FUNC_CIPHERFLAG = "cipherFlag";
+
     public static final String FUNC_CREATETOKEN = "createToken";
 
     public static final String FUNC_GETCHARACTER = "getCharacter";
+
+    public static final String FUNC_GETEXTINFO = "getExtInfo";
 
     public static final Event APPROVAL_EVENT = new Event("Approval",
             Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Uint256>(true) {}));
@@ -327,13 +335,14 @@ public class ERC721Template extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteCall<TransactionReceipt> initialize(String admin_, String name_, String symbol_, String proof_) {
+    public RemoteCall<TransactionReceipt> initialize(String admin_, String name_, String symbol_, String proof_, BigInteger cipherFlag_) {
         final Function function = new Function(
                 FUNC_INITIALIZE,
                 Arrays.<Type>asList(new Address(admin_),
                 new Utf8String(name_),
                 new Utf8String(symbol_),
-                new Utf8String(proof_)),
+                new Utf8String(proof_),
+                new Uint8(cipherFlag_)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
@@ -366,20 +375,54 @@ public class ERC721Template extends Contract {
         return executeRemoteCallSingleValueReturn(function, String.class);
     }
 
-    public RemoteCall<TransactionReceipt> createToken(String term, String tokenURI_) {
+    public RemoteCall<BigInteger> cipherFlag() {
+        final Function function = new Function(FUNC_CIPHERFLAG,
+                Arrays.<Type>asList(),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {}));
+        return executeRemoteCallSingleValueReturn(function, BigInteger.class);
+    }
+
+    public RemoteCall<TransactionReceipt> createToken(String term, Boolean cipher_, String tokenURI_) {
         final Function function = new Function(
                 FUNC_CREATETOKEN,
                 Arrays.<Type>asList(new Utf8String(term),
+                new Bool(cipher_),
                 new Utf8String(tokenURI_)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteCall<String> getCharacter(BigInteger tokenId) {
+    public RemoteCall<Tuple2<String, Boolean>> getCharacter(BigInteger tokenId) {
         final Function function = new Function(FUNC_GETCHARACTER,
                 Arrays.<Type>asList(new Uint256(tokenId)),
-                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}));
-        return executeRemoteCallSingleValueReturn(function, String.class);
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Bool>() {}));
+        return new RemoteCall<Tuple2<String, Boolean>>(
+                new Callable<Tuple2<String, Boolean>>() {
+                    @Override
+                    public Tuple2<String, Boolean> call() throws Exception {
+                        List<Type> results = executeCallMultipleValueReturn(function);
+                        return new Tuple2<String, Boolean>(
+                                (String) results.get(0).getValue(),
+                                (Boolean) results.get(1).getValue());
+                    }
+                });
+    }
+
+    public RemoteCall<Tuple3<String, String, Boolean>> getExtInfo(BigInteger tokenId) {
+        final Function function = new Function(FUNC_GETEXTINFO,
+                Arrays.<Type>asList(new Uint256(tokenId)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Bool>() {}));
+        return new RemoteCall<Tuple3<String, String, Boolean>>(
+                new Callable<Tuple3<String, String, Boolean>>() {
+                    @Override
+                    public Tuple3<String, String, Boolean> call() throws Exception {
+                        List<Type> results = executeCallMultipleValueReturn(function);
+                        return new Tuple3<String, String, Boolean>(
+                                (String) results.get(0).getValue(),
+                                (String) results.get(1).getValue(),
+                                (Boolean) results.get(2).getValue());
+                    }
+                });
     }
 
     public static RemoteCall<ERC721Template> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {

@@ -8,6 +8,7 @@ import com.platon.abi.solidity.datatypes.Event;
 import com.platon.abi.solidity.datatypes.Function;
 import com.platon.abi.solidity.datatypes.Type;
 import com.platon.abi.solidity.datatypes.Utf8String;
+import com.platon.abi.solidity.datatypes.generated.Uint8;
 import com.platon.crypto.Credentials;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.DefaultBlockParameter;
@@ -18,6 +19,7 @@ import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.tx.Contract;
 import com.platon.tx.TransactionManager;
 import com.platon.tx.gas.GasProvider;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +46,7 @@ public class ERC721Factory extends Contract {
     ;
 
     public static final Event NFTCONTRACTCREATED_EVENT = new Event("NFTContractCreated",
-            Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}));
+            Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint8>() {}));
     ;
 
     protected ERC721Factory(String contractAddress, Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
@@ -108,6 +110,7 @@ public class ERC721Factory extends Contract {
             typedResponse.name = (String) eventValues.getNonIndexedValues().get(0).getValue();
             typedResponse.symbol = (String) eventValues.getNonIndexedValues().get(1).getValue();
             typedResponse.proof = (String) eventValues.getNonIndexedValues().get(2).getValue();
+            typedResponse.cipherFlag = (BigInteger) eventValues.getNonIndexedValues().get(3).getValue();
             responses.add(typedResponse);
         }
         return responses;
@@ -126,6 +129,7 @@ public class ERC721Factory extends Contract {
                 typedResponse.name = (String) eventValues.getNonIndexedValues().get(0).getValue();
                 typedResponse.symbol = (String) eventValues.getNonIndexedValues().get(1).getValue();
                 typedResponse.proof = (String) eventValues.getNonIndexedValues().get(2).getValue();
+                typedResponse.cipherFlag = (BigInteger) eventValues.getNonIndexedValues().get(3).getValue();
                 return typedResponse;
             }
         });
@@ -137,12 +141,13 @@ public class ERC721Factory extends Contract {
         return nFTContractCreatedEventObservable(filter);
     }
 
-    public RemoteCall<TransactionReceipt> deployERC721Contract(String name, String symbol, String proof) {
+    public RemoteCall<TransactionReceipt> deployERC721Contract(String name, String symbol, String proof, BigInteger cipherFlag) {
         final Function function = new Function(
                 FUNC_DEPLOYERC721CONTRACT,
                 Arrays.<Type>asList(new Utf8String(name),
                 new Utf8String(symbol),
-                new Utf8String(proof)),
+                new Utf8String(proof),
+                new Uint8(cipherFlag)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
@@ -175,5 +180,7 @@ public class ERC721Factory extends Contract {
         public String symbol;
 
         public String proof;
+
+        public BigInteger cipherFlag;
     }
 }

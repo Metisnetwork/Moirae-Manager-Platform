@@ -25,8 +25,8 @@ public abstract class BaseContractTest {
 //	protected static final String privateKey = "0x3a4130e4abb887a296eb38c15bbd83253ab09492a505b10a54b008b7dcc1668";
 
 //	platon开发网
-	protected static final long chainId = 210309;
-	protected static final String nodeUrl = "http://192.168.10.146:6789";
+	protected static final long chainId = 2203181;
+	protected static final String nodeUrl = "http://8.219.126.197:6789";
 	protected static final String hrp = "lat";
 	protected static final String privateKey = "0x3a4130e4abb887a296eb38c15bbd83253ab09492a505b10a54b008b7dcc1668";
 

@@ -3,6 +3,7 @@ package com.datum.platform.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.TokenTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class Token implements Serializable {
     /**
      * 合约类型: 0-erc20,1-erc721
      */
-    private Integer type;
+    private TokenTypeEnum type;
 
     /**
      * 对应元数据ID,hash
@@ -62,6 +63,16 @@ public class Token implements Serializable {
      * erc20是否添加流动性: 0-否，1-是
      */
     private Boolean isAddLiquidity;
+
+    /**
+     * 明文算法消耗量
+     */
+    private String ptAlgConsume;
+
+    /**
+     * 密文算法消耗量
+     */
+    private String ctAlgConsume;
 
     /**
      * 创建时间

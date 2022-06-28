@@ -18,12 +18,6 @@ public class DataDetailsVo extends DataVo {
     @ApiModelProperty(value = "源文件类型: 0-未知，1- CSV类型")
     private MetaDataFileTypeEnum fileType;
 
-    @ApiModelProperty(value = "数据凭证符号")
-    private String tokenSymbol;
-
-    @ApiModelProperty(value = "发布时间，精确到毫秒")
-    private Date publishedAt;
-
     @ApiModelProperty(value = "源文件的行数")
     private Integer rows;
 

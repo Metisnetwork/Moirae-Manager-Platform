@@ -2,8 +2,10 @@ package com.datum.platform.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.datum.platform.chain.platon.contract.DataTokenTemplateContract;
+import com.datum.platform.chain.platon.contract.ERC721TemplateContract;
 import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.mapper.domain.Token;
+import com.datum.platform.mapper.enums.TokenTypeEnum;
 import com.datum.platform.service.DataService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ public class SyncTokenInfoTask {
     private DataTokenTemplateContract dataTokenTemplateDao;
     @Resource
     private IUniswapV2FactoryContract uniswapV2FactoryDao;
+    @Resource
+    private ERC721TemplateContract erc721TemplateContract;
 
     @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncTokenInfoTask")
@@ -55,11 +59,18 @@ public class SyncTokenInfoTask {
     }
 
     private void sync(Token token){
-        token.setSymbol(dataTokenTemplateDao.symbol(token.getAddress()));
-        token.setName(dataTokenTemplateDao.name(token.getAddress()));
-        BigInteger decimals = dataTokenTemplateDao.decimals(token.getAddress());
-        if(decimals.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
-            token.setDecimal(decimals.longValue());
+        if(TokenTypeEnum.ERC20 == token.getType()){
+            token.setSymbol(dataTokenTemplateDao.symbol(token.getAddress()));
+            token.setName(dataTokenTemplateDao.name(token.getAddress()));
+            BigInteger decimals = dataTokenTemplateDao.decimals(token.getAddress());
+            if(decimals.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
+                token.setDecimal(decimals.longValue());
+            }
+        }
+
+        if(TokenTypeEnum.ERC721 == token.getType()){
+            token.setSymbol(erc721TemplateContract.symbol(token.getAddress()));
+            token.setName(erc721TemplateContract.name(token.getAddress()));
         }
         dataService.updateTokenById(token);
     }

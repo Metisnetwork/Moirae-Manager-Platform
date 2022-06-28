@@ -112,7 +112,15 @@ public interface DataService {
      *
      * @return
      */
-    List<String> listTokenId();
+    List<String> listERC20TokenAddress();
+
+
+    /**
+     * 查询721token列表
+     *
+     * @return
+     */
+    List<Token> listERC721Token();
 
     /**
      * 查询token列表
@@ -262,4 +270,6 @@ public interface DataService {
     CredentialDto getNoAttributeCredential(String metaDataId);
 
     IPage<CredentialDto> listAttributeCredential(Long current, Long size, String metaDataId);
+
+    boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList);
 }

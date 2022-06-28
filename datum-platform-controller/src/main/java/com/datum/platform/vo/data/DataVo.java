@@ -30,4 +30,7 @@ public class DataVo extends BaseOrgVo {
 
     @ApiModelProperty(value = "是否支持明文算法: true-是 false-否")
     private Boolean isSupportPtAlg;
+
+    @ApiModelProperty(value = "是否支持密文算法: true-是 false-否")
+    private Boolean isSupportCtAlg;
 }

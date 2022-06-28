@@ -22,9 +22,6 @@ public class CredentialDto extends CredentialKeyDto {
     @ApiModelProperty(value = "数据凭证余额")
     private String tokenBalance;
 
-    @ApiModelProperty(value = "tokenId名称")
-    private String tokenIdName;
-
-    @ApiModelProperty(value = "tokenId 对应特性值，如有效期")
+    @ApiModelProperty(value = "tokenId 对应特性值，如有效期，时间戳")
     private String characteristic;
 }
