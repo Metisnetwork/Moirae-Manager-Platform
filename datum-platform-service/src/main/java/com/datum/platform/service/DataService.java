@@ -66,6 +66,18 @@ public interface DataService {
      */
     IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword);
 
+
+    /**
+     * 查询用户可授权的元数据列表
+     *
+     * @param current    页数
+     * @param size       大小
+     * @param keyword  凭证名称 或 数据名称
+     * @return
+     */
+    IPage<MetaData> getUserAuthDataList(Long current, Long size, String keyword);
+
+
     /**
      *  查询给定元数据id对应元数据集合，返回map结构
      *
@@ -267,9 +279,17 @@ public interface DataService {
 
     boolean existTokeHolder(String address, String token);
 
-    CredentialDto getNoAttributeCredential(String metaDataId);
+    MetaDataCertificate getNoAttributeCredentialByMetaDataId(String metaDataId);
 
-    IPage<CredentialDto> listAttributeCredential(Long current, Long size, String metaDataId);
+    MetaDataCertificate getNoAttributeCredentialByMetaDataIdAndUser(String metaDataId);
+
+    IPage<MetaDataCertificate> pageHaveAttributesCertificateByMetaDataId(Long current, Long size, String metaDataId);
+
+    IPage<MetaDataCertificate> pageHaveAttributesCertificateByMetaDataIdAndUser(Long current, Long size, String metaDataId);
+
+    List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId);
 
     boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList);
+
+    boolean isMetaDataOwner(String metaDataId);
 }

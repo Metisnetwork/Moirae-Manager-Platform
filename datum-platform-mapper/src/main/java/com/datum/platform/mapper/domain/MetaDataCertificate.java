@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -37,7 +39,7 @@ public class MetaDataCertificate implements Serializable {
      * 凭证类型: 0-无属性,1-有属性
      */
     @TableField("`type`")
-    private Integer type;
+    private MetaDataCertificateTypeEnum type;
 
     /**
      * 凭证对应合约地址
@@ -69,21 +71,24 @@ public class MetaDataCertificate implements Serializable {
     private String characteristic;
 
     /**
-     * 无属性对应DEX中的价格
-     */
-    private String price;
-
-    /**
      * 创建时间
      */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @TableField(update = "now()")
     private LocalDateTime updateTime;
 
+    private static final long serialVersionUID = 1L;
 
+    @TableField(exist = false)
+    private String tokenName;
+    @TableField(exist = false)
+    private String tokenSymbol;
+    @TableField(exist = false)
+    private Long tokenDecimal;
+    @TableField(exist = false)
+    private String tokenBalance;
 }

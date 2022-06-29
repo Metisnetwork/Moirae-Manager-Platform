@@ -269,7 +269,6 @@ CREATE TABLE `mo_meta_data_certificate` (
     `is_support_pt_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持明文算法',
     `is_support_ct_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持密文算法',
     `characteristic` varchar(256) DEFAULT NULL COMMENT 'token id 对应特性值，有效期时间戳',
-	`price` VARCHAR(128) NULL COMMENT '无属性对应DEX中的价格',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
@@ -627,6 +626,7 @@ CREATE TABLE `mo_token` (
     `name` varchar(64)  DEFAULT NULL COMMENT '合约名称',
     `symbol` varchar(64)  DEFAULT NULL COMMENT '合约符号',
     `decimal` bigint DEFAULT NULL COMMENT '合约精度',
+    `price` VARCHAR(128) NULL COMMENT '无属性对应DEX中的价格',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`address`)
@@ -842,8 +842,8 @@ CREATE TABLE `mo_workflow_task` (
     `input_model_step` int DEFAULT NULL COMMENT '工作流节点需要的模型产生的步骤',
     `input_psi` int NOT NULL DEFAULT '0' COMMENT '是否需要输入PSI: 0-否，1:是',
     `input_psi_step` int DEFAULT NULL COMMENT '工作流节点需要的psi产生步骤',
-	`power_type` INT DEFAULT 0  NOT NULL COMMENT '算力提供方式 0-随机 1-指定',
-	`power_identity_id` VARCHAR(128) NULL COMMENT '算力提供组织',
+	`power_type` INT DEFAULT NULL COMMENT '算力提供方式 0-随机 1-指定',
+	`power_identity_id` VARCHAR(128) DEFAULT NULL COMMENT '算力提供组织',
     `enable` tinyint NOT NULL DEFAULT '1' COMMENT '是否可用: 0-否，1:是',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

@@ -8,6 +8,7 @@ import com.datum.platform.common.enums.WorkflowTaskInputTypeEnum;
 import com.datum.platform.manager.WorkflowTaskManager;
 import com.datum.platform.mapper.WorkflowTaskMapper;
 import com.datum.platform.mapper.domain.WorkflowTask;
+import com.datum.platform.mapper.enums.WorkflowTaskPowerTypeEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -118,23 +119,25 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
     }
 
     @Override
-    public Map<WorkflowTaskInputTypeEnum, WorkflowTask> setWorkflowTask(Long workflowId, Long workflowVersion, Integer psiTaskStep, Integer taskStep, String identityId, Boolean inputPsi, Optional<String> modelId) {
-        WorkflowTask workflowTask = getByStep(workflowId, workflowVersion, taskStep);
-        workflowTask.setIdentityId(identityId);
-        workflowTask.setInputPsi(inputPsi);
-        modelId.ifPresent(item -> {
-            workflowTask.setInputModelId(item);
-        });
-        updateById(workflowTask);
-
-        WorkflowTask psiWorkflowTask = getByStep(workflowId, workflowVersion, psiTaskStep);
-        psiWorkflowTask.setIdentityId(identityId);
-        psiWorkflowTask.setEnable(inputPsi);
-        updateById(psiWorkflowTask);
-
+    public Map<WorkflowTaskInputTypeEnum, WorkflowTask> setWorkflowTask(Long workflowId, Long workflowVersion, Optional<Integer> prePsiTaskStep, Integer taskStep, String senderIdentityId, Optional<Boolean> activationPrePsi, Optional<String> modelId, Optional<WorkflowTaskPowerTypeEnum> powerType, Optional<String> powerIdentityId) {
         Map<WorkflowTaskInputTypeEnum, WorkflowTask> result = new HashMap<>();
+        // 主任务的设置
+        WorkflowTask workflowTask = getByStep(workflowId, workflowVersion, taskStep);
+        workflowTask.setIdentityId(senderIdentityId);
+        activationPrePsi.ifPresent(item -> workflowTask.setInputPsi(item));
+        modelId.ifPresent(item -> workflowTask.setInputModelId(item));
+        powerType.ifPresent(item -> workflowTask.setPowerType(item));
+        powerIdentityId.ifPresent(item -> workflowTask.setPowerIdentityId(item));
+        updateById(workflowTask);
         result.put(WorkflowTaskInputTypeEnum.NORMAL, workflowTask);
-        result.put(WorkflowTaskInputTypeEnum.PSI, psiWorkflowTask);
+        // 前置psi设置
+        prePsiTaskStep.ifPresent(item -> {
+            WorkflowTask psiWorkflowTask = getByStep(workflowId, workflowVersion, item);
+            psiWorkflowTask.setIdentityId(senderIdentityId);
+            activationPrePsi.ifPresent(item1 -> psiWorkflowTask.setEnable(item1));
+            updateById(psiWorkflowTask);
+            result.put(WorkflowTaskInputTypeEnum.PSI, psiWorkflowTask);
+        });
         return result;
     }
 }

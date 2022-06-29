@@ -125,7 +125,27 @@ public class MetaData implements Serializable {
     /**
      * 数据拥有者地址
      */
-    private String tokenAddress;
+    private String ownerAddress;
+
+    /**
+     * 数据对应erc20合约地址
+     */
+    private String erc20Address;
+
+    /**
+     * 数据对应erc721合约地址
+     */
+    private String erc721Address;
+
+    /**
+     * 明文算法消耗量
+     */
+    private String erc20PtAlgConsume;
+
+    /**
+     * 密文算法消耗量
+     */
+    private String erc20CtAlg_consume;
 
     /**
      * 创建时间

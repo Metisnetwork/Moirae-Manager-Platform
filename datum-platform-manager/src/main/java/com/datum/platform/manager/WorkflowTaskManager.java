@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.datum.platform.common.enums.OldAndNewEnum;
 import com.datum.platform.common.enums.WorkflowTaskInputTypeEnum;
 import com.datum.platform.mapper.domain.WorkflowTask;
+import com.datum.platform.mapper.enums.WorkflowTaskPowerTypeEnum;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,6 @@ public interface WorkflowTaskManager extends IService<WorkflowTask> {
     List<WorkflowTask> listExecutableByWorkflowVersion(Long workflowId, Long workflowVersion);
 
     WorkflowTask createOfWizardMode(Long workflowId, Long workflowVersion, Integer step, Long algorithmId, Boolean inputModel, Integer inputModelStep, Boolean inputPsi, Integer inputPsiStep);
-
-    Map<WorkflowTaskInputTypeEnum, WorkflowTask> setWorkflowTask(Long workflowId, Long workflowVersion, Integer psiTaskStep, Integer taskStep, String identityId, Boolean inputPsi, Optional<String> modelId);
+    
+    Map<WorkflowTaskInputTypeEnum, WorkflowTask> setWorkflowTask(Long workflowId, Long workflowVersion, Optional<Integer> prePsiTaskStep, Integer taskStep, String senderIdentityId, Optional<Boolean> activationPrePsi, Optional<String> modelId, Optional<WorkflowTaskPowerTypeEnum> powerType, Optional<String> powerIdentityId);
 }

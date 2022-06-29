@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.WorkflowTaskPowerTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -94,7 +95,7 @@ public class WorkflowTask implements Serializable {
     /**
      * 算力提供方式 0-随机 1-指定
      */
-    private Integer powerType;
+    private WorkflowTaskPowerTypeEnum powerType;
 
     /**
      * 算力提供组织

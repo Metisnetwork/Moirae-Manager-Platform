@@ -46,6 +46,8 @@ public interface WorkflowService{
 
     Boolean terminate(WorkflowRunKeyDto req);
 
+    List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req);
+
     WorkflowFeeDto preparationStart(WorkflowVersionKeyDto req);
 
     List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
@@ -78,6 +80,4 @@ public interface WorkflowService{
      * @param task
      */
     void taskFinish(WorkflowRunStatusTask workflowRunTaskStatus, Task task);
-
-    List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req);
 }

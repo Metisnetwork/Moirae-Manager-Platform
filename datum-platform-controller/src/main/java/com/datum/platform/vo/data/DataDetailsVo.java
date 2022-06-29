@@ -29,10 +29,4 @@ public class DataDetailsVo extends DataVo {
 
     @ApiModelProperty(value = "数据列")
     private List<DataColumnsVo> columnsList;
-
-    @ApiModelProperty(value = "无属性凭证")
-    private CredentialDto noAttributeCredential;
-
-    @ApiModelProperty(value = "有属性凭证列表")
-    private List<CredentialDto> attributeCredentialList;
 }

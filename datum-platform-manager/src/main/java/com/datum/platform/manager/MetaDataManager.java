@@ -17,9 +17,13 @@ public interface MetaDataManager extends IService<MetaData> {
 
     IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId, String keyword);
 
+    IPage<MetaData> getUserAuthDataList(Page<MetaData> page, String address, String keyword);
+
     MetaData statisticsOfGlobal();
 
     List<MetaData> listDataByTokenAddress(String tokenAddress);
 
     List<String> listDataOrgIdByUser(String address);
+
+    boolean isOwner(String metaDataId, String address);
 }

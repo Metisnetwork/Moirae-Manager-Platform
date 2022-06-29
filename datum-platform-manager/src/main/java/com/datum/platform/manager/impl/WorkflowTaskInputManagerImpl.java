@@ -9,9 +9,7 @@ import com.datum.platform.mapper.WorkflowTaskInputMapper;
 import com.datum.platform.mapper.domain.WorkflowTaskInput;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,12 +29,6 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
         wrapper.eq(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId);
         wrapper.orderByAsc(WorkflowTaskInput::getSortKey);
         return list(wrapper);
-    }
-
-    @Override
-    public void clearAndSave(Long workflowTaskId, List<WorkflowTaskInput> trainingWorkflowTaskInputList) {
-        removeByWorkflowTaskId(workflowTaskId);
-        saveBatch(trainingWorkflowTaskInputList);
     }
 
     @Override
@@ -83,33 +75,35 @@ public class WorkflowTaskInputManagerImpl extends ServiceImpl<WorkflowTaskInputM
     }
 
     @Override
-    public boolean setWorkflowTaskInput(Long psiWorkflowTaskId, Long workflowTaskId, List<WorkflowTaskInput> workflowTaskInputList) {
+    public boolean setWorkflowTaskInput(Optional<Long> prePsiWorkflowTaskId, Long workflowTaskId, List<WorkflowTaskInput> workflowTaskInputList) {
+        List<WorkflowTaskInput> save = new ArrayList<>();
+        save.addAll(workflowTaskInputList);
         // 删除旧设置
         LambdaQueryWrapper<WorkflowTaskInput> wrapper = Wrappers.lambdaQuery();
-        wrapper.in(WorkflowTaskInput::getWorkflowTaskId, psiWorkflowTaskId, workflowTaskId);
+        if(prePsiWorkflowTaskId.isPresent()){
+            wrapper.in(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId, prePsiWorkflowTaskId.get());
+        }else{
+            wrapper.eq(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId);
+        }
         remove(wrapper);
         // 组装PSI的设置
-        List<WorkflowTaskInput> psiWorkflowTaskInputList = workflowTaskInputList.stream().map(
-            item -> {
-                WorkflowTaskInput psiWorkflowTaskInput = new WorkflowTaskInput();
-                psiWorkflowTaskInput.setWorkflowTaskId(psiWorkflowTaskId);
-                psiWorkflowTaskInput.setMetaDataId(item.getMetaDataId());
-                psiWorkflowTaskInput.setIdentityId(item.getIdentityId());
-                psiWorkflowTaskInput.setKeyColumn(item.getKeyColumn());
-                psiWorkflowTaskInput.setPartyId(item.getPartyId());
-                psiWorkflowTaskInput.setDataColumnIds(item.getDataColumnIds());
-                psiWorkflowTaskInput.setDependentVariable(item.getDependentVariable());
-                psiWorkflowTaskInput.setSortKey(item.getSortKey());
-                return psiWorkflowTaskInput;
-            }
-        ).collect(Collectors.toList());
-        psiWorkflowTaskInputList.addAll(workflowTaskInputList);
-        return saveBatch(psiWorkflowTaskInputList);
-    }
-
-    private boolean removeByWorkflowTaskId(Long workflowTaskId){
-        LambdaQueryWrapper<WorkflowTaskInput> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WorkflowTaskInput::getWorkflowTaskId, workflowTaskId);
-        return remove(wrapper);
+        prePsiWorkflowTaskId.ifPresent(item -> {
+            List<WorkflowTaskInput> psiWorkflowTaskInputList = workflowTaskInputList.stream().map(
+                    item1 -> {
+                        WorkflowTaskInput psiWorkflowTaskInput = new WorkflowTaskInput();
+                        psiWorkflowTaskInput.setWorkflowTaskId(item);
+                        psiWorkflowTaskInput.setMetaDataId(item1.getMetaDataId());
+                        psiWorkflowTaskInput.setIdentityId(item1.getIdentityId());
+                        psiWorkflowTaskInput.setKeyColumn(item1.getKeyColumn());
+                        psiWorkflowTaskInput.setPartyId(item1.getPartyId());
+                        psiWorkflowTaskInput.setDataColumnIds(item1.getDataColumnIds());
+                        psiWorkflowTaskInput.setDependentVariable(item1.getDependentVariable());
+                        psiWorkflowTaskInput.setSortKey(item1.getSortKey());
+                        return psiWorkflowTaskInput;
+                    }
+            ).collect(Collectors.toList());
+            save.addAll(psiWorkflowTaskInputList);
+        });
+        return saveBatch(save);
     }
 }

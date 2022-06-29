@@ -14,7 +14,9 @@ public enum CalculationProcessTypeEnum {
     RESOURCE_COMMON(3, "选择计算环境(通用)"),
     RESOURCE_TRAINING_PREDICTION(4, "选择计算环境(训练&预测)"),
     OUTPUT_COMMON(5, "选择结果接收方(通用)"),
-    OUTPUT_TRAINING_PREDICTION(6, "选择结果接收方(训练&预测)")
+    OUTPUT_TRAINING_PREDICTION(6, "选择结果接收方(训练&预测)"),
+    PT_INPUT_TRAINING(7, "选择明文训练输入数据"),
+    PT_INPUT_PREDICTION(8, "选择明文预测输入数据")
     ;
 
     @JsonValue

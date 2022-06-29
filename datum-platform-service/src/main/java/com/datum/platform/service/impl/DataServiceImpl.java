@@ -8,9 +8,9 @@ import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.service.DataService;
-import com.datum.platform.service.dto.data.CredentialDto;
 import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
 import com.datum.platform.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
@@ -35,15 +35,14 @@ public class DataServiceImpl implements DataService {
     @Resource
     private TokenManager tokenManager;
     @Resource
-    private TokenHolderManager tokenHolderManager;
-    @Resource
     private ModelManager modelManager;
     @Resource
     private PsiManager psiManager;
     @Resource
     private StatsTokenManager statsTokenManager;
     @Resource
-    private TokenInventoryManager tokenInventoryManager;
+    private MetaDataCertificateManager metaDataCertificateManager;
+
 
     @Override
     public MetaData statisticsOfGlobal() {
@@ -76,6 +75,12 @@ public class DataServiceImpl implements DataService {
     public IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword) {
         Page<MetaData> page = new Page<>(current, size);
         return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress(), identityId, keyword);
+    }
+
+    @Override
+    public IPage<MetaData> getUserAuthDataList(Long current, Long size, String keyword) {
+        Page<MetaData> page = new Page<>(current, size);
+        return metaDataManager.getUserAuthDataList(page, UserContext.getCurrentUser().getAddress(), keyword);
     }
 
     @Override
@@ -256,18 +261,40 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public CredentialDto getNoAttributeCredential(String metaDataId) {
-        return null;
+    public MetaDataCertificate getNoAttributeCredentialByMetaDataId(String metaDataId) {
+        return metaDataCertificateManager.getNoAttributeCredentialByMetaDataId(metaDataId);
     }
 
     @Override
-    public IPage<CredentialDto> listAttributeCredential(Long current, Long size, String metaDataId) {
-        return null;
+    public MetaDataCertificate getNoAttributeCredentialByMetaDataIdAndUser(String metaDataId) {
+        return metaDataCertificateManager.getNoAttributeCredentialByMetaDataIdAndUser(metaDataId,UserContext.getCurrentUser().getAddress());
+    }
+
+    @Override
+    public IPage<MetaDataCertificate> pageHaveAttributesCertificateByMetaDataId(Long current, Long size, String metaDataId) {
+        Page<MetaDataCertificate> page = new Page<>(current, size);
+        return metaDataCertificateManager.pageHaveAttributesCertificateByMetaDataId(page, metaDataId);
+    }
+
+    @Override
+    public IPage<MetaDataCertificate> pageHaveAttributesCertificateByMetaDataIdAndUser(Long current, Long size, String metaDataId) {
+        Page<MetaDataCertificate> page = new Page<>(current, size);
+        return metaDataCertificateManager.pageHaveAttributesCertificateByMetaDataIdAndUser(page, metaDataId, UserContext.getCurrentUser().getAddress());
+    }
+
+    @Override
+    public List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId) {
+        return metaDataCertificateManager.listHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, UserContext.getCurrentUser().getAddress());
     }
 
     @Override
     @Transactional
     public boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList) {
         return tokenInventoryManager.saveOrUpdateBatchByTokenAddress(address, tokenInventoryList);
+    }
+
+    @Override
+    public boolean isMetaDataOwner(String metaDataId) {
+        return metaDataManager.isOwner(metaDataId, UserContext.getCurrentUser().getAddress());
     }
 }

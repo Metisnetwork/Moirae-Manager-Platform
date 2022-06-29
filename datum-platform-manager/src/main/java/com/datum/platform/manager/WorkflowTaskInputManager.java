@@ -6,6 +6,7 @@ import com.datum.platform.mapper.domain.WorkflowTaskInput;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * <p>
@@ -19,13 +20,11 @@ public interface WorkflowTaskInputManager extends IService<WorkflowTaskInput> {
 
     List<WorkflowTaskInput> listByWorkflowTaskId(Long workflowTaskId);
 
-    void clearAndSave(Long workflowTaskId, List<WorkflowTaskInput> trainingWorkflowTaskInputList);
-
     boolean removeByWorkflowTaskIds(List<Long> workflowTaskIdList);
 
     List<Map<OldAndNewEnum, WorkflowTaskInput>> copy(Long oldWorkflowTaskId, Long newWorkflowTaskId);
 
     List<WorkflowTaskInput> deleteByWorkflowTaskId(Long workflowTaskId);
 
-    boolean setWorkflowTaskInput(Long psiWorkflowTaskId, Long workflowTaskId, List<WorkflowTaskInput> workflowTaskInputList);
+    boolean setWorkflowTaskInput(Optional<Long> prePsiWorkflowTaskId, Long workflowTaskId, List<WorkflowTaskInput> workflowTaskInputList);
 }

@@ -51,24 +51,21 @@
     <select id="getDataDetails" resultType="com.datum.platform.mapper.domain.MetaData">
         select dmd.meta_data_id,
                dmd.file_name as metaDataName,
+               dmd.published_at,
                dmd.identity_id,
                do.node_name,
-               mt.name as tokenName,
-               mt.price as tokenPrice,
-               dmd.file_type,
-               mt.symbol as tokenSymbol,
-               dmd.published_at,
-               dmd.industry,
                dmd.size,
+               dmd.industry,
+               dmd.is_support_ct_alg,
+               dmd.is_support_pt_alg,
+               dmd.file_type,
                dmd.rows,
                dmd.columns,
                dmd.remarks
         from dc_meta_data dmd
                  inner join dc_org do on dmd.identity_id = do.identity_id
-                 inner join mo_token mt on dmd.token_address = mt.address
-        where dmd.status = 2
-            and mt.is_add_liquidity = 1
-            and dmd.meta_data_id = #{metaDataId}
+                 inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
+        where dmd.meta_data_id = #{metaDataId}
     </select>
     <select id="getUserDataList" resultType="com.datum.platform.mapper.domain.MetaData">
         select dmd.meta_data_id,
@@ -92,6 +89,38 @@
           </if>
         order by mmdu.create_time desc
     </select>
+
+    <select id="getUserAuthDataList" resultType="com.datum.platform.mapper.domain.MetaData">
+        select dmd.meta_data_id,
+               dmd.file_name as metaDataName,
+               dmd.published_at,
+               dmd.identity_id,
+               do.node_name,
+               dmd.size,
+               dmd.industry,
+               dmd.is_support_ct_alg,
+               dmd.is_support_pt_alg,
+               dmd.erc20_address as tokenAddress,
+               mt.name as tokenName,
+               mt.price as tokenPrice,
+               mt.symbol as tokenSymbol,
+               mt.`decimal` as tokenDecimal,
+               mmdcu.balance as tokenBalance,
+               mmdcu.authorize_balance as authorizeBalance
+        from dc_meta_data dmd
+            inner join dc_org do on dmd.identity_id = do.identity_id
+            inner join mo_meta_data_user mmdu on mmdu.meta_data_id = dmd.meta_data_id and mmdu.address = #{address}
+            inner join mo_token mt on dmd.erc20_address = mt.address
+            inner join mo_meta_data_certificate mmdc on mmdc.meta_data_id = dmd.meta_data_id and mmdc.type = 0
+            inner join mo_meta_data_certificate_user mmdcu on mmdc.id = mmdcu.meta_data_certificate_id and mmdcu.address = #{address}
+        where 1 = 1
+        <if test="keyword != null and keyword != ''">
+            and ( dmd.file_name like concat('%', #{keyword}, '%') or mt.name like concat('%', #{keyword}, '%') )
+        </if>
+        order by mmdu.create_time desc
+    </select>
+
+
     <select id="sizeOfData" resultType="java.lang.Long">
         select sum(dmd.size)
         from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address

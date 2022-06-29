@@ -38,6 +38,11 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
+    public IPage<MetaData> getUserAuthDataList(Page<MetaData> page, String address, String keyword) {
+        return this.baseMapper.getUserAuthDataList(page, address, keyword);
+    }
+
+    @Override
     public MetaData statisticsOfGlobal() {
         return this.baseMapper.statisticsOfGlobal();
     }
@@ -52,5 +57,13 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     @Override
     public List<String> listDataOrgIdByUser(String address) {
         return this.baseMapper.listDataOrgIdByUser(address);
+    }
+
+    @Override
+    public boolean isOwner(String metaDataId, String address) {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaData::getMetaDataId, metaDataId);
+        wrapper.eq(MetaData::getOwnerAddress, address);
+        return count(wrapper) == 1;
     }
 }
