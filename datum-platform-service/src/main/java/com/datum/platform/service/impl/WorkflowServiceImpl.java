@@ -10,11 +10,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.datum.platform.common.enums.*;
-import com.datum.platform.service.dto.data.CredentialDto;
-import com.datum.platform.service.dto.data.CredentialKeyDto;
-import com.google.protobuf.ByteString;
 import com.datum.platform.common.constants.SysConfig;
+import com.datum.platform.common.enums.*;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.common.utils.LanguageContext;
 import com.datum.platform.grpc.client.GrpcSysServiceClient;
@@ -23,11 +20,14 @@ import com.datum.platform.grpc.constant.GrpcConstant;
 import com.datum.platform.grpc.dynamic.*;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
-import com.datum.platform.mapper.enums.*;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
+import com.datum.platform.mapper.enums.*;
 import com.datum.platform.service.*;
 import com.datum.platform.service.dto.alg.AlgDto;
 import com.datum.platform.service.dto.alg.AlgVariableV2Dto;
+import com.datum.platform.service.dto.data.HaveAttributesCredentialDto;
+import com.datum.platform.service.dto.data.NoAttributesCredentialDto;
+import com.datum.platform.service.dto.data.UserWLatCredentialDto;
 import com.datum.platform.service.dto.model.ModelDto;
 import com.datum.platform.service.dto.org.OrgNameDto;
 import com.datum.platform.service.dto.task.TaskEventDto;
@@ -35,12 +35,16 @@ import com.datum.platform.service.dto.task.TaskResultDto;
 import com.datum.platform.service.dto.token.TokenDto;
 import com.datum.platform.service.dto.token.TokenHolderDto;
 import com.datum.platform.service.dto.workflow.*;
-import com.datum.platform.service.dto.workflow.common.*;
+import com.datum.platform.service.dto.workflow.common.CodeDto;
+import com.datum.platform.service.dto.workflow.common.DataInputDto;
+import com.datum.platform.service.dto.workflow.common.OutputDto;
+import com.datum.platform.service.dto.workflow.common.ResourceDto;
 import com.datum.platform.service.dto.workflow.expert.*;
 import com.datum.platform.service.dto.workflow.wizard.*;
 import com.datum.platform.service.utils.CommonUtils;
 import com.datum.platform.service.utils.TreeUtils;
 import com.datum.platform.service.utils.UserContext;
+import com.google.protobuf.ByteString;
 import common.constant.CarrierEnum;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
@@ -1103,10 +1107,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .map(item -> {
                     WorkflowStartCredentialDto workflowStartCredentialDto = new WorkflowStartCredentialDto();
                     workflowStartCredentialDto.setMetaDataId(item);
-                    List<CredentialDto> credentialList = new ArrayList<>();
-                    credentialList.add(BeanUtil.copyProperties(dataService.getNoAttributeCredentialByMetaDataIdAndUser(item), CredentialDto.class));
-                    credentialList.addAll(BeanUtil.copyToList(dataService.listHaveAttributesCertificateByMetaDataIdAndUser(item), CredentialDto.class));
-                    workflowStartCredentialDto.setCredentialList(credentialList);
+                    workflowStartCredentialDto.setNoAttributesCredential(BeanUtil.copyProperties(dataService.getNoAttributeCredentialByMetaDataIdAndUser(item), NoAttributesCredentialDto.class));
+                    workflowStartCredentialDto.setHaveAttributesCredentialList(BeanUtil.copyToList(dataService.listHaveAttributesCertificateByMetaDataIdAndUser(item), HaveAttributesCredentialDto.class));
                     return workflowStartCredentialDto;
                 })
                 .collect(Collectors.toList());
@@ -1119,7 +1121,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
         workflowFeeDto.setWorkflowId(req.getWorkflowId());
         workflowFeeDto.setWorkflowVersion(req.getWorkflowVersion());
-        workflowFeeDto.setItemList(convert2WorkflowFee(workflowTaskList, req.getCredentialKeyList()));
+        workflowFeeDto.setItemList(convert2WorkflowFee(workflowTaskList, req.getCredentialIdList()));
         return workflowFeeDto;
     }
 
@@ -1136,7 +1138,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
         // 交易-手续费校验
-        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList);
+        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList, req.getCredentialIdList());
         checkFee(workflowFeeList);
         // 保存运行时信息
         WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(UserContext.getCurrentUser().getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
@@ -1558,82 +1560,110 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .map(item -> item.getToken().getName())
                 .collect(Collectors.toList());
         if( tokenNameList.size() > 0) {
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg(), "{}",tokenNameList.toString()));
-        }
+   }
     }
 
-    private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList, List<CredentialKeyDto> credentialKeyList) {
-        // 白名单校验（如果任务使用了非自己元数据 并且 无属性凭证支付）
-        Set<String> senderSet = workflowTaskList.stream().map(WorkflowTask::getIdentityId).collect(Collectors.toSet());
-        Map<String, Org> userOrgMap = orgService.getUserOrgList().stream()
-                .filter(item -> senderSet.contains(item.getIdentityId()))
-                .collect(Collectors.toMap(Org::getIdentityId, me -> me));
-        List<String> errorList = new ArrayList<>();
-        for (String sender : senderSet){
-            if(!userOrgMap.containsKey(sender) || ! userOrgMap.get(sender).getIsInWhitelist()){
-                if(userOrgMap.containsKey(sender)){
-                    errorList.add(userOrgMap.get(sender).getNodeName());
+    private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList, List<Long> credentialIdList) {
+        // 如果任务中存在使用非自己元数据并且使用无属性凭证支付方式，则需要进行发起组织白名单校验
+        Map<String, MetaDataCertificate> metaDataId2credentialKeyDtoMap = dataService.listMetaDataCertificateUser(credentialIdList).stream().collect(Collectors.toMap(MetaDataCertificate::getMetaDataId, me -> me));
+        Map<String, Org> orgIdentityId2OrgMap = orgService.getUserOrgList().stream().collect(Collectors.toMap(Org::getIdentityId, me -> me));
+        Set<String> needCheckSet = new HashSet<>();
+        for (WorkflowTask workflowTask: workflowTaskList) {
+            if(needCheckSet.contains(workflowTask.getIdentityId())){
+                continue;
+            }
+            if(needWhitelistAuthorization(workflowTask, metaDataId2credentialKeyDtoMap)){
+                needCheckSet.add(workflowTask.getIdentityId());
+            }
+        }
+        List<String> errorSenderList = new ArrayList<>();
+        for (String sender : needCheckSet){
+            if(!orgIdentityId2OrgMap.containsKey(sender) || ! orgIdentityId2OrgMap.get(sender).getIsInWhitelist()){
+                if(orgIdentityId2OrgMap.containsKey(sender)){
+                    errorSenderList.add(orgIdentityId2OrgMap.get(sender).getNodeName());
                 }else{
-                    errorList.add(sender);
+                    errorSenderList.add(sender);
                 }
             }
         }
-        if(errorList.size() > 0){
-            throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.ORGANIZATION_NOT_IN_WHITE_LIST.getMsg(), "{}", errorList.toString()));
+        if(errorSenderList.size() > 0){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.ORGANIZATION_NOT_IN_WHITE_LIST.getMsg(), "{}", errorSenderList.toString()));
         }
 
-        // token费用
-
-
-
-
-        Map<String, Long> metaDataId2CountMap = workflowTaskList.stream()
-                .flatMap(item -> item.getInputList().stream())
-                .collect(Collectors.groupingBy(WorkflowTaskInput::getMetaDataId, Collectors.counting()));
-        for (int i = 0; i < workflowTaskList.size(); i++) {
-            if(workflowTaskList.get(i).getInputPsi() && workflowTaskList.get(i-1) != null && workflowTaskList.get(i-1).getAlgorithmId() == sysConfig.getDefaultPsi() ){
-                for (WorkflowTaskInput workflowTaskInput : workflowTaskList.get(i).getInputList()) {
-                    metaDataId2CountMap.put(workflowTaskInput.getMetaDataId(), metaDataId2CountMap.get(workflowTaskInput.getMetaDataId()) - 1);
+        // 如果是无属性凭证支付，需要保证余额及授权金额足够支付任务消耗； 如果是有属性凭证支付，则需要该凭证的拥有者为当前发起任务的用户
+        List<WorkflowFeeItemDto> tokenFeeList = new ArrayList<>();
+        Map<String, BigInteger> metaDataId2consumptionMap = new HashMap<>();
+        for (WorkflowTask workflowTask: workflowTaskList) {
+            for (WorkflowTaskInput taskInput: workflowTask.getInputList()) {
+                MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(taskInput.getMetaDataId());
+                if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES){
+                    metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);
+                }
+                if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+                    metaDataId2consumptionMap.computeIfPresent(taskInput.getMetaDataId(), (key, oldValue) -> {
+                        if ( workflowTask.getAlgorithm().getType() == AlgorithmTypeEnum.CT){
+                            return oldValue.add(new BigInteger(metaDataCertificate.getErc20CtAlgConsume()));
+                        }else{
+                            return oldValue.add(new BigInteger(metaDataCertificate.getErc20PtAlgConsume()));
+                        }
+                    });
                 }
             }
         }
-
-        List<MetaData> metaDataList = dataService.listMetaDataByIds(metaDataId2CountMap.keySet());
-        Map<String, String> metaDataId2TokenAddressMap = metaDataList.stream()
-                .collect(Collectors.toMap(MetaData::getMetaDataId, MetaData::getTokenAddress));
-        List<Token> tokenList = dataService.listTokenByIds(metaDataId2TokenAddressMap.values());
-        tokenList.add(dataService.getDatumNetworkToken());
-        Map<String, Token> tokenId2TokenMap = tokenList.stream().collect(Collectors.toMap(Token::getAddress, item -> item));
-        List<WorkflowFeeItemDto> tokenFeeList =  metaDataId2CountMap.entrySet().stream()
-                .map(item -> createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, new BigInteger(sysConfig.getDefaultTokenValue()).multiply(BigInteger.valueOf(item.getValue())).toString(), tokenId2TokenMap.get(metaDataId2TokenAddressMap.get(item.getKey()))))
-                .collect(Collectors.toList());
-
-        // 校验下
-        checkFee(tokenFeeList);
+        List<String> errorCertificateList = new ArrayList<>();
+        metaDataId2consumptionMap.entrySet().forEach(item -> {
+            MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(item.getKey());
+            if(item.getValue().compareTo(new BigInteger(metaDataCertificate.getTokenBalance())) > 0
+            || item.getValue().compareTo(new BigInteger(metaDataCertificate.getAuthorizeBalance())) > 0){
+                errorCertificateList.add(metaDataCertificate.getTokenName());
+            }
+            if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+                tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, item.getValue().toString(), metaDataCertificate));
+            }
+        });
+        if(errorSenderList.size() > 0){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg(), "{}",errorCertificateList.toString()));
+        }
 
         // 手续费
-        List<WorkflowFeeItemDto> feeList = workflowTaskList.stream()
+        UserWLatCredentialDto wLatCredentialDto = dataService.getUserWLatCredential();
+        BigInteger feeList = workflowTaskList.stream()
                 .map(item -> {
-                    List<String> tokenIdList = item.getInputList().stream().map(subItem-> metaDataId2TokenAddressMap.get(subItem.getMetaDataId())).collect(Collectors.toList());
-                    TaskRpcApi.EstimateTaskGasRequest.Builder requestBuilder = TaskRpcApi.EstimateTaskGasRequest.newBuilder();
-                    requestBuilder.setTaskSponsorAddress(UserContext.getCurrentUser().getAddress());
-                    tokenIdList.forEach(subItem -> requestBuilder.addDataTokenAddresses(subItem));
-                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
-                    WorkflowFeeItemDto workflowTaskFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice())).toString(), dataService.getDatumNetworkToken());
-                    return workflowTaskFeeItemDto;
+                    return BigInteger.ONE;
                 })
-                .collect(Collectors.toList());
-
-        tokenFeeList.addAll(feeList);
+                .reduce((item1, item2) -> item1.add(item2) ).get();
+        tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(),wLatCredentialDto));
         return tokenFeeList;
     }
 
-    private WorkflowFeeItemDto createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum typeEnum, String value, Token token){
+    private boolean needWhitelistAuthorization(WorkflowTask workflowTask, Map<String, MetaDataCertificate> credentialKeyMap) {
+        for (WorkflowTaskInput taskInput: workflowTask.getInputList()) {
+            MetaData metaData = dataService.getMetaDataById(taskInput.getMetaDataId(), false);
+            if(!UserContext.getCurrentUser().getAddress().equals(metaData.getOwnerAddress()) && credentialKeyMap.get(metaData.getMetaDataId()).getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private WorkflowFeeItemDto createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum typeEnum, String needValue, UserWLatCredentialDto metaDataCertificate){
         WorkflowFeeItemDto workflowFeeItemDto = new WorkflowFeeItemDto();
         workflowFeeItemDto.setType(typeEnum);
-        workflowFeeItemDto.setNeedValue(value);
-        workflowFeeItemDto.setToken(BeanUtil.copyProperties(token, TokenDto.class));
-        workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(dataService.getTokenHolderById(token.getAddress(), UserContext.getCurrentUser().getAddress()), TokenHolderDto.class));
+        workflowFeeItemDto.setNeedValue(needValue);
+        workflowFeeItemDto.setToken(BeanUtil.copyProperties(metaDataCertificate, TokenDto.class));
+        workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(metaDataCertificate, TokenHolderDto.class));
+        workflowFeeItemDto.setIsEnough(
+                new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0
+                        && new BigDecimal(workflowFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0);
+        return workflowFeeItemDto;
+    }
+
+    private WorkflowFeeItemDto createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum typeEnum, String needValue, MetaDataCertificate metaDataCertificate){
+        WorkflowFeeItemDto workflowFeeItemDto = new WorkflowFeeItemDto();
+        workflowFeeItemDto.setType(typeEnum);
+        workflowFeeItemDto.setNeedValue(needValue);
+        workflowFeeItemDto.setToken(BeanUtil.copyProperties(metaDataCertificate, TokenDto.class));
+        workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(metaDataCertificate, TokenHolderDto.class));
         workflowFeeItemDto.setIsEnough(
                 new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0
                         && new BigDecimal(workflowFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0);

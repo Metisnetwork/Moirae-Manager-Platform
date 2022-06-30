@@ -3,12 +3,13 @@ package com.datum.platform.service.dto.data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel
-public class CredentialDto extends CredentialKeyDto {
+@ApiModel(value = "DatumNetworkLat账户信息")
+public class UserWLatCredentialDto {
+
+    @ApiModelProperty(value = "数据凭证合约地址")
+    private String tokenAddress;
 
     @ApiModelProperty(value = "数据凭证名称")
     private String tokenName;
@@ -22,6 +23,6 @@ public class CredentialDto extends CredentialKeyDto {
     @ApiModelProperty(value = "数据凭证余额")
     private String tokenBalance;
 
-    @ApiModelProperty(value = "tokenId 对应特性值，如有效期，时间戳")
-    private String characteristic;
+    @ApiModelProperty(value = "已授权给支付合约的金额")
+    private String authorizeBalance;
 }

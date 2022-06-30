@@ -19,7 +19,7 @@ import java.util.List;
 @ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
-public class SyncTokenHolderInfoTask {
+public class SyncMetaDataCertificateTask {
 
     @Resource
     private DataService dataService;
@@ -29,7 +29,7 @@ public class SyncTokenHolderInfoTask {
     private DataTokenTemplateContract dataTokenTemplateDao;
 
     @Scheduled(fixedDelay = 5 * 1000)
-    @Lock(keys = "SyncTokenHolderInfoTask")
+    @Lock(keys = "SyncMetaDataCertificateTask")
     public void run() {
         long begin = DateUtil.current();
         try {

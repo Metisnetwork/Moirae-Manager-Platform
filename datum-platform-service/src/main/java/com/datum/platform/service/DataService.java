@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
-import com.datum.platform.service.dto.data.CredentialDto;
-import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
+import com.datum.platform.service.dto.data.UserWLatCredentialDto;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,14 +85,6 @@ public interface DataService {
     Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataIdList);
 
     /**
-     * 查询给定元数据id对应元数据列表
-     *
-     * @param metaDataIdList 元数据id
-     * @return
-     */
-    List<MetaData> listMetaDataByIds(Set<String> metaDataIdList);
-
-    /**
      * 查询给的token对应的元数据列表
      *
      * @param tokenAddress 凭证地址
@@ -134,13 +124,6 @@ public interface DataService {
      */
     List<Token> listERC721Token();
 
-    /**
-     * 查询token列表
-     *
-     * @param tokenIdList 地址列表
-     * @return
-     */
-    List<Token> listTokenByIds(Collection<String> tokenIdList);
 
     /**
      * 查询待同步的token列表
@@ -159,13 +142,6 @@ public interface DataService {
     Token getTokenById(String tokenAddress);
 
     /**
-     * 查询token信息
-     *
-     * @return
-     */
-    Token getDatumNetworkToken();
-
-    /**
      * 保存token信息
      *
      * @param token 保存的token
@@ -180,15 +156,6 @@ public interface DataService {
      * @return
      */
     boolean updateTokenById(Token token);
-
-    /**
-     * 查询用户持有的token信息
-     *
-     * @param tokenAddress 合约地址
-     * @param userAddress  用户地址
-     * @return
-     */
-    TokenHolder getTokenHolderById(String tokenAddress, String userAddress);
 
     /**
      * 批量更新或保存
@@ -242,14 +209,6 @@ public interface DataService {
     boolean saveBatchModel(List<Model> modelList);
 
     /**
-     * 查询psi文件列表
-     *
-     * @param taskId 生成psi文件的任务id
-     * @return
-     */
-    List<Psi> listPsiByTrainTaskId(String taskId);
-
-    /**
      * 批量保存psi
      *
      * @param psiList
@@ -271,7 +230,7 @@ public interface DataService {
      *
      * @return
      */
-    DatumNetworkLatInfoDto getUserDatumNetworkLatInfo();
+    UserWLatCredentialDto getUserWLatCredential();
 
     List<MetaDataColumn> listMetaDataColumnByIdAndIndex(String metaDataId, List<Integer> selectedColumnsV2);
 
@@ -292,4 +251,6 @@ public interface DataService {
     boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList);
 
     boolean isMetaDataOwner(String metaDataId);
+
+    List<MetaDataCertificate> listMetaDataCertificateUser(List<Long> credentialIdList);
 }

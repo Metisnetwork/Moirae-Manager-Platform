@@ -4,9 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import com.datum.platform.chain.platon.contract.DataTokenTemplateContract;
 import com.datum.platform.chain.platon.contract.ERC721TemplateContract;
 import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
+import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.mapper.domain.Token;
 import com.datum.platform.mapper.enums.TokenTypeEnum;
 import com.datum.platform.service.DataService;
+import com.platon.contracts.ppos.dto.common.ErrorCode;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,6 +41,7 @@ public class SyncTokenInfoTask {
             Token token = dataService.getTokenById(uniswapV2FactoryDao.WETH());
             if(token == null){
                 token = new Token();
+                token.setType(TokenTypeEnum.ERC20);
                 token.setAddress(uniswapV2FactoryDao.WETH());
                 dataService.saveToken(token);
             }
@@ -59,19 +62,23 @@ public class SyncTokenInfoTask {
     }
 
     private void sync(Token token){
-        if(TokenTypeEnum.ERC20 == token.getType()){
-            token.setSymbol(dataTokenTemplateDao.symbol(token.getAddress()));
-            token.setName(dataTokenTemplateDao.name(token.getAddress()));
-            BigInteger decimals = dataTokenTemplateDao.decimals(token.getAddress());
-            if(decimals.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
-                token.setDecimal(decimals.longValue());
-            }
+        switch (token.getType()){
+            case ERC20:
+                token.setSymbol(dataTokenTemplateDao.symbol(token.getAddress()));
+                token.setName(dataTokenTemplateDao.name(token.getAddress()));
+                BigInteger decimals = dataTokenTemplateDao.decimals(token.getAddress());
+                if(decimals.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0){
+                    token.setDecimal(decimals.longValue());
+                }
+                break;
+            case ERC721:
+                token.setSymbol(erc721TemplateContract.symbol(token.getAddress()));
+                token.setName(erc721TemplateContract.name(token.getAddress()));
+                break;
+            default:
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "未知类型");
         }
 
-        if(TokenTypeEnum.ERC721 == token.getType()){
-            token.setSymbol(erc721TemplateContract.symbol(token.getAddress()));
-            token.setName(erc721TemplateContract.name(token.getAddress()));
-        }
         dataService.updateTokenById(token);
     }
 }

@@ -1,13 +1,11 @@
 package com.datum.platform.vo.data;
 
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
-import com.datum.platform.service.dto.data.CredentialDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)

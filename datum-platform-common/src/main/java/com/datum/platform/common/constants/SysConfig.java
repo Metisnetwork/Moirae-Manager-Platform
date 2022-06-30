@@ -20,7 +20,6 @@ public class SysConfig {
     private long nonceTimeOut = 5 * 60 * 1000;
     private List<OrgConfig> publicOrgList = new ArrayList<>();
     private long defaultPsi = 1001L;
-    private String defaultTokenValue = "1000000000000000000";
 
     @Data
     public static class OrgConfig {

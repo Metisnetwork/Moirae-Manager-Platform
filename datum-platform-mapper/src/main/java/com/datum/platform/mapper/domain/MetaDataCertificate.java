@@ -1,13 +1,14 @@
 package com.datum.platform.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -18,7 +19,6 @@ import lombok.EqualsAndHashCode;
  * @since 2022-06-28
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
 @TableName("mo_meta_data_certificate")
 public class MetaDataCertificate implements Serializable {
 
@@ -26,60 +26,64 @@ public class MetaDataCertificate implements Serializable {
     /**
      * ID(自增长)
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
      * 元数据ID,hash
      */
-    @TableField("meta_data_id")
     private String metaDataId;
 
     /**
      * 凭证类型: 0-无属性,1-有属性
      */
-    @TableField("`type`")
     private MetaDataCertificateTypeEnum type;
 
     /**
      * 凭证对应合约地址
      */
-    @TableField("token_address")
     private String tokenAddress;
 
     /**
      * 有属性凭证对应 token id
      */
-    @TableField("token_id")
     private String tokenId;
 
     /**
      * 是否支持明文算法
      */
-    @TableField("is_support_pt_alg")
-    private Integer isSupportPtAlg;
+    private Boolean isSupportPtAlg;
 
     /**
      * 是否支持密文算法
      */
-    @TableField("is_support_ct_alg")
-    private Integer isSupportCtAlg;
+    private Boolean isSupportCtAlg;
 
     /**
-     * token id 对应特性值，有效期时间戳
+     * 有属性凭证有效期
      */
     private String characteristic;
 
     /**
+     * 无属性凭证明文算法消耗量
+     */
+    private String erc20PtAlgConsume;
+
+    /**
+     * 无属性凭证密文算法消耗量
+     */
+    private String erc20CtAlgConsume;
+
+    /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 更新时间
      */
     @TableField(update = "now()")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     private static final long serialVersionUID = 1L;
 
@@ -91,4 +95,6 @@ public class MetaDataCertificate implements Serializable {
     private Long tokenDecimal;
     @TableField(exist = false)
     private String tokenBalance;
+    @TableField(exist = false)
+    private String authorizeBalance;
 }

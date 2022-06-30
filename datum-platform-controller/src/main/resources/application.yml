@@ -72,8 +72,6 @@ system:
     nonceTimeOut: 300000
     # 系统默认的psi算法
     defaultPsi: 1001
-    # 每笔默认支付的token金额
-    defaultTokenValue: "1000000000000000000"
 
 grpc:
   client:

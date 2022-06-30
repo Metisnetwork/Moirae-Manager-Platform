@@ -21,7 +21,6 @@ import java.util.Date;
 @TableName("mo_token")
 public class Token implements Serializable {
 
-
     /**
      * 合约地址
      */
@@ -32,11 +31,6 @@ public class Token implements Serializable {
      * 合约类型: 0-erc20,1-erc721
      */
     private TokenTypeEnum type;
-
-    /**
-     * 对应元数据ID,hash
-     */
-    private String metaDataId;
 
     /**
      * 合约名称
@@ -60,19 +54,9 @@ public class Token implements Serializable {
     private String price;
 
     /**
-     * erc20是否添加流动性: 0-否，1-是
+     * erc20对应Dex流动性
      */
     private Boolean isAddLiquidity;
-
-    /**
-     * 明文算法消耗量
-     */
-    private String ptAlgConsume;
-
-    /**
-     * 密文算法消耗量
-     */
-    private String ctAlgConsume;
 
     /**
      * 创建时间

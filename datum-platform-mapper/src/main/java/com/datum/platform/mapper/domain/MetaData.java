@@ -138,16 +138,6 @@ public class MetaData implements Serializable {
     private String erc721Address;
 
     /**
-     * 明文算法消耗量
-     */
-    private String erc20PtAlgConsume;
-
-    /**
-     * 密文算法消耗量
-     */
-    private String erc20CtAlg_consume;
-
-    /**
      * 创建时间
      */
     private Date createTime;

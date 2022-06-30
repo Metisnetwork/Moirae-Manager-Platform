@@ -1,6 +1,5 @@
 package com.datum.platform.service.dto.workflow;
 
-import com.datum.platform.service.dto.data.CredentialKeyDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,5 +18,5 @@ public class WorkflowStartSignatureDto extends WorkflowVersionKeyDto {
     private String sign;
 
     @ApiModelProperty(value = "发起任务选择的凭证列表", required = true)
-    private List<CredentialKeyDto> credentialKeyList;
+    private List<Long> credentialIdList;
 }

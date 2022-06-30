@@ -1,6 +1,7 @@
 package com.datum.platform.chain.platon;
 
 import com.datum.platform.chain.platon.contract.evm.ERC721Template;
+import com.platon.bech32.Bech32;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,14 @@ public class ERC721TemplateTest extends BaseContractTest {
         transferEventResponseList.forEach(item ->{
             System.out.println("from = " + item.from + " to = " + item.to + " tokenId = " + item.tokenId );
         });
+    }
+
+    @Test
+    public void tranf() throws Exception{
+        ERC721Template contract = load(address);
+        contract.transferFrom(credentials.getAddress(), Bech32.addressEncode("lat", "0x07c1FF4Ef5c94A9680977cDf85bDfb5a234a85d7"), BigInteger.valueOf(0)).send();
+        System.out.println(contract.name().send());
+        System.out.println(contract.symbol().send());
     }
 
     @Test

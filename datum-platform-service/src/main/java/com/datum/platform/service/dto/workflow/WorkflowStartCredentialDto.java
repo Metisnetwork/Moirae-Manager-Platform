@@ -1,10 +1,10 @@
 package com.datum.platform.service.dto.workflow;
 
-import com.datum.platform.service.dto.data.CredentialDto;
+import com.datum.platform.service.dto.data.HaveAttributesCredentialDto;
+import com.datum.platform.service.dto.data.NoAttributesCredentialDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -15,6 +15,9 @@ public class WorkflowStartCredentialDto {
     @ApiModelProperty(value = "元数据id")
     private String metaDataId;
 
-    @ApiModelProperty(value = "数据凭证列表")
-    List<CredentialDto> credentialList;
+    @ApiModelProperty(value = "无属性凭证")
+    NoAttributesCredentialDto noAttributesCredential;
+
+    @ApiModelProperty(value = "有属性凭证")
+    List<HaveAttributesCredentialDto> haveAttributesCredentialList;
 }

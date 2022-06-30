@@ -4,22 +4,26 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datum.platform.chain.platon.contract.DataTokenTemplateContract;
 import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
-import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.service.DataService;
-import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
+import com.datum.platform.service.dto.data.UserWLatCredentialDto;
 import com.datum.platform.service.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,6 +32,8 @@ public class DataServiceImpl implements DataService {
 
     @Resource
     private IUniswapV2FactoryContract uniswapV2FactoryContract;
+    @Resource
+    private DataTokenTemplateContract dataTokenTemplateContract;
     @Resource
     private MetaDataManager metaDataManager;
     @Resource
@@ -62,6 +68,7 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
+    @Cacheable("getMetaDataById-1")
     public MetaData getMetaDataById(String metaDataId, boolean isNeedDetails) {
         MetaData metaData = metaDataManager.getDataDetails(metaDataId);
         if(isNeedDetails){
@@ -105,11 +112,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<MetaData> listMetaDataByIds(Set<String> metaDataIdList) {
-        return metaDataManager.listByIds(metaDataIdList);
-    }
-
-    @Override
     public List<MetaData> listMetaDataByTokenAddress(String tokenAddress) {
         return metaDataManager.listDataByTokenAddress(tokenAddress);
     }
@@ -135,11 +137,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Token> listTokenByIds(Collection<String> tokenIdList) {
-        return tokenManager.listByIds(tokenIdList);
-    }
-
-    @Override
     public List<Token> listTokenByNeedSyncedInfo(int size) {
         return tokenManager.getNeedSyncedTokenList(size);
     }
@@ -150,11 +147,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Token getDatumNetworkToken() {
-        return getTokenById(uniswapV2FactoryContract.WETH());
-    }
-
-    @Override
     public boolean saveToken(Token token) {
         return tokenManager.save(token);
     }
@@ -162,11 +154,6 @@ public class DataServiceImpl implements DataService {
     @Override
     public boolean updateTokenById(Token token) {
         return tokenManager.updateById(token);
-    }
-
-    @Override
-    public TokenHolder getTokenHolderById(String tokenAddress, String userAddress) {
-        return tokenHolderManager.getById(tokenAddress, userAddress);
     }
 
     @Override
@@ -202,11 +189,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Psi> listPsiByTrainTaskId(String taskId) {
-        return psiManager.listByTrainTaskId(taskId);
-    }
-
-    @Override
     public boolean saveBatchPsi(List<Psi> psiList) {
         return psiManager.saveBatch(psiList);
     }
@@ -227,21 +209,15 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public DatumNetworkLatInfoDto getUserDatumNetworkLatInfo() {
-        DatumNetworkLatInfoDto result = new DatumNetworkLatInfoDto();
+    public UserWLatCredentialDto getUserWLatCredential() {
+        UserWLatCredentialDto result = new UserWLatCredentialDto();
         Token token = tokenManager.getById(uniswapV2FactoryContract.WETH());
-        TokenHolder tokenHolder = tokenHolderManager.getById(uniswapV2FactoryContract.WETH(), UserContext.getCurrentUser().getAddress());
         result.setTokenAddress(token.getAddress());
         result.setTokenName(token.getName());
         result.setTokenSymbol(token.getSymbol());
         result.setTokenDecimal(token.getDecimal());
-        if(tokenHolder != null){
-            result.setTokenBalance(tokenHolder.getBalance());
-            result.setAuthorizeBalance(tokenHolder.getAuthorizeBalance());
-        }else{
-            result.setTokenBalance("0");
-            result.setAuthorizeBalance("0");
-        }
+        result.setTokenBalance(dataTokenTemplateContract.balanceOf(uniswapV2FactoryContract.WETH(),  UserContext.getCurrentUser().getAddress()).toString());
+        result.setAuthorizeBalance(dataTokenTemplateContract.allowance(uniswapV2FactoryContract.WETH(),  UserContext.getCurrentUser().getAddress()).toString());
         return result;
     }
 
@@ -296,5 +272,10 @@ public class DataServiceImpl implements DataService {
     @Override
     public boolean isMetaDataOwner(String metaDataId) {
         return metaDataManager.isOwner(metaDataId, UserContext.getCurrentUser().getAddress());
+    }
+
+    @Override
+    public List<MetaDataCertificate> listMetaDataCertificateUser(List<Long> credentialIdList) {
+        return metaDataCertificateManager.listCertificateByMetaDataIdListAndUser(credentialIdList, UserContext.getCurrentUser().getAddress());
     }
 }

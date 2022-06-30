@@ -9,8 +9,8 @@ import com.datum.platform.req.data.*;
 import com.datum.platform.req.model.GetUserModelListReq;
 import com.datum.platform.req.org.OrgIdPageReq;
 import com.datum.platform.service.DataService;
-import com.datum.platform.service.dto.data.CredentialDto;
-import com.datum.platform.service.dto.data.DatumNetworkLatInfoDto;
+import com.datum.platform.service.dto.data.BaseCredentialDto;
+import com.datum.platform.service.dto.data.UserWLatCredentialDto;
 import com.datum.platform.utils.ConvertUtils;
 import com.datum.platform.vo.PageVo;
 import com.datum.platform.vo.ResponseVo;
@@ -101,42 +101,42 @@ public class DataController {
     @GetMapping("getNoAttributeCredential")
     @ApiOperation(value = "查询数据关联的无属性凭证", notes = "查询数据关联的无属性凭证")
     @ApiOperationSupport(order = 7)
-    public ResponseVo<CredentialDto> getNoAttributeCredential(@Valid GetDataDetailsReq req) {
+    public ResponseVo<BaseCredentialDto> getNoAttributeCredential(@Valid GetDataDetailsReq req) {
         MetaDataCertificate certificate = dataService.getNoAttributeCredentialByMetaDataId(req.getMetaDataId());
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, CredentialDto.class));
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, BaseCredentialDto.class));
     }
 
     @GetMapping("getAttributeCredentialList")
     @ApiOperation(value = "查询数据关联的有属性凭证列表", notes = "查询数据关联的有属性凭证列表")
     @ApiOperationSupport(order = 8)
-    public ResponseVo<PageVo<CredentialDto>> getAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
+    public ResponseVo<PageVo<BaseCredentialDto>> getAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
         IPage<MetaDataCertificate> page = dataService.pageHaveAttributesCertificateByMetaDataId(req.getCurrent(), req.getSize(), req.getMetaDataId());
-        List<CredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), CredentialDto.class);
+        List<BaseCredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), BaseCredentialDto.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 
     @GetMapping("getUserDatumNetworkLatInfo")
     @ApiOperation(value = "查询DatumNetworkLat代币信息", notes = "查询DatumNetworkLat代币信息")
     @ApiOperationSupport(order = 9)
-    public ResponseVo<DatumNetworkLatInfoDto> getUserDatumNetworkLatInfo() {
-        DatumNetworkLatInfoDto resp = dataService.getUserDatumNetworkLatInfo();
+    public ResponseVo<UserWLatCredentialDto> getUserDatumNetworkLatInfo() {
+        UserWLatCredentialDto resp = dataService.getUserWLatCredential();
         return ResponseVo.createSuccess(resp);
     }
 
     @GetMapping("getUserNoAttributeCredential")
     @ApiOperation(value = "查询用户数据关联的无属性凭证", notes = "查询用户数据关联的无属性凭证")
     @ApiOperationSupport(order = 10)
-    public ResponseVo<CredentialDto> getUserNoAttributeCredential(@Valid GetDataDetailsReq req) {
+    public ResponseVo<BaseCredentialDto> getUserNoAttributeCredential(@Valid GetDataDetailsReq req) {
         MetaDataCertificate certificate = dataService.getNoAttributeCredentialByMetaDataIdAndUser(req.getMetaDataId());
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, CredentialDto.class));
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, BaseCredentialDto.class));
     }
 
     @GetMapping("getUserAttributeCredentialList")
     @ApiOperation(value = "查询用户数据关联的有属性凭证列表", notes = "查询用户数据关联的有属性凭证列表")
     @ApiOperationSupport(order = 11)
-    public ResponseVo<PageVo<CredentialDto>> getUserAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
+    public ResponseVo<PageVo<BaseCredentialDto>> getUserAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
         IPage<MetaDataCertificate> page = dataService.pageHaveAttributesCertificateByMetaDataIdAndUser(req.getCurrent(), req.getSize(), req.getMetaDataId());
-        List<CredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), CredentialDto.class);
+        List<BaseCredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), BaseCredentialDto.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 

@@ -3,6 +3,7 @@ package com.datum.platform.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -122,7 +123,7 @@ public class Algorithm implements Serializable {
     /**
      * 算法类别：0-密文算法，1-明文算法
      */
-    private Integer type;
+    private AlgorithmTypeEnum type;
 
     /**
      * 创建时间

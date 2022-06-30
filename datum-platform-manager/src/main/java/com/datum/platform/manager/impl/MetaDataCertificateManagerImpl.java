@@ -45,4 +45,9 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
     public List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, String address) {
         return baseMapper.listHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, address);
     }
+
+    @Override
+    public List<MetaDataCertificate> listCertificateByMetaDataIdListAndUser(List<Long> credentialIdList, String address) {
+        return baseMapper.listCertificateByMetaDataIdListAndUser(credentialIdList, address);
+    }
 }
