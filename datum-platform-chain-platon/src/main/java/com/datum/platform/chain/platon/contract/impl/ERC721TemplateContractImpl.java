@@ -51,6 +51,16 @@ public class ERC721TemplateContractImpl implements ERC721TemplateContract {
         return query(contract -> contract.tokenByIndex(index), contractAddress);
     }
 
+    @Override
+    public String tokenURI(String contractAddress, BigInteger tokenId) {
+        return query(contract -> contract.tokenURI(tokenId), contractAddress);
+    }
+
+    @Override
+    public String ownerOf(String contractAddress, BigInteger tokenId) {
+        return Bech32.addressDecodeHex(query(contract -> contract.ownerOf(tokenId), contractAddress));
+    }
+
 
     private <R> R query(ExceptionFunction<ERC721Template, RemoteCall<R>> supplier, String contractAddress) {
         contractAddress = AddressUtils.hexToBech32(contractAddress);

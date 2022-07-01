@@ -22,7 +22,7 @@ import java.util.List;
 @ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
-public class SyncTokenInfoTask {
+public class SyncTokenTask {
 
     @Resource
     private DataService dataService;
@@ -34,7 +34,7 @@ public class SyncTokenInfoTask {
     private ERC721TemplateContract erc721TemplateContract;
 
     @Scheduled(fixedDelay = 5 * 1000)
-    @Lock(keys = "SyncTokenInfoTask")
+    @Lock(keys = "SyncTokenTask")
     public void run() {
         long begin = DateUtil.current();
         try {

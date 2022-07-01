@@ -26,4 +26,6 @@ public interface MetaDataManager extends IService<MetaData> {
     List<String> listDataOrgIdByUser(String address);
 
     boolean isOwner(String metaDataId, String address);
+
+    List<MetaData> listDataOfNeedSyncedMetaDataCertificate();
 }

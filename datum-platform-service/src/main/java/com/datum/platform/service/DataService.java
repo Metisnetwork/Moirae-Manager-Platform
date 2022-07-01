@@ -118,14 +118,6 @@ public interface DataService {
 
 
     /**
-     * 查询721token列表
-     *
-     * @return
-     */
-    List<Token> listERC721Token();
-
-
-    /**
      * 查询待同步的token列表
      *
      * @param size
@@ -156,15 +148,6 @@ public interface DataService {
      * @return
      */
     boolean updateTokenById(Token token);
-
-    /**
-     * 批量更新或保存
-     *
-     * @param address
-     * @param tokenHolderList
-     * @return
-     */
-    boolean saveOrUpdateBatchTokenHolder(String address, List<TokenHolder> tokenHolderList);
 
     /**
      * 批量更新或保存
@@ -236,8 +219,6 @@ public interface DataService {
 
     Model getModelByTaskId(String taskId);
 
-    boolean existTokeHolder(String address, String token);
-
     MetaDataCertificate getNoAttributeCredentialByMetaDataId(String metaDataId);
 
     MetaDataCertificate getNoAttributeCredentialByMetaDataIdAndUser(String metaDataId);
@@ -248,9 +229,27 @@ public interface DataService {
 
     List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId);
 
-    boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList);
-
     boolean isMetaDataOwner(String metaDataId);
 
     List<MetaDataCertificate> listMetaDataCertificateUser(List<Long> credentialIdList);
+
+    /**
+     * 查询元数据列表
+     *
+     * @return 对象中仅返回 metaDataId、erc721Address
+     */
+    List<MetaData> listMetaDataOfNeedSyncedMetaDataCertificate();
+
+    boolean saveOrUpdateOrDeleteBatchMetaDataCertificate(String metaDataId, List<MetaDataCertificate> metaDataCertificateList);
+
+    /**
+     * 查询数据凭证列表
+     *
+     * @return 对象返回 id、type、token_address、token_id
+     */
+    List<MetaDataCertificate> listMetaDataCertificate();
+
+    boolean existMetaDataCertificateUser(String address, Long metaDataCertificateId);
+
+    boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList);
 }

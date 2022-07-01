@@ -66,4 +66,12 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         wrapper.eq(MetaData::getOwnerAddress, address);
         return count(wrapper) == 1;
     }
+
+    @Override
+    public List<MetaData> listDataOfNeedSyncedMetaDataCertificate() {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(MetaData::getMetaDataId, MetaData::getErc721Address);
+        wrapper.isNotNull(MetaData::getErc721Address);
+        return list(wrapper);
+    }
 }

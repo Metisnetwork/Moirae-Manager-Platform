@@ -3,6 +3,8 @@ package com.datum.platform.mapper;
 import com.datum.platform.mapper.domain.MetaDataCertificateUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 用户持有的元数据凭证 Mapper 接口
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MetaDataCertificateUserMapper extends BaseMapper<MetaDataCertificateUser> {
 
+    boolean updateBatch(List<MetaDataCertificateUser> updateList);
 }

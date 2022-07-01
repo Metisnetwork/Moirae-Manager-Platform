@@ -42,11 +42,16 @@ public class ERC721TemplateTest extends BaseContractTest {
     @Test
     public void queryTokenIdInfo() throws Exception{
         ERC721Template contract = load(address);
-        BigInteger total = contract.totalSupply().send();
+        BigInteger totalSupply = contract.totalSupply().send();
+//
+//        for (int i = 0; i < total.intValue(); i++) {
+//            System.out.println(contract.getExtInfo(BigInteger.valueOf(i)).send());
+//            System.out.println(contract.tokenURI(BigInteger.valueOf(i)).send());
+//        }
 
-        for (int i = 0; i < total.intValue(); i++) {
-            System.out.println(contract.getExtInfo(BigInteger.valueOf(0)).send());
-            System.out.println(contract.tokenURI(BigInteger.valueOf(0)).send());
+        for (BigInteger i = BigInteger.ZERO; i.compareTo(totalSupply) < 0; i = i.add(BigInteger.ONE)) {
+            System.out.println(contract.getExtInfo(i).send());
+            System.out.println(contract.tokenURI(i).send());
         }
     }
 

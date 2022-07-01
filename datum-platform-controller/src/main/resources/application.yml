@@ -72,6 +72,8 @@ system:
     nonceTimeOut: 300000
     # 系统默认的psi算法
     defaultPsi: 1001
+    # ipfs公用网关
+    ipfsGateway: https://ipfs.io/ipfs/
 
 grpc:
   client:

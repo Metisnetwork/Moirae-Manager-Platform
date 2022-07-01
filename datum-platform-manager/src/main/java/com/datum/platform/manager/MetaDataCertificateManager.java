@@ -29,4 +29,10 @@ public interface MetaDataCertificateManager extends IService<MetaDataCertificate
     List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, String address);
 
     List<MetaDataCertificate> listCertificateByMetaDataIdListAndUser(List<Long> credentialIdList, String address);
+
+    boolean saveOrUpdateOrDeleteBatch(String metaDataId, List<MetaDataCertificate> metaDataCertificateList);
+
+    boolean updateNameByTokenAddress(String address, String name);
+
+    List<MetaDataCertificate> listKey();
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.chain.platon.contract.IUniswapV2PairContract;
 import com.datum.platform.mapper.domain.Token;
+import com.datum.platform.mapper.enums.TokenTypeEnum;
 import com.datum.platform.service.DataService;
 import com.platon.tuples.generated.Tuple3;
 import com.zengtengpeng.annotation.Lock;
@@ -21,7 +22,7 @@ import java.util.List;
 @ConditionalOnProperty(name="dev.quartz", havingValue="true")
 @Slf4j
 @Component
-public class SyncTokenInfoFromDexTask {
+public class SyncTokenFromDexTask {
 
     @Resource
     private DataService dataService;
@@ -31,7 +32,7 @@ public class SyncTokenInfoFromDexTask {
     private IUniswapV2PairContract uniswapV2PairDao;
 
     @Scheduled(fixedDelay = 5 * 1000)
-    @Lock(keys = "SyncTokenInfoFromDexTask")
+    @Lock(keys = "SyncTokenFromDexTask")
     public void run() {
         long begin = DateUtil.current();
         try {
@@ -63,6 +64,7 @@ public class SyncTokenInfoFromDexTask {
         }
         Token token = new Token();
         token.setAddress(tokenAddress);
+        token.setType(TokenTypeEnum.ERC20);
         token.setIsAddLiquidity(true);
         token.setPrice(getPrice(tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue2() : tuple3.getValue1(),
                 tokenAddress.compareTo(uniswapV2FactoryDao.WETH()) < 0 ? tuple3.getValue1() : tuple3.getValue2()));

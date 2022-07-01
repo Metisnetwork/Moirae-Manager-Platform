@@ -10,6 +10,7 @@ import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
+import com.datum.platform.mapper.enums.TokenTypeEnum;
 import com.datum.platform.service.DataService;
 import com.datum.platform.service.dto.data.UserWLatCredentialDto;
 import com.datum.platform.service.utils.UserContext;
@@ -48,7 +49,8 @@ public class DataServiceImpl implements DataService {
     private StatsTokenManager statsTokenManager;
     @Resource
     private MetaDataCertificateManager metaDataCertificateManager;
-
+    @Resource
+    private MetaDataCertificateUserManager metaDataCertificateUserManager;
 
     @Override
     public MetaData statisticsOfGlobal() {
@@ -132,11 +134,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<Token> listERC721Token() {
-        return tokenManager.listERC721Token();
-    }
-
-    @Override
     public List<Token> listTokenByNeedSyncedInfo(int size) {
         return tokenManager.getNeedSyncedTokenList(size);
     }
@@ -153,13 +150,10 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public boolean updateTokenById(Token token) {
+        if(token.getType() == TokenTypeEnum.ERC20 && StringUtils.isNotBlank(token.getName())){
+            metaDataCertificateManager.updateNameByTokenAddress(token.getAddress(), token.getName());
+        }
         return tokenManager.updateById(token);
-    }
-
-    @Override
-    @Transactional
-    public boolean saveOrUpdateBatchTokenHolder(String address, List<TokenHolder> tokenHolderList) {
-        return tokenHolderManager.batchInsertOrUpdateByUser(address, tokenHolderList);
     }
 
     @Override
@@ -232,11 +226,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public boolean existTokeHolder(String address, String token) {
-        return tokenHolderManager.getById(token, address) != null;
-    }
-
-    @Override
     public MetaDataCertificate getNoAttributeCredentialByMetaDataId(String metaDataId) {
         return metaDataCertificateManager.getNoAttributeCredentialByMetaDataId(metaDataId);
     }
@@ -264,12 +253,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    @Transactional
-    public boolean saveOrUpdateBatchTokenInventory(String address, List<TokenInventory> tokenInventoryList) {
-        return tokenInventoryManager.saveOrUpdateBatchByTokenAddress(address, tokenInventoryList);
-    }
-
-    @Override
     public boolean isMetaDataOwner(String metaDataId) {
         return metaDataManager.isOwner(metaDataId, UserContext.getCurrentUser().getAddress());
     }
@@ -277,5 +260,30 @@ public class DataServiceImpl implements DataService {
     @Override
     public List<MetaDataCertificate> listMetaDataCertificateUser(List<Long> credentialIdList) {
         return metaDataCertificateManager.listCertificateByMetaDataIdListAndUser(credentialIdList, UserContext.getCurrentUser().getAddress());
+    }
+
+    @Override
+    public List<MetaData> listMetaDataOfNeedSyncedMetaDataCertificate() {
+        return metaDataManager.listDataOfNeedSyncedMetaDataCertificate();
+    }
+
+    @Override
+    public boolean saveOrUpdateOrDeleteBatchMetaDataCertificate(String metaDataId, List<MetaDataCertificate> metaDataCertificateList) {
+        return metaDataCertificateManager.saveOrUpdateOrDeleteBatch(metaDataId, metaDataCertificateList);
+    }
+
+    @Override
+    public List<MetaDataCertificate> listMetaDataCertificate() {
+        return metaDataCertificateManager.listKey();
+    }
+
+    @Override
+    public boolean existMetaDataCertificateUser(String address, Long metaDataCertificateId) {
+        return metaDataCertificateUserManager.getById(metaDataCertificateId, address) != null;
+    }
+
+    @Override
+    public boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList) {
+        return metaDataCertificateUserManager.saveOrUpdateBatchMetaDataCertificateUser(address, metaDataCertificateUserList);
     }
 }

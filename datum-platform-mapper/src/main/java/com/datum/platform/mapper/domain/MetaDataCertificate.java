@@ -50,6 +50,11 @@ public class MetaDataCertificate implements Serializable {
     private String tokenId;
 
     /**
+     * 凭证名称
+     */
+    private String name;
+
+    /**
      * 是否支持明文算法
      */
     private Boolean isSupportPtAlg;
