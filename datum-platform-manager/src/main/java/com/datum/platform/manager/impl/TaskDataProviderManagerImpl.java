@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.TaskDataProviderManager;
 import com.datum.platform.mapper.TaskDataProviderMapper;
 import com.datum.platform.mapper.domain.TaskDataProvider;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,18 @@ public class TaskDataProviderManagerImpl extends ServiceImpl<TaskDataProviderMap
     public Long countOfTokenUsed(List<String> metaDataIdList) {
         LambdaQueryWrapper<TaskDataProvider> wrapper = Wrappers.lambdaQuery();
         wrapper.in(TaskDataProvider::getMetaDataId, metaDataIdList);
+        return Long.valueOf(count(wrapper));
+    }
+
+    @Override
+    public Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId) {
+        LambdaQueryWrapper<TaskDataProvider> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(TaskDataProvider::getMetaDataId, metaDataId);
+        wrapper.eq(TaskDataProvider::getConsumeType, type == MetaDataCertificateTypeEnum.NO_ATTRIBUTES ? 2 : 3);
+        wrapper.eq(TaskDataProvider::getConsumeTokenAddress, tokenAddress);
+        if(type == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES){
+            wrapper.eq(TaskDataProvider::getConsumeTokenId, tokenId);
+        }
         return Long.valueOf(count(wrapper));
     }
 }

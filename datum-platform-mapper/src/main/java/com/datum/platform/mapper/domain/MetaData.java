@@ -108,11 +108,6 @@ public class MetaData implements Serializable {
     private Long nonce;
 
     /**
-     * 是否可以被曝光 (1: 可以; 0: 不可以; 如 数据原始内容可以被下载或者支持外域查看时则为1, 默认为0)
-     */
-    private Boolean allowExpose;
-
-    /**
      * 是否支持明文算法
      */
     private Boolean isSupportPtAlg;

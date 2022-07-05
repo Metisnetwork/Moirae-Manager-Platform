@@ -9,19 +9,19 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-@TableName(value = "mo_stats_token")
-public class StatsToken implements Serializable {
+@TableName(value = "mo_stats_meta_data_certificate")
+public class StatsMetaDataCertificate implements Serializable {
 
     /**
-     * 凭证地址
+     * 数据凭证ID
      */
     @TableId
-    private String address;
+    private Long metaDataCertificateId;
 
     /**
-     * 数据凭证使用量
+     * 使用次数
      */
-    private Long tokenUsed;
+    private Long usageCount;
 
     private static final long serialVersionUID = 1L;
     @TableField(exist = false)

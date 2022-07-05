@@ -58,6 +58,14 @@ public class TaskDataProvider implements Serializable {
      */
     private String selectedColumns;
 
+    private Integer consumeType;
+
+    private String consumeTokenAddress;
+
+    private String consumeTokenId;
+
+    private String consumeBalance;
+
     private static final long serialVersionUID = 1L;
 
     /**

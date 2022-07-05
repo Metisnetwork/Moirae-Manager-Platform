@@ -6,7 +6,6 @@ import com.datum.platform.req.KeyWorkReq;
 import com.datum.platform.req.home.GetLatestTaskListReq;
 import com.datum.platform.req.home.GetOrgComputingTopReq;
 import com.datum.platform.req.home.GetTaskTrendReq;
-import com.datum.platform.service.DataService;
 import com.datum.platform.service.StatisticsService;
 import com.datum.platform.service.TaskService;
 import com.datum.platform.service.dto.statistics.NavigationDto;
@@ -74,7 +73,7 @@ public class HomeController {
     @GetMapping("getDataTokenUsedTop")
     @ApiOperation(value = "获得数据凭证使用量排行", notes = "获得数据凭证使用量排行")
     public ResponseVo<List<DataTokenUsedVo>> getDataTokenUsedTop(@Valid GetOrgComputingTopReq req) {
-        List<StatsToken> statsTokenList = statisticsService.getDataTokenUsedTop(req.getSize());
+        List<StatsMetaDataCertificate> statsTokenList = statisticsService.getDataTokenUsedTop(req.getSize());
         return ResponseVo.createSuccess(BeanUtil.copyToList(statsTokenList, DataTokenUsedVo.class));
     }
 }

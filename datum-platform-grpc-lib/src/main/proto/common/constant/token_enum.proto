@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/common/constant";
+
+package common.constant;
+
+enum TokenType {
+  ERC20 = 0;
+  ERC721 = 1;
+  ERC1155 = 2;
+}

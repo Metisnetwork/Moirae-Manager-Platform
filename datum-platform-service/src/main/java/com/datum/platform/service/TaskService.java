@@ -3,6 +3,7 @@ package com.datum.platform.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.common.enums.TaskStatusEnum;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 
 import java.util.Date;
 import java.util.List;
@@ -38,4 +39,6 @@ public interface TaskService {
     Long countOfTokenUsed(List<String> metaDataIdList);
 
     List<Task> listTaskOfLatest(Integer size);
+
+    Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId);
 }

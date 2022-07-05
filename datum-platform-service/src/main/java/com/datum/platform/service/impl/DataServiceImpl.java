@@ -9,6 +9,7 @@ import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.mapper.enums.TokenTypeEnum;
 import com.datum.platform.service.DataService;
@@ -46,7 +47,7 @@ public class DataServiceImpl implements DataService {
     @Resource
     private PsiManager psiManager;
     @Resource
-    private StatsTokenManager statsTokenManager;
+    private StatsMetaDataCertificateManager statsTokenManager;
     @Resource
     private MetaDataCertificateManager metaDataCertificateManager;
     @Resource
@@ -93,32 +94,6 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataId) {
-        List<MetaData> metaDataList = metaDataManager.listByIds(metaDataId);
-        if(metaDataList.size() == 0){
-            return new HashMap<>();
-        }
-        Set<String> tokenIdList = metaDataList.stream()
-                .filter(item -> StringUtils.isNotBlank(item.getTokenAddress()))
-                .map(MetaData::getTokenAddress)
-                .collect(Collectors.toSet());
-        Map<String, Token> tokenMap = tokenManager.listByIds(tokenIdList).stream().collect(Collectors.toMap(Token::getAddress, item -> item));
-
-        metaDataList.stream().forEach(item -> {
-            if(tokenMap.containsKey(item.getTokenAddress())){
-                item.setTokenName(tokenMap.get(item.getTokenAddress()).getName());
-            }
-        });
-
-        return metaDataList.stream().collect(Collectors.toMap(MetaData::getMetaDataId, item -> item));
-    }
-
-    @Override
-    public List<MetaData> listMetaDataByTokenAddress(String tokenAddress) {
-        return metaDataManager.listDataByTokenAddress(tokenAddress);
-    }
-
-    @Override
     public List<String> listMetaDataOrgIdByUser(String address) {
         return metaDataManager.listDataOrgIdByUser(address);
     }
@@ -157,7 +132,7 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public boolean saveOrUpdateBatchStatsToken(List<StatsToken> saveList) {
+    public boolean saveOrUpdateBatchStatsToken(List<StatsMetaDataCertificate> saveList) {
         return statsTokenManager.saveOrUpdateBatch(saveList);
     }
 
@@ -189,7 +164,7 @@ public class DataServiceImpl implements DataService {
 
     @Override
     @Transactional
-    public void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList) {
+    public void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList, List<MetaDataCertificate> metaDataCertificateList) {
         metaDataManager.saveOrUpdateBatch(metaDataList);
         LambdaQueryWrapper<MetaDataColumn> wrapper = Wrappers.lambdaQuery();
         wrapper.in(MetaDataColumn::getMetaDataId, metaDataList.stream().map(MetaData::getMetaDataId).collect(Collectors.toSet()));
@@ -198,6 +173,12 @@ public class DataServiceImpl implements DataService {
         for (Token token: tokenList) {
             if(tokenManager.getById(token.getAddress()) == null){
                 tokenManager.save(token);
+            }
+        }
+
+        for (MetaDataCertificate metaDataCertificate: metaDataCertificateList) {
+            if(metaDataCertificateManager.existNoAttributes(metaDataCertificate.getMetaDataId(), metaDataCertificate.getTokenAddress())){
+                metaDataCertificateManager.save(metaDataCertificate);
             }
         }
     }
@@ -285,5 +266,10 @@ public class DataServiceImpl implements DataService {
     @Override
     public boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList) {
         return metaDataCertificateUserManager.saveOrUpdateBatchMetaDataCertificateUser(address, metaDataCertificateUserList);
+    }
+
+    @Override
+    public String getMetaDataCertificateName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId) {
+        return metaDataCertificateManager.getName(metaDataCertificateTypeEnum, metaDataId, consumeTokenAddress, consumeTokenId);
     }
 }

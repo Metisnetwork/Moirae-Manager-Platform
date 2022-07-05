@@ -2,6 +2,8 @@ package com.datum.platform.chain.platon;
 
 import com.datum.platform.chain.platon.contract.evm.DataTokenTemplate;
 import com.datum.platform.chain.platon.utils.AddressUtils;
+import com.fasterxml.jackson.core.json.JsonWriteContext;
+import com.jayway.jsonpath.internal.JsonContext;
 import com.platon.bech32.Bech32;
 import com.platon.crypto.Credentials;
 import org.junit.jupiter.api.Test;
@@ -10,7 +12,17 @@ import java.math.BigInteger;
 
 public class DataTokenTemplateTest extends BaseContractTest {
 
-    private String address = AddressUtils.hexToBech32("0xd95a1f6e580041aead8fa15e84f5d062b425a8e2");
+//    private String address = AddressUtils.hexToBech32("0xd95a1f6e580041aead8fa15e84f5d062b425a8e2");
+    private String address = "lat1zupvmpcq4dl68rk9465ulk04fyu8w206dmaf25";
+
+    @Test
+    public void balanceOf2() throws Exception{
+        DataTokenTemplate contract = load(address);
+        System.out.println(contract.name().send());
+        System.out.println(contract.symbol().send());
+        System.out.println(contract.decimals().send());
+        System.out.println(contract.totalSupply().send());
+    }
 
     @Test
     public void deploy() throws Exception{
@@ -69,7 +81,7 @@ public class DataTokenTemplateTest extends BaseContractTest {
         return DataTokenTemplate.load(address, web3j, credentials, gasProvider);
     }
 
-    private DataTokenTemplate load(Credentials credentials){
+    private DataTokenTemplate load(Credentials credentials ){
         return DataTokenTemplate.load(address, web3j, credentials, gasProvider);
     }
 

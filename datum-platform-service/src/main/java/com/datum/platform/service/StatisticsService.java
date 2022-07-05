@@ -1,11 +1,10 @@
 package com.datum.platform.service;
 
 
-import com.datum.platform.mapper.domain.StatsToken;
+import com.datum.platform.mapper.domain.StatsMetaDataCertificate;
 import com.datum.platform.mapper.domain.StatsDay;
 import com.datum.platform.mapper.domain.StatsGlobal;
 import com.datum.platform.mapper.domain.StatsOrg;
-import com.datum.platform.mapper.enums.StatsDayKeyEnum;
 import com.datum.platform.service.dto.statistics.NavigationDto;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public interface StatisticsService {
 
     List<StatsOrg> getOrgComputingTop(Integer size);
 
-    List<StatsToken> getDataTokenUsedTop(Integer size);
+    List<StatsMetaDataCertificate> getDataTokenUsedTop(Integer size);
 
     boolean updateStatsGlobal(StatsGlobal global);
 }

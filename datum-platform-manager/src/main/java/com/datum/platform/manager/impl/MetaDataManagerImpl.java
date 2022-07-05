@@ -48,13 +48,6 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public List<MetaData> listDataByTokenAddress(String tokenAddress) {
-        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(MetaData::getTokenAddress, tokenAddress);
-        return list(wrapper);
-    }
-
-    @Override
     public List<String> listDataOrgIdByUser(String address) {
         return this.baseMapper.listDataOrgIdByUser(address);
     }

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.MetaDataCertificateManager;
 import com.datum.platform.mapper.MetaDataCertificateMapper;
 import com.datum.platform.mapper.domain.MetaDataCertificate;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -107,5 +108,30 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
         LambdaQueryWrapper<MetaDataCertificate> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.select(MetaDataCertificate::getId, MetaDataCertificate::getType,MetaDataCertificate::getTokenAddress, MetaDataCertificate::getTokenId);
         return list(queryWrapper);
+    }
+
+    @Override
+    public boolean existNoAttributes(String metaDataId, String tokenAddress) {
+        LambdaQueryWrapper<MetaDataCertificate> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaDataCertificate::getMetaDataId, metaDataId);
+        queryWrapper.eq(MetaDataCertificate::getTokenAddress, tokenAddress);
+        queryWrapper.eq(MetaDataCertificate::getType, MetaDataCertificateTypeEnum.NO_ATTRIBUTES);
+        return count(queryWrapper) > 0;
+    }
+
+    @Override
+    public String getName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId) {
+        LambdaQueryWrapper<MetaDataCertificate> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaDataCertificate::getMetaDataId, metaDataId);
+        queryWrapper.eq(MetaDataCertificate::getTokenAddress, consumeTokenAddress);
+        queryWrapper.eq(MetaDataCertificate::getType, metaDataCertificateTypeEnum);
+        if(metaDataCertificateTypeEnum == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES){
+            queryWrapper.eq(MetaDataCertificate::getTokenId, consumeTokenId);
+        }
+        MetaDataCertificate result = getOne(queryWrapper);
+        if(result != null){
+            return result.getName();
+        }
+        return null;
     }
 }

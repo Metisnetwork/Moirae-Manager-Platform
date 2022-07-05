@@ -12,6 +12,7 @@ import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.service.DataService;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.service.TaskService;
@@ -100,13 +101,12 @@ public class TaskServiceImpl implements TaskService {
         task.setAlgoProvider(taskAlgoProvider);
         // 任务数据提供方
         List<TaskDataProvider> taskDataProviderList = taskDataProviderManager.listByTaskId(taskId);
-        Map<String, MetaData> metaDataId2MetaDataMap = dataService.getMetaDataId2MetaDataMap(taskDataProviderList.stream().map(TaskDataProvider::getMetaDataId).collect(Collectors.toSet()));
         task.setDataProviderList(taskDataProviderList.stream()
                 .map(item -> {
                     item.setNodeName(identityId2OrgMap.get(item.getIdentityId()).getNodeName());
                     item.setMetaDataName(item.getMetaDataName());
-                    if(metaDataId2MetaDataMap.containsKey(item.getMetaDataId())){
-                        item.setDataTokenName(metaDataId2MetaDataMap.get(item.getMetaDataId()).getTokenName());
+                    if(item.getConsumeType() != null && item.getConsumeTokenAddress() != null){
+                        item.setDataTokenName(dataService.getMetaDataCertificateName(item.getConsumeType() == 2 ? MetaDataCertificateTypeEnum.NO_ATTRIBUTES : MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES, item.getMetaDataId(), item.getConsumeTokenAddress(), item.getConsumeTokenId()));
                     }else{
                         item.setDataTokenName("");
                     }
@@ -227,5 +227,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> listTaskOfLatest(Integer size) {
         return taskManager.listTaskOfLatest(size);
+    }
+
+    @Override
+    public Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId) {
+        return taskDataProviderManager.countOfMetaDataCertificateUsed(metaDataId, type, tokenAddress, tokenId);
     }
 }

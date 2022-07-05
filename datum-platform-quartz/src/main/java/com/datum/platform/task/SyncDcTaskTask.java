@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.dynamic.TaskDataPolicy30001;
 import com.datum.platform.grpc.dynamic.TaskDataPolicyCsv;
+import com.datum.platform.grpc.dynamic.TaskDataPolicyHaveConsume;
 import com.datum.platform.grpc.dynamic.TaskPowerPolicy2;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
@@ -108,6 +109,14 @@ public class SyncDcTaskTask {
                     }
                 }
 
+                // 设置数据消耗
+                TaskDataPolicyHaveConsume taskDataPolicyHaveConsume = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyHaveConsume.class);
+                taskDataPolicyHaveConsume.getConsume().ifPresent( consume ->{
+                    taskDataProvider.setConsumeType(consume.getConsumeType());
+                    taskDataProvider.setConsumeTokenAddress(consume.getTokenAddress());
+                    taskDataProvider.setConsumeTokenId(consume.getTokenId());
+                    taskDataProvider.setConsumeBalance(consume.getBalance());
+                });
                 taskDataProviderList.add(taskDataProvider);
             }
 
@@ -118,12 +127,13 @@ public class SyncDcTaskTask {
                 Integer type = information.getPowerPolicyTypes(i);
                 String partyId;
                 String providerPartyId = null;
-                if(type == 2){
+                if(type == 1){
+                    partyId = information.getPowerPolicyOptions(i);
+                }else{
+                    // type = 2 或 3
                     TaskPowerPolicy2 taskPowerPolicy2 = JSONObject.parseObject(information.getPowerPolicyOptions(i), TaskPowerPolicy2.class);
                     partyId = taskPowerPolicy2.getPowerPartyId();
                     providerPartyId = taskPowerPolicy2.getProviderPartyId();
-                }else{
-                    partyId = information.getPowerPolicyOptions(i);
                 }
                 if(powerMap.containsKey(partyId)){
                     TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
@@ -164,12 +174,5 @@ public class SyncDcTaskTask {
             taskList.add(task);
         });
         taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);
-    }
-
-    public static void main(String[] args) {
-        List<String> dataList = new ArrayList<>();
-        dataList.add("A");
-        dataList.add("B");
-        System.out.println(StringUtils.join(dataList, ","));
     }
 }

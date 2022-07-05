@@ -3,12 +3,11 @@ package com.datum.platform.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.service.dto.data.UserWLatCredentialDto;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface DataService {
 
@@ -77,22 +76,6 @@ public interface DataService {
 
 
     /**
-     *  查询给定元数据id对应元数据集合，返回map结构
-     *
-     * @param metaDataIdList  元数据id
-     * @return  返回元数据包括token名称
-     */
-    Map<String, MetaData> getMetaDataId2MetaDataMap(Set<String> metaDataIdList);
-
-    /**
-     * 查询给的token对应的元数据列表
-     *
-     * @param tokenAddress 凭证地址
-     * @return
-     */
-    List<MetaData> listMetaDataByTokenAddress(String tokenAddress);
-
-    /**
      * 查询给定用户地址对应元数据的组织列表
      *
      * @param address
@@ -155,7 +138,7 @@ public interface DataService {
      * @param saveList
      * @return
      */
-    boolean saveOrUpdateBatchStatsToken(List<StatsToken> saveList);
+    boolean saveOrUpdateBatchStatsToken(List<StatsMetaDataCertificate> saveList);
 
     /**
      * 查询用户可用的模型列表
@@ -201,12 +184,8 @@ public interface DataService {
 
     /**
      * 批量保存元数据及token信息
-     *
-     * @param metaDataList
-     * @param metaDataColumnList
-     * @param tokenList
      */
-    void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList);
+    void batchReplace(List<MetaData> metaDataList, List<MetaDataColumn> metaDataColumnList, List<Token> tokenList, List<MetaDataCertificate> metaDataCertificateList);
 
     /**
      * 获得用户的账户信息
@@ -252,4 +231,6 @@ public interface DataService {
     boolean existMetaDataCertificateUser(String address, Long metaDataCertificateId);
 
     boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList);
+
+    String getMetaDataCertificateName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId);
 }

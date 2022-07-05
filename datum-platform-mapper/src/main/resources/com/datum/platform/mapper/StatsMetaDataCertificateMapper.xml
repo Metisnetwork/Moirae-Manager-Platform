@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.datum.platform.mapper.StatsTokenMapper">
-    <select id="getDataTokenUsedTop" resultType="com.datum.platform.mapper.domain.StatsToken">
+<mapper namespace="com.datum.platform.mapper.StatsMetaDataCertificateMapper">
+    <select id="getDataTokenUsedTop" resultType="com.datum.platform.mapper.domain.StatsMetaDataCertificate">
         select msd.token_used as tokenUsed,
                mt.name as tokenName,
                mt.address as tokenAddress

@@ -9,16 +9,14 @@ import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.GrpcMetaDataServiceClient;
 import com.datum.platform.grpc.dynamic.MetadataOptionCsv;
 import com.datum.platform.mapper.domain.MetaData;
+import com.datum.platform.mapper.domain.MetaDataCertificate;
 import com.datum.platform.mapper.domain.MetaDataColumn;
 import com.datum.platform.mapper.domain.Token;
-import com.datum.platform.mapper.enums.DataSyncTypeEnum;
-import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
-import com.datum.platform.mapper.enums.MetaDataStatusEnum;
+import com.datum.platform.mapper.enums.*;
 import com.datum.platform.service.DataService;
 import com.datum.platform.service.DataSyncService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -75,11 +73,13 @@ public class SyncDcMetaDataTask {
         List<MetaData> metaDataList = new ArrayList<>();
         List<MetaDataColumn> metaDataColumnList = new ArrayList<>();
         List<Token> tokenList = new ArrayList<>();
+        List<MetaDataCertificate> metaDataCertificateList = new ArrayList<>();
 
         getGlobalMetadataDetailList.stream().forEach(item -> {
             Identitydata.Organization organization = item.getOwner();
             Metadata.MetadataSummary information = item.getInformation().getMetadataSummary();
             MetadataOptionCsv metadataOptionCsv = JSONObject.parseObject(information.getMetadataOption(), MetadataOptionCsv.class);
+            MetadataOptionCsv.Attribute attribute = metadataOptionCsv.getAttributeInfo();
 
             MetaData metaData = new MetaData();
             metaData.setMetaDataId(information.getMetadataId());
@@ -94,36 +94,50 @@ public class SyncDcMetaDataTask {
             metaData.setPublishedAt(new Date(information.getPublishAt()));
             metaData.setUpdateAt(new Date(information.getUpdateAt()));
             metaData.setNonce(information.getNonce());
-            metaData.setAllowExpose(information.getAllowExpose());
-            metaData.setTokenAddress(information.getTokenAddress());
             metaData.setOriginId(metadataOptionCsv.getOriginId());
             metaData.setFilePath(metadataOptionCsv.getDataPath());
             metaData.setSize(metadataOptionCsv.getSize().longValue());
             metaData.setRows(metadataOptionCsv.getRows());
             metaData.setColumns(metadataOptionCsv.getColumns());
             metaData.setHasTitle(metadataOptionCsv.getHasTitle());
+            metaData.setOwnerAddress(information.getUser());
+            attribute.getNoAttribute().ifPresent( noAttribute -> {
+                metaData.setErc20Address(noAttribute.getContract());
+                tokenList.add(create(noAttribute.getContract(), TokenTypeEnum.ERC20));
+                MetaDataCertificate metaDataCertificate = new MetaDataCertificate();
+                metaDataCertificate.setMetaDataId(information.getMetadataId());
+                metaDataCertificate.setType(MetaDataCertificateTypeEnum.NO_ATTRIBUTES);
+                metaDataCertificate.setTokenAddress(noAttribute.getContract());
+                metaDataCertificate.setIsSupportCtAlg(true);
+                metaDataCertificate.setIsSupportPtAlg(true);
+                metaDataCertificate.setErc20CtAlgConsume(noAttribute.getCryptoAlgoConsumeUnit());
+                metaDataCertificate.setErc20PtAlgConsume(noAttribute.getPlainAlgoConsumeUnit());
+                metaDataCertificateList.add(metaDataCertificate);
+            });
+            attribute.getHaveAttribute().ifPresent( haveAttribute -> {
+                metaData.setErc721Address(haveAttribute);
+                tokenList.add(create(haveAttribute, TokenTypeEnum.ERC721));
+            });
             metaDataList.add(metaData);
 
-            for (MetadataOptionCsv.CsvColumns csvColumns: metadataOptionCsv.getMetadataColumns()) {
+            for (MetadataOptionCsv.MetadataColumn metadataColumn : metadataOptionCsv.getMetadataColumns()) {
                 MetaDataColumn metaDataColumn = new MetaDataColumn();
                 metaDataColumn.setMetaDataId(metaData.getMetaDataId());
-                metaDataColumn.setColumnIdx(csvColumns.getIndex());
-                metaDataColumn.setColumnName(csvColumns.getName());
-                metaDataColumn.setColumnType(csvColumns.getType());
-                metaDataColumn.setColumnSize(csvColumns.getSize());
-                metaDataColumn.setRemarks(csvColumns.getComment());
+                metaDataColumn.setColumnIdx(metadataColumn.getIndex());
+                metaDataColumn.setColumnName(metadataColumn.getName());
+                metaDataColumn.setColumnType(metadataColumn.getType());
+                metaDataColumn.setColumnSize(metadataColumn.getSize());
+                metaDataColumn.setRemarks(metadataColumn.getComment());
                 metaDataColumnList.add(metaDataColumn);
             }
-            if(StringUtils.isNotBlank(information.getTokenAddress())){
-                tokenList.add(create(information.getTokenAddress().toLowerCase()));
-            }
         });
-        metaDataService.batchReplace(metaDataList, metaDataColumnList, tokenList);
+        metaDataService.batchReplace(metaDataList, metaDataColumnList, tokenList, metaDataCertificateList);
     }
 
-    private Token create(String address){
+    private Token create(String address, TokenTypeEnum tokenType){
         Token token = new Token();
         token.setAddress(AddressChangeUtils.convert0xAddress(address));
+        token.setType(tokenType);
         return token;
     }
 }
