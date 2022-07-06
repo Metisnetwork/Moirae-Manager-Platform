@@ -31,10 +31,4 @@ public class TokenManagerImpl extends ServiceImpl<TokenMapper, Token> implements
         return listObjs(wrapper, Object::toString);
     }
 
-    @Override
-    public List<Token> listERC721Token() {
-        LambdaQueryWrapper<Token> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(Token::getType, TokenTypeEnum.ERC721);
-        return list(wrapper);
-    }
 }

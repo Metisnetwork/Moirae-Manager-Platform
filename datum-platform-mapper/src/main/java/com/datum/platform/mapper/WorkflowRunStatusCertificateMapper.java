@@ -1,7 +1,7 @@
 package com.datum.platform.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.datum.platform.mapper.domain.WorkflowRunStatusPaymentMethod;
+import com.datum.platform.mapper.domain.WorkflowRunStatusCertificate;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.datum.platform.mapper.domain.WorkflowRunStatusPaymentMethod;
  * @author chendai
  * @since 2022-03-30
  */
-public interface WorkflowRunStatusPaymentMethodMapper extends BaseMapper<WorkflowRunStatusPaymentMethod> {
+public interface WorkflowRunStatusCertificateMapper extends BaseMapper<WorkflowRunStatusCertificate> {
 
 }

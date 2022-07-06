@@ -4,7 +4,7 @@ import carrier.types.Taskdata;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
-import com.datum.platform.grpc.dynamic.TaskDataPolicy30001;
+import com.datum.platform.grpc.dynamic.TaskDataPolicyPreTask;
 import com.datum.platform.grpc.dynamic.TaskDataPolicyCsv;
 import com.datum.platform.grpc.dynamic.TaskDataPolicyHaveConsume;
 import com.datum.platform.grpc.dynamic.TaskPowerPolicy2;
@@ -87,7 +87,7 @@ public class SyncDcTaskTask {
             for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
                 if(information.getDataPolicyTypesList().get(i) == 30001){
-                    TaskDataPolicy30001 dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicy30001.class);
+                    TaskDataPolicyPreTask dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyPreTask.class);
                     taskDataProvider.setTaskId(information.getTaskId());
                     taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
                     taskDataProvider.setPolicyType(information.getDataPolicyTypesList().get(i));

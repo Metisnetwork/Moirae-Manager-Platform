@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,15 +13,15 @@ import java.util.List;
 
 /**
  * <p>
- * 工作流运行状态对应支付方式
+ * 工作流运行使用的凭证
  * </p>
  *
  * @author chendai
  * @since 2022-03-28
  */
 @Data
-@TableName("mo_workflow_run_status_payment_method")
-public class WorkflowRunStatusPaymentMethod implements Serializable {
+@TableName("mo_workflow_run_status_certificate")
+public class WorkflowRunStatusCertificate implements Serializable {
 
 
     /**
@@ -40,9 +41,9 @@ public class WorkflowRunStatusPaymentMethod implements Serializable {
     private String metaDataId;
 
     /**
-     * 合约类型: 0-erc20,1-erc721
+     * 凭证类型
      */
-    private Integer type;
+    private MetaDataCertificateTypeEnum type;
 
     /**
      * 合约地址
@@ -53,6 +54,16 @@ public class WorkflowRunStatusPaymentMethod implements Serializable {
      * 721下合约token id
      */
     private String tokenId;
+
+    /**
+     * 无属性凭证明文算法消耗量
+     */
+    private String erc20PtAlgConsume;
+
+    /**
+     * 无属性凭证密文算法消耗量
+     */
+    private String erc20CtAlgConsume;
 
     /**
      * 创建时间

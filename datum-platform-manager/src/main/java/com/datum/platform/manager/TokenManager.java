@@ -10,6 +10,4 @@ public interface TokenManager extends IService<Token> {
     List<Token> getNeedSyncedTokenList(int size);
 
     List<String> getERC20TokenAddressList();
-
-    List<Token> listERC721Token();
 }

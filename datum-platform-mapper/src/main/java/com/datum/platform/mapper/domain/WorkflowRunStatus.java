@@ -10,6 +10,8 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -101,6 +103,13 @@ public class WorkflowRunStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     @TableField(exist = false)
     private List<WorkflowRunStatusTask> workflowRunTaskStatusList;
+    @TableField(exist = false)
+    private Map<String, WorkflowRunStatusCertificate> metaDataId2WorkflowRunStatusCertificate;
+    public void setWorkflowRunStatusCertificateList(List<WorkflowRunStatusCertificate> workflowRunStatusCertificateList){
+        metaDataId2WorkflowRunStatusCertificate = workflowRunStatusCertificateList
+                .stream()
+                .collect(Collectors.toMap(WorkflowRunStatusCertificate::getMetaDataId, me -> me));
+    }
     @TableField(exist = false)
     private Workflow workflow;
 }

@@ -3,6 +3,7 @@ package com.datum.platform.grpc.dynamic;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,27 @@ public class TaskDataPolicyHaveConsume {
             return Optional.of(consume);
         }
         return Optional.empty();
+    }
+
+    public void setConsume(Consume consume){
+        if(consume.consumeType == 2){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("contract", consume.getTokenAddress());
+            jsonObject.put("balance", consume.getBalance());
+            consumeTypes = new ArrayList<>();
+            consumeOptions = new ArrayList<>();
+            consumeTypes.add(2);
+            consumeOptions.add(jsonObject.toJSONString());
+        }
+        if(consume.consumeType == 3){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("contract", consume.getTokenAddress());
+            jsonObject.put("takenId", consume.getTokenId());
+            consumeTypes = new ArrayList<>();
+            consumeOptions = new ArrayList<>();
+            consumeTypes.add(3);
+            consumeOptions.add(jsonObject.toJSONString());
+        }
     }
 
     @Data

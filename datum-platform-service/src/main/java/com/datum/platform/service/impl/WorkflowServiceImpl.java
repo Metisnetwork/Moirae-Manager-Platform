@@ -18,6 +18,8 @@ import com.datum.platform.grpc.client.GrpcSysServiceClient;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.constant.GrpcConstant;
 import com.datum.platform.grpc.dynamic.*;
+import com.datum.platform.grpc.enums.DataPolicyTypesEnum;
+import com.datum.platform.grpc.enums.ReceiverPolicyTypesEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
@@ -46,6 +48,7 @@ import com.datum.platform.service.utils.TreeUtils;
 import com.datum.platform.service.utils.UserContext;
 import com.google.protobuf.ByteString;
 import common.constant.CarrierEnum;
+import common.constant.TokenEnum;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -105,6 +108,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     private WorkflowRunStatusTaskManager workflowRunTaskStatusManager;
     @Resource
     private WorkflowRunTaskResultManager workflowRunTaskResultManager;
+    @Resource
+    private WorkflowRunStatusCertificateManager workflowRunStatusCertificateManager;
 
     @Override
     public int getWorkflowCount() {
@@ -1121,7 +1126,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
         workflowFeeDto.setWorkflowId(req.getWorkflowId());
         workflowFeeDto.setWorkflowVersion(req.getWorkflowVersion());
-        workflowFeeDto.setItemList(convert2WorkflowFee(workflowTaskList, req.getCredentialIdList()));
+        workflowFeeDto.setItemList(convert2WorkflowFee(workflowTaskList, dataService.listMetaDataCertificateUser(req.getCredentialIdList())));
         return workflowFeeDto;
     }
 
@@ -1138,10 +1143,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 生成运行时任务清单明细
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
         // 交易-手续费校验
-        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList, req.getCredentialIdList());
+        List<MetaDataCertificate> metaDataCertificateList = dataService.listMetaDataCertificateUser(req.getCredentialIdList());
+        List<WorkflowFeeItemDto> workflowFeeList = convert2WorkflowFee(workflowTaskList, metaDataCertificateList);
         checkFee(workflowFeeList);
         // 保存运行时信息
-        WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(UserContext.getCurrentUser().getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList);
+        WorkflowRunStatus workflowRunStatus = createAndSaveWorkflowRunStatus(UserContext.getCurrentUser().getAddress(), req.getSign(), req.getWorkflowId(), req.getWorkflowVersion(), workflowTaskList, metaDataCertificateList);
         // 更新运行时间
         workflowManager.updateLastRunTime(workflowRunStatus.getWorkflowId());
         // 启动任务
@@ -1202,13 +1208,12 @@ public class WorkflowServiceImpl implements WorkflowService {
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
             WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
-
             if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
-                requestBuild.addDataPolicyTypes(30001);
+                requestBuild.addDataPolicyTypes(DataPolicyTypesEnum.POLICY_TYPES_30001.getValue());
                 requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, curWorkflowRunTaskStatus.getPreStepTaskId()));
             }else{
-                requestBuild.addDataPolicyTypes(MetaDataFileTypeEnum.CSV.getValue());
-                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
+                requestBuild.addDataPolicyTypes(DataPolicyTypesEnum.POLICY_TYPES_40001.getValue());
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, workflowRunStatus.getMetaDataId2WorkflowRunStatusCertificate(), curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getType()));
             }
         }
         // 设置模型输入组织
@@ -1216,32 +1221,35 @@ public class WorkflowServiceImpl implements WorkflowService {
         if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
             modelPartyId = "data" + (requestBuild.getDataSuppliersBuilderList().size() + 1);
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), modelPartyId));
-            requestBuild.addDataPolicyTypes(2);
+            requestBuild.addDataPolicyTypes(DataPolicyTypesEnum.POLICY_TYPES_2.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
         }
-
         // 接收方策略
         for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().size(); i++) {
             WorkflowTaskOutput workflowTaskOutput = curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().get(i);
             requestBuild.addReceivers(publishTaskOfGetTaskOrganization(workflowTaskOutput.getOrg(), workflowTaskOutput.getPartyId()));
             if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
-                requestBuild.addReceiverPolicyTypes(2);
+                requestBuild.addReceiverPolicyTypes(ReceiverPolicyTypesEnum.POLICY_TYPES_2.getValue());
                 requestBuild.addReceiverPolicyOptions(createPowerPolicy2Item(workflowTaskOutput, curWorkflowRunTaskStatus.getWorkflowTask().getInputList()));
             } else {
-                requestBuild.addReceiverPolicyTypes(1);
+                requestBuild.addReceiverPolicyTypes(ReceiverPolicyTypesEnum.POLICY_TYPES_1.getValue());
                 requestBuild.addReceiverPolicyOptions(workflowTaskOutput.getPartyId());
             }
         }
 
         // 算力策略
         if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
-            // 如果是psi算法，指定数据节点提供算力策略
+            // psi指定数据节点提供算力策略
             for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
                 WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
                 requestBuild.addPowerPolicyTypes(2);
                 requestBuild.addPowerPolicyOptions(createPowerPolicy2Item(workflowTaskInput));
             }
-        }else{
+        } else if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getType() == AlgorithmTypeEnum.PT && curWorkflowRunTaskStatus.getWorkflowTask().getPowerType() == WorkflowTaskPowerTypeEnum.ASSIGN){
+            // 明文算法并且算力用户指定的
+
+
+        } else {
             // 随机算力
             requestBuild.addPowerPolicyTypes(1);
             requestBuild.addPowerPolicyOptions("compute1");
@@ -1442,8 +1450,36 @@ public class WorkflowServiceImpl implements WorkflowService {
         return JSONObject.toJSONString(dataPolicy);
     }
 
+    private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput, Map<String, WorkflowRunStatusCertificate> metaDataId2WorkflowRunStatusCertificate, AlgorithmTypeEnum algorithmType) {
+        TaskDataPolicyCsv dataPolicy = new TaskDataPolicyCsv();
+        dataPolicy.setInputType(1);
+        dataPolicy.setPartyId(workflowTaskInput.getPartyId());
+        dataPolicy.setMetadataId(workflowTaskInput.getMetaDataId());
+        dataPolicy.setMetadataName(dataService.getMetaDataById(workflowTaskInput.getMetaDataId(), false).getMetaDataName());
+        dataPolicy.setKeyColumn(workflowTaskInput.getKeyColumn());
+        List<Integer> selectedColumns = new ArrayList<>();
+        if(StringUtils.isNotBlank(workflowTaskInput.getDataColumnIds())){
+            Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
+                selectedColumns.add(Integer.valueOf(subItem));
+            });
+        }
+        dataPolicy.setSelectedColumns(selectedColumns);
+        WorkflowRunStatusCertificate workflowRunStatusCertificate = metaDataId2WorkflowRunStatusCertificate.get(workflowTaskInput.getMetaDataId());
+        TaskDataPolicyHaveConsume.Consume consume = new TaskDataPolicyHaveConsume.Consume();
+        consume.setTokenAddress(workflowRunStatusCertificate.getTokenAddress());
+        if(workflowRunStatusCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+            consume.setConsumeType(2);
+            consume.setBalance(algorithmType == AlgorithmTypeEnum.CT ? workflowRunStatusCertificate.getErc20CtAlgConsume() : workflowRunStatusCertificate.getErc20PtAlgConsume());
+        } else {
+            consume.setConsumeType(3);
+            consume.setTokenId(workflowRunStatusCertificate.getTokenId());
+        }
+        dataPolicy.setConsume(consume);
+        return JSONObject.toJSONString(dataPolicy);
+    }
+
     private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput, String preStepTaskId) {
-        TaskDataPolicy30001 dataPolicy = new TaskDataPolicy30001();
+        TaskDataPolicyPreTask dataPolicy = new TaskDataPolicyPreTask();
         dataPolicy.setInputType(1);
         dataPolicy.setPartyId(workflowTaskInput.getPartyId());
         dataPolicy.setTaskId(preStepTaskId);
@@ -1469,23 +1505,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         });
 
         dataPolicy.setSelectedColumnNames(selectedColumnsName);
-        return JSONObject.toJSONString(dataPolicy);
-    }
-
-    private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput) {
-        TaskDataPolicyCsv dataPolicy = new TaskDataPolicyCsv();
-        dataPolicy.setInputType(1);
-        dataPolicy.setPartyId(workflowTaskInput.getPartyId());
-        dataPolicy.setMetadataId(workflowTaskInput.getMetaDataId());
-        dataPolicy.setMetadataName(dataService.getMetaDataById(workflowTaskInput.getMetaDataId(), false).getMetaDataName());
-        dataPolicy.setKeyColumn(workflowTaskInput.getKeyColumn());
-        List<Integer> selectedColumns = new ArrayList<>();
-        if(StringUtils.isNotBlank(workflowTaskInput.getDataColumnIds())){
-            Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(subItem -> {
-                selectedColumns.add(Integer.valueOf(subItem));
-            });
-        }
-        dataPolicy.setSelectedColumns(selectedColumns);
         return JSONObject.toJSONString(dataPolicy);
     }
 
@@ -1517,10 +1536,12 @@ public class WorkflowServiceImpl implements WorkflowService {
                     item.setWorkflowTask(workflowTaskMap.get(item.getWorkflowTaskId()));
                 });
         workflowRunStatus.setWorkflowRunTaskStatusList(workflowRunTaskStatusList);
+        workflowRunStatus.setWorkflowRunStatusCertificateList(workflowRunStatusCertificateManager.listByWorkflowRunId(workflowRunStatus.getId()));
+
         return workflowRunStatus;
     }
 
-    private WorkflowRunStatus createAndSaveWorkflowRunStatus(String address, String sign, Long workflowId, Long workflowVersion, List<WorkflowTask> workflowTaskList) {
+    private WorkflowRunStatus createAndSaveWorkflowRunStatus(String address, String sign, Long workflowId, Long workflowVersion, List<WorkflowTask> workflowTaskList, List<MetaDataCertificate> metaDataCertificateList) {
         WorkflowRunStatus workflowRunStatus = new WorkflowRunStatus();
         workflowRunStatus.setWorkflowId(workflowId);
         workflowRunStatus.setWorkflowVersion(workflowVersion);
@@ -1546,6 +1567,20 @@ public class WorkflowServiceImpl implements WorkflowService {
                 })
                 .collect(Collectors.toList());
         workflowRunStatus.setWorkflowRunTaskStatusList(workflowRunTaskStatusList);
+
+        List<WorkflowRunStatusCertificate> workflowRunStatusCertificateList = metaDataCertificateList.stream().map(item -> {
+            WorkflowRunStatusCertificate workflowRunStatusCertificate = new WorkflowRunStatusCertificate();
+            workflowRunStatusCertificate.setWorkflowRunId(workflowRunStatus.getId());
+            workflowRunStatusCertificate.setMetaDataId(item.getMetaDataId());
+            workflowRunStatusCertificate.setType(item.getType());
+            workflowRunStatusCertificate.setTokenAddress(item.getTokenAddress());
+            workflowRunStatusCertificate.setTokenId(item.getTokenId());
+            workflowRunStatusCertificate.setErc20CtAlgConsume(item.getErc20CtAlgConsume());
+            workflowRunStatusCertificate.setErc20PtAlgConsume(item.getErc20PtAlgConsume());
+            workflowRunStatusCertificateManager.save(workflowRunStatusCertificate);
+            return workflowRunStatusCertificate;
+        }).collect(Collectors.toList());
+        workflowRunStatus.setWorkflowRunStatusCertificateList(workflowRunStatusCertificateList);
         return workflowRunStatus;
     }
 
@@ -1563,9 +1598,9 @@ public class WorkflowServiceImpl implements WorkflowService {
    }
     }
 
-    private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList, List<Long> credentialIdList) {
+    private List<WorkflowFeeItemDto> convert2WorkflowFee(List<WorkflowTask> workflowTaskList, List<MetaDataCertificate> metaDataCertificateList) {
         // 如果任务中存在使用非自己元数据并且使用无属性凭证支付方式，则需要进行发起组织白名单校验
-        Map<String, MetaDataCertificate> metaDataId2credentialKeyDtoMap = dataService.listMetaDataCertificateUser(credentialIdList).stream().collect(Collectors.toMap(MetaDataCertificate::getMetaDataId, me -> me));
+        Map<String, MetaDataCertificate> metaDataId2credentialKeyDtoMap = metaDataCertificateList.stream().collect(Collectors.toMap(MetaDataCertificate::getMetaDataId, me -> me));
         Map<String, Org> orgIdentityId2OrgMap = orgService.getUserOrgList().stream().collect(Collectors.toMap(Org::getIdentityId, me -> me));
         Set<String> needCheckSet = new HashSet<>();
         for (WorkflowTask workflowTask: workflowTaskList) {
@@ -1629,7 +1664,23 @@ public class WorkflowServiceImpl implements WorkflowService {
         UserWLatCredentialDto wLatCredentialDto = dataService.getUserWLatCredential();
         BigInteger feeList = workflowTaskList.stream()
                 .map(item -> {
-                    return BigInteger.ONE;
+                    TaskRpcApi.EstimateTaskGasRequest.Builder requestBuilder = TaskRpcApi.EstimateTaskGasRequest.newBuilder();
+                    requestBuilder.setTaskSponsorAddress(UserContext.getCurrentUser().getAddress());
+                    item.getInputList().stream().map(WorkflowTaskInput::getMetaDataId).forEach(metaDataId -> {
+                        MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(metaDataId);
+                        TaskRpcApi.TokenItem.Builder tokenItem = TaskRpcApi.TokenItem.newBuilder();
+                        tokenItem.setTokenType(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES ? TokenEnum.TokenType.ERC20 : TokenEnum.TokenType.ERC721);
+                        tokenItem.setTokenAddress(metaDataCertificate.getTokenAddress());
+                        if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+                            tokenItem.setValue(item.getAlgorithm().getType() == AlgorithmTypeEnum.CT? Long.valueOf(metaDataCertificate.getErc20CtAlgConsume()): Long.valueOf(metaDataCertificate.getErc20PtAlgConsume()));
+                        }else{
+                            tokenItem.setId(Long.valueOf(metaDataCertificate.getTokenId()));
+                        }
+                        //TODO
+                    });
+
+                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
+                    return BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice()));
                 })
                 .reduce((item1, item2) -> item1.add(item2) ).get();
         tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(),wLatCredentialDto));

@@ -10,7 +10,5 @@ public interface TaskDataProviderManager extends IService<TaskDataProvider> {
 
     List<TaskDataProvider> listByTaskId(String taskId);
 
-    Long countOfTokenUsed(List<String> metaDataIdList);
-
     Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId);
 }

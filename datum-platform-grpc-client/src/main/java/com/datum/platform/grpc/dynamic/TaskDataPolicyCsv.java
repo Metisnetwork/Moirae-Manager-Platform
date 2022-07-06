@@ -1,11 +1,13 @@
 package com.datum.platform.grpc.dynamic;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class TaskDataPolicyCsv {
+public class TaskDataPolicyCsv extends TaskDataPolicyHaveConsume {
     private String partyId;
     private String metadataId;
     private String metadataName;

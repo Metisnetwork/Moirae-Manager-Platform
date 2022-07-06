@@ -36,8 +36,6 @@ public interface TaskService {
 
     List<Task> statisticsOfDay(Integer size);
 
-    Long countOfTokenUsed(List<String> metaDataIdList);
-
     List<Task> listTaskOfLatest(Integer size);
 
     Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId);
