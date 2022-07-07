@@ -7,7 +7,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.GrpcMetaDataServiceClient;
-import com.datum.platform.grpc.dynamic.MetadataOptionCsv;
+import com.datum.platform.grpc.dynamic.MetaDataOptionCsv;
 import com.datum.platform.mapper.domain.MetaData;
 import com.datum.platform.mapper.domain.MetaDataCertificate;
 import com.datum.platform.mapper.domain.MetaDataColumn;
@@ -78,8 +78,8 @@ public class SyncDcMetaDataTask {
         getGlobalMetadataDetailList.stream().forEach(item -> {
             Identitydata.Organization organization = item.getOwner();
             Metadata.MetadataSummary information = item.getInformation().getMetadataSummary();
-            MetadataOptionCsv metadataOptionCsv = JSONObject.parseObject(information.getMetadataOption(), MetadataOptionCsv.class);
-            MetadataOptionCsv.Attribute attribute = metadataOptionCsv.getAttributeInfo();
+            MetaDataOptionCsv metadataOptionCsv = JSONObject.parseObject(information.getMetadataOption(), MetaDataOptionCsv.class);
+            MetaDataOptionCsv.Attribute attribute = metadataOptionCsv.getAttributeInfo();
 
             MetaData metaData = new MetaData();
             metaData.setMetaDataId(information.getMetadataId());
@@ -101,6 +101,8 @@ public class SyncDcMetaDataTask {
             metaData.setColumns(metadataOptionCsv.getColumns());
             metaData.setHasTitle(metadataOptionCsv.getHasTitle());
             metaData.setOwnerAddress(information.getUser());
+            metaData.setIsSupportCtAlg(metadataOptionCsv.isSupportCtAlg());
+            metaData.setIsSupportPtAlg(metadataOptionCsv.isSupportPtAlg());
             attribute.getNoAttribute().ifPresent( noAttribute -> {
                 metaData.setErc20Address(noAttribute.getContract());
                 tokenList.add(create(noAttribute.getContract(), TokenTypeEnum.ERC20));
@@ -120,7 +122,7 @@ public class SyncDcMetaDataTask {
             });
             metaDataList.add(metaData);
 
-            for (MetadataOptionCsv.MetadataColumn metadataColumn : metadataOptionCsv.getMetadataColumns()) {
+            for (MetaDataOptionCsv.MetadataColumn metadataColumn : metadataOptionCsv.getMetadataColumns()) {
                 MetaDataColumn metaDataColumn = new MetaDataColumn();
                 metaDataColumn.setMetaDataId(metaData.getMetaDataId());
                 metaDataColumn.setColumnIdx(metadataColumn.getIndex());

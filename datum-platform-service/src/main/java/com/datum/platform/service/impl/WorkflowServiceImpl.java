@@ -18,8 +18,10 @@ import com.datum.platform.grpc.client.GrpcSysServiceClient;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
 import com.datum.platform.grpc.constant.GrpcConstant;
 import com.datum.platform.grpc.dynamic.*;
-import com.datum.platform.grpc.enums.DataPolicyTypesEnum;
-import com.datum.platform.grpc.enums.ReceiverPolicyTypesEnum;
+import com.datum.platform.grpc.enums.TaskDataFlowPolicyTypesEnum;
+import com.datum.platform.grpc.enums.TaskDataPolicyTypesEnum;
+import com.datum.platform.grpc.enums.TaskPowerPolicyTypesEnum;
+import com.datum.platform.grpc.enums.TaskReceiverPolicyTypesEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
@@ -1197,81 +1199,132 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private TaskRpcApi.PublishTaskDeclareRequest assemblyTask(WorkflowRunStatus workflowRunStatus, WorkflowRunStatusTask curWorkflowRunTaskStatus) {
+        // 全局参数
+        WorkflowTask workflowTask =  curWorkflowRunTaskStatus.getWorkflowTask();
+        String calculateContractStruct = workflowTask.getAlgorithm().getAlgorithmCode().getCalculateContractStruct();
+        List<WorkflowTaskVariable> workflowTaskVariableList = workflowTask.getVariableList();
+        Optional<WorkflowTaskInput> dependentVariableWorkflowTaskInput = workflowTask.getInputList().stream().filter(item -> item.getDependentVariable() != null && item.getDependentVariable() > 0).findFirst();
+        Algorithm algorithm = workflowTask.getAlgorithm();
+        List<WorkflowTaskInput> workflowTaskInputList = workflowTask.getInputList();
+        List<WorkflowTaskOutput> workflowTaskOutputList = workflowTask.getOutputList();
+        Org senderOrg = workflowTask.getOrg();
+
+        // 组装任务提交参数
         TaskRpcApi.PublishTaskDeclareRequest.Builder requestBuild = TaskRpcApi.PublishTaskDeclareRequest.newBuilder()
                 .setTaskName(publishTaskOfGetTaskName(workflowRunStatus, curWorkflowRunTaskStatus))
                 .setUser(workflowRunStatus.getAddress())
                 .setUserType(CarrierEnum.UserType.User_1)
-                .setSender(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "sender1"))
-                .setAlgoSupplier(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getWorkflowTask().getOrg(), "algo1"));
+                .setSender(publishTaskOfGetTaskOrganization(senderOrg, "sender1"))
+                .setAlgoSupplier(publishTaskOfGetTaskOrganization(senderOrg, "algo1"));
 
         // 设置数据输入组织
-        for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
-            WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
+        workflowTaskInputList.forEach(workflowTaskInput -> {
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
-            if(curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi()){
-                requestBuild.addDataPolicyTypes(DataPolicyTypesEnum.POLICY_TYPES_30001.getValue());
+            if(workflowTask.getInputPsi()){
+                requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue());
                 requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, curWorkflowRunTaskStatus.getPreStepTaskId()));
             }else{
-                requestBuild.addDataPolicyTypes(DataPolicyTypesEnum.POLICY_TYPES_40001.getValue());
-                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, workflowRunStatus.getMetaDataId2WorkflowRunStatusCertificate(), curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getType()));
+                requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_40001.getValue());
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput, workflowRunStatus.getMetaDataId2WorkflowRunStatusCertificate(), algorithm.getType()));
             }
-        }
+        });
+
         // 设置模型输入组织
         String modelPartyId = null;
-        if(curWorkflowRunTaskStatus.getWorkflowTask().getInputModel()){
-            modelPartyId = "data" + (requestBuild.getDataSuppliersBuilderList().size() + 1);
+        if(workflowTask.getInputModel()){
+            modelPartyId = "model1";
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(curWorkflowRunTaskStatus.getModel().getOrg(), modelPartyId));
-            requestBuild.addDataPolicyTypes(DataPolicyTypesEnum.POLICY_TYPES_2.getValue());
+            requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_2.getValue());
             requestBuild.addDataPolicyOptions(createDataPolicyItem(curWorkflowRunTaskStatus.getModel(), modelPartyId));
         }
+
         // 接收方策略
-        for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().size(); i++) {
-            WorkflowTaskOutput workflowTaskOutput = curWorkflowRunTaskStatus.getWorkflowTask().getOutputList().get(i);
+        workflowTaskOutputList.forEach(workflowTaskOutput -> {
             requestBuild.addReceivers(publishTaskOfGetTaskOrganization(workflowTaskOutput.getOrg(), workflowTaskOutput.getPartyId()));
-            if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
-                requestBuild.addReceiverPolicyTypes(ReceiverPolicyTypesEnum.POLICY_TYPES_2.getValue());
-                requestBuild.addReceiverPolicyOptions(createPowerPolicy2Item(workflowTaskOutput, curWorkflowRunTaskStatus.getWorkflowTask().getInputList()));
+            if(algorithm.getAlgorithmId() == sysConfig.getDefaultPsi()){
+                requestBuild.addReceiverPolicyTypes(TaskReceiverPolicyTypesEnum.POLICY_TYPES_2.getValue());
+                requestBuild.addReceiverPolicyOptions(createReceiverPolicyItem(workflowTaskOutput, workflowTaskInputList));
             } else {
-                requestBuild.addReceiverPolicyTypes(ReceiverPolicyTypesEnum.POLICY_TYPES_1.getValue());
+                requestBuild.addReceiverPolicyTypes(TaskReceiverPolicyTypesEnum.POLICY_TYPES_1.getValue());
                 requestBuild.addReceiverPolicyOptions(workflowTaskOutput.getPartyId());
             }
-        }
+        });
 
         // 算力策略
-        if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
+        if(algorithm.getAlgorithmId() == sysConfig.getDefaultPsi()){
             // psi指定数据节点提供算力策略
-            for (int i = 0; i < curWorkflowRunTaskStatus.getWorkflowTask().getInputList().size(); i++) {
-                WorkflowTaskInput workflowTaskInput = curWorkflowRunTaskStatus.getWorkflowTask().getInputList().get(i);
-                requestBuild.addPowerPolicyTypes(2);
-                requestBuild.addPowerPolicyOptions(createPowerPolicy2Item(workflowTaskInput));
-            }
-        } else if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getType() == AlgorithmTypeEnum.PT && curWorkflowRunTaskStatus.getWorkflowTask().getPowerType() == WorkflowTaskPowerTypeEnum.ASSIGN){
-            // 明文算法并且算力用户指定的
-
-
+            workflowTaskInputList.forEach(workflowTaskInput -> {
+                requestBuild.addPowerPolicyTypes(TaskPowerPolicyTypesEnum.POLICY_TYPES_2.getValue());
+                requestBuild.addPowerPolicyOptions(createPowerPolicyItem(workflowTaskInput));
+            });
+        } else if(algorithm.getType() == AlgorithmTypeEnum.PT && workflowTask.getPowerType() == WorkflowTaskPowerTypeEnum.ASSIGN){
+            // 明文算法并且算力用户指定算力
+            requestBuild.addPowerPolicyTypes(TaskPowerPolicyTypesEnum.POLICY_TYPES_3.getValue());
+            requestBuild.addPowerPolicyOptions(createPowerPolicyItem("compute1", curWorkflowRunTaskStatus.getWorkflowTask().getIdentityId()));
+        } else if(algorithm.getType() == AlgorithmTypeEnum.PT && workflowTask.getPowerType() == WorkflowTaskPowerTypeEnum.RANDOM){
+            // 明文算法并且算力随机选1个
+            requestBuild.addPowerPolicyTypes(TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue());
+            requestBuild.addPowerPolicyOptions("compute1");
         } else {
             // 随机算力
-            requestBuild.addPowerPolicyTypes(1);
+            requestBuild.addPowerPolicyTypes(TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue());
             requestBuild.addPowerPolicyOptions("compute1");
-            requestBuild.addPowerPolicyTypes(1);
+            requestBuild.addPowerPolicyTypes(TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue());
             requestBuild.addPowerPolicyOptions("compute2");
-            requestBuild.addPowerPolicyTypes(1);
+            requestBuild.addPowerPolicyTypes(TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue());
             requestBuild.addPowerPolicyOptions("compute3");
         }
 
-        // data_flow_policy_type & data_flow_policy_option
-        if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
-            // psi 需要指定
-            requestBuild.addDataFlowPolicyTypes(2);
-            requestBuild.addDataFlowPolicyOptions(createDataFlowPolicy2(curWorkflowRunTaskStatus.getWorkflowTask().getInputList(), curWorkflowRunTaskStatus.getWorkflowTask().getOutputList()));
-        }else{
+        JSONObject dataFlowPolicyOption;
+        TaskDataFlowPolicyTypesEnum dataFlowPolicyType;
+        // 连接策略
+        if(algorithm.getAlgorithmId() == sysConfig.getDefaultPsi()){
+            /**
+             * psi网络连接:
+             *
+             * data1             data2
+             *    ↓                 ↓
+             * compute1 -------> compute2
+             *          <-------
+             *    ↓                 ↓
+             *  result1           result2
+             */
+            dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
+            dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList, workflowTaskOutputList);
+        } else if(algorithm.getType() == AlgorithmTypeEnum.PT && algorithm.getInputModel() == false){
+            /**
+             * 明文训练算法网络连接:
+             *
+             * data1
+             *   ↓
+             * compute1
+             *   ↓
+             * result1 （只需要指定一个结果接收方，多了业务逻辑意义）
+             */
+            dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
+            dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList.get(0).getPartyId(), Optional.empty(), workflowTaskOutputList.stream().map(WorkflowTaskOutput::getPartyId).collect(Collectors.toList()));
+        } else if(algorithm.getType() == AlgorithmTypeEnum.PT && algorithm.getInputModel() == false){
+            /**
+             * 明文预测算法网络连接:
+             *
+             * data1       model1
+             *   ↓          ↓
+             * compute1
+             *   ↓
+             * result1
+             */
+            dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
+            dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList.get(0).getPartyId(), Optional.of(modelPartyId), workflowTaskOutputList.stream().map(WorkflowTaskOutput::getPartyId).collect(Collectors.toList()));
+        } else {
             // 其他全连接
-            requestBuild.addDataFlowPolicyTypes(1);
-            requestBuild.addDataFlowPolicyOptions(createDataFlowPolicy1());
+            dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_1;
+            dataFlowPolicyOption = createDataFlowPolicy();
         }
+        requestBuild.addDataFlowPolicyTypes(dataFlowPolicyType.getValue());
+        requestBuild.addDataFlowPolicyOptions(dataFlowPolicyOption.toJSONString());
 
-
-        WorkflowTaskResource resource = curWorkflowRunTaskStatus.getWorkflowTask().getResource();
+        // 设置资源使用
+        WorkflowTaskResource resource = workflowTask.getResource();
         Resourcedata.TaskResourceCostDeclare taskResourceCostDeclare = Resourcedata.TaskResourceCostDeclare.newBuilder()
                 .setMemory(resource.getCostMem())
                 .setProcessor(resource.getCostCpu())
@@ -1280,33 +1333,42 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .build();
         requestBuild.setOperationCost(taskResourceCostDeclare);
 
-        requestBuild.setAlgorithmCode(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmCode().getCalculateContractCode());
+        // 设置算法代码
+        requestBuild.setAlgorithmCode(algorithm.getAlgorithmCode().getCalculateContractCode());
         requestBuild.setMetaAlgorithmId("");
 
-        // 如果是psi算法，指定数据节点提供算力策略
-        if(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmId() == sysConfig.getDefaultPsi()){
-            requestBuild.setAlgorithmCodeExtraParams(
-                    createAlgorithmCodeExtraParamsForPsi(
-                            curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmCode().getCalculateContractStruct(),
-                            curWorkflowRunTaskStatus.getWorkflowTask().getInputList(),
-                            curWorkflowRunTaskStatus.getWorkflowTask().getOutputList()));
-        }else{
-            requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmCode().getCalculateContractStruct(),
-                    curWorkflowRunTaskStatus.getWorkflowTask().getVariableList(), curWorkflowRunTaskStatus.getWorkflowTask().getInputPsi(),
-                    curWorkflowRunTaskStatus.getWorkflowTask().getInputList().stream().filter(item -> item.getDependentVariable() != null && item.getDependentVariable() > 0
-                    ).findFirst(), modelPartyId, curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm()));
-        }
+        // 设置算法变量
+        boolean useAlignment =  workflowTaskInputList.stream()
+                .filter(item-> StringUtils.isNotBlank(item.getDataColumnIds()))
+                .count() > 0 ? true : false;
+        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(calculateContractStruct, useAlignment, workflowTask.getInputPsi(), dependentVariableWorkflowTaskInput, Optional.ofNullable(modelPartyId), workflowTaskVariableList, algorithm, dataFlowPolicyOption));
 
+        // 其他设置
         requestBuild.setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()));
         requestBuild.setDesc("");
         return requestBuild.build();
     }
 
-    private String createDataFlowPolicy1() {
-        return "{}";
+    private JSONObject createDataFlowPolicy() {
+        return new JSONObject();
     }
 
-    private String createDataFlowPolicy2(List<WorkflowTaskInput> inputList, List<WorkflowTaskOutput> outputList) {
+    private JSONObject createDataFlowPolicy(String inputPartId, Optional<String> modelPartIdOptional, List<String> outputPartIdList) {
+        JSONObject connectPolicy = new JSONObject();
+        // data -> compute 连接
+        JSONArray computeArray = new JSONArray();
+        computeArray.add("compute1");
+        connectPolicy.put(inputPartId, computeArray);
+        // model -> compute 连接
+        modelPartIdOptional.ifPresent(modelPartId -> connectPolicy.put(modelPartId, computeArray));
+        // compute -> result 连接
+        JSONArray resultArray = new JSONArray();
+        outputPartIdList.forEach(resultPartId -> resultArray.add(resultPartId));
+        connectPolicy.put("compute1", resultArray);
+        return connectPolicy;
+    }
+
+    private JSONObject createDataFlowPolicy(List<WorkflowTaskInput> inputList, List<WorkflowTaskOutput> outputList) {
         JSONObject connectPolicy = new JSONObject();
         // data -> compute 连接
         Map<String, WorkflowTaskInput> workflowTaskInputMap = new HashMap<>();
@@ -1328,77 +1390,40 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
             connectPolicy.put(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"),value1);
         }
-        return connectPolicy.toJSONString();
+        return connectPolicy;
     }
 
-
-    private String createAlgorithmCodeExtraParamsForPsi(String calculateContractStruct, List<WorkflowTaskInput> workflowTaskInputList,  List<WorkflowTaskOutput> workflowTaskOutputList) {
+    private String createAlgorithmCodeExtraParams(String calculateContractStruct, Boolean useAlignment, Boolean usePsi, Optional<WorkflowTaskInput> dependentVariableWorkflowTaskInputOptional, Optional<String> modelPartyIdOptional, List<WorkflowTaskVariable> variableList, Algorithm algorithm,JSONObject dataFlowRestrict) {
         JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
-
+        // psi时是否对齐
         if(algorithmDynamicParams.containsKey("use_alignment")){
-            boolean useAlignment =  workflowTaskInputList.stream()
-                    .filter(item-> StringUtils.isNotBlank(item.getDataColumnIds()))
-                    .count() > 0 ? true : false;
             algorithmDynamicParams.put("use_alignment", useAlignment);
         }
-
-        workflowTaskInputList.stream()
-            .filter(item -> item.getDependentVariable() != null && item.getDependentVariable() > 0)
-            .findFirst().ifPresent(item -> {
-                algorithmDynamicParams.put("label_owner", item.getPartyId());
-                algorithmDynamicParams.put("label_column", dataService.getDataColumnByIds(item.getMetaDataId(), item.getDependentVariable().intValue()).getColumnName());
-        });
-
-        if(algorithmDynamicParams.containsKey("data_flow_restrict")){
-            JSONObject dataFlowRestrict = new JSONObject();
-            // 输入
-            Map<String, WorkflowTaskInput> workflowTaskInputMap = new HashMap<>();
-            for (WorkflowTaskInput workflowTaskInput : workflowTaskInputList) {
-                JSONArray value1 = new JSONArray();
-                value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
-                dataFlowRestrict.put(workflowTaskInput.getPartyId(), value1 );
-                workflowTaskInputMap.put(workflowTaskInput.getIdentityId(), workflowTaskInput);
-            }
-            // 计算
-            for (WorkflowTaskOutput workflowTaskOutput: workflowTaskOutputList) {
-                WorkflowTaskInput workflowTaskInput = workflowTaskInputMap.get(workflowTaskOutput.getIdentityId());
-
-                JSONArray value1 = new JSONArray();
-                value1.add(workflowTaskOutput.getPartyId());
-                dataFlowRestrict.put(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"), value1);
-            }
-            algorithmDynamicParams.put("data_flow_restrict", dataFlowRestrict);
-        }
-        return algorithmDynamicParams.toJSONString();
-    }
-
-    private String createAlgorithmCodeExtraParams(String calculateContractStruct, List<WorkflowTaskVariable> variableList, Boolean usePsi, Optional<WorkflowTaskInput> workflowTaskInput, String modelRestoreParty, Algorithm algorithm) {
-        JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
         //是否使用psi
         if(algorithmDynamicParams.containsKey("use_psi")){
             algorithmDynamicParams.put("use_psi", usePsi);
         }
         //标签所在方的party_id
         if(algorithmDynamicParams.containsKey("label_owner")){
-            workflowTaskInput.ifPresent(item -> {
-                algorithmDynamicParams.put("label_owner", item.getPartyId());
-            });
-
+            dependentVariableWorkflowTaskInputOptional.ifPresent(workflowTaskInput -> algorithmDynamicParams.put("label_owner", workflowTaskInput.getPartyId()));
         }
         // 因变量(标签)
         if(algorithmDynamicParams.containsKey("label_column")){
-            workflowTaskInput.ifPresent(item -> {
-                algorithmDynamicParams.put("label_column", dataService.getDataColumnByIds(item.getMetaDataId(), item.getDependentVariable().intValue()).getColumnName());
-            });
+            dependentVariableWorkflowTaskInputOptional.ifPresent(workflowTaskInput -> algorithmDynamicParams.put("label_column", dataService.getDataColumnByIds(workflowTaskInput.getMetaDataId(), workflowTaskInput.getDependentVariable().intValue()).getColumnName()));
         }
         // 模型所在方
         if(algorithmDynamicParams.containsKey("model_restore_party")){
-            algorithmDynamicParams.put("model_restore_party", modelRestoreParty);
+            modelPartyIdOptional.ifPresent(modelPartyId -> algorithmDynamicParams.put("model_restore_party", modelPartyId));
         }
+        // 动态参数
         if(algorithmDynamicParams.containsKey("hyperparams")){
             JSONObject hyperParams = algorithmDynamicParams.getJSONObject("hyperparams");
             Map<String, AlgorithmVariableTypeEnum> variableTypeEnumMap = algorithm.getAlgorithmVariableList().stream().collect(Collectors.toMap(AlgorithmVariable::getVarKey, AlgorithmVariable::getVarType));
             variableList.forEach(workflowTaskVariable -> hyperParams.put(workflowTaskVariable.getVarKey(), convert2HyperParams(workflowTaskVariable, variableTypeEnumMap)));
+        }
+        // 连接方式
+        if(algorithmDynamicParams.containsKey("data_flow_restrict")){
+            algorithmDynamicParams.put("data_flow_restrict", dataFlowRestrict);
         }
         return algorithmDynamicParams.toJSONString();
     }
@@ -1426,19 +1451,26 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
     }
 
-    private String createPowerPolicy2Item(WorkflowTaskOutput workflowTaskOutput, List<WorkflowTaskInput> inputList) {
-        TaskReceiverPolicy2 taskReceiverPolicy2 = new TaskReceiverPolicy2();
-        taskReceiverPolicy2.setProviderPartyId(inputList.stream().filter(item -> item.getIdentityId().equals(workflowTaskOutput.getIdentityId())).findFirst().get().getPartyId());
-        taskReceiverPolicy2.setReceiverPartyId(workflowTaskOutput.getPartyId());
-        return JSONObject.toJSONString(taskReceiverPolicy2);
+    private String createReceiverPolicyItem(WorkflowTaskOutput workflowTaskOutput, List<WorkflowTaskInput> inputList) {
+        TaskReceiverPolicy taskReceiverPolicy = new TaskReceiverPolicy();
+        taskReceiverPolicy.setProviderPartyId(inputList.stream().filter(item -> item.getIdentityId().equals(workflowTaskOutput.getIdentityId())).findFirst().get().getPartyId());
+        taskReceiverPolicy.setReceiverPartyId(workflowTaskOutput.getPartyId());
+        return JSONObject.toJSONString(taskReceiverPolicy);
 
     }
 
-    private String createPowerPolicy2Item(WorkflowTaskInput workflowTaskInput) {
-        TaskPowerPolicy2 taskPowerPolicy2 = new TaskPowerPolicy2();
-        taskPowerPolicy2.setProviderPartyId(workflowTaskInput.getPartyId());
-        taskPowerPolicy2.setPowerPartyId(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
-        return JSONObject.toJSONString(taskPowerPolicy2);
+    private String createPowerPolicyItem(String partyId, String identityId) {
+        TaskPowerPolicy taskPowerPolicy = new TaskPowerPolicy();
+        taskPowerPolicy.setPowerPartyId(partyId);
+        taskPowerPolicy.setIdentityId(identityId);
+        return JSONObject.toJSONString(taskPowerPolicy);
+    }
+
+    private String createPowerPolicyItem(WorkflowTaskInput workflowTaskInput) {
+        TaskPowerPolicy taskPowerPolicy = new TaskPowerPolicy();
+        taskPowerPolicy.setProviderPartyId(workflowTaskInput.getPartyId());
+        taskPowerPolicy.setPowerPartyId(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
+        return JSONObject.toJSONString(taskPowerPolicy);
     }
 
     private String createDataPolicyItem(Model model, String partyId) {

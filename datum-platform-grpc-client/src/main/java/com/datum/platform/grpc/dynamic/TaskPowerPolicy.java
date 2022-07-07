@@ -3,7 +3,8 @@ package com.datum.platform.grpc.dynamic;
 import lombok.Data;
 
 @Data
-public class TaskReceiverPolicy2 {
+public class TaskPowerPolicy {
     private String providerPartyId;
-    private String receiverPartyId;
+    private String powerPartyId;
+    private String identityId;
 }

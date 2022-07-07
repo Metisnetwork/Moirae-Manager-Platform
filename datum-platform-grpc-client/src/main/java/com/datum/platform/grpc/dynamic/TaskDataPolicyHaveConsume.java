@@ -1,5 +1,6 @@
 package com.datum.platform.grpc.dynamic;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class TaskDataPolicyHaveConsume {
     private List<String> consumeOptions;
 
     public Optional<Consume> getConsume(){
-        if(consumeTypes.size() == 0 || consumeOptions.size() == 0 ){
+        if(CollectionUtil.isEmpty(consumeTypes) || CollectionUtil.isEmpty(consumeOptions) ){
             return Optional.empty();
         }
         if(consumeTypes.get(0) == 2){

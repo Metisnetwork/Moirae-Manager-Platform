@@ -2,13 +2,17 @@ package com.datum.platform.grpc.dynamic;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.datum.platform.grpc.enums.MetaDataCunsumeTypesEnum;
 import lombok.Data;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 
 @Data
-public class MetadataOptionCsv {
+public class MetaDataOptionCsv {
     //原始数据Id
     private String originId;
     //当前数据的完整路径
@@ -21,32 +25,46 @@ public class MetadataOptionCsv {
     private Integer columns;
     //表示数据是否含有标题行, true: 含有, false: 没有
     private Boolean hasTitle;
+    //表示数据的一些使用条件,以32bit位设置值, 各个bit上的值可以并存查看
+    private Integer condition;
     //数据的列信息
     private List<MetadataColumn> metadataColumns;
+    //支持的消费类型
+    private List<Integer> consumeTypes;
     //支持的消费选项汇总信息
     private List<String> consumeOptions;
     //支持的消费对象选项汇总信息
     public Attribute getAttributeInfo(){
         Attribute attribute = new Attribute();
-        if(CollectionUtil.isEmpty(consumeOptions)){
+        if(CollectionUtil.isEmpty(consumeTypes) || CollectionUtil.isEmpty(consumeOptions)){
             return attribute;
         }
-        for (String consumeOption: consumeOptions) {
-            JSONObject jsonObject = JSONObject.parseObject(consumeOption);
-            if(jsonObject.getIntValue("type") == 2){
+        for (int i = 0; i < consumeTypes.size(); i++) {
+            Integer consumeType = consumeTypes.get(i);
+            if(consumeType == MetaDataCunsumeTypesEnum.TYPES_2.getValue()){
+                JSONObject jsonObject = JSONObject.parseArray(consumeOptions.get(i)).getJSONObject(0);
                 NoAttribute noAttribute = new NoAttribute();
-                noAttribute.setContract(jsonObject.getJSONArray("information").getJSONObject(0).getString("contract").toLowerCase());
-                noAttribute.setCryptoAlgoConsumeUnit(jsonObject.getJSONArray("information").getJSONObject(0).getString("cryptoAlgoConsumeUnit"));
-                noAttribute.setPlainAlgoConsumeUnit(jsonObject.getJSONArray("information").getJSONObject(0).getString("plainAlgoConsumeUnit"));
+                noAttribute.setContract(jsonObject.getString("contract").toLowerCase());
+                noAttribute.setCryptoAlgoConsumeUnit(jsonObject.getString("cryptoAlgoConsumeUnit"));
+                noAttribute.setPlainAlgoConsumeUnit(jsonObject.getString("plainAlgoConsumeUnit"));
                 attribute.setNoAttribute(Optional.of(noAttribute));
             }
-            if(jsonObject.getIntValue("type") == 3){
-                attribute.setHaveAttribute(Optional.ofNullable(jsonObject.getJSONArray("information").getString(0).toLowerCase()));
+
+            if(consumeType == MetaDataCunsumeTypesEnum.TYPES_3.getValue()){
+                String jsonObject = JSONObject.parseArray(consumeOptions.get(i)).getString(0);
+                attribute.setHaveAttribute(Optional.ofNullable(jsonObject.toLowerCase()));
             }
         }
         return attribute;
     }
 
+    public boolean isSupportPtAlg(){
+        return (condition & 0x00000001) == 1;
+    }
+
+    public boolean isSupportCtAlg(){
+        return (condition >> 1 & 0x00000001) == 1;
+    }
 
     @Data
     public static class MetadataColumn {

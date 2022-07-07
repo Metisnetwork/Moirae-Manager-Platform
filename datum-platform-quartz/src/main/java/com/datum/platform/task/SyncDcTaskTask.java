@@ -4,10 +4,11 @@ import carrier.types.Taskdata;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.grpc.client.GrpcTaskServiceClient;
-import com.datum.platform.grpc.dynamic.TaskDataPolicyPreTask;
 import com.datum.platform.grpc.dynamic.TaskDataPolicyCsv;
-import com.datum.platform.grpc.dynamic.TaskDataPolicyHaveConsume;
-import com.datum.platform.grpc.dynamic.TaskPowerPolicy2;
+import com.datum.platform.grpc.dynamic.TaskDataPolicyPreTask;
+import com.datum.platform.grpc.dynamic.TaskPowerPolicy;
+import com.datum.platform.grpc.enums.TaskDataPolicyTypesEnum;
+import com.datum.platform.grpc.enums.TaskPowerPolicyTypesEnum;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
@@ -86,7 +87,7 @@ public class SyncDcTaskTask {
             Map<String, Taskdata.TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
             for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
-                if(information.getDataPolicyTypesList().get(i) == 30001){
+                if(information.getDataPolicyTypesList().get(i) == TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue()){
                     TaskDataPolicyPreTask dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyPreTask.class);
                     taskDataProvider.setTaskId(information.getTaskId());
                     taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
@@ -107,16 +108,14 @@ public class SyncDcTaskTask {
                     if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
                         taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
                     }
+                    // 设置数据消耗
+                    dataPolicy.getConsume().ifPresent(consume ->{
+                        taskDataProvider.setConsumeType(consume.getConsumeType());
+                        taskDataProvider.setConsumeTokenAddress(consume.getTokenAddress());
+                        taskDataProvider.setConsumeTokenId(consume.getTokenId());
+                        taskDataProvider.setConsumeBalance(consume.getBalance());
+                    });
                 }
-
-                // 设置数据消耗
-                TaskDataPolicyHaveConsume taskDataPolicyHaveConsume = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyHaveConsume.class);
-                taskDataPolicyHaveConsume.getConsume().ifPresent( consume ->{
-                    taskDataProvider.setConsumeType(consume.getConsumeType());
-                    taskDataProvider.setConsumeTokenAddress(consume.getTokenAddress());
-                    taskDataProvider.setConsumeTokenId(consume.getTokenId());
-                    taskDataProvider.setConsumeBalance(consume.getBalance());
-                });
                 taskDataProviderList.add(taskDataProvider);
             }
 
@@ -127,13 +126,13 @@ public class SyncDcTaskTask {
                 Integer type = information.getPowerPolicyTypes(i);
                 String partyId;
                 String providerPartyId = null;
-                if(type == 1){
+                if(type == TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue()){
                     partyId = information.getPowerPolicyOptions(i);
                 }else{
                     // type = 2 或 3
-                    TaskPowerPolicy2 taskPowerPolicy2 = JSONObject.parseObject(information.getPowerPolicyOptions(i), TaskPowerPolicy2.class);
-                    partyId = taskPowerPolicy2.getPowerPartyId();
-                    providerPartyId = taskPowerPolicy2.getProviderPartyId();
+                    TaskPowerPolicy taskPowerPolicy = JSONObject.parseObject(information.getPowerPolicyOptions(i), TaskPowerPolicy.class);
+                    partyId = taskPowerPolicy.getPowerPartyId();
+                    providerPartyId = taskPowerPolicy.getProviderPartyId();
                 }
                 if(powerMap.containsKey(partyId)){
                     TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
