@@ -4,14 +4,22 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * <p>
+ * 组织的VC
+ * </p>
+ *
+ * @author chendai
+ * @since 2022-07-08
+ */
 @Data
-@TableName(value = "mo_org_expand")
-public class OrgExpand implements Serializable {
+@TableName("mo_org_vc")
+public class OrgVc implements Serializable {
+
     /**
      * 身份认证标识的id
      */
@@ -19,30 +27,39 @@ public class OrgExpand implements Serializable {
     private String identityId;
 
     /**
-     * 组织的ip
+     * vc的颁发者
      */
-    private String identityIp;
+    private String issuer;
 
     /**
-     * 组织的端口
+     * vc的颁发时间
      */
-    private Integer identityPort;
+    private Date issuanceDate;
 
     /**
-     * 是否公共组织: 0-否，1-是
+     * vc的过期时间
      */
-    private Boolean isPublic;
-
-
-    /**
-     * 是否委员会成员: 0-否，1-是
-     */
-    private Boolean isAuthority;
+    private Date expirationDate;
 
     /**
-     * 是否已认证: 0-否，1-是
+     * vc的持有者
      */
-    private Boolean isCertified;
+    private String holder;
+
+    /**
+     * vc的公示信息
+     */
+    private String publicityId;
+
+    /**
+     * vc的内容归档
+     */
+    private String vcContent;
+
+    /**
+     * vc的证明归档
+     */
+    private String vcProof;
 
     /**
      * 创建时间
@@ -57,10 +74,4 @@ public class OrgExpand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public String getObserverProxyWalletAddress(){
-        if(StringUtils.isBlank(identityId)){
-            return null;
-        }
-        return identityId;
-    }
 }

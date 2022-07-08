@@ -4,6 +4,7 @@ import carrier.types.Identitydata;
 import cn.hutool.core.date.DateUtil;
 import com.datum.platform.grpc.client.impl.GrpcAuthServiceClientImpl;
 import com.datum.platform.mapper.domain.Org;
+import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
 import com.datum.platform.service.DataSyncService;
@@ -15,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +76,16 @@ public class SyncDcOrgTask {
                     return org;
                 })
                 .collect(Collectors.toList());
+
+        List<OrgExpand> addOrgExpandList = orgList
+                .stream()
+                .map(org -> {
+                    OrgExpand orgExpand = new OrgExpand();
+                    orgExpand.setIdentityIp(org.getIdentityIp());
+                    return orgExpand;
+                })
+                .collect(Collectors.toList());
         //更新
-        organizationService.batchReplace(orgList);
+        organizationService.batchReplace(orgList, addOrgExpandList);
     }
 }

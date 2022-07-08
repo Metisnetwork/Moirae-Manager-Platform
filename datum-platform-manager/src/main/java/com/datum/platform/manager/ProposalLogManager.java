@@ -1,0 +1,21 @@
+package com.datum.platform.manager;
+
+import com.datum.platform.mapper.domain.ProposalLog;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.math.BigInteger;
+
+/**
+ * <p>
+ * 提案日志 服务类
+ * </p>
+ *
+ * @author chendai
+ * @since 2022-07-08
+ */
+public interface ProposalLogManager extends IService<ProposalLog> {
+
+    ProposalLog getLatestOne();
+
+    boolean contain(BigInteger blockNumber, String transactionHash, BigInteger logIndex);
+}

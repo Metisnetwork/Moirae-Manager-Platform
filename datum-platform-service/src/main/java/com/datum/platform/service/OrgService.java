@@ -7,6 +7,7 @@ import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.domain.StatsOrg;
 import io.grpc.ManagedChannel;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -36,10 +37,8 @@ public interface OrgService {
     /**
      * 批量提供组织信息
      *
-     * @param orgList
-     * @return
      */
-    boolean batchReplace(List<Org> orgList);
+    boolean batchReplace(List<Org> orgList,  List<OrgExpand> orgExpandList);
 
     /**
      * 用户添加私有组织
@@ -67,8 +66,6 @@ public interface OrgService {
 
     Org getOrgDetails(String identityId);
 
-    List<OrgExpand> getOrgExpandList();
-
     void batchUpdateOrgExpand(List<OrgExpand> updateList);
 
     List<String> getEffectiveOrgIdList();
@@ -85,4 +82,8 @@ public interface OrgService {
     List<Org> getUserOrgList();
 
     List<Org> getBaseOrgList();
+
+    List<OrgExpand> listOrgExpand();
+
+    List<String> listOrgVcId();
 }

@@ -33,8 +33,10 @@ chain:
   platon:
     chainId: 2203181
     hrp: lat
-    datumNetworkPayAddress: "0X263B1D39843BF2E1DA27D827E749992FBD1F1577"
-    uniswapV2Router02: "0X4378DAF745E9053F6048C4F78C803F3BC8829703"
+    datumNetworkPayAddress: "0x263B1D39843BF2e1DA27d827e749992fbD1f1577"
+    uniswapV2Router02: "0x4378dAF745E9053f6048c4f78c803f3bC8829703"
+    voteAddress: "0x2Ea91Cd38dA39c2a202D64cD9e41E3E3A74fb057"
+    voteDeployBlockNumber: "10000"
     web3jProtocol: WS
     web3jAddresses: 8.219.126.197:6790
     chainName: "PlatON开发网"

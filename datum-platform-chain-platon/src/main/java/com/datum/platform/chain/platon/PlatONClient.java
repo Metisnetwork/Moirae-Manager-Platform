@@ -34,7 +34,6 @@ public class PlatONClient {
     private PlatONProperties specialNodeProperties;
 
     private List<String> nodeUrlList;
-    private long chainId;
 
     private List<Web3j> web3List = new ArrayList<>();
     private int web3Index = -1;
@@ -47,7 +46,6 @@ public class PlatONClient {
 
     private void init(Web3jProtocolEnum web3jProtocolEnum, List<String> web3jAddresses, long chainId) {
         this.nodeUrlList = web3jAddresses.stream().map(item-> web3jProtocolEnum.getHead() + item).collect(Collectors.toList());
-        this.chainId = chainId;
         // 初始化所有web3j实例
         nodeUrlList.forEach(address ->
                 getWeb3j(address).ifPresent( item -> web3List.add(item))

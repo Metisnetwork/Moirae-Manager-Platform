@@ -6,6 +6,5 @@ import com.datum.platform.mapper.domain.OrgExpand;
 import java.util.List;
 
 public interface OrgExpandManager extends IService<OrgExpand> {
-
-    List<OrgExpand> getOrgExpandList();
+    boolean saveOfNotExist(List<OrgExpand> orgExpandList);
 }

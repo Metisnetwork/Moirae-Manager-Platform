@@ -9,21 +9,22 @@ import com.datum.platform.mapper.domain.OrgExpand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand> implements OrgExpandManager {
-
-    @Resource
-    private OrgExpandMapper orgExpandMapper;
-
     @Override
-    public List<OrgExpand> getOrgExpandList() {
-        LambdaQueryWrapper<OrgExpand> wrapper = Wrappers.lambdaQuery();
-        wrapper.select(OrgExpand::getIdentityId, OrgExpand::getObserverProxyWalletAddress);
-        wrapper.isNull(OrgExpand::getObserverProxyWalletAddress);
-        return list(wrapper);
+    public boolean saveOfNotExist(List<OrgExpand> orgExpandList) {
+        LambdaQueryWrapper<OrgExpand> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.select(OrgExpand::getIdentityId);
+        Set<String> idSet = listObjs(queryWrapper, item -> item.toString()).stream().collect(Collectors.toSet());
+        List<OrgExpand> addList = orgExpandList.stream().filter(item -> !idSet.contains(item.getIdentityId())).collect(Collectors.toList());
+        if(addList.size() > 0){
+            return saveBatch(addList);
+        }
+        return true;
     }
 }

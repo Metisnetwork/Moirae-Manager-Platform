@@ -1,7 +1,9 @@
 package com.datum.platform.init;
 
 import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
+import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.service.OrgService;
+import com.datum.platform.service.ProposalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -17,16 +19,24 @@ import java.util.TimeZone;
 public class ProcessInit {
 
     @Resource
-    private OrgService organizationService;
+    private OrgService orgService;
     @Resource
-    private IUniswapV2FactoryContract uniswapV2FactoryDao;
+    private ProposalService proposalService;
+    @Resource
+    private IUniswapV2FactoryContract uniswapV2FactoryContract;
+    @Resource
+    private VoteContract voteContract;
 
     @PostConstruct
     public void init() throws Exception {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         // 第一次启动时初始化公共组织
-        organizationService.initPublicOrg();
+        orgService.initPublicOrg();
         // 初始化工厂合约地址
-        uniswapV2FactoryDao.initContractAddress();
+        uniswapV2FactoryContract.initContractAddress();
+        // 初始化投票合约
+        voteContract.init();
+        // 添加提案消费
+        proposalService.subscribe();
     }
 }

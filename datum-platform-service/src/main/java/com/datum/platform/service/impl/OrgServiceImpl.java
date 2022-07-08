@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datum.platform.manager.*;
 import com.datum.platform.service.DataService;
 import com.google.protobuf.Empty;
 import com.datum.platform.chain.platon.contract.DatumNetworkPayContract;
@@ -17,10 +18,6 @@ import com.datum.platform.common.enums.RespCodeEnum;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.dto.UserDto;
 import com.datum.platform.grpc.constant.GrpcConstant;
-import com.datum.platform.manager.OrgExpandManager;
-import com.datum.platform.manager.OrgManager;
-import com.datum.platform.manager.OrgUserManager;
-import com.datum.platform.manager.StatsOrgManager;
 import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.domain.OrgUser;
@@ -54,11 +51,13 @@ public class OrgServiceImpl implements OrgService {
     @Resource
     private OrgManager orgManager;
     @Resource
+    private OrgVcManager orgVcManager;
+    @Resource
     private OrgUserManager userOrgManager;
     @Resource
     private StatsOrgManager statsOrgManager;
     @Resource
-    private DatumNetworkPayContract datumNetworkPayDao;
+    private DatumNetworkPayContract datumNetworkPayContract;
 
     private final Map<String, ManagedChannel> channelMap = new ConcurrentHashMap<>();
 
@@ -104,8 +103,11 @@ public class OrgServiceImpl implements OrgService {
     }
 
     @Override
-    public boolean batchReplace(List<Org> orgList) {
-        return orgManager.saveOrUpdateBatch(orgList);
+    @Transactional
+    public boolean batchReplace(List<Org> orgList, List<OrgExpand> orgExpandList) {
+        orgManager.saveOrUpdateBatch(orgList);
+        orgExpandManager.saveOfNotExist(orgExpandList);
+        return true;
     }
 
     @Override
@@ -198,11 +200,6 @@ public class OrgServiceImpl implements OrgService {
     }
 
     @Override
-    public List<OrgExpand> getOrgExpandList() {
-        return orgExpandManager.getOrgExpandList();
-    }
-
-    @Override
     public void batchUpdateOrgExpand(List<OrgExpand> updateList) {
         orgExpandManager.updateBatchById(updateList);
     }
@@ -226,7 +223,7 @@ public class OrgServiceImpl implements OrgService {
     public List<Org> getUserOrgList(){
         String address = UserContext.getCurrentUser().getAddress();
         List<Org> orgList = userOrgManager.getUserOrgList(address);
-        Set<String> whiteListSet = datumNetworkPayDao.whitelist(address).stream().collect(Collectors.toSet());
+        Set<String> whiteListSet = datumNetworkPayContract.whitelist(address).stream().collect(Collectors.toSet());
         orgList.forEach(item -> {
             item.setIsInWhitelist(whiteListSet.contains(item.getObserverProxyWalletAddress())?true:false);
         });
@@ -241,6 +238,16 @@ public class OrgServiceImpl implements OrgService {
         return orgIdList.stream()
                 .map(item -> orgMap.get(item) )
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrgExpand> listOrgExpand() {
+        return orgExpandManager.list();
+    }
+
+    @Override
+    public List<String> listOrgVcId() {
+        return orgVcManager.listId();
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
