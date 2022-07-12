@@ -23,5 +23,7 @@ public class PlatONPropertiesDto {
     private String uniswapV2Router02;
     @ApiModelProperty(value = "dex地址")
     private String dexUrl;
+    @ApiModelProperty(value = "tofunft地址")
+    private String tofunftUrl;
 
 }

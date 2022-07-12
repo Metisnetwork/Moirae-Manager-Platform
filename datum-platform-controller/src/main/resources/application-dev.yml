@@ -44,4 +44,5 @@ chain:
     symbol: LAT
     blockExplorerUrl: https://devnetscan.platon.network/
     dexUrl: http://10.10.8.181:8080/
+    tofunftUrl: https://tofunft.com/
 

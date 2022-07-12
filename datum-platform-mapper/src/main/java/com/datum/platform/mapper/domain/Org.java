@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,6 +18,11 @@ public class Org implements Serializable {
      */
     @TableId
     private String identityId;
+
+    /**
+     * 组织钱包地址
+     */
+    private String walletAddress;
 
     /**
      * 组织身份名称

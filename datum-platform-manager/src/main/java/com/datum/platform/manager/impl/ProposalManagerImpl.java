@@ -1,5 +1,7 @@
 package com.datum.platform.manager.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.ProposalMapper;
 import com.datum.platform.manager.ProposalManager;
@@ -17,4 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProposalManagerImpl extends ServiceImpl<ProposalMapper, Proposal> implements ProposalManager {
 
+    @Override
+    public IPage<Proposal> list(Page<Proposal> page) {
+        return baseMapper.list(page);
+    }
 }

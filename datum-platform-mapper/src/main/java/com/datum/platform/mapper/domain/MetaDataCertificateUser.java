@@ -29,7 +29,6 @@ public class MetaDataCertificateUser implements Serializable {
     /**
      * 元数据凭证ID
      */
-    @TableId
     private Long metaDataCertificateId;
 
     /**

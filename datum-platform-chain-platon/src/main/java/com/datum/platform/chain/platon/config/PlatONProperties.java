@@ -28,6 +28,7 @@ public class PlatONProperties {
     private String blockExplorerUrl;
     private String dexUrl;
     private String symbol;
+    private String tofunftUrl;
 
     public void setDatumNetworkPayAddress(String datumNetworkPayAddress){
         this.datumNetworkPayAddress = datumNetworkPayAddress.toLowerCase();

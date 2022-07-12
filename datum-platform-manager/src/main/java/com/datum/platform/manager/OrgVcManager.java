@@ -1,5 +1,7 @@
 package com.datum.platform.manager;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.mapper.domain.OrgVc;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -16,4 +18,8 @@ import java.util.List;
 public interface OrgVcManager extends IService<OrgVc> {
 
     List<String> listId();
+
+    List<OrgVc> listLatest(Integer size);
+
+    IPage<OrgVc> list(Page<OrgVc> page);
 }

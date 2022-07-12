@@ -46,7 +46,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "工作流管理关接口")
-@ApiSupport(order = 700)
+@ApiSupport(order = 800)
 @RequestMapping(value = "workflow", produces = MediaType.APPLICATION_JSON_VALUE)
 public class WorkflowController {
 

@@ -57,6 +57,19 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public void batchReplace(List<Task> taskList, List<TaskAlgoProvider> taskAlgoProviderList, List<TaskDataProvider> taskDataProviderList, List<TaskMetaDataColumn> taskMetaDataColumnList, List<TaskPowerProvider> taskPowerProviderList, List<TaskResultConsumer> taskResultConsumerList) {
+        // 查询待入库记录是否存在重复的
+        Map<String, Task> dbTaskId2TaskMap =  taskManager.getExistedTaskIdAndUpdateAtList(taskList.stream()
+                .map(Task::getId)
+                .collect(Collectors.toSet()))
+                .stream()
+                .collect(Collectors.toMap(Task::getId, me -> me));
+
+        for (Task task : taskList) {
+            if(dbTaskId2TaskMap.containsKey(task.getId())){
+                task.setSyncSeq(dbTaskId2TaskMap.get(task.getId()).getSyncSeq());
+            }
+        }
+
         taskManager.saveOrUpdateBatch(taskList);
         taskAlgoProviderManager.saveOrUpdateBatch(taskAlgoProviderList);
         Set<String> taskIdSet = taskList.stream().map(Task::getId).collect(Collectors.toSet());
@@ -227,5 +240,19 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId) {
         return taskDataProviderManager.countOfMetaDataCertificateUsed(metaDataId, type, tokenAddress, tokenId);
+    }
+
+    @Override
+    public long getTaskMaxSyncSeq() {
+        return taskManager.getMaxSyncSeq();
+    }
+
+    @Override
+    public List<Task> listTaskDetail(Long latestSynced, Long size) {
+        List<Task> taskList = taskManager.listTask(latestSynced, size);
+        taskList.forEach(task -> {
+            task.setDataProviderList(taskDataProviderManager.listByTaskId(task.getId()));
+        });
+        return null;
     }
 }

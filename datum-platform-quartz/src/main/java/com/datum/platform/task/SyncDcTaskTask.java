@@ -13,7 +13,7 @@ import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.TaskStatusEnum;
 import com.datum.platform.mapper.enums.UserTypeEnum;
-import com.datum.platform.service.DataSyncService;
+import com.datum.platform.service.SysService;
 import com.datum.platform.service.TaskService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +41,7 @@ public class SyncDcTaskTask {
     @Resource
     private GrpcTaskServiceClient grpcTaskService;
     @Resource
-    private DataSyncService dataSyncService;
+    private SysService sysService;
     @Resource
     private TaskService taskService;
 
@@ -49,7 +50,7 @@ public class SyncDcTaskTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            dataSyncService.sync(DataSyncTypeEnum.TASK.getDataType(),DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            sysService.syncFromDc(DataSyncTypeEnum.TASK.getDataType(),DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcTaskService.getGlobalTaskDetailList(latestSynced);
                     },
@@ -69,6 +70,7 @@ public class SyncDcTaskTask {
     }
 
     private void batchUpdateTask(List<Taskdata.TaskDetail> taskDetailResponseDtoList) {
+        AtomicLong maxSeq = new AtomicLong(taskService.getTaskMaxSyncSeq());
         List<Task> taskList = new ArrayList<>();
         List<TaskAlgoProvider> taskAlgoProviderList = new ArrayList<>();
         List<TaskDataProvider> taskDataProviderList = new ArrayList<>();
@@ -170,6 +172,8 @@ public class SyncDcTaskTask {
             task.setStartAt(new Date(information.getStartAt()));
             task.setEndAt(information.getEndAt() == 0 ? null : new Date(information.getEndAt()));
             task.setStatus(TaskStatusEnum.find(information.getStateValue()));
+            task.setSyncSeq(maxSeq.incrementAndGet());
+            task.setUpdateAt(new Date(information.getUpdateAt()));
             taskList.add(task);
         });
         taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);

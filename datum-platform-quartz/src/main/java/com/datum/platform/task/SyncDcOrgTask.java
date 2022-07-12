@@ -7,8 +7,8 @@ import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
-import com.datum.platform.service.DataSyncService;
 import com.datum.platform.service.OrgService;
+import com.datum.platform.service.SysService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,14 +33,14 @@ public class SyncDcOrgTask {
     @Resource
     private OrgService organizationService;
     @Resource
-    private DataSyncService dataSyncService;
+    private SysService sysService;
 
     @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcOrgTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            dataSyncService.sync(DataSyncTypeEnum.ORG_STATUS.getDataType(),DataSyncTypeEnum.ORG_STATUS.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            sysService.syncFromDc(DataSyncTypeEnum.ORG_STATUS.getDataType(),DataSyncTypeEnum.ORG_STATUS.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return authServiceClient.getIdentityList(latestSynced);
                     },
@@ -67,6 +66,7 @@ public class SyncDcOrgTask {
         List<Org> orgList = nodeIdentityDtoList.stream().map(nodeIdentityDto -> {
                     Org org = new Org();
                     org.setIdentityId(nodeIdentityDto.getIdentityId());
+                    org.setWalletAddress(nodeIdentityDto.getIdentityId());
                     org.setNodeId(nodeIdentityDto.getNodeId());
                     org.setNodeName(nodeIdentityDto.getNodeName());
                     org.setImageUrl(nodeIdentityDto.getImageUrl());

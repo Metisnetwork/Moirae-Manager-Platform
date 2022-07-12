@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datum.platform.mapper.StatsMetaDataMapper">
+    <select id="getMetaDataUsedTop" resultType="com.datum.platform.mapper.domain.StatsMetaData">
+        select msmd.meta_data_id as metaDataId,
+               msmd.usage_count as usageCount,
+               dmd.file_name as metaDataName
+        from mo_stats_meta_data msmd inner join dc_meta_data dmd on msmd.meta_data_id = dmd.meta_data_id
+        order by msmd.usage_count desc
+        limit #{size}
+    </select>
+</mapper>

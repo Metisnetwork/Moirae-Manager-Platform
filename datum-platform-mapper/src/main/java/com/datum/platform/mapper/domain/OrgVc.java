@@ -3,6 +3,7 @@ package com.datum.platform.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -73,5 +74,35 @@ public class OrgVc implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 持有者组织标识
+     */
+    @TableField(exist = false)
+    private String issuerIdentityId;
+
+    /**
+     * 颁发者组织名称
+     */
+    @TableField(exist = false)
+    private String issuerNodeName;
+
+    /**
+     * 持有者组织标识
+     */
+    @TableField(exist = false)
+    private String holderIdentityId;
+
+    /**
+     * 持有者组织名称
+     */
+    @TableField(exist = false)
+    private String holderNodeName;
+
+    /**
+     * 持有者组织图像url
+     */
+    @TableField(exist = false)
+    private String holderImageUrl;
 
 }

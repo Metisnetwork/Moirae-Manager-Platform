@@ -3,7 +3,7 @@ package com.datum.platform.init;
 import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.service.OrgService;
-import com.datum.platform.service.ProposalService;
+import com.datum.platform.service.PublicityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class ProcessInit {
     @Resource
     private OrgService orgService;
     @Resource
-    private ProposalService proposalService;
+    private PublicityService publicityService;
     @Resource
     private IUniswapV2FactoryContract uniswapV2FactoryContract;
     @Resource
@@ -37,6 +37,6 @@ public class ProcessInit {
         // 初始化投票合约
         voteContract.init();
         // 添加提案消费
-        proposalService.subscribe();
+        publicityService.subscribe();
     }
 }

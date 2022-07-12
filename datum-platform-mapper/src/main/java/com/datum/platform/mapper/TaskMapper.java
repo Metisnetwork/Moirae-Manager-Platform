@@ -29,4 +29,6 @@ public interface TaskMapper extends BaseMapper<Task> {
     List<Task> statisticsOfDay(Integer size);
 
     List<Task> listTaskOfLatest(Integer size);
+
+    List<Task> list(Long latestSynced, Long size);
 }

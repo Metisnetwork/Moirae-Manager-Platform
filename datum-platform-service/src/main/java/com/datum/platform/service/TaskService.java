@@ -39,4 +39,8 @@ public interface TaskService {
     List<Task> listTaskOfLatest(Integer size);
 
     Long countOfMetaDataCertificateUsed(String metaDataId, MetaDataCertificateTypeEnum type, String tokenAddress, String tokenId);
+
+    long getTaskMaxSyncSeq();
+
+    List<Task> listTaskDetail(Long latestSynced, Long size);
 }

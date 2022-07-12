@@ -88,4 +88,12 @@ public interface OrgService {
     List<OrgExpand> listHaveIpPortOrgExpand();
 
     boolean batchSaveOrgVc(List<OrgVc> orgVcList, List<Publicity> publicityList);
+
+    int countOfOrgVc();
+
+    List<OrgVc> getLatestOrgVcList(Integer size);
+
+    IPage<OrgVc> listOrgVcList(Long current, Long size);
+
+    IPage<OrgExpand> listAuthority(Long current, Long size);
 }

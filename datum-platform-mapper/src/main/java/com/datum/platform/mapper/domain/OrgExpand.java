@@ -3,6 +3,7 @@ package com.datum.platform.mapper.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,6 +46,11 @@ public class OrgExpand implements Serializable {
     private Boolean isCertified;
 
     /**
+     * 加入委员会的时间
+     */
+    private Date authorityJoinTime;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -63,4 +69,16 @@ public class OrgExpand implements Serializable {
         }
         return identityId;
     }
+
+    /**
+     * 组织名称
+     */
+    @TableField(exist = false)
+    private String nodeName;
+
+    /**
+     * 组织机构图像url
+     */
+    @TableField(exist = false)
+    private String imageUrl;
 }

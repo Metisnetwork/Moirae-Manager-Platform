@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,7 +44,7 @@ public class DataServiceImpl implements DataService {
     @Resource
     private PsiManager psiManager;
     @Resource
-    private StatsMetaDataCertificateManager statsTokenManager;
+    private StatsMetaDataManager statsTokenManager;
     @Resource
     private MetaDataCertificateManager metaDataCertificateManager;
     @Resource
@@ -132,7 +129,7 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public boolean saveOrUpdateBatchStatsToken(List<StatsMetaDataCertificate> saveList) {
+    public boolean saveOrUpdateBatchStatsToken(List<StatsMetaData> saveList) {
         return statsTokenManager.saveOrUpdateBatch(saveList);
     }
 

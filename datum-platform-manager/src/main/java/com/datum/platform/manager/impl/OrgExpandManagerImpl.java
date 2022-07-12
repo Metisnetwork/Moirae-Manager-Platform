@@ -1,7 +1,9 @@
 package com.datum.platform.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.OrgExpandManager;
 import com.datum.platform.mapper.OrgExpandMapper;
@@ -34,5 +36,10 @@ public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand
         queryWrapper.isNotNull(OrgExpand::getIdentityIp);
         queryWrapper.isNotNull(OrgExpand::getIdentityPort);
         return list(queryWrapper);
+    }
+
+    @Override
+    public IPage<OrgExpand> list(Page<OrgExpand> page) {
+        return baseMapper.list(page);
     }
 }

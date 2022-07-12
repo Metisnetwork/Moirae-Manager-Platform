@@ -13,11 +13,10 @@ import lombok.Getter;
 public enum DataSyncTypeEnum {
 
     ORG_STATUS("org_status", "同步组织状态"),
-    DATA_AUTH("data_auth", "同步数据授权信息"),
     META_DATA("meta_data", "同步元数据信息"),
     TASK("task","同步组织相关任务信息"),
     POWER("power", "算力同步"),
-    STATS_METADATA_CERTIFICATE_USED("stats_metadata_certificate_used","数据凭证使用次数");;
+    ANALYZE_TASK("analyze_task","任务数据分析");;
 
     DataSyncTypeEnum(String dataType, String desc) {
         this.dataType = dataType;

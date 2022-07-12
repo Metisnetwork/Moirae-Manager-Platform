@@ -2,4 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.datum.platform.mapper.OrgVcMapper">
 
+    <select id="listLatest" resultType="com.datum.platform.mapper.domain.OrgVc">
+        select ho.node_name as holderNodeName,
+               ho.identity_id as holderIdentityId,
+               ho.image_url as holderImageUrl,
+               mov.issuance_date
+        from mo_org_vc mov inner join dc_org ho  on ho.identity_id = mov.identity_id
+        where ho.status = 1
+        order by mov.issuance_date desc
+        limit #{size}
+    </select>
+    <select id="list" resultType="com.datum.platform.mapper.domain.OrgVc">
+        select ho.node_name as holderNodeName,
+               ho.identity_id as holderIdentityId,
+               io.node_name as issuerNodeName,
+               io.identity_id as issuerIdentityId,
+               mov.issuance_date,
+               mov.expiration_date
+        from mo_org_vc mov inner join dc_org io  on io.wallet_address = mov.issuer
+                           inner join dc_org ho  on ho.identity_id = mov.identity_id
+        where ho.status = 1
+        order by mov.issuance_date desc
+        limit #{size}
+    </select>
+
 </mapper>

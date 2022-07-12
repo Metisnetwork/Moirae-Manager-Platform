@@ -138,7 +138,7 @@ public interface DataService {
      * @param saveList
      * @return
      */
-    boolean saveOrUpdateBatchStatsToken(List<StatsMetaDataCertificate> saveList);
+    boolean saveOrUpdateBatchStatsToken(List<StatsMetaData> saveList);
 
     /**
      * 查询用户可用的模型列表

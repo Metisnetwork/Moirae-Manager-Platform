@@ -14,7 +14,7 @@ import com.datum.platform.mapper.domain.MetaDataColumn;
 import com.datum.platform.mapper.domain.Token;
 import com.datum.platform.mapper.enums.*;
 import com.datum.platform.service.DataService;
-import com.datum.platform.service.DataSyncService;
+import com.datum.platform.service.SysService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,14 +38,14 @@ public class SyncDcMetaDataTask {
     private DataService metaDataService;
 
     @Resource
-    private DataSyncService dataSyncService;
+    private SysService sysService;
 
     @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            dataSyncService.sync(DataSyncTypeEnum.META_DATA.getDataType(),DataSyncTypeEnum.META_DATA.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            sysService.syncFromDc(DataSyncTypeEnum.META_DATA.getDataType(),DataSyncTypeEnum.META_DATA.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcMetaDataService.getGlobalMetadataDetailList(latestSynced);
                     },

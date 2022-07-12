@@ -166,4 +166,12 @@
         from dc_task t inner join dc_org o on t.owner_identity_id = o.identity_id
         order by t.create_at desc limit #{size}
     </select>
+
+    <select id="list" resultType="com.datum.platform.mapper.domain.Task">
+        select t.id,
+               t.sync_seq
+        from dc_task t
+        where t.sync_seq > #{latestSynced}
+        order by t.sync_seq desc limit #{size}
+    </select>
 </mapper>

@@ -7,6 +7,7 @@ import com.datum.platform.mapper.domain.Task;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager extends IService<Task> {
 
@@ -25,4 +26,16 @@ public interface TaskManager extends IService<Task> {
     List<Task> statisticsOfDay(Integer size);
 
     List<Task> listTaskOfLatest(Integer size);
+
+    long getMaxSyncSeq();
+
+    /**
+     * 查询已经存在任务列表，只返回id、updateAt、syncSeq字段
+     *
+     * @param collect
+     * @return
+     */
+    List<Task> getExistedTaskIdAndUpdateAtList(Set<String> collect);
+
+    List<Task> listTask(Long latestSynced, Long size);
 }

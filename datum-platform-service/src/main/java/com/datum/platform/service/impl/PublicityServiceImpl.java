@@ -2,12 +2,15 @@ package com.datum.platform.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.chain.platon.config.PlatONProperties;
 import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.chain.platon.contract.evm.Vote;
 import com.datum.platform.manager.ProposalLogManager;
 import com.datum.platform.manager.ProposalManager;
 import com.datum.platform.manager.PublicityManager;
+import com.datum.platform.mapper.domain.OrgVc;
 import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.domain.ProposalLog;
 import com.datum.platform.mapper.domain.Publicity;
@@ -15,7 +18,7 @@ import com.datum.platform.mapper.enums.ProposalLogTypeEnum;
 import com.datum.platform.mapper.enums.ProposalStatusEnum;
 import com.datum.platform.mapper.enums.ProposalTypeEnum;
 import com.datum.platform.service.OrgService;
-import com.datum.platform.service.ProposalService;
+import com.datum.platform.service.PublicityService;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.tuples.generated.Tuple3;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,7 @@ import java.math.BigInteger;
 
 @Slf4j
 @Service
-public class ProposalServiceImpl implements ProposalService {
+public class PublicityServiceImpl implements PublicityService {
 
     @Resource
     private VoteContract voteContract;
@@ -113,4 +116,14 @@ public class ProposalServiceImpl implements ProposalService {
             }
         }));
     }
+
+    @Override
+    public IPage<Proposal> listProposal(Long current, Long size) {
+        Page<Proposal> page = new Page<>(current, size);
+        IPage<Proposal> iPage = proposalManager.list(page);
+
+
+        return iPage;
+    }
+
 }

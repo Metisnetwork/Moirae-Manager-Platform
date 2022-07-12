@@ -1,5 +1,7 @@
 package com.datum.platform.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.mapper.domain.Proposal;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProposalMapper extends BaseMapper<Proposal> {
 
+    IPage<Proposal> list(Page<Proposal> page);
 }

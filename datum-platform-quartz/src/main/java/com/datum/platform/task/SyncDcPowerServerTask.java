@@ -7,8 +7,8 @@ import cn.hutool.core.date.DateUtil;
 import com.datum.platform.grpc.client.impl.GrpcPowerServiceClientImpl;
 import com.datum.platform.mapper.domain.PowerServer;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
-import com.datum.platform.service.DataSyncService;
 import com.datum.platform.service.PowerService;
+import com.datum.platform.service.SysService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,7 +28,7 @@ public class SyncDcPowerServerTask {
     @Resource
     private GrpcPowerServiceClientImpl powerServiceClient;
     @Resource
-    private DataSyncService dataSyncService;
+    private SysService sysService;
     @Resource
     private PowerService powerService;
 
@@ -37,7 +37,7 @@ public class SyncDcPowerServerTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            dataSyncService.sync(DataSyncTypeEnum.POWER.getDataType(),DataSyncTypeEnum.POWER.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            sysService.syncFromDc(DataSyncTypeEnum.POWER.getDataType(),DataSyncTypeEnum.POWER.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return powerServiceClient.getGlobalPowerDetailList(latestSynced);
                     },

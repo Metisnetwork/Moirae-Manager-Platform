@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -166,4 +167,14 @@ public class MetaData implements Serializable {
     private Long totalSize;
     @TableField(exist = false)
     private Integer totalCount;
+    /**
+     * 组织是否为委员会成员
+     */
+    @TableField(exist = false)
+    private Boolean isAuthority;
+    /**
+     * 组织是否已认证
+     */
+    @TableField(exist = false)
+    private Boolean isCertified;
 }

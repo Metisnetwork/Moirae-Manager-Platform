@@ -6,7 +6,7 @@ import com.datum.platform.common.enums.RespCodeEnum;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.manager.StatsGlobalManager;
 import com.datum.platform.manager.StatsOrgManager;
-import com.datum.platform.manager.StatsMetaDataCertificateManager;
+import com.datum.platform.manager.StatsMetaDataManager;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.service.StatisticsService;
@@ -30,7 +30,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Resource
     private StatsOrgManager statsOrgManager;
     @Resource
-    private StatsMetaDataCertificateManager statsDataManager;
+    private StatsMetaDataManager statsMetaDataManager;
     @Resource
     private TaskService taskService;
     @Resource
@@ -111,14 +111,24 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<StatsMetaDataCertificate> getDataTokenUsedTop(Integer size) {
-        List<StatsMetaDataCertificate> statsTokenList = statsDataManager.getDataTokenUsedTop(size);
+    public List<StatsMetaData> getMetaDataUsedTop(Integer size) {
+        List<StatsMetaData> statsTokenList = statsMetaDataManager.getMetaDataUsedTop(size);
         return statsTokenList;
     }
 
     @Override
     public boolean updateStatsGlobal(StatsGlobal global) {
         return statsGlobalManager.updateById(global);
+    }
+
+    @Override
+    public StatsMetaData getStatsMetaDataById(String metaDataId) {
+        return statsMetaDataManager.getById(metaDataId);
+    }
+
+    @Override
+    public boolean saveOrUpdateBatchStatsMetaData(Collection<StatsMetaData> statsMetaDataList) {
+        return statsMetaDataManager.saveOrUpdateBatch(statsMetaDataList);
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -57,4 +58,27 @@ public class TaskManagerImpl extends ServiceImpl<TaskMapper, Task> implements Ta
     public List<Task> listTaskOfLatest(Integer size) {
         return this.baseMapper.listTaskOfLatest(size);
     }
+
+    @Override
+    public long getMaxSyncSeq() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.orderByDesc(Task::getSyncSeq);
+        queryWrapper.last("limit 1");
+        Task task = getOne(queryWrapper);
+        return task == null ? 0L : task.getSyncSeq();
+    }
+
+    @Override
+    public List<Task> getExistedTaskIdAndUpdateAtList(Set<String> collect) {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.select(Task::getId, Task::getUpdateAt, Task::getSyncSeq);
+        queryWrapper.in(Task::getId, collect);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public List<Task> listTask(Long latestSynced, Long size) {
+        return this.baseMapper.list(latestSynced, size);
+    }
+
 }

@@ -262,6 +262,28 @@ public class OrgServiceImpl implements OrgService {
         return true;
     }
 
+    @Override
+    public int countOfOrgVc() {
+        return orgVcManager.count();
+    }
+
+    @Override
+    public List<OrgVc> getLatestOrgVcList(Integer size) {
+        return orgVcManager.listLatest(size);
+    }
+
+    @Override
+    public IPage<OrgVc> listOrgVcList(Long current, Long size) {
+        Page<OrgVc> page = new Page<>(current, size);
+        return orgVcManager.list(page);
+    }
+
+    @Override
+    public IPage<OrgExpand> listAuthority(Long current, Long size) {
+        Page<OrgExpand> page = new Page<>(current, size);
+        return orgExpandManager.list(page);
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

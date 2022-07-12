@@ -127,6 +127,16 @@ public class Task implements Serializable {
     private String taskSign;
 
     /**
+     * 用于记录同步的序列
+     */
+    private Long syncSeq;
+
+    /**
+     * 状态)修改时间
+     */
+    private Date updateAt;
+
+    /**
      * 创建时间
      */
     private Date createTime;
