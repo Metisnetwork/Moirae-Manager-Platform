@@ -5,7 +5,7 @@
     <select id="getIdentityIdListByUser" resultType="java.lang.String">
         SELECT o.`identity_id`
         FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
-        WHERE o.`status` = 1 AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
+        WHERE o.`status` = 1 AND oe.identity_ip is not null AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
     </select>
 
     <select id="getUserOrgList" resultType="com.datum.platform.mapper.domain.Org">
@@ -19,6 +19,6 @@
             oe.`identity_port`,
             oe.`is_public` as public_flag
         FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
-        WHERE `status` = 1 AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
+        WHERE `status` = 1 AND oe.identity_ip is not null AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
     </select>
 </mapper>

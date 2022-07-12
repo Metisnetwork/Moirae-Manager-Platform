@@ -2,9 +2,7 @@ package com.datum.platform.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.common.enums.OrgOrderByEnum;
-import com.datum.platform.mapper.domain.Org;
-import com.datum.platform.mapper.domain.OrgExpand;
-import com.datum.platform.mapper.domain.StatsOrg;
+import com.datum.platform.mapper.domain.*;
 import io.grpc.ManagedChannel;
 
 import java.util.Collection;
@@ -86,4 +84,8 @@ public interface OrgService {
     List<OrgExpand> listOrgExpand();
 
     List<String> listOrgVcId();
+
+    List<OrgExpand> listHaveIpPortOrgExpand();
+
+    boolean batchSaveOrgVc(List<OrgVc> orgVcList, List<Publicity> publicityList);
 }

@@ -20,4 +20,10 @@ public class BaseOrgVo {
 
     @ApiModelProperty(value = "组织的最新更新时间")
     private Date updateAt;
+
+    @ApiModelProperty(value = "是否为委员会成员")
+    private Boolean isAuthority;
+
+    @ApiModelProperty(value = "是否已认证")
+    private Boolean isCertified;
 }

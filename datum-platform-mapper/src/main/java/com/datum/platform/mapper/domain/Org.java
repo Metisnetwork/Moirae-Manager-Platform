@@ -118,4 +118,8 @@ public class Org implements Serializable {
      */
     @TableField(exist = false)
     private Boolean isInWhitelist;
+    @TableField(exist = false)
+    private Boolean isAuthority;
+    @TableField(exist = false)
+    private Boolean isCertified;
 }

@@ -8,6 +8,8 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.ProposalStatusEnum;
+import com.datum.platform.mapper.enums.ProposalTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -44,7 +46,7 @@ public class Proposal implements Serializable {
      * 提案类型, 1-增加委员会成员; 2-剔除委员会成员; 3-委员会成员退出
      */
     @TableField("`type`")
-    private Integer type;
+    private ProposalTypeEnum type;
 
     /**
      * 提案的附言
@@ -59,17 +61,17 @@ public class Proposal implements Serializable {
     /**
      * 提交时间
      */
-    private Date submissionTime;
+    private String submissionBn;
 
     /**
      * 投票开始时间
      */
-    private Date voteBeginTime;
+    private String voteBeginBn;
 
     /**
      * 投票结束时间
      */
-    private Date voteEndTime;
+    private String voteEndBn;
 
     /**
      * 赞成票数量
@@ -85,7 +87,7 @@ public class Proposal implements Serializable {
      * 提案状态, 0-未开始; 1-投票中; 2-投票通过; 3-投票未通过; 4-退出中；5-已退出
      */
     @TableField("`status`")
-    private Integer status;
+    private ProposalStatusEnum status;
 
     /**
      * 创建时间

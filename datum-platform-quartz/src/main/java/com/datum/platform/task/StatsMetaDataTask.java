@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @ConditionalOnProperty(name="dev.quartz", havingValue="true")
-public class StatsMetaDataCertificateTask {
+public class StatsMetaDataTask {
 
     @Resource
     private DataService dataService;
@@ -30,7 +30,7 @@ public class StatsMetaDataCertificateTask {
     private TaskService taskService;
 
     @Scheduled(fixedDelay = 60 * 1000)
-    @Lock(keys = "StatsMetaDataCertificateTask")
+    @Lock(keys = "StatsMetaDataTask")
     public void run() {
         long begin = DateUtil.current();
         try {
@@ -43,7 +43,7 @@ public class StatsMetaDataCertificateTask {
                     save.setUsageCount(taskService.countOfMetaDataCertificateUsed(certificate.getMetaDataId(), certificate.getType(), certificate.getTokenAddress(), certificate.getTokenId()));
                     saveList.add(save);
                 } catch (Exception e){
-                    log.error("StatsMetaDataCertificateTask, 明细失败：{}",certificate, e);
+                    log.error("StatsMetaDataTask, 明细失败：{}",certificate, e);
                 }
             }
 
@@ -51,8 +51,8 @@ public class StatsMetaDataCertificateTask {
                 dataService.saveOrUpdateBatchStatsToken(saveList);
             }
         } catch (Exception e) {
-            log.error("StatsMetaDataCertificateTask, 失败原因：{}", e.getMessage(), e);
+            log.error("StatsMetaDataTask, 失败原因：{}", e.getMessage(), e);
         }
-        log.info("StatsMetaDataCertificateTask，总耗时:{}ms", DateUtil.current() - begin);
+        log.info("StatsMetaDataTask，总耗时:{}ms", DateUtil.current() - begin);
     }
 }

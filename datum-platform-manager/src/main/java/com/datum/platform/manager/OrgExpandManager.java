@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface OrgExpandManager extends IService<OrgExpand> {
     boolean saveOfNotExist(List<OrgExpand> orgExpandList);
+
+    List<OrgExpand> listHaveIpPort();
 }

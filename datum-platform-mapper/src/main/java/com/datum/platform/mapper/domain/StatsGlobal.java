@@ -36,12 +36,12 @@ public class StatsGlobal implements Serializable {
     /**
      * 数据凭证数量
      */
-    private int dataTokenCount;
+    private int dataCount;
 
     /**
      * 数据凭证使用量
      */
-    private long dataTokenUsed;
+    private long dataUsed;
 
     /**
      * 全网目前的算力核心数，单位：个

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.manager.*;
+import com.datum.platform.mapper.domain.*;
 import com.datum.platform.service.DataService;
 import com.google.protobuf.Empty;
 import com.datum.platform.chain.platon.contract.DatumNetworkPayContract;
@@ -18,10 +19,6 @@ import com.datum.platform.common.enums.RespCodeEnum;
 import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.dto.UserDto;
 import com.datum.platform.grpc.constant.GrpcConstant;
-import com.datum.platform.mapper.domain.Org;
-import com.datum.platform.mapper.domain.OrgExpand;
-import com.datum.platform.mapper.domain.OrgUser;
-import com.datum.platform.mapper.domain.StatsOrg;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.service.utils.UserContext;
 import io.grpc.ManagedChannel;
@@ -56,6 +53,8 @@ public class OrgServiceImpl implements OrgService {
     private OrgUserManager userOrgManager;
     @Resource
     private StatsOrgManager statsOrgManager;
+    @Resource
+    private PublicityManager publicityManager;
     @Resource
     private DatumNetworkPayContract datumNetworkPayContract;
 
@@ -248,6 +247,19 @@ public class OrgServiceImpl implements OrgService {
     @Override
     public List<String> listOrgVcId() {
         return orgVcManager.listId();
+    }
+
+    @Override
+    public List<OrgExpand> listHaveIpPortOrgExpand() {
+        return orgExpandManager.listHaveIpPort();
+    }
+
+    @Override
+    @Transactional
+    public boolean batchSaveOrgVc(List<OrgVc> orgVcList, List<Publicity> publicityList) {
+        orgVcManager.saveBatch(orgVcList);
+        publicityManager.saveBatch(publicityList);
+        return true;
     }
 
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){

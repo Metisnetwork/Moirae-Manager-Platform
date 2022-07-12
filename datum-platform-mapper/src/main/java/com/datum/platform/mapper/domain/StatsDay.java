@@ -24,5 +24,15 @@ public class StatsDay implements Serializable {
      */
     private Long statsValue;
 
+    /**
+     * 统计值（隐私）
+     */
+    Long privacyStatsValue;
+
+    /**
+     * 统计值（非隐私）
+     */
+    Long noPrivacyStatsValue;
+
     private static final long serialVersionUID = 1L;
 }

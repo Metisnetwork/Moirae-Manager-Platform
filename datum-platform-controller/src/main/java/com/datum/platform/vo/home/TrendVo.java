@@ -14,6 +14,12 @@ public class TrendVo {
     @ApiModelProperty(value = "统计时间")
     Date statsTime;
 
-    @ApiModelProperty(value = "统计值")
+    @ApiModelProperty(value = "统计值（隐私 + 非隐私）")
     Long statsValue;
+
+    @ApiModelProperty(value = "统计值（隐私）")
+    Long privacyStatsValue;
+
+    @ApiModelProperty(value = "统计值（非隐私）")
+    Long noPrivacyStatsValue;
 }

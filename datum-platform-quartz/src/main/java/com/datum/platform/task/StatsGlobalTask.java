@@ -39,10 +39,10 @@ public class StatsGlobalTask {
             Task task = taskService.statisticsOfGlobal();
             global.setTaskCount(task.getTaskCount());
             global.setAddressCountOfTask(task.getAddressCount());
-            global.setDataTokenUsed(task.getDataCount());
+            global.setDataUsed(task.getDataCount());
             MetaData data = dataService.statisticsOfGlobal();
             global.setDataSize(data.getTotalSize());
-            global.setDataTokenCount(data.getTotalCount());
+            global.setDataCount(data.getTotalCount());
             global.setAddressCountOfActive(userService.countOfActiveAddress());
             PowerServer powerServer = powerService.statisticsOfGlobal();
             global.setTotalCore(powerServer.getOrgTotalCore());

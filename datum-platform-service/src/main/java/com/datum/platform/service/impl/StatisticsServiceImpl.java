@@ -69,6 +69,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 StatsDay statsDay = new StatsDay();
                 statsDay.setStatsTime(date);
                 statsDay.setStatsValue(task.getTaskCount().longValue());
+
                 statsDayMap.put(date, statsDay);
             } catch (ParseException e) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.BIZ_QUERY_NOT_EXIST.getMsg(), e);
@@ -90,6 +91,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                 StatsDay statsDay = new StatsDay();
                 statsDay.setStatsTime(item);
                 statsDay.setStatsValue(0L);
+                statsDay.setPrivacyStatsValue(0L);
+                statsDay.setNoPrivacyStatsValue(0L);
                 return statsDay;
             }));
             now = DateUtils.addDays(now, -1);
@@ -128,8 +131,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             statsGlobal.setTotalBandwidth(0);
             statsGlobal.setTotalCore(0);
             statsGlobal.setDataSize(0);
-            statsGlobal.setDataTokenUsed(0);
-            statsGlobal.setDataTokenCount(0);
+            statsGlobal.setDataUsed(0);
+            statsGlobal.setDataCount(0);
             statsGlobal.setAddressCountOfActive(0);
             statsGlobal.setAddressCountOfTask(0);
             statsGlobal.setTaskCount(0);

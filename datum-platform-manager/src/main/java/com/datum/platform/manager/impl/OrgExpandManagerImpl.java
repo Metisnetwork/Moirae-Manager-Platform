@@ -27,4 +27,12 @@ public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand
         }
         return true;
     }
+
+    @Override
+    public List<OrgExpand> listHaveIpPort() {
+        LambdaQueryWrapper<OrgExpand> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.isNotNull(OrgExpand::getIdentityIp);
+        queryWrapper.isNotNull(OrgExpand::getIdentityPort);
+        return list(queryWrapper);
+    }
 }

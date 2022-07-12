@@ -70,10 +70,10 @@ public class HomeController {
         return ResponseVo.createSuccess(BeanUtil.copyToList(statsOrgList, OrgPowerVo.class));
     }
 
-    @GetMapping("getDataTokenUsedTop")
-    @ApiOperation(value = "获得数据凭证使用量排行", notes = "获得数据凭证使用量排行")
-    public ResponseVo<List<DataTokenUsedVo>> getDataTokenUsedTop(@Valid GetOrgComputingTopReq req) {
+    @GetMapping("getDataUsedTop")
+    @ApiOperation(value = "获得数据使用排行", notes = "获得数据使用排行")
+    public ResponseVo<List<DataUsedVo>> getDataTokenUsedTop(@Valid GetOrgComputingTopReq req) {
         List<StatsMetaDataCertificate> statsTokenList = statisticsService.getDataTokenUsedTop(req.getSize());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(statsTokenList, DataTokenUsedVo.class));
+        return ResponseVo.createSuccess(BeanUtil.copyToList(statsTokenList, DataUsedVo.class));
     }
 }

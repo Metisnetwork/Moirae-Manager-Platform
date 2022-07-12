@@ -1556,7 +1556,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         String algorithmName = curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmName();
         String workflowVersionName = workflowVersionManager.getById(workflowRunStatus.getWorkflowId(), workflowRunStatus.getWorkflowVersion()).getWorkflowVersionName();
         WorkflowCreateModeEnum createModeEnum = workflowRunStatus.getWorkflow().getCreateMode();
-        return StringUtils.abbreviate(id+ "_" + address + "_" + algorithmName + "_" + createModeEnum.getValue() + "_" + workflowVersionName, 100);
+        return StringUtils.abbreviate(StringUtils.joinWith("_", id, address, algorithmName, createModeEnum.getValue(),
+                curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getType() == AlgorithmTypeEnum.CT?"p" :"np",workflowVersionName), 100);
     }
 
     private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {
@@ -1708,7 +1709,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                         }else{
                             tokenItem.setId(Long.valueOf(metaDataCertificate.getTokenId()));
                         }
-                        //TODO
+                        requestBuilder.addTokenItems(tokenItem);
                     });
 
                     TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());

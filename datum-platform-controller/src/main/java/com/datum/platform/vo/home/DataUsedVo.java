@@ -6,14 +6,11 @@ import lombok.Data;
 
 @Data
 @ApiModel(value = "数据凭证使用明细")
-public class DataTokenUsedVo {
-
-    @ApiModelProperty(value = "数据凭证合约地址")
-    private String tokenAddress;
+public class DataUsedVo {
 
     @ApiModelProperty(value = "数据凭证名称")
-    private String tokenName;
+    private String name;
 
     @ApiModelProperty(value = "数据凭证使用量")
-    private Long tokenUsed;
+    private Long used;
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.ProposalLogTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ import java.util.Date;
  * @since 2022-07-08
  */
 @Data
-@TableName("mo_prposal_log")
+@TableName("mo_proposal_log")
 public class ProposalLog implements Serializable {
 
 
@@ -36,12 +37,7 @@ public class ProposalLog implements Serializable {
     /**
      * 事件类型, 1-提交提案; 2-撤销提案; 3-对提案投票; 4-投票结果
      */
-    private Integer type;
-
-    /**
-     * 事件操作地址
-     */
-    private String operator;
+    private ProposalLogTypeEnum type;
 
     /**
      * 事件所在块高
