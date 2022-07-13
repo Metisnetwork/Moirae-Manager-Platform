@@ -35,7 +35,7 @@ public class AnalyzeTaskTask {
     @Resource
     private StatisticsService statisticsService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "AnalyzeTaskTask")
     public void run() {
         long begin = DateUtil.current();

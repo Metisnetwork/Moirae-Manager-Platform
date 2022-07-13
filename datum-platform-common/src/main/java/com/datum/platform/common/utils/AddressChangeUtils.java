@@ -27,4 +27,8 @@ public class AddressChangeUtils {
         }
         return Numeric.toHexString(Bech32.addressDecode(hrpAddress));
     }
+
+    public static String did20xAddress(String did){
+        return Bech32.addressDecodeHex(did.substring(did.lastIndexOf(":") + 1));
+    }
 }

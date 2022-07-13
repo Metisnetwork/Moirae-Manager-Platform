@@ -2,6 +2,7 @@ package com.datum.platform.task;
 
 import cn.hutool.core.date.DateUtil;
 import com.datum.platform.chain.platon.contract.VoteContract;
+import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
@@ -29,7 +30,7 @@ public class SyncOrgExpandTask {
     @Resource
     private VoteContract voteContract;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncOrgExpandTask")
     public void run() {
         long begin = DateUtil.current();
@@ -39,19 +40,19 @@ public class SyncOrgExpandTask {
             Set<String> authoritySet = voteContract.getAllAuthority().getValue1().stream().collect(Collectors.toSet());
             Set<String> vcSet = orgService.listOrgVcId().stream().collect(Collectors.toSet());
             orgExpandList.forEach(orgExpand -> {
-                if(authoritySet.contains(orgExpand.getObserverProxyWalletAddress()) && !orgExpand.getIsAuthority()){
+                if(authoritySet.contains(AddressChangeUtils.did20xAddress(orgExpand.getIdentityId())) && !orgExpand.getIsAuthority()){
                     orgExpand.setIsAuthority(true);
                     updateOrgExpandList.add(orgExpand);
                 }
-                if(!authoritySet.contains(orgExpand.getObserverProxyWalletAddress()) && orgExpand.getIsAuthority()){
+                if(!authoritySet.contains(AddressChangeUtils.did20xAddress(orgExpand.getIdentityId())) && orgExpand.getIsAuthority()){
                     orgExpand.setIsAuthority(false);
                     updateOrgExpandList.add(orgExpand);
                 }
-                if(vcSet.contains(orgExpand.getObserverProxyWalletAddress()) && !orgExpand.getIsCertified()){
+                if(vcSet.contains(AddressChangeUtils.did20xAddress(orgExpand.getIdentityId())) && !orgExpand.getIsCertified()){
                     orgExpand.setIsCertified(true);
                     updateOrgExpandList.add(orgExpand);
                 }
-                if(!vcSet.contains(orgExpand.getObserverProxyWalletAddress()) && orgExpand.getIsCertified()){
+                if(!vcSet.contains(AddressChangeUtils.did20xAddress(orgExpand.getIdentityId())) && orgExpand.getIsCertified()){
                     orgExpand.setIsCertified(false);
                     updateOrgExpandList.add(orgExpand);
                 }

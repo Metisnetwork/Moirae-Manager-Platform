@@ -31,7 +31,7 @@ public class SyncPublicityTask {
     @Resource
     private SysConfig sysConfig;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncPublicityTask")
     public void run() {
         long begin = DateUtil.current();

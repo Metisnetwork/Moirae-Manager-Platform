@@ -1,11 +1,13 @@
 package com.datum.platform.vo.publicity;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@ApiModel(value = "提案基本信息")
 public class ProposalVo {
     @ApiModelProperty(value = "提案id")
     private String id;

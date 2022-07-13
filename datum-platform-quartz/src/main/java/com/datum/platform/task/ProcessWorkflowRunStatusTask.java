@@ -30,7 +30,7 @@ public class ProcessWorkflowRunStatusTask {
     @Resource
     private TaskService taskService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "ProcessWorkflowRunStatusTask")
     public void run() {
         List<WorkflowRunStatusTask> workflowRunTaskStatusList =  workflowService.listWorkflowRunTaskStatusOfUnConfirmed();

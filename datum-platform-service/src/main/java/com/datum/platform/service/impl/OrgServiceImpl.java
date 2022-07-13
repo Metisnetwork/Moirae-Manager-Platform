@@ -284,6 +284,11 @@ public class OrgServiceImpl implements OrgService {
         return orgExpandManager.list(page);
     }
 
+    @Override
+    public Integer countOfAuthority() {
+        return orgExpandManager.countOfAuthority();
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

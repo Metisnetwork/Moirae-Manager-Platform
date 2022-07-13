@@ -13,4 +13,6 @@ public interface OrgExpandManager extends IService<OrgExpand> {
     List<OrgExpand> listHaveIpPort();
 
     IPage<OrgExpand> list(Page<OrgExpand> page);
+
+    Integer countOfAuthority();
 }

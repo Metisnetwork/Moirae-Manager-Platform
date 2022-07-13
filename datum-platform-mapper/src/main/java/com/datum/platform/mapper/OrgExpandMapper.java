@@ -12,4 +12,6 @@ public interface OrgExpandMapper extends BaseMapper<OrgExpand> {
     List<String> getUsableIdentityIdList();
 
     IPage<OrgExpand> list(Page<OrgExpand> page);
+
+    Integer countOfAuthority();
 }

@@ -5,23 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.domain.OrgVc;
 import com.datum.platform.mapper.domain.Proposal;
-import com.datum.platform.mapper.domain.Task;
 import com.datum.platform.req.CommonPageReq;
+import com.datum.platform.req.IdReq;
 import com.datum.platform.req.publicity.GetLatestOrgVcListReq;
-import com.datum.platform.req.task.GetTaskDetailsReq;
-import com.datum.platform.req.task.GetTaskListReq;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.service.PublicityService;
-import com.datum.platform.service.SysService;
 import com.datum.platform.utils.ConvertUtils;
 import com.datum.platform.vo.PageVo;
 import com.datum.platform.vo.ResponseVo;
-import com.datum.platform.vo.publicity.AuthorityVo;
-import com.datum.platform.vo.publicity.OrgVcVo;
-import com.datum.platform.vo.publicity.ProposalVo;
-import com.datum.platform.vo.publicity.PublicityStatsVo;
-import com.datum.platform.vo.task.TaskDetailsVo;
-import com.datum.platform.vo.task.TaskVo;
+import com.datum.platform.vo.publicity.*;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
@@ -46,8 +38,6 @@ public class PublicityController {
     private PublicityService publicityService;
     @Resource
     private OrgService orgService;
-    @Resource
-    private SysService sysService;
 
     @GetMapping("getPublicityStats")
     @ApiOperation(value = "查询公示统计", notes = "查询公示统计")
@@ -92,5 +82,13 @@ public class PublicityController {
         IPage<OrgExpand> page = orgService.listAuthority(req.getCurrent(), req.getSize());
         List<AuthorityVo> itemList = BeanUtil.copyToList(page.getRecords(), AuthorityVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
+    }
+
+    @GetMapping("getProposalDetails")
+    @ApiOperation(value = "查询委员会提案详情", notes = "查询委员会提案详情")
+    @ApiOperationSupport(order = 6)
+    public ResponseVo<ProposalDetailsVo> getProposalDetails(@Valid IdReq req) {
+        Proposal proposal = publicityService.getProposalDetails(req.getId());
+        return ResponseVo.createSuccess(BeanUtil.copyProperties(proposal, ProposalDetailsVo.class));
     }
 }

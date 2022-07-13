@@ -42,4 +42,9 @@ public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand
     public IPage<OrgExpand> list(Page<OrgExpand> page) {
         return baseMapper.list(page);
     }
+
+    @Override
+    public Integer countOfAuthority() {
+        return baseMapper.countOfAuthority();
+    }
 }

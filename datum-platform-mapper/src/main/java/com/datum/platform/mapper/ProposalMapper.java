@@ -16,4 +16,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ProposalMapper extends BaseMapper<Proposal> {
 
     IPage<Proposal> list(Page<Proposal> page);
+
+    Proposal getDetailsById(String id);
 }

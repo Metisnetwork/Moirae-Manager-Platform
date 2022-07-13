@@ -1,17 +1,14 @@
 package com.datum.platform.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.datum.platform.mapper.enums.ProposalStatusEnum;
 import com.datum.platform.mapper.enums.ProposalTypeEnum;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -101,5 +98,44 @@ public class Proposal implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
+    /**
+     * 提交的组织id
+     */
+    @TableField(exist = false)
+    private String submitterIdentityId;
+    /**
+     * 提交的组织名称
+     */
+    @TableField(exist = false)
+    private String submitterNodeName;
+    /**
+     * 候选的组织id
+     */
+    @TableField(exist = false)
+    private String candidateIdentityId;
+    /**
+     * 候选的组织名称
+     */
+    @TableField(exist = false)
+    private String candidateNodeName;
+    /**
+     * 投票开始时间
+     */
+    @TableField(exist = false)
+    private Date voteBeginTime;
+    /**
+     * 投票结束时间
+     */
+    @TableField(exist = false)
+    private Date voteEndTime;
+    /**
+     * 提交时间
+     */
+    @TableField(exist = false)
+    private Date submissionTime;
+    /**
+     * 提案公式信息
+     */
+    @TableField(exist = false)
+    private Publicity publicity;
 }

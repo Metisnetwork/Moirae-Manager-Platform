@@ -28,7 +28,8 @@ public class SyncOrgVcTask {
 
     @Resource
     private OrgService orgService;
-    @Scheduled(fixedDelay = 5 * 1000)
+
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncOrgVcTask")
     public void run() {
         long begin = DateUtil.current();

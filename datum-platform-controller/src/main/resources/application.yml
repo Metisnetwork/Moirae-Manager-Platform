@@ -32,7 +32,7 @@ server:
       charset: UTF-8
 
 dev:
-  quartz: false
+  quartz: true
 
 spring:
   datasource:

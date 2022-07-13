@@ -23,4 +23,9 @@ public class ProposalManagerImpl extends ServiceImpl<ProposalMapper, Proposal> i
     public IPage<Proposal> list(Page<Proposal> page) {
         return baseMapper.list(page);
     }
+
+    @Override
+    public Proposal getDetailsById(String id) {
+        return baseMapper.getDetailsById(id);
+    }
 }

@@ -5,6 +5,10 @@ import com.datum.platform.chain.platon.enums.CodeEnum;
 import com.datum.platform.chain.platon.enums.Web3jProtocolEnum;
 import com.datum.platform.chain.platon.exception.AppException;
 import com.datum.platform.chain.platon.function.ExceptionSupplier;
+import com.platon.contracts.ppos.ProposalContract;
+import com.platon.contracts.ppos.StakingContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.common.ErrorCode;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.*;
 import com.platon.protocol.core.methods.response.PlatonBlock;
@@ -39,6 +43,9 @@ public class PlatONClient {
     private int web3Index = -1;
     private BigInteger maxBlockNumber = BigInteger.ZERO;
 
+    // 委托合约接口
+    private StakingContract stakingContract;
+
     @PostConstruct
     public void init(){
         init(specialNodeProperties.getWeb3jProtocol(), specialNodeProperties.getWeb3jAddresses(), specialNodeProperties.getChainId());
@@ -61,6 +68,10 @@ public class PlatONClient {
 
     public void selectBestNode(){
         selectBestNodeInner();
+    }
+
+    public BigInteger getAvgPackTime() {
+        return queryPPOS(() -> stakingContract.getAvgPackTime());
     }
 
     public BigInteger platonGetBalance(String address) {
@@ -138,6 +149,7 @@ public class PlatONClient {
 
     private synchronized void updateWeb3j(int index) {
         web3Index = index;
+        stakingContract = StakingContract.load(web3List.get(index));
     }
 
     private Optional<Web3j> getWeb3j(String address) {
@@ -189,6 +201,29 @@ public class PlatONClient {
             throw new AppException(CodeEnum.CALL_RPC_BIZ_ERROR, rpcMessage);
         }
         return response;
+    }
+
+    private  <T> T queryPPOS(ExceptionSupplier<RemoteCall<CallResponse<T>>> supplier) {
+        CallResponse<T> response;
+
+        try {
+            response = supplier.get().send();
+        }   catch (SocketTimeoutException e) {
+            throw new AppException(CodeEnum.CALL_RPC_READ_TIMEOUT,CodeEnum.CALL_RPC_READ_TIMEOUT.getName(),e);
+        }  catch (IOException e) {
+            throw new AppException(CodeEnum.CALL_RPC_NET_ERROR,CodeEnum.CALL_RPC_NET_ERROR.getName(),e);
+        } catch (Exception e) {
+            throw new AppException(CodeEnum.CALL_RPC_ERROR,CodeEnum.CALL_RPC_ERROR.getName(),e);
+        }
+
+        if(response == null){
+            throw new AppException(CodeEnum.CALL_RPC_BIZ_ERROR, String.format(CodeEnum.CALL_RPC_BIZ_ERROR.getName(), "response is null"));
+        }
+
+        if(!response.isStatusOk()){
+            throw new AppException(CodeEnum.CALL_RPC_BIZ_ERROR, response.getErrMsg());
+        }
+        return response.getData();
     }
 
 }

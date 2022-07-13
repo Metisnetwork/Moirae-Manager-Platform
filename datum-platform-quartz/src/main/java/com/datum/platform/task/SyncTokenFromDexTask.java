@@ -31,7 +31,7 @@ public class SyncTokenFromDexTask {
     @Resource
     private IUniswapV2PairContract uniswapV2PairDao;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncTokenFromDexTask")
     public void run() {
         long begin = DateUtil.current();

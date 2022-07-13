@@ -39,7 +39,7 @@ public class SyncMetaDataCertificateTask {
     private SysConfig sysConfig;
 
 
-    @Scheduled(fixedDelay = 1 * 60 * 1000)
+//    @Scheduled(fixedDelay = 1 * 60 * 1000)
     @Lock(keys = "SyncMetaDataCertificateTask")
     public void run() {
         long begin = DateUtil.current();

@@ -3,8 +3,35 @@
 <mapper namespace="com.datum.platform.mapper.ProposalMapper">
 
     <select id="list" resultType="com.datum.platform.mapper.domain.Proposal">
-
-
-
+        select mp.id,
+               so.identity_id as submitterIdentityId,
+               so.node_name as submitterNodeName,
+               co.identity_id as candidateIdentityId,
+               co.node_name as candidateNodeName,
+               mp.type,
+               mp.vote_begin_bn,
+               mp.vote_end_bn,
+               mp.status
+        from mo_proposal mp inner join dc_org so on mp.submitter = so.wallet_address
+                            inner join dc_org co on mp.candidate = co.wallet_address
+        where mp.type in (1, 2)
+    </select>
+    <select id="getDetailsById" resultType="com.datum.platform.mapper.domain.Proposal">
+        select mp.id,
+               so.identity_id as submitterIdentityId,
+               so.node_name as submitterNodeName,
+               co.identity_id as candidateIdentityId,
+               co.node_name as candidateNodeName,
+               mp.type,
+               mp.vote_begin_bn,
+               mp.vote_end_bn,
+               mp.status,
+               mp.submission_bn,
+               mp.vote_agree_number,
+               mp.authority_number,
+               mp.publicity_id
+        from mo_proposal mp inner join dc_org so on mp.submitter = so.wallet_address
+                            inner join dc_org co on mp.candidate = co.wallet_address
+        where mp.type in (1, 2) and mp.id = #{id}
     </select>
 </mapper>

@@ -15,4 +15,11 @@
         from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
         where o.status = 1 and oe.is_authority = 1;
     </select>
+
+    <select id="countOfAuthority" resultType="java.lang.Integer">
+        select count(1)
+        from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
+        where o.status = 1 and oe.is_authority = 1;
+    </select>
+
 </mapper>

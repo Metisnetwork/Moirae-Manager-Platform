@@ -33,7 +33,7 @@ public class SyncTokenTask {
     @Resource
     private ERC721TemplateContract erc721TemplateContract;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncTokenTask")
     public void run() {
         long begin = DateUtil.current();

@@ -7,4 +7,6 @@ public interface PublicityService {
     void subscribe();
 
     IPage<Proposal> listProposal(Long current, Long size);
+
+    Proposal getProposalDetails(String id);
 }

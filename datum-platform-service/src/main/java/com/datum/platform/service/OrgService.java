@@ -96,4 +96,6 @@ public interface OrgService {
     IPage<OrgVc> listOrgVcList(Long current, Long size);
 
     IPage<OrgExpand> listAuthority(Long current, Long size);
+
+    Integer countOfAuthority();
 }

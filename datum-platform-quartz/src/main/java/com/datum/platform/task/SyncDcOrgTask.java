@@ -2,6 +2,7 @@ package com.datum.platform.task;
 
 import carrier.types.Identitydata;
 import cn.hutool.core.date.DateUtil;
+import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.impl.GrpcAuthServiceClientImpl;
 import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.mapper.domain.OrgExpand;
@@ -12,7 +13,6 @@ import com.datum.platform.service.SysService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -35,7 +35,7 @@ public class SyncDcOrgTask {
     @Resource
     private SysService sysService;
 
-    @Scheduled(fixedDelay = 5 * 1000)
+//    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "SyncDcOrgTask")
     public void run() {
         long begin = DateUtil.current();
@@ -66,7 +66,7 @@ public class SyncDcOrgTask {
         List<Org> orgList = nodeIdentityDtoList.stream().map(nodeIdentityDto -> {
                     Org org = new Org();
                     org.setIdentityId(nodeIdentityDto.getIdentityId());
-                    org.setWalletAddress(nodeIdentityDto.getIdentityId());
+                    org.setWalletAddress(AddressChangeUtils.did20xAddress(nodeIdentityDto.getIdentityId()));
                     org.setNodeId(nodeIdentityDto.getNodeId());
                     org.setNodeName(nodeIdentityDto.getNodeName());
                     org.setImageUrl(nodeIdentityDto.getImageUrl());

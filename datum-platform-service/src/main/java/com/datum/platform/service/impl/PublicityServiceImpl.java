@@ -4,13 +4,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.datum.platform.chain.platon.PlatONClient;
 import com.datum.platform.chain.platon.config.PlatONProperties;
 import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.chain.platon.contract.evm.Vote;
 import com.datum.platform.manager.ProposalLogManager;
 import com.datum.platform.manager.ProposalManager;
 import com.datum.platform.manager.PublicityManager;
-import com.datum.platform.mapper.domain.OrgVc;
 import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.domain.ProposalLog;
 import com.datum.platform.mapper.domain.Publicity;
@@ -26,6 +26,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -43,6 +46,10 @@ public class PublicityServiceImpl implements PublicityService {
     private PublicityManager publicityManager;
     @Resource
     private OrgService orgService;
+    @Resource
+    private PlatONClient platONClient;
+
+    private static Map<BigInteger, BigInteger> timeCache = new ConcurrentHashMap<>();
 
     @Override
     public void subscribe() {
@@ -75,6 +82,7 @@ public class PublicityServiceImpl implements PublicityService {
                     proposal.setVoteBeginBn(log.getBlockNumber().add(config.getValue1()).toString());
                     proposal.setVoteEndBn(log.getBlockNumber().add(config.getValue1()).add(config.getValue2()).toString());
                     proposal.setVoteAgreeNumber(0);
+                    proposal.setAuthorityNumber(orgService.countOfAuthority());
                     proposal.setStatus(ProposalStatusEnum.HAS_NOT_STARTED);
                     proposal.setRemark("");
                     proposalManager.save(proposal);
@@ -121,9 +129,40 @@ public class PublicityServiceImpl implements PublicityService {
     public IPage<Proposal> listProposal(Long current, Long size) {
         Page<Proposal> page = new Page<>(current, size);
         IPage<Proposal> iPage = proposalManager.list(page);
-
-
+        // 查询当前块高
+        BigInteger curBn = platONClient.platonBlockNumber();
+        // 查询平均出块时间
+        BigInteger avgPackTime  = platONClient.getAvgPackTime();
+        iPage.getRecords().forEach(proposal -> {
+            proposal.setVoteBeginTime(bn2Date(proposal.getVoteBeginBn(), curBn, avgPackTime));
+            proposal.setVoteEndTime(bn2Date(proposal.getVoteEndBn(), curBn, avgPackTime));
+        });
         return iPage;
     }
 
+    @Override
+    public Proposal getProposalDetails(String id) {
+        Proposal proposal = proposalManager.getDetailsById(id);
+        proposal.setPublicity(publicityManager.getById(proposal.getPublicityId()));
+        return proposal;
+    }
+
+    private Date bn2Date(String bn, BigInteger curBn, BigInteger avgPackTime){
+        BigInteger convertBn = new BigInteger(bn);
+        int comp = convertBn.compareTo(curBn);
+        if(comp > 0){
+            // 需要通过预估获得时间
+            Date cur = getTimeByBn(convertBn);
+            cur.setTime(cur.getTime() + convertBn.subtract(curBn).multiply(avgPackTime).longValue());
+            return cur;
+        } else {
+            // 已经过去的块高
+            return getTimeByBn(convertBn);
+        }
+    }
+
+    private Date getTimeByBn(BigInteger bn) {
+        BigInteger time = timeCache.computeIfAbsent(bn, k -> platONClient.platonGetBlockByNumber(k).getTimestamp());
+        return new Date(time.longValue());
+    }
 }

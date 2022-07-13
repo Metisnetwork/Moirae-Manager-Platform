@@ -63,13 +63,6 @@ public class OrgExpand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public String getObserverProxyWalletAddress(){
-        if(StringUtils.isBlank(identityId)){
-            return null;
-        }
-        return identityId;
-    }
-
     /**
      * 组织名称
      */

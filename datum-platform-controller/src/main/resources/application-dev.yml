@@ -12,14 +12,14 @@ system:
   config:
     # 公共组织信息
     publicOrgList:
-      - identity: identity:4d7b5f1f114b43b682d9c73d6d2bc18e
-        host: 192.168.10.147
+      - identity: did:pid:lat1eqpf8vxz7m64j25mkmwk39t3xf8zeltxrr2nql
+        host: 192.168.10.152
         port: 10033
-      - identity: identity:8003323d0d1248719be0d50e98e9666e
-        host: 192.168.10.148
+      - identity: did:pid:lat1hlh4qhk9pv33wl62w3myhw2h4mcu4eyfxax4hs
+        host: 192.168.10.153
         port: 10033
-      - identity: identity:7008f843ae69476590c3aab9fc888ec4
-        host: 192.168.10.149
+      - identity: did:pid:lat166gjn98vr5lvl3x2lsltsxjspq77arrp2szcfw
+        host: 192.168.10.154
         port: 10033
 
 # 单Redis节点模式
@@ -36,7 +36,7 @@ chain:
     datumNetworkPayAddress: "0x263B1D39843BF2e1DA27d827e749992fbD1f1577"
     uniswapV2Router02: "0x4378dAF745E9053f6048c4f78c803f3bC8829703"
     voteAddress: "0x2Ea91Cd38dA39c2a202D64cD9e41E3E3A74fb057"
-    voteDeployBlockNumber: "10000"
+    voteDeployBlockNumber: "23590202"
     web3jProtocol: WS
     web3jAddresses: 8.219.126.197:6790
     chainName: "PlatON开发网"

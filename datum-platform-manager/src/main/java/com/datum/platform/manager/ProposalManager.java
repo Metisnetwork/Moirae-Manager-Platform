@@ -16,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ProposalManager extends IService<Proposal> {
 
     IPage<Proposal> list(Page<Proposal> page);
+
+    Proposal getDetailsById(String id);
 }
