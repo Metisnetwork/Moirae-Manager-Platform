@@ -233,4 +233,18 @@ public interface DataService {
     boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList);
 
     String getMetaDataCertificateName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId);
+
+    boolean existMetaData(String metaDataId);
+
+    List<String> listMetaDataIdOfPublished();
+
+    /**
+     * 判断元数据是否可以交易（存在无属性凭证并且已经上架Dex 或 存在有属性凭证）
+     *
+     * @param metaDataId
+     * @return
+     */
+    boolean isTradable(String metaDataId);
+
+    boolean batchReplaceMetaDataMarketplace(List<MetaDataMarketplace> metaDataMarketplaceList);
 }

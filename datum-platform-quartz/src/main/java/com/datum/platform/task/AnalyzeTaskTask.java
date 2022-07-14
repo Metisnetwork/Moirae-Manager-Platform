@@ -35,7 +35,7 @@ public class AnalyzeTaskTask {
     @Resource
     private StatisticsService statisticsService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 5 * 1000)
     @Lock(keys = "AnalyzeTaskTask")
     public void run() {
         long begin = DateUtil.current();
@@ -49,9 +49,9 @@ public class AnalyzeTaskTask {
                         return this.analyzeTaskDetail(taskDetailList);
                     });
         } catch (Exception e) {
-            log.error("任务信息同步,从net同步任务失败,失败原因：{}", e.getMessage(), e);
+            log.error("任务分析,失败原因：{}", e.getMessage(), e);
         }
-        log.info("任务信息同步结束，总耗时:{}ms", DateUtil.current() - begin);
+        log.info("任务分析结束，总耗时:{}ms", DateUtil.current() - begin);
     }
 
     private long analyzeTaskDetail(List<Task> taskDetailList) {
@@ -62,6 +62,7 @@ public class AnalyzeTaskTask {
                     if(save.containsKey(dataProvider.getMetaDataId())){
                         StatsMetaData statsMetaData = save.get(dataProvider.getMetaDataId());
                         statsMetaData.setUsageCount(statsMetaData.getUsageCount() + 1);
+                        return ;
                     }
 
                     StatsMetaData statsMetaData = statisticsService.getStatsMetaDataById(dataProvider.getMetaDataId());

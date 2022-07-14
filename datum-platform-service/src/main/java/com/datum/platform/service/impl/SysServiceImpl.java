@@ -119,7 +119,7 @@ public class SysServiceImpl implements SysService {
         List<T> grpcResponseList;
         do {
             //2.根据新的同步时间latestSynced获取分页列表grpcResponseList
-            grpcResponseList = dbFunction.apply(latestSynced, GrpcConstant.PAGE_SIZE);
+            grpcResponseList = dbFunction.apply(latestSynced, 10L);
             if (CollUtil.isEmpty(grpcResponseList)) {
                 break;
             }
@@ -130,7 +130,7 @@ public class SysServiceImpl implements SysService {
             //5.将最新的同步时间latestSynced存到数据库中
             dataSyncByType.setLatestSynced(latestSynced);
             this.updateDataSyncByType(dataSyncByType);
-        } while (grpcResponseList.size() == GrpcConstant.PAGE_SIZE);//如果小于pageSize说明是最后一批了
+        } while (grpcResponseList.size() == 10L);//如果小于pageSize说明是最后一批了
     }
 
     private DataSync getDataSyncByType(String dataSyncType) {

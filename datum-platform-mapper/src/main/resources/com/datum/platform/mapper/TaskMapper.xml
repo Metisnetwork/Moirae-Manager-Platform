@@ -172,6 +172,6 @@
                t.sync_seq
         from dc_task t
         where t.sync_seq > #{latestSynced}
-        order by t.sync_seq desc limit #{size}
+        order by t.sync_seq asc limit #{size}
     </select>
 </mapper>

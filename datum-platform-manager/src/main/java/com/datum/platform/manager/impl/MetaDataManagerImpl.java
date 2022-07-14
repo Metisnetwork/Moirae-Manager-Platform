@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.MetaDataManager;
 import com.datum.platform.mapper.MetaDataMapper;
 import com.datum.platform.mapper.domain.MetaData;
+import com.datum.platform.mapper.enums.MetaDataStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -66,5 +67,20 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         wrapper.select(MetaData::getMetaDataId, MetaData::getErc721Address);
         wrapper.isNotNull(MetaData::getErc721Address);
         return list(wrapper);
+    }
+
+    @Override
+    public boolean exist(String metaDataId) {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaData::getMetaDataId, metaDataId);
+        return count(wrapper) == 1;
+    }
+
+    @Override
+    public List<String> listIdOfPublished() {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(MetaData::getMetaDataId);
+        wrapper.eq(MetaData::getStatus, MetaDataStatusEnum.PUBLISHED);
+        return listObjs(wrapper, result -> result.toString());
     }
 }

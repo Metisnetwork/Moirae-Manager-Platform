@@ -253,6 +253,6 @@ public class TaskServiceImpl implements TaskService {
         taskList.forEach(task -> {
             task.setDataProviderList(taskDataProviderManager.listByTaskId(task.getId()));
         });
-        return null;
+        return taskList;
     }
 }

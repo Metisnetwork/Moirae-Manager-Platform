@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,6 +50,8 @@ public class DataServiceImpl implements DataService {
     private MetaDataCertificateManager metaDataCertificateManager;
     @Resource
     private MetaDataCertificateUserManager metaDataCertificateUserManager;
+    @Resource
+    private MetaDataMarketplaceManager metaDataMarketplaceManager;
 
     @Override
     public MetaData statisticsOfGlobal() {
@@ -268,5 +271,35 @@ public class DataServiceImpl implements DataService {
     @Override
     public String getMetaDataCertificateName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId) {
         return metaDataCertificateManager.getName(metaDataCertificateTypeEnum, metaDataId, consumeTokenAddress, consumeTokenId);
+    }
+
+    @Override
+    public boolean existMetaData(String metaDataId) {
+        return metaDataManager.exist(metaDataId);
+    }
+
+    @Override
+    public List<String> listMetaDataIdOfPublished() {
+        return metaDataManager.listIdOfPublished();
+    }
+
+    @Override
+    public boolean isTradable(String metaDataId) {
+        List<MetaDataCertificate> metaDataCertificateList = metaDataCertificateManager.listByMetaDataId(metaDataId);
+        long countOfHaveAttributes = metaDataCertificateList.stream().filter(metaDataCertificate -> metaDataCertificate.getType() == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES).count();
+        if(countOfHaveAttributes > 0){
+            return true;
+        }
+        Optional<MetaDataCertificate> noAttributesMetaDataCertificate = metaDataCertificateList.stream().filter(metaDataCertificate -> metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES).findFirst();
+        if(noAttributesMetaDataCertificate.isPresent()){
+            return tokenManager.isAddLiquidity(noAttributesMetaDataCertificate.get().getTokenAddress());
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public boolean batchReplaceMetaDataMarketplace(List<MetaDataMarketplace> metaDataMarketplaceList) {
+        return metaDataMarketplaceManager.batchReplace(metaDataMarketplaceList);
     }
 }

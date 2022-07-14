@@ -15,7 +15,7 @@ public class StatsMetaData implements Serializable {
      * 数据凭证ID
      */
     @TableId
-    private Long metaDataId;
+    private String metaDataId;
 
     /**
      * 使用次数

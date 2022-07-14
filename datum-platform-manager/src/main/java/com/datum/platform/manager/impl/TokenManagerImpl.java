@@ -31,4 +31,12 @@ public class TokenManagerImpl extends ServiceImpl<TokenMapper, Token> implements
         return listObjs(wrapper, Object::toString);
     }
 
+    @Override
+    public boolean isAddLiquidity(String tokenAddress) {
+        LambdaQueryWrapper<Token> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(Token::getAddress, tokenAddress);
+        wrapper.eq(Token::getIsAddLiquidity, true);
+        return count(wrapper) == 1;
+    }
+
 }

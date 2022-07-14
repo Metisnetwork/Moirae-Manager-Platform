@@ -39,4 +39,6 @@ public interface MetaDataCertificateManager extends IService<MetaDataCertificate
     boolean existNoAttributes(String metaDataId, String tokenAddress);
 
     String getName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId);
+
+    List<MetaDataCertificate> listByMetaDataId(String metaDataId);
 }

@@ -8,6 +8,7 @@ import com.datum.platform.manager.StatsGlobalManager;
 import com.datum.platform.manager.StatsOrgManager;
 import com.datum.platform.manager.StatsMetaDataManager;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.service.DataService;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.service.StatisticsService;
 import com.datum.platform.service.TaskService;
@@ -35,6 +36,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     private TaskService taskService;
     @Resource
     private OrgService orgService;
+    @Resource
+    private DataService dataService;
 
     @Override
     public NavigationDto queryNavigation(String keyword) {
@@ -123,7 +126,13 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public StatsMetaData getStatsMetaDataById(String metaDataId) {
-        return statsMetaDataManager.getById(metaDataId);
+        StatsMetaData statsMetaData = statsMetaDataManager.getById(metaDataId);
+        if(statsMetaData == null && dataService.existMetaData(metaDataId)){
+            statsMetaData = new StatsMetaData();
+            statsMetaData.setMetaDataId(metaDataId);
+            statsMetaData.setUsageCount(0L);
+        }
+        return statsMetaData;
     }
 
     @Override

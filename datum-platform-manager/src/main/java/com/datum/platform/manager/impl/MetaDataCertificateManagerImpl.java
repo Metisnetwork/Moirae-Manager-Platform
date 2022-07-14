@@ -134,4 +134,11 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
         }
         return null;
     }
+
+    @Override
+    public List<MetaDataCertificate> listByMetaDataId(String metaDataId) {
+        LambdaQueryWrapper<MetaDataCertificate> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(MetaDataCertificate::getMetaDataId, metaDataId);
+        return list(wrapper);
+    }
 }

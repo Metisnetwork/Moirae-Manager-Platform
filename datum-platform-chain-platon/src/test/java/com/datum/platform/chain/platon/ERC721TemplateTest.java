@@ -10,7 +10,16 @@ import java.util.List;
 
 public class ERC721TemplateTest extends BaseContractTest {
 
-    private String address = "lat120wduf4gjnswzrt8ae8lcs32yem5esqduqu0qj";
+    private String address = "lat1n6demns656sxpetnjdkcl9e97uzykzgtyg7c4l";
+
+
+    /**
+     *   "ERC20Template": "0x14B26A38146532D317Af70905f227986A7308A7E",
+     *     "ERC20Factory": "0xF1cd24c3ebb7cDe2087371D67a6532dF4B1AbE71",
+     *     "ERC721Template": "0x648058A9eF81B490D7241A293426C5e1Fd7428e8",
+     *     "ERC721Factory": "0x9E9b9dCE1aa6a060e573936D8F9725F7044b090b"
+     * @throws Exception
+     */
 
     @Test
     public void createToken() throws Exception{
