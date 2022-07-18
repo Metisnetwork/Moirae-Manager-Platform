@@ -122,4 +122,12 @@
               </foreach>
         and mmdcu.address = #{address}
     </select>
+    <select id="listMetaDataIdByIds" resultType="java.lang.String">
+        select distinct mmdc.meta_data_id
+        from mo_meta_data_certificate mmdc
+        where mmdc.id in
+        <foreach collection="credentialIdList" item="credentialId" index="index" open="(" close=")" separator=",">
+            #{credentialId}
+        </foreach>
+    </select>
 </mapper>

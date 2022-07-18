@@ -10,22 +10,41 @@ import java.util.List;
 
 public class ERC721TemplateTest extends BaseContractTest {
 
-    private String address = "lat1n6demns656sxpetnjdkcl9e97uzykzgtyg7c4l";
+    private String address = "lat1j5c3rhakmdkmfktxfx44w6ttrsspyvl7gy5vwe";
 
 
     /**
-     *   "ERC20Template": "0x14B26A38146532D317Af70905f227986A7308A7E",
-     *     "ERC20Factory": "0xF1cd24c3ebb7cDe2087371D67a6532dF4B1AbE71",
-     *     "ERC721Template": "0x648058A9eF81B490D7241A293426C5e1Fd7428e8",
-     *     "ERC721Factory": "0x9E9b9dCE1aa6a060e573936D8F9725F7044b090b"
+     * "ERC20Template": "0x14B26A38146532D317Af70905f227986A7308A7E",
+     * "ERC20Factory": "0xF1cd24c3ebb7cDe2087371D67a6532dF4B1AbE71",
+     * "ERC721Template": "0x648058A9eF81B490D7241A293426C5e1Fd7428e8",
+     * "ERC721Factory": "0x9E9b9dCE1aa6a060e573936D8F9725F7044b090b"
+     *
+     * ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image1.json
+     * ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image2.json
+     * ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image3.json
+     * https://ipfs.io/ipfs/QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image4.json
+     * https://ipfs.io/ipfs/QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image5.json
+     * https://ipfs.io/ipfs/QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image6.json
      * @throws Exception
      */
 
     @Test
     public void createToken() throws Exception{
-        ERC721Template contract = load(address);
-        TransactionReceipt transactionReceipt = contract.createToken("20000", false,  "https://ipfs.io/ipfs/QmXCamtKUQLfAkbmtPfmsGXEUCz88Mnsuxs4CzAH61VQKe/image1.json" ).send();
+//        createToken("1660492800000", true, "ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image1.json");
+//        createToken("1660492800000", true, "ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image2.json");
+//        createToken("1660492800000", true, "ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image3.json");
+//        createToken("1660492800000", false, "https://ipfs.io/ipfs/QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image4.json");
+//        createToken("1660492800000", false, "https://ipfs.io/ipfs/QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image5.json");
+//        createToken("1660492800000", false, "https://ipfs.io/ipfs/QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image6.json");
 
+        createToken("1660492800000", true, "ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image1.json");
+        createToken("1660492800000", true, "ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image2.json");
+        createToken("1660492800000", true, "ipfs://QmNyx35qjHgHsTpdpgr5juQHC8aELp9UiZ1bEGbRu2TxiL/image3.json");
+    }
+
+    private void createToken(String term, boolean cipher, String tokenUrl) throws Exception{
+        ERC721Template contract = load(address);
+        TransactionReceipt transactionReceipt = contract.createToken(term, cipher,  tokenUrl ).send();
         List<ERC721Template.TransferEventResponse> transferEventResponseList = contract.getTransferEvents(transactionReceipt);
         transferEventResponseList.forEach(item ->{
             System.out.println("from = " + item.from + " to = " + item.to + " tokenId = " + item.tokenId );

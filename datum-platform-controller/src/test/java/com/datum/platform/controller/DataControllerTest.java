@@ -16,7 +16,7 @@ public class DataControllerTest extends BaseControllerTest {
 
     @Test
     public void getDataStats() throws Exception {
-        System.out.println("result = "  + commonGetWithToken("/data/getDataStats", emptyParameters));
+        System.out.println("result = "  + commonGet("/data/getDataStats", emptyParameters));
     }
 
     @Test

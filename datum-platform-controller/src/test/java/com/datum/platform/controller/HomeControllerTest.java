@@ -15,15 +15,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class HomeControllerTest extends BaseControllerTest {
 
     @Test
-    public void queryNavigation() throws Exception {
-        emptyParameters.add("keyword", "identity:6a9df99adf8e48ed94bed3b53f9ea4f7");
+    public void queryNavigation1() throws Exception {
+        emptyParameters.add("keyword", "did:pid:lat1eqpf8vxz7m64j25mkmwk39t3xf8zeltxrr2nql");
         System.out.println("result = "  + commonGet("/home/queryNavigation", emptyParameters));
     }
 
     @Test
-    public void getLatestModelList() throws Exception {
+    public void queryNavigation2() throws Exception {
+        emptyParameters.add("keyword", "task:0x2efd7745846a3df8eebbf31fa836c5c62e4246df05074bdac95a6aa6d0c5f4bd");
+        System.out.println("result = "  + commonGet("/home/queryNavigation", emptyParameters));
+    }
+
+    @Test
+    public void getLatestTaskList() throws Exception {
         emptyParameters.add("size", "10");
-        System.out.println("result = "  + commonGet("/home/getLatestModelList", emptyParameters));
+        System.out.println("result = "  + commonGet("/home/getLatestTaskList", emptyParameters));
     }
 
     @Test
@@ -46,6 +52,6 @@ public class HomeControllerTest extends BaseControllerTest {
     @Test
     public void getDataTokenUsedTop() throws Exception {
         emptyParameters.add("size", "15");
-        System.out.println("result = "  + commonGet("/home/getDataTokenUsedTop", emptyParameters));
+        System.out.println("result = "  + commonGet("/home/getDataUsedTop", emptyParameters));
     }
 }

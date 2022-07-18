@@ -34,7 +34,7 @@ public class MetaDataCertificateUserManagerImpl extends ServiceImpl<MetaDataCert
     @Override
     public boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList) {
         // 查询用户的账户信息
-        Set<Long> metaDataCertificateIdSet = listByUser(address).stream().collect(Collectors.toSet());
+        Set<Long> metaDataCertificateIdSet = listMetaDataCertificateIdByAddress(address).stream().collect(Collectors.toSet());
 
         List<MetaDataCertificateUser> insertList = metaDataCertificateUserList.stream().filter(item -> !metaDataCertificateIdSet.contains(item.getMetaDataCertificateId())).collect(Collectors.toList());
         List<MetaDataCertificateUser> updateList = metaDataCertificateUserList.stream().filter(item -> metaDataCertificateIdSet.contains(item.getMetaDataCertificateId())).collect(Collectors.toList());
@@ -49,7 +49,8 @@ public class MetaDataCertificateUserManagerImpl extends ServiceImpl<MetaDataCert
         return true;
     }
 
-    private List<Long> listByUser(String address){
+    @Override
+    public List<Long> listMetaDataCertificateIdByAddress(String address) {
         LambdaQueryWrapper<MetaDataCertificateUser> wrapper = Wrappers.lambdaQuery();
         wrapper.select(MetaDataCertificateUser::getMetaDataCertificateId);
         wrapper.eq(MetaDataCertificateUser::getAddress, address);

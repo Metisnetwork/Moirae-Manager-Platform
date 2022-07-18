@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.datum.platform.mapper.MetaDataUserMapper">
 
+    <insert id="saveBatch">
+        insert into mo_meta_data_user(address, meta_data_id) values
+        <foreach collection="addList" item="item" index="index" separator=",">
+            (#{item.address}, #{item.metaDataId})
+        </foreach>
+    </insert>
 </mapper>

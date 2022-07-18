@@ -18,20 +18,25 @@ public class OrgControllerTest extends BaseControllerTest {
 
     @Test
     public void getOrgStats() throws Exception {
-        System.out.println("result = "  + commonGetWithToken("/org/getOrgStats", emptyParameters));
+        System.out.println("result = "  + commonGet("/org/getOrgStats", emptyParameters));
     }
 
     @Test
     public void getOrgList() throws Exception {
         pageParameters.add("keyword", "");
         pageParameters.add("orderBy", OrgOrderByEnum.NAME.name());
-        System.out.println("result = "  + commonGetWithToken("/org/getOrgList", emptyParameters));
+        System.out.println("result = "  + commonGet("/org/getOrgList", emptyParameters));
     }
 
     @Test
     public void getOrgDetails() throws Exception {
-        emptyParameters.add("identityId", "identity:07c0119cb39e47f497ff581efd48e342");
-        System.out.println("result = "  + commonGetWithToken("/org/getOrgDetails", emptyParameters));
+        emptyParameters.add("identityId", "did:pid:lat1eqpf8vxz7m64j25mkmwk39t3xf8zeltxrr2nql");
+        System.out.println("result = "  + commonGet("/org/getOrgDetails", emptyParameters));
+    }
+
+    @Test
+    public void getBaseOrgList() throws Exception {
+        System.out.println("result = "  + commonGetWithToken("/org/getBaseOrgList", emptyParameters));
     }
 
     @Test
@@ -42,7 +47,7 @@ public class OrgControllerTest extends BaseControllerTest {
     @Test
     public void joinOrg() throws Exception {
         JSONObject req = new JSONObject();
-        req.put("identityIp", "192.168.10.154");
+        req.put("identityIp", "192.168.10.156");
         req.put("identityPort", 10033);
         System.out.println("result = "  + commonPostWithToken("/org/joinOrg", req.toJSONString()));
     }

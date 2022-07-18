@@ -8,7 +8,7 @@ import com.datum.platform.mapper.domain.OrgExpand;
 import java.util.List;
 
 public interface OrgExpandManager extends IService<OrgExpand> {
-    boolean saveOfNotExist(List<OrgExpand> orgExpandList);
+    boolean saveOfNotExist(List<String> orgExpandList);
 
     List<OrgExpand> listHaveIpPort();
 

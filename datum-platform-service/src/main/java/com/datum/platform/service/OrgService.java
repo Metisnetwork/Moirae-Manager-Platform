@@ -36,7 +36,7 @@ public interface OrgService {
      * 批量提供组织信息
      *
      */
-    boolean batchReplace(List<Org> orgList,  List<OrgExpand> orgExpandList);
+    boolean batchReplace(List<Org> orgList,  List<String> addOrgIdList);
 
     /**
      * 用户添加私有组织

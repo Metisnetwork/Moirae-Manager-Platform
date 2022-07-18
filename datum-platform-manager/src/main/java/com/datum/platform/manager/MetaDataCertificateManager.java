@@ -30,7 +30,7 @@ public interface MetaDataCertificateManager extends IService<MetaDataCertificate
 
     List<MetaDataCertificate> listCertificateByMetaDataIdListAndUser(List<Long> credentialIdList, String address);
 
-    boolean saveOrUpdateOrDeleteBatch(String metaDataId, List<MetaDataCertificate> metaDataCertificateList);
+    boolean saveOrUpdateOrDeleteBatch(String metaDataId, List<MetaDataCertificate> insertMetaDataCertificateList, List<MetaDataCertificate> updateMetaDataCertificateList, List<Long> deleteIdList);
 
     boolean updateNameByTokenAddress(String address, String name);
 
@@ -41,4 +41,6 @@ public interface MetaDataCertificateManager extends IService<MetaDataCertificate
     String getName(MetaDataCertificateTypeEnum metaDataCertificateTypeEnum, String metaDataId, String consumeTokenAddress, String consumeTokenId);
 
     List<MetaDataCertificate> listByMetaDataId(String metaDataId);
+
+    List<String> listMetaDataIdByIds(List<Long> metaDataCertificateIdList);
 }

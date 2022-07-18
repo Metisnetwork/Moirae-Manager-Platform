@@ -57,7 +57,7 @@ public class HomeController {
     }
 
     @GetMapping("getTaskTrend")
-    @ApiOperation(value = "获得15天隐私计算走势", notes = "获得15天隐私计算走势")
+    @ApiOperation(value = "获得15天计算走势", notes = "获得15天计算走势")
     public ResponseVo<List<TrendVo>> getTaskTrend(@Valid GetTaskTrendReq req) {
         List<StatsDay> statsDayList = statisticsService.getTaskTrend(req.getSize());
         return ResponseVo.createSuccess(BeanUtil.copyToList(statsDayList, TrendVo.class));

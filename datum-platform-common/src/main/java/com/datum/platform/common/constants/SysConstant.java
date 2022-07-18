@@ -88,7 +88,7 @@ public class SysConstant {
             "home/getGlobalStats",
             "home/getTaskTrend",
             "home/getOrgPowerTop",
-            "home/getDataTokenUsedTop",
+            "home/getDataUsedTop",
             "swagger",
             "error",
             "api-docs"

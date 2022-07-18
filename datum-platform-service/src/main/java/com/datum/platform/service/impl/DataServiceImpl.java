@@ -52,6 +52,8 @@ public class DataServiceImpl implements DataService {
     private MetaDataCertificateUserManager metaDataCertificateUserManager;
     @Resource
     private MetaDataMarketplaceManager metaDataMarketplaceManager;
+    @Resource
+    private MetaDataUserManager metaDataUserManager;
 
     @Override
     public MetaData statisticsOfGlobal() {
@@ -249,8 +251,8 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public boolean saveOrUpdateOrDeleteBatchMetaDataCertificate(String metaDataId, List<MetaDataCertificate> metaDataCertificateList) {
-        return metaDataCertificateManager.saveOrUpdateOrDeleteBatch(metaDataId, metaDataCertificateList);
+    public boolean saveOrUpdateOrDeleteBatchMetaDataCertificate(String metaDataId, List<MetaDataCertificate> insertMetaDataCertificateList, List<MetaDataCertificate> updateMetaDataCertificateList, List<Long> deleteIdList) {
+        return metaDataCertificateManager.saveOrUpdateOrDeleteBatch(metaDataId, insertMetaDataCertificateList, updateMetaDataCertificateList, deleteIdList);
     }
 
     @Override
@@ -301,5 +303,21 @@ public class DataServiceImpl implements DataService {
     @Override
     public boolean batchReplaceMetaDataMarketplace(List<MetaDataMarketplace> metaDataMarketplaceList) {
         return metaDataMarketplaceManager.batchReplace(metaDataMarketplaceList);
+    }
+
+    @Override
+    public List<MetaDataCertificate> listMetaDataCertificateByMetaDataId(String metaDataId) {
+        return metaDataCertificateManager.listByMetaDataId(metaDataId);
+    }
+
+    @Override
+    public boolean setMetaDataUser(String address) {
+        // 查询用户存在的凭证列表
+        List<Long> metaDataCertificateIdList = metaDataCertificateUserManager.listMetaDataCertificateIdByAddress(address);
+        // 查询凭证对应元数据id
+        List<String> metaDataIdList = metaDataCertificateManager.listMetaDataIdByIds(metaDataCertificateIdList);
+        // 设置用户的可见
+        metaDataUserManager.saveOrDeleteBatch(address, metaDataIdList);
+        return true;
     }
 }

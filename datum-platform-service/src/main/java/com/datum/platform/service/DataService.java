@@ -219,7 +219,7 @@ public interface DataService {
      */
     List<MetaData> listMetaDataOfNeedSyncedMetaDataCertificate();
 
-    boolean saveOrUpdateOrDeleteBatchMetaDataCertificate(String metaDataId, List<MetaDataCertificate> metaDataCertificateList);
+    boolean saveOrUpdateOrDeleteBatchMetaDataCertificate(String metaDataId, List<MetaDataCertificate> insertMetaDataCertificateList, List<MetaDataCertificate> updateMetaDataCertificateList, List<Long> deleteIdList);
 
     /**
      * 查询数据凭证列表
@@ -247,4 +247,14 @@ public interface DataService {
     boolean isTradable(String metaDataId);
 
     boolean batchReplaceMetaDataMarketplace(List<MetaDataMarketplace> metaDataMarketplaceList);
+
+    List<MetaDataCertificate> listMetaDataCertificateByMetaDataId(String metaDataId);
+
+    /**
+     * 设置数据是否用户可见
+     *
+     * @param address
+     * @return
+     */
+    boolean setMetaDataUser(String address);
 }

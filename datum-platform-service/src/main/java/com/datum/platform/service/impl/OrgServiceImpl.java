@@ -103,9 +103,9 @@ public class OrgServiceImpl implements OrgService {
 
     @Override
     @Transactional
-    public boolean batchReplace(List<Org> orgList, List<OrgExpand> orgExpandList) {
+    public boolean batchReplace(List<Org> orgList, List<String> addOrgIdList) {
         orgManager.saveOrUpdateBatch(orgList);
-        orgExpandManager.saveOfNotExist(orgExpandList);
+        orgExpandManager.saveOfNotExist(addOrgIdList);
         return true;
     }
 

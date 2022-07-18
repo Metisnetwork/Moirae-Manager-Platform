@@ -11,10 +11,7 @@ import com.datum.platform.service.OrgService;
 import com.datum.platform.utils.ConvertUtils;
 import com.datum.platform.vo.PageVo;
 import com.datum.platform.vo.ResponseVo;
-import com.datum.platform.vo.org.BaseOrgVo;
-import com.datum.platform.vo.org.OrgStatsVo;
-import com.datum.platform.vo.org.OrgVo;
-import com.datum.platform.vo.org.UserOrgVo;
+import com.datum.platform.vo.org.*;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
@@ -78,10 +75,10 @@ public class OrgController {
 
     @GetMapping("getBaseOrgList")
     @ApiOperationSupport(order = 5)
-    @ApiOperation(value = "查询存在用户数据的基本组织信息列表", notes = "查询存在用户数据的基本组织信息列表")
-    public ResponseVo<List<BaseOrgVo>> getBaseOrgList() {
+    @ApiOperation(value = "工作流数据输入时, 查询用户可用的组织列表", notes = "工作流数据输入时, 查询用户可用的组织列表")
+    public ResponseVo<List<DataSelectOrgVo>> getBaseOrgList() {
         List<Org> orgList = orgService.getBaseOrgList();
-        return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, BaseOrgVo.class));
+        return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, DataSelectOrgVo.class));
     }
 
     @PostMapping("joinOrg")

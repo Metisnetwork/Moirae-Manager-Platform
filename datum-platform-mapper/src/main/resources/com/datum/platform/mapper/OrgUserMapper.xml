@@ -14,10 +14,12 @@
             o.`identity_id`,
             o.`status`,
             o.update_at,
+            o.wallet_address as observerProxyWalletAddress,
             oe.`identity_ip`,
-            oe.observer_proxy_wallet_address,
             oe.`identity_port`,
-            oe.`is_public` as public_flag
+            oe.`is_public` as public_flag,
+            oe.is_authority,
+            oe.is_certified
         FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
         WHERE `status` = 1 AND oe.identity_ip is not null AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
     </select>

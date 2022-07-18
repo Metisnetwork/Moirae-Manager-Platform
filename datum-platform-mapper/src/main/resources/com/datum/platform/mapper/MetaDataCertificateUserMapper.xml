@@ -2,4 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.datum.platform.mapper.MetaDataCertificateUserMapper">
 
+    <update id="updateBatch">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update mo_meta_data_certificate_user mmdcu
+            set mmdcu.balance = #{item.balance},
+            mmdcu.authorize_balance = #{item.authorizeBalance}
+            where mmdcu.address = #{item.address} and mmdcu.meta_data_certificate_id = #{item.metaDataCertificateId}
+        </foreach>
+    </update>
 </mapper>

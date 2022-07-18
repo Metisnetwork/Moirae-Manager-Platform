@@ -150,11 +150,8 @@
     <select id="listDataOrgIdByUser" resultType="string">
         select distinct
         dmd.identity_id
-        from dc_meta_data dmd
-        inner join dc_org do on dmd.identity_id = do.identity_id
-        inner join mo_token mt on dmd.token_address = mt.address
-        inner join mo_token_holder mth on mt.address = mth.token_address and mth.address = #{address}
+        from dc_meta_data dmd inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
+           inner join mo_meta_data_user mddu on dmd.meta_data_id = mddu.meta_data_id and mddu.address =  #{address}
         where dmd.status = 2
-        and mt.is_add_liquidity = 1
     </select>
 </mapper>

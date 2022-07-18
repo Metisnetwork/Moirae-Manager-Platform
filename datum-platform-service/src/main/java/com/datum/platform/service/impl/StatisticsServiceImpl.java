@@ -72,7 +72,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                 StatsDay statsDay = new StatsDay();
                 statsDay.setStatsTime(date);
                 statsDay.setStatsValue(task.getTaskCount().longValue());
-
+                statsDay.setNoPrivacyStatsValue(task.getNoPrivacyTaskCount().longValue());
+                statsDay.setPrivacyStatsValue(task.getPrivacyTaskCount().longValue());
                 statsDayMap.put(date, statsDay);
             } catch (ParseException e) {
                 throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.BIZ_QUERY_NOT_EXIST.getMsg(), e);

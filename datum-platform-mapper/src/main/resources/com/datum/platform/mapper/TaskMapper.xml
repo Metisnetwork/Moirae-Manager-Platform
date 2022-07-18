@@ -144,14 +144,14 @@
             (select count(1) from dc_task_data_provider) as dataCount
     </select>
     <select id="statisticsOfDay" resultType="com.datum.platform.mapper.domain.Task">
-        select DATE_FORMAT(`create_at`, '%Y-%m-%d') as statsTime,
-               count(1) as taskCount,
-               (select count(1) from dc_task it where DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(`create_at`, '%Y-%m-%d') and  it.task_name like '%_p_%' ) as privacyTaskCount,
-               (select count(1) from dc_task it where DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(`create_at`, '%Y-%m-%d') and  it.task_name like '%_np_%' ) as noPrivacyTaskCount
-        from `dc_task`
-        group by DATE_FORMAT(`create_at`, '%Y-%m-%d')
-        order by DATE_FORMAT(`create_at`, '%Y-%m-%d') desc
-        limit  #{size};
+        SELECT DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AS statsTime,
+               COUNT(1) AS taskCount,
+               (SELECT COUNT(1) FROM dc_task it WHERE DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AND  it.task_name LIKE '%\_p\_%' ) AS privacyTaskCount,
+               (SELECT COUNT(1) FROM dc_task it WHERE DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AND  it.task_name LIKE '%\_np\_%' ) AS noPrivacyTaskCount
+        FROM `dc_task` dc
+        GROUP BY DATE_FORMAT(dc.`create_at`, '%Y-%m-%d')
+        ORDER BY DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') DESC
+        LIMIT  #{size};
     </select>
     <select id="listTaskOfLatest" resultType="com.datum.platform.mapper.domain.Task">
         select t.id,

@@ -218,7 +218,7 @@ public class Task implements Serializable {
     @TableField(exist = false)
     private Integer privacyTaskCount;
     @TableField(exist = false)
-    private Integer noPrivacytaskCount;
+    private Integer noPrivacyTaskCount;
     @TableField(exist = false)
     private Integer addressCount;
     @TableField(exist = false)

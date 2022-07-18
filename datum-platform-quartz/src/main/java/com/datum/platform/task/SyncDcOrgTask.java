@@ -77,15 +77,11 @@ public class SyncDcOrgTask {
                 })
                 .collect(Collectors.toList());
 
-        List<OrgExpand> addOrgExpandList = orgList
+        List<String> addOrgIdList = orgList
                 .stream()
-                .map(org -> {
-                    OrgExpand orgExpand = new OrgExpand();
-                    orgExpand.setIdentityIp(org.getIdentityIp());
-                    return orgExpand;
-                })
+                .map(Org::getIdentityId)
                 .collect(Collectors.toList());
         //更新
-        organizationService.batchReplace(orgList, addOrgExpandList);
+        organizationService.batchReplace(orgList, addOrgIdList);
     }
 }

@@ -9,9 +9,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.MetaDataCertificateManager;
 import com.datum.platform.mapper.MetaDataCertificateMapper;
 import com.datum.platform.mapper.domain.MetaDataCertificate;
+import com.datum.platform.mapper.domain.MetaDataCertificateUser;
 import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,35 +60,14 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
     }
 
     @Override
-    public boolean saveOrUpdateOrDeleteBatch(String metaDataId, List<MetaDataCertificate> metaDataCertificateList) {
-        LambdaQueryWrapper<MetaDataCertificate> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(MetaDataCertificate::getMetaDataId, metaDataId);
-        Map<String, MetaDataCertificate> dbMap = list(queryWrapper).stream().collect(Collectors.toMap(MetaDataCertificate::getTokenId, me -> me));
-
-        List<MetaDataCertificate> addList = new ArrayList<>();
-        List<MetaDataCertificate> updateList = new ArrayList<>();
-        metaDataCertificateList.forEach(item ->{
-            if(dbMap.containsKey(item.getTokenId())){
-                MetaDataCertificate dbItem = dbMap.get(item);
-                if(StringUtils.isBlank(dbItem.getName()) && StringUtils.isNotBlank(item.getName())){
-                    dbItem.setName(item.getName());
-                    updateList.add(dbItem);
-                }
-            }else{
-                addList.add(item);
-            }
-        });
-
-        Set<String> tokenIdList = metaDataCertificateList.stream().map(MetaDataCertificate::getTokenId).collect(Collectors.toSet());
-        Collection<MetaDataCertificate> dbTokenList = dbMap.values();
-        Set<Long> deleteIdList = dbTokenList.stream().filter(item -> !tokenIdList.contains(item.getTokenId())).map(MetaDataCertificate::getId).collect(Collectors.toSet());
-
-        if(addList.size() > 0){
-            saveBatch(addList);
+    @Transactional
+    public boolean saveOrUpdateOrDeleteBatch(String metaDataId, List<MetaDataCertificate> insertMetaDataCertificateList, List<MetaDataCertificate> updateMetaDataCertificateList, List<Long> deleteIdList) {
+        if(insertMetaDataCertificateList.size() > 0){
+            saveBatch(insertMetaDataCertificateList);
         }
 
-        if(updateList.size() > 0){
-            updateBatchById(updateList);
+        if(updateMetaDataCertificateList.size() > 0){
+            updateBatchById(updateMetaDataCertificateList);
         }
 
         if(deleteIdList.size() > 0){
@@ -140,5 +121,10 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
         LambdaQueryWrapper<MetaDataCertificate> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(MetaDataCertificate::getMetaDataId, metaDataId);
         return list(wrapper);
+    }
+
+    @Override
+    public List<String> listMetaDataIdByIds(List<Long> metaDataCertificateIdList) {
+        return this.baseMapper.listMetaDataIdByIds(metaDataCertificateIdList);
     }
 }

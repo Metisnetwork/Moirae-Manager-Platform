@@ -60,27 +60,30 @@
                  where identity_id = #{identityId,jdbcType=VARCHAR} and (status = 2 or status = 3)
              ) power,
              (
-                 select count(meta_data_id) as total_data_token
-                 from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address
-                 where dmd.identity_id = #{identityId,jdbcType=VARCHAR} and dmd.status = 2 and mt.is_add_liquidity = 1
+                 select count(dmd.meta_data_id) as total_data_token
+                 from dc_meta_data dmd inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
+                     inner join mo_meta_data_certificate mmdc on dmd.meta_data_id = mmdc.meta_data_id
+                 where dmd.identity_id = #{identityId,jdbcType=VARCHAR} and dmd.status = 2
              ) token,
              (
-                 select count(meta_data_id) as total_data
-                 from dc_meta_data dmd
+                 select count(dmd.meta_data_id) as total_data
+                 from dc_meta_data dmd inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
                  where dmd.identity_id = #{identityId,jdbcType=VARCHAR} and dmd.status = 2
              ) data,
              (
-                 select count(t.task_id) as total_task
+                 select count(distinct(t.task_id)) as total_task
                  from (
-                          select task_id
-                          from dc_task_power_provider
-                          where identity_id = #{identityId,jdbcType=VARCHAR}
-
+                          -- 发送者
+                          select id as task_id from dc_task where owner_identity_id = #{identityId,jdbcType=VARCHAR}
                           union
-
-                          select task_id
-                          from dc_task_data_provider
-                          where identity_id = #{identityId,jdbcType=VARCHAR}
+                          -- 数据者
+                          select task_id from dc_task_data_provider where identity_id = #{identityId,jdbcType=VARCHAR}
+                          union
+                          -- 算力提供者
+                          select task_id from dc_task_power_provider where identity_id = #{identityId,jdbcType=VARCHAR}
+                          union
+                          -- 结果接收者
+                          select task_id from dc_task_result_consumer where consumer_identity_id = #{identityId,jdbcType=VARCHAR}
                       ) t
              ) task
         where o.identity_id = #{identityId,jdbcType=VARCHAR}

@@ -3,6 +3,8 @@ package com.datum.platform.mapper;
 import com.datum.platform.mapper.domain.MetaDataUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 用户可见的元数据 Mapper 接口
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MetaDataUserMapper extends BaseMapper<MetaDataUser> {
 
+    boolean saveBatch(List<MetaDataUser> addList);
 }

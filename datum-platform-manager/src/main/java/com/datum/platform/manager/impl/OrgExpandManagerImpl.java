@@ -19,11 +19,18 @@ import java.util.stream.Collectors;
 @Service
 public class OrgExpandManagerImpl extends ServiceImpl<OrgExpandMapper, OrgExpand> implements OrgExpandManager {
     @Override
-    public boolean saveOfNotExist(List<OrgExpand> orgExpandList) {
+    public boolean saveOfNotExist(List<String> orgExpandList) {
         LambdaQueryWrapper<OrgExpand> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.select(OrgExpand::getIdentityId);
         Set<String> idSet = listObjs(queryWrapper, item -> item.toString()).stream().collect(Collectors.toSet());
-        List<OrgExpand> addList = orgExpandList.stream().filter(item -> !idSet.contains(item.getIdentityId())).collect(Collectors.toList());
+        List<OrgExpand> addList = orgExpandList.stream()
+                .filter(identityId -> !idSet.contains(identityId))
+                .map(identityId -> {
+                    OrgExpand orgExpand = new OrgExpand();
+                    orgExpand.setIdentityId(identityId);
+                    return orgExpand;
+                })
+                .collect(Collectors.toList());
         if(addList.size() > 0){
             return saveBatch(addList);
         }

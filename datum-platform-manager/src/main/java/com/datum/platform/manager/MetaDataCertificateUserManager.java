@@ -18,4 +18,6 @@ public interface MetaDataCertificateUserManager extends IService<MetaDataCertifi
     MetaDataCertificateUser getById(Long metaDataCertificateId, String address);
 
     boolean saveOrUpdateBatchMetaDataCertificateUser(String address, List<MetaDataCertificateUser> metaDataCertificateUserList);
+
+    List<Long> listMetaDataCertificateIdByAddress(String address);
 }
