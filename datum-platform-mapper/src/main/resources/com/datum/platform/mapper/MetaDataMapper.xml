@@ -107,13 +107,6 @@
     <select id="getUserAuthDataList" resultType="com.datum.platform.mapper.domain.MetaData">
         select dmd.meta_data_id,
                dmd.file_name as metaDataName,
-               dmd.published_at,
-               dmd.identity_id,
-               do.node_name,
-               dmd.size,
-               dmd.industry,
-               dmd.is_support_ct_alg,
-               dmd.is_support_pt_alg,
                dmd.erc20_address as tokenAddress,
                mt.name as tokenName,
                mt.price as tokenPrice,

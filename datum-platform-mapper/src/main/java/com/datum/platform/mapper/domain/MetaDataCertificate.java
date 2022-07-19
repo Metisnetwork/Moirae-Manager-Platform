@@ -91,7 +91,6 @@ public class MetaDataCertificate implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
     @TableField(exist = false)
     private String tokenName;
     @TableField(exist = false)

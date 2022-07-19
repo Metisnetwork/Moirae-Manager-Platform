@@ -18,10 +18,10 @@ public class BaseCredentialDto {
     private String metaDataId;
 
     @ApiModelProperty(value = "凭证对应合约地址")
-    private String contractAddress;
+    private String tokenAddress;
 
     @ApiModelProperty(value = "凭证名称")
-    private String name;
+    private String tokenName;
 
     @ApiModelProperty(value = "是否支持明文算法")
     private Boolean isSupportPtAlg;

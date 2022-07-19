@@ -19,7 +19,7 @@ public class BaseControllerTest {
     protected MockMvc mvc;
 
     protected Credentials user = Credentials.create("68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f89");
-    protected String accessToken = "1658137636526EE6534B29F1A4D2FB4C72DBA6E641F55";
+    protected String accessToken = "16581985160033D73814B58ED4B45BC937A639F6D19A1";
     protected String lang = "zh";
     protected MultiValueMap<String, String> emptyParameters = new LinkedMultiValueMap();
     protected MultiValueMap<String, String> pageParameters = new LinkedMultiValueMap();

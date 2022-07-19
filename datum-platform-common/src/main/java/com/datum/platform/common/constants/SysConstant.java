@@ -76,6 +76,8 @@ public class SysConstant {
             "data/getDataListByOrg",
             "data/getDataList",
             "data/getDataDetails",
+            "data/getNoAttributeCredential",
+            "data/getAttributeCredentialList",
             "task/getTaskStats",
             "task/getTaskListByOrg",
             "task/getTaskListByData",

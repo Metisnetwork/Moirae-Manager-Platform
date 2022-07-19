@@ -150,6 +150,8 @@ public class MetaData implements Serializable {
     @TableField(exist = false)
     private String nodeName;
     @TableField(exist = false)
+    private String tokenAddress;
+    @TableField(exist = false)
     private String tokenName;
     @TableField(exist = false)
     private String tokenPrice;

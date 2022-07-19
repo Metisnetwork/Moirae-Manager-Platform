@@ -9,8 +9,7 @@ import com.datum.platform.req.data.*;
 import com.datum.platform.req.model.GetUserModelListReq;
 import com.datum.platform.req.org.OrgIdPageReq;
 import com.datum.platform.service.DataService;
-import com.datum.platform.service.dto.data.BaseCredentialDto;
-import com.datum.platform.service.dto.data.UserWLatCredentialDto;
+import com.datum.platform.service.dto.data.*;
 import com.datum.platform.utils.ConvertUtils;
 import com.datum.platform.vo.PageVo;
 import com.datum.platform.vo.ResponseVo;
@@ -101,17 +100,21 @@ public class DataController {
     @GetMapping("getNoAttributeCredential")
     @ApiOperation(value = "查询数据关联的无属性凭证", notes = "查询数据关联的无属性凭证")
     @ApiOperationSupport(order = 7)
-    public ResponseVo<BaseCredentialDto> getNoAttributeCredential(@Valid GetDataDetailsReq req) {
+    public ResponseVo<NoAttributesCredentialDto> getNoAttributeCredential(@Valid GetDataDetailsReq req) {
         MetaDataCertificate certificate = dataService.getNoAttributeCredentialByMetaDataId(req.getMetaDataId());
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, BaseCredentialDto.class));
+        if(certificate != null){
+            return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, NoAttributesCredentialDto.class));
+        }else{
+            return ResponseVo.createSuccess();
+        }
     }
 
     @GetMapping("getAttributeCredentialList")
     @ApiOperation(value = "查询数据关联的有属性凭证列表", notes = "查询数据关联的有属性凭证列表")
     @ApiOperationSupport(order = 8)
-    public ResponseVo<PageVo<BaseCredentialDto>> getAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
+    public ResponseVo<PageVo<HaveAttributesCredentialDto>> getAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
         IPage<MetaDataCertificate> page = dataService.pageHaveAttributesCertificateByMetaDataId(req.getCurrent(), req.getSize(), req.getMetaDataId());
-        List<BaseCredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), BaseCredentialDto.class);
+        List<HaveAttributesCredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), HaveAttributesCredentialDto.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 
@@ -126,17 +129,21 @@ public class DataController {
     @GetMapping("getUserNoAttributeCredential")
     @ApiOperation(value = "查询用户数据关联的无属性凭证", notes = "查询用户数据关联的无属性凭证")
     @ApiOperationSupport(order = 10)
-    public ResponseVo<BaseCredentialDto> getUserNoAttributeCredential(@Valid GetDataDetailsReq req) {
+    public ResponseVo<UserNoAttributesCredentialDto> getUserNoAttributeCredential(@Valid GetDataDetailsReq req) {
         MetaDataCertificate certificate = dataService.getNoAttributeCredentialByMetaDataIdAndUser(req.getMetaDataId());
-        return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, BaseCredentialDto.class));
+        if(certificate != null){
+            return ResponseVo.createSuccess(BeanUtil.copyProperties(certificate, UserNoAttributesCredentialDto.class));
+        }else{
+            return ResponseVo.createSuccess();
+        }
     }
 
     @GetMapping("getUserAttributeCredentialList")
     @ApiOperation(value = "查询用户数据关联的有属性凭证列表", notes = "查询用户数据关联的有属性凭证列表")
     @ApiOperationSupport(order = 11)
-    public ResponseVo<PageVo<BaseCredentialDto>> getUserAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
+    public ResponseVo<PageVo<UserHaveAttributesCredentialDto>> getUserAttributeCredentialList(@Valid GetAttributeCredentialListReq req) {
         IPage<MetaDataCertificate> page = dataService.pageHaveAttributesCertificateByMetaDataIdAndUser(req.getCurrent(), req.getSize(), req.getMetaDataId());
-        List<BaseCredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), BaseCredentialDto.class);
+        List<UserHaveAttributesCredentialDto> itemList = BeanUtil.copyToList(page.getRecords(), UserHaveAttributesCredentialDto.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }
 

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 public enum DataOrderByEnum {
-    PUBLISHED("publishedAt",  " dmd.published_at desc","发布时间"),
-    TOKEN_NAME("tokenName",  "mt.name","凭证名称"),
-    TOKEN_PRICE_DESC("tokenPriceDesc", "mt.price desc", "凭证价格倒序"),
-    TOKEN_PRICE_ASC("tokenPriceAsc", "mt.price asc",  "凭证价格正序");
+    PUBLISHED("publishedAt",  " dmd.published_at desc","发布时间");
 
     @JsonValue
     @Getter

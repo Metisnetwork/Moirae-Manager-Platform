@@ -7,12 +7,11 @@
                mmdc.meta_data_id,
                mmdc.type,
                mmdc.token_address,
-               mmdc.token_id,
                mmdc.is_support_pt_alg,
                mmdc.is_support_ct_alg,
                mmdc.characteristic,
-               mmdc.create_time,
-               mmdc.update_time,
+               mmdc.erc20_pt_alg_consume,
+               mmdc.erc20_ct_alg_consume,
                mt.name as tokenName,
                mt.symbol as tokenSymbol,
                mt.`decimal` as tokenDecimal
@@ -25,15 +24,16 @@
                mmdc.meta_data_id,
                mmdc.type,
                mmdc.token_address,
-               mmdc.token_id,
                mmdc.is_support_pt_alg,
                mmdc.is_support_ct_alg,
                mmdc.characteristic,
-               mmdc.create_time,
-               mmdc.update_time,
+               mmdc.erc20_pt_alg_consume,
+               mmdc.erc20_ct_alg_consume,
                mt.name as tokenName,
                mt.symbol as tokenSymbol,
-               mt.`decimal` as tokenDecimal
+               mt.`decimal` as tokenDecimal,
+               mmdcu.balance as tokenBalance,
+               mmdcu.authorize_balance as authorizeBalance
         from mo_meta_data_certificate mmdc left join mo_token mt on mmdc.token_address = mt.address
             inner join mo_meta_data_certificate_user mmdcu on mmdc.id = mmdcu.meta_data_certificate_id
         where mmdc.meta_data_id = #{metaDataId}
@@ -49,14 +49,12 @@
                mmdc.is_support_pt_alg,
                mmdc.is_support_ct_alg,
                mmdc.characteristic,
-               mmdc.create_time,
-               mmdc.update_time,
-               mt.name as tokenName,
-               mt.symbol as tokenSymbol,
-               mt.`decimal` as tokenDecimal
+               mmdc.name as tokenName
         from mo_meta_data_certificate mmdc left join mo_token mt on mmdc.token_address = mt.address
         where mmdc.meta_data_id = #{metaDataId}
           and mmdc.type = 1
+          and mmdc.name is not null
+        order by mmdc.token_id desc
     </select>
     <select id="pageHaveAttributesCertificateByMetaDataIdAndUser" resultType="com.datum.platform.mapper.domain.MetaDataCertificate">
         select mmdc.id,
@@ -67,15 +65,13 @@
                mmdc.is_support_pt_alg,
                mmdc.is_support_ct_alg,
                mmdc.characteristic,
-               mmdc.create_time,
-               mmdc.update_time,
-               mt.name as tokenName,
-               mt.symbol as tokenSymbol,
-               mt.`decimal` as tokenDecimal
+               mmdc.name as tokenName
         from mo_meta_data_certificate mmdc left join mo_token mt on mmdc.token_address = mt.address
                inner join mo_meta_data_certificate_user mmdcu on mmdc.id = mmdcu.meta_data_certificate_id
         where mmdc.meta_data_id = #{metaDataId}
           and mmdc.type = 1
+          and mmdc.name is not null
+          and mmdcu.balance = 1
           and mmdcu.address = #{address}
     </select>
     <select id="listHaveAttributesCertificateByMetaDataIdAndUser" resultType="com.datum.platform.mapper.domain.MetaDataCertificate">

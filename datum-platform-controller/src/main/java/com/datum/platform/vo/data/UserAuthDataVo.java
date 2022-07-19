@@ -5,10 +5,17 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
+import java.util.Date;
+
 @Data
 @ApiModel
-public class UserAuthDataVo extends DataVo {
+public class UserAuthDataVo {
+
+    @ApiModelProperty(value = "元数据id")
+    private String metaDataId;
+
+    @ApiModelProperty(value = "元数据名称")
+    private String metaDataName;
 
     @ApiModelProperty(value = "数据凭证合约地址")
     private String tokenAddress;
