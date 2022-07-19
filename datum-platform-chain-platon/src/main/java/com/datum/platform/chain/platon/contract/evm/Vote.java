@@ -18,8 +18,8 @@ import com.platon.protocol.core.RemoteCall;
 import com.platon.protocol.core.methods.request.PlatonFilter;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
-import com.platon.tuples.generated.Tuple2;
-import com.platon.tuples.generated.Tuple6;
+import com.platon.tuples.generated.Tuple3;
+import com.platon.tuples.generated.Tuple7;
 import com.platon.tx.Contract;
 import com.platon.tx.TransactionManager;
 import com.platon.tx.gas.GasProvider;
@@ -52,6 +52,8 @@ public class Vote extends Contract {
 
     public static final String FUNC_INITIALIZE = "initialize";
 
+    public static final String FUNC_CHANGERANGE = "changeRange";
+
     public static final String FUNC_SUBMITPROPOSAL = "submitProposal";
 
     public static final String FUNC_WITHDRAWPROPOSAL = "withdrawProposal";
@@ -69,6 +71,14 @@ public class Vote extends Contract {
     public static final String FUNC_GETPROPOSALID = "getProposalId";
 
     public static final String FUNC_GETPROPOSAL = "getProposal";
+
+    public static final Event AUTHORITYADD_EVENT = new Event("AuthorityAdd",
+            Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint256>() {}));
+    ;
+
+    public static final Event AUTHORITYDELETE_EVENT = new Event("AuthorityDelete",
+            Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint256>() {}));
+    ;
 
     public static final Event INITIALIZED_EVENT = new Event("Initialized",
             Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {}));
@@ -100,6 +110,76 @@ public class Vote extends Contract {
 
     protected Vote(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
         super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
+    }
+
+    public List<AuthorityAddEventResponse> getAuthorityAddEvents(TransactionReceipt transactionReceipt) {
+        List<EventValuesWithLog> valueList = extractEventParametersWithLog(AUTHORITYADD_EVENT, transactionReceipt);
+        ArrayList<AuthorityAddEventResponse> responses = new ArrayList<AuthorityAddEventResponse>(valueList.size());
+        for (EventValuesWithLog eventValues : valueList) {
+            AuthorityAddEventResponse typedResponse = new AuthorityAddEventResponse();
+            typedResponse.log = eventValues.getLog();
+            typedResponse.addr = (String) eventValues.getNonIndexedValues().get(0).getValue();
+            typedResponse.serviceUrl = (String) eventValues.getNonIndexedValues().get(1).getValue();
+            typedResponse.joinTime = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
+            responses.add(typedResponse);
+        }
+        return responses;
+    }
+
+    public Observable<AuthorityAddEventResponse> authorityAddEventObservable(PlatonFilter filter) {
+        return web3j.platonLogObservable(filter).map(new Func1<Log, AuthorityAddEventResponse>() {
+            @Override
+            public AuthorityAddEventResponse call(Log log) {
+                EventValuesWithLog eventValues = extractEventParametersWithLog(AUTHORITYADD_EVENT, log);
+                AuthorityAddEventResponse typedResponse = new AuthorityAddEventResponse();
+                typedResponse.log = log;
+                typedResponse.addr = (String) eventValues.getNonIndexedValues().get(0).getValue();
+                typedResponse.serviceUrl = (String) eventValues.getNonIndexedValues().get(1).getValue();
+                typedResponse.joinTime = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
+                return typedResponse;
+            }
+        });
+    }
+
+    public Observable<AuthorityAddEventResponse> authorityAddEventObservable(DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
+        PlatonFilter filter = new PlatonFilter(startBlock, endBlock, getContractAddress());
+        filter.addSingleTopic(EventEncoder.encode(AUTHORITYADD_EVENT));
+        return authorityAddEventObservable(filter);
+    }
+
+    public List<AuthorityDeleteEventResponse> getAuthorityDeleteEvents(TransactionReceipt transactionReceipt) {
+        List<EventValuesWithLog> valueList = extractEventParametersWithLog(AUTHORITYDELETE_EVENT, transactionReceipt);
+        ArrayList<AuthorityDeleteEventResponse> responses = new ArrayList<AuthorityDeleteEventResponse>(valueList.size());
+        for (EventValuesWithLog eventValues : valueList) {
+            AuthorityDeleteEventResponse typedResponse = new AuthorityDeleteEventResponse();
+            typedResponse.log = eventValues.getLog();
+            typedResponse.addr = (String) eventValues.getNonIndexedValues().get(0).getValue();
+            typedResponse.serviceUrl = (String) eventValues.getNonIndexedValues().get(1).getValue();
+            typedResponse.joinTime = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
+            responses.add(typedResponse);
+        }
+        return responses;
+    }
+
+    public Observable<AuthorityDeleteEventResponse> authorityDeleteEventObservable(PlatonFilter filter) {
+        return web3j.platonLogObservable(filter).map(new Func1<Log, AuthorityDeleteEventResponse>() {
+            @Override
+            public AuthorityDeleteEventResponse call(Log log) {
+                EventValuesWithLog eventValues = extractEventParametersWithLog(AUTHORITYDELETE_EVENT, log);
+                AuthorityDeleteEventResponse typedResponse = new AuthorityDeleteEventResponse();
+                typedResponse.log = log;
+                typedResponse.addr = (String) eventValues.getNonIndexedValues().get(0).getValue();
+                typedResponse.serviceUrl = (String) eventValues.getNonIndexedValues().get(1).getValue();
+                typedResponse.joinTime = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
+                return typedResponse;
+            }
+        });
+    }
+
+    public Observable<AuthorityDeleteEventResponse> authorityDeleteEventObservable(DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
+        PlatonFilter filter = new PlatonFilter(startBlock, endBlock, getContractAddress());
+        filter.addSingleTopic(EventEncoder.encode(AUTHORITYDELETE_EVENT));
+        return authorityDeleteEventObservable(filter);
     }
 
     public List<InitializedEventResponse> getInitializedEvents(TransactionReceipt transactionReceipt) {
@@ -331,10 +411,20 @@ public class Vote extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteCall<TransactionReceipt> initialize(String serviceUrl) {
+    public RemoteCall<TransactionReceipt> initialize(String adminAddress, String serviceUrl) {
         final Function function = new Function(
                 FUNC_INITIALIZE,
-                Arrays.<Type>asList(new Utf8String(serviceUrl)),
+                Arrays.<Type>asList(new Address(adminAddress),
+                new Utf8String(serviceUrl)),
+                Collections.<TypeReference<?>>emptyList());
+        return executeRemoteCallTransaction(function);
+    }
+
+    public RemoteCall<TransactionReceipt> changeRange(BigInteger flag, BigInteger range) {
+        final Function function = new Function(
+                FUNC_CHANGERANGE,
+                Arrays.<Type>asList(new Uint8(flag),
+                new Uint256(range)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
@@ -374,34 +464,36 @@ public class Vote extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteCall<Tuple2<String, String>> getAdmin() {
+    public RemoteCall<Tuple3<String, String, BigInteger>> getAdmin() {
         final Function function = new Function(FUNC_GETADMIN,
                 Arrays.<Type>asList(),
-                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}));
-        return new RemoteCall<Tuple2<String, String>>(
-                new Callable<Tuple2<String, String>>() {
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint256>() {}));
+        return new RemoteCall<Tuple3<String, String, BigInteger>>(
+                new Callable<Tuple3<String, String, BigInteger>>() {
                     @Override
-                    public Tuple2<String, String> call() throws Exception {
+                    public Tuple3<String, String, BigInteger> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
-                        return new Tuple2<String, String>(
+                        return new Tuple3<String, String, BigInteger>(
                                 (String) results.get(0).getValue(),
-                                (String) results.get(1).getValue());
+                                (String) results.get(1).getValue(),
+                                (BigInteger) results.get(2).getValue());
                     }
                 });
     }
 
-    public RemoteCall<Tuple2<List<String>, List<String>>> getAllAuthority() {
+    public RemoteCall<Tuple3<List<String>, List<String>, List<BigInteger>>> getAllAuthority() {
         final Function function = new Function(FUNC_GETALLAUTHORITY,
                 Arrays.<Type>asList(),
-                Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Address>>() {}, new TypeReference<DynamicArray<Utf8String>>() {}));
-        return new RemoteCall<Tuple2<List<String>, List<String>>>(
-                new Callable<Tuple2<List<String>, List<String>>>() {
+                Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Address>>() {}, new TypeReference<DynamicArray<Utf8String>>() {}, new TypeReference<DynamicArray<Uint256>>() {}));
+        return new RemoteCall<Tuple3<List<String>, List<String>, List<BigInteger>>>(
+                new Callable<Tuple3<List<String>, List<String>, List<BigInteger>>>() {
                     @Override
-                    public Tuple2<List<String>, List<String>> call() throws Exception {
+                    public Tuple3<List<String>, List<String>, List<BigInteger>> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
-                        return new Tuple2<List<String>, List<String>>(
+                        return new Tuple3<List<String>, List<String>, List<BigInteger>>(
                                 convertToNative((List<Address>) results.get(0).getValue()),
-                                convertToNative((List<Utf8String>) results.get(1).getValue()));
+                                convertToNative((List<Utf8String>) results.get(1).getValue()),
+                                convertToNative((List<Uint256>) results.get(2).getValue()));
                     }
                 });
     }
@@ -436,22 +528,23 @@ public class Vote extends Contract {
                 });
     }
 
-    public RemoteCall<Tuple6<BigInteger, String, String, String, String, BigInteger>> getProposal(BigInteger proposalId) {
+    public RemoteCall<Tuple7<BigInteger, String, String, String, String, BigInteger, List<String>>> getProposal(BigInteger proposalId) {
         final Function function = new Function(FUNC_GETPROPOSAL,
                 Arrays.<Type>asList(new Uint256(proposalId)),
-                Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Uint256>() {}));
-        return new RemoteCall<Tuple6<BigInteger, String, String, String, String, BigInteger>>(
-                new Callable<Tuple6<BigInteger, String, String, String, String, BigInteger>>() {
+                Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Uint256>() {}, new TypeReference<DynamicArray<Address>>() {}));
+        return new RemoteCall<Tuple7<BigInteger, String, String, String, String, BigInteger, List<String>>>(
+                new Callable<Tuple7<BigInteger, String, String, String, String, BigInteger, List<String>>>() {
                     @Override
-                    public Tuple6<BigInteger, String, String, String, String, BigInteger> call() throws Exception {
+                    public Tuple7<BigInteger, String, String, String, String, BigInteger, List<String>> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
-                        return new Tuple6<BigInteger, String, String, String, String, BigInteger>(
+                        return new Tuple7<BigInteger, String, String, String, String, BigInteger, List<String>>(
                                 (BigInteger) results.get(0).getValue(),
                                 (String) results.get(1).getValue(),
                                 (String) results.get(2).getValue(),
                                 (String) results.get(3).getValue(),
                                 (String) results.get(4).getValue(),
-                                (BigInteger) results.get(5).getValue());
+                                (BigInteger) results.get(5).getValue(),
+                                convertToNative((List<Address>) results.get(6).getValue()));
                     }
                 });
     }
@@ -470,6 +563,26 @@ public class Vote extends Contract {
 
     public static Vote load(String contractAddress, Web3j web3j, TransactionManager transactionManager, GasProvider contractGasProvider) {
         return new Vote(contractAddress, web3j, transactionManager, contractGasProvider);
+    }
+
+    public static class AuthorityAddEventResponse {
+        public Log log;
+
+        public String addr;
+
+        public String serviceUrl;
+
+        public BigInteger joinTime;
+    }
+
+    public static class AuthorityDeleteEventResponse {
+        public Log log;
+
+        public String addr;
+
+        public String serviceUrl;
+
+        public BigInteger joinTime;
     }
 
     public static class InitializedEventResponse {

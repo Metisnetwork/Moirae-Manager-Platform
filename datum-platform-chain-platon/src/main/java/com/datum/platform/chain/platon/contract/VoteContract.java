@@ -29,7 +29,7 @@ public interface VoteContract {
      *
      * @return 1-委员会地址  2-委员会服务url
      */
-    Tuple2<List<String>, List<String>> getAllAuthority();
+    Tuple3<List<String>, List<String>, List<BigInteger>> getAllAuthority();
 
     /**
      * 添加对投票合约事件监听

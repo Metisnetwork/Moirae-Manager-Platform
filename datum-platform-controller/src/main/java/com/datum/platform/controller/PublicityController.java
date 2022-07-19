@@ -39,27 +39,9 @@ public class PublicityController {
     @Resource
     private OrgService orgService;
 
-    @GetMapping("getPublicityStats")
-    @ApiOperation(value = "查询公示统计", notes = "查询公示统计")
-    @ApiOperationSupport(order = 1)
-    public ResponseVo<PublicityStatsVo> getPublicityStats() {
-        int orgVcCount = orgService.countOfOrgVc();
-        PublicityStatsVo publicityStatsVo = new PublicityStatsVo();
-        publicityStatsVo.setOrgVcCount(orgVcCount);
-        return ResponseVo.createSuccess(publicityStatsVo);
-    }
-
-    @GetMapping("getLatestOrgVcList")
-    @ApiOperation(value = "获得最新的已认证组织列表", notes = "获得最新的已认证组织列表")
-    @ApiOperationSupport(order = 2)
-    public ResponseVo<List<OrgVcVo>> getLatestOrgVcList(@Valid GetLatestOrgVcListReq req) {
-        List<OrgVc> orgList = orgService.getLatestOrgVcList(req.getSize());
-        return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, OrgVcVo.class));
-    }
-
     @GetMapping("getProposalList")
     @ApiOperation(value = "查询委员会提案列表", notes = "查询委员会提案列表")
-    @ApiOperationSupport(order = 3)
+    @ApiOperationSupport(order = 1)
     public ResponseVo<PageVo<ProposalVo>> getProposalList(@Valid CommonPageReq req) {
         IPage<Proposal> page = publicityService.listProposal(req.getCurrent(), req.getSize());
         List<ProposalVo> itemList = BeanUtil.copyToList(page.getRecords(), ProposalVo.class);
@@ -68,7 +50,7 @@ public class PublicityController {
 
     @GetMapping("getOrgVcList")
     @ApiOperation(value = "获得已认证组织列表", notes = "获得已认证组织列表")
-    @ApiOperationSupport(order = 4)
+    @ApiOperationSupport(order = 2)
     public ResponseVo<PageVo<OrgVcVo>> getOrgVcList(@Valid CommonPageReq req) {
         IPage<OrgVc> page = orgService.listOrgVcList(req.getCurrent(), req.getSize());
         List<OrgVcVo> itemList = BeanUtil.copyToList(page.getRecords(), OrgVcVo.class);
@@ -77,7 +59,7 @@ public class PublicityController {
 
     @GetMapping("getAuthorityList")
     @ApiOperation(value = "查询委员会列表", notes = "查询委员会列表")
-    @ApiOperationSupport(order = 5)
+    @ApiOperationSupport(order = 3)
     public ResponseVo<PageVo<AuthorityVo>> getAuthorityList(@Valid CommonPageReq req) {
         IPage<OrgExpand> page = orgService.listAuthority(req.getCurrent(), req.getSize());
         List<AuthorityVo> itemList = BeanUtil.copyToList(page.getRecords(), AuthorityVo.class);
@@ -86,7 +68,7 @@ public class PublicityController {
 
     @GetMapping("getProposalDetails")
     @ApiOperation(value = "查询委员会提案详情", notes = "查询委员会提案详情")
-    @ApiOperationSupport(order = 6)
+    @ApiOperationSupport(order = 4)
     public ResponseVo<ProposalDetailsVo> getProposalDetails(@Valid IdReq req) {
         Proposal proposal = publicityService.getProposalDetails(req.getId());
         return ResponseVo.createSuccess(BeanUtil.copyProperties(proposal, ProposalDetailsVo.class));

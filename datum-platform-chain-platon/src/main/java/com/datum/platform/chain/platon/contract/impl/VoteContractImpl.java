@@ -57,7 +57,7 @@ public class VoteContractImpl implements VoteContract {
     }
 
     @Override
-    public Tuple2<List<String>, List<String>> getAllAuthority() {
+    public Tuple3<List<String>, List<String>, List<BigInteger>> getAllAuthority() {
         return query(contract -> contract.getAllAuthority(), platONProperties.getVoteAddress());
     }
 
