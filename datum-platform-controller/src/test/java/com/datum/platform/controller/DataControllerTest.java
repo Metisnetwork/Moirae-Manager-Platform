@@ -21,10 +21,13 @@ public class DataControllerTest extends BaseControllerTest {
 
     @Test
     public void getDataListByOrg() throws Exception {
-        pageParameters.add("identityId", "identity:3ddb63047d214ddd8187438a82841250");
-        System.out.println("result = "  + commonGetWithToken("/data/getDataListByOrg", pageParameters));
+        pageParameters.add("identityId", "did:pid:lat1eqpf8vxz7m64j25mkmwk39t3xf8zeltxrr2nql");
+        System.out.println("result = "  + commonGet("/data/getDataListByOrg", pageParameters));
     }
 
+
+
+    //TODO
     @Test
     public void getUserDataList() throws Exception {
         pageParameters.add("identityId", "identity:17c9cc15b6a14f858a96a633c3486f3d");

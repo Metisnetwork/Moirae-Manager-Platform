@@ -70,6 +70,9 @@ public class AlgDto {
     @ApiModelProperty(value = "输出存储形式: 1-明文，2:密文")
     private Integer storePattern;
 
+    @ApiModelProperty(value = "算法类别：0-密文算法，1-明文算法")
+    private Integer type;
+
     @ApiModelProperty(value = "算法代码")
     private AlgCodeDto algorithmCode;
 

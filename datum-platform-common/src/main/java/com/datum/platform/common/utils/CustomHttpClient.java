@@ -4,13 +4,12 @@ import cn.hutool.http.ssl.TrustAnyHostnameVerifier;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
+import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class CustomHttpClient {
@@ -20,48 +19,67 @@ public class CustomHttpClient {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
-            .hostnameVerifier(new TrustAnyHostnameVerifier())
-            .sslSocketFactory(createSSLSocketFactory())
+            .hostnameVerifier(getHostnameVerifier())
+            .sslSocketFactory(getSSLSocketFactory(), getX509TrustManager())
             .build();
 
+
     /**
-     * 默认信任所有的证书
-     *
-     * @param
-     * @return javax.net.ssl.SSLSocketFactory
-     * @date 2021/6/8
-     */
-    private static SSLSocketFactory createSSLSocketFactory() {
-        SSLSocketFactory sSLSocketFactory = null;
+     * 获取这个SSLSocketFactory
+     * */
+    public static SSLSocketFactory getSSLSocketFactory() {
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new TrustAllManager()},
-                    new SecureRandom());
-            sSLSocketFactory = sc.getSocketFactory();
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, getTrustManager(), new SecureRandom());
+            return sslContext.getSocketFactory();
         } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        return sSLSocketFactory;
     }
 
-    private static class TrustAllManager implements X509TrustManager {
+    /**
+     * 获取TrustManager
+     * */
+    private static TrustManager[] getTrustManager() {
+        return new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                    }
 
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-        }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                    }
 
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-
-                throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-        }
-
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[]{};
+                    }
+                }
+        };
     }
 
+    /**
+     * 获取HostnameVerifier
+     * */
+    public static HostnameVerifier getHostnameVerifier() {
+        return (s, sslSession) -> true;
+    }
+
+    public static X509TrustManager getX509TrustManager() {
+        X509TrustManager trustManager = null;
+        try {
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore) null);
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+            if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
+            }
+            trustManager = (X509TrustManager) trustManagers[0];
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return trustManager;
+    }
 }

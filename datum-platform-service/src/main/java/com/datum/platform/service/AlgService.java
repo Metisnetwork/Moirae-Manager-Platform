@@ -16,6 +16,8 @@ public interface AlgService{
      */
     AlgorithmClassify getAlgorithmClassifyTree(boolean isNeedDetails);
 
+    AlgorithmClassify getAlgorithmClassifyTree(boolean isNeedDetails, Long id);
+
 
     /**
      * 查询算法信息
@@ -43,4 +45,6 @@ public interface AlgService{
      * @return
      */
     Algorithm findAlgorithm(CalculationProcessTaskAlgorithmSelectEnum algorithmSelect, AlgorithmClassify rootTree, AlgorithmClassify selectedTree);
+
+
 }

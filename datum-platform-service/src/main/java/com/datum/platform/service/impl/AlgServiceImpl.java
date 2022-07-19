@@ -40,6 +40,16 @@ public class AlgServiceImpl implements AlgService {
     }
 
     @Override
+    @Cacheable("getAlgorithmClassifyTree-2")
+    public AlgorithmClassify getAlgorithmClassifyTree(boolean isNeedDetails, Long id) {
+        if(id == null){
+            return getAlgTree(isNeedDetails, 1L);
+        }else{
+            return getAlgTree(isNeedDetails, id);
+        }
+    }
+
+    @Override
     @Cacheable("getAlgorithm-1")
     public Algorithm getAlgorithm(Long algorithmId, boolean isNeedDetails) {
         AlgorithmClassify algorithmClassify = algorithmClassifyManager.getById(algorithmId);
