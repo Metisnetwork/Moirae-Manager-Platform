@@ -91,6 +91,10 @@ public class SysConstant {
             "home/getTaskTrend",
             "home/getOrgPowerTop",
             "home/getDataUsedTop",
+            "publicity/getProposalList",
+            "publicity/getOrgVcList",
+            "publicity/getAuthorityList",
+            "publicity/getProposalDetails",
             "swagger",
             "error",
             "api-docs"

@@ -4,12 +4,14 @@ import com.datum.platform.chain.platon.PlatONClient;
 import com.datum.platform.chain.platon.config.PlatONProperties;
 import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.chain.platon.contract.evm.Vote;
+import com.datum.platform.chain.platon.dto.AuthorityDto;
 import com.datum.platform.chain.platon.enums.CodeEnum;
 import com.datum.platform.chain.platon.exception.AppException;
 import com.datum.platform.chain.platon.function.ExceptionFunction;
 import com.datum.platform.chain.platon.utils.AddressUtils;
 import com.platon.abi.solidity.EventEncoder;
 import com.platon.abi.solidity.EventValues;
+import com.platon.bech32.Bech32;
 import com.platon.protocol.core.DefaultBlockParameter;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.core.RemoteCall;
@@ -27,8 +29,11 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class VoteContractImpl implements VoteContract {
@@ -57,8 +62,20 @@ public class VoteContractImpl implements VoteContract {
     }
 
     @Override
-    public Tuple3<List<String>, List<String>, List<BigInteger>> getAllAuthority() {
-        return query(contract -> contract.getAllAuthority(), platONProperties.getVoteAddress());
+    public List<AuthorityDto> getAllAuthority() {
+        Tuple3<List<String>, List<String>, List<BigInteger>> result = query(contract -> contract.getAllAuthority(), platONProperties.getVoteAddress());
+        List<AuthorityDto> resultList = new ArrayList<>();
+        for (int i = 0; i < result.getValue1().size(); i++) {
+            AuthorityDto authorityDto = new AuthorityDto();
+            authorityDto.setAddress(Bech32.addressDecodeHex(result.getValue1().get(i)));
+            authorityDto.setServiceUrl(result.getValue2().get(i));
+            authorityDto.setJoinTime(new Date(result.getValue3().get(i).longValue()));
+            resultList.add(authorityDto);
+        }
+
+
+        List<String> addressList = result.getValue1().stream().map(latAddress -> Bech32.addressDecodeHex(latAddress)).collect(Collectors.toList());
+        return resultList;
     }
 
     @Override

@@ -4,7 +4,7 @@
     <select id="getUsableIdentityIdList" resultType="java.lang.String">
         select o.identity_id
         from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
-        where o.status = 1;
+        where o.status = 1
     </select>
 
     <select id="list" resultType="com.datum.platform.mapper.domain.OrgExpand">
@@ -13,13 +13,13 @@
                o.image_url,
                oe.authority_join_time
         from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
-        where o.status = 1 and oe.is_authority = 1;
+        where o.status = 1 and oe.is_authority = 1
     </select>
 
     <select id="countOfAuthority" resultType="java.lang.Integer">
         select count(1)
         from dc_org o inner join mo_org_expand oe on o.identity_id = oe.identity_id
-        where o.status = 1 and oe.is_authority = 1;
+        where o.status = 1 and oe.is_authority = 1
     </select>
 
 </mapper>

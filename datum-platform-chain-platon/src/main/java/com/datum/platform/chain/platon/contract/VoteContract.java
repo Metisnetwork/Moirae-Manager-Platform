@@ -1,5 +1,6 @@
 package com.datum.platform.chain.platon.contract;
 
+import com.datum.platform.chain.platon.dto.AuthorityDto;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.tuples.generated.Tuple2;
 import com.platon.tuples.generated.Tuple3;
@@ -29,7 +30,7 @@ public interface VoteContract {
      *
      * @return 1-委员会地址  2-委员会服务url
      */
-    Tuple3<List<String>, List<String>, List<BigInteger>> getAllAuthority();
+    List<AuthorityDto> getAllAuthority();
 
     /**
      * 添加对投票合约事件监听
