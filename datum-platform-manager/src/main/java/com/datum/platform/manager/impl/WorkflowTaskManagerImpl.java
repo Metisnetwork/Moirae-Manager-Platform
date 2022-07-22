@@ -102,7 +102,7 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
     }
 
     @Override
-    public WorkflowTask createOfWizardMode(Long workflowId, Long workflowVersion, Integer step, Long algorithmId, Boolean inputModel, Integer inputModelStep, Boolean inputPsi, Integer inputPsiStep) {
+    public WorkflowTask createOfWizardMode(Long workflowId, Long workflowVersion, Integer step, Long algorithmId, Boolean inputModel, Integer inputModelStep, Boolean inputPsi, Integer inputPsiStep, Optional<WorkflowTaskPowerTypeEnum> powerType) {
         WorkflowTask workflowTask = new WorkflowTask();
         workflowTask.setWorkflowId(workflowId);
         workflowTask.setWorkflowVersion(workflowVersion);
@@ -112,6 +112,9 @@ public class WorkflowTaskManagerImpl extends ServiceImpl<WorkflowTaskMapper, Wor
         workflowTask.setInputModelStep(inputModelStep);
         workflowTask.setInputPsi(inputPsi);
         workflowTask.setInputPsiStep(inputPsiStep);
+        powerType.ifPresent(powerTypeEnum -> {
+            workflowTask.setPowerType(powerTypeEnum);
+        });
         if(save(workflowTask)){
             return workflowTask;
         }

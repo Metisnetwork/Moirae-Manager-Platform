@@ -185,7 +185,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                     calculationProcessTask.getStep(),
                     algorithm.getAlgorithmId(),
                     algorithm.getInputModel(), calculationProcessTask.getInputModelStep(),
-                    algorithm.getSupportDefaultPsi(), calculationProcessTask.getInputPsiStep());
+                    algorithm.getSupportDefaultPsi(), calculationProcessTask.getInputPsiStep(),
+                    algorithm.getType() == AlgorithmTypeEnum.PT ? Optional.of(WorkflowTaskPowerTypeEnum.RANDOM) : Optional.empty());
             if(algorithm.getAlgorithmVariableList().size() > 0){
                 workflowTaskVariableManager.create(workflowTask.getWorkflowTaskId(), algorithm.getAlgorithmVariableList());
             }
@@ -475,7 +476,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     modelId1 = Optional.of(req.getPtPredictionInput().getModel().getMetaDataId());
                 }
                 setInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(),
-                        Optional.empty(), wizard.getTask2Step(),
+                        Optional.empty(), wizard.getTask4Step(),
                         root,
                         req.getPtPredictionInput().getIdentityId(), Optional.empty(), Arrays.asList(req.getPtPredictionInput().getDataInput()), modelId1, Optional.of(WorkflowTaskPowerTypeEnum.find(req.getPtPredictionInput().getPowerType())), Optional.of(req.getPtPredictionInput().getPowerIdentityId()));
                 break;
@@ -536,7 +537,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 result.setPredictionInput(getPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case PT_INPUT_PREDICTION:
-                result.setPtPredictionInput(getPTPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
+                result.setPtPredictionInput(getPTPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step()));
                 break;
             case INPUT_PSI:
                 result.setPsiInput(getPsiInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
@@ -776,7 +777,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 psiWorkflowTask = workflowTaskManager.createOfWizardMode(
                         req.getWorkflowId(), req.getWorkflowVersion(), taskStep++,
                         psiAlgorithmClassify.getId(), false, null,
-                        false, null);
+                        false, null, Optional.empty());
 
                 if(psiAlgorithmClassify.getAlg().getAlgorithmVariableList().size() > 0){
                     workflowTaskVariableManager.create(psiWorkflowTask.getWorkflowTaskId(), psiAlgorithmClassify.getAlg().getAlgorithmVariableList());
@@ -788,7 +789,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                     req.getWorkflowId(), req.getWorkflowVersion(), taskStep++,
                     algorithmClassify.getId(), algorithmClassify.getAlg().getInputModel(),
                     algorithmClassify.getAlg().getInputModel() && ( nodeDto.getNodeInput().getModel() == null || "frontNodeOutput".equals(nodeDto.getNodeInput().getModel().getMetaDataId())) ? preStep : null,
-                    nodeDto.getNodeInput().getIsPsi(), algorithmClassify.getAlg().getSupportDefaultPsi() ? psiWorkflowTask.getStep() : null);
+                    nodeDto.getNodeInput().getIsPsi(), algorithmClassify.getAlg().getSupportDefaultPsi() ? psiWorkflowTask.getStep() : null,
+                    algorithmClassify.getAlg().getType() == AlgorithmTypeEnum.PT ? Optional.of(WorkflowTaskPowerTypeEnum.RANDOM) : Optional.empty());
 
             // 创建设置
             WorkflowSettingExpert workflowSettingExpert = new WorkflowSettingExpert();
@@ -915,6 +917,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                     nodeInputDto.setIsPsi(workflowTask.getInputPsi());
                     nodeInputDto.setDataInputList(BeanUtil.copyToList(workflowTaskInputManager.listByWorkflowTaskId(workflowTask.getWorkflowTaskId()), DataInputDto.class));
+                    nodeInputDto.setPowerType(workflowTask.getPowerType() == null ? null : workflowTask.getPowerType().getValue());
+                    nodeInputDto.setPowerIdentityId(workflowTask.getPowerIdentityId());
                     nodeDto.setNodeInput(nodeInputDto);
 
                     WorkflowTaskResource workflowTaskResource = workflowTaskResourceManager.getById(workflowTask.getWorkflowTaskId());

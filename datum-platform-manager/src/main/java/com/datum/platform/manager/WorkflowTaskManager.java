@@ -32,7 +32,7 @@ public interface WorkflowTaskManager extends IService<WorkflowTask> {
 
     List<WorkflowTask> listExecutableByWorkflowVersion(Long workflowId, Long workflowVersion);
 
-    WorkflowTask createOfWizardMode(Long workflowId, Long workflowVersion, Integer step, Long algorithmId, Boolean inputModel, Integer inputModelStep, Boolean inputPsi, Integer inputPsiStep);
-    
+    WorkflowTask createOfWizardMode(Long workflowId, Long workflowVersion, Integer step, Long algorithmId, Boolean inputModel, Integer inputModelStep, Boolean inputPsi, Integer inputPsiStep, Optional<WorkflowTaskPowerTypeEnum> powerType);
+
     Map<WorkflowTaskInputTypeEnum, WorkflowTask> setWorkflowTask(Long workflowId, Long workflowVersion, Optional<Integer> prePsiTaskStep, Integer taskStep, String senderIdentityId, Optional<Boolean> activationPrePsi, Optional<String> modelId, Optional<WorkflowTaskPowerTypeEnum> powerType, Optional<String> powerIdentityId);
 }
