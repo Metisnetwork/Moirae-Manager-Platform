@@ -36,7 +36,7 @@ public class ProcessInit {
         uniswapV2FactoryContract.initContractAddress();
         // 初始化投票合约
         voteContract.init();
-//        // 添加提案消费
-//        publicityService.subscribe();
+        // 添加提案消费
+        publicityService.subscribe();
     }
 }

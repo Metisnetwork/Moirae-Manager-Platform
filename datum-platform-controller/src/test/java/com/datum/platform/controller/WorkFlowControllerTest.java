@@ -609,8 +609,13 @@ public class WorkFlowControllerTest extends BaseControllerTest{
     }
 
     @Test
+    public void preparationStartCredentialList()throws Exception{
+        System.out.println("result = "  + preparationStartCredentialList(21L, 1L));
+    }
+
+    @Test
     public void preparationStart()throws Exception{
-        System.out.println("result = "  + preparationStart(1L, 1L));
+        System.out.println("result = "  + preparationStart(21L, 1L));
     }
 
     @Test
@@ -641,6 +646,12 @@ public class WorkFlowControllerTest extends BaseControllerTest{
     private String getWorkflowJson(String address){
         String json = "{\"domain\":{\"name\":\"Moirae\"},\"message\":{\"address\":\"{}\"},\"primaryType\":\"sign\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"}],\"sign\":[{\"name\":\"address\",\"type\":\"string\"}]}}";
         return StrUtil.format(json, address);
+    }
+
+    private String preparationStartCredentialList(Long workflowId, Long workflowVersion)throws Exception{
+        emptyParameters.add("workflowId", String.valueOf(workflowId));
+        emptyParameters.add("workflowVersion", String.valueOf(workflowVersion));
+        return commonGetWithToken("/workflow/preparationStartCredentialList", emptyParameters);
     }
 
     private String preparationStart(Long workflowId, Long workflowVersion)throws Exception{

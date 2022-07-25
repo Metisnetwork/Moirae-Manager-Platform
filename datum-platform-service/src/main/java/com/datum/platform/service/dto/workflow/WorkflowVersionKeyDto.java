@@ -14,7 +14,4 @@ public class WorkflowVersionKeyDto extends WorkflowKeyDto {
 
     @ApiModelProperty(value = "工作流最新版本号")
     private Long workflowVersion;
-
-    @ApiModelProperty(value = "发起任务选择的凭证列表", required = true)
-    private List<Long> credentialIdList;
 }

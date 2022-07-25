@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class VoteContractImpl implements VoteContract {
@@ -50,10 +49,14 @@ public class VoteContractImpl implements VoteContract {
     public final static String proposalResultSignature = EventEncoder.encode(Vote.PROPOSALRESULT_EVENT);
     public final static String voteProposalSignature = EventEncoder.encode(Vote.VOTEPROPOSAL_EVENT);
     public final static String withdrawProposalSignature = EventEncoder.encode(Vote.WITHDRAWPROPOSAL_EVENT);
+    public final static String authorityDeleteSignature = EventEncoder.encode(Vote.AUTHORITYDELETE_EVENT);
+    public final static String authorityAddSignature = EventEncoder.encode(Vote.AUTHORITYADD_EVENT);
 
     @Override
     public void init() {
-
+        rangeBeginVote = query(contract -> contract.getInterval(BigInteger.valueOf(1)), platONProperties.getVoteAddress());
+        rangeVote = query(contract -> contract.getInterval(BigInteger.valueOf(2)), platONProperties.getVoteAddress());
+        rangeQuit = query(contract -> contract.getInterval(BigInteger.valueOf(4)), platONProperties.getVoteAddress());
     }
 
     @Override
@@ -72,16 +75,13 @@ public class VoteContractImpl implements VoteContract {
             authorityDto.setJoinTime(new Date(result.getValue3().get(i).longValue()));
             resultList.add(authorityDto);
         }
-
-
-        List<String> addressList = result.getValue1().stream().map(latAddress -> Bech32.addressDecodeHex(latAddress)).collect(Collectors.toList());
         return resultList;
     }
 
     @Override
     public Observable<Optional<Tuple2<Log, Object>>> subscribe(BigInteger beginBN) {
         PlatonFilter filter = new PlatonFilter(DefaultBlockParameter.valueOf(beginBN), DefaultBlockParameterName.LATEST, platONProperties.getVoteAddress());
-        filter.addOptionalTopics(newProposalSignature, proposalResultSignature, voteProposalSignature, withdrawProposalSignature);
+        filter.addOptionalTopics(newProposalSignature, proposalResultSignature, voteProposalSignature, withdrawProposalSignature, authorityAddSignature, authorityDeleteSignature);
         return platOnClient.getWeb3j().platonLogObservable(filter).map(log -> {
             List<String> topics = log.getTopics();
             if (topics == null || topics.size() == 0) {
@@ -101,23 +101,34 @@ public class VoteContractImpl implements VoteContract {
             } else if(topics.get(0).equals(proposalResultSignature)){
                 EventValues eventValues = Contract.staticExtractEventParameters(Vote.PROPOSALRESULT_EVENT, log);
                 Vote.ProposalResultEventResponse typedResponse = new Vote.ProposalResultEventResponse();
-                typedResponse.log = log;
                 typedResponse.proposalId = (BigInteger) eventValues.getIndexedValues().get(0).getValue();
                 typedResponse.result = (Boolean) eventValues.getNonIndexedValues().get(0).getValue();
                 return Optional.of(new Tuple2<>(log, typedResponse));
             } else if(topics.get(0).equals(voteProposalSignature)){
                 EventValues eventValues = Contract.staticExtractEventParameters(Vote.VOTEPROPOSAL_EVENT, log);
                 Vote.VoteProposalEventResponse typedResponse = new Vote.VoteProposalEventResponse();
-                typedResponse.log = log;
                 typedResponse.proposalId = (BigInteger) eventValues.getIndexedValues().get(0).getValue();
                 typedResponse.voter = (String) eventValues.getNonIndexedValues().get(0).getValue();
                 return Optional.of(new Tuple2<>(log, typedResponse));
             } else if(topics.get(0).equals(withdrawProposalSignature)){
                 EventValues eventValues = Contract.staticExtractEventParameters(Vote.WITHDRAWPROPOSAL_EVENT, log);
                 Vote.WithdrawProposalEventResponse typedResponse = new Vote.WithdrawProposalEventResponse();
-                typedResponse.log = log;
                 typedResponse.proposalId = (BigInteger) eventValues.getIndexedValues().get(0).getValue();
                 typedResponse.blockNo = (BigInteger) eventValues.getNonIndexedValues().get(0).getValue();
+                return Optional.of(new Tuple2<>(log, typedResponse));
+            }  else if(topics.get(0).equals(authorityDeleteSignature)){
+                EventValues eventValues = Contract.staticExtractEventParameters(Vote.AUTHORITYDELETE_EVENT, log);
+                Vote.AuthorityDeleteEventResponse typedResponse = new Vote.AuthorityDeleteEventResponse();
+                typedResponse.addr = (String) eventValues.getNonIndexedValues().get(0).getValue();
+                typedResponse.serviceUrl = (String) eventValues.getNonIndexedValues().get(1).getValue();
+                typedResponse.joinTime = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
+                return Optional.of(new Tuple2<>(log, typedResponse));
+            }  else if(topics.get(0).equals(authorityAddSignature)){
+                EventValues eventValues = Contract.staticExtractEventParameters(Vote.AUTHORITYADD_EVENT, log);
+                Vote.AuthorityAddEventResponse typedResponse = new Vote.AuthorityAddEventResponse();
+                typedResponse.addr = (String) eventValues.getNonIndexedValues().get(0).getValue();
+                typedResponse.serviceUrl = (String) eventValues.getNonIndexedValues().get(1).getValue();
+                typedResponse.joinTime = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
                 return Optional.of(new Tuple2<>(log, typedResponse));
             } else {
                 return Optional.empty();

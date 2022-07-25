@@ -1109,10 +1109,10 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .flatMap(item -> item.getInputList().stream())
                 .map(item -> item.getMetaDataId())
                 .collect(Collectors.toSet());
-        // 过滤掉自己的元数据，因为自己发布的元数据不需要走支付
-        metaDataIdSet = metaDataIdSet.stream()
-                .filter(item -> !dataService.isMetaDataOwner(item))
-                .collect(Collectors.toSet());
+//        // 过滤掉自己的元数据，因为自己发布的元数据不需要走支付
+//        metaDataIdSet = metaDataIdSet.stream()
+//                .filter(item -> !dataService.isMetaDataOwner(item))
+//                .collect(Collectors.toSet());
         // 查询元数据对应用户的凭证
         List<WorkflowStartCredentialDto> result = metaDataIdSet.stream()
                 .map(item -> {
@@ -1127,7 +1127,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public WorkflowFeeDto preparationStart(WorkflowVersionKeyDto req) {
+    public WorkflowFeeDto preparationStart(WorkflowVersionKeyAndCredentialIdListDto req) {
         List<WorkflowTask> workflowTaskList = listExecutableDetailsByWorkflowVersion(req.getWorkflowId(), req.getWorkflowVersion());
         WorkflowFeeDto workflowFeeDto = new WorkflowFeeDto();
         workflowFeeDto.setWorkflowId(req.getWorkflowId());
@@ -1339,7 +1339,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         // 设置算法代码
         requestBuild.setAlgorithmCode(algorithm.getAlgorithmCode().getCalculateContractCode());
-        requestBuild.setMetaAlgorithmId("");
+        requestBuild.setMetaAlgorithmId(algorithm.getType() == AlgorithmTypeEnum.CT ? "ciphertext" : "plaintext");
 
         // 设置算法变量
         boolean useAlignment =  workflowTaskInputList.stream()
@@ -1560,8 +1560,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         String algorithmName = curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getAlgorithmName();
         String workflowVersionName = workflowVersionManager.getById(workflowRunStatus.getWorkflowId(), workflowRunStatus.getWorkflowVersion()).getWorkflowVersionName();
         WorkflowCreateModeEnum createModeEnum = workflowRunStatus.getWorkflow().getCreateMode();
-        return StringUtils.abbreviate(StringUtils.joinWith("_", id, address, algorithmName, createModeEnum.getValue(),
-                curWorkflowRunTaskStatus.getWorkflowTask().getAlgorithm().getType() == AlgorithmTypeEnum.CT?"p" :"np",workflowVersionName), 100);
+        return StringUtils.abbreviate(StringUtils.joinWith("_", id, address, algorithmName, createModeEnum.getValue(),workflowVersionName), 100);
     }
 
     private WorkflowRunStatus loadWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, List<WorkflowTask> workflowTaskList) {

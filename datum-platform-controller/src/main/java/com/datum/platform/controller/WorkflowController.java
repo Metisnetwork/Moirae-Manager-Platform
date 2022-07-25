@@ -189,7 +189,7 @@ public class WorkflowController {
     @GetMapping("preparationStart")
     @ApiOperation(value = "启动工作流查询预估费用", notes = "启动工作流查询预估费用")
     @ApiOperationSupport(order = 17)
-    public ResponseVo<WorkflowFeeDto> preparationStart(@Validated WorkflowVersionKeyDto req) {
+    public ResponseVo<WorkflowFeeDto> preparationStart(@Validated WorkflowVersionKeyAndCredentialIdListDto req) {
         WorkflowFeeDto resp = workflowService.preparationStart(req);
         return ResponseVo.createSuccess(resp);
     }

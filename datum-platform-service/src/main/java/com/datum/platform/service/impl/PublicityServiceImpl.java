@@ -67,62 +67,40 @@ public class PublicityServiceImpl implements PublicityService {
                 save.setLogIndex(log.getLogIndex().toString());
                 if(tuple2.getValue2() instanceof Vote.NewProposalEventResponse ){
                     Vote.NewProposalEventResponse newProposalEventResponse = (Vote.NewProposalEventResponse) tuple2.getValue2();
-                    save.setProposalId(newProposalEventResponse.proposalId.toString());
                     save.setType(ProposalLogTypeEnum.NEWPROPOSAL_EVENT);
                     save.setContent(JSON.toJSONString(newProposalEventResponse));
-                    // 新增提案
-                    Proposal proposal = new Proposal();
-                    proposal.setId(newProposalEventResponse.proposalId.toString());
-                    proposal.setSubmitter(newProposalEventResponse.submitter);
-                    proposal.setCandidate(newProposalEventResponse.candidate);
-                    proposal.setType(ProposalTypeEnum.find(newProposalEventResponse.proposalType));
-                    proposal.setPublicityId(newProposalEventResponse.proposalUrl);
-                    proposal.setSubmissionBn(log.getBlockNumber().toString());
-                    Tuple3<BigInteger, BigInteger, BigInteger> config = voteContract.getConfig();
-                    proposal.setVoteBeginBn(log.getBlockNumber().add(config.getValue1()).toString());
-                    proposal.setVoteEndBn(log.getBlockNumber().add(config.getValue1()).add(config.getValue2()).toString());
-                    proposal.setVoteAgreeNumber(0);
-                    proposal.setAuthorityNumber(orgService.countOfAuthority());
-                    proposal.setStatus(ProposalStatusEnum.HAS_NOT_STARTED);
-                    proposal.setRemark("");
-                    proposalManager.save(proposal);
-                    Publicity publicity = new Publicity();
-                    publicity.setId(newProposalEventResponse.proposalUrl);
-                    publicityManager.save(publicity);
                 }
                 if(tuple2.getValue2() instanceof Vote.VoteProposalEventResponse ){
                     Vote.VoteProposalEventResponse newProposalEventResponse = (Vote.VoteProposalEventResponse) tuple2.getValue2();
-                    save.setProposalId(newProposalEventResponse.proposalId.toString());
                     save.setType(ProposalLogTypeEnum.VOTEPROPOSAL_EVENT);
                     save.setContent(JSON.toJSONString(newProposalEventResponse));
-                    // 提案投票
-                    Proposal proposal = proposalManager.getById(newProposalEventResponse.proposalId.toString());
-                    proposal.setVoteAgreeNumber(proposal.getVoteAgreeNumber() + 1);
-                    proposalManager.updateById(proposal);
                 }
                 if(tuple2.getValue2() instanceof Vote.ProposalResultEventResponse ){
                     Vote.ProposalResultEventResponse newProposalEventResponse = (Vote.ProposalResultEventResponse) tuple2.getValue2();
-                    save.setProposalId(newProposalEventResponse.proposalId.toString());
                     save.setType(ProposalLogTypeEnum.PROPOSALRESULT_EVENT);
                     save.setContent(JSON.toJSONString(newProposalEventResponse));
-                    // 投票统计结果
-                    Proposal proposal = proposalManager.getById(newProposalEventResponse.proposalId.toString());
-                    proposal.setStatus(newProposalEventResponse.result ? ProposalStatusEnum.VOTE_PASS : ProposalStatusEnum.VOTE_NOT_PASS);
-                    proposalManager.updateById(proposal);
                 }
                 if(tuple2.getValue2() instanceof Vote.WithdrawProposalEventResponse ){
                     Vote.WithdrawProposalEventResponse newProposalEventResponse = (Vote.WithdrawProposalEventResponse) tuple2.getValue2();
-                    save.setProposalId(newProposalEventResponse.proposalId.toString());
                     save.setType(ProposalLogTypeEnum.WITHDRAWPROPOSAL_EVENT);
                     save.setContent(JSON.toJSONString(newProposalEventResponse));
-                    // 撤销提案
-                    Proposal proposal = proposalManager.getById(newProposalEventResponse.proposalId.toString());
-                    proposal.setStatus(ProposalStatusEnum.REVOKED);
-                    proposalManager.updateById(proposal);
+                }
+                if(tuple2.getValue2() instanceof Vote.AuthorityDeleteEventResponse ){
+                    Vote.AuthorityDeleteEventResponse newProposalEventResponse = (Vote.AuthorityDeleteEventResponse) tuple2.getValue2();
+                    save.setType(ProposalLogTypeEnum.AUTHORITYDELETE_EVENT);
+                    save.setContent(JSON.toJSONString(newProposalEventResponse));
+                }
+
+                if(tuple2.getValue2() instanceof Vote.AuthorityAddEventResponse ){
+                    Vote.AuthorityAddEventResponse newProposalEventResponse = (Vote.AuthorityAddEventResponse) tuple2.getValue2();
+                    save.setType(ProposalLogTypeEnum.AUTHORITYADD_EVENT);
+                    save.setContent(JSON.toJSONString(newProposalEventResponse));
                 }
                 proposalLogManager.save(save);
             }
-        }));
+        }), error -> {
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + error);
+        });
     }
 
     @Override

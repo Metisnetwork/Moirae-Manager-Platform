@@ -52,7 +52,9 @@ public class Vote extends Contract {
 
     public static final String FUNC_INITIALIZE = "initialize";
 
-    public static final String FUNC_CHANGERANGE = "changeRange";
+    public static final String FUNC_GETINTERVAL = "getInterval";
+
+    public static final String FUNC_SETINTERVAL = "setInterval";
 
     public static final String FUNC_SUBMITPROPOSAL = "submitProposal";
 
@@ -420,11 +422,18 @@ public class Vote extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteCall<TransactionReceipt> changeRange(BigInteger flag, BigInteger range) {
+    public RemoteCall<BigInteger> getInterval(BigInteger flag) {
+        final Function function = new Function(FUNC_GETINTERVAL,
+                Arrays.<Type>asList(new Uint8(flag)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}));
+        return executeRemoteCallSingleValueReturn(function, BigInteger.class);
+    }
+
+    public RemoteCall<TransactionReceipt> setInterval(BigInteger flag, BigInteger interval) {
         final Function function = new Function(
-                FUNC_CHANGERANGE,
+                FUNC_SETINTERVAL,
                 Arrays.<Type>asList(new Uint8(flag),
-                new Uint256(range)),
+                new Uint256(interval)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }

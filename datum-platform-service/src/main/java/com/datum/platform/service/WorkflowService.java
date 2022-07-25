@@ -48,7 +48,7 @@ public interface WorkflowService{
 
     List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req);
 
-    WorkflowFeeDto preparationStart(WorkflowVersionKeyDto req);
+    WorkflowFeeDto preparationStart(WorkflowVersionKeyAndCredentialIdListDto req);
 
     List<WorkflowRunTaskDto> getWorkflowRunTaskList(WorkflowRunKeyDto req);
 

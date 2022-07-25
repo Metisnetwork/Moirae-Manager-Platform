@@ -14,7 +14,8 @@ public enum ProposalLogTypeEnum {
     WITHDRAWPROPOSAL_EVENT(2, "撤销提案"),
     VOTEPROPOSAL_EVENT(3, "对提案投票"),
     PROPOSALRESULT_EVENT(4, "投票结果"),
-    ;
+    AUTHORITYADD_EVENT(5, "新增委员会"),
+    AUTHORITYDELETE_EVENT(6, "删除委员会");
 
     @JsonValue
     @EnumValue

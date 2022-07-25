@@ -30,11 +30,6 @@ public class ProposalLog implements Serializable {
     private Long id;
 
     /**
-     * 提案id
-     */
-    private String proposalId;
-
-    /**
      * 事件类型, 1-提交提案; 2-撤销提案; 3-对提案投票; 4-投票结果
      */
     private ProposalLogTypeEnum type;
