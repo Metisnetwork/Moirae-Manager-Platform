@@ -16,7 +16,19 @@ public class PublicityControllerTest extends BaseControllerTest {
 
     @Test
     public void getAuthorityList() throws Exception {
-        System.out.println("result = "  + commonGet("/publicity/getAuthorityList", emptyParameters));
+        System.out.println("result = "  + commonGet("/publicity/getAuthorityList", pageParameters));
+    }
+
+
+    @Test
+    public void getProposalList() throws Exception {
+        System.out.println("result = "  + commonGet("/publicity/getProposalList", pageParameters));
+    }
+
+    @Test
+    public void getProposalDetails() throws Exception {
+        emptyParameters.add("id", "1");
+        System.out.println("result = "  + commonGet("/publicity/getProposalDetails", emptyParameters));
     }
 
 }

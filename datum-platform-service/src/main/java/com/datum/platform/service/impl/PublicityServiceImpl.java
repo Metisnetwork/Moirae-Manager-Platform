@@ -111,10 +111,13 @@ public class PublicityServiceImpl implements PublicityService {
         BigInteger curBn = platONClient.platonBlockNumber();
         // 查询平均出块时间
         BigInteger avgPackTime  = platONClient.getAvgPackTime();
-        iPage.getRecords().forEach(proposal -> {
-            proposal.setVoteBeginTime(bn2Date(proposal.getVoteBeginBn(), curBn, avgPackTime));
-            proposal.setVoteEndTime(bn2Date(proposal.getVoteEndBn(), curBn, avgPackTime));
-        });
+        iPage.getRecords().stream()
+                .filter(proposal -> proposal.getType() != ProposalTypeEnum.AUTO_QUIT_AUTHORITY)
+                .forEach(proposal -> {
+                    proposal.setVoteBeginTime(bn2Date(proposal.getVoteBeginBn(), curBn, avgPackTime));
+                    proposal.setVoteEndTime(bn2Date(proposal.getVoteEndBn(), curBn, avgPackTime));
+                }
+                );
         return iPage;
     }
 

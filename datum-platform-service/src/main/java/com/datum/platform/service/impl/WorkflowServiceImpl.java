@@ -667,6 +667,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         PTPredictionInputDto predictionInputDto = new PTPredictionInputDto();
         WorkflowTask prediction = workflowTaskManager.getByStep(workflowId, workflowVersion, taskStep);
         predictionInputDto.setIdentityId(prediction.getIdentityId());
+        predictionInputDto.setPowerType(prediction.getPowerType().getValue());
+        predictionInputDto.setPowerIdentityId(prediction.getPowerIdentityId());
         predictionInputDto.setInputModel(prediction.getInputModel());
         predictionInputDto.setAlgorithmId(prediction.getAlgorithmId());
         if(prediction.getInputModel() && StringUtils.isNotBlank(prediction.getInputModelId())){
