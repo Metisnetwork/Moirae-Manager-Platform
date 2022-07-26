@@ -4,6 +4,7 @@ import com.datum.platform.mapper.domain.Publicity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -16,4 +17,6 @@ import java.util.List;
 public interface PublicityManager extends IService<Publicity> {
 
     List<Publicity> listNeedSync();
+
+    boolean saveBatch(Set<String> publicityIdSet);
 }

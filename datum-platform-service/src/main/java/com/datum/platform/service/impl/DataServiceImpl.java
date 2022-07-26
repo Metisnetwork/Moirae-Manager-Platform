@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -315,9 +316,17 @@ public class DataServiceImpl implements DataService {
         // 查询用户存在的凭证列表
         List<Long> metaDataCertificateIdList = metaDataCertificateUserManager.listMetaDataCertificateIdByAddress(address);
         // 查询凭证对应元数据id
-        List<String> metaDataIdList = metaDataCertificateManager.listMetaDataIdByIds(metaDataCertificateIdList);
+        List<String> metaDataIdList = new ArrayList<>();
+        if(metaDataCertificateIdList.size() > 0){
+            metaDataIdList = metaDataCertificateManager.listMetaDataIdByIds(metaDataCertificateIdList);
+        }
         // 设置用户的可见
         metaDataUserManager.saveOrDeleteBatch(address, metaDataIdList);
         return true;
+    }
+
+    @Override
+    public String getMetaDataName(String metaDataId) {
+        return metaDataManager.getName(metaDataId);
     }
 }

@@ -15,6 +15,9 @@ public class WorkflowStartCredentialDto {
     @ApiModelProperty(value = "元数据id")
     private String metaDataId;
 
+    @ApiModelProperty(value = "元数据名称")
+    private String metaDataName;
+
     @ApiModelProperty(value = "无属性凭证")
     NoAttributesCredentialDto noAttributesCredential;
 

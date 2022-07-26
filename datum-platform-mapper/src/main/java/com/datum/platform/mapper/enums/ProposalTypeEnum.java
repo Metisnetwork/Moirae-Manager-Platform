@@ -11,9 +11,9 @@ import java.util.Map;
 @Getter
 public enum ProposalTypeEnum {
 
-    ADD_AUTHORITY(1, "新增委员会成员"),
-    KICK_OUT_AUTHORITY(2, "踢出委员会成员"),
-    AUTO_QUIT_AUTHORITY(3, "自己退出提案投票"),
+    ADD_AUTHORITY(1, "提名加入委员会"),
+    KICK_OUT_AUTHORITY(2, "提名退出委员会"),
+    AUTO_QUIT_AUTHORITY(3, "主动退出委员会"),
     ;
 
     @JsonValue

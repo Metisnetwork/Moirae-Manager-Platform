@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -30,8 +31,8 @@ public class SyncPublicityTask {
     @Resource
     private SysConfig sysConfig;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
-    @Lock(keys = "SyncPublicityTask")
+    @Scheduled(fixedDelay = 1 * 60 * 1000)
+    @Lock(keys = "SyncPublicityTask", lockWatchdogTimeout = 5 * 60 * 1000,  attemptTimeout = -1)
     public void run() {
         long begin = DateUtil.current();
         try {
@@ -44,10 +45,11 @@ public class SyncPublicityTask {
                     if(response.isSuccessful()){
                         publicity.setImageUrl(JSONPath.extract(response.body().string(), "$.image").toString());
                         publicity.setDescribe(JSONPath.extract(response.body().string(), "$.desc").toString());
+                        publicity.setDescribe(JSONPath.extract(response.body().string(), "$.remark").toString());
                         updateList.add(publicity);
                     }
                 } catch (Exception e){
-
+                    log.error("同步明细失败！ 公示id = {} message = {}", publicity.getId(), e.getMessage());
                 }
             });
             if(updateList.size() > 0){

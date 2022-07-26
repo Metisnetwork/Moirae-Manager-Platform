@@ -46,11 +46,6 @@ public class Proposal implements Serializable {
     private ProposalTypeEnum type;
 
     /**
-     * 提案的附言
-     */
-    private String remark;
-
-    /**
      * 提案的公示信息
      */
     private String publicityId;
@@ -69,6 +64,11 @@ public class Proposal implements Serializable {
      * 投票结束时间
      */
     private String voteEndBn;
+
+    /**
+     * 主动退出的块高
+     */
+    private String autoQuitBn;
 
     /**
      * 赞成票数量

@@ -2,4 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.datum.platform.mapper.PublicityMapper">
 
+    <select id="listNeedSync" resultType="com.datum.platform.mapper.domain.Publicity">
+        select mp.id,
+               mp.image_url,
+               mp.`describe`,
+               mp.create_time,
+               mp.update_time
+        from mo_publicity mp
+        where mp.image_url is null
+    </select>
 </mapper>

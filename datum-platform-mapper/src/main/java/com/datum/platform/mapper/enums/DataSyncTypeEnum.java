@@ -17,7 +17,7 @@ public enum DataSyncTypeEnum {
     TASK("task","同步组织相关任务信息"),
     POWER("power", "算力同步"),
     ANALYZE_TASK("analyze_task","任务数据分析"),
-    ANALYZE_PROPOSAL_LOG("analyze_proposal_log","提案日志数据分析")
+    ANALYZE_PROPOSAL("analyze_proposal","提案数据分析")
     ;
 
     DataSyncTypeEnum(String dataType, String desc) {

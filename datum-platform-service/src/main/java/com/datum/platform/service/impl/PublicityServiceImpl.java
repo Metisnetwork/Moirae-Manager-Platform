@@ -23,11 +23,11 @@ import com.platon.protocol.core.methods.response.Log;
 import com.platon.tuples.generated.Tuple3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -123,6 +123,26 @@ public class PublicityServiceImpl implements PublicityService {
         Proposal proposal = proposalManager.getDetailsById(id);
         proposal.setPublicity(publicityManager.getById(proposal.getPublicityId()));
         return proposal;
+    }
+
+    @Override
+    public List<ProposalLog> listProposalLog(Long latestSynced, Long size) {
+        return proposalLogManager.listByPage(latestSynced, size);
+    }
+
+    @Override
+    @Transactional
+    public boolean saveOrUpdateBatchProposal(Collection<Proposal> proposalList, Set<String> publicityIdSet) {
+        proposalManager.saveOrUpdateBatch(proposalList);
+        if(publicityIdSet.size() > 0 ){
+            publicityManager.saveBatch(publicityIdSet);
+        }
+        return true;
+    }
+
+    @Override
+    public Proposal getProposalById(String id) {
+        return proposalManager.getById(id);
     }
 
     private Date bn2Date(String bn, BigInteger curBn, BigInteger avgPackTime){

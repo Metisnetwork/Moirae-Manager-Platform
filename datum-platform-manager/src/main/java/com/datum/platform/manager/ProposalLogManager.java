@@ -4,6 +4,7 @@ import com.datum.platform.mapper.domain.ProposalLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * <p>
@@ -18,4 +19,6 @@ public interface ProposalLogManager extends IService<ProposalLog> {
     ProposalLog getLatestOne();
 
     boolean contain(BigInteger blockNumber, String transactionHash, BigInteger logIndex);
+
+    List<ProposalLog> listByPage(Long latestSynced, Long size);
 }

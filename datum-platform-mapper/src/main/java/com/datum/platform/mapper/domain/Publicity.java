@@ -1,14 +1,12 @@
 package com.datum.platform.mapper.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -26,19 +24,24 @@ public class Publicity implements Serializable {
     /**
      * 公示的id, ipfs path
      */
+    @TableId
     private String id;
 
     /**
      * 图片url
      */
-    @TableField("image_url")
     private String imageUrl;
 
     /**
      * 描述
      */
-    @TableField("`describe`")
     private String describe;
+
+    /**
+     * 提案的附言
+     */
+    private String remark;
+
 
     /**
      * 创建时间
@@ -52,6 +55,5 @@ public class Publicity implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
 
 }

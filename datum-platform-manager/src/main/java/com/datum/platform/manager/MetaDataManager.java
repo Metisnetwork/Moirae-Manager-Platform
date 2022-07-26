@@ -30,4 +30,6 @@ public interface MetaDataManager extends IService<MetaData> {
     boolean exist(String metaDataId);
 
     List<String> listIdOfPublished();
+
+    String getName(String metaDataId);
 }

@@ -2,4 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.datum.platform.mapper.ProposalLogMapper">
 
+    <select id="listByPage" resultType="com.datum.platform.mapper.domain.ProposalLog">
+        select mpl.id,
+               mpl.type,
+               mpl.block_number,
+               mpl.log_index,
+               mpl.tx_hash,
+               mpl.content
+        from mo_proposal_log mpl
+        where mpl.id > #{latestSynced}
+        order by mpl.id asc limit #{size}
+    </select>
 </mapper>

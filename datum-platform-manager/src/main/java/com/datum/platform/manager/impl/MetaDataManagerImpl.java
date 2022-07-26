@@ -83,4 +83,12 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
         wrapper.eq(MetaData::getStatus, MetaDataStatusEnum.PUBLISHED);
         return listObjs(wrapper, result -> result.toString());
     }
+
+    @Override
+    public String getName(String metaDataId) {
+        LambdaQueryWrapper<MetaData> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(MetaData::getFileName);
+        wrapper.eq(MetaData::getMetaDataId, metaDataId);
+        return getObj(wrapper, item -> item.toString());
+    }
 }

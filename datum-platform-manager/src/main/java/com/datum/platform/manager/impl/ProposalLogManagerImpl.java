@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * <p>
@@ -36,5 +37,10 @@ public class ProposalLogManagerImpl extends ServiceImpl<ProposalLogMapper, Propo
         queryWrapper.eq(ProposalLog::getTxHash, transactionHash);
         queryWrapper.eq(ProposalLog::getLogIndex, logIndex.toString());
         return count(queryWrapper) == 1;
+    }
+
+    @Override
+    public List<ProposalLog> listByPage(Long latestSynced, Long size) {
+        return baseMapper.listByPage(latestSynced, size);
     }
 }

@@ -257,4 +257,6 @@ public interface DataService {
      * @return
      */
     boolean setMetaDataUser(String address);
+
+    String getMetaDataName(String metaDataId);
 }
