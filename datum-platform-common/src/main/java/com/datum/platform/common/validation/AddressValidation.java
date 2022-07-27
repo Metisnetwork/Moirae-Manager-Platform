@@ -1,8 +1,8 @@
 package com.datum.platform.common.validation;
 
 
-import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.common.annotation.CheckAddress;
+import com.datum.platform.common.utils.AddressChangeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

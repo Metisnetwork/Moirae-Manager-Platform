@@ -2,7 +2,6 @@ package com.datum.platform.mapper.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import jnr.ffi.annotations.In;
 import lombok.Data;
 
 import java.io.Serializable;

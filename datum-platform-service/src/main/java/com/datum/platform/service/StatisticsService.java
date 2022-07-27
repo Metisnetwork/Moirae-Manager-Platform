@@ -1,9 +1,9 @@
 package com.datum.platform.service;
 
 
-import com.datum.platform.mapper.domain.StatsMetaData;
 import com.datum.platform.mapper.domain.StatsDay;
 import com.datum.platform.mapper.domain.StatsGlobal;
+import com.datum.platform.mapper.domain.StatsMetaData;
 import com.datum.platform.mapper.domain.StatsOrg;
 import com.datum.platform.service.dto.statistics.NavigationDto;
 

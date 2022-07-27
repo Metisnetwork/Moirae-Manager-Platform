@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -54,6 +53,11 @@ public class Org implements Serializable {
      * (状态)修改时间
      */
     private Date updateAt;
+
+    /**
+     * 组织可验证凭证
+     */
+    private String vc;
 
     /**
      * 创建时间

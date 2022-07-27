@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateUtil;
 import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.impl.GrpcAuthServiceClientImpl;
 import com.datum.platform.mapper.domain.Org;
-import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
 import com.datum.platform.service.OrgService;
@@ -72,6 +71,7 @@ public class SyncDcOrgTask {
                     org.setImageUrl(nodeIdentityDto.getImageUrl());
                     org.setDetails(nodeIdentityDto.getDetails());
                     org.setStatus(OrgStatusEnum.find(nodeIdentityDto.getStatus().getNumber()));
+                    org.setVc(nodeIdentityDto.getCredential());
                     org.setUpdateAt(new Date(nodeIdentityDto.getUpdateAt()));
                     return org;
                 })

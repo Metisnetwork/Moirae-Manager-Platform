@@ -2,8 +2,6 @@ package com.datum.platform.chain.platon;
 
 import com.datum.platform.chain.platon.contract.evm.DataTokenTemplate;
 import com.datum.platform.chain.platon.utils.AddressUtils;
-import com.fasterxml.jackson.core.json.JsonWriteContext;
-import com.jayway.jsonpath.internal.JsonContext;
 import com.platon.bech32.Bech32;
 import com.platon.crypto.Credentials;
 import org.junit.jupiter.api.Test;

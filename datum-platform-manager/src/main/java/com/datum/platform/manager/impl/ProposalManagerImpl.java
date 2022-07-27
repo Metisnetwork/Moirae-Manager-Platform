@@ -2,10 +2,10 @@ package com.datum.platform.manager.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.datum.platform.mapper.domain.Proposal;
-import com.datum.platform.mapper.ProposalMapper;
-import com.datum.platform.manager.ProposalManager;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.datum.platform.manager.ProposalManager;
+import com.datum.platform.mapper.ProposalMapper;
+import com.datum.platform.mapper.domain.Proposal;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,16 +1,13 @@
 package com.datum.platform.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.datum.platform.chain.platon.config.PlatONProperties;
 import com.datum.platform.grpc.constant.GrpcConstant;
 import com.datum.platform.manager.DataSyncManager;
 import com.datum.platform.manager.PublicityManager;
 import com.datum.platform.mapper.domain.DataSync;
-import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.domain.Publicity;
 import com.datum.platform.service.SysService;
 import com.datum.platform.service.dto.sys.PlatONPropertiesDto;

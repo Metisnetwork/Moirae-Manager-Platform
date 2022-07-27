@@ -1,6 +1,5 @@
 package com.datum.platform.service.dto.workflow.expert;
 
-import com.datum.platform.service.dto.alg.AlgVariableDto;
 import com.datum.platform.service.dto.alg.AlgVariableV2Dto;
 import com.datum.platform.service.dto.workflow.common.CodeDto;
 import io.swagger.annotations.ApiModel;

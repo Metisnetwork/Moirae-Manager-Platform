@@ -1,7 +1,7 @@
 package com.datum.platform.manager;
 
-import com.datum.platform.mapper.domain.Publicity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datum.platform.mapper.domain.Publicity;
 
 import java.util.List;
 import java.util.Set;

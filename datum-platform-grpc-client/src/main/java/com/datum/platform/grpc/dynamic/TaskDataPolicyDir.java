@@ -2,8 +2,6 @@ package com.datum.platform.grpc.dynamic;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class TaskDataPolicyDir {
     private String partyId;

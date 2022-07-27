@@ -1,7 +1,6 @@
 package com.datum.platform.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.domain.OrgVc;
 import com.datum.platform.mapper.domain.Publicity;
@@ -9,7 +8,6 @@ import com.datum.platform.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

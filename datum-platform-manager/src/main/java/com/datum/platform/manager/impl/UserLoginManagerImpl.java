@@ -1,7 +1,5 @@
 package com.datum.platform.manager.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.UserLoginManager;
 import com.datum.platform.mapper.UserLoginMapper;

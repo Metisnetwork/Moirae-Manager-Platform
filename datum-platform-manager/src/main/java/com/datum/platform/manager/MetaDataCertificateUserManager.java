@@ -1,7 +1,7 @@
 package com.datum.platform.manager;
 
-import com.datum.platform.mapper.domain.MetaDataCertificateUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.datum.platform.mapper.domain.MetaDataCertificateUser;
 
 import java.util.List;
 

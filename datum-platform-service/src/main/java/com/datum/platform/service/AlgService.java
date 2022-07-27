@@ -4,9 +4,6 @@ import com.datum.platform.mapper.domain.Algorithm;
 import com.datum.platform.mapper.domain.AlgorithmClassify;
 import com.datum.platform.mapper.enums.CalculationProcessTaskAlgorithmSelectEnum;
 
-import java.util.List;
-import java.util.Set;
-
 public interface AlgService{
     /**
      * 查询算法分类树结构

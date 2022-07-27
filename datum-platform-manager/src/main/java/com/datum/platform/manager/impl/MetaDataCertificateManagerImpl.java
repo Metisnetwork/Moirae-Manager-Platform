@@ -9,14 +9,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.MetaDataCertificateManager;
 import com.datum.platform.mapper.MetaDataCertificateMapper;
 import com.datum.platform.mapper.domain.MetaDataCertificate;
-import com.datum.platform.mapper.domain.MetaDataCertificateUser;
 import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * <p>

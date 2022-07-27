@@ -1,8 +1,8 @@
 package com.datum.platform.service.dto.alg;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.datum.platform.common.utils.LanguageContext;
 import com.datum.platform.service.utils.CommonUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

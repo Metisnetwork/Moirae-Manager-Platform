@@ -1,7 +1,5 @@
 package com.datum.platform.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.domain.Publicity;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.service.dto.sys.PlatONPropertiesDto;

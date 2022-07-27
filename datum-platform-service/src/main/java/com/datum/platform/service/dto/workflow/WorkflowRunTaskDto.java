@@ -1,9 +1,9 @@
 package com.datum.platform.service.dto.workflow;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.datum.platform.common.constants.SysConstant;
 import com.datum.platform.common.utils.LanguageContext;
 import com.datum.platform.mapper.enums.WorkflowTaskRunStatusEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

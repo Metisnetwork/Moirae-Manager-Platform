@@ -4,7 +4,6 @@ import com.datum.platform.chain.platon.dto.AuthorityDto;
 import com.datum.platform.chain.platon.dto.VoteConfigDto;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.tuples.generated.Tuple2;
-import com.platon.tuples.generated.Tuple3;
 import rx.Observable;
 
 import java.math.BigInteger;

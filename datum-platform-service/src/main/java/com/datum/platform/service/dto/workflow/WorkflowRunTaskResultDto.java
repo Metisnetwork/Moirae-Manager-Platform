@@ -1,9 +1,7 @@
 package com.datum.platform.service.dto.workflow;
 
-import com.datum.platform.mapper.enums.TaskStatusEnum;
 import com.datum.platform.service.dto.task.TaskEventDto;
 import com.datum.platform.service.dto.task.TaskResultDto;
-import com.datum.platform.service.dto.workflow.WorkflowRunTaskDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

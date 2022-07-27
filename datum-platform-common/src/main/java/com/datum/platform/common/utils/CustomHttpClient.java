@@ -1,13 +1,11 @@
 package com.datum.platform.common.utils;
 
-import cn.hutool.http.ssl.TrustAnyHostnameVerifier;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
 import javax.net.ssl.*;
 import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

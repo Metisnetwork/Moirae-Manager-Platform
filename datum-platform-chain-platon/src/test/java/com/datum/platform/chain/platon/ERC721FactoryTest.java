@@ -1,7 +1,6 @@
 package com.datum.platform.chain.platon;
 
 import com.datum.platform.chain.platon.contract.evm.ERC721Factory;
-import com.datum.platform.chain.platon.utils.AddressUtils;
 import com.platon.bech32.Bech32;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import org.junit.jupiter.api.Test;
