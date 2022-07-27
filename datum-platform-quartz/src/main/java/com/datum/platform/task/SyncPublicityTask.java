@@ -1,7 +1,7 @@
 package com.datum.platform.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.common.constants.SysConfig;
 import com.datum.platform.common.utils.CustomHttpClient;
 import com.datum.platform.mapper.domain.Publicity;
@@ -43,9 +43,12 @@ public class SyncPublicityTask {
                     Request request = new Request.Builder().url(publicity.getId().replace("ipfs://", sysConfig.getIpfsGateway())).build();
                     Response response = CustomHttpClient.client.newCall(request).execute();
                     if(response.isSuccessful()){
-                        publicity.setImageUrl(JSONPath.extract(response.body().string(), "$.image").toString());
-                        publicity.setDescribe(JSONPath.extract(response.body().string(), "$.desc").toString());
-                        publicity.setDescribe(JSONPath.extract(response.body().string(), "$.remark").toString());
+                        JSONObject resp = JSONObject.parseObject(response.body().string());
+                        publicity.setImageUrl(resp.getString("image"));
+                        publicity.setDescribe(resp.getString("desc"));
+                        publicity.setRemark(resp.getString("remark"));
+                        publicity.setCreateTime(null);
+                        publicity.setUpdateTime(null);
                         updateList.add(publicity);
                     }
                 } catch (Exception e){

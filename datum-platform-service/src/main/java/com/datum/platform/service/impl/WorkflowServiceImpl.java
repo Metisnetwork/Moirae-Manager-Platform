@@ -50,7 +50,7 @@ import com.datum.platform.service.utils.TreeUtils;
 import com.datum.platform.service.utils.UserContext;
 import com.google.protobuf.ByteString;
 import common.constant.CarrierEnum;
-import common.constant.TokenEnum;
+import common.constant.TkEnum;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -1707,15 +1707,15 @@ public class WorkflowServiceImpl implements WorkflowService {
                     requestBuilder.setTaskSponsorAddress(UserContext.getCurrentUser().getAddress());
                     item.getInputList().stream().map(WorkflowTaskInput::getMetaDataId).forEach(metaDataId -> {
                         MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(metaDataId);
-                        TaskRpcApi.TokenItem.Builder tokenItem = TaskRpcApi.TokenItem.newBuilder();
-                        tokenItem.setTokenType(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES ? TokenEnum.TokenType.ERC20 : TokenEnum.TokenType.ERC721);
-                        tokenItem.setTokenAddress(metaDataCertificate.getTokenAddress());
+                        TaskRpcApi.TkItem.Builder tokenItem = TaskRpcApi.TkItem.newBuilder();
+                        tokenItem.setTkType(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES ? TkEnum.TkType.Tk20 : TkEnum.TkType.Tk721);
+                        tokenItem.setTkAddress(metaDataCertificate.getTokenAddress());
                         if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
                             tokenItem.setValue(item.getAlgorithm().getType() == AlgorithmTypeEnum.CT? Long.valueOf(metaDataCertificate.getErc20CtAlgConsume()): Long.valueOf(metaDataCertificate.getErc20PtAlgConsume()));
                         }else{
                             tokenItem.setId(Long.valueOf(metaDataCertificate.getTokenId()));
                         }
-                        requestBuilder.addTokenItems(tokenItem);
+                        requestBuilder.addTkItems(tokenItem);
                     });
 
                     TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());

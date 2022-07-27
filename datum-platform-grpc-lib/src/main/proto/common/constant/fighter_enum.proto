@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/common/constant";
+
+package common.constant;
+
+enum ConnectPolicyFormat {
+  ConnectPolicyFormat_Unknown = 0;       // 未知
+  ConnectPolicyFormat_Str = 1;           // 字符串
+  ConnectPolicyFormat_Json = 2;          // json
+}
+
+enum ServiceType {
+  DATA_SVC = 0;
+  COMPUTE_SVC = 1;
+  SCHEDULE_SVC = 2;
+  NET_COMM_SVC = 3;
+}
+
+
+enum TaskStatus {
+  Start = 0;
+  Finished = 1;
+  Cancelled = 2;
+  Failed = 3;
+}

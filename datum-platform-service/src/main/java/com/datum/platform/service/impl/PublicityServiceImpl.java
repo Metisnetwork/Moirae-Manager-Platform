@@ -13,14 +13,10 @@ import com.datum.platform.manager.ProposalManager;
 import com.datum.platform.manager.PublicityManager;
 import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.domain.ProposalLog;
-import com.datum.platform.mapper.domain.Publicity;
 import com.datum.platform.mapper.enums.ProposalLogTypeEnum;
-import com.datum.platform.mapper.enums.ProposalStatusEnum;
 import com.datum.platform.mapper.enums.ProposalTypeEnum;
-import com.datum.platform.service.OrgService;
 import com.datum.platform.service.PublicityService;
 import com.platon.protocol.core.methods.response.Log;
-import com.platon.tuples.generated.Tuple3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +40,6 @@ public class PublicityServiceImpl implements PublicityService {
     private ProposalManager proposalManager;
     @Resource
     private PublicityManager publicityManager;
-    @Resource
-    private OrgService orgService;
     @Resource
     private PlatONClient platONClient;
 
@@ -98,9 +92,7 @@ public class PublicityServiceImpl implements PublicityService {
                 }
                 proposalLogManager.save(save);
             }
-        }), error -> {
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + error);
-        });
+        }));
     }
 
     @Override

@@ -32,6 +32,7 @@ message MetadataPB {
   // add by v0.5.0
   string                                user = 17;                      // 发布元数据的账户 (元数据发布是属于用户的)
   common.constant.UserType              user_type = 18;                 // 账户类型 (自行查看enum定义处)
+  bytes									sign = 19;						// 账户的签名
 }
 
 // 元数据申请记录实体
@@ -73,6 +74,7 @@ message MetadataSummary {
   // add by v0.5.0
   string                                  user = 14;                  // 发布元数据的账户 (元数据发布是属于用户的)
   common.constant.UserType                user_type = 15;             // 账户类型  (自行查看enum定义处)
+  bytes 								  sign = 16;				  // 账户的签名
 }
 
 // 元数据的详情信息

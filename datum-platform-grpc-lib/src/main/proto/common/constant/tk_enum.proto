@@ -4,8 +4,8 @@ option go_package = "github.com/datumtechs/datum-network-carrier/pb/common/const
 
 package common.constant;
 
-enum TokenType {
-  ERC20 = 0;
-  ERC721 = 1;
-  ERC1155 = 2;
+enum TkType {
+  Tk20 = 0;
+  Tk721 = 1;
+  Tk1155 = 2;
 }

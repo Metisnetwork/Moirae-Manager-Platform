@@ -47,7 +47,7 @@ spring:
   task:
     scheduling:
       pool:
-        size: 10
+        size: 20
       thread-name-prefix: Moirae-Task-
   cache:
     caffeine:
@@ -72,7 +72,7 @@ system:
     # 系统默认的psi算法
     defaultPsi: 1001
     # ipfs公用网关
-    ipfsGateway: https://ipfs.io/ipfs/
+    ipfsGateway: https://datumdev.mypinata.cloud/ipfs/
 
 grpc:
   client:

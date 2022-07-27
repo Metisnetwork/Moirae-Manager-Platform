@@ -35,11 +35,13 @@ public class Publicity implements Serializable {
     /**
      * 描述
      */
+    @TableField(value = "`describe`")
     private String describe;
 
     /**
      * 提案的附言
      */
+    @TableField(value = "remark")
     private String remark;
 
 
