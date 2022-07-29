@@ -11,6 +11,8 @@ import com.datum.platform.service.dto.workflow.expert.WorkflowStatusOfExpertMode
 import com.datum.platform.service.dto.workflow.wizard.WorkflowDetailsOfWizardModeDto;
 import com.datum.platform.service.dto.workflow.wizard.WorkflowWizardStepDto;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -80,4 +82,6 @@ public interface WorkflowService{
      * @param task
      */
     void taskFinish(WorkflowRunStatusTask workflowRunTaskStatus, Task task);
+
+    void downloadTaskResultData(String metaDataId, OutputStream outputStream)  throws IOException;
 }

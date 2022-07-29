@@ -80,6 +80,11 @@ public class WorkflowRunTaskResult implements Serializable {
     private String metadataOption;
 
     /**
+     * 任务结果文件扩展
+     */
+    private String extra;
+
+    /**
      * 创建时间
      */
     private Date createTime;

@@ -96,6 +96,11 @@ public class Algorithm implements Serializable {
     private Boolean outputModel;
 
     /**
+     * 是否生成信息价值评估文件
+     */
+    private Boolean outputIvEvaluate;
+
+    /**
      * 是否支持默认的psi处理: 0-否，1:是
      */
     private Boolean supportDefaultPsi;

@@ -27,4 +27,11 @@ public class WorkflowRunTaskResultManagerImpl extends ServiceImpl<WorkflowRunTas
         wrapper.eq(WorkflowRunTaskResult::getTaskId, taskId);
         return list(wrapper);
     }
+
+    @Override
+    public WorkflowRunTaskResult getByMetaDataId(String metaDataId) {
+        LambdaQueryWrapper<WorkflowRunTaskResult> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunTaskResult::getMetadataId, metaDataId);
+        return getOne(wrapper);
+    }
 }

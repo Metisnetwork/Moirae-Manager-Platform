@@ -58,6 +58,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -292,6 +294,12 @@ public class WorkflowServiceImpl implements WorkflowService {
                 taskFail(workflowRunStatus,task);
             }
         }
+    }
+
+    @Override
+    public void downloadTaskResultData(String metaDataId, OutputStream outputStream) throws IOException {
+        WorkflowRunTaskResult workflowRunTaskResult = workflowRunTaskResultManager.getByMetaDataId(metaDataId);
+        grpcSysServiceClient.downloadTaskResultData(orgService.getChannel(workflowRunTaskResult.getIdentityId()), outputStream, workflowRunTaskResult.getTaskId() );
     }
 
 
@@ -1877,12 +1885,20 @@ public class WorkflowServiceImpl implements WorkflowService {
         resultDto.setWorkflowVersionName(workflowVersion.getWorkflowVersionName());
         resultDto.setOutputModel(algorithm.getOutputModel());
         resultDto.setEndAt(workflowRunTaskStatus.getEndTime());
-        resultDto.setTaskResultList(BeanUtil.copyToList(listWorkflowRunTaskResultByTaskId(resultDto.getTaskId()), TaskResultDto.class));
+        List<WorkflowRunTaskResult> workflowRunTaskResultList = listWorkflowRunTaskResultByTaskId(resultDto.getTaskId());
+        resultDto.setTaskResultList(BeanUtil.copyToList(workflowRunTaskResultList, TaskResultDto.class));
         resultDto.setEventList(BeanUtil.copyToList(taskService.listTaskEventByTaskId(resultDto.getTaskId(), workflowTask.getIdentityId()), TaskEventDto.class));
+
+        // 产生模型评估
         if(algorithm.getOutputModel()){
-            Model model = dataService.getModelByTaskId(resultDto.getTaskId());
-            if(model != null){
-                resultDto.setModelEvaluate(model.getEvaluate());
+            if(workflowRunTaskResultList.size() > 0){
+                resultDto.setModelEvaluate(workflowRunTaskResultList.get(0).getExtra());
+            }
+        }
+        // 产生信息价值评估
+        if(algorithm.getOutputIvEvaluate()){
+            if(workflowRunTaskResultList.size() > 0){
+                resultDto.setInformationValueEvaluate(workflowRunTaskResultList.get(0).getExtra());
             }
         }
         return resultDto;

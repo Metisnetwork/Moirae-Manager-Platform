@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.mapper.domain.CalculationProcess;
 import com.datum.platform.mapper.domain.Workflow;
 import com.datum.platform.mapper.domain.WorkflowVersion;
+import com.datum.platform.req.data.GetDataDetailsReq;
 import com.datum.platform.req.task.GetTaskDetailsReq;
 import com.datum.platform.req.workflow.GetCalculationProcessListReq;
 import com.datum.platform.req.workflow.GetWorkflowListReq;
@@ -37,7 +38,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -223,5 +227,14 @@ public class WorkflowController {
     public ResponseVo<WorkflowRunTaskResultDto> getWorkflowRunTaskResult(@Valid GetTaskDetailsReq req) {
         WorkflowRunTaskResultDto result = workflowService.getWorkflowRunTaskResult(req.getTaskId());
         return ResponseVo.createSuccess(result);
+    }
+
+    @GetMapping("getWorkflowRunTaskResult")
+    @ApiOperation(value = "查询指定工作流的运行任务结果", notes = "查询指定工作流的运行任务结果")
+    @ApiOperationSupport(order = 21)
+    public void downloadResultFile(@Valid GetDataDetailsReq req, HttpServletResponse response) throws IOException{
+        workflowService.downloadTaskResultData(req.getMetaDataId(), response.getOutputStream());
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(req.getMetaDataId(), "UTF-8"));
+        response.setContentType("application/octet-stream");
     }
 }

@@ -16,4 +16,6 @@ import java.util.List;
 public interface WorkflowRunTaskResultManager extends IService<WorkflowRunTaskResult> {
 
     List<WorkflowRunTaskResult> listByTaskId(String taskId);
+
+    WorkflowRunTaskResult getByMetaDataId(String metaDataId);
 }

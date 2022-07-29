@@ -18,7 +18,7 @@ public class WorkflowRunTaskResultDto extends WorkflowRunTaskDto {
     @ApiModelProperty(value = "任务计算结束时间，精确到毫秒")
     private Date endAt;
 
-    @ApiModelProperty(value = "算力提供方")
+    @ApiModelProperty(value = "任务结果文件")
     private List<TaskResultDto> taskResultList;
 
     @ApiModelProperty(value = "任务事件")
@@ -26,4 +26,7 @@ public class WorkflowRunTaskResultDto extends WorkflowRunTaskDto {
 
     @ApiModelProperty(value = "模型评估结果")
     private String modelEvaluate;
+
+    @ApiModelProperty(value = "信息价值评估指标")
+    private String informationValueEvaluate;
 }
