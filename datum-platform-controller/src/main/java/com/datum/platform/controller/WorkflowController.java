@@ -229,7 +229,7 @@ public class WorkflowController {
         return ResponseVo.createSuccess(result);
     }
 
-    @GetMapping("getWorkflowRunTaskResult")
+    @GetMapping("downloadResultFile")
     @ApiOperation(value = "查询指定工作流的运行任务结果", notes = "查询指定工作流的运行任务结果")
     @ApiOperationSupport(order = 21)
     public void downloadResultFile(@Valid GetDataDetailsReq req, HttpServletResponse response) throws IOException{
