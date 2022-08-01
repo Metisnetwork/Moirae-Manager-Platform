@@ -374,6 +374,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             taskResult.setMetadataOption(response.getMetadataOption());
             taskResult.setIp(response.getIp());
             taskResult.setPort(response.getPort());
+            taskResult.setExtra(response.getExtra());
             taskResultList.add(taskResult);
 
             JSONObject meta = JSONObject.parseObject(response.getMetadataOption());
@@ -399,7 +400,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                 model.setTrainAlgorithmId(workflowTask.getAlgorithmId());
                 model.setTrainUserAddress(workflowRunStatus.getAddress());
                 model.setSupportedAlgorithmId(predictionAlgorithm.getAlgorithmId());
-                model.setEvaluate(response.getExtra());
                 model.setFilePath(filePath);
                 modelList.add(model);
             }
@@ -1119,10 +1119,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .flatMap(item -> item.getInputList().stream())
                 .map(item -> item.getMetaDataId())
                 .collect(Collectors.toSet());
-//        // 过滤掉自己的元数据，因为自己发布的元数据不需要走支付
-//        metaDataIdSet = metaDataIdSet.stream()
-//                .filter(item -> !dataService.isMetaDataOwner(item))
-//                .collect(Collectors.toSet());
         // 查询元数据对应用户的凭证
         List<WorkflowStartCredentialDto> result = metaDataIdSet.stream()
                 .map(item -> {
@@ -1677,6 +1673,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         Map<String, BigInteger> metaDataId2consumptionMap = new HashMap<>();
         for (WorkflowTask workflowTask: workflowTaskList) {
             for (WorkflowTaskInput taskInput: workflowTask.getInputList()) {
+                MetaData metaData = dataService.getMetaDataById(taskInput.getMetaDataId(), false);
+                // 如果元数据属于自己，则不要凭证
+                if(metaData.getOwnerAddress().equals(UserContext.getCurrentUser().getAddress())){
+                    continue;
+                }
                 MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(taskInput.getMetaDataId());
                 if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES){
                     metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);

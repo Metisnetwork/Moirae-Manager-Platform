@@ -136,6 +136,11 @@ public class Task implements Serializable {
     private Date updateAt;
 
     /**
+     * 算法元数据Id
+     */
+    private String metaAlgorithmId;
+
+    /**
      * 创建时间
      */
     private Date createTime;

@@ -146,8 +146,8 @@
     <select id="statisticsOfDay" resultType="com.datum.platform.mapper.domain.Task">
         SELECT DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AS statsTime,
                COUNT(1) AS taskCount,
-               (SELECT COUNT(1) FROM dc_task it WHERE DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AND  it.task_name LIKE '%\_p\_%' ) AS privacyTaskCount,
-               (SELECT COUNT(1) FROM dc_task it WHERE DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AND  it.task_name LIKE '%\_np\_%' ) AS noPrivacyTaskCount
+               (SELECT COUNT(1) FROM dc_task it WHERE DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AND  it.meta_algorithm_id = 'ciphertext' ) AS privacyTaskCount,
+               (SELECT COUNT(1) FROM dc_task it WHERE DATE_FORMAT(it.`create_at`, '%Y-%m-%d') = DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') AND  it.meta_algorithm_id = 'plaintext' ) AS noPrivacyTaskCount
         FROM `dc_task` dc
         GROUP BY DATE_FORMAT(dc.`create_at`, '%Y-%m-%d')
         ORDER BY DATE_FORMAT(dc.`create_at`, '%Y-%m-%d') DESC

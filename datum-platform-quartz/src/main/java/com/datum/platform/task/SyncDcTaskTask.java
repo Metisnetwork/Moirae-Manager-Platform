@@ -173,6 +173,7 @@ public class SyncDcTaskTask {
             task.setStatus(TaskStatusEnum.find(information.getStateValue()));
             task.setSyncSeq(maxSeq.incrementAndGet());
             task.setUpdateAt(new Date(information.getUpdateAt()));
+            task.setMetaAlgorithmId(information.getMetaAlgorithmId());
             taskList.add(task);
         });
         taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);
