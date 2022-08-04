@@ -1,43 +1,40 @@
-CREATE DATABASE IF NOT EXISTS `datum_platform_0.5.0` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `datum_platform` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE `datum_platform_0.5.0`;
+USE `datum_platform`;
 
 /*Table structure for table `dc_meta_data` */
 
 DROP TABLE IF EXISTS `dc_meta_data`;
 
 CREATE TABLE `dc_meta_data` (
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '元数据ID,hash',
-    `meta_data_type` tinyint NOT NULL DEFAULT '1' COMMENT '表示该元数据是 `普通数据` 还是 `模型数据` 的元数据 (0: 未定义; 1: 普通数据元数据; 2: 模型数据元数据)',
-    `file_name` varchar(100)  NOT NULL COMMENT '文件名称',
-    `identity_id` varchar(200)  NOT NULL COMMENT '组织身份ID',
-    `file_type` int NOT NULL COMMENT '文件后缀/类型, 0:未知; 1:csv',
-    `industry` varchar(100)  DEFAULT NULL COMMENT '行业名称',
-    `published_at` datetime(3) NOT NULL COMMENT '发布时间，精确到毫秒',
-    `remarks` varchar(100)  DEFAULT NULL COMMENT '数据描述',
-    `status` int DEFAULT NULL COMMENT '元数据的状态 (0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表)',
-    `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
-    `location_type` tinyint NOT NULL DEFAULT '1' COMMENT '源数据的存储位置类型 (组织本地服务器、远端服务器、云等)：0-未知，1-存储在组织本地服务器上，2-存储在远端服务器上',
-    `nonce` int DEFAULT '0' COMMENT '元数据的 nonce (用来标识该元数据在所属组织中的元数据的序号, 从 0 开始递增)',
-    `allow_expose` tinyint(1) DEFAULT '0' COMMENT '是否可以被曝光 (1: 可以; 0: 不可以; 如 数据原始内容可以被下载或者支持外域查看时则为1, 默认为0)',
-    `origin_id` varchar(200)  NOT NULL COMMENT '数据文件ID,hash',
-    `file_path` varchar(100)  NOT NULL COMMENT '文件存储路径',
-    `rows` int NOT NULL DEFAULT '0' COMMENT '数据行数(不算title)',
-    `size` bigint NOT NULL DEFAULT '0' COMMENT '文件大小(字节)',
-    `columns` int NOT NULL DEFAULT '0' COMMENT '数据列数',
-    `has_title` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否带标题',
-	`is_support_pt_alg` TINYINT DEFAULT 0  NOT NULL  COMMENT '是否支持明文算法',
-	`is_support_ct_alg` TINYINT DEFAULT 0  NOT NULL  COMMENT '是否支持密文算法',
-	`owner_address` VARCHAR(64) NOT NULL   COMMENT '数据拥有者地址',
-	`erc20_address` VARCHAR(64) NULL   COMMENT '数据对应erc20合约地址',
-	`erc721_address` VARCHAR(64) NULL   COMMENT '数据对应erc721合约地址',
-	`erc20_pt_alg_consume` VARCHAR(128)  COMMENT '明文算法消耗量',
-	`erc20_ct_alg_consume` VARCHAR(128)  COMMENT '密文算法消耗量',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`meta_data_id`),
-    KEY `update_at` (`update_at`)
-) ENGINE=InnoDB  COMMENT='数据文件信息';
+  `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+  `meta_data_type` tinyint NOT NULL DEFAULT '1' COMMENT '表示该元数据是 `普通数据` 还是 `模型数据` 的元数据 (0: 未定义; 1: 普通数据元数据; 2: 模型数据元数据)',
+  `file_name` varchar(100) NOT NULL COMMENT '文件名称',
+  `identity_id` varchar(200) NOT NULL COMMENT '组织身份ID',
+  `file_type` int NOT NULL COMMENT '文件后缀/类型, 0:未知; 1:csv',
+  `industry` varchar(100) DEFAULT NULL COMMENT '行业名称',
+  `published_at` datetime(3) NOT NULL COMMENT '发布时间，精确到毫秒',
+  `remarks` varchar(100) DEFAULT NULL COMMENT '数据描述',
+  `status` int DEFAULT NULL COMMENT '元数据的状态 (0: 未知; 1: 还未发布的新表; 2: 已发布的表; 3: 已撤销的表)',
+  `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
+  `location_type` tinyint NOT NULL DEFAULT '1' COMMENT '源数据的存储位置类型 (组织本地服务器、远端服务器、云等)：0-未知，1-存储在组织本地服务器上，2-存储在远端服务器上',
+  `nonce` int DEFAULT '0' COMMENT '元数据的 nonce (用来标识该元数据在所属组织中的元数据的序号, 从 0 开始递增)',
+  `origin_id` varchar(200) NOT NULL COMMENT '数据文件ID,hash',
+  `file_path` varchar(100) NOT NULL COMMENT '文件存储路径',
+  `rows` int NOT NULL DEFAULT '0' COMMENT '数据行数(不算title)',
+  `size` bigint NOT NULL DEFAULT '0' COMMENT '文件大小(字节)',
+  `columns` int NOT NULL DEFAULT '0' COMMENT '数据列数',
+  `has_title` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否带标题',
+  `is_support_pt_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持明文算法',
+  `is_support_ct_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持密文算法',
+  `owner_address` varchar(64) NOT NULL COMMENT '数据拥有者地址',
+  `erc20_address` varchar(64) DEFAULT NULL COMMENT '数据对应erc20合约地址',
+  `erc721_address` varchar(64) DEFAULT NULL COMMENT '数据对应erc721合约地址',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`meta_data_id`),
+  KEY `update_at` (`update_at`)
+) ENGINE=InnoDB COMMENT='数据文件信息';
 
 /*Data for the table `dc_meta_data` */
 
@@ -46,14 +43,14 @@ CREATE TABLE `dc_meta_data` (
 DROP TABLE IF EXISTS `dc_meta_data_column`;
 
 CREATE TABLE `dc_meta_data_column` (
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '元数据ID,hash',
-    `column_idx` int NOT NULL COMMENT '字段索引序号',
-    `column_name` varchar(100)  NOT NULL COMMENT '字段名称',
-    `column_type` varchar(100)  NOT NULL COMMENT '字段类型',
-    `column_size` int NOT NULL DEFAULT '0' COMMENT '字段大小',
-    `remarks` varchar(100)  DEFAULT NULL COMMENT '字段描述',
-    PRIMARY KEY (`meta_data_id`,`column_idx`)
-) ENGINE=InnoDB  COMMENT='数据文件元数据信息';
+  `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+  `column_idx` int NOT NULL COMMENT '字段索引序号',
+  `column_name` varchar(100) NOT NULL COMMENT '字段名称',
+  `column_type` varchar(100) NOT NULL COMMENT '字段类型',
+  `column_size` int NOT NULL DEFAULT '0' COMMENT '字段大小',
+  `remarks` varchar(100) DEFAULT NULL COMMENT '字段描述',
+  PRIMARY KEY (`meta_data_id`,`column_idx`)
+) ENGINE=InnoDB COMMENT='数据文件元数据信息';
 
 /*Data for the table `dc_meta_data_column` */
 
@@ -62,18 +59,20 @@ CREATE TABLE `dc_meta_data_column` (
 DROP TABLE IF EXISTS `dc_org`;
 
 CREATE TABLE `dc_org` (
-    `identity_id` varchar(200)  NOT NULL COMMENT '身份认证标识的id',
-    `node_name` varchar(100)  DEFAULT NULL COMMENT '组织身份名称',
-    `node_id` varchar(200)  NOT NULL COMMENT '组织节点ID',
-    `image_url` varchar(256)  DEFAULT NULL COMMENT '组织机构图像url',
-    `details` varchar(256)  DEFAULT NULL COMMENT '组织机构简介',
-    `status` int NOT NULL DEFAULT '1' COMMENT '状态,1-Normal; 2-NonNormal',
-    `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`identity_id`),
-    KEY `update_at` (`update_at`)
-) ENGINE=InnoDB  COMMENT='数据中心组织信息';
+  `identity_id` varchar(200) NOT NULL COMMENT '身份认证标识的id',
+  `wallet_address` varchar(200) NOT NULL COMMENT '组织内置钱包地址',
+  `node_name` varchar(100) DEFAULT NULL COMMENT '组织身份名称',
+  `node_id` varchar(200) NOT NULL COMMENT '组织节点ID',
+  `image_url` varchar(256) DEFAULT NULL COMMENT '组织机构图像url',
+  `details` varchar(256) DEFAULT NULL COMMENT '组织机构简介',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态,1-Normal; 2-NonNormal',
+  `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
+  `vc` varchar(4086) DEFAULT NULL COMMENT 'vc信息',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`identity_id`),
+  KEY `update_at` (`update_at`)
+) ENGINE=InnoDB COMMENT='数据中心组织信息';
 
 /*Data for the table `dc_org` */
 
@@ -82,23 +81,23 @@ CREATE TABLE `dc_org` (
 DROP TABLE IF EXISTS `dc_power_server`;
 
 CREATE TABLE `dc_power_server` (
-    `id` varchar(200)  NOT NULL COMMENT '计算服务主机ID,hash',
-    `identity_id` varchar(200)  NOT NULL COMMENT '组织身份ID',
-    `memory` bigint NOT NULL DEFAULT '0' COMMENT '计算服务内存, 字节',
-    `core` int NOT NULL DEFAULT '0' COMMENT '计算服务core',
-    `bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '计算服务带宽, bps',
-    `used_memory` bigint DEFAULT '0' COMMENT '使用的内存, 字节',
-    `used_core` int DEFAULT '0' COMMENT '使用的core',
-    `used_bandwidth` bigint DEFAULT '0' COMMENT '使用的带宽, bps',
-    `published` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否发布，true/false',
-    `published_at` datetime(3) NOT NULL COMMENT '发布时间，精确到毫秒',
-    `status` int DEFAULT NULL COMMENT '算力的状态 (0: 未知; 1: 还未发布的算力; 2: 已发布的算力(算力未被占用); 3: 已发布的算力(算力正在被占用); 4: 已撤销的算力)',
-    `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    KEY `update_at` (`update_at`)
-) ENGINE=InnoDB  COMMENT='计算服务信息';
+  `id` varchar(200) NOT NULL COMMENT '计算服务主机ID,hash',
+  `identity_id` varchar(200) NOT NULL COMMENT '组织身份ID',
+  `memory` bigint NOT NULL DEFAULT '0' COMMENT '计算服务内存, 字节',
+  `core` int NOT NULL DEFAULT '0' COMMENT '计算服务core',
+  `bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '计算服务带宽, bps',
+  `used_memory` bigint DEFAULT '0' COMMENT '使用的内存, 字节',
+  `used_core` int DEFAULT '0' COMMENT '使用的core',
+  `used_bandwidth` bigint DEFAULT '0' COMMENT '使用的带宽, bps',
+  `published` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否发布，true/false',
+  `published_at` datetime(3) NOT NULL COMMENT '发布时间，精确到毫秒',
+  `status` int DEFAULT NULL COMMENT '算力的状态 (0: 未知; 1: 还未发布的算力; 2: 已发布的算力(算力未被占用); 3: 已发布的算力(算力正在被占用); 4: 已撤销的算力)',
+  `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `update_at` (`update_at`)
+) ENGINE=InnoDB COMMENT='计算服务信息';
 
 /*Data for the table `dc_power_server` */
 
@@ -107,32 +106,35 @@ CREATE TABLE `dc_power_server` (
 DROP TABLE IF EXISTS `dc_task`;
 
 CREATE TABLE `dc_task` (
-    `id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `task_name` varchar(100)  NOT NULL COMMENT '任务名称',
-    `user_id` varchar(200)  NOT NULL COMMENT '发起任务的用户的信息 (task是属于用户的)',
-    `user_type` int NOT NULL COMMENT '用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址',
-    `required_memory` bigint NOT NULL DEFAULT '0' COMMENT '需要的内存, 字节',
-    `required_core` int NOT NULL DEFAULT '0' COMMENT '需要的core',
-    `required_bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '需要的带宽, bps',
-    `required_duration` bigint NOT NULL DEFAULT '0' COMMENT '需要的时间, milli seconds',
-    `owner_identity_id` varchar(200)  NOT NULL COMMENT '任务创建者组织身份ID',
-    `owner_party_id` varchar(200)  NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
-    `create_at` datetime(3) NOT NULL COMMENT '任务创建时间，精确到毫秒',
-    `start_at` datetime(3) DEFAULT NULL COMMENT '任务开始执行时间，精确到毫秒',
-    `end_at` datetime(3) DEFAULT NULL COMMENT '任务结束时间，精确到毫秒',
-    `used_memory` bigint NOT NULL DEFAULT '0' COMMENT '使用的内存, 字节',
-    `used_core` int NOT NULL DEFAULT '0' COMMENT '使用的core',
-    `used_bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '使用的带宽, bps',
-    `used_file_size` bigint DEFAULT '0' COMMENT '使用的所有数据大小，字节',
-    `status` int DEFAULT NULL COMMENT '任务状态, 0:未知;1:等待中;2:计算中,3:失败;4:成功',
-    `status_desc` varchar(255)  DEFAULT NULL COMMENT '任务状态说明',
-    `remarks` varchar(255)  DEFAULT NULL COMMENT '任务描述',
-    `task_sign` varchar(1024)  DEFAULT NULL COMMENT '任务签名',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    KEY `end_at` (`end_at`)
-) ENGINE=InnoDB  COMMENT='任务';
+  `id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `task_name` varchar(100) NOT NULL COMMENT '任务名称',
+  `user_id` varchar(200) NOT NULL COMMENT '发起任务的用户的信息 (task是属于用户的)',
+  `user_type` int NOT NULL COMMENT '用户类型 (0: 未定义; 1: 以太坊地址; 2: Alaya地址; 3: PlatON地址',
+  `required_memory` bigint NOT NULL DEFAULT '0' COMMENT '需要的内存, 字节',
+  `required_core` int NOT NULL DEFAULT '0' COMMENT '需要的core',
+  `required_bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '需要的带宽, bps',
+  `required_duration` bigint NOT NULL DEFAULT '0' COMMENT '需要的时间, milli seconds',
+  `owner_identity_id` varchar(200) NOT NULL COMMENT '任务创建者组织身份ID',
+  `owner_party_id` varchar(200) NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
+  `create_at` datetime(3) NOT NULL COMMENT '任务创建时间，精确到毫秒',
+  `start_at` datetime(3) DEFAULT NULL COMMENT '任务开始执行时间，精确到毫秒',
+  `end_at` datetime(3) DEFAULT NULL COMMENT '任务结束时间，精确到毫秒',
+  `used_memory` bigint NOT NULL DEFAULT '0' COMMENT '使用的内存, 字节',
+  `used_core` int NOT NULL DEFAULT '0' COMMENT '使用的core',
+  `used_bandwidth` bigint NOT NULL DEFAULT '0' COMMENT '使用的带宽, bps',
+  `used_file_size` bigint DEFAULT '0' COMMENT '使用的所有数据大小，字节',
+  `status` int DEFAULT NULL COMMENT '任务状态, 0:未知;1:等待中;2:计算中,3:失败;4:成功',
+  `status_desc` varchar(255) DEFAULT NULL COMMENT '任务状态说明',
+  `remarks` varchar(255) DEFAULT NULL COMMENT '任务描述',
+  `task_sign` varchar(1024) DEFAULT NULL COMMENT '任务签名',
+  `sync_seq` bigint NOT NULL COMMENT '用于记录同步的序列',
+  `meta_algorithm_id` varchar(255) DEFAULT NULL COMMENT '算法元数据Id (为了后续支持 算法市场而用, 使用内置算法时则该值为 "" 空字符串)',
+  `update_at` timestamp(3) NOT NULL COMMENT '(状态)修改时间',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `end_at` (`end_at`)
+) ENGINE=InnoDB COMMENT='任务';
 
 /*Data for the table `dc_task` */
 
@@ -141,11 +143,11 @@ CREATE TABLE `dc_task` (
 DROP TABLE IF EXISTS `dc_task_algo_provider`;
 
 CREATE TABLE `dc_task_algo_provider` (
-    `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `identity_id` varchar(200)  NOT NULL COMMENT '算法提供者组织身份ID',
-    `party_id` varchar(200)  NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
-    PRIMARY KEY (`task_id`)
-) ENGINE=InnoDB  COMMENT='任务算法提供者';
+  `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `identity_id` varchar(200) NOT NULL COMMENT '算法提供者组织身份ID',
+  `party_id` varchar(200) NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
+  PRIMARY KEY (`task_id`)
+) ENGINE=InnoDB COMMENT='任务算法提供者';
 
 /*Data for the table `dc_task_algo_provider` */
 
@@ -154,17 +156,21 @@ CREATE TABLE `dc_task_algo_provider` (
 DROP TABLE IF EXISTS `dc_task_data_provider`;
 
 CREATE TABLE `dc_task_data_provider` (
-    `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '参与任务的元数据ID',
-    `meta_data_name` varchar(1024)  DEFAULT NULL COMMENT '元数据名称',
-    `policy_type` int NOT NULL COMMENT '存储的策略类型',
-    `input_type` int NOT NULL COMMENT '输入数据的类型. 0: unknown, 1: origin_data, 2: model',
-    `identity_id` varchar(200)  NOT NULL COMMENT '(冗余)参与任务的元数据的所属组织的identity_id',
-    `party_id` varchar(200)  NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
-    `key_column_idx` int DEFAULT NULL COMMENT '元数据id',
-    `selected_columns` varchar(200)  DEFAULT NULL COMMENT '元数据选择列',
-    PRIMARY KEY (`task_id`,`meta_data_id`)
-) ENGINE=InnoDB  COMMENT='任务数据提供者（数据和模型）';
+  `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `meta_data_id` varchar(200) NOT NULL COMMENT '参与任务的元数据ID',
+  `meta_data_name` varchar(1024) DEFAULT NULL COMMENT '元数据名称',
+  `policy_type` int NOT NULL COMMENT '存储的策略类型',
+  `input_type` int NOT NULL COMMENT '输入数据的类型. 0: unknown, 1: origin_data, 2: model',
+  `identity_id` varchar(200) NOT NULL COMMENT '(冗余)参与任务的元数据的所属组织的identity_id',
+  `party_id` varchar(200) NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
+  `key_column_idx` int DEFAULT NULL COMMENT '元数据id',
+  `selected_columns` varchar(200) DEFAULT NULL COMMENT '元数据选择列',
+  `consume_type` int DEFAULT NULL COMMENT '元数据消费类型 0-未知 1-metadataAuth 2-ERC20 3-ERC721',
+  `consume_token_address` varchar(200) DEFAULT NULL COMMENT '元数据消费的合约地址',
+  `consume_token_id` varchar(200) DEFAULT NULL COMMENT '元数据消费的tokenId',
+  `consume_balance` varchar(200) DEFAULT NULL COMMENT '元数据消费的token的个数',
+  PRIMARY KEY (`task_id`,`meta_data_id`)
+) ENGINE=InnoDB COMMENT='任务数据提供者（数据和模型）';
 
 /*Data for the table `dc_task_data_provider` */
 
@@ -173,15 +179,15 @@ CREATE TABLE `dc_task_data_provider` (
 DROP TABLE IF EXISTS `dc_task_event`;
 
 CREATE TABLE `dc_task_event` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `event_type` varchar(20)  NOT NULL COMMENT '事件类型',
-    `identity_id` varchar(200)  NOT NULL COMMENT '产生事件的组织身份ID',
-    `party_id` varchar(200)  NOT NULL COMMENT '产生事件的partyId (单个组织可以担任任务的多个party, 区分是哪一方产生的event)',
-    `event_at` datetime(3) NOT NULL COMMENT '产生事件的时间，精确到毫秒',
-    `event_content` varchar(1024)  NOT NULL COMMENT '事件内容',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='任务事件';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `event_type` varchar(20) NOT NULL COMMENT '事件类型',
+  `identity_id` varchar(200) NOT NULL COMMENT '产生事件的组织身份ID',
+  `party_id` varchar(200) NOT NULL COMMENT '产生事件的partyId (单个组织可以担任任务的多个party, 区分是哪一方产生的event)',
+  `event_at` datetime(3) NOT NULL COMMENT '产生事件的时间，精确到毫秒',
+  `event_content` varchar(1024) NOT NULL COMMENT '事件内容',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='任务事件';
 
 /*Data for the table `dc_task_event` */
 
@@ -190,11 +196,11 @@ CREATE TABLE `dc_task_event` (
 DROP TABLE IF EXISTS `dc_task_meta_data_column`;
 
 CREATE TABLE `dc_task_meta_data_column` (
-    `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '参与任务的元数据ID',
-    `selected_column_idx` int NOT NULL COMMENT '元数据在此次任务中的参与计算的字段索引序号',
-    PRIMARY KEY (`task_id`,`meta_data_id`,`selected_column_idx`)
-) ENGINE=InnoDB  COMMENT='任务数据metadata明细';
+  `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `meta_data_id` varchar(200) NOT NULL COMMENT '参与任务的元数据ID',
+  `selected_column_idx` int NOT NULL COMMENT '元数据在此次任务中的参与计算的字段索引序号',
+  PRIMARY KEY (`task_id`,`meta_data_id`,`selected_column_idx`)
+) ENGINE=InnoDB COMMENT='任务数据metadata明细';
 
 /*Data for the table `dc_task_meta_data_column` */
 
@@ -203,16 +209,16 @@ CREATE TABLE `dc_task_meta_data_column` (
 DROP TABLE IF EXISTS `dc_task_power_provider`;
 
 CREATE TABLE `dc_task_power_provider` (
-    `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `identity_id` varchar(200)  NOT NULL COMMENT '算力提供者组织身份ID',
-    `policy_type` int NOT NULL COMMENT '存储的策略类型',
-    `party_id` varchar(200)  NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
-    `provider_party_id` varchar(200)  DEFAULT NULL COMMENT '算力依附的数据角色',
-    `used_memory` bigint DEFAULT '0' COMMENT '任务使用的内存, 字节',
-    `used_core` int DEFAULT '0' COMMENT '任务使用的core',
-    `used_bandwidth` bigint DEFAULT '0' COMMENT '任务使用的带宽, bps',
-    PRIMARY KEY (`task_id`,`identity_id`)
-) ENGINE=InnoDB  COMMENT='任务算力提供者';
+  `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `identity_id` varchar(200) NOT NULL COMMENT '算力提供者组织身份ID',
+  `policy_type` int NOT NULL COMMENT '存储的策略类型',
+  `party_id` varchar(200) NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
+  `provider_party_id` varchar(200) DEFAULT NULL COMMENT '算力依附的数据角色',
+  `used_memory` bigint DEFAULT '0' COMMENT '任务使用的内存, 字节',
+  `used_core` int DEFAULT '0' COMMENT '任务使用的core',
+  `used_bandwidth` bigint DEFAULT '0' COMMENT '任务使用的带宽, bps',
+  PRIMARY KEY (`task_id`,`identity_id`)
+) ENGINE=InnoDB COMMENT='任务算力提供者';
 
 /*Data for the table `dc_task_power_provider` */
 
@@ -221,150 +227,89 @@ CREATE TABLE `dc_task_power_provider` (
 DROP TABLE IF EXISTS `dc_task_result_consumer`;
 
 CREATE TABLE `dc_task_result_consumer` (
-    `task_id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `consumer_identity_id` varchar(200)  NOT NULL COMMENT '结果消费者组织身份ID',
-    `consumer_party_id` varchar(200)  NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
-    `producer_identity_id` varchar(200)  DEFAULT NULL COMMENT '结果产生者的组织身份ID',
-    `producer_party_id` varchar(200)  DEFAULT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
-    PRIMARY KEY (`task_id`,`consumer_identity_id`)
-) ENGINE=InnoDB  COMMENT='任务结果接收者';
+  `task_id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `consumer_identity_id` varchar(200) NOT NULL COMMENT '结果消费者组织身份ID',
+  `consumer_party_id` varchar(200) NOT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
+  `producer_identity_id` varchar(200) DEFAULT NULL COMMENT '结果产生者的组织身份ID',
+  `producer_party_id` varchar(200) DEFAULT NULL COMMENT '任务参与方在本次任务中的唯一识别ID',
+  PRIMARY KEY (`task_id`,`consumer_identity_id`)
+) ENGINE=InnoDB COMMENT='任务结果接收者';
 
 /*Data for the table `dc_task_result_consumer` */
-
-/*Table structure for table `mo_meta_data_marketplace` */
-DROP TABLE IF EXISTS `mo_meta_data_marketplace`;
-
-CREATE TABLE `mo_meta_data_marketplace` (
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '元数据ID,hash',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`meta_data_id`)
-) ENGINE=InnoDB  COMMENT='数据市场可见的元数据';
-
-/*Data for the table `mo_meta_data_marketplace` */
-
-
-/*Table structure for table `mo_meta_data_user` */
-DROP TABLE IF EXISTS `mo_meta_data_user`;
-
-CREATE TABLE `mo_meta_data_user` (
-    `address` varchar(64) NOT NULL COMMENT '用户地址',
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '元数据ID,hash',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`meta_data_id`)
-) ENGINE=InnoDB  COMMENT='用户可见的元数据';
-
-/*Data for the table `mo_meta_data_user` */
-
-/*Table structure for table `mo_meta_data_certificate` */
-DROP TABLE IF EXISTS `mo_meta_data_certificate`;
-
-CREATE TABLE `mo_meta_data_certificate` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
-    `meta_data_id` varchar(200)  NOT NULL COMMENT '元数据ID,hash',
-    `type` TINYINT NOT NULL  COMMENT '凭证类型: 0-无属性,1-有属性',
-    `token_address` varchar(64) NOT NULL COMMENT '凭证对应合约地址',
-    `token_id` varchar(128) NOT NULL COMMENT '有属性凭证对应 token id',
-    `is_support_pt_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持明文算法',
-    `is_support_ct_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持密文算法',
-    `characteristic` varchar(256) DEFAULT NULL COMMENT 'token id 对应特性值，有效期时间戳',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='元数据凭证';
-
-/*Data for the table `mo_meta_data_certificate` */
-
-
-/*Table structure for table `mo_meta_data_certificate_user` */
-DROP TABLE IF EXISTS `mo_meta_data_certificate_user`;
-
-CREATE TABLE `mo_meta_data_certificate_user` (
-    `address` varchar(64) NOT NULL COMMENT '用户地址',
-    `meta_data_certificate_id` bigint NOT NULL COMMENT '元数据凭证ID',
-    `balance` varchar(128) NOT NULL COMMENT '账户余额, ERC20为金额, ERC721时 0-未持有 1-持有',
-    `authorize_balance` varchar(128) DEFAULT NULL COMMENT '授权支付助手合约金额, ERC20为金额， ERC721时 0-未授权 1-已授权',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`address`, `meta_data_certificate_id`)
-) ENGINE=InnoDB  COMMENT='用户持有的元数据凭证';
-
-/*Data for the table `mo_meta_data_certificate_user` */
-
 
 /*Table structure for table `mo_algorithm` */
 
 DROP TABLE IF EXISTS `mo_algorithm`;
 
 CREATE TABLE `mo_algorithm` (
-    `algorithm_id` bigint NOT NULL COMMENT '算法表ID',
-    `algorithm_desc` varchar(200)  DEFAULT NULL COMMENT '中文算法描述',
-    `algorithm_desc_en` varchar(200)  DEFAULT NULL COMMENT '英文算法描述',
-    `author` varchar(30)  DEFAULT NULL COMMENT '算法作者',
-    `max_numbers` bigint DEFAULT NULL COMMENT '支持协同方最大数量',
-    `min_numbers` bigint DEFAULT NULL COMMENT '支持协同方最小数量',
-    `support_language` varchar(64)  DEFAULT NULL COMMENT '支持语言,多个以","进行分隔',
-    `support_os_system` varchar(64)  DEFAULT NULL COMMENT '支持操作系统,多个以","进行分隔',
-    `cost_mem` bigint DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
-    `cost_cpu` int DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
-    `cost_gpu` int DEFAULT NULL COMMENT 'GPU核数(单位：核)',
-    `cost_bandwidth` bigint DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
-    `run_time` bigint NOT NULL DEFAULT '3600000' COMMENT '所需的运行时长,默认1小时 (单位: ms)',
-    `input_model` tinyint NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
-    `output_model` tinyint NOT NULL DEFAULT '0' COMMENT '是否产生模型: 0-否，1:是',
-    `support_default_psi` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持默认的psi处理: 0-否，1:是',
-    `output_psi` tinyint NOT NULL DEFAULT '0' COMMENT '是否产生psi: 0-否，1:是',
-    `store_pattern` tinyint NOT NULL DEFAULT '1' COMMENT '输出存储形式: 1-明文，2:密文',
-    `data_rows_flag` tinyint NOT NULL DEFAULT '0' COMMENT '是否判断数据行数: 0-否，1-是',
-    `data_columns_flag` tinyint NOT NULL DEFAULT '0' COMMENT '是否判断数据列数: 0-否，1-是',
-	`type` TINYINT DEFAULT 0  NOT NULL  COMMENT '算法类别：0-密文算法，1-明文算法',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`algorithm_id`)
-) ENGINE=InnoDB  COMMENT='算法表';
+  `algorithm_id` bigint NOT NULL COMMENT '算法表ID',
+  `algorithm_desc` varchar(200) DEFAULT NULL COMMENT '中文算法描述',
+  `algorithm_desc_en` varchar(200) DEFAULT NULL COMMENT '英文算法描述',
+  `author` varchar(30) DEFAULT NULL COMMENT '算法作者',
+  `max_numbers` bigint DEFAULT NULL COMMENT '支持协同方最大数量',
+  `min_numbers` bigint DEFAULT NULL COMMENT '支持协同方最小数量',
+  `support_language` varchar(64) DEFAULT NULL COMMENT '支持语言,多个以","进行分隔',
+  `support_os_system` varchar(64) DEFAULT NULL COMMENT '支持操作系统,多个以","进行分隔',
+  `cost_mem` bigint DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+  `cost_cpu` int DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+  `cost_gpu` int DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+  `cost_bandwidth` bigint DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
+  `run_time` bigint NOT NULL DEFAULT '3600000' COMMENT '所需的运行时长,默认1小时 (单位: ms)',
+  `input_model` tinyint NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
+  `output_model` tinyint NOT NULL DEFAULT '0' COMMENT '是否产生模型: 0-否，1:是',
+  `output_iv_evaluate` tinyint NOT NULL DEFAULT '0' COMMENT '是否生成信息价值评估文件',
+  `support_default_psi` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持默认的psi处理: 0-否，1:是',
+  `output_psi` tinyint NOT NULL DEFAULT '0' COMMENT '是否产生psi: 0-否，1:是',
+  `store_pattern` tinyint NOT NULL DEFAULT '1' COMMENT '输出存储形式: 1-明文，2:密文',
+  `data_rows_flag` tinyint NOT NULL DEFAULT '0' COMMENT '是否判断数据行数: 0-否，1-是',
+  `data_columns_flag` tinyint NOT NULL DEFAULT '0' COMMENT '是否判断数据列数: 0-否，1-是',
+  `type` tinyint NOT NULL DEFAULT '0' COMMENT '算法类别：0-密文算法，1-明文算法',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`algorithm_id`)
+) ENGINE=InnoDB COMMENT='算法表';
 
 /*Data for the table `mo_algorithm` */
 
-insert  into `mo_algorithm`(`algorithm_id`,`algorithm_desc`,`algorithm_desc_en`,`author`,`max_numbers`,`min_numbers`,`support_language`,`support_os_system`,`cost_mem`,`cost_cpu`,`cost_gpu`,`cost_bandwidth`,`run_time`,`input_model`,`output_model`,`support_default_psi`,`output_psi`,`store_pattern`,`data_rows_flag`,`data_columns_flag`,`type`,`create_time`,`update_time`) values (1001,'用于跨组织的数据交集查询','Used for cross-organization data intersection query','Rosetta',3,2,'SQL,Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,0,0,1,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:47'),(2011,'用于跨组织线性回归训练','Used for cross-organization linear regression training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:48'),(2012,'用于跨组织线性回归预测','Used for cross-organization linear regression prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-27 02:59:37'),(2021,'用于跨组织逻辑回归训练','Used for cross-organization logistic regression training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:49'),(2022,'用于跨组织逻辑回归预测','Used for cross-organization logistic regression prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:51'),(2031,'用于跨组织DNN训练','Used for cross-organization DNN training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-27 01:59:07'),(2032,'用于跨组织DNN预测算法','Used for cross-organization DNN prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-27 01:59:08'),(2041,'用于跨组织XGBoost训练','Used for cross-organization XGBoost training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:53'),(2042,'用于跨组织XGBoost预测','Used for cross-organization XGBoost prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:54'),(3001,'计算跨组织数据的信息价值','Calculate the information value of cross-organizational data','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,0,1,0,1,1,0,0,'2022-06-27 01:58:17','2022-06-27 02:09:30'),(12011,'线性回归训练','linear regression training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 02:59:08','2022-06-27 03:20:46'),(12012,'线性回归预测','linear regression prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 02:59:13','2022-06-27 03:20:47'),(12021,'逻辑回归训练','logistic regression training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 03:01:49','2022-06-27 03:20:48'),(12022,'逻辑回归预测','logistic regression prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 03:01:55','2022-06-27 03:20:48'),(12031,'DNN训练','DNN training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 03:04:14','2022-06-27 03:20:49'),(12032,'DNN预测','DNN prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 03:04:17','2022-06-27 03:20:50'),(12041,'XGBoost训练','XGBoost training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 03:06:04','2022-06-27 03:20:51'),(12042,'XGBoost预测','XGBoost prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 03:06:07','2022-06-27 03:20:51'),(12051,'SVM训练','SVM training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 03:08:32','2022-06-27 03:20:53'),(12052,'SVM预测','SVM prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 03:08:38','2022-06-27 03:20:53'),(12061,'KNN训练','KNN training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 03:10:56','2022-06-27 03:20:54'),(12062,'KNN预测','KNN prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 03:11:01','2022-06-27 03:20:55'),(12071,'KMeans训练','KMeans training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,1,0,1,1,0,1,'2022-06-27 03:12:38','2022-06-27 03:20:56'),(12072,'KMeans预测','KMeans prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,1,0,1,1,0,1,'2022-06-27 03:12:43','2022-06-27 03:21:12');
+insert  into `mo_algorithm`(`algorithm_id`,`algorithm_desc`,`algorithm_desc_en`,`author`,`max_numbers`,`min_numbers`,`support_language`,`support_os_system`,`cost_mem`,`cost_cpu`,`cost_gpu`,`cost_bandwidth`,`run_time`,`input_model`,`output_model`,`output_iv_evaluate`,`support_default_psi`,`output_psi`,`store_pattern`,`data_rows_flag`,`data_columns_flag`,`type`,`create_time`,`update_time`) values (1001,'用于跨组织的数据交集查询','Used for cross-organization data intersection query','Rosetta',3,2,'SQL,Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,0,0,0,1,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:47'),(2011,'用于跨组织线性回归训练','Used for cross-organization linear regression training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:48'),(2012,'用于跨组织线性回归预测','Used for cross-organization linear regression prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-27 02:59:37'),(2021,'用于跨组织逻辑回归训练','Used for cross-organization logistic regression training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:49'),(2022,'用于跨组织逻辑回归预测','Used for cross-organization logistic regression prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:51'),(2031,'用于跨组织DNN训练','Used for cross-organization DNN training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-27 01:59:07'),(2032,'用于跨组织DNN预测算法','Used for cross-organization DNN prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-27 01:59:08'),(2041,'用于跨组织XGBoost训练','Used for cross-organization XGBoost training','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:53'),(2042,'用于跨组织XGBoost预测','Used for cross-organization XGBoost prediction','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,1,0,1,1,0,0,'2022-03-24 04:09:33','2022-06-10 05:58:54'),(3001,'计算跨组织数据的信息价值','Calculate the information value of cross-organizational data','Rosetta',3,2,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,0,1,1,0,1,1,0,0,'2022-06-27 01:58:17','2022-07-29 04:17:01'),(12011,'线性回归训练','linear regression training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 02:59:08','2022-06-29 07:45:00'),(12012,'线性回归预测','linear regression prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 02:59:13','2022-06-29 07:45:02'),(12021,'逻辑回归训练','logistic regression training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 03:01:49','2022-06-29 07:45:03'),(12022,'逻辑回归预测','logistic regression prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 03:01:55','2022-06-29 07:45:04'),(12031,'DNN训练','DNN training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 03:04:14','2022-06-29 07:45:04'),(12032,'DNN预测','DNN prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 03:04:17','2022-06-29 07:45:05'),(12041,'XGBoost训练','XGBoost training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 03:06:04','2022-06-29 07:45:06'),(12042,'XGBoost预测','XGBoost prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 03:06:07','2022-06-29 07:45:07'),(12051,'SVM训练','SVM training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 03:08:32','2022-06-29 07:45:08'),(12052,'SVM预测','SVM prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 03:08:38','2022-06-29 07:45:09'),(12061,'KNN训练','KNN training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 03:10:56','2022-06-29 07:45:10'),(12062,'KNN预测','KNN prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 03:11:01','2022-06-29 07:45:11'),(12071,'KMeans训练','KMeans training','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,0,1,0,0,0,1,1,0,1,'2022-06-27 03:12:38','2022-06-29 07:45:12'),(12072,'KMeans预测','KMeans prediction','Rosetta',1,1,'Python','window,linux,mac',2147483648,1,2,20971520,7200000,1,0,0,0,0,1,1,0,1,'2022-06-27 03:12:43','2022-06-29 07:45:13');
 
 /*Table structure for table `mo_algorithm_classify` */
 
 DROP TABLE IF EXISTS `mo_algorithm_classify`;
 
 CREATE TABLE `mo_algorithm_classify` (
-    `id` bigint NOT NULL COMMENT '分类id',
-    `parent_id` bigint NOT NULL COMMENT '父分类id，如果为顶级分类，则为0',
-    `name` varchar(30)  DEFAULT NULL COMMENT '分类中文名称',
-    `name_en` varchar(60)  DEFAULT NULL COMMENT '英文算法名称',
-    `image_url` varchar(1024)  DEFAULT NULL COMMENT '算法图片url',
-    `is_available` tinyint NOT NULL DEFAULT '1' COMMENT '是否可用: 0-否，1-是',
-    `is_algorithm` tinyint NOT NULL DEFAULT '1' COMMENT '是否算法: 0-否，1-是',
-    `is_exist_algorithm` tinyint NOT NULL DEFAULT '1' COMMENT '是否存在对应算法: 0-否，1-是',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_ALG_NAME` (`name`)
-) ENGINE=InnoDB  COMMENT='算法分类表';
+  `id` bigint NOT NULL COMMENT '分类id',
+  `parent_id` bigint NOT NULL COMMENT '父分类id，如果为顶级分类，则为0',
+  `name` varchar(30) DEFAULT NULL COMMENT '分类中文名称',
+  `name_en` varchar(60) DEFAULT NULL COMMENT '英文算法名称',
+  `image_url` varchar(1024) DEFAULT NULL COMMENT '算法图片url',
+  `is_available` tinyint NOT NULL DEFAULT '1' COMMENT '是否可用: 0-否，1-是',
+  `is_algorithm` tinyint NOT NULL DEFAULT '1' COMMENT '是否算法: 0-否，1-是',
+  `is_exist_algorithm` tinyint NOT NULL DEFAULT '1' COMMENT '是否存在对应算法: 0-否，1-是',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_ALG_NAME` (`name`)
+) ENGINE=InnoDB COMMENT='算法分类表';
 
 /*Data for the table `mo_algorithm_classify` */
 
-insert  into `mo_algorithm_classify`(`id`,`parent_id`,`name`,`name_en`,`image_url`,`is_available`,`is_algorithm`,`is_exist_algorithm`,`create_time`,`update_time`) values (1,0,'计算','Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:42:10'),(2,1,'隐私计算','Privacy Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(3,1,'非隐私计算','Non-Privacy Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(1000,2,'隐私统计分析','Privacy Statistics',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(1001,1000,'隐私求交集（PSI）','Private Set Intersection','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/SetIntersection.png\r',1,1,1,'2022-03-28 11:41:08','2022-04-25 02:43:23'),(2000,2,'隐私AI计算','Privacy AI Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2010,2000,'隐私线性回归','Private Linear Regression','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/AIComputing.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:44:28'),(2011,2010,'隐私线性回归训练','Private Linear Regression Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2012,2010,'隐私线性回归预测','Private Linear Regression Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-04-01 08:51:39'),(2020,2000,'隐私逻辑回归','Private Logistic Regression','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/logistic.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:44:08'),(2021,2020,'隐私逻辑回归训练','Private Logistic Regression Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2022,2020,'隐私逻辑回归预测','Private Logistic Regression Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2030,2000,'隐私DNN（深度神经网络）','Private DNN','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/DNN.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:43:38'),(2031,2030,'隐私DNN训练','Private DNN Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2032,2030,'隐私DNN预测','Private DNN Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2040,2000,'隐私XGBoost','Private XGBoost','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/XGBoost.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:43:52'),(2041,2040,'隐私XGBoost训练','Private XGBoost Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2042,2040,'隐私XGBoost预测','Private XGBoost Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(3000,2,'隐私特征工程','Private Feature Engineering',NULL,1,0,0,'2022-06-27 02:05:53','2022-06-27 02:07:08'),(3001,3000,'隐私信息价值','Private Information Value',NULL,1,1,1,'2022-06-27 01:56:39','2022-06-27 02:06:50'),(12000,3,'AI计算','AI Computing',NULL,1,0,0,'2022-06-27 02:24:34','2022-06-27 02:30:57'),(12010,12000,'线性回归','Linear Regression',NULL,1,1,0,'2022-06-27 02:32:08','2022-06-27 02:32:45'),(12011,12010,'线性回归训练','Linear Regression Training',NULL,1,1,1,'2022-06-27 02:33:28','2022-06-27 02:34:21'),(12012,12010,'线性回归预测','Linear Regression Prediction',NULL,1,1,1,'2022-06-27 02:34:09','2022-06-27 02:34:35'),(12020,12000,'逻辑回归','Logistic Regression',NULL,1,1,0,'2022-06-27 02:35:31','2022-06-27 02:37:01'),(12021,12020,'逻辑回归训练','Logistic Regression Training',NULL,1,1,1,'2022-06-27 02:36:28','2022-06-27 02:36:44'),(12022,12020,'逻辑回归预测','Logistic Regression Prediction',NULL,1,1,1,'2022-06-27 02:37:49','2022-06-27 02:38:08'),(12030,12000,'DNN（深度神经网络）','DNN',NULL,1,1,0,'2022-06-27 02:40:05','2022-06-27 02:45:02'),(12031,12030,'DNN训练','DNN Training',NULL,1,1,1,'2022-06-27 02:41:30','2022-06-27 02:42:45'),(12032,12030,'DNN预测','DNN Prediction',NULL,1,1,1,'2022-06-27 02:42:25','2022-06-27 02:42:40'),(12040,12000,'XGBoost','XGBoost',NULL,1,1,0,'2022-06-27 02:44:40','2022-06-27 02:45:00'),(12041,12040,'XGBoost训练','XGBoost Training',NULL,1,1,1,'2022-06-27 02:46:03','2022-06-27 02:46:16'),(12042,12040,'XGBoost预测','XGBoost Prediction',NULL,1,1,1,'2022-06-27 02:46:29','2022-06-27 02:47:00'),(12050,12000,'SVM','SVM',NULL,1,1,0,'2022-06-27 02:48:25','2022-06-27 02:48:25'),(12051,12050,'SVM训练','SVM Training',NULL,1,1,1,'2022-06-27 02:49:26','2022-06-27 02:50:04'),(12052,12050,'SVM预测','SVM Prediction',NULL,1,1,1,'2022-06-27 02:49:35','2022-06-27 02:50:11'),(12060,12000,'KNN','KNN',NULL,1,1,0,'2022-06-27 02:53:26','2022-06-27 02:55:28'),(12061,12060,'KNN训练','KNN Training',NULL,1,1,1,'2022-06-27 02:54:36','2022-06-27 02:55:16'),(12062,12060,'KNN预测','KNN Prediction',NULL,1,1,1,'2022-06-27 02:54:41','2022-06-27 02:55:21'),(12070,12000,'KMeans','KMeans',NULL,1,1,0,'2022-06-27 02:56:34','2022-06-27 02:57:44'),(12071,12070,'KMeans训练','KMeans Training',NULL,1,1,1,'2022-06-27 02:56:39','2022-06-27 02:57:24'),(12072,12070,'KMeans预测','KMeans Prediction',NULL,1,1,1,'2022-06-27 02:56:45','2022-06-27 02:57:27');
+insert  into `mo_algorithm_classify`(`id`,`parent_id`,`name`,`name_en`,`image_url`,`is_available`,`is_algorithm`,`is_exist_algorithm`,`create_time`,`update_time`) values (1,0,'计算','Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:42:10'),(2,1,'隐私计算','Privacy Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(3,1,'非隐私计算','Non-Privacy Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(1000,2,'隐私统计分析','Privacy Statistics',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(1001,1000,'隐私求交集（PSI）','Private Set Intersection','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/SetIntersection.png\r',1,1,1,'2022-03-28 11:41:08','2022-04-25 02:43:23'),(2000,2,'隐私AI计算','Privacy AI Computing',NULL,1,0,0,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2010,2000,'隐私线性回归','Private Linear Regression','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/AIComputing.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:44:28'),(2011,2010,'隐私线性回归训练','Private Linear Regression Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2012,2010,'隐私线性回归预测','Private Linear Regression Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-04-01 08:51:39'),(2020,2000,'隐私逻辑回归','Private Logistic Regression','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/logistic.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:44:08'),(2021,2020,'隐私逻辑回归训练','Private Logistic Regression Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2022,2020,'隐私逻辑回归预测','Private Logistic Regression Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2030,2000,'隐私DNN（深度神经网络）','Private DNN','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/DNN.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:43:38'),(2031,2030,'隐私DNN训练','Private DNN Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2032,2030,'隐私DNN预测','Private DNN Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2040,2000,'隐私XGBoost','Private XGBoost','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/XGBoost.png',1,1,0,'2022-03-28 11:41:08','2022-04-25 02:43:52'),(2041,2040,'隐私XGBoost训练','Private XGBoost Training',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(2042,2040,'隐私XGBoost预测','Private XGBoost Prediction',NULL,1,1,1,'2022-03-28 11:41:08','2022-03-28 11:41:08'),(3000,2,'隐私特征工程','Private Feature Engineering',NULL,1,0,0,'2022-06-27 02:05:53','2022-06-27 02:07:08'),(3001,3000,'隐私信息价值','Private Information Value','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/informationValue.png',1,1,1,'2022-06-27 01:56:39','2022-07-20 08:37:44'),(12010,3,'线性回归','Linear Regression','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_linear_regression.png',1,1,0,'2022-06-27 02:32:08','2022-07-25 09:37:54'),(12011,12010,'线性回归训练','Linear Regression Training',NULL,1,1,1,'2022-06-27 02:33:28','2022-06-27 02:34:21'),(12012,12010,'线性回归预测','Linear Regression Prediction',NULL,1,1,1,'2022-06-27 02:34:09','2022-06-27 02:34:35'),(12020,3,'逻辑回归','Logistic Regression','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_logistic_regression.png',1,1,0,'2022-06-27 02:35:31','2022-07-25 09:37:56'),(12021,12020,'逻辑回归训练','Logistic Regression Training',NULL,1,1,1,'2022-06-27 02:36:28','2022-06-27 02:36:44'),(12022,12020,'逻辑回归预测','Logistic Regression Prediction',NULL,1,1,1,'2022-06-27 02:37:49','2022-06-27 02:38:08'),(12030,3,'DNN（深度神经网络）','DNN','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_dnn.png',1,1,0,'2022-06-27 02:40:05','2022-07-25 09:37:58'),(12031,12030,'DNN训练','DNN Training',NULL,1,1,1,'2022-06-27 02:41:30','2022-06-27 02:42:45'),(12032,12030,'DNN预测','DNN Prediction',NULL,1,1,1,'2022-06-27 02:42:25','2022-06-27 02:42:40'),(12040,3,'XGBoost','XGBoost','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_xgboost.png',1,1,0,'2022-06-27 02:44:40','2022-07-25 09:37:59'),(12041,12040,'XGBoost训练','XGBoost Training',NULL,1,1,1,'2022-06-27 02:46:03','2022-06-27 02:46:16'),(12042,12040,'XGBoost预测','XGBoost Prediction',NULL,1,1,1,'2022-06-27 02:46:29','2022-06-27 02:47:00'),(12050,3,'SVM','SVM','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_svm.png',1,1,0,'2022-06-27 02:48:25','2022-07-25 09:38:03'),(12051,12050,'SVM训练','SVM Training',NULL,1,1,1,'2022-06-27 02:49:26','2022-06-27 02:50:04'),(12052,12050,'SVM预测','SVM Prediction',NULL,1,1,1,'2022-06-27 02:49:35','2022-06-27 02:50:11'),(12060,3,'KNN','KNN','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_knn.png',1,1,0,'2022-06-27 02:53:26','2022-07-25 09:38:05'),(12061,12060,'KNN训练','KNN Training',NULL,1,1,1,'2022-06-27 02:54:36','2022-06-27 02:55:16'),(12062,12060,'KNN预测','KNN Prediction',NULL,1,1,1,'2022-06-27 02:54:41','2022-06-27 02:55:21'),(12070,3,'KMeans','KMeans','https://nft-sgp-oss-001.oss-ap-southeast-1.aliyuncs.com/moirae/alg/p_kmeans.png',1,1,0,'2022-06-27 02:56:34','2022-07-25 09:38:07'),(12071,12070,'KMeans训练','KMeans Training',NULL,1,1,1,'2022-06-27 02:56:39','2022-06-27 02:57:24'),(12072,12070,'KMeans预测','KMeans Prediction',NULL,1,1,1,'2022-06-27 02:56:45','2022-06-27 02:57:27');
 
 /*Table structure for table `mo_algorithm_code` */
 
 DROP TABLE IF EXISTS `mo_algorithm_code`;
 
 CREATE TABLE `mo_algorithm_code` (
-    `algorithm_id` bigint NOT NULL COMMENT '算法代码表ID',
-    `edit_type` tinyint DEFAULT NULL COMMENT '编辑类型:1-sql,2-noteBook',
-    `calculate_contract_struct` varchar(1024)  DEFAULT NULL COMMENT '计算合约变量模板json格式结构',
-    `calculate_contract_code` text  COMMENT '计算合约',
-    `data_split_contract_code` text  COMMENT '数据分片合约',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`algorithm_id`)
-) ENGINE=InnoDB  COMMENT='算法代码表';
+  `algorithm_id` bigint NOT NULL COMMENT '算法代码表ID',
+  `edit_type` tinyint DEFAULT NULL COMMENT '编辑类型:1-sql,2-noteBook',
+  `calculate_contract_struct` varchar(1024) DEFAULT NULL COMMENT '计算合约变量模板json格式结构',
+  `calculate_contract_code` text COMMENT '计算合约',
+  `data_split_contract_code` text COMMENT '数据分片合约',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`algorithm_id`)
+) ENGINE=InnoDB COMMENT='算法代码表';
 
 /*Data for the table `mo_algorithm_code` */
 
@@ -375,16 +320,16 @@ insert  into `mo_algorithm_code`(`algorithm_id`,`edit_type`,`calculate_contract_
 DROP TABLE IF EXISTS `mo_algorithm_variable`;
 
 CREATE TABLE `mo_algorithm_variable` (
-    `algorithm_id` bigint NOT NULL COMMENT '算法id',
-    `var_key` varchar(128)  NOT NULL COMMENT '变量key',
-    `var_type` tinyint NOT NULL COMMENT '变量类型. 1-boolean, 2-number, 3-string, 4-numberArray, 5-stringArray',
-    `var_value` varchar(128)  NOT NULL COMMENT '变量默认值',
-    `var_desc` varchar(512)  DEFAULT NULL COMMENT '变量中文描述',
-    `var_desc_en` varchar(512)  DEFAULT NULL COMMENT '变量英文描述',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`algorithm_id`,`var_key`)
-) ENGINE=InnoDB  COMMENT='算法变量表';
+  `algorithm_id` bigint NOT NULL COMMENT '算法id',
+  `var_key` varchar(128) NOT NULL COMMENT '变量key',
+  `var_type` tinyint NOT NULL COMMENT '变量类型. 1-boolean, 2-number, 3-string, 4-numberArray, 5-stringArray',
+  `var_value` varchar(128) NOT NULL COMMENT '变量默认值',
+  `var_desc` varchar(512) DEFAULT NULL COMMENT '变量中文描述',
+  `var_desc_en` varchar(512) DEFAULT NULL COMMENT '变量英文描述',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`algorithm_id`,`var_key`)
+) ENGINE=InnoDB COMMENT='算法变量表';
 
 /*Data for the table `mo_algorithm_variable` */
 
@@ -395,104 +340,169 @@ insert  into `mo_algorithm_variable`(`algorithm_id`,`var_key`,`var_type`,`var_va
 DROP TABLE IF EXISTS `mo_calculation_process`;
 
 CREATE TABLE `mo_calculation_process` (
-    `calculation_process_id` bigint NOT NULL AUTO_INCREMENT COMMENT '计算流程ID',
-    `name` varchar(200)  NOT NULL COMMENT '计算流程中文名字',
-    `name_en` varchar(200)  DEFAULT NULL COMMENT '计算流程英文名字',
-    `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`calculation_process_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5  COMMENT='计算流程配置表';
+  `calculation_process_id` bigint NOT NULL AUTO_INCREMENT COMMENT '计算流程ID',
+  `name` varchar(200) NOT NULL COMMENT '计算流程中文名字',
+  `name_en` varchar(200) DEFAULT NULL COMMENT '计算流程英文名字',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态: 0-无效，1- 有效',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`calculation_process_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 COMMENT='计算流程配置表';
 
 /*Data for the table `mo_calculation_process` */
 
-insert  into `mo_calculation_process`(`calculation_process_id`,`name`,`name_en`,`status`,`create_time`,`update_time`) values (1,'训练','Train',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(2,'预测','Predict',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(3,'训练，并预测','Train and then predict',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(4,'PSI','PSI',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(5,'训练','Train',1,'2022-06-27 09:59:17','2022-06-27 09:59:23'),(6,'预测','Predict',1,'2022-06-27 09:59:30','2022-06-27 09:59:34'),(7,'训练，并预测','Train and then predict',1,'2022-06-27 09:59:40','2022-06-27 09:59:44');
+insert  into `mo_calculation_process`(`calculation_process_id`,`name`,`name_en`,`status`,`create_time`,`update_time`) values (1,'训练','Train',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(2,'预测','Predict',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(3,'训练，并预测','Train and then predict',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(4,'PSI','PSI',1,'2022-03-24 08:17:01','2022-03-24 08:17:01'),(5,'训练','Train',1,'2022-06-27 09:59:17','2022-06-27 09:59:23'),(6,'预测','Predict',1,'2022-06-27 09:59:30','2022-06-27 09:59:34'),(7,'训练，并预测','Train and then predict',1,'2022-06-27 09:59:40','2022-06-27 09:59:44'),(8,'训练','Train',1,'2022-07-21 02:26:37','2022-07-21 02:26:42');
 
 /*Table structure for table `mo_calculation_process_algorithm` */
 
 DROP TABLE IF EXISTS `mo_calculation_process_algorithm`;
 
 CREATE TABLE `mo_calculation_process_algorithm` (
-    `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
-    `algorithm_id` bigint NOT NULL COMMENT '算法ID',
-    PRIMARY KEY (`algorithm_id`,`calculation_process_id`)
-) ENGINE=InnoDB  COMMENT='计算流程配置和算法关系表';
+  `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
+  `algorithm_id` bigint NOT NULL COMMENT '算法ID',
+  PRIMARY KEY (`algorithm_id`,`calculation_process_id`)
+) ENGINE=InnoDB COMMENT='计算流程配置和算法关系表';
 
 /*Data for the table `mo_calculation_process_algorithm` */
 
-insert  into `mo_calculation_process_algorithm`(`calculation_process_id`,`algorithm_id`) values (4,1001),(1,2010),(2,2010),(3,2010),(1,2020),(2,2020),(3,2020),(1,2030),(2,2030),(3,2030),(1,2040),(2,2040),(3,2040),(1,3001),(5,12010),(6,12010),(7,12010),(5,12020),(6,12020),(7,12020),(5,12030),(6,12030),(7,12030),(5,12040),(6,12040),(7,12040),(5,12050),(6,12050),(7,12050),(5,12060),(6,12060),(7,12060),(5,12070),(6,12070),(7,12070);
-
+insert  into `mo_calculation_process_algorithm`(`calculation_process_id`,`algorithm_id`) values (4,1001),(1,2010),(2,2010),(3,2010),(1,2020),(2,2020),(3,2020),(1,2030),(2,2030),(3,2030),(1,2040),(2,2040),(3,2040),(8,3001),(5,12010),(6,12010),(7,12010),(5,12020),(6,12020),(7,12020),(5,12030),(6,12030),(7,12030),(5,12040),(6,12040),(7,12040),(5,12050),(6,12050),(7,12050),(5,12060),(6,12060),(7,12060),(5,12070),(6,12070),(7,12070);
 
 /*Table structure for table `mo_calculation_process_step` */
 
 DROP TABLE IF EXISTS `mo_calculation_process_step`;
 
 CREATE TABLE `mo_calculation_process_step` (
-    `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
-    `step` int NOT NULL COMMENT '步骤. 从0开始',
-    `type` int NOT NULL COMMENT '部署说明. 0-选择训练输入数据, 1-选择预测输入数据, 2-选择PSI输入数据, 3-选择计算环境(通用), 4-选择计算环境(训练&预测), 5-选择结果接收方(通用), 6-选择结果接收方(训练&预测), 7-选择明文训练输入数据, 8-选择明文预测输入数据',
-    `task_1_step` int DEFAULT NULL COMMENT '任务1对应的步骤',
-    `task_2_step` int DEFAULT NULL COMMENT '任务2对应的步骤',
-    `task_3_step` int DEFAULT NULL COMMENT '任务3对应的步骤',
-    `task_4_step` int DEFAULT NULL COMMENT '任务4对应的步骤',
-    PRIMARY KEY (`calculation_process_id`,`step`)
-) ENGINE=InnoDB  COMMENT='计算流程配置步骤表';
+  `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
+  `step` int NOT NULL COMMENT '步骤. 从0开始',
+  `type` int NOT NULL COMMENT '部署说明. 0-选择训练输入数据, 1-选择预测输入数据, 2-选择PSI输入数据, 3-选择计算环境(通用), 4-选择计算环境(训练&预测), 5-选择结果接收方(通用), 6-选择结果接收方(训练&预测), 7-选择明文训练输入数据, 8-选择明文预测输入数据',
+  `task_1_step` int DEFAULT NULL COMMENT '任务1对应的步骤',
+  `task_2_step` int DEFAULT NULL COMMENT '任务2对应的步骤',
+  `task_3_step` int DEFAULT NULL COMMENT '任务3对应的步骤',
+  `task_4_step` int DEFAULT NULL COMMENT '任务4对应的步骤',
+  PRIMARY KEY (`calculation_process_id`,`step`)
+) ENGINE=InnoDB COMMENT='计算流程配置步骤表';
 
 /*Data for the table `mo_calculation_process_step` */
 
-insert  into `mo_calculation_process_step`(`calculation_process_id`,`step`,`type`,`task_1_step`,`task_2_step`,`task_3_step`,`task_4_step`) values (1,1,0,1,2,NULL,NULL),(1,2,3,1,2,NULL,NULL),(1,3,5,1,2,NULL,NULL),(2,1,1,1,2,NULL,NULL),(2,2,3,1,2,NULL,NULL),(2,3,5,1,2,NULL,NULL),(3,1,0,1,2,NULL,NULL),(3,2,1,3,4,NULL,NULL),(3,3,4,1,2,3,4),(3,4,6,1,2,3,4),(4,1,2,NULL,1,NULL,NULL),(4,2,3,NULL,1,NULL,NULL),(4,3,5,NULL,1,NULL,NULL),(5,1,7,NULL,1,NULL,NULL),(5,2,3,NULL,1,NULL,NULL),(5,3,5,NULL,1,NULL,NULL),(6,1,8,NULL,1,NULL,NULL),(6,2,3,NULL,1,NULL,NULL),(6,3,4,NULL,1,NULL,NULL),(7,1,7,NULL,1,NULL,2),(7,2,8,NULL,1,NULL,2),(7,3,4,NULL,1,NULL,2),(7,4,6,NULL,1,NULL,2);
+insert  into `mo_calculation_process_step`(`calculation_process_id`,`step`,`type`,`task_1_step`,`task_2_step`,`task_3_step`,`task_4_step`) values (1,1,0,1,2,NULL,NULL),(1,2,3,1,2,NULL,NULL),(1,3,5,1,2,NULL,NULL),(2,1,1,1,2,NULL,NULL),(2,2,3,1,2,NULL,NULL),(2,3,5,1,2,NULL,NULL),(3,1,0,1,2,NULL,NULL),(3,2,1,3,4,NULL,NULL),(3,3,4,1,2,3,4),(3,4,6,1,2,3,4),(4,1,2,NULL,1,NULL,NULL),(4,2,3,NULL,1,NULL,NULL),(4,3,5,NULL,1,NULL,NULL),(5,1,7,NULL,1,NULL,NULL),(5,2,3,NULL,1,NULL,NULL),(5,3,5,NULL,1,NULL,NULL),(6,1,8,NULL,NULL,NULL,1),(6,2,3,NULL,1,NULL,NULL),(6,3,5,NULL,1,NULL,NULL),(7,1,7,NULL,1,NULL,2),(7,2,8,NULL,1,NULL,2),(7,3,4,NULL,1,NULL,2),(7,4,6,NULL,1,NULL,2),(8,1,0,1,2,NULL,NULL),(8,2,3,1,2,NULL,NULL),(8,3,5,1,2,NULL,NULL);
 
 /*Table structure for table `mo_calculation_process_task` */
 
 DROP TABLE IF EXISTS `mo_calculation_process_task`;
 
 CREATE TABLE `mo_calculation_process_task` (
-    `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
-    `step` int NOT NULL COMMENT '任务步骤',
-    `algorithm_select` int NOT NULL COMMENT '算法选择方式. 0-用户输入母算法; 1-用户输入子训练算法, 2-用户输入子预测算法, 3-内置PSI算法',
-    `input_model_step` int DEFAULT NULL COMMENT '工作流节点需要的模型产生的步骤',
-    `input_psi_step` int DEFAULT NULL COMMENT '工作流节点需要的psi产生步骤',
-    PRIMARY KEY (`calculation_process_id`,`step`)
-) ENGINE=InnoDB  COMMENT='计算流程任务步骤表';
+  `calculation_process_id` bigint NOT NULL COMMENT '计算流程ID',
+  `step` int NOT NULL COMMENT '任务步骤',
+  `algorithm_select` int NOT NULL COMMENT '算法选择方式. 0-用户输入母算法; 1-用户输入子训练算法, 2-用户输入子预测算法, 3-内置PSI算法',
+  `input_model_step` int DEFAULT NULL COMMENT '工作流节点需要的模型产生的步骤',
+  `input_psi_step` int DEFAULT NULL COMMENT '工作流节点需要的psi产生步骤',
+  PRIMARY KEY (`calculation_process_id`,`step`)
+) ENGINE=InnoDB COMMENT='计算流程任务步骤表';
 
 /*Data for the table `mo_calculation_process_task` */
 
-insert  into `mo_calculation_process_task`(`calculation_process_id`,`step`,`algorithm_select`,`input_model_step`,`input_psi_step`) values (1,1,3,NULL,NULL),(1,2,1,NULL,1),(2,1,3,NULL,NULL),(2,2,2,NULL,1),(3,1,3,NULL,NULL),(3,2,1,NULL,1),(3,3,3,NULL,NULL),(3,4,2,2,3),(4,1,0,NULL,NULL),(5,1,1,NULL,NULL),(6,1,2,NULL,NULL),(7,1,1,NULL,NULL),(7,2,2,1,NULL);
+insert  into `mo_calculation_process_task`(`calculation_process_id`,`step`,`algorithm_select`,`input_model_step`,`input_psi_step`) values (1,1,3,NULL,NULL),(1,2,1,NULL,1),(2,1,3,NULL,NULL),(2,2,2,NULL,1),(3,1,3,NULL,NULL),(3,2,1,NULL,1),(3,3,3,NULL,NULL),(3,4,2,2,3),(4,1,0,NULL,NULL),(5,1,1,NULL,NULL),(6,1,2,NULL,NULL),(7,1,1,NULL,NULL),(7,2,2,1,NULL),(8,1,3,NULL,NULL),(8,2,0,NULL,1);
 
 /*Table structure for table `mo_data_sync` */
 
 DROP TABLE IF EXISTS `mo_data_sync`;
 
 CREATE TABLE `mo_data_sync` (
-    `data_type` varchar(256)  NOT NULL COMMENT '数据类型',
-    `latest_synced` bigint NOT NULL DEFAULT '0' COMMENT '数据最新同步时间戳，精确到毫秒',
-    `info` varchar(50)  DEFAULT '' COMMENT '描述',
-    PRIMARY KEY (`data_type`)
-) ENGINE=InnoDB  COMMENT='数据同步时间记录';
+  `data_type` varchar(256) NOT NULL COMMENT '数据类型',
+  `latest_synced` bigint NOT NULL DEFAULT '0' COMMENT '数据最新同步时间戳，精确到毫秒',
+  `info` varchar(50) DEFAULT '' COMMENT '描述',
+  PRIMARY KEY (`data_type`)
+) ENGINE=InnoDB COMMENT='数据同步时间记录';
 
 /*Data for the table `mo_data_sync` */
+
+/*Table structure for table `mo_meta_data_certificate` */
+
+DROP TABLE IF EXISTS `mo_meta_data_certificate`;
+
+CREATE TABLE `mo_meta_data_certificate` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
+  `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+  `type` tinyint NOT NULL COMMENT '凭证类型: 0-无属性,1-有属性',
+  `token_address` varchar(64) NOT NULL COMMENT '合约地址',
+  `token_id` varchar(128) DEFAULT NULL COMMENT '有属性凭证对应tokenId',
+  `name` varchar(256) DEFAULT NULL COMMENT '凭证名称',
+  `is_support_pt_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持明文算法',
+  `is_support_ct_alg` tinyint NOT NULL DEFAULT '0' COMMENT '是否支持密文算法',
+  `characteristic` varchar(256) DEFAULT NULL COMMENT '有属性凭证有效期',
+  `erc20_pt_alg_consume` varchar(128) DEFAULT NULL COMMENT '无属性凭证明文算法消耗量',
+  `erc20_ct_alg_consume` varchar(128) DEFAULT NULL COMMENT '无属性凭证密文算法消耗量',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='元数据凭证';
+
+/*Data for the table `mo_meta_data_certificate` */
+
+/*Table structure for table `mo_meta_data_certificate_user` */
+
+DROP TABLE IF EXISTS `mo_meta_data_certificate_user`;
+
+CREATE TABLE `mo_meta_data_certificate_user` (
+  `address` varchar(64) NOT NULL COMMENT '用户地址',
+  `meta_data_certificate_id` bigint NOT NULL COMMENT '元数据凭证ID',
+  `balance` varchar(128) NOT NULL COMMENT '账户余额, ERC20为金额, ERC721时 0-未持有 1-持有',
+  `authorize_balance` varchar(128) DEFAULT NULL COMMENT '授权支付助手合约金额, ERC20为金额， ERC721时 0-未授权 1-已授权',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`address`,`meta_data_certificate_id`)
+) ENGINE=InnoDB COMMENT='用户持有的元数据凭证';
+
+/*Data for the table `mo_meta_data_certificate_user` */
+
+/*Table structure for table `mo_meta_data_marketplace` */
+
+DROP TABLE IF EXISTS `mo_meta_data_marketplace`;
+
+CREATE TABLE `mo_meta_data_marketplace` (
+  `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`meta_data_id`)
+) ENGINE=InnoDB COMMENT='数据市场可见的元数据';
+
+/*Data for the table `mo_meta_data_marketplace` */
+
+/*Table structure for table `mo_meta_data_user` */
+
+DROP TABLE IF EXISTS `mo_meta_data_user`;
+
+CREATE TABLE `mo_meta_data_user` (
+  `address` varchar(64) NOT NULL COMMENT '用户地址',
+  `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`address`,`meta_data_id`)
+) ENGINE=InnoDB COMMENT='用户可见的元数据';
+
+/*Data for the table `mo_meta_data_user` */
 
 /*Table structure for table `mo_model` */
 
 DROP TABLE IF EXISTS `mo_model`;
 
 CREATE TABLE `mo_model` (
-    `meta_data_id` varchar(128)  NOT NULL COMMENT '模型元数据id',
-    `identity_id` varchar(128)  NOT NULL COMMENT '所属组织',
-    `name` varchar(128)  DEFAULT NULL COMMENT '名称',
-    `file_id` varchar(256)  DEFAULT NULL COMMENT '源文件ID',
-    `file_path` varchar(128)  NOT NULL COMMENT '源文件存放路径',
-    `train_task_id` varchar(256)  NOT NULL COMMENT '训练模型的任务id',
-    `supported_algorithm_id` bigint DEFAULT NULL COMMENT '输入模型的算法id',
-    `train_algorithm_id` bigint DEFAULT NULL COMMENT '训练模型的算法id',
-    `train_user_address` varchar(64)  DEFAULT NULL COMMENT '训练模型的账户',
-    `evaluate` varchar(2048)  DEFAULT NULL COMMENT '模型评估结果',
-    `data_type` int NOT NULL DEFAULT '0' COMMENT '原始数据的类型',
-    `metadata_option` text  COMMENT '元数据的选项，和 data_type 配套使用',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`meta_data_id`)
-) ENGINE=InnoDB  COMMENT='模型表';
+  `meta_data_id` varchar(128) NOT NULL COMMENT '模型元数据id',
+  `identity_id` varchar(128) NOT NULL COMMENT '所属组织',
+  `name` varchar(128) DEFAULT NULL COMMENT '名称',
+  `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
+  `file_path` varchar(128) NOT NULL COMMENT '源文件存放路径',
+  `train_task_id` varchar(256) NOT NULL COMMENT '训练模型的任务id',
+  `supported_algorithm_id` bigint DEFAULT NULL COMMENT '输入模型的算法id',
+  `train_algorithm_id` bigint DEFAULT NULL COMMENT '训练模型的算法id',
+  `train_user_address` varchar(64) DEFAULT NULL COMMENT '训练模型的账户',
+  `evaluate` varchar(2048) DEFAULT NULL COMMENT '模型评估结果',
+  `data_type` int NOT NULL DEFAULT '0' COMMENT '原始数据的类型',
+  `metadata_option` text COMMENT '元数据的选项，和 data_type 配套使用',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`meta_data_id`)
+) ENGINE=InnoDB COMMENT='模型表';
 
 /*Data for the table `mo_model` */
 
@@ -501,15 +511,17 @@ CREATE TABLE `mo_model` (
 DROP TABLE IF EXISTS `mo_org_expand`;
 
 CREATE TABLE `mo_org_expand` (
-    `identity_id` varchar(200)  NOT NULL COMMENT '身份认证标识的id',
-    `identity_ip` varchar(20)  NOT NULL COMMENT '组织的ip',
-    `identity_port` int NOT NULL COMMENT '组织的端口',
-    `is_public` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否公共组织: 0-否，1-是',
-    `observer_proxy_wallet_address` varchar(100)  DEFAULT NULL COMMENT '当前组织内置系统钱包地址 (见证人代理钱包)',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`identity_id`)
-) ENGINE=InnoDB  COMMENT='组织扩展表';
+  `identity_id` varchar(200) NOT NULL COMMENT '身份认证标识的id',
+  `identity_ip` varchar(20) DEFAULT NULL COMMENT '组织的ip',
+  `identity_port` int DEFAULT NULL COMMENT '组织的端口',
+  `is_public` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否公共组织: 0-否，1-是',
+  `is_authority` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否委员会成员: 0-否，1-是',
+  `is_certified` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已认证: 0-否，1-是',
+  `authority_join_time` timestamp NULL DEFAULT NULL COMMENT '加入委员会的时间',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`identity_id`)
+) ENGINE=InnoDB COMMENT='组织扩展表';
 
 /*Data for the table `mo_org_expand` */
 
@@ -518,102 +530,180 @@ CREATE TABLE `mo_org_expand` (
 DROP TABLE IF EXISTS `mo_org_user`;
 
 CREATE TABLE `mo_org_user` (
-    `identity_id` varchar(128)  NOT NULL COMMENT '组织的身份标识Id',
-    `address` varchar(64)  NOT NULL COMMENT '用户的钱包地址',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`identity_id`,`address`)
-) ENGINE=InnoDB  COMMENT='组织管理用户';
+  `identity_id` varchar(128) NOT NULL COMMENT '组织的身份标识Id',
+  `address` varchar(64) NOT NULL COMMENT '用户的钱包地址',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`identity_id`,`address`)
+) ENGINE=InnoDB COMMENT='组织管理用户';
 
 /*Data for the table `mo_org_user` */
+
+/*Table structure for table `mo_org_vc` */
+
+DROP TABLE IF EXISTS `mo_org_vc`;
+
+CREATE TABLE `mo_org_vc` (
+  `identity_id` varchar(200) NOT NULL COMMENT '身份认证标识的id',
+  `issuer` varchar(200) NOT NULL COMMENT 'vc的颁发者',
+  `issuance_date` timestamp NOT NULL COMMENT 'vc的颁发时间',
+  `expiration_date` timestamp NOT NULL COMMENT 'vc的过期时间',
+  `holder` varchar(200) NOT NULL COMMENT 'vc的持有者',
+  `publicity_id` varchar(200) NOT NULL COMMENT 'vc的公示信息',
+  `vc_content` text NOT NULL COMMENT 'vc的内容归档',
+  `vc_proof` text NOT NULL COMMENT 'vc的证明归档',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`identity_id`)
+) ENGINE=InnoDB COMMENT='组织的VC';
+
+/*Data for the table `mo_org_vc` */
+
+/*Table structure for table `mo_proposal` */
+
+DROP TABLE IF EXISTS `mo_proposal`;
+
+CREATE TABLE `mo_proposal` (
+  `id` varchar(200) NOT NULL COMMENT '提案id',
+  `submitter` varchar(200) NOT NULL COMMENT '提案提交者',
+  `candidate` varchar(200) NOT NULL COMMENT '提案关联者',
+  `type` int NOT NULL COMMENT '提案类型, 1-增加委员会成员; 2-剔除委员会成员; 3-委员会成员退出',
+  `publicity_id` varchar(200) NOT NULL COMMENT '提案的公示信息',
+  `submission_bn` varchar(64) DEFAULT NULL COMMENT '提交块高',
+  `vote_begin_bn` varchar(64) DEFAULT NULL COMMENT '投票开始块高',
+  `vote_end_bn` varchar(64) DEFAULT NULL COMMENT '投票结束块高',
+  `auto_quit_bn` varchar(64) DEFAULT NULL COMMENT '主动退出的块高',
+  `vote_agree_number` int DEFAULT NULL COMMENT '赞成票数量',
+  `authority_number` int DEFAULT NULL COMMENT '委员总数，如果为空需要实时查询',
+  `status` int NOT NULL COMMENT '提案状态, 0-未开始; 1-投票中; 2-投票通过; 3-投票未通过; 4-退出中；5-已退出；6-已撤销',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='提案信息';
+
+/*Data for the table `mo_proposal` */
+
+/*Table structure for table `mo_proposal_log` */
+
+DROP TABLE IF EXISTS `mo_proposal_log`;
+
+CREATE TABLE `mo_proposal_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志表id(自增长)',
+  `type` int NOT NULL COMMENT '事件类型, 1-提交提案; 2-撤销提案; 3-对提案投票; 4-投票结果; 5-新增委员会; 6-删除委员会',
+  `block_number` varchar(200) NOT NULL COMMENT '事件所在块高',
+  `tx_hash` varchar(200) NOT NULL COMMENT '事件对应交易hash',
+  `log_index` varchar(200) NOT NULL COMMENT '事件日志index',
+  `content` varchar(2048) NOT NULL COMMENT '事件对应内容',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='提案日志';
+
+/*Data for the table `mo_proposal_log` */
 
 /*Table structure for table `mo_psi` */
 
 DROP TABLE IF EXISTS `mo_psi`;
 
 CREATE TABLE `mo_psi` (
-    `meta_data_id` varchar(128)  NOT NULL COMMENT '模型元数据id',
-    `identity_id` varchar(128)  NOT NULL COMMENT '所属组织',
-    `name` varchar(128)  DEFAULT NULL COMMENT '名称',
-    `file_id` varchar(256)  DEFAULT NULL COMMENT '源文件ID',
-    `file_path` varchar(128)  NOT NULL COMMENT '源文件存放路径',
-    `train_task_id` varchar(256)  NOT NULL COMMENT '训练模型的任务id',
-    `train_algorithm_id` bigint DEFAULT NULL COMMENT '训练模型的算法id, 母算法',
-    `train_user_address` varchar(64)  DEFAULT NULL COMMENT '训练模型的账户',
-    `data_type` int DEFAULT '0' COMMENT '原始数据的类型',
-    `metadata_option` text  COMMENT '元数据的选项，和 data_type 配套使用',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`meta_data_id`)
-) ENGINE=InnoDB  COMMENT='PSI结果表';
+  `meta_data_id` varchar(128) NOT NULL COMMENT '模型元数据id',
+  `identity_id` varchar(128) NOT NULL COMMENT '所属组织',
+  `name` varchar(128) DEFAULT NULL COMMENT '名称',
+  `file_id` varchar(256) DEFAULT NULL COMMENT '源文件ID',
+  `file_path` varchar(128) NOT NULL COMMENT '源文件存放路径',
+  `train_task_id` varchar(256) NOT NULL COMMENT '训练模型的任务id',
+  `train_algorithm_id` bigint DEFAULT NULL COMMENT '训练模型的算法id, 母算法',
+  `train_user_address` varchar(64) DEFAULT NULL COMMENT '训练模型的账户',
+  `data_type` int DEFAULT '0' COMMENT '原始数据的类型',
+  `metadata_option` text COMMENT '元数据的选项，和 data_type 配套使用',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`meta_data_id`)
+) ENGINE=InnoDB COMMENT='PSI结果表';
 
 /*Data for the table `mo_psi` */
+
+/*Table structure for table `mo_publicity` */
+
+DROP TABLE IF EXISTS `mo_publicity`;
+
+CREATE TABLE `mo_publicity` (
+  `id` varchar(200) NOT NULL COMMENT '公示的id, ipfs path',
+  `image_url` varchar(200) DEFAULT NULL COMMENT '图片url',
+  `describe` varchar(200) DEFAULT NULL COMMENT '描述',
+  `remark` varchar(200) DEFAULT NULL COMMENT '公示备注信息',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='公示信息';
+
+/*Data for the table `mo_publicity` */
 
 /*Table structure for table `mo_stats_global` */
 
 DROP TABLE IF EXISTS `mo_stats_global`;
 
 CREATE TABLE `mo_stats_global` (
-    `id` bigint NOT NULL COMMENT 'ID(自增长)',
-    `task_count` int DEFAULT '0' COMMENT '隐私计算总次数(总的任务数,包括成功和失败的)',
-    `address_count_of_task` int DEFAULT '0' COMMENT '参与计算地址总数',
-    `address_count_of_active` int DEFAULT '0' COMMENT '24h活跃地址总数',
-    `data_size` bigint DEFAULT '0' COMMENT '全网数据总量，单位：字节',
-    `data_token_count` int DEFAULT '0' COMMENT '数据凭证数量',
-    `data_token_used` bigint DEFAULT '0' COMMENT '数据凭证使用量',
-    `total_core` int DEFAULT '0' COMMENT '全网目前的算力核心数，单位：个',
-    `total_memory` bigint DEFAULT '0' COMMENT '全网目前的算力内存数，单位：字节',
-    `total_bandwidth` bigint DEFAULT '0' COMMENT '全网目前的带宽，单位：字节',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='全网维度统计';
+  `id` bigint NOT NULL COMMENT 'ID(自增长)',
+  `task_count` int DEFAULT '0' COMMENT '隐私计算总次数(总的任务数,包括成功和失败的)',
+  `address_count_of_task` int DEFAULT '0' COMMENT '参与计算地址总数',
+  `address_count_of_active` int DEFAULT '0' COMMENT '24h活跃地址总数',
+  `data_size` bigint DEFAULT '0' COMMENT '全网数据总量，单位：字节',
+  `data_count` int DEFAULT '0' COMMENT '全网数据个数',
+  `data_used` bigint DEFAULT '0' COMMENT '数据使用总次数',
+  `total_core` int DEFAULT '0' COMMENT '全网目前的算力核心数，单位：个',
+  `total_memory` bigint DEFAULT '0' COMMENT '全网目前的算力内存数，单位：字节',
+  `total_bandwidth` bigint DEFAULT '0' COMMENT '全网目前的带宽，单位：字节',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='全网维度统计';
 
 /*Data for the table `mo_stats_global` */
+
+/*Table structure for table `mo_stats_meta_data` */
+
+DROP TABLE IF EXISTS `mo_stats_meta_data`;
+
+CREATE TABLE `mo_stats_meta_data` (
+  `meta_data_id` varchar(200) NOT NULL COMMENT '元数据id',
+  `usage_count` bigint NOT NULL DEFAULT '0' COMMENT '使用次数',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`meta_data_id`)
+) ENGINE=InnoDB COMMENT='数据凭证统计';
+
+/*Data for the table `mo_stats_meta_data` */
 
 /*Table structure for table `mo_stats_org` */
 
 DROP TABLE IF EXISTS `mo_stats_org`;
 
 CREATE TABLE `mo_stats_org` (
-    `identity_id` varchar(200)  NOT NULL COMMENT '身份认证标识的id',
-    `org_total_core` int DEFAULT '0' COMMENT '全网目前的算力核心数，单位：个',
-    `org_total_memory` bigint DEFAULT '0' COMMENT '全网目前的算力内存数，单位：字节',
-    `org_total_bandwidth` bigint DEFAULT '0' COMMENT '全网目前的带宽，单位：字节',
-    `computing_power_ratio` int DEFAULT '0' COMMENT '算力占比. 万分比。100 = 1%',
-    `total_task` bigint DEFAULT '0' COMMENT '参与任务数量',
-    `total_data` bigint DEFAULT '0' COMMENT '数据数',
-    `total_data_token` bigint DEFAULT '0' COMMENT '凭证数',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`identity_id`)
-) ENGINE=InnoDB  COMMENT='组织维度统计';
+  `identity_id` varchar(200) NOT NULL COMMENT '身份认证标识的id',
+  `org_total_core` int DEFAULT '0' COMMENT '全网目前的算力核心数，单位：个',
+  `org_total_memory` bigint DEFAULT '0' COMMENT '全网目前的算力内存数，单位：字节',
+  `org_total_bandwidth` bigint DEFAULT '0' COMMENT '全网目前的带宽，单位：字节',
+  `computing_power_ratio` int DEFAULT '0' COMMENT '算力占比. 万分比。100 = 1%',
+  `total_task` bigint DEFAULT '0' COMMENT '参与任务数量',
+  `total_data` bigint DEFAULT '0' COMMENT '数据数',
+  `total_data_token` bigint DEFAULT '0' COMMENT '凭证数',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`identity_id`)
+) ENGINE=InnoDB COMMENT='组织维度统计';
 
 /*Data for the table `mo_stats_org` */
-
-/*Table structure for table `mo_stats_token` */
-
-DROP TABLE IF EXISTS `mo_stats_token`;
-
-CREATE TABLE `mo_stats_token` (
-    `address` varchar(200)  NOT NULL COMMENT '凭证地址',
-    `token_used` bigint DEFAULT '0' COMMENT '数据凭证使用量',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`address`)
-) ENGINE=InnoDB  COMMENT='数据维度统计';
-
-/*Data for the table `mo_stats_token` */
 
 /*Table structure for table `mo_task_expand` */
 
 DROP TABLE IF EXISTS `mo_task_expand`;
 
 CREATE TABLE `mo_task_expand` (
-    `id` varchar(200)  NOT NULL COMMENT '任务ID,hash',
-    `event_synced` tinyint(1) NOT NULL DEFAULT '0' COMMENT '事件是否同步完成 0-否 1-是',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='任务扩展表';
+  `id` varchar(200) NOT NULL COMMENT '任务ID,hash',
+  `event_synced` tinyint(1) NOT NULL DEFAULT '0' COMMENT '事件是否同步完成 0-否 1-是',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='任务扩展表';
 
 /*Data for the table `mo_task_expand` */
 
@@ -622,34 +712,35 @@ CREATE TABLE `mo_task_expand` (
 DROP TABLE IF EXISTS `mo_token`;
 
 CREATE TABLE `mo_token` (
-    `address` varchar(64)  NOT NULL COMMENT '合约地址',
-    `name` varchar(64)  DEFAULT NULL COMMENT '合约名称',
-    `symbol` varchar(64)  DEFAULT NULL COMMENT '合约符号',
-    `decimal` bigint DEFAULT NULL COMMENT '合约精度',
-    `price` VARCHAR(128) NULL COMMENT '无属性对应DEX中的价格',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`address`)
-) ENGINE=InnoDB  COMMENT='token信息';
+  `address` varchar(64) NOT NULL COMMENT '合约地址',
+  `type` tinyint NOT NULL COMMENT '合约类型: 0-erc20,1-erc721',
+  `name` varchar(64) DEFAULT NULL COMMENT '合约名称',
+  `symbol` varchar(64) DEFAULT NULL COMMENT '合约符号',
+  `decimal` bigint DEFAULT NULL COMMENT '合约精度',
+  `price` varchar(128) DEFAULT NULL COMMENT '无属性对应DEX中的价格',
+  `is_add_liquidity` tinyint DEFAULT NULL COMMENT '是否添加流动性: 0-否，1-是',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`address`)
+) ENGINE=InnoDB COMMENT='token信息';
 
 /*Data for the table `mo_token` */
-
 
 /*Table structure for table `mo_user` */
 
 DROP TABLE IF EXISTS `mo_user`;
 
 CREATE TABLE `mo_user` (
-    `address` varchar(64)  NOT NULL COMMENT '用户钱包地址',
-    `user_name` varchar(64)  NOT NULL COMMENT '用户名',
-    `is_valid` tinyint NOT NULL DEFAULT '1' COMMENT '是否有效: 0-否，1-是',
-    `org_identity_id` varchar(128)  DEFAULT NULL COMMENT '默认连接的组织id',
-    `heart_beat_time` timestamp NULL DEFAULT NULL COMMENT '最后的心跳时间',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`address`),
-    UNIQUE KEY `UK_USERNAME` (`user_name`) USING BTREE COMMENT '用户名称唯一'
-) ENGINE=InnoDB  COMMENT='用户表';
+  `address` varchar(64) NOT NULL COMMENT '用户钱包地址',
+  `user_name` varchar(64) NOT NULL COMMENT '用户名',
+  `is_valid` tinyint NOT NULL DEFAULT '1' COMMENT '是否有效: 0-否，1-是',
+  `org_identity_id` varchar(128) DEFAULT NULL COMMENT '默认连接的组织id',
+  `heart_beat_time` timestamp NULL DEFAULT NULL COMMENT '最后的心跳时间',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`address`),
+  UNIQUE KEY `UK_USERNAME` (`user_name`) USING BTREE COMMENT '用户名称唯一'
+) ENGINE=InnoDB COMMENT='用户表';
 
 /*Data for the table `mo_user` */
 
@@ -658,13 +749,13 @@ CREATE TABLE `mo_user` (
 DROP TABLE IF EXISTS `mo_user_login`;
 
 CREATE TABLE `mo_user_login` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志表id(自增长)',
-    `address` varchar(64)  NOT NULL COMMENT '登录地址',
-    `is_success` tinyint NOT NULL DEFAULT '1' COMMENT '是否成功: 0-否，1-是',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='用户登录日志表';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志表id(自增长)',
+  `address` varchar(64) NOT NULL COMMENT '登录地址',
+  `is_success` tinyint NOT NULL DEFAULT '1' COMMENT '是否成功: 0-否，1-是',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='用户登录日志表';
 
 /*Data for the table `mo_user_login` */
 
@@ -673,26 +764,26 @@ CREATE TABLE `mo_user_login` (
 DROP TABLE IF EXISTS `mo_workflow`;
 
 CREATE TABLE `mo_workflow` (
-    `workflow_id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流ID(自增长)',
-    `create_mode` tinyint NOT NULL COMMENT '创建模式:1-专家模式,2-向导模式',
-    `address` varchar(64)  NOT NULL COMMENT '用户地址',
-    `workflow_name` varchar(128)  NOT NULL COMMENT '工作流名称',
-    `workflow_desc` varchar(200)  DEFAULT NULL COMMENT '工作流描述',
-    `algorithm_id` bigint DEFAULT NULL COMMENT '算法id',
-    `algorithm_name` varchar(200)  DEFAULT NULL COMMENT '算法名称',
-    `calculation_process_id` bigint DEFAULT NULL COMMENT '计算流程id',
-    `calculation_process_name` varchar(200)  DEFAULT NULL COMMENT '计算流程名称',
-    `last_run_time` timestamp(3) NULL DEFAULT NULL COMMENT '最后运行时间',
-    `is_setting_completed` tinyint NOT NULL DEFAULT '0' COMMENT '是否设置完成:  0-否  1-是',
-    `calculation_process_step` int DEFAULT NULL COMMENT '向导模式下当前步骤',
-    `is_delete` tinyint NOT NULL DEFAULT '0' COMMENT '是否删除: 0-否  1-是',
-    `workflow_version` bigint DEFAULT '1' COMMENT '当前最大版本号,从1开始',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_id`),
-    UNIQUE KEY `uk_address_name` (`address`,`workflow_name`),
-    KEY `user_address` (`address`)
-) ENGINE=InnoDB  COMMENT='工作流表';
+  `workflow_id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流ID(自增长)',
+  `create_mode` tinyint NOT NULL COMMENT '创建模式:1-专家模式,2-向导模式',
+  `address` varchar(64) NOT NULL COMMENT '用户地址',
+  `workflow_name` varchar(128) NOT NULL COMMENT '工作流名称',
+  `workflow_desc` varchar(200) DEFAULT NULL COMMENT '工作流描述',
+  `algorithm_id` bigint DEFAULT NULL COMMENT '算法id',
+  `algorithm_name` varchar(200) DEFAULT NULL COMMENT '算法名称',
+  `calculation_process_id` bigint DEFAULT NULL COMMENT '计算流程id',
+  `calculation_process_name` varchar(200) DEFAULT NULL COMMENT '计算流程名称',
+  `last_run_time` timestamp(3) NULL DEFAULT NULL COMMENT '最后运行时间',
+  `is_setting_completed` tinyint NOT NULL DEFAULT '0' COMMENT '是否设置完成:  0-否  1-是',
+  `calculation_process_step` int DEFAULT NULL COMMENT '向导模式下当前步骤',
+  `is_delete` tinyint NOT NULL DEFAULT '0' COMMENT '是否删除: 0-否  1-是',
+  `workflow_version` bigint DEFAULT '1' COMMENT '当前最大版本号,从1开始',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_id`),
+  UNIQUE KEY `uk_address_name` (`address`,`workflow_name`),
+  KEY `user_address` (`address`)
+) ENGINE=InnoDB COMMENT='工作流表';
 
 /*Data for the table `mo_workflow` */
 
@@ -701,106 +792,107 @@ CREATE TABLE `mo_workflow` (
 DROP TABLE IF EXISTS `mo_workflow_run_status`;
 
 CREATE TABLE `mo_workflow_run_status` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
-    `workflow_id` bigint DEFAULT NULL COMMENT '工作流id',
-    `workflow_version` int NOT NULL DEFAULT '1' COMMENT '工作流版本号',
-    `sign` varchar(512)  NOT NULL COMMENT '发起任务的账户的签名',
-    `address` varchar(64)  NOT NULL COMMENT '发起任务的账户的地址',
-    `step` int DEFAULT NULL COMMENT '总步骤',
-    `cur_step` int DEFAULT NULL COMMENT '当前步骤',
-    `begin_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
-    `end_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '结束时间',
-    `run_status` tinyint DEFAULT NULL COMMENT '运行状态: 1-运行中,2-运行成功,3-运行失败',
-    `cancel_status` tinyint DEFAULT NULL COMMENT '取消状态: 1-取消中,2-取消成功,3-取消失败',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='工作流运行状态';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
+  `workflow_id` bigint DEFAULT NULL COMMENT '工作流id',
+  `workflow_version` int NOT NULL DEFAULT '1' COMMENT '工作流版本号',
+  `sign` varchar(512) NOT NULL COMMENT '发起任务的账户的签名',
+  `address` varchar(64) NOT NULL COMMENT '发起任务的账户的地址',
+  `step` int DEFAULT NULL COMMENT '总步骤',
+  `cur_step` int DEFAULT NULL COMMENT '当前步骤',
+  `begin_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
+  `end_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '结束时间',
+  `run_status` tinyint DEFAULT NULL COMMENT '运行状态: 1-运行中,2-运行成功,3-运行失败',
+  `cancel_status` tinyint DEFAULT NULL COMMENT '取消状态: 1-取消中,2-取消成功,3-取消失败',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='工作流运行状态';
 
 /*Data for the table `mo_workflow_run_status` */
 
-/*Table structure for table `mo_workflow_run_task_result` */
+/*Table structure for table `mo_workflow_run_status_certificate` */
 
-DROP TABLE IF EXISTS `mo_workflow_run_task_result`;
+DROP TABLE IF EXISTS `mo_workflow_run_status_certificate`;
 
-CREATE TABLE `mo_workflow_run_task_result` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
-    `identity_id` varchar(128)  NOT NULL COMMENT '所属组织',
-    `task_id` varchar(256)  DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
-    `file_name` varchar(128)  NOT NULL COMMENT '任务结果文件的名称',
-    `metadata_id` varchar(128)  NOT NULL COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
-    `origin_id` varchar(128)  NOT NULL COMMENT '任务结果文件的原始文件Id',
-    `ip` varchar(32)  NOT NULL COMMENT '任务结果文件所在的 数据服务内网ip',
-    `port` varchar(8)  NOT NULL COMMENT '任务结果文件所在的 数据服务内网port',
-    `data_type` int NOT NULL DEFAULT '0' COMMENT '原始数据类型 (文件类型)',
-    `metadata_option` text  COMMENT '元数据的选项，和 data_type 配套使用',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='工作流任务运行状态';
+CREATE TABLE `mo_workflow_run_status_certificate` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
+  `workflow_run_id` bigint NOT NULL COMMENT '工作流运行状态ID',
+  `meta_data_id` varchar(200) NOT NULL COMMENT '对应元数据ID,hash',
+  `type` tinyint NOT NULL COMMENT '合约类型: 0-erc20,1-erc721',
+  `token_address` varchar(64) NOT NULL COMMENT '合约地址',
+  `token_id` varchar(128) NOT NULL COMMENT '721下合约token id',
+  `erc20_pt_alg_consume` varchar(64) DEFAULT NULL COMMENT '明文消耗量',
+  `erc20_ct_alg_consume` varchar(64) DEFAULT NULL COMMENT '密文消耗量',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='工作流运行状态对应支付方式';
 
-/*Data for the table `mo_workflow_run_task_result` */
+/*Data for the table `mo_workflow_run_status_certificate` */
 
 /*Table structure for table `mo_workflow_run_status_task` */
 
 DROP TABLE IF EXISTS `mo_workflow_run_status_task`;
 
 CREATE TABLE `mo_workflow_run_status_task` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
-    `workflow_run_id` bigint NOT NULL COMMENT '工作流运行状态ID',
-    `workflow_task_id` bigint NOT NULL COMMENT '工作流节点配置ID',
-    `step` int DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
-    `begin_time` datetime DEFAULT NULL COMMENT '开始时间',
-    `end_time` datetime DEFAULT NULL COMMENT '结束时间',
-    `run_status` tinyint DEFAULT NULL COMMENT '运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败',
-    `task_id` varchar(256)  DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
-    `run_msg` varchar(256)  DEFAULT NULL COMMENT '任务处理结果描述',
-    `model_id` varchar(128)  DEFAULT '0' COMMENT '工作流节点需要的模型id',
-    `psi_id` varchar(128)  DEFAULT '0' COMMENT '工作流节点需要的psi的id',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB  COMMENT='工作流任务运行状态';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
+  `workflow_run_id` bigint NOT NULL COMMENT '工作流运行状态ID',
+  `workflow_task_id` bigint NOT NULL COMMENT '工作流节点配置ID',
+  `step` int DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
+  `begin_time` datetime DEFAULT NULL COMMENT '开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `run_status` tinyint DEFAULT NULL COMMENT '运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败',
+  `task_id` varchar(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
+  `run_msg` varchar(256) DEFAULT NULL COMMENT '任务处理结果描述',
+  `model_id` varchar(128) DEFAULT '0' COMMENT '工作流节点需要的模型id',
+  `psi_id` varchar(128) DEFAULT '0' COMMENT '工作流节点需要的psi的id',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='工作流任务运行状态';
 
 /*Data for the table `mo_workflow_run_status_task` */
 
+/*Table structure for table `mo_workflow_run_task_result` */
 
-/*Table structure for table `mo_workflow_run_status_payment_method` */
+DROP TABLE IF EXISTS `mo_workflow_run_task_result`;
 
-DROP TABLE IF EXISTS `mo_workflow_run_status_payment_method`;
+CREATE TABLE `mo_workflow_run_task_result` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
+  `identity_id` varchar(128) NOT NULL COMMENT '所属组织',
+  `task_id` varchar(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
+  `file_name` varchar(128) NOT NULL COMMENT '任务结果文件的名称',
+  `metadata_id` varchar(128) NOT NULL COMMENT '任务结果文件的元数据Id <系统默认生成的元数据>',
+  `origin_id` varchar(128) NOT NULL COMMENT '任务结果文件的原始文件Id',
+  `ip` varchar(32) NOT NULL COMMENT '任务结果文件所在的 数据服务内网ip',
+  `port` varchar(8) NOT NULL COMMENT '任务结果文件所在的 数据服务内网port',
+  `data_type` int NOT NULL DEFAULT '0' COMMENT '原始数据类型 (文件类型)',
+  `metadata_option` text COMMENT '元数据的选项，和 data_type 配套使用',
+  `extra` varchar(2048) DEFAULT NULL COMMENT '任务结果文件扩展',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='工作流任务运行状态';
 
-CREATE TABLE `mo_workflow_run_status_payment_method` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID(自增长)',
-    `workflow_run_id` bigint NOT NULL COMMENT '工作流运行状态ID',
-    `meta_data_id` VARCHAR(200) NOT NULL COMMENT '对应元数据ID,hash',
-    `type` TINYINT NOT NULL  COMMENT '合约类型: 0-erc20,1-erc721',
-    `token_address` varchar(64) NOT NULL COMMENT '合约地址',
-    `token_id` varchar(128) NOT NULL COMMENT '721下合约token id',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB COMMENT='工作流运行状态对应支付方式';
-
-/*Data for the table `mo_workflow_run_status_payment_method` */
-
+/*Data for the table `mo_workflow_run_task_result` */
 
 /*Table structure for table `mo_workflow_setting_expert` */
 
 DROP TABLE IF EXISTS `mo_workflow_setting_expert`;
 
 CREATE TABLE `mo_workflow_setting_expert` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
-    `workflow_id` bigint DEFAULT NULL COMMENT '工作流id',
-    `workflow_version` bigint NOT NULL DEFAULT '1' COMMENT '工作流版本号',
-    `node_step` int DEFAULT '1' COMMENT '工作流中节点的顺序,从1开始',
-    `node_name` varchar(30)  DEFAULT NULL COMMENT '节点名称',
-    `psi_task_step` int DEFAULT NULL COMMENT '工作流任务步骤',
-    `task_step` int NOT NULL COMMENT '工作流任务步骤',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_NODE_STEP` (`workflow_id`,`workflow_version`,`node_step`)
-) ENGINE=InnoDB  COMMENT='工作流专家模式节点表';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流节点表ID(自增长)',
+  `workflow_id` bigint DEFAULT NULL COMMENT '工作流id',
+  `workflow_version` bigint NOT NULL DEFAULT '1' COMMENT '工作流版本号',
+  `node_step` int DEFAULT '1' COMMENT '工作流中节点的顺序,从1开始',
+  `node_name` varchar(30) DEFAULT NULL COMMENT '节点名称',
+  `psi_task_step` int DEFAULT NULL COMMENT '工作流任务步骤',
+  `task_step` int NOT NULL COMMENT '工作流任务步骤',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_NODE_STEP` (`workflow_id`,`workflow_version`,`node_step`)
+) ENGINE=InnoDB COMMENT='工作流专家模式节点表';
 
 /*Data for the table `mo_workflow_setting_expert` */
 
@@ -809,20 +901,20 @@ CREATE TABLE `mo_workflow_setting_expert` (
 DROP TABLE IF EXISTS `mo_workflow_setting_wizard`;
 
 CREATE TABLE `mo_workflow_setting_wizard` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流步骤表ID(自增长)',
-    `workflow_id` bigint DEFAULT NULL COMMENT '工作流id',
-    `workflow_version` bigint NOT NULL DEFAULT '1' COMMENT '工作流版本号',
-    `step` int DEFAULT '1' COMMENT '当前步骤,从1开始',
-    `calculation_process_step_type` int DEFAULT '1' COMMENT '部署说明. 0-选择训练输入数据, 1-选择预测输入数据, 2-选择PSI输入数据, 3-选择计算环境(通用), 4-选择计算环境(训练&预测), 5-选择结果接收方(通用), 6-选择结果接收方(训练&预测)',
-    `task_1_step` int DEFAULT NULL COMMENT '任务1对应的步骤',
-    `task_2_step` int DEFAULT NULL COMMENT '任务2对应的步骤',
-    `task_3_step` int DEFAULT NULL COMMENT '任务3对应的步骤',
-    `task_4_step` int DEFAULT NULL COMMENT '任务4对应的步骤',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `UK_NODE_STEP` (`workflow_id`,`workflow_version`,`step`)
-) ENGINE=InnoDB  COMMENT='工作流向导模式步骤表';
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流步骤表ID(自增长)',
+  `workflow_id` bigint DEFAULT NULL COMMENT '工作流id',
+  `workflow_version` bigint NOT NULL DEFAULT '1' COMMENT '工作流版本号',
+  `step` int DEFAULT '1' COMMENT '当前步骤,从1开始',
+  `calculation_process_step_type` int DEFAULT '1' COMMENT '部署说明. 0-选择训练输入数据, 1-选择预测输入数据, 2-选择PSI输入数据, 3-选择计算环境(通用), 4-选择计算环境(训练&预测), 5-选择结果接收方(通用), 6-选择结果接收方(训练&预测)',
+  `task_1_step` int DEFAULT NULL COMMENT '任务1对应的步骤',
+  `task_2_step` int DEFAULT NULL COMMENT '任务2对应的步骤',
+  `task_3_step` int DEFAULT NULL COMMENT '任务3对应的步骤',
+  `task_4_step` int DEFAULT NULL COMMENT '任务4对应的步骤',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_NODE_STEP` (`workflow_id`,`workflow_version`,`step`)
+) ENGINE=InnoDB COMMENT='工作流向导模式步骤表';
 
 /*Data for the table `mo_workflow_setting_wizard` */
 
@@ -831,25 +923,25 @@ CREATE TABLE `mo_workflow_setting_wizard` (
 DROP TABLE IF EXISTS `mo_workflow_task`;
 
 CREATE TABLE `mo_workflow_task` (
-    `workflow_task_id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流任务配置id',
-    `workflow_id` bigint NOT NULL COMMENT '工作流ID',
-    `workflow_version` bigint DEFAULT '1' COMMENT '编辑版本标识,从1开始',
-    `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
-    `algorithm_id` bigint DEFAULT NULL COMMENT '算法id',
-    `identity_id` varchar(128)  DEFAULT NULL COMMENT '任务发启放组织id',
-    `input_model` int NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
-    `input_model_id` varchar(128)  DEFAULT NULL COMMENT '工作流节点需要的模型id',
-    `input_model_step` int DEFAULT NULL COMMENT '工作流节点需要的模型产生的步骤',
-    `input_psi` int NOT NULL DEFAULT '0' COMMENT '是否需要输入PSI: 0-否，1:是',
-    `input_psi_step` int DEFAULT NULL COMMENT '工作流节点需要的psi产生步骤',
-	`power_type` INT DEFAULT NULL COMMENT '算力提供方式 0-随机 1-指定',
-	`power_identity_id` VARCHAR(128) DEFAULT NULL COMMENT '算力提供组织',
-    `enable` tinyint NOT NULL DEFAULT '1' COMMENT '是否可用: 0-否，1:是',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_task_id`),
-    UNIQUE KEY `UK_WF_TASK` (`workflow_id`,`workflow_version`,`step`)
-) ENGINE=InnoDB  COMMENT='工作流任务配置表';
+  `workflow_task_id` bigint NOT NULL AUTO_INCREMENT COMMENT '工作流任务配置id',
+  `workflow_id` bigint NOT NULL COMMENT '工作流ID',
+  `workflow_version` bigint DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+  `step` int DEFAULT '1' COMMENT '工作流中任务的顺序,从1开始',
+  `algorithm_id` bigint DEFAULT NULL COMMENT '算法id',
+  `identity_id` varchar(128) DEFAULT NULL COMMENT '任务发启放组织id',
+  `input_model` int NOT NULL DEFAULT '0' COMMENT '是否需要输入模型: 0-否，1:是',
+  `input_model_id` varchar(128) DEFAULT NULL COMMENT '工作流节点需要的模型id',
+  `input_model_step` int DEFAULT NULL COMMENT '工作流节点需要的模型产生的步骤',
+  `input_psi` int NOT NULL DEFAULT '0' COMMENT '是否需要输入PSI: 0-否，1:是',
+  `input_psi_step` int DEFAULT NULL COMMENT '工作流节点需要的psi产生步骤',
+  `power_type` int DEFAULT NULL COMMENT '算力提供方式 0-随机 1-指定',
+  `power_identity_id` varchar(128) DEFAULT NULL COMMENT '算力提供组织',
+  `enable` tinyint NOT NULL DEFAULT '1' COMMENT '是否可用: 0-否，1:是',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_task_id`),
+  UNIQUE KEY `UK_WF_TASK` (`workflow_id`,`workflow_version`,`step`)
+) ENGINE=InnoDB COMMENT='工作流任务配置表';
 
 /*Data for the table `mo_workflow_task` */
 
@@ -858,18 +950,18 @@ CREATE TABLE `mo_workflow_task` (
 DROP TABLE IF EXISTS `mo_workflow_task_input`;
 
 CREATE TABLE `mo_workflow_task_input` (
-    `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
-    `meta_data_id` varchar(128)  NOT NULL COMMENT '数据表ID',
-    `identity_id` varchar(128)  NOT NULL COMMENT '组织的身份标识Id',
-    `key_column` bigint DEFAULT NULL COMMENT 'ID列(列索引)(存id值)',
-    `dependent_variable` bigint DEFAULT NULL COMMENT '因变量(标签)(存id值)',
-    `data_column_ids` varchar(1024)  DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
-    `party_id` varchar(64)  DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
-    `sort_key` int NOT NULL DEFAULT '0' COMMENT '用于排序的字段',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_task_id`,`meta_data_id`)
-) ENGINE=InnoDB  COMMENT='工作流任务输入表';
+  `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
+  `meta_data_id` varchar(128) NOT NULL COMMENT '数据表ID',
+  `identity_id` varchar(128) NOT NULL COMMENT '组织的身份标识Id',
+  `key_column` bigint DEFAULT NULL COMMENT 'ID列(列索引)(存id值)',
+  `dependent_variable` bigint DEFAULT NULL COMMENT '因变量(标签)(存id值)',
+  `data_column_ids` varchar(1024) DEFAULT NULL COMMENT '数据字段ID索引(存id值)',
+  `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (p0 -> pN 方 ...)',
+  `sort_key` int NOT NULL DEFAULT '0' COMMENT '用于排序的字段',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_task_id`,`meta_data_id`)
+) ENGINE=InnoDB COMMENT='工作流任务输入表';
 
 /*Data for the table `mo_workflow_task_input` */
 
@@ -878,16 +970,16 @@ CREATE TABLE `mo_workflow_task_input` (
 DROP TABLE IF EXISTS `mo_workflow_task_output`;
 
 CREATE TABLE `mo_workflow_task_output` (
-    `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
-    `identity_id` varchar(128)  NOT NULL COMMENT '协同方组织的身份标识Id',
-    `store_pattern` tinyint DEFAULT '1' COMMENT '存储形式: 1-明文，2:密文',
-    `output_content` text  COMMENT '输出内容',
-    `party_id` varchar(64)  DEFAULT NULL COMMENT '任务里面定义的 (q0 -> qN 方 ...)',
-    `sort_key` int NOT NULL DEFAULT '0' COMMENT '用于排序的字段',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_task_id`,`identity_id`)
-) ENGINE=InnoDB  COMMENT='项目工作流节点输出表';
+  `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
+  `identity_id` varchar(128) NOT NULL COMMENT '协同方组织的身份标识Id',
+  `store_pattern` tinyint DEFAULT '1' COMMENT '存储形式: 1-明文，2:密文',
+  `output_content` text COMMENT '输出内容',
+  `party_id` varchar(64) DEFAULT NULL COMMENT '任务里面定义的 (q0 -> qN 方 ...)',
+  `sort_key` int NOT NULL DEFAULT '0' COMMENT '用于排序的字段',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_task_id`,`identity_id`)
+) ENGINE=InnoDB COMMENT='项目工作流节点输出表';
 
 /*Data for the table `mo_workflow_task_output` */
 
@@ -896,16 +988,16 @@ CREATE TABLE `mo_workflow_task_output` (
 DROP TABLE IF EXISTS `mo_workflow_task_resource`;
 
 CREATE TABLE `mo_workflow_task_resource` (
-    `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
-    `cost_mem` bigint DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
-    `cost_cpu` int DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
-    `cost_gpu` int DEFAULT NULL COMMENT 'GPU核数(单位：核)',
-    `cost_bandwidth` bigint DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
-    `run_time` bigint DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_task_id`)
-) ENGINE=InnoDB  COMMENT='工作流任务资源表';
+  `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
+  `cost_mem` bigint DEFAULT NULL COMMENT '所需的内存 (单位: byte)',
+  `cost_cpu` int DEFAULT NULL COMMENT '所需的核数 (单位: 个)',
+  `cost_gpu` int DEFAULT NULL COMMENT 'GPU核数(单位：核)',
+  `cost_bandwidth` bigint DEFAULT '0' COMMENT '所需的带宽 (单位: bps)',
+  `run_time` bigint DEFAULT NULL COMMENT '所需的运行时长 (单位: ms)',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_task_id`)
+) ENGINE=InnoDB COMMENT='工作流任务资源表';
 
 /*Data for the table `mo_workflow_task_resource` */
 
@@ -914,13 +1006,13 @@ CREATE TABLE `mo_workflow_task_resource` (
 DROP TABLE IF EXISTS `mo_workflow_task_variable`;
 
 CREATE TABLE `mo_workflow_task_variable` (
-    `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
-    `var_key` varchar(128)  NOT NULL COMMENT '变量key',
-    `var_value` varchar(128)  NOT NULL COMMENT '变量值',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_task_id`,`var_key`)
-) ENGINE=InnoDB  COMMENT='工作流任务变量表';
+  `workflow_task_id` bigint NOT NULL COMMENT '工作流任务配置id',
+  `var_key` varchar(128) NOT NULL COMMENT '变量key',
+  `var_value` varchar(128) NOT NULL COMMENT '变量值',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_task_id`,`var_key`)
+) ENGINE=InnoDB COMMENT='工作流任务变量表';
 
 /*Data for the table `mo_workflow_task_variable` */
 
@@ -929,14 +1021,15 @@ CREATE TABLE `mo_workflow_task_variable` (
 DROP TABLE IF EXISTS `mo_workflow_version`;
 
 CREATE TABLE `mo_workflow_version` (
-    `workflow_id` bigint NOT NULL COMMENT '工作流ID',
-    `workflow_version` bigint NOT NULL DEFAULT '1' COMMENT '编辑版本标识,从1开始',
-    `workflow_version_name` varchar(128)  DEFAULT NULL COMMENT '工作流版本名称',
-    `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`workflow_id`,`workflow_version`),
-    UNIQUE KEY `UK_id_name` (`workflow_id`,`workflow_version_name`)
-) ENGINE=InnoDB  COMMENT='工作流不同版本设置表';
+  `workflow_id` bigint NOT NULL COMMENT '工作流ID',
+  `workflow_version` bigint NOT NULL DEFAULT '1' COMMENT '编辑版本标识,从1开始',
+  `workflow_version_name` varchar(128) DEFAULT NULL COMMENT '工作流版本名称',
+  `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态: 0-待支付、1-支付中、2-已支付、3-运行中、4-运行成功、5-运行失败',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`workflow_id`,`workflow_version`),
+  UNIQUE KEY `UK_id_name` (`workflow_id`,`workflow_version_name`)
+) ENGINE=InnoDB COMMENT='工作流不同版本设置表';
 
 /*Data for the table `mo_workflow_version` */
+

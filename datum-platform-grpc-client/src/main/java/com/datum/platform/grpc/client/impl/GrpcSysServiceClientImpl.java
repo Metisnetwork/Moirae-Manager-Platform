@@ -38,7 +38,6 @@ public class GrpcSysServiceClientImpl implements GrpcSysServiceClient {
                     throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.METADATA_RESULT_DOWNLOAD_ERROR.getMsg(), e);
                 }
             }
-            downloadTaskResultDataResponse.getContent().toByteArray();
         });
         outputStream.flush();
         outputStream.close();
