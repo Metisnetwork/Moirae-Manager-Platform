@@ -6,7 +6,7 @@ package carrier.types;
 
 
 message SimpleResponse {
-  // the code for response
+  // the code for response; 0: SUCCESS
   int32 status = 1;
   // the message for response
   string msg = 2;
