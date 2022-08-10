@@ -102,14 +102,17 @@
                mmdc.token_id,
                mmdc.is_support_pt_alg,
                mmdc.is_support_ct_alg,
+               mmdc.erc20_pt_alg_consume,
+               mmdc.erc20_ct_alg_consume,
                mmdc.characteristic,
                mmdc.create_time,
                mmdc.update_time,
                mt.name as tokenName,
                mt.symbol as tokenSymbol,
                mt.`decimal` as tokenDecimal,
-               mmdcu.balance,
-               mmdcu.authorize_balance
+               mmdcu.balance as tokenBalance,
+               mmdcu.authorize_balance,
+               mmdcu.address as userAddress
         from mo_meta_data_certificate mmdc left join mo_token mt on mmdc.token_address = mt.address
             inner join mo_meta_data_certificate_user mmdcu on mmdc.id = mmdcu.meta_data_certificate_id
         where mmdc.id in

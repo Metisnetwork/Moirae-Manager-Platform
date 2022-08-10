@@ -98,6 +98,8 @@ public class MetaDataCertificate implements Serializable {
     @TableField(exist = false)
     private Long tokenDecimal;
     @TableField(exist = false)
+    private String userAddress;
+    @TableField(exist = false)
     private String tokenBalance;
     @TableField(exist = false)
     private String authorizeBalance;

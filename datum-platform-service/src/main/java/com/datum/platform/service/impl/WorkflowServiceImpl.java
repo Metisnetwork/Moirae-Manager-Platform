@@ -1683,6 +1683,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                     metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);
                 }
                 if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+                    if(!metaDataId2consumptionMap.containsKey(taskInput.getMetaDataId())){
+                        metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);
+                    }
                     metaDataId2consumptionMap.computeIfPresent(taskInput.getMetaDataId(), (key, oldValue) -> {
                         if ( workflowTask.getAlgorithm().getType() == AlgorithmTypeEnum.CT){
                             return oldValue.add(new BigInteger(metaDataCertificate.getErc20CtAlgConsume()));
@@ -1761,8 +1764,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowFeeItemDto workflowFeeItemDto = new WorkflowFeeItemDto();
         workflowFeeItemDto.setType(typeEnum);
         workflowFeeItemDto.setNeedValue(needValue);
-        workflowFeeItemDto.setToken(BeanUtil.copyProperties(metaDataCertificate, TokenDto.class));
-        workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(metaDataCertificate, TokenHolderDto.class));
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setName(metaDataCertificate.getTokenName());
+        tokenDto.setAddress(metaDataCertificate.getTokenAddress());
+        tokenDto.setDecimal(metaDataCertificate.getTokenDecimal().intValue());
+        tokenDto.setSymbol(metaDataCertificate.getTokenSymbol());
+        workflowFeeItemDto.setToken(tokenDto);
+        TokenHolderDto tokenHolderDto = new TokenHolderDto();
+        tokenHolderDto.setAddress(metaDataCertificate.getUserAddress());
+        tokenHolderDto.setBalance(metaDataCertificate.getTokenBalance());
+        tokenHolderDto.setAuthorizeBalance(metaDataCertificate.getAuthorizeBalance());
+        workflowFeeItemDto.setTokenHolder(tokenHolderDto);
         workflowFeeItemDto.setIsEnough(
                 new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0
                         && new BigDecimal(workflowFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0);
