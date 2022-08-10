@@ -180,9 +180,7 @@ public class DataServiceImpl implements DataService {
         }
 
         for (MetaDataCertificate metaDataCertificate: metaDataCertificateList) {
-            if(!metaDataCertificateManager.existNoAttributes(metaDataCertificate.getMetaDataId(), metaDataCertificate.getTokenAddress())){
-                metaDataCertificateManager.save(metaDataCertificate);
-            }
+            metaDataCertificateManager.saveOrSelectUpdate(metaDataCertificate);
         }
     }
 

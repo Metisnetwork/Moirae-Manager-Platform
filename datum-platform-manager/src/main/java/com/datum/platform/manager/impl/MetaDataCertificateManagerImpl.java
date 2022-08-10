@@ -10,6 +10,7 @@ import com.datum.platform.manager.MetaDataCertificateManager;
 import com.datum.platform.mapper.MetaDataCertificateMapper;
 import com.datum.platform.mapper.domain.MetaDataCertificate;
 import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,5 +124,28 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
     @Override
     public List<String> listMetaDataIdByIds(List<Long> metaDataCertificateIdList) {
         return this.baseMapper.listMetaDataIdByIds(metaDataCertificateIdList);
+    }
+
+    @Override
+    public void saveOrSelectUpdate(MetaDataCertificate metaDataCertificate) {
+        LambdaQueryWrapper<MetaDataCertificate> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaDataCertificate::getMetaDataId, metaDataCertificate.getMetaDataId());
+        queryWrapper.eq(MetaDataCertificate::getTokenAddress, metaDataCertificate.getTokenAddress());
+        queryWrapper.eq(MetaDataCertificate::getType, MetaDataCertificateTypeEnum.NO_ATTRIBUTES);
+
+        MetaDataCertificate db = getOne(queryWrapper);
+        // 不存在信息
+        if(db == null){
+            save(metaDataCertificate);
+        }
+
+        // 存在的是设置不同则更新
+        if(db != null && (!StringUtils.equals(db.getErc20CtAlgConsume(), metaDataCertificate.getErc20CtAlgConsume()) || !StringUtils.equals(db.getErc20PtAlgConsume(), metaDataCertificate.getErc20PtAlgConsume())) ){
+            LambdaUpdateWrapper<MetaDataCertificate> updateWrapper = Wrappers.lambdaUpdate();
+            updateWrapper.set(MetaDataCertificate::getErc20CtAlgConsume, metaDataCertificate.getErc20CtAlgConsume());
+            updateWrapper.set(MetaDataCertificate::getErc20PtAlgConsume, metaDataCertificate.getErc20PtAlgConsume());
+            updateWrapper.eq(MetaDataCertificate::getId, db.getId());
+            update(updateWrapper);
+        }
     }
 }

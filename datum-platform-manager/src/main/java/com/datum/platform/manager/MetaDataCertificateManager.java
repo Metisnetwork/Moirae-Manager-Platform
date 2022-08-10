@@ -43,4 +43,6 @@ public interface MetaDataCertificateManager extends IService<MetaDataCertificate
     List<MetaDataCertificate> listByMetaDataId(String metaDataId);
 
     List<String> listMetaDataIdByIds(List<Long> metaDataCertificateIdList);
+
+    void saveOrSelectUpdate(MetaDataCertificate metaDataCertificate);
 }
