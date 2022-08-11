@@ -1288,6 +1288,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         JSONObject dataFlowPolicyOption;
+        JSONObject algorithmPolicyOption;
         TaskDataFlowPolicyTypesEnum dataFlowPolicyType;
         // 连接策略
         if(algorithm.getAlgorithmId() == sysConfig.getDefaultPsi()){
@@ -1301,8 +1302,10 @@ public class WorkflowServiceImpl implements WorkflowService {
              *    ↓                 ↓
              *  result1           result2
              */
+
             dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
             dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList, workflowTaskOutputList);
+            algorithmPolicyOption = createAlgorithmFlowPolicy(workflowTaskInputList, workflowTaskOutputList);
         } else if(algorithm.getType() == AlgorithmTypeEnum.PT && algorithm.getInputModel() == false){
             /**
              * 明文训练算法网络连接:
@@ -1315,6 +1318,7 @@ public class WorkflowServiceImpl implements WorkflowService {
              */
             dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
             dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList.get(0).getPartyId(), Optional.empty(), workflowTaskOutputList.stream().map(WorkflowTaskOutput::getPartyId).collect(Collectors.toList()));
+            algorithmPolicyOption = dataFlowPolicyOption;
         } else if(algorithm.getType() == AlgorithmTypeEnum.PT && algorithm.getInputModel() == false){
             /**
              * 明文预测算法网络连接:
@@ -1327,10 +1331,12 @@ public class WorkflowServiceImpl implements WorkflowService {
              */
             dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
             dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList.get(0).getPartyId(), Optional.of(modelPartyId), workflowTaskOutputList.stream().map(WorkflowTaskOutput::getPartyId).collect(Collectors.toList()));
+            algorithmPolicyOption = dataFlowPolicyOption;
         } else {
             // 其他全连接
             dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_1;
             dataFlowPolicyOption = createDataFlowPolicy();
+            algorithmPolicyOption = dataFlowPolicyOption;
         }
         requestBuild.addDataFlowPolicyTypes(dataFlowPolicyType.getValue());
         requestBuild.addDataFlowPolicyOptions(dataFlowPolicyOption.toJSONString());
@@ -1353,7 +1359,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         boolean useAlignment =  workflowTaskInputList.stream()
                 .filter(item-> StringUtils.isNotBlank(item.getDataColumnIds()))
                 .count() > 0 ? true : false;
-        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(calculateContractStruct, useAlignment, workflowTask.getInputPsi(), dependentVariableWorkflowTaskInput, Optional.ofNullable(modelPartyId), workflowTaskVariableList, algorithm, dataFlowPolicyOption));
+
+
+        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(calculateContractStruct, useAlignment, workflowTask.getInputPsi(), dependentVariableWorkflowTaskInput, Optional.ofNullable(modelPartyId), workflowTaskVariableList, algorithm, algorithmPolicyOption));
 
         // 其他设置
         requestBuild.setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()));
@@ -1401,6 +1409,27 @@ public class WorkflowServiceImpl implements WorkflowService {
                 value1.add(workflowTaskOutputMap.get(workflowTaskInput.getIdentityId()).getPartyId());
             }
             connectPolicy.put(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"),value1);
+        }
+        return connectPolicy;
+    }
+
+    private JSONObject createAlgorithmFlowPolicy(List<WorkflowTaskInput> inputList, List<WorkflowTaskOutput> outputList) {
+        JSONObject connectPolicy = new JSONObject();
+        // data -> compute 连接
+        Map<String, WorkflowTaskInput> workflowTaskInputMap = new HashMap<>();
+        for (WorkflowTaskInput workflowTaskInput : inputList) {
+            JSONArray value1 = new JSONArray();
+            value1.add(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"));
+            connectPolicy.put(workflowTaskInput.getPartyId(),value1 );
+            workflowTaskInputMap.put(workflowTaskInput.getIdentityId(), workflowTaskInput);
+        }
+        // compute -> result 连接
+        for (WorkflowTaskOutput workflowTaskOutput: outputList) {
+            WorkflowTaskInput workflowTaskInput = workflowTaskInputMap.get(workflowTaskOutput.getIdentityId());
+
+            JSONArray value1 = new JSONArray();
+            value1.add(workflowTaskOutput.getPartyId());
+            connectPolicy.put(StringUtils.replace(workflowTaskInput.getPartyId(), "data", "compute"), value1);
         }
         return connectPolicy;
     }
