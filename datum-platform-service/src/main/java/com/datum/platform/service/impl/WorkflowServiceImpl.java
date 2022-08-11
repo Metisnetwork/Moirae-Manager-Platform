@@ -8,6 +8,7 @@ import carrier.types.Taskdata;
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.common.constants.SysConfig;
@@ -1518,7 +1519,9 @@ public class WorkflowServiceImpl implements WorkflowService {
             consume.setTokenId(workflowRunStatusCertificate.getTokenId());
         }
         dataPolicy.setConsume(consume);
-        return JSONObject.toJSONString(dataPolicy);
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("consume");
+        return JSONObject.toJSONString(dataPolicy, filter);
     }
 
     private String createDataPolicyItem(WorkflowTaskInput workflowTaskInput, String preStepTaskId) {
@@ -1730,9 +1733,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                         requestBuilder.addTkItems(tokenItem);
                     });
                     //TODO
-//                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
-//                    return BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice()));
-                    return new BigInteger("10000000000000000");
+                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
+                    return BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice()));
                 })
                 .reduce((item1, item2) -> item1.add(item2) ).get();
         tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(), wLatCredentialDto));
