@@ -1729,12 +1729,13 @@ public class WorkflowServiceImpl implements WorkflowService {
                         }
                         requestBuilder.addTkItems(tokenItem);
                     });
-
-                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
-                    return BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice()));
+                    //TODO
+//                    TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
+//                    return BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice()));
+                    return new BigInteger("10000000000000000");
                 })
                 .reduce((item1, item2) -> item1.add(item2) ).get();
-        tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(),wLatCredentialDto));
+        tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(), wLatCredentialDto));
         return tokenFeeList;
     }
 
@@ -1752,8 +1753,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowFeeItemDto workflowFeeItemDto = new WorkflowFeeItemDto();
         workflowFeeItemDto.setType(typeEnum);
         workflowFeeItemDto.setNeedValue(needValue);
-        workflowFeeItemDto.setToken(BeanUtil.copyProperties(metaDataCertificate, TokenDto.class));
-        workflowFeeItemDto.setTokenHolder(BeanUtil.copyProperties(metaDataCertificate, TokenHolderDto.class));
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setName(metaDataCertificate.getTokenName());
+        tokenDto.setAddress(metaDataCertificate.getTokenAddress());
+        tokenDto.setDecimal(metaDataCertificate.getTokenDecimal().intValue());
+        tokenDto.setSymbol(metaDataCertificate.getTokenSymbol());
+        workflowFeeItemDto.setToken(tokenDto);
+        TokenHolderDto tokenHolderDto = new TokenHolderDto();
+        tokenHolderDto.setAddress(UserContext.getCurrentUser().getAddress());
+        tokenHolderDto.setBalance(metaDataCertificate.getTokenBalance());
+        tokenHolderDto.setAuthorizeBalance(metaDataCertificate.getAuthorizeBalance());
+        workflowFeeItemDto.setTokenHolder(tokenHolderDto);
         workflowFeeItemDto.setIsEnough(
                 new BigDecimal(workflowFeeItemDto.getTokenHolder().getBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0
                         && new BigDecimal(workflowFeeItemDto.getTokenHolder().getAuthorizeBalance()).compareTo(new BigDecimal(workflowFeeItemDto.getNeedValue())) >= 0);
