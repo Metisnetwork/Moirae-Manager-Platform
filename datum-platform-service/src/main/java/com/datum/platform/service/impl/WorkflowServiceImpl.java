@@ -1728,7 +1728,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                         if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
                             tokenItem.setValue(item.getAlgorithm().getType() == AlgorithmTypeEnum.CT? metaDataCertificate.getErc20CtAlgConsume(): metaDataCertificate.getErc20PtAlgConsume());
                         }else{
-                            tokenItem.setId(Long.valueOf(metaDataCertificate.getTokenId()));
+                            tokenItem.setId(metaDataCertificate.getTokenId());
                         }
                         requestBuilder.addTkItems(tokenItem);
                     });

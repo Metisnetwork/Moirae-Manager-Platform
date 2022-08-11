@@ -91,7 +91,7 @@ message EstimateTaskGasRequest {
 message TkItem {
   common.constant.TkType          tk_type = 1;                       // tk类型
   string                          tk_address = 2;                    // tk合约地址
-  uint64                          id  = 3;                           // available if tk_type=Tk1155 or Tk721
+  string                          id  = 3;                           // available if tk_type=Tk1155 or Tk721
   string                          value = 4;                         // tk value
 }
 
