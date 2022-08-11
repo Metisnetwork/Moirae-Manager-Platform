@@ -30,7 +30,7 @@ public class TaskDataPolicyHaveConsume {
             Consume consume = new Consume();
             consume.setConsumeType(consumeTypes.get(0));
             consume.setTokenAddress(jsonObject.getString("contract").toLowerCase());
-            consume.setTokenId(jsonObject.getString("takenId"));
+            consume.setTokenId(jsonObject.getString("tokenId"));
             return Optional.of(consume);
         }
         return Optional.empty();
@@ -49,7 +49,7 @@ public class TaskDataPolicyHaveConsume {
         if(consume.consumeType == 3){
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("contract", consume.getTokenAddress());
-            jsonObject.put("takenId", consume.getTokenId());
+            jsonObject.put("tokenId", consume.getTokenId());
             consumeTypes = new ArrayList<>();
             consumeOptions = new ArrayList<>();
             consumeTypes.add(3);
