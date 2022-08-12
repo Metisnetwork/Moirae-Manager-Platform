@@ -1473,7 +1473,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowTaskInputList.stream().forEach( workflowTaskInput -> {
                 JSONArray value = new JSONArray();
                 Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(columnId -> {
-                    value.add( dataService.getDataColumnByIds(workflowTaskInput.getMetaDataId(), Integer.valueOf(columnId)));
+                    value.add( dataService.getDataColumnByIds(workflowTaskInput.getMetaDataId(), Integer.valueOf(columnId)).getColumnName());
                 });
                 calcIvColumns.put(workflowTaskInput.getPartyId(), value);
             });
