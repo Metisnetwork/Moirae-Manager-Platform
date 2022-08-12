@@ -89,7 +89,7 @@ public class SyncDcTaskTask {
             Map<String, Taskdata.TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
             for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
                 TaskDataProvider taskDataProvider = new TaskDataProvider();
-                if(information.getDataPolicyTypesList().get(i) == TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue()){
+                if(information.getDataPolicyTypesList().get(i).compareTo(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue()) == 0){
                     TaskDataPolicyPreTask dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyPreTask.class);
                     taskDataProvider.setTaskId(information.getTaskId());
                     taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
