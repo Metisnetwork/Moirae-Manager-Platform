@@ -1469,12 +1469,13 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         // 存储所有数据提供方的selected_columns，目的是给结果方使用
         if(algorithmDynamicParams.containsKey("calc_iv_columns")){
+            JSONObject calcIvColumns = algorithmDynamicParams.getJSONObject("calc_iv_columns");
             workflowTaskInputList.stream().forEach( workflowTaskInput -> {
                 JSONArray value = new JSONArray();
                 Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(columnId -> {
                     value.add( dataService.getDataColumnByIds(workflowTaskInput.getMetaDataId(), Integer.valueOf(columnId)));
                 });
-                algorithmDynamicParams.put(workflowTaskInput.getPartyId(), value);
+                calcIvColumns.put(workflowTaskInput.getPartyId(), value);
             });
         }
         return algorithmDynamicParams.toJSONString();
