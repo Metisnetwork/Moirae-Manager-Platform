@@ -1361,7 +1361,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .count() > 0 ? true : false;
 
 
-        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(calculateContractStruct, useAlignment, workflowTask.getInputPsi(), dependentVariableWorkflowTaskInput, Optional.ofNullable(modelPartyId), workflowTaskVariableList, algorithm, algorithmPolicyOption));
+        requestBuild.setAlgorithmCodeExtraParams(createAlgorithmCodeExtraParams(calculateContractStruct, useAlignment, workflowTask.getInputPsi(), dependentVariableWorkflowTaskInput, Optional.ofNullable(modelPartyId), workflowTaskVariableList, algorithm, algorithmPolicyOption, workflowTaskInputList));
 
         // 其他设置
         requestBuild.setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()));
@@ -1434,7 +1434,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         return connectPolicy;
     }
 
-    private String createAlgorithmCodeExtraParams(String calculateContractStruct, Boolean useAlignment, Boolean usePsi, Optional<WorkflowTaskInput> dependentVariableWorkflowTaskInputOptional, Optional<String> modelPartyIdOptional, List<WorkflowTaskVariable> variableList, Algorithm algorithm,JSONObject dataFlowRestrict) {
+    private String createAlgorithmCodeExtraParams(String calculateContractStruct, Boolean useAlignment, Boolean usePsi, Optional<WorkflowTaskInput> dependentVariableWorkflowTaskInputOptional, Optional<String> modelPartyIdOptional, List<WorkflowTaskVariable> variableList, Algorithm algorithm,JSONObject dataFlowRestrict, List<WorkflowTaskInput> workflowTaskInputList) {
         JSONObject algorithmDynamicParams = JSONObject.parseObject(calculateContractStruct);
         // psi时是否对齐
         if(algorithmDynamicParams.containsKey("use_alignment")){
@@ -1465,6 +1465,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 连接方式
         if(algorithmDynamicParams.containsKey("data_flow_restrict")){
             algorithmDynamicParams.put("data_flow_restrict", dataFlowRestrict);
+        }
+
+        // 存储所有数据提供方的selected_columns，目的是给结果方使用
+        if(algorithmDynamicParams.containsKey("calc_iv_columns")){
+            workflowTaskInputList.stream().forEach( workflowTaskInput -> {
+                JSONArray value = new JSONArray();
+                Arrays.stream(workflowTaskInput.getDataColumnIds().split(",")).forEach(columnId -> {
+                    value.add( dataService.getDataColumnByIds(workflowTaskInput.getMetaDataId(), Integer.valueOf(columnId)));
+                });
+                algorithmDynamicParams.put(workflowTaskInput.getPartyId(), value);
+            });
         }
         return algorithmDynamicParams.toJSONString();
     }
