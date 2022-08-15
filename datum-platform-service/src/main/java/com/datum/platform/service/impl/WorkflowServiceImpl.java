@@ -1319,7 +1319,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             dataFlowPolicyType = TaskDataFlowPolicyTypesEnum.POLICY_TYPES_2;
             dataFlowPolicyOption = createDataFlowPolicy(workflowTaskInputList.get(0).getPartyId(), Optional.empty(), workflowTaskOutputList.stream().map(WorkflowTaskOutput::getPartyId).collect(Collectors.toList()));
             algorithmPolicyOption = dataFlowPolicyOption;
-        } else if(algorithm.getType() == AlgorithmTypeEnum.PT && algorithm.getInputModel() == false){
+        } else if(algorithm.getType() == AlgorithmTypeEnum.PT && algorithm.getInputModel() == true){
             /**
              * 明文预测算法网络连接:
              *
