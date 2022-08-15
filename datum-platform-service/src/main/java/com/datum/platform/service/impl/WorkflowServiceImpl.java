@@ -800,7 +800,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     req.getWorkflowId(), req.getWorkflowVersion(), taskStep++,
                     algorithmClassify.getId(), algorithmClassify.getAlg().getInputModel(),
                     algorithmClassify.getAlg().getInputModel() && ( nodeDto.getNodeInput().getModel() == null || "frontNodeOutput".equals(nodeDto.getNodeInput().getModel().getMetaDataId())) ? preStep : null,
-                    nodeDto.getNodeInput().getIsPsi(), algorithmClassify.getAlg().getSupportDefaultPsi() ? psiWorkflowTask.getStep() : null,
+                    algorithmClassify.getAlg().getSupportDefaultPsi() ? nodeDto.getNodeInput().getIsPsi() : false, algorithmClassify.getAlg().getSupportDefaultPsi() ? psiWorkflowTask.getStep() : null,
                     algorithmClassify.getAlg().getType() == AlgorithmTypeEnum.PT ? Optional.of(WorkflowTaskPowerTypeEnum.RANDOM) : Optional.empty());
 
             // 创建设置
