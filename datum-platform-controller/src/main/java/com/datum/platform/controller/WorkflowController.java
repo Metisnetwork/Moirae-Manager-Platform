@@ -231,10 +231,10 @@ public class WorkflowController {
 
     @GetMapping("downloadResultFile")
     @ApiOperation(value = "工作流结果文件下载", notes = "工作流结果文件下载")
-    @ApiOperationSupport(order = 21)
+    @ApiOperationSupport(order = 22)
     public void downloadResultFile(@Valid GetDataDetailsReq req, HttpServletResponse response) throws IOException{
-        workflowService.downloadTaskResultData(req.getMetaDataId(), response.getOutputStream());
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(req.getMetaDataId(), "UTF-8"));
+        response.setHeader("Content-Disposition", "attachment; filename=" + req.getMetaDataId() + ".zip");
         response.setContentType("application/octet-stream");
+        workflowService.downloadTaskResultData(req.getMetaDataId(), response.getOutputStream());
     }
 }
