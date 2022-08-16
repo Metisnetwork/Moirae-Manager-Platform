@@ -12,16 +12,15 @@ system:
   config:
     # 公共组织信息
     publicOrgList:
-      - identity: did:pid:lat1eqpf8vxz7m64j25mkmwk39t3xf8zeltxrr2nql
-        host: 192.168.10.152
+      - identity: did:pid:lat1utket7egta7kjw269zku8qxrgfypvd2ns7nuz5
+        host: 192.168.9.153
         port: 10033
-      - identity: did:pid:lat1hlh4qhk9pv33wl62w3myhw2h4mcu4eyfxax4hs
-        host: 192.168.10.153
+      - identity: did:pid:lat1uejmcfntvvpx7ddw4a28wpzr4puh8kl9248fln
+        host: 192.168.9.154
         port: 10033
-      - identity: did:pid:lat166gjn98vr5lvl3x2lsltsxjspq77arrp2szcfw
-        host: 192.168.10.154
+      - identity: did:pid:lat1jdm2tfctz6q08xjt8eztym8xtzxa5ep5x5pepk
+        host: 192.168.9.155
         port: 10033
-
 # 单Redis节点模式
 redisson:
   password: 123456
@@ -35,14 +34,13 @@ chain:
     hrp: lat
     datumNetworkPayAddress: "0x263B1D39843BF2e1DA27d827e749992fbD1f1577"
     uniswapV2Router02: "0x4378dAF745E9053f6048c4f78c803f3bC8829703"
-    voteAddress: "0xe525118e9DD588D75c2925F8DE01AFC4Fc22c391"
-    voteDeployBlockNumber: "25461949"
-    web3jProtocol: WS
-    web3jAddresses: 8.219.126.197:6790
+    voteAddress: "0x0a033cA8faA1cBB184d196a71A0BaeD76cE493cB"
+    voteDeployBlockNumber: "26092260"
+    web3jProtocol: HTTP
+    web3jAddresses: 8.219.126.197:6789
     chainName: "PlatON开发网"
     rpcUrl: https://devnetopenapi2.platon.network/rpc
     symbol: LAT
     blockExplorerUrl: https://devnetscan.platon.network/
     dexUrl: http://10.10.8.181:8080/
     tofunftUrl: https://tofunft.com/
-
