@@ -24,6 +24,7 @@ import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +86,7 @@ public class OrgServiceImpl implements OrgService {
         return channelMap.computeIfAbsent(identityId, key ->{
             OrgExpand orgExpand = orgExpandManager.getById(identityId);
 
-            if (null == orgExpand) {
+            if (null == orgExpand || StringUtils.isBlank(orgExpand.getIdentityIp()) || orgExpand.getIdentityPort() == null) {
                 log.error("Can not find organization by identityId:{}", identityId);
                 throw new BusinessException(RespCodeEnum.BIZ_EXCEPTION, ErrorMsg.ORGANIZATION_NOT_EXIST.getMsg());
             }
