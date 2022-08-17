@@ -97,4 +97,6 @@ public interface OrgService {
     IPage<OrgExpand> listAuthority(Long current, Long size);
 
     Integer countOfAuthority();
+
+    List<Org> getPowerOrgList();
 }

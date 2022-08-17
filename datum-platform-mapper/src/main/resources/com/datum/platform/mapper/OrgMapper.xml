@@ -88,4 +88,12 @@
              ) task
         where o.identity_id = #{identityId,jdbcType=VARCHAR}
     </select>
+    <select id="getPowerOrgList" resultType="com.datum.platform.mapper.domain.Org">
+        select o.node_name,
+        o.identity_id,
+        o.status,
+        o.update_at
+        from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
+        where o.status = 1 and so.org_total_core > 0
+    </select>
 </mapper>

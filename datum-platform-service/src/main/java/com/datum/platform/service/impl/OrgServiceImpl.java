@@ -290,6 +290,11 @@ public class OrgServiceImpl implements OrgService {
         return orgExpandManager.countOfAuthority();
     }
 
+    @Override
+    public List<Org> getPowerOrgList() {
+        return orgManager.getPowerOrgList();
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

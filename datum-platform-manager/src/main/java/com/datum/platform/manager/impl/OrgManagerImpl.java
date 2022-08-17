@@ -48,4 +48,9 @@ public class OrgManagerImpl extends ServiceImpl<OrgMapper, Org> implements OrgMa
     public StatsOrg getStatsOrg(String identityId) {
         return baseMapper.getStatsOrg(identityId);
     }
+
+    @Override
+    public List<Org> getPowerOrgList() {
+        return this.baseMapper.getPowerOrgList();
+    }
 }

@@ -19,4 +19,6 @@ public interface OrgManager extends IService<Org> {
     List<String> getEffectiveOrgIdList();
 
     StatsOrg getStatsOrg(String identityId);
+
+    List<Org> getPowerOrgList();
 }

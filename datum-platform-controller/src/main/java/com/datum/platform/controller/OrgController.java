@@ -78,14 +78,22 @@ public class OrgController {
 
     @GetMapping("getBaseOrgList")
     @ApiOperationSupport(order = 5)
-    @ApiOperation(value = "工作流数据输入时, 查询用户可用的组织列表", notes = "工作流数据输入时, 查询用户可用的组织列表")
+    @ApiOperation(value = "工作流数据输入时, 查询用户存在数据的组织列表", notes = "工作流数据输入时, 查询用户存在数据的组织列表")
     public ResponseVo<List<DataSelectOrgVo>> getBaseOrgList() {
         List<Org> orgList = orgService.getBaseOrgList();
         return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, DataSelectOrgVo.class));
     }
 
-    @PostMapping("joinOrg")
+    @GetMapping("getPowerOrgList")
     @ApiOperationSupport(order = 6)
+    @ApiOperation(value = "工作流数据输入时, 查询存在算力的组织列表", notes = "工作流数据输入时, 查询存在算力的组织列表")
+    public ResponseVo<List<DataSelectOrgVo>> getPowerOrgList() {
+        List<Org> orgList = orgService.getPowerOrgList();
+        return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, DataSelectOrgVo.class));
+    }
+
+    @PostMapping("joinOrg")
+    @ApiOperationSupport(order = 7)
     @ApiOperation(value = "用户加入组织", notes = "用户加入组织")
     public ResponseVo<?> joinOrg(@RequestBody @Valid JoinOrgReq req) {
         orgService.addOrganizationByUser(req.getIdentityIp(), req.getIdentityPort());
@@ -93,7 +101,7 @@ public class OrgController {
     }
 
     @PostMapping("quitOrg")
-    @ApiOperationSupport(order = 7)
+    @ApiOperationSupport(order = 8)
     @ApiOperation(value = "用户退出组织", notes = "用户退出组织")
     public ResponseVo<?> quitOrg(@RequestBody @Valid OrgIdReq req) {
         orgService.deleteOrganizationByUser(req.getIdentityId());

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.datum.platform.mapper.domain.Org;
 import com.datum.platform.mapper.domain.StatsOrg;
 
+import java.util.List;
+
 public interface OrgMapper extends BaseMapper<Org> {
 
     IPage<Org> getOrgList(Page<Org> page, String keyword, String orderBy);
@@ -13,4 +15,6 @@ public interface OrgMapper extends BaseMapper<Org> {
     Org getOrgDetails(String identityId);
 
     StatsOrg getStatsOrg(String identityId);
+
+    List<Org> getPowerOrgList();
 }

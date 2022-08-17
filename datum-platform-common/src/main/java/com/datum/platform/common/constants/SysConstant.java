@@ -72,6 +72,7 @@ public class SysConstant {
             "org/getOrgStats",
             "org/getOrgList",
             "org/getOrgDetails",
+            "org/getPowerOrgList",
             "data/getDataStats",
             "data/getDataListByOrg",
             "data/getDataList",
