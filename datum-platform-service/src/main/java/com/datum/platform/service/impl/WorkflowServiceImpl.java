@@ -1751,7 +1751,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.TOKEN, item.getValue().toString(), metaDataCertificate));
             }
         });
-        if(errorSenderList.size() > 0){
+        if(errorCertificateList.size() > 0){
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.WORKFLOW_EXECUTE_VALUE_INSUFFICIENT.getMsg(), "{}",errorCertificateList.toString()));
         }
 
