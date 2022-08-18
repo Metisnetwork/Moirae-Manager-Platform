@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * 工作流输入明细
@@ -15,15 +16,16 @@ import javax.validation.constraints.NotNull;
 public class DataInputDto {
 
     @ApiModelProperty(value = "数据提供方组织的身份标识Id", required = true)
-    @NotBlank(message = "{node.identity.id.NotBlank}")
+    @NotBlank(message = "{task.dataInput.object.identityId.NotBlank}")
     private String identityId;
 
     @ApiModelProperty(value = "元数据id")
-    @NotNull(message = "{node.input.data.table.id.NotNull}")
+    @NotBlank(message = "{task.dataInput.object.metaDataId.NotBlank}")
     private String metaDataId;
 
     @ApiModelProperty(value = "ID列(列索引)")
-    @NotNull(message = "{node.identity.name.id.column}")
+    @NotNull(message = "{task.dataInput.object.keyColumn.notNull}")
+    @Positive(message = "{task.dataInput.object.keyColumn.positive}")
     private Long keyColumn;
 
     @ApiModelProperty(value = "因变量（标签）, 训练时必填, 预测不需要")

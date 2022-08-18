@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ import java.util.List;
 public class OutputDto {
 
     @ApiModelProperty(value = "结算输入方组织的身份标识Id", required = true)
-    @NotBlank(message = "{node.identity.id.NotBlank}")
+    @Size(message = "{task.output.identityId.size}", min = 1)
     private List<String> identityId;
 
     @ApiModelProperty(value = "存储形式: 1-明文，2:密文")

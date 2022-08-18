@@ -112,7 +112,7 @@ public class WorkflowController {
     @PostMapping("wizard/settingWorkflowOfWizardMode")
     @ApiOperation(value = "向导模式设置工作流", notes = "向导模式设置工作流")
     @ApiOperationSupport(order = 7)
-    public ResponseVo<WorkflowVersionKeyDto> settingWorkflowOfWizardMode(@RequestBody @Validated WorkflowDetailsOfWizardModeDto req) {
+    public ResponseVo<WorkflowVersionKeyDto> settingWorkflowOfWizardMode(@RequestBody @Valid WorkflowDetailsOfWizardModeDto req) {
         WorkflowVersionKeyDto workflowKeyDto = workflowService.settingWorkflowOfWizardMode(req);
         return ResponseVo.createSuccess(workflowKeyDto);
     }

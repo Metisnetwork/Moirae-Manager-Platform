@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
@@ -14,7 +16,7 @@ import java.util.List;
 public class PredictionInputDto {
 
     @ApiModelProperty(value = "发起方的组织的身份标识Id", required = true)
-    @NotBlank(message = "{node.identity.id.NotBlank}")
+    @NotBlank(message = "{task.sender.NotBlank}")
     private String identityId;
 
     @ApiModelProperty(value = "是否需要做psi")
@@ -30,5 +32,7 @@ public class PredictionInputDto {
     private ModelDto model;
 
     @ApiModelProperty(value = "向导模式下预测元数据输入")
+    @Size(message = "{task.dataInput.size.equal.2}", min = 2, max = 2)
+    @Valid
     private List<DataInputDto> item;
 }

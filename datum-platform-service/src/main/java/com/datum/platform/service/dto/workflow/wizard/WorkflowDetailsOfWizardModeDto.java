@@ -6,6 +6,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -19,6 +22,8 @@ public class WorkflowDetailsOfWizardModeDto {
     private Long workflowId;
 
     @ApiModelProperty(value = "工作流最新版本号")
+    @NotNull(message = "{workflow.id.notNull}")
+    @Positive(message = "{workflow.id.positive}")
     private Long workflowVersion;
 
     @ApiModelProperty(value = "工作流名称")
@@ -40,32 +45,43 @@ public class WorkflowDetailsOfWizardModeDto {
     private Long calculationProcessId;
 
     @ApiModelProperty(value = "向导模式下计算流程的当前步骤")
+    @NotNull(message = "{calculation.process.step.object.notNull}")
+    @Valid
     private CalculationProcessStepDto calculationProcessStep;
 
     @ApiModelProperty(value = "0-选择训练输入数据")
+    @Valid
     private TrainingInputDto trainingInput;
 
     @ApiModelProperty(value = "1-选择预测输入数据")
+    @Valid
     private PredictionInputDto predictionInput;
 
     @ApiModelProperty(value = "2-选择PSI输入数据")
+    @Valid
     private PsiInputDto psiInput;
 
     @ApiModelProperty(value = "3-选择计算环境(通用)")
+    @Valid
     private ResourceDto commonResource;
 
     @ApiModelProperty(value = "4-选择计算环境(训练&预测)")
+    @Valid
     private TrainingAndPredictionResourceDto trainingAndPredictionResource;
 
     @ApiModelProperty(value = "5-选择结果接收方(通用)")
+    @Valid
     private OutputDto commonOutput;
 
     @ApiModelProperty(value = "6-选择结果接收方(训练&预测)")
+    @Valid
     private TrainingAndPredictionOutputDto trainingAndPredictionOutput;
 
     @ApiModelProperty(value = "7-选择明文算法训练输入数据")
+    @Valid
     private PTTrainingInputDto ptTrainingInput;
 
     @ApiModelProperty(value = "8-选择明文算法预测输入数据")
+    @Valid
     private PTPredictionInputDto ptPredictionInput;
 }
