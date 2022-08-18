@@ -467,7 +467,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 setInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(),
                         Optional.empty(), wizard.getTask2Step(),
                         root,
-                        req.getPtTrainingInput().getIdentityId(), Optional.empty(), Arrays.asList(req.getPtTrainingInput().getDataInput()), Optional.empty(), Optional.of(WorkflowTaskPowerTypeEnum.find(req.getPtTrainingInput().getPowerType())), Optional.of(req.getPtTrainingInput().getPowerIdentityId()));
+                        req.getPtTrainingInput().getIdentityId(), Optional.empty(), Arrays.asList(req.getPtTrainingInput().getDataInput()), Optional.empty(), Optional.of(WorkflowTaskPowerTypeEnum.find(req.getPtTrainingInput().getPowerType())), Optional.ofNullable(req.getPtTrainingInput().getPowerIdentityId()));
                 break;
             case INPUT_PREDICTION:
                 Optional<String> modelId = Optional.empty();
