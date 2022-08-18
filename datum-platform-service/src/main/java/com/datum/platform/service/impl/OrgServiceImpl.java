@@ -231,9 +231,9 @@ public class OrgServiceImpl implements OrgService {
     }
 
     @Override
-    public List<Org> getBaseOrgList() {
+    public List<Org> getBaseOrgList(Integer algorithmType) {
         String address = UserContext.getCurrentUser().getAddress();
-        List<String> orgIdList = dataService.listMetaDataOrgIdByUser(address);
+        List<String> orgIdList = dataService.listMetaDataOrgIdByUser(address, algorithmType);
         Map<String, Org> orgMap = getIdentityId2OrgMap();
         return orgIdList.stream()
                 .map(item -> orgMap.get(item) )

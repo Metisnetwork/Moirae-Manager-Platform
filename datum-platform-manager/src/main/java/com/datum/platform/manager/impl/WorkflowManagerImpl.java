@@ -12,6 +12,7 @@ import com.datum.platform.common.exception.BusinessException;
 import com.datum.platform.manager.WorkflowManager;
 import com.datum.platform.mapper.WorkflowMapper;
 import com.datum.platform.mapper.domain.Workflow;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import com.datum.platform.mapper.enums.WorkflowCreateModeEnum;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     }
 
     @Override
-    public Workflow createOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, String algorithmName, Long calculationProcessId, String calculationProcessName, String address) {
+    public Workflow createOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, String algorithmName, Long calculationProcessId, String calculationProcessName, String address, AlgorithmTypeEnum algorithmType) {
         Workflow workflow = new Workflow();
         workflow.setCreateMode(WorkflowCreateModeEnum.WIZARD_MODE);
         workflow.setWorkflowName(workflowName);
@@ -79,6 +80,7 @@ public class WorkflowManagerImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         workflow.setCalculationProcessStep(0);
         workflow.setWorkflowVersion(1L);
         workflow.setAddress(address);
+        workflow.setAlgorithmType(algorithmType);
         return create(workflow);
     }
 

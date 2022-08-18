@@ -146,5 +146,11 @@
         from dc_meta_data dmd inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
            inner join mo_meta_data_user mddu on dmd.meta_data_id = mddu.meta_data_id and mddu.address =  #{address}
         where dmd.status = 2
+        <if test="algorithmType != null and algorithmType == 0 ">
+            and dmd.is_support_ct_alg = 1
+        </if>
+        <if test="algorithmType != null and algorithmType == 1 ">
+            and dmd.is_support_pt_alg = 1
+        </if>
     </select>
 </mapper>

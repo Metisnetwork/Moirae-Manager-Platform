@@ -174,7 +174,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Workflow workflow = workflowManager.createOfWizardMode(workflowName, workflowDesc,
                 algorithmId, selectedTree.getName(),
                 calculationProcessId, LanguageContext.getByLanguage(calculationProcess.getName(), calculationProcess.getNameEn()),
-                UserContext.getCurrentUser().getAddress());
+                UserContext.getCurrentUser().getAddress(), algService.getAlgorithmType(selectedTree));
 
         // 创建工作流版本
         workflowVersionManager.create(workflow.getWorkflowId(), workflow.getWorkflowVersion(), StringUtils.join(workflowName, "-v1"));
@@ -525,6 +525,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         result.setWorkflowId(req.getWorkflowId());
         result.setWorkflowVersion(req.getWorkflowVersion());
         result.setAlgorithmId(workflow.getAlgorithmId());
+        result.setAlgorithmType(workflow.getAlgorithmType().getValue());
         result.setCalculationProcessId(workflow.getCalculationProcessId());
         CalculationProcessStepDto calculationProcessStepDto = new CalculationProcessStepDto();
         calculationProcessStepDto.setStep(wizard.getStep());

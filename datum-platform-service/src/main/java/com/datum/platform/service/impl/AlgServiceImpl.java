@@ -7,6 +7,7 @@ import com.datum.platform.manager.AlgorithmManager;
 import com.datum.platform.manager.AlgorithmVariableManager;
 import com.datum.platform.mapper.domain.Algorithm;
 import com.datum.platform.mapper.domain.AlgorithmClassify;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import com.datum.platform.mapper.enums.CalculationProcessTaskAlgorithmSelectEnum;
 import com.datum.platform.service.AlgService;
 import com.datum.platform.service.utils.TreeUtils;
@@ -76,6 +77,19 @@ public class AlgServiceImpl implements AlgService {
             default:
                 return selectedTree.getAlg();
         }
+    }
+
+    @Override
+    public AlgorithmTypeEnum getAlgorithmType(AlgorithmClassify selectedTree) {
+        if(selectedTree.getIsExistAlgorithm()){
+            return selectedTree.getAlg().getType();
+        }
+
+        if(selectedTree.getChildrenList().size() > 0){
+            return selectedTree.getChildrenList().get(0).getAlg().getType();
+        }
+
+        return null;
     }
 
     private AlgorithmClassify getAlgTree(boolean isNeedDetails, Long rootId) {

@@ -41,6 +41,9 @@ public class WorkflowDetailsOfWizardModeDto {
     @ApiModelProperty(value = "工作流算法id")
     private Long algorithmId;
 
+    @ApiModelProperty(value = "算法类别：0-密文算法，1-明文算法")
+    private Integer algorithmType;
+
     @ApiModelProperty(value = "计算流程id")
     private Long calculationProcessId;
 

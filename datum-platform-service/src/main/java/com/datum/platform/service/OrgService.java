@@ -78,7 +78,7 @@ public interface OrgService {
      */
     List<Org> getUserOrgList();
 
-    List<Org> getBaseOrgList();
+    List<Org> getBaseOrgList(Integer algorithmType);
 
     List<OrgExpand> listOrgExpand();
 

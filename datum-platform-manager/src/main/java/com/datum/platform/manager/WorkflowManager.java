@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.datum.platform.mapper.domain.Workflow;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 
 import java.util.Date;
 import java.util.List;
@@ -28,7 +29,7 @@ public interface WorkflowManager extends IService<Workflow> {
 
     Workflow delete(Long workflowId);
 
-    Workflow createOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, String algorithmName, Long calculationProcessId, String calculationProcessName, String address);
+    Workflow createOfWizardMode(String workflowName, String workflowDesc, Long algorithmId, String algorithmName, Long calculationProcessId, String calculationProcessName, String address, AlgorithmTypeEnum algorithmType);
 
     Workflow createOfExpertMode(String workflowName, String address);
 

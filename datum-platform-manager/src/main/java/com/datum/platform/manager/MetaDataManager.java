@@ -21,7 +21,7 @@ public interface MetaDataManager extends IService<MetaData> {
 
     MetaData statisticsOfGlobal();
 
-    List<String> listDataOrgIdByUser(String address);
+    List<String> listDataOrgIdByUser(String address, Integer algorithmType);
 
     boolean isOwner(String metaDataId, String address);
 

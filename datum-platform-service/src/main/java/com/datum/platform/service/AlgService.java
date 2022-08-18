@@ -2,6 +2,7 @@ package com.datum.platform.service;
 
 import com.datum.platform.mapper.domain.Algorithm;
 import com.datum.platform.mapper.domain.AlgorithmClassify;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import com.datum.platform.mapper.enums.CalculationProcessTaskAlgorithmSelectEnum;
 
 public interface AlgService{
@@ -44,4 +45,5 @@ public interface AlgService{
     Algorithm findAlgorithm(CalculationProcessTaskAlgorithmSelectEnum algorithmSelect, AlgorithmClassify rootTree, AlgorithmClassify selectedTree);
 
 
+    AlgorithmTypeEnum getAlgorithmType(AlgorithmClassify selectedTree);
 }

@@ -81,7 +81,7 @@ public interface DataService {
      * @param address
      * @return
      */
-    List<String> listMetaDataOrgIdByUser(String address);
+    List<String> listMetaDataOrgIdByUser(String address, Integer algorithmType);
 
     /**
      * 查询给的元数据列

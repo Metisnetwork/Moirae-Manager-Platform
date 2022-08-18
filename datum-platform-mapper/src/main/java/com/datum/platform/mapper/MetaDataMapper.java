@@ -26,5 +26,5 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
 
     MetaData statisticsOfGlobal();
 
-    List<String> listDataOrgIdByUser(String address);
+    List<String> listDataOrgIdByUser(String address, Integer algorithmType);
 }

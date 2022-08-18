@@ -49,8 +49,8 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public List<String> listDataOrgIdByUser(String address) {
-        return this.baseMapper.listDataOrgIdByUser(address);
+    public List<String> listDataOrgIdByUser(String address, Integer algorithmType) {
+        return this.baseMapper.listDataOrgIdByUser(address, algorithmType);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import com.datum.platform.mapper.enums.WorkflowCreateModeEnum;
 import lombok.Data;
 
@@ -105,6 +106,11 @@ public class Workflow implements Serializable {
      */
     @TableField("workflow_version")
     private Long workflowVersion;
+
+    /**
+     * 算法类别：0-密文算法，1-明文算法
+     */
+    private AlgorithmTypeEnum algorithmType;
 
     /**
      * 创建时间

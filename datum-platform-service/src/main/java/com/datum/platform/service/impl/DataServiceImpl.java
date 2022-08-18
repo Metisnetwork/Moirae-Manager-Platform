@@ -97,8 +97,8 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<String> listMetaDataOrgIdByUser(String address) {
-        return metaDataManager.listDataOrgIdByUser(address);
+    public List<String> listMetaDataOrgIdByUser(String address, Integer algorithmType) {
+        return metaDataManager.listDataOrgIdByUser(address, algorithmType);
     }
 
     @Override

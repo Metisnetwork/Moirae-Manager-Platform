@@ -19,6 +19,7 @@ import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -79,8 +80,8 @@ public class OrgController {
     @GetMapping("getBaseOrgList")
     @ApiOperationSupport(order = 5)
     @ApiOperation(value = "工作流数据输入时, 查询用户存在数据的组织列表", notes = "工作流数据输入时, 查询用户存在数据的组织列表")
-    public ResponseVo<List<DataSelectOrgVo>> getBaseOrgList() {
-        List<Org> orgList = orgService.getBaseOrgList();
+    public ResponseVo<List<DataSelectOrgVo>> getBaseOrgList(@ApiParam(value = "算法类别：0-密文算法，1-明文算法", required = true)  @RequestParam(value = "algorithmType", required = false)  Integer algorithmType) {
+        List<Org> orgList = orgService.getBaseOrgList(algorithmType);
         return ResponseVo.createSuccess(BeanUtil.copyToList(orgList, DataSelectOrgVo.class));
     }
 
