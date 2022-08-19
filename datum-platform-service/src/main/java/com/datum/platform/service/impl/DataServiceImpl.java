@@ -9,6 +9,7 @@ import com.datum.platform.chain.platon.contract.IUniswapV2FactoryContract;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.manager.*;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.mapper.enums.TokenTypeEnum;
@@ -235,8 +236,8 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId) {
-        return metaDataCertificateManager.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, UserContext.getCurrentUser().getAddress());
+    public List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, AlgorithmTypeEnum algorithmType) {
+        return metaDataCertificateManager.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, UserContext.getCurrentUser().getAddress(), algorithmType.getValue());
     }
 
     @Override

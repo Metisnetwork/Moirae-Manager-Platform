@@ -53,8 +53,8 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
     }
 
     @Override
-    public List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, String address) {
-        return baseMapper.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, address);
+    public List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, String address, Integer algorithmType) {
+        return baseMapper.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, address, algorithmType);
     }
 
     @Override

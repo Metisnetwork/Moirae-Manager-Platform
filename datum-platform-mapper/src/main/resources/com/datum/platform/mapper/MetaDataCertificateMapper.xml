@@ -116,6 +116,13 @@
           and mmdc.type = 1
           and mmdcu.address = #{address}
           and mmdc.characteristic >= (UNIX_TIMESTAMP(NOW()) * 1000)
+        <if test="algorithmType != null and algorithmType == 0 ">
+            and mmdc.is_support_ct_alg = 1
+        </if>
+        <if test="algorithmType != null and algorithmType == 1 ">
+            and mmdc.is_support_pt_alg = 1
+        </if>
+
     </select>
 
     <select id="listCertificateByMetaDataIdListAndUser" resultType="com.datum.platform.mapper.domain.MetaDataCertificate">

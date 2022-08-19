@@ -3,6 +3,7 @@ package com.datum.platform.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.datum.platform.common.enums.DataOrderByEnum;
 import com.datum.platform.mapper.domain.*;
+import com.datum.platform.mapper.enums.AlgorithmTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataCertificateTypeEnum;
 import com.datum.platform.mapper.enums.MetaDataFileTypeEnum;
 import com.datum.platform.service.dto.data.UserWLatCredentialDto;
@@ -208,7 +209,7 @@ public interface DataService {
 
     List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId);
 
-    List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId);
+    List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId,  AlgorithmTypeEnum algorithmType);
 
     boolean isMetaDataOwner(String metaDataId);
 
