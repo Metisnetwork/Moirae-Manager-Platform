@@ -235,6 +235,11 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
+    public List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId) {
+        return metaDataCertificateManager.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, UserContext.getCurrentUser().getAddress());
+    }
+
+    @Override
     public boolean isMetaDataOwner(String metaDataId) {
         return metaDataManager.isOwner(metaDataId, UserContext.getCurrentUser().getAddress());
     }

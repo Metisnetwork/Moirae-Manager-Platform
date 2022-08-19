@@ -1123,12 +1123,15 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .collect(Collectors.toSet());
         // 查询元数据对应用户的凭证
         List<WorkflowStartCredentialDto> result = metaDataIdSet.stream()
-                .map(item -> {
+                .map(metaDataId -> {
                     WorkflowStartCredentialDto workflowStartCredentialDto = new WorkflowStartCredentialDto();
-                    workflowStartCredentialDto.setMetaDataId(item);
-                    workflowStartCredentialDto.setMetaDataName(dataService.getMetaDataName(item));
-                    workflowStartCredentialDto.setNoAttributesCredential(BeanUtil.copyProperties(dataService.getNoAttributeCredentialByMetaDataIdAndUser(item), NoAttributesCredentialDto.class));
-                    workflowStartCredentialDto.setHaveAttributesCredentialList(BeanUtil.copyToList(dataService.listHaveAttributesCertificateByMetaDataIdAndUser(item), HaveAttributesCredentialDto.class));
+                    workflowStartCredentialDto.setMetaDataId(metaDataId);
+                    workflowStartCredentialDto.setMetaDataName(dataService.getMetaDataName(metaDataId));
+                    MetaDataCertificate noAttributesCredential = dataService.getNoAttributeCredentialByMetaDataIdAndUser(metaDataId);
+                    if(noAttributesCredential != null) {
+                        workflowStartCredentialDto.setNoAttributesCredential(BeanUtil.copyProperties(dataService.getNoAttributeCredentialByMetaDataIdAndUser(metaDataId), NoAttributesCredentialDto.class));
+                    }
+                    workflowStartCredentialDto.setHaveAttributesCredentialList(BeanUtil.copyToList(dataService.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId), HaveAttributesCredentialDto.class));
                     return workflowStartCredentialDto;
                 })
                 .collect(Collectors.toList());

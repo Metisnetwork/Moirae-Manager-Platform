@@ -208,6 +208,8 @@ public interface DataService {
 
     List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId);
 
+    List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId);
+
     boolean isMetaDataOwner(String metaDataId);
 
     List<MetaDataCertificate> listMetaDataCertificateUser(List<Long> credentialIdList);

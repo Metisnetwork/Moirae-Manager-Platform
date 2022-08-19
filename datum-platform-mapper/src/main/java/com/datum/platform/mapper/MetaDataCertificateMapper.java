@@ -27,6 +27,8 @@ public interface MetaDataCertificateMapper extends BaseMapper<MetaDataCertificat
 
     List<MetaDataCertificate> listHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, String address);
 
+    List<MetaDataCertificate> listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(String metaDataId, String address);
+
     List<MetaDataCertificate> listCertificateByMetaDataIdListAndUser(List<Long> credentialIdList, String address);
 
     List<String> listMetaDataIdByIds(List<Long> credentialIdList);
