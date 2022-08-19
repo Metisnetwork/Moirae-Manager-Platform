@@ -286,7 +286,7 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public boolean isTradable(String metaDataId) {
-        List<MetaDataCertificate> metaDataCertificateList = metaDataCertificateManager.listByMetaDataId(metaDataId);
+        List<MetaDataCertificate> metaDataCertificateList = metaDataCertificateManager.listEffectiveByMetaDataId(metaDataId);
         long countOfHaveAttributes = metaDataCertificateList.stream().filter(metaDataCertificate -> metaDataCertificate.getType() == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES).count();
         if(countOfHaveAttributes > 0){
             return true;

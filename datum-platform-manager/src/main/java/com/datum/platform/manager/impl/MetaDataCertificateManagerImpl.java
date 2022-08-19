@@ -148,4 +148,9 @@ public class MetaDataCertificateManagerImpl extends ServiceImpl<MetaDataCertific
             update(updateWrapper);
         }
     }
+
+    @Override
+    public List<MetaDataCertificate> listEffectiveByMetaDataId(String metaDataId) {
+        return baseMapper.listEffectiveByMetaDataId(metaDataId);
+    }
 }
