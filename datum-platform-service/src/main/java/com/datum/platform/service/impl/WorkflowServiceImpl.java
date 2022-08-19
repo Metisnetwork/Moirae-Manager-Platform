@@ -1129,7 +1129,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     workflowStartCredentialDto.setMetaDataName(dataService.getMetaDataName(metaDataId));
                     MetaDataCertificate noAttributesCredential = dataService.getNoAttributeCredentialByMetaDataIdAndUser(metaDataId);
                     if(noAttributesCredential != null) {
-                        workflowStartCredentialDto.setNoAttributesCredential(BeanUtil.copyProperties(dataService.getNoAttributeCredentialByMetaDataIdAndUser(metaDataId), NoAttributesCredentialDto.class));
+                        workflowStartCredentialDto.setNoAttributesCredential(BeanUtil.copyProperties(noAttributesCredential, NoAttributesCredentialDto.class));
                     }
                     workflowStartCredentialDto.setHaveAttributesCredentialList(BeanUtil.copyToList(dataService.listEffectiveHaveAttributesCertificateByMetaDataIdAndUser(metaDataId, workflowTaskList.get(0).getAlgorithm().getType()), HaveAttributesCredentialDto.class));
                     return workflowStartCredentialDto;

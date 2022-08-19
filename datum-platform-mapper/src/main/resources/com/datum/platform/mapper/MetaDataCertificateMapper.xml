@@ -122,7 +122,7 @@
         <if test="algorithmType != null and algorithmType == 1 ">
             and mmdc.is_support_pt_alg = 1
         </if>
-
+          order by mmdc.characteristic
     </select>
 
     <select id="listCertificateByMetaDataIdListAndUser" resultType="com.datum.platform.mapper.domain.MetaDataCertificate">
