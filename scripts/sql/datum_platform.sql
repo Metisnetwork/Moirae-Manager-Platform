@@ -778,6 +778,7 @@ CREATE TABLE `mo_workflow` (
   `calculation_process_step` int DEFAULT NULL COMMENT '向导模式下当前步骤',
   `is_delete` tinyint NOT NULL DEFAULT '0' COMMENT '是否删除: 0-否  1-是',
   `workflow_version` bigint DEFAULT '1' COMMENT '当前最大版本号,从1开始',
+  `algorithm_type` tinyint DEFAULT NULL COMMENT '向导模式中算法类别：0-密文算法，1-明文算法',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`workflow_id`),
