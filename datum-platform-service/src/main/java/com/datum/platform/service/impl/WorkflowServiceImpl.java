@@ -1777,12 +1777,16 @@ public class WorkflowServiceImpl implements WorkflowService {
                         }
                         requestBuilder.addTkItems(tokenItem);
                     });
-                    //TODO
                     TaskRpcApi.EstimateTaskGasResponse response = grpcTaskServiceClient.estimateTaskGas(orgService.getChannel(item.getIdentityId()), requestBuilder.build());
                     return BigInteger.valueOf(response.getGasLimit()).multiply(BigInteger.valueOf(response.getGasPrice()));
                 })
                 .reduce((item1, item2) -> item1.add(item2) ).get();
-        tokenFeeList.add(createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(), wLatCredentialDto));
+
+        WorkflowFeeItemDto workflowFeeItemDto = createWorkflowTaskFeeItemDto(WorkflowPayTypeEnum.FEE, feeList.toString(), wLatCredentialDto);
+        if(!workflowFeeItemDto.getIsEnough()){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_FEE_ESTIMATE_FAIL.getMsg());
+        }
+        tokenFeeList.add(workflowFeeItemDto);
         return tokenFeeList;
     }
 
