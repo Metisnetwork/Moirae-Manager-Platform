@@ -72,6 +72,7 @@
         where mmdc.meta_data_id = #{metaDataId}
           and mmdc.type = 1
           and mmdc.name is not null
+          and mmdc.characteristic >= (UNIX_TIMESTAMP(NOW()) * 1000)
           and mmdcu.balance = 1
           and mmdcu.address = #{address}
     </select>
