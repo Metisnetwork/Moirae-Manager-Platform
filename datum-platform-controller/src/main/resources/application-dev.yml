@@ -34,8 +34,8 @@ chain:
     hrp: lat
     datumNetworkPayAddress: "0x263B1D39843BF2e1DA27d827e749992fbD1f1577"
     uniswapV2Router02: "0x4378dAF745E9053f6048c4f78c803f3bC8829703"
-    voteAddress: "0x0a033cA8faA1cBB184d196a71A0BaeD76cE493cB"
-    voteDeployBlockNumber: "26092260"
+    voteAddress: "0x47c0d7D6689b55875ae75B2CF41E75400B76927F"
+    voteDeployBlockNumber: "27183320"
     web3jProtocol: HTTP
     web3jAddresses: 8.219.126.197:6789
     chainName: "PlatON开发网"

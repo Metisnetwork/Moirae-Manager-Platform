@@ -1716,7 +1716,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             throw new BusinessException(RespCodeEnum.BIZ_FAILED, StringUtils.replace(ErrorMsg.ORGANIZATION_NOT_IN_WHITE_LIST.getMsg(), "{}", errorSenderList.toString()));
         }
 
-        // 如果是无属性凭证支付，需要保证余额及授权金额足够支付任务消耗； 如果是有属性凭证支付，则需要该凭证的拥有者为当前发起任务的用户
+        // 如果是无属性凭证支付，需要保证余额及授权数量足够支付任务消耗； 如果是有属性凭证支付，则需要该凭证的拥有者为当前发起任务的用户
         List<WorkflowFeeItemDto> tokenFeeList = new ArrayList<>();
         Map<String, BigInteger> metaDataId2consumptionMap = new HashMap<>();
         for (WorkflowTask workflowTask: workflowTaskList) {

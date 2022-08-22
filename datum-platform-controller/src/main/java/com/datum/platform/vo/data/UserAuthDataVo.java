@@ -29,6 +29,6 @@ public class UserAuthDataVo {
     @ApiModelProperty(value = "数据凭证余额")
     private String tokenBalance;
 
-    @ApiModelProperty(value = "已授权给支付合约的金额")
+    @ApiModelProperty(value = "已授权给支付合约的数量")
     private String authorizeBalance;
 }

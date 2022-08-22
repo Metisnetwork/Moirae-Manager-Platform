@@ -19,9 +19,9 @@ public class TokenHolderDto {
     @ApiModelProperty(value = "用户地址")
     private String address;
 
-    @ApiModelProperty(value = "地址代币余额, ERC20为金额")
+    @ApiModelProperty(value = "地址代币余额, ERC20为数量")
     private String balance;
 
-    @ApiModelProperty(value = "地址已授权支付助手的代币余额, ERC20为金额")
+    @ApiModelProperty(value = "地址已授权支付助手的代币余额, ERC20为数量")
     private String authorizeBalance;
 }

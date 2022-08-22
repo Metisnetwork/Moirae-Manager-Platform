@@ -446,8 +446,8 @@ DROP TABLE IF EXISTS `mo_meta_data_certificate_user`;
 CREATE TABLE `mo_meta_data_certificate_user` (
   `address` varchar(64) NOT NULL COMMENT '用户地址',
   `meta_data_certificate_id` bigint NOT NULL COMMENT '元数据凭证ID',
-  `balance` varchar(128) NOT NULL COMMENT '账户余额, ERC20为金额, ERC721时 0-未持有 1-持有',
-  `authorize_balance` varchar(128) DEFAULT NULL COMMENT '授权支付助手合约金额, ERC20为金额， ERC721时 0-未授权 1-已授权',
+  `balance` varchar(128) NOT NULL COMMENT '账户余额, ERC20为数量, ERC721时 0-未持有 1-持有',
+  `authorize_balance` varchar(128) DEFAULT NULL COMMENT '授权支付助手合约数量, ERC20为数量， ERC721时 0-未授权 1-已授权',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`address`,`meta_data_certificate_id`)

@@ -32,12 +32,12 @@ public class MetaDataCertificateUser implements Serializable {
     private Long metaDataCertificateId;
 
     /**
-     * 账户余额, ERC20为金额, ERC721时 0-未持有 1-持有
+     * 账户余额, ERC20为数量, ERC721时 0-未持有 1-持有
      */
     private String balance;
 
     /**
-     * 授权支付助手合约金额, ERC20为金额， ERC721时 0-未授权 1-已授权
+     * 授权支付助手合约数量, ERC20为数量， ERC721时 0-未授权 1-已授权
      */
     private String authorizeBalance;
 

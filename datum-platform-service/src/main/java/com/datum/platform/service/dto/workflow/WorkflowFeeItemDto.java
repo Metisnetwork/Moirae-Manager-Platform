@@ -14,7 +14,7 @@ public class WorkflowFeeItemDto {
     @ApiModelProperty(value = "支付类型（手续费、token）")
     private WorkflowPayTypeEnum type;
 
-    @ApiModelProperty(value = "需消耗的金额")
+    @ApiModelProperty(value = "需消耗的数量")
     private String needValue;
 
     @ApiModelProperty(value = "是否足够")

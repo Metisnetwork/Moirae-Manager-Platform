@@ -13,6 +13,6 @@ public class UserNoAttributesCredentialDto extends NoAttributesCredentialDto {
     @ApiModelProperty(value = "账户余额")
     private String tokenBalance;
 
-    @ApiModelProperty(value = "已授权金额")
+    @ApiModelProperty(value = "已授权数量")
     private String authorizeBalance;
 }
