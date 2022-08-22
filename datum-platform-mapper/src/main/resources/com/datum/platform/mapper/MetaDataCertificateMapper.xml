@@ -55,7 +55,7 @@
           and mmdc.type = 1
           and mmdc.name is not null
           and mmdc.characteristic >= (UNIX_TIMESTAMP(NOW()) * 1000)
-        order by mmdc.token_id desc
+        order by CAST(mmdc.token_id AS DECIMAL(64,18)) desc
     </select>
     <select id="pageHaveAttributesCertificateByMetaDataIdAndUser" resultType="com.datum.platform.mapper.domain.MetaDataCertificate">
         select mmdc.id,
@@ -75,6 +75,7 @@
           and mmdc.characteristic >= (UNIX_TIMESTAMP(NOW()) * 1000)
           and mmdcu.balance = 1
           and mmdcu.address = #{address}
+        order by CAST(mmdc.token_id AS DECIMAL(64,18)) desc
     </select>
     <select id="listHaveAttributesCertificateByMetaDataIdAndUser" resultType="com.datum.platform.mapper.domain.MetaDataCertificate">
         select mmdc.id,
