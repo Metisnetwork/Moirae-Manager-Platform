@@ -14,6 +14,7 @@ import com.datum.platform.manager.PublicityManager;
 import com.datum.platform.mapper.domain.Proposal;
 import com.datum.platform.mapper.domain.ProposalLog;
 import com.datum.platform.mapper.enums.ProposalLogTypeEnum;
+import com.datum.platform.mapper.enums.ProposalStatusEnum;
 import com.datum.platform.mapper.enums.ProposalTypeEnum;
 import com.datum.platform.service.PublicityService;
 import com.platon.protocol.core.methods.response.Log;
@@ -108,8 +109,10 @@ public class PublicityServiceImpl implements PublicityService {
                 .forEach(proposal -> {
                     proposal.setVoteBeginTime(bn2Date(proposal.getVoteBeginBn(), curBn, avgPackTime));
                     proposal.setVoteEndTime(bn2Date(proposal.getVoteEndBn(), curBn, avgPackTime));
-                }
-                );
+                    if(proposal.getStatus() == ProposalStatusEnum.HAS_NOT_STARTED && curBn.compareTo(new BigInteger(proposal.getVoteBeginBn())) > 0){
+                        proposal.setStatus(ProposalStatusEnum.VOTING);
+                    }
+                });
         return iPage;
     }
 
