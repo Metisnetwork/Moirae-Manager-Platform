@@ -101,7 +101,7 @@
             and dmd.identity_id = #{identityId}
           </if>
           <if test="includeExpired == false">
-              and mmdu.`eff_have_attr_number` > 0
+              and ( mmdu.no_attr_number > 0 or mmdu.eff_have_attr_number > 0)
           </if>
         order by mmdu.create_time desc
     </select>
@@ -146,7 +146,7 @@
         select distinct
         dmd.identity_id
         from dc_meta_data dmd inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
-           inner join mo_meta_data_user mddu on dmd.meta_data_id = mddu.meta_data_id and mddu.address =  #{address}
+           inner join mo_meta_data_user mddu on dmd.meta_data_id = mddu.meta_data_id and mddu.address =  #{address} and (mddu.no_attr_number > 0 or mddu.eff_have_attr_number > 0)
         where dmd.status = 2
         <if test="algorithmType != null and algorithmType == 0 ">
             and dmd.is_support_ct_alg = 1
