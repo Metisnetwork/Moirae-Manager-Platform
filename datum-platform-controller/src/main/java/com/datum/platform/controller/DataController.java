@@ -75,7 +75,7 @@ public class DataController {
     @ApiOperation(value = "查询用户的数据列表", notes = "查询用户的数据列表")
     @ApiOperationSupport(order = 4)
     public ResponseVo<PageVo<DataVo>> getDataListByUser(@Valid GetDataListByIdentityIdReq req) {
-        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize(), req.getIdentityId(), req.getKeyword());
+        IPage<MetaData> page = dataService.getUserDataList(req.getCurrent(), req.getSize(), req.getIdentityId(), req.getKeyword(), req.getIncludeExpired());
         List<DataVo> itemList = BeanUtil.copyToList(page.getRecords(), DataVo.class);
         return ResponseVo.createSuccess(ConvertUtils.convertPageVo(page, itemList));
     }

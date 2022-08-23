@@ -10,4 +10,10 @@
             where mmdcu.address = #{item.address} and mmdcu.meta_data_certificate_id = #{item.metaDataCertificateId}
         </foreach>
     </update>
+    <select id="countByMetaDataIdAndUser"
+            resultType="com.datum.platform.mapper.domain.MetaDataCertificateUser">
+        SELECT (SELECT COUNT(1) FROM `mo_meta_data_certificate_user` mmdcu JOIN `mo_meta_data_certificate` mmdc ON mmdcu.`meta_data_certificate_id` = mmdc.`id` WHERE mmdc.`meta_data_id` = #{metaDataId} AND mmdcu.`address` = #{address} AND mmdc.`type` = 0) AS noAttrNumber,
+               (SELECT COUNT(1) FROM `mo_meta_data_certificate_user` mmdcu JOIN `mo_meta_data_certificate` mmdc ON mmdcu.`meta_data_certificate_id` = mmdc.`id` WHERE mmdc.`meta_data_id` = #{metaDataId} AND mmdcu.`address` = #{address} AND mmdc.`type` = 1) AS haveAttrNumber,
+               (SELECT COUNT(1) FROM `mo_meta_data_certificate_user` mmdcu JOIN `mo_meta_data_certificate` mmdc ON mmdcu.`meta_data_certificate_id` = mmdc.`id` WHERE mmdc.`meta_data_id` = #{metaDataId} AND mmdcu.`address` = #{address} AND mmdc.`type` = 1 AND mmdc.`characteristic` >= (UNIX_TIMESTAMP(NOW()) * 1000)) AS effHaveAttrNumber
+    </select>
 </mapper>

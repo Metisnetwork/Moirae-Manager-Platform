@@ -33,6 +33,21 @@ public class MetaDataUser implements Serializable {
     private String metaDataId;
 
     /**
+     * 无属性凭证个数
+     */
+    private Integer noAttrNumber;
+
+    /**
+     * 有属性凭证个数
+     */
+    private Integer haveAttrNumber;
+
+    /**
+     * 有效的有属性凭证个数
+     */
+    private Integer effHaveAttrNumber;
+
+    /**
      * 创建时间
      */
     private Date createTime;

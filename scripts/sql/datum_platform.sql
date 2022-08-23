@@ -475,6 +475,9 @@ DROP TABLE IF EXISTS `mo_meta_data_user`;
 CREATE TABLE `mo_meta_data_user` (
   `address` varchar(64) NOT NULL COMMENT '用户地址',
   `meta_data_id` varchar(200) NOT NULL COMMENT '元数据ID,hash',
+  `no_attr_number` int NOT NULL DEFAULT '0' COMMENT '无属性凭证个数',
+  `have_attr_number` int NOT NULL DEFAULT '0' COMMENT '有属性凭证个数',
+  `eff_have_attr_number` int NOT NULL DEFAULT '0' COMMENT '有效的有属性凭证个数',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`address`,`meta_data_id`)

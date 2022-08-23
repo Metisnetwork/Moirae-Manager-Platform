@@ -60,9 +60,10 @@ public interface DataService {
      * @param size       大小
      * @param identityId  组织id
      * @param keyword
+     * @param includeExpired
      * @return
      */
-    IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword);
+    IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword, Boolean includeExpired);
 
 
     /**

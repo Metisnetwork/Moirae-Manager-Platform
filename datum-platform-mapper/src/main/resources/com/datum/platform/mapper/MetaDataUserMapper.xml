@@ -8,4 +8,11 @@
             (#{item.address}, #{item.metaDataId})
         </foreach>
     </insert>
+    <update id="batchUpdate">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update mo_meta_data_user
+            set `no_attr_number` = #{item.noAttrNumber},  `have_attr_number` = #{item.haveAttrNumber}, `eff_have_attr_number` = #{item.effHaveAttrNumber}
+            where `address` = #{item.address} and `meta_data_id` = #{item.metaDataId}
+        </foreach>
+    </update>
 </mapper>

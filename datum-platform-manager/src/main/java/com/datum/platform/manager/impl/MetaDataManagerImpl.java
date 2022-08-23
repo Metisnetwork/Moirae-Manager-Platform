@@ -34,8 +34,8 @@ public class MetaDataManagerImpl extends ServiceImpl<MetaDataMapper, MetaData> i
     }
 
     @Override
-    public IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId, String keyword) {
-        return this.baseMapper.getUserDataList(page, address, identityId, keyword);
+    public IPage<MetaData> getUserDataList(Page<MetaData> page, String address, String identityId, String keyword, Boolean includeExpired) {
+        return this.baseMapper.getUserDataList(page, address, identityId, keyword, includeExpired);
     }
 
     @Override

@@ -53,4 +53,16 @@ public class MetaDataUserManagerImpl extends ServiceImpl<MetaDataUserMapper, Met
         }
         return true;
     }
+
+    @Override
+    public List<MetaDataUser> listByUser(String address) {
+        LambdaQueryWrapper<MetaDataUser> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(MetaDataUser::getAddress, address);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public boolean batchUpdate(List<MetaDataUser> updateList) {
+        return baseMapper.batchUpdate(updateList);
+    }
 }

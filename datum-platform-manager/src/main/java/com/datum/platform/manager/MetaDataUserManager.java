@@ -16,4 +16,8 @@ import java.util.List;
 public interface MetaDataUserManager extends IService<MetaDataUser> {
 
     boolean saveOrDeleteBatch(String address, List<String> metaDataIdList);
+
+    List<MetaDataUser> listByUser(String address);
+
+    boolean batchUpdate(List<MetaDataUser> updateList);
 }

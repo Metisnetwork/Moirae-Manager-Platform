@@ -56,4 +56,9 @@ public class MetaDataCertificateUserManagerImpl extends ServiceImpl<MetaDataCert
         wrapper.eq(MetaDataCertificateUser::getAddress, address);
         return listObjs(wrapper, item -> (long)item);
     }
+
+    @Override
+    public MetaDataCertificateUser countByMetaDataIdAndUser(String address, String metaDataId) {
+        return baseMapper.countByMetaDataIdAndUser(address, metaDataId);
+    }
 }

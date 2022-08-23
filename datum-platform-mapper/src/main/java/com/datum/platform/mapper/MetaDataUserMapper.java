@@ -16,4 +16,6 @@ import java.util.List;
 public interface MetaDataUserMapper extends BaseMapper<MetaDataUser> {
 
     boolean saveBatch(List<MetaDataUser> addList);
+
+    boolean batchUpdate(List<MetaDataUser> updateList);
 }

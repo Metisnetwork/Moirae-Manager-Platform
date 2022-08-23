@@ -53,4 +53,11 @@ public class MetaDataCertificateUser implements Serializable {
     private Date updateTime;
 
     private static final long serialVersionUID = 1L;
+
+    @TableField(exist = false)
+    private Integer noAttrNumber;
+    @TableField(exist = false)
+    private Integer haveAttrNumber;
+    @TableField(exist = false)
+    private Integer effHaveAttrNumber;
 }

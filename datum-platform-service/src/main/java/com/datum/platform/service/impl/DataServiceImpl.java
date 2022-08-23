@@ -86,9 +86,9 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword) {
+    public IPage<MetaData> getUserDataList(Long current, Long size, String identityId, String keyword, Boolean includeExpired) {
         Page<MetaData> page = new Page<>(current, size);
-        return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress(), identityId, keyword);
+        return metaDataManager.getUserDataList(page, UserContext.getCurrentUser().getAddress(), identityId, keyword, includeExpired);
     }
 
     @Override
@@ -326,6 +326,33 @@ public class DataServiceImpl implements DataService {
         }
         // 设置用户的可见
         metaDataUserManager.saveOrDeleteBatch(address, metaDataIdList);
+        // 设置用户数据的凭证数量
+        List<MetaDataUser> updateList = new ArrayList<>();
+        List<MetaDataUser> metaDataUserList = metaDataUserManager.listByUser(address);
+        metaDataUserList.forEach(metaDataUser -> {
+            MetaDataCertificateUser metaDataCertificateUser = metaDataCertificateUserManager.countByMetaDataIdAndUser(metaDataUser.getAddress(), metaDataUser.getMetaDataId());
+            boolean update = false;
+            if(metaDataUser.getNoAttrNumber().compareTo(metaDataCertificateUser.getNoAttrNumber()) != 0 ){
+                metaDataUser.setNoAttrNumber(metaDataCertificateUser.getNoAttrNumber());
+                update = true;
+            }
+            if(metaDataUser.getHaveAttrNumber().compareTo(metaDataCertificateUser.getHaveAttrNumber()) != 0){
+                metaDataUser.setHaveAttrNumber(metaDataCertificateUser.getHaveAttrNumber());
+                update = true;
+            }
+            if(metaDataUser.getEffHaveAttrNumber().compareTo(metaDataCertificateUser.getEffHaveAttrNumber()) != 0){
+                metaDataUser.setEffHaveAttrNumber(metaDataCertificateUser.getEffHaveAttrNumber());
+                update = true;
+            }
+
+            if(update == true){
+                updateList.add(metaDataUser);
+            }
+        });
+
+        if(!updateList.isEmpty()){
+            metaDataUserManager.batchUpdate(updateList);
+        }
         return true;
     }
 

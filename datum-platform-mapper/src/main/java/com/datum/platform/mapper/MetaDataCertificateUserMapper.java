@@ -16,4 +16,6 @@ import java.util.List;
 public interface MetaDataCertificateUserMapper extends BaseMapper<MetaDataCertificateUser> {
 
     boolean updateBatch(List<MetaDataCertificateUser> updateList);
+
+    MetaDataCertificateUser countByMetaDataIdAndUser(String address, String metaDataId);
 }

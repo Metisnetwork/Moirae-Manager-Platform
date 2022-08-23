@@ -100,6 +100,9 @@
           <if test="identityId != null and identityId != ''">
             and dmd.identity_id = #{identityId}
           </if>
+          <if test="includeExpired == false">
+              and mmdu.`eff_have_attr_number` > 0
+          </if>
         order by mmdu.create_time desc
     </select>
 
