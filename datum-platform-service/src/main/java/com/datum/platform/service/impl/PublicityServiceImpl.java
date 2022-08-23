@@ -145,7 +145,7 @@ public class PublicityServiceImpl implements PublicityService {
         int comp = convertBn.compareTo(curBn);
         if(comp > 0){
             // 需要通过预估获得时间
-            Date cur = getTimeByBn(convertBn);
+            Date cur = getTimeByBn(curBn);
             cur.setTime(cur.getTime() + convertBn.subtract(curBn).multiply(avgPackTime).longValue());
             return cur;
         } else {
@@ -156,6 +156,6 @@ public class PublicityServiceImpl implements PublicityService {
 
     private Date getTimeByBn(BigInteger bn) {
         BigInteger time = timeCache.computeIfAbsent(bn, k -> platONClient.platonGetBlockByNumber(k).getTimestamp());
-        return new Date(time.longValue());
+        return new Date(time.longValue() * 1000);
     }
 }

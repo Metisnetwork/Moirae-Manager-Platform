@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 public class VoteTest extends BaseContractTest {
 
-    private String address = "lat1u5j3rr5a6kydwhpfyhuduqd0cn7z9su35epap2";
-    private static final String org135 = "0x68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f80";
+    private String address = "lat1s4cz0v3lw06cywvymyz4pguu4fh6gws3l5hduy";
+    private static final String org135 = "0x4accaa7db5023460645410d7b38fbdb8e7f7298e8033e8fb4eb0beaef9eeecca";
     private static final String org152 = "0x68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f81";
     private static final String org153 = "0x68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f82";
     private static final String org154 = "0x68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f83";
@@ -214,9 +214,9 @@ public class VoteTest extends BaseContractTest {
     @Test
     public void setInterval() throws Exception{
         Vote contract = load(org135);
-        System.out.println(contract.setInterval(BigInteger.valueOf(1), BigInteger.valueOf(1 * 60)).send());
-        System.out.println(contract.setInterval(BigInteger.valueOf(2), BigInteger.valueOf(2 * 60)).send());
-        System.out.println(contract.setInterval(BigInteger.valueOf(4), BigInteger.valueOf(1 * 60)).send());
+        System.out.println(contract.setInterval(BigInteger.valueOf(1), BigInteger.valueOf(5 * 60)).send());
+        System.out.println(contract.setInterval(BigInteger.valueOf(2), BigInteger.valueOf(10 * 60)).send());
+        System.out.println(contract.setInterval(BigInteger.valueOf(4), BigInteger.valueOf(5 * 60)).send());
     }
 
     private Vote load(){
