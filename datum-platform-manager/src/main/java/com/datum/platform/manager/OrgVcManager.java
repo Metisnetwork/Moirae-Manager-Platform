@@ -24,4 +24,8 @@ public interface OrgVcManager extends IService<OrgVc> {
     IPage<OrgVc> list(Page<OrgVc> page);
 
     void saveBatchIfAbsent(List<OrgVc> orgVcList);
+
+    List<OrgVc> listNeedVerify();
+
+    void updateStatus(String identityId, int status);
 }

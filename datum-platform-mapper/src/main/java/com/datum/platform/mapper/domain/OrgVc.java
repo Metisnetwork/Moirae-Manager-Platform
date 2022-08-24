@@ -62,6 +62,11 @@ public class OrgVc implements Serializable {
     private String vcProof;
 
     /**
+     * 状态 0-待验证 1-验证通过 2-验证失败
+     */
+    private Integer status;
+
+    /**
      * 创建时间
      */
     private Date createTime;

@@ -1,6 +1,7 @@
 package com.datum.platform.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,5 +51,20 @@ public class OrgVcManagerImpl extends ServiceImpl<OrgVcMapper, OrgVc> implements
         if(save.size() > 0){
             saveBatch(save);
         }
+    }
+
+    @Override
+    public List<OrgVc> listNeedVerify() {
+        LambdaQueryWrapper<OrgVc> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(OrgVc::getStatus, 0);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public void updateStatus(String identityId, int status) {
+        LambdaUpdateWrapper<OrgVc> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.set(OrgVc::getStatus, status);
+        updateWrapper.eq(OrgVc::getIdentityId, identityId);
+        update(updateWrapper);
     }
 }

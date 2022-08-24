@@ -1,20 +1,16 @@
 package com.datum.platform.task;
 
 import cn.hutool.core.date.DateUtil;
-import com.datum.platform.mapper.domain.OrgExpand;
 import com.datum.platform.mapper.domain.OrgVc;
-import com.datum.platform.mapper.domain.Publicity;
 import com.datum.platform.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 数据中心的组织同步
@@ -27,28 +23,23 @@ public class SyncOrgVcTask {
     @Resource
     private OrgService orgService;
 
-//    @Scheduled(fixedDelay = 5 * 1000)
+    @Scheduled(fixedDelay = 60 * 1000)
     @Lock(keys = "SyncOrgVcTask")
     public void run() {
         long begin = DateUtil.current();
         try {
-            List<OrgExpand> orgExpandList = orgService.listHaveIpPortOrgExpand();
-            Set<String> vcSet = orgService.listOrgVcId().stream().collect(Collectors.toSet());
-            List<OrgVc> orgVcList = new ArrayList<>();
-            List<Publicity> publicityList = new ArrayList<>();
-            orgExpandList.stream()
-                    .filter(orgExpand -> !vcSet.contains(orgExpand.getIdentityId()))
-                    .forEach(orgExpand -> {
-                        //TODO
-
-                    }
-            );
-            if(orgVcList.size() > 0){
-                orgService.batchSaveOrgVc(orgVcList, publicityList);
-            }
+            List<OrgVc> orgVcList = orgService.listNeedVerifyOrgVc();
+            orgVcList.forEach(orgVc -> {
+                try {
+                    log.error("work");
+//                    orgService.verifyOrgVcFinish(orgVc.getIdentityId(), 1);
+                } catch (Exception e) {
+                    log.error("组织VC明细验证失败 id = " + orgVc.getIdentityId(), e);
+                }
+            });
         } catch (Exception e) {
-            log.error("组织VC信息,失败原因：{}", e.getMessage(), e);
+            log.error("组织VC验证,失败原因：{}", e.getMessage(), e);
         }
-        log.info("组织VC信息，总耗时:{}ms", DateUtil.current() - begin);
+        log.info("组织VC验证完成，总耗时:{}ms", DateUtil.current() - begin);
     }
 }

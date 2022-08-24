@@ -298,6 +298,16 @@ public class OrgServiceImpl implements OrgService {
         return orgManager.getPowerOrgList();
     }
 
+    @Override
+    public List<OrgVc> listNeedVerifyOrgVc() {
+        return orgVcManager.listNeedVerify();
+    }
+
+    @Override
+    public void verifyOrgVcFinish(String identityId,int status){
+        orgVcManager.updateStatus(identityId, status);
+    }
+
     private ManagedChannel assemblyChannel(String identityIp, Integer identityPort){
         return ManagedChannelBuilder
                 .forAddress(identityIp, identityPort)

@@ -100,4 +100,8 @@ public interface OrgService {
     Integer countOfAuthority();
 
     List<Org> getPowerOrgList();
+
+    List<OrgVc> listNeedVerifyOrgVc();
+
+    void verifyOrgVcFinish(String identityId,int status);
 }
