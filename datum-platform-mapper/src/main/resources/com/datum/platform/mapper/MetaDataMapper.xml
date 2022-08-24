@@ -12,11 +12,12 @@
                dmd.is_support_ct_alg,
                dmd.is_support_pt_alg,
                moe.is_authority,
-               moe.is_certified
+               if(mov.status = 1, 1, 0) as is_certified
         from dc_meta_data dmd
             inner join dc_org do on dmd.identity_id = do.identity_id
             inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
             inner join mo_org_expand moe on dmd.identity_id = moe.identity_id
+            left join mo_org_vc mov on dmd.identity_id = mov.identity_id
         where dmd.identity_id = #{identityId}
         order by dmd.published_at desc
     </select>
@@ -31,11 +32,12 @@
                dmd.is_support_ct_alg,
                dmd.is_support_pt_alg,
                moe.is_authority,
-               moe.is_certified
+               if(mov.status = 1, 1, 0) as is_certified
         from dc_meta_data dmd
             inner join dc_org do on dmd.identity_id = do.identity_id
             inner join mo_meta_data_marketplace mmdm on dmd.meta_data_id = mmdm.meta_data_id
             inner join mo_org_expand moe on dmd.identity_id = moe.identity_id
+            left join mo_org_vc mov on dmd.identity_id = mov.identity_id
         where 1 = 1
             <if test="keyword != null and keyword != ''">
                 and dmd.file_name like concat('%', #{keyword}, '%')
@@ -88,11 +90,12 @@
                dmd.is_support_ct_alg,
                dmd.is_support_pt_alg,
                moe.is_authority,
-               moe.is_certified
+               if(mov.status = 1, 1, 0) as is_certified
         from dc_meta_data dmd
             inner join dc_org do on dmd.identity_id = do.identity_id
             inner join mo_meta_data_user mmdu on mmdu.meta_data_id = dmd.meta_data_id and mmdu.address = #{address}
             inner join mo_org_expand moe on dmd.identity_id = moe.identity_id
+            left join mo_org_vc mov on dmd.identity_id = mov.identity_id
         where 1 = 1
           <if test="keyword != null and keyword != ''">
             and dmd.file_name like concat('%', #{keyword}, '%')
@@ -129,12 +132,6 @@
         order by mmdu.create_time desc
     </select>
 
-
-    <select id="sizeOfData" resultType="java.lang.Long">
-        select sum(dmd.size)
-        from dc_meta_data dmd inner join mo_token mt on dmd.token_address = mt.address
-        where  mt.is_add_liquidity = 1 and dmd.status = 2
-    </select>
     <select id="statisticsOfGlobal" resultType="com.datum.platform.mapper.domain.MetaData">
         select ifnull(sum(dmd.size),0) as totalSize,
                count(1) as totalCount

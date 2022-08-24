@@ -14,9 +14,10 @@
                so.total_data_token,
                so.total_data,
                moe.is_authority,
-               moe.is_certified
+               if(mov.status = 1, 1, 0) as is_certified
         from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
             left join mo_org_expand moe on o.identity_id = moe.identity_id
+            left join mo_org_vc mov on o.identity_id = mov.identity_id
         where o.status = 1
         <if test="keyword != null and keyword != ''">
             and ( o.identity_id = #{keyword} or o.node_name like concat('%', #{keyword}, '%') )
@@ -37,9 +38,10 @@
                so.total_data_token,
                so.total_data,
                moe.is_authority,
-               moe.is_certified
+               if(mov.status = 1, 1, 0) as is_certified
         from dc_org o left join mo_stats_org so on o.identity_id = so.identity_id
             left join mo_org_expand moe on o.identity_id = moe.identity_id
+            left join mo_org_vc mov on o.identity_id = mov.identity_id
         where o.status = 1 and  o.identity_id = #{identityId}
     </select>
     <select id="getStatsOrg" resultType="com.datum.platform.mapper.domain.StatsOrg">

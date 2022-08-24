@@ -19,11 +19,10 @@
                io.identity_id as issuerIdentityId,
                mov.issuance_date,
                mov.expiration_date
-        from mo_org_vc mov inner join dc_org io  on io.wallet_address = mov.issuer
-                           inner join dc_org ho  on ho.identity_id = mov.identity_id
-        where ho.status = 1
+        from mo_org_vc mov inner join dc_org io  on io.identity_id = mov.issuer
+                           inner join dc_org ho  on ho.identity_id = mov.holder
+        where ho.status = 1 and mov.status = 1
         order by mov.issuance_date desc
-        limit #{size}
     </select>
 
 </mapper>

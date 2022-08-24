@@ -55,11 +55,6 @@ public class Org implements Serializable {
     private Date updateAt;
 
     /**
-     * 组织可验证凭证
-     */
-    private String vc;
-
-    /**
      * 创建时间
      */
     private Date createTime;

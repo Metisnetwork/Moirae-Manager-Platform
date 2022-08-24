@@ -22,8 +22,6 @@ public interface MetaDataMapper extends BaseMapper<MetaData> {
 
     IPage<MetaData> getUserAuthDataList(Page<MetaData> page, String address, String keyword);
 
-    long sizeOfData();
-
     MetaData statisticsOfGlobal();
 
     List<String> listDataOrgIdByUser(String address, Integer algorithmType);

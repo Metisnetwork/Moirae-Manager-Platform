@@ -40,7 +40,6 @@ public class SyncOrgExpandTask {
             List<OrgExpand> orgExpandList = orgService.listOrgExpand();
             List<OrgExpand> updateOrgExpandList = new ArrayList<>();
             Map<String, AuthorityDto> address2Authority = voteContract.getAllAuthority().stream().collect(Collectors.toMap(AuthorityDto::getAddress, me -> me));
-            Set<String> vcSet = orgService.listOrgVcId().stream().collect(Collectors.toSet());
             orgExpandList.forEach(orgExpand -> {
                 String address = AddressChangeUtils.did20xAddress(orgExpand.getIdentityId());
                 if(address2Authority.containsKey(address) && !orgExpand.getIsAuthority()){
@@ -50,14 +49,6 @@ public class SyncOrgExpandTask {
                 }
                 if(!address2Authority.containsKey(address) && orgExpand.getIsAuthority()){
                     orgExpand.setIsAuthority(false);
-                    updateOrgExpandList.add(orgExpand);
-                }
-                if(vcSet.contains(address) && !orgExpand.getIsCertified()){
-                    orgExpand.setIsCertified(true);
-                    updateOrgExpandList.add(orgExpand);
-                }
-                if(!vcSet.contains(address) && orgExpand.getIsCertified()){
-                    orgExpand.setIsCertified(false);
                     updateOrgExpandList.add(orgExpand);
                 }
             });

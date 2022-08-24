@@ -11,6 +11,7 @@ import com.datum.platform.mapper.domain.OrgVc;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -26,7 +27,7 @@ public class OrgVcManagerImpl extends ServiceImpl<OrgVcMapper, OrgVc> implements
     @Override
     public List<String> listId() {
         LambdaQueryWrapper<OrgVc> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.select(OrgVc::getIdentityId);
+            queryWrapper.select(OrgVc::getIdentityId);
         return listObjs(queryWrapper, item -> item.toString());
     }
 
@@ -38,5 +39,16 @@ public class OrgVcManagerImpl extends ServiceImpl<OrgVcMapper, OrgVc> implements
     @Override
     public IPage<OrgVc> list(Page<OrgVc> page) {
         return baseMapper.list(page);
+    }
+
+    @Override
+    public void saveBatchIfAbsent(List<OrgVc> orgVcList) {
+        List<String> db = listId();
+        List<OrgVc> save = orgVcList.stream()
+                .filter(orgVc -> !db.contains(orgVc.getIdentityId()))
+                .collect(Collectors.toList());
+        if(save.size() > 0){
+            saveBatch(save);
+        }
     }
 }

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,9 +105,11 @@ public class OrgServiceImpl implements OrgService {
 
     @Override
     @Transactional
-    public boolean batchReplace(List<Org> orgList, List<String> addOrgIdList) {
+    public boolean batchReplace(List<Org> orgList, List<String> addOrgIdList, List<OrgVc> orgVcList, Set<String> publicityIdSet) {
         orgManager.saveOrUpdateBatch(orgList);
         orgExpandManager.saveOfNotExist(addOrgIdList);
+        publicityManager.saveBatch(publicityIdSet);
+        orgVcManager.saveBatchIfAbsent(orgVcList);
         return true;
     }
 

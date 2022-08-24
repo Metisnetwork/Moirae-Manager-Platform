@@ -7,6 +7,7 @@ import io.grpc.ManagedChannel;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface OrgService {
 
@@ -35,7 +36,7 @@ public interface OrgService {
      * 批量提供组织信息
      *
      */
-    boolean batchReplace(List<Org> orgList,  List<String> addOrgIdList);
+    boolean batchReplace(List<Org> orgList,  List<String> addOrgIdList, List<OrgVc> orgVcList, Set<String> publicityIdSet);
 
     /**
      * 用户添加私有组织

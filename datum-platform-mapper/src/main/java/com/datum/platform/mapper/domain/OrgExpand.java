@@ -39,11 +39,6 @@ public class OrgExpand implements Serializable {
     private Boolean isAuthority;
 
     /**
-     * 是否已认证: 0-否，1-是
-     */
-    private Boolean isCertified;
-
-    /**
      * 加入委员会的时间
      */
     private Date authorityJoinTime;

@@ -22,4 +22,6 @@ public interface OrgVcManager extends IService<OrgVc> {
     List<OrgVc> listLatest(Integer size);
 
     IPage<OrgVc> list(Page<OrgVc> page);
+
+    void saveBatchIfAbsent(List<OrgVc> orgVcList);
 }

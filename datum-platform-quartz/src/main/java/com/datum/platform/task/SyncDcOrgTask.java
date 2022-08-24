@@ -2,22 +2,24 @@ package com.datum.platform.task;
 
 import carrier.types.Identitydata;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.datum.platform.common.utils.AddressChangeUtils;
 import com.datum.platform.grpc.client.impl.GrpcAuthServiceClientImpl;
 import com.datum.platform.mapper.domain.Org;
+import com.datum.platform.mapper.domain.OrgVc;
 import com.datum.platform.mapper.enums.DataSyncTypeEnum;
 import com.datum.platform.mapper.enums.OrgStatusEnum;
 import com.datum.platform.service.OrgService;
 import com.datum.platform.service.SysService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +65,8 @@ public class SyncDcOrgTask {
      * @param nodeIdentityDtoList 需更新数据
      */
     private void batchUpdateOrg(List<Identitydata.Organization> nodeIdentityDtoList) {
+        List<OrgVc> orgVcList = new ArrayList<>();
+        Set<String> publicityIdSet = new HashSet<>();
         List<Org> orgList = nodeIdentityDtoList.stream().map(nodeIdentityDto -> {
                     Org org = new Org();
                     org.setIdentityId(nodeIdentityDto.getIdentityId());
@@ -72,8 +76,25 @@ public class SyncDcOrgTask {
                     org.setImageUrl(nodeIdentityDto.getImageUrl());
                     org.setDetails(nodeIdentityDto.getDetails());
                     org.setStatus(OrgStatusEnum.find(nodeIdentityDto.getStatus().getNumber()));
-                    org.setVc(nodeIdentityDto.getCredential());
                     org.setUpdateAt(new Date(nodeIdentityDto.getUpdateAt()));
+
+                    if(StringUtils.isNotBlank(nodeIdentityDto.getCredential())){
+                        JSONObject vc = JSONObject.parseObject(nodeIdentityDto.getCredential());
+                        OrgVc orgVc = new OrgVc();
+                        orgVc.setIdentityId(nodeIdentityDto.getIdentityId());
+                        orgVc.setVcContent(nodeIdentityDto.getCredential());
+                        orgVc.setIssuer(vc.getString("issuer"));
+                        orgVc.setIssuanceDate(vc.getDate("issuanceDate"));
+                        orgVc.setExpirationDate(vc.getDate("expirationDate"));
+                        orgVc.setHolder(vc.getString("holder"));
+                        orgVc.setPublicityId(vc.getJSONObject("claimData").getString("url"));
+                        orgVc.setVcProof(vc.getString("proof"));
+                        orgVcList.add(orgVc);
+
+                        if(StringUtils.isNotBlank(orgVc.getPublicityId())){
+                            publicityIdSet.add(orgVc.getPublicityId());
+                        }
+                    }
                     return org;
                 })
                 .collect(Collectors.toList());
@@ -83,6 +104,6 @@ public class SyncDcOrgTask {
                 .map(Org::getIdentityId)
                 .collect(Collectors.toList());
         //更新
-        organizationService.batchReplace(orgList, addOrgIdList);
+        organizationService.batchReplace(orgList, addOrgIdList, orgVcList, publicityIdSet);
     }
 }
