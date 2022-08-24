@@ -14,6 +14,7 @@
                mp.status
         from mo_proposal mp inner join dc_org so on mp.submitter = so.wallet_address
                             inner join dc_org co on mp.candidate = co.wallet_address
+        where mp.type in (1, 2)
     </select>
     <select id="getDetailsById" resultType="com.datum.platform.mapper.domain.Proposal">
         select mp.id,
