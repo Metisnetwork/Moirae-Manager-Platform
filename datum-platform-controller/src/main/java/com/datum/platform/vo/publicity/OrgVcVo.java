@@ -17,6 +17,9 @@ public class OrgVcVo {
     @ApiModelProperty(value = "vc的颁发时间")
     private Date issuanceDate;
 
+    @ApiModelProperty(value = "vc的过期时间")
+    private Date expirationDate;
+
     @ApiModelProperty(value = "组织机构图像url")
     private String imageUrl;
 
