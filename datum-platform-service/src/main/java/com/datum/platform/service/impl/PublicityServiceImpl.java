@@ -8,6 +8,7 @@ import com.datum.platform.chain.platon.PlatONClient;
 import com.datum.platform.chain.platon.config.PlatONProperties;
 import com.datum.platform.chain.platon.contract.VoteContract;
 import com.datum.platform.chain.platon.contract.evm.Vote;
+import com.datum.platform.common.constants.SysConfig;
 import com.datum.platform.manager.ProposalLogManager;
 import com.datum.platform.manager.ProposalManager;
 import com.datum.platform.manager.PublicityManager;
@@ -19,6 +20,7 @@ import com.datum.platform.mapper.enums.ProposalTypeEnum;
 import com.datum.platform.service.PublicityService;
 import com.platon.protocol.core.methods.response.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,8 @@ public class PublicityServiceImpl implements PublicityService {
     private PublicityManager publicityManager;
     @Resource
     private PlatONClient platONClient;
+    @Resource
+    private SysConfig sysConfig;
 
     private static Map<BigInteger, BigInteger> timeCache = new ConcurrentHashMap<>();
 
@@ -113,13 +117,33 @@ public class PublicityServiceImpl implements PublicityService {
                         proposal.setStatus(ProposalStatusEnum.VOTING);
                     }
                 });
+
         return iPage;
     }
 
     @Override
     public Proposal getProposalDetails(String id) {
         Proposal proposal = proposalManager.getDetailsById(id);
+        // 查询当前块高
+        BigInteger curBn = platONClient.platonBlockNumber();
+        // 查询平均出块时间
+        BigInteger avgPackTime  = platONClient.getAvgPackTime();
+        if(proposal.getType() != ProposalTypeEnum.AUTO_QUIT_AUTHORITY){
+            proposal.setVoteBeginTime(bn2Date(proposal.getVoteBeginBn(), curBn, avgPackTime));
+            proposal.setVoteEndTime(bn2Date(proposal.getVoteEndBn(), curBn, avgPackTime));
+            if(proposal.getStatus() == ProposalStatusEnum.HAS_NOT_STARTED && curBn.compareTo(new BigInteger(proposal.getVoteBeginBn())) > 0){
+                proposal.setStatus(ProposalStatusEnum.VOTING);
+            }
+        }
+        proposal.setSubmissionTime(getTimeByBn(new BigInteger(proposal.getSubmissionBn())));
+        if(proposal.getAuthorityNumber() == null){
+            proposal.setAuthorityNumber(voteContract.sizeOfAllAuthority(curBn));
+        }
         proposal.setPublicity(publicityManager.getById(proposal.getPublicityId()));
+        proposal.setPublicityId(proposal.getPublicityId().replace("ipfs://", sysConfig.getIpfsGateway()));
+        if(proposal.getPublicity() != null && StringUtils.isNotBlank(proposal.getPublicity().getImageUrl())){
+            proposal.getPublicity().setImageUrl(proposal.getPublicity().getImageUrl().replace("ipfs://", sysConfig.getIpfsGateway()));
+        }
         return proposal;
     }
 
