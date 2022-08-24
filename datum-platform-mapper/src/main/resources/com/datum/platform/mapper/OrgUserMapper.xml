@@ -19,8 +19,9 @@
             oe.`identity_port`,
             oe.`is_public` as public_flag,
             oe.is_authority,
-            oe.is_certified
+            if(mov.status = 1, 1, 0) as is_certified
         FROM `dc_org` o join `mo_org_expand` oe on o.`identity_id` = oe.`identity_id`
+                        left join mo_org_vc mov on o.identity_id = mov.identity_id
         WHERE `status` = 1 AND oe.identity_ip is not null AND (oe.`is_public` = 1 OR o.`identity_id` IN ( SELECT `identity_id` FROM `mo_org_user` WHERE `address` = #{address, jdbcType=VARCHAR}))
     </select>
 </mapper>
