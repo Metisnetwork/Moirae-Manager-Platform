@@ -137,12 +137,10 @@ public class OrgServiceImpl implements OrgService {
             orgExpand.setIdentityPort(identityPort);
             orgExpand.setIsPublic(false);
             orgExpandManager.save(orgExpand);
-        } else {
-            if (!orgExpand.getIdentityIp().equals(identityIp) || orgExpand.getIdentityPort() != identityPort.intValue()) {
-                orgExpand.setIdentityIp(identityIp);
-                orgExpand.setIdentityPort(identityPort);
-                orgExpandManager.updateById(orgExpand);
-            }
+        }else{
+            orgExpand.setIdentityIp(identityIp);
+            orgExpand.setIdentityPort(identityPort);
+            orgExpandManager.updateById(orgExpand);
         }
         // 绑定用户私有组织关系
         UserDto userDto = UserContext.getCurrentUser();
