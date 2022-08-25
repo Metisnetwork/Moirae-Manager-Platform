@@ -7,5 +7,8 @@ bootJar {
 }
 
 dependencies {
+    implementation ("network.platon.did:client-sdk:0.0.5.2") {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
     api project(':datum-platform-service')
 }

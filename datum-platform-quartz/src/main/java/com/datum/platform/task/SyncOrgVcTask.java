@@ -1,10 +1,19 @@
 package com.datum.platform.task;
 
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.datum.platform.chain.platon.config.PlatONProperties;
+import com.datum.platform.chain.platon.enums.Web3jProtocolEnum;
 import com.datum.platform.mapper.domain.OrgVc;
 import com.datum.platform.service.OrgService;
 import com.zengtengpeng.annotation.Lock;
 import lombok.extern.slf4j.Slf4j;
+import network.platon.did.common.config.DidConfig;
+import network.platon.did.sdk.base.dto.Credential;
+import network.platon.did.sdk.contract.service.ContractService;
+import network.platon.did.sdk.factory.PClient;
+import network.platon.did.sdk.req.evidence.VerifyCredentialEvidenceReq;
+import network.platon.did.sdk.resp.BaseResp;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,17 +31,36 @@ public class SyncOrgVcTask {
 
     @Resource
     private OrgService orgService;
+    @Resource
+    private PlatONProperties platONProperties;
 
     @Scheduled(fixedDelay = 60 * 1000)
     @Lock(keys = "SyncOrgVcTask")
     public void run() {
         long begin = DateUtil.current();
+        DidConfig.setCHAIN_ID(platONProperties.getChainId());
+        DidConfig.setCHAIN_HRP(platONProperties.getHrp());
+        DidConfig.setWeb3jProtocolEnum(platONProperties.getWeb3jProtocol() == Web3jProtocolEnum.HTTP ? network.platon.did.common.enums.Web3jProtocolEnum.HTTP : network.platon.did.common.enums.Web3jProtocolEnum.WS);
+        DidConfig.setPLATON_URL(platONProperties.getWeb3jAddresses().get(0));
+        DidConfig.setGAS_PRICE("10000000000");
+        DidConfig.setGAS_LIMIT("4700000");
+        DidConfig.setDID_CONTRACT_ADDRESS(platONProperties.getDidLatAddress());
+        DidConfig.setPCT_CONTRACT_ADDRESS(platONProperties.getPctLatAddress());
+        DidConfig.setVOTE_CONTRACT_ADDRESS(platONProperties.getVoteLatAddress());
+        DidConfig.setCREDENTIAL_CONTRACT_ADDRESS(platONProperties.getCredentialLatAddress());
+        ContractService.init();
         try {
             List<OrgVc> orgVcList = orgService.listNeedVerifyOrgVc();
             orgVcList.forEach(orgVc -> {
                 try {
-                    log.error("work");
-//                    orgService.verifyOrgVcFinish(orgVc.getIdentityId(), 1);
+                    Credential credential = JSONObject.parseObject(orgVc.getVcContent(), Credential.class);
+                    VerifyCredentialEvidenceReq credentialReq = VerifyCredentialEvidenceReq.builder().credential(credential).build();
+                    BaseResp<String> result = PClient.createEvidenceClient().verifyCredentialEvidence(credentialReq);
+                    if(result.checkSuccess()){
+                        orgService.verifyOrgVcFinish(orgVc.getIdentityId(), 1);
+                    }else{
+                        orgService.verifyOrgVcFinish(orgVc.getIdentityId(), 2);
+                    }
                 } catch (Exception e) {
                     log.error("组织VC明细验证失败 id = " + orgVc.getIdentityId(), e);
                 }

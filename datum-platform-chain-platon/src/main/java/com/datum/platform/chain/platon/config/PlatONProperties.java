@@ -1,6 +1,7 @@
 package com.datum.platform.chain.platon.config;
 
 import com.datum.platform.chain.platon.enums.Web3jProtocolEnum;
+import com.platon.bech32.Bech32;
 import com.platon.parameters.NetworkParameters;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,6 +20,10 @@ public class PlatONProperties {
     private String datumNetworkPayAddress;
     private String uniswapV2Router02;
     private String voteAddress;
+    private String didAddress;
+    private String pctAddress;
+    private String credentialAddress;
+
     private BigInteger voteDeployBlockNumber;
     private Web3jProtocolEnum web3jProtocol;
     private List<String> web3jAddresses;
@@ -38,6 +43,27 @@ public class PlatONProperties {
     }
     public void setVoteAddress(String voteAddress){
         this.voteAddress = voteAddress.toLowerCase();
+    }
+    public void setDidAddress(String didAddress){
+        this.didAddress = didAddress.toLowerCase();
+    }
+    public void setPctAddress(String pctAddress){
+        this.pctAddress = pctAddress.toLowerCase();
+    }
+    public void setCredentialAddress(String credentialAddress){
+        this.credentialAddress = credentialAddress.toLowerCase();
+    }
+    public String getVoteLatAddress(){
+        return Bech32.addressEncode(hrp, voteAddress);
+    }
+    public String getDidLatAddress(){
+        return Bech32.addressEncode(hrp, didAddress);
+    }
+    public String getPctLatAddress(){
+        return Bech32.addressEncode(hrp, pctAddress);
+    }
+    public String getCredentialLatAddress(){
+        return Bech32.addressEncode(hrp, credentialAddress);
     }
 
     @PostConstruct

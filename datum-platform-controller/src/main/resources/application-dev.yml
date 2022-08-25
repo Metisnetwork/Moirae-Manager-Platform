@@ -36,6 +36,9 @@ chain:
     uniswapV2Router02: "0x4378dAF745E9053f6048c4f78c803f3bC8829703"
     voteAddress: "0x857027b23F73F5823984d90550A39cAA6FA43A11"
     voteDeployBlockNumber: "27713101"
+    didAddress: "0x279167d9767b10CEF88b9a81D9C912e475c0B75b"
+    pctAddress: "0xFa2A71584740c749F1EF055741140833534504CD"
+    credentialAddress: "0x6Afe474d2201525558b50D5D5a8544e88d222E05"
     web3jProtocol: HTTP
     web3jAddresses: 8.219.126.197:6789
     chainName: "PlatON开发网"
