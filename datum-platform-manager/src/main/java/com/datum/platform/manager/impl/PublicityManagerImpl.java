@@ -30,6 +30,9 @@ public class PublicityManagerImpl extends ServiceImpl<PublicityMapper, Publicity
 
     @Override
     public boolean saveBatch(Set<String> publicityIdSet) {
+        if(publicityIdSet.isEmpty()){
+            return true;
+        }
         LambdaQueryWrapper<Publicity> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.select(Publicity::getId);
         queryWrapper.in(Publicity::getId, publicityIdSet);

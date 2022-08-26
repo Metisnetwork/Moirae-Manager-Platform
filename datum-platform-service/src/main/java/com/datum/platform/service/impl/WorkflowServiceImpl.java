@@ -758,6 +758,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     public WorkflowVersionKeyDto settingWorkflowOfExpertMode(WorkflowDetailsOfExpertModeDto req) {
         Workflow dbWorkflow = workflowManager.getById(req.getWorkflowId());
         checkWorkFlowOnlyOwner(dbWorkflow);
+        checkModelInputOfExpertMode(req.getWorkflowNodeList());
 
         // 清理节点设置
         clearWorkflowOfExpertMode(req.getWorkflowId(), req.getWorkflowVersion());
@@ -2001,6 +2002,12 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflowRunTaskResultList;
     }
 
+    private void checkModelInputOfExpertMode(List<NodeDto> workflowNodeList) {
+        // 训练预测组合模式
+        if(workflowNodeList.size() == 2 && !workflowNodeList.get(0).getNodeOutput().getIdentityId().contains(workflowNodeList.get(1).getNodeInput().getIdentityId())){
+            throw new BusinessException(RespCodeEnum.BIZ_FAILED, ErrorMsg.WORKFLOW_NODE_INPUT_INCLUDE_PRE_NODE_OUTPUT.getMsg());
+        }
+    }
 
     private void checkWorkFlowOnlyOwner(Workflow workflow){
         // 只有拥有者才可以终止

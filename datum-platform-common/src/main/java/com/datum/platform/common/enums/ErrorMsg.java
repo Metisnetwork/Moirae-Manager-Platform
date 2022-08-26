@@ -133,6 +133,7 @@ public enum ErrorMsg {
     WORKFLOW_FILE_DOWNLOAD_TIMEOUT("工作流节点输入模型文件下载超时", "Workflow node model file download timeout"),
     WORKFLOW_FILE_DOWNLOAD_COMPRESSTYPE_ERROR("工作流节点输入模型文件下载压缩格式错误", "Workflow node model file download compressType error"),
     WORKFLOW_ONLY_OWNER_OPERATE("只有拥有者才可以操作该工作流", "Only the owner can operate the workflow"),
+    WORKFLOW_NODE_INPUT_INCLUDE_PRE_NODE_OUTPUT("节点输入配置任务发起方和上个节点输出不在一个组织内！", "The node input configuration task initiator and the last node output are not in the same organization!"),
 
     WORKFLOW_FEE_ESTIMATE_FAIL("估算手续费失败，请检查手续费凭证是否足够", "Failed to estimate the handling fee, please check whether the handling fee certificate is sufficient"),
     WORKFLOW_SETTING_PSI_OUTERROR("PSI的输出组织设置必须限制在数据输入组织内，不合法的组织 = {}", "The output organization setting of PSI must be limited to the data input organization, and the illegal organization = {}"),
