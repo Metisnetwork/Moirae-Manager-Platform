@@ -59,6 +59,7 @@ public class SyncOrgVcTask {
                     if(result.checkSuccess()){
                         orgService.verifyOrgVcFinish(orgVc.getIdentityId(), 1);
                     }else{
+                        log.error("vc 验证失败id = {} code ={} msg = {}",orgVc.getIdentityId(),  result.getCode(), result.getErrMsg());
                         orgService.verifyOrgVcFinish(orgVc.getIdentityId(), 2);
                     }
                 } catch (Exception e) {
