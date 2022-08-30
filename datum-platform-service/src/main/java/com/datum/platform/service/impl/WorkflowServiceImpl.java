@@ -1720,28 +1720,31 @@ public class WorkflowServiceImpl implements WorkflowService {
         // 如果是无属性凭证支付，需要保证余额及授权数量足够支付任务消耗； 如果是有属性凭证支付，则需要该凭证的拥有者为当前发起任务的用户
         List<WorkflowFeeItemDto> tokenFeeList = new ArrayList<>();
         Map<String, BigInteger> metaDataId2consumptionMap = new HashMap<>();
-        for (WorkflowTask workflowTask: workflowTaskList) {
-            for (WorkflowTaskInput taskInput: workflowTask.getInputList()) {
-                MetaData metaData = dataService.getMetaDataById(taskInput.getMetaDataId(), false);
-                // 如果元数据属于自己，则不要凭证
-                if(metaData.getOwnerAddress().equals(UserContext.getCurrentUser().getAddress())){
-                    continue;
-                }
-                MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(taskInput.getMetaDataId());
-                if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES){
-                    metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);
-                }
-                if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
-                    if(!metaDataId2consumptionMap.containsKey(taskInput.getMetaDataId())){
+        for (int i = 0; i < workflowTaskList.size(); i++) {
+            if((workflowTaskList.get(i).getInputPsi() && workflowTaskList.get(i-1) != null && workflowTaskList.get(i-1).getAlgorithmId() == sysConfig.getDefaultPsi()) || workflowTaskList.get(i).getPowerType() != null){
+                WorkflowTask workflowTask = workflowTaskList.get(i);
+                for (WorkflowTaskInput taskInput: workflowTask.getInputList()) {
+                    MetaData metaData = dataService.getMetaDataById(taskInput.getMetaDataId(), false);
+                    // 如果元数据属于自己，则不要凭证
+                    if(metaData.getOwnerAddress().equals(UserContext.getCurrentUser().getAddress())){
+                        continue;
+                    }
+                    MetaDataCertificate metaDataCertificate = metaDataId2credentialKeyDtoMap.get(taskInput.getMetaDataId());
+                    if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.HAVE_ATTRIBUTES){
                         metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);
                     }
-                    metaDataId2consumptionMap.computeIfPresent(taskInput.getMetaDataId(), (key, oldValue) -> {
-                        if ( workflowTask.getAlgorithm().getType() == AlgorithmTypeEnum.CT){
-                            return oldValue.add(new BigInteger(metaDataCertificate.getErc20CtAlgConsume()));
-                        }else{
-                            return oldValue.add(new BigInteger(metaDataCertificate.getErc20PtAlgConsume()));
+                    if(metaDataCertificate.getType() == MetaDataCertificateTypeEnum.NO_ATTRIBUTES){
+                        if(!metaDataId2consumptionMap.containsKey(taskInput.getMetaDataId())){
+                            metaDataId2consumptionMap.put(taskInput.getMetaDataId(), BigInteger.ZERO);
                         }
-                    });
+                        metaDataId2consumptionMap.computeIfPresent(taskInput.getMetaDataId(), (key, oldValue) -> {
+                            if ( workflowTask.getAlgorithm().getType() == AlgorithmTypeEnum.CT){
+                                return oldValue.add(new BigInteger(metaDataCertificate.getErc20CtAlgConsume()));
+                            }else{
+                                return oldValue.add(new BigInteger(metaDataCertificate.getErc20PtAlgConsume()));
+                            }
+                        });
+                    }
                 }
             }
         }
