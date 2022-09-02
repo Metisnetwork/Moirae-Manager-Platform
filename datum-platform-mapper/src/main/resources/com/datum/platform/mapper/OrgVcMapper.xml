@@ -21,7 +21,8 @@
                mov.expiration_date
         from mo_org_vc mov inner join dc_org io  on io.identity_id = mov.issuer
                            inner join dc_org ho  on ho.identity_id = mov.holder
-        where ho.status = 1 and mov.status = 1
+                           inner join mo_org_expand hmoe on hmoe.identity_id =  mov.holder
+        where ho.status = 1 and mov.status = 1 and hmoe.is_authority = 0
         order by mov.issuance_date desc
     </select>
 
