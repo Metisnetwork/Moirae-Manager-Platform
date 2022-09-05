@@ -9,6 +9,6 @@
                mp.create_time,
                mp.update_time
         from mo_publicity mp
-        where mp.image_url is null
+        where mp.image_url is null and mp.remark is null and mp.`describe` is null
     </select>
 </mapper>
