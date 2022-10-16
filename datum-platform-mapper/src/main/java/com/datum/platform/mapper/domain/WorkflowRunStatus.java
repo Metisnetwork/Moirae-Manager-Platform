@@ -39,6 +39,12 @@ public class WorkflowRunStatus implements Serializable {
     private Long workflowId;
 
     /**
+     * 工作流Hash,工作流启动成功后，carrier返回
+     */
+    @TableField("workflow_hash")
+    private String workflowHash;
+
+    /**
      * 工作流版本号
      */
     @TableField("workflow_version")

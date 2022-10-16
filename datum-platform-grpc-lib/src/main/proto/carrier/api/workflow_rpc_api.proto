@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option go_package = "github.com/datumtechs/datum-network-carrier/pb/carrier/api";
+
+package carrier.api;
+
+import "common/constant/carrier_enum.proto";
+import "carrier/types/common.proto";
+import "google/api/annotations.proto";
+import "carrier/api/task_rpc_api.proto";
+
+message PublishWorkFlowDeclareRequest {
+  string                              desc = 1;                 // 关于工作流的描述信息
+  string                              workflow_name = 2;       // 工作流名字
+  common.constant.WorkFlowPolicyType  policy_type = 3;          // 策略类型
+  string                              policy = 4;               // 策略
+  repeated  PublishTaskDeclareRequest task_list = 5;            // 工作流所有的任务
+  string                              user = 6;                 // 发起工作流的用户的信息
+  common.constant.UserType            user_type = 7;            // 发起工作流的用户的用户类型
+  bytes                               sign = 8;                 //消息签名
+}
+
+message PublishWorkFlowDeclareResponse {
+  int32         status = 1;
+  string        msg = 2;
+  string        id = 3;    // 工作流id
+}
+
+message WorkFlowTaskStatus {
+  string                      task_id = 1;
+  common.constant.TaskState  status = 2;
+  string                      task_name = 3;
+}
+
+message QueryWorkStatusRequest {
+  repeated string             workflow_id = 1;
+}
+
+
+message WorkFlowStatus {
+  common.constant.WorkFlowState  status = 1;      //成功 失败 执行中 未执行
+  repeated  WorkFlowTaskStatus  task_list = 2;    //工作流各个任务执行的状态
+}
+
+message QueryWorkStatusResponse {
+  int32                   status = 1;
+  string                  msg = 2;
+  repeated WorkFlowStatus workflow_status_list = 3;
+}
+
+// ## 工作流 相关接口
+service WorkFlowService {
+  //发布工作流
+  rpc PublishWorkFlowDeclare (PublishWorkFlowDeclareRequest) returns (PublishWorkFlowDeclareResponse) {
+    option (google.api.http) = {
+      post: "/carrier/v1/workflow/publish"
+      body: "*"
+    };
+  }
+  //查询工作流状态
+  rpc QueryWorkFlowStatus (QueryWorkStatusRequest) returns (QueryWorkStatusResponse) {
+    option (google.api.http) = {
+      post: "/carrier/v1/workflow/getStatus"
+      body: "*"
+    };
+  }
+}

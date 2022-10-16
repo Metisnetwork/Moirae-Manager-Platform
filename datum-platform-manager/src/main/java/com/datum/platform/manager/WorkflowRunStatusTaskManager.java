@@ -24,4 +24,8 @@ public interface WorkflowRunStatusTaskManager extends IService<WorkflowRunStatus
     List<WorkflowRunStatusTask> listByWorkflowRunId(Long workflowRunId);
 
     WorkflowRunStatusTask getByTaskId(String taskId);
+
+    WorkflowRunStatusTask getByTaskName(String taskName);
+
+    boolean updateByTaskName(String taskName);
 }

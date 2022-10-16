@@ -41,7 +41,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -232,9 +231,18 @@ public class WorkflowController {
     @GetMapping("downloadResultFile")
     @ApiOperation(value = "工作流结果文件下载", notes = "工作流结果文件下载")
     @ApiOperationSupport(order = 22)
-    public void downloadResultFile(@Valid GetDataDetailsReq req, HttpServletResponse response) throws IOException{
+    public void downloadResultFile(@Valid GetDataDetailsReq req, HttpServletResponse response) throws IOException {
         response.setHeader("Content-Disposition", "attachment; filename=" + req.getMetaDataId() + ".zip");
         response.setContentType("application/octet-stream");
         workflowService.downloadTaskResultData(req.getMetaDataId(), response.getOutputStream());
     }
+
+    @PostMapping("unsignedWorkflow")
+    @ApiOperation(value = "待签名工作流信息", notes = "待签名工作流信息")
+    @ApiOperationSupport(order = 23)
+    public ResponseVo<String> unsignedWorkflow(@RequestBody @Validated WorkflowUnsignedWorkflowDto req) {
+        String unsignedMsg = workflowService.unsignedWorkflow(req);
+        return ResponseVo.createSuccess(unsignedMsg);
+    }
+
 }

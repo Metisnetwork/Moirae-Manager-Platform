@@ -3,6 +3,8 @@ package com.datum.platform.manager;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.datum.platform.mapper.domain.WorkflowRunStatus;
 
+import java.util.List;
+
 /**
  * <p>
  * 工作流运行状态 服务类
@@ -16,4 +18,6 @@ public interface WorkflowRunStatusManager extends IService<WorkflowRunStatus> {
     WorkflowRunStatus getLatestOneByWorkflowVersion(Long workflowId, Long workflowVersion);
 
     boolean hasBeenRun(Long workflowId);
+
+    List<WorkflowRunStatus> getRunningWorkflow();
 }

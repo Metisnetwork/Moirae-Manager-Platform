@@ -42,6 +42,12 @@ public class WorkflowRunStatusTask implements Serializable {
     private Long workflowTaskId;
 
     /**
+     * 任务名称
+     */
+    @TableField("task_name")
+    private String taskName;
+
+    /**
      * 节点在工作流中序号,从1开始
      */
     private Integer step;
@@ -104,6 +110,4 @@ public class WorkflowRunStatusTask implements Serializable {
     private WorkflowTask workflowTask;
     @TableField(exist = false)
     private Model model;
-    @TableField(exist = false)
-    private String preStepTaskId;
 }

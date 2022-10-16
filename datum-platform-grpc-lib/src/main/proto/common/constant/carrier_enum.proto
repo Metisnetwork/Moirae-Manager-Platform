@@ -118,3 +118,17 @@ enum MetadataAuthorityState {
   MAState_Invalid = 4;
 }
 
+// 工作流策略类型
+enum WorkFlowPolicyType {
+  Unknown_Policy 	  = 0;	  // 未知策略
+  Ordinary_Policy 	= 1;    // 普通（常规）策略
+}
+
+// 工作流状态
+enum WorkFlowState {
+  WorkFlowState_Unknown = 0;                  // 未知
+  WorkFlowState_Pending = 1;                  // 等在中
+  WorkFlowState_Running = 2;                  // 执行中
+  WorkFlowState_Failed  = 3;                  // 失败
+  WorkFlowState_Succeed = 4;                  // 成功
+}

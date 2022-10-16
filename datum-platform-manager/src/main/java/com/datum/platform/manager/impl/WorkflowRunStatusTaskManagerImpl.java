@@ -1,6 +1,8 @@
 package com.datum.platform.manager.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.WorkflowRunStatusTaskManager;
@@ -60,5 +62,23 @@ public class WorkflowRunStatusTaskManagerImpl extends ServiceImpl<WorkflowRunSta
         LambdaQueryWrapper<WorkflowRunStatusTask> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowRunStatusTask::getTaskId, taskId);
         return getOne(wrapper);
+    }
+
+    @Override
+    public WorkflowRunStatusTask getByTaskName(String taskName) {
+        LambdaQueryWrapper<WorkflowRunStatusTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunStatusTask::getTaskName, taskName);
+        return getOne(wrapper);
+    }
+
+    @Override
+    public boolean updateByTaskName(String taskName) {
+        if(StrUtil.isBlank(taskName)){
+            return false;
+        }
+        LambdaUpdateWrapper<WorkflowRunStatusTask> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(WorkflowRunStatusTask::getTaskName, taskName);
+        boolean update = update(wrapper);
+        return update;
     }
 }

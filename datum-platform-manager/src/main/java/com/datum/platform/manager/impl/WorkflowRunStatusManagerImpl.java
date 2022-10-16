@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.datum.platform.manager.WorkflowRunStatusManager;
 import com.datum.platform.mapper.WorkflowRunStatusMapper;
 import com.datum.platform.mapper.domain.WorkflowRunStatus;
+import com.datum.platform.mapper.enums.WorkflowTaskRunStatusEnum;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -34,5 +37,12 @@ public class WorkflowRunStatusManagerImpl extends ServiceImpl<WorkflowRunStatusM
         LambdaQueryWrapper<WorkflowRunStatus> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowRunStatus::getWorkflowId, workflowId);
         return count(wrapper) > 0;
+    }
+
+    @Override
+    public List<WorkflowRunStatus> getRunningWorkflow() {
+        LambdaQueryWrapper<WorkflowRunStatus> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunStatus::getRunStatus, WorkflowTaskRunStatusEnum.RUN_DOING);
+        return list(wrapper);
     }
 }

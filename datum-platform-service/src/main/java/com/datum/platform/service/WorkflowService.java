@@ -46,6 +46,8 @@ public interface WorkflowService{
 
     WorkflowRunKeyDto start(WorkflowStartSignatureDto req);
 
+    List<WorkflowTask> listExecutableDetailsByWorkflowVersion(Long workflowId, Long workflowVersion);
+
     Boolean terminate(WorkflowRunKeyDto req);
 
     List<WorkflowStartCredentialDto> preparationStartCredentialList(WorkflowVersionKeyDto req);
@@ -60,28 +62,7 @@ public interface WorkflowService{
 
     WorkflowVersionKeyDto createWorkflowOfExpertMode(String workflowName);
 
-    /**
-     * 查询待确认的任务列表
-     *
-     * @return
-     */
-    List<WorkflowRunStatusTask> listWorkflowRunTaskStatusOfUnConfirmed();
-
-    /**
-     * 取消任务
-     *
-     * @param workflowRunTaskStatus
-     * @return
-     */
-    boolean cancelWorkflowRunTaskStatus(WorkflowRunStatusTask workflowRunTaskStatus);
-
-    /**
-     * 任务结束
-     *
-     * @param workflowRunTaskStatus
-     * @param task
-     */
-    void taskFinish(WorkflowRunStatusTask workflowRunTaskStatus, Task task);
-
     void downloadTaskResultData(String metaDataId, OutputStream outputStream)  throws IOException;
+
+    String unsignedWorkflow(WorkflowUnsignedWorkflowDto req);
 }
