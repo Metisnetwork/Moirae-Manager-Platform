@@ -61,12 +61,12 @@ public class WorkflowRunStatus implements Serializable {
     private String address;
 
     /**
-     * 总步骤
+     * 总步骤 //0.5.1已经弃用
      */
     private Integer step;
 
     /**
-     * 当前步骤
+     * 当前步骤 //0.5.1已经弃用
      */
     @TableField("cur_step")
     private Integer curStep;

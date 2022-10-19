@@ -80,6 +80,7 @@ public class SyncTokenFromDexTask {
         BigDecimal feesN = new BigDecimal("9975");
         BigDecimal numerator = reserve0.multiply(inputAmount).multiply(feesD);
         BigDecimal denominator = reserve1.subtract(inputAmount).multiply(feesN);
+        //TODO denominator == 0
         BigDecimal result = numerator.divide(denominator, 10,  RoundingMode.HALF_DOWN).add(one).divide(inputAmount, 10,  RoundingMode.HALF_DOWN);
         if(result.signum() == 1){
             return result.toPlainString();

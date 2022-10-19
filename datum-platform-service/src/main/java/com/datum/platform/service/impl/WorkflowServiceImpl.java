@@ -387,7 +387,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         //        Desc：utf-8编码byte数组,
         RlpType descRlpType = rplEncode(request.getDesc(), true);
         list.add(descRlpType);
-        //        length dependTask:长度的大端uint32编码byte数组,TODO 待确定
+        //        length dependTask:长度的大端uint32编码byte数组
 //        RlpType dependTaskRlpType = rplEncode(, true);
 
         return list;
@@ -1160,8 +1160,6 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .filter(workflowRunStatusTask -> workflowRunStatusTask.getStep() == 1)
                 .findFirst()
                 .get();
-        firstWorkflowTask.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
-        firstWorkflowTask.setBeginTime(new Date());
 
         Map<Integer, TaskRpcApi.PublishTaskDeclareRequest> requestMap = new HashMap<>();
         //组装任务列表
@@ -1196,8 +1194,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             if (GrpcConstant.GRPC_SUCCESS_CODE != response.getStatus()) {
                 workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
                 workflowRunStatus.setEndTime(new Date());
-                firstWorkflowTask.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
-                firstWorkflowTask.setEndTime(new Date());
             } else {
                 workflowRunStatus.setWorkflowHash(response.getId());
             }
@@ -1207,9 +1203,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             log.error("executeTask error! ", e);
             workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
             workflowRunStatus.setEndTime(new Date());
-            firstWorkflowTask.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
-            firstWorkflowTask.setEndTime(new Date());
-            firstWorkflowTask.setRunMsg(e.getMessage());
         }
         workflowRunStatusManager.updateById(workflowRunStatus);
         workflowRunTaskStatusManager.updateById(firstWorkflowTask);
@@ -1679,12 +1672,16 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     private Taskdata.TaskOrganization publishTaskOfGetTaskOrganization(Org identity, String partyId) {
-        Taskdata.TaskOrganization taskOrganization = Taskdata.TaskOrganization.newBuilder()
-                .setPartyId(partyId)
-                .setNodeName(identity == null ? null : identity.getNodeName())
-                .setNodeId(identity == null ? null : identity.getNodeId())
-                .setIdentityId(identity == null ? null : identity.getIdentityId())
-                .build();
+        Taskdata.TaskOrganization.Builder builder = Taskdata.TaskOrganization.newBuilder();
+        if (partyId != null) {
+            builder.setPartyId(partyId);
+        }
+        if (identity != null) {
+            builder.setNodeName(identity.getNodeName())
+                    .setNodeId(identity.getNodeId())
+                    .setIdentityId(identity.getIdentityId());
+        }
+        Taskdata.TaskOrganization taskOrganization = builder.build();
         return taskOrganization;
     }
 
@@ -1721,7 +1718,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowRunStatus.setCurStep(1);
         workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
         workflowRunStatus.setWorkflow(workflowManager.getById(workflowId));
-        //保存一条workflowRunStatus信息，TODO 定时任务刷新任务时，记得更新他的当前步骤，结束时间，运行状态，更新时间
+        //保存一条workflowRunStatus信息
         workflowRunStatusManager.save(workflowRunStatus);
 
         List<WorkflowRunStatusTask> workflowRunTaskStatusList = workflowTaskList.stream()
@@ -1733,7 +1730,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     workflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_NEED);
                     workflowRunTaskStatus.setModelId(item.getInputModelId());
                     workflowRunTaskStatus.setWorkflowTask(item);
-                    //保存一条workflowRunTaskStatus信息，TODO 定时任务刷新任务时，记得更新他的开始时间，结束时间，运行状态，任务id，运行结果信息，modelId，psiId，更新时间
+                    //保存一条workflowRunTaskStatus信息
 
                     String taskName = publishTaskOfGetTaskName(workflowRunStatus, workflowRunTaskStatus);
                     workflowRunTaskStatus.setTaskName(taskName);
@@ -2074,6 +2071,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkflowRunStatusTask workflowRunTaskStatus = workflowRunTaskStatusManager.getByTaskId(taskId);
         resultDto.setId(workflowRunTaskStatus.getId());
         resultDto.setTaskId(workflowRunTaskStatus.getTaskId());
+        resultDto.setTaskName(workflowRunTaskStatus.getTaskName());
         resultDto.setCreateTime(workflowRunTaskStatus.getBeginTime());
         WorkflowTask workflowTask = workflowTaskManager.getById(workflowRunTaskStatus.getWorkflowTaskId());
         Algorithm algorithm = algService.getAlgorithm(workflowTask.getAlgorithmId(), false);

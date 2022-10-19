@@ -14,15 +14,20 @@ import com.datum.platform.manager.WorkflowRunStatusTaskManager;
 import com.datum.platform.manager.WorkflowRunTaskResultManager;
 import com.datum.platform.mapper.domain.*;
 import com.datum.platform.mapper.enums.WorkflowTaskRunStatusEnum;
-import com.datum.platform.service.*;
+import com.datum.platform.service.AlgService;
+import com.datum.platform.service.DataService;
+import com.datum.platform.service.OrgService;
+import com.datum.platform.service.WorkflowService;
 import com.zengtengpeng.annotation.Lock;
 import common.constant.CarrierEnum;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -39,8 +44,6 @@ public class ProcessWorkflowRunStatusTask {
 
     @Resource
     private WorkflowService workflowService;
-    @Resource
-    private TaskService taskService;
     @Resource
     private GrpcWorkflowServiceClient grpcWorkflowServiceClient;
     @Resource
@@ -65,54 +68,60 @@ public class ProcessWorkflowRunStatusTask {
 
         //1.获取执行中的工作流
         List<WorkflowRunStatus> runningWorkflowList = workflowRunStatusManager.getRunningWorkflow();
+        log.info("待更新工作流的数量:{}", runningWorkflowList.size());
         //如果没有需要同步的数据则不进行同步
         if (CollUtil.isEmpty(runningWorkflowList)) {
             return;
         }
-
         runningWorkflowList.forEach(workflowRunStatus -> {
-            List<WorkflowTask> workflowTasks = workflowService.listExecutableDetailsByWorkflowVersion(
-                    workflowRunStatus.getWorkflowId(),
-                    workflowRunStatus.getWorkflowVersion());
-            Map<Long, WorkflowTask> workflowTaskMap = workflowTasks.stream()
-                    .collect(Collectors.toMap(WorkflowTask::getWorkflowTaskId, me -> me));
-            //2.获取发起方组织
-            WorkflowTask workflowTask = workflowTasks.get(0);
-            String identityId = workflowTask.getIdentityId();
-            Channel channel = orgService.getChannel(identityId);
-
-            //3.构建请求体
-            WorkflowRpcApi.QueryWorkStatusRequest request = WorkflowRpcApi.QueryWorkStatusRequest.newBuilder()
-                    .setWorkflowId(0, workflowRunStatus.getWorkflowHash())
-                    .build();
-            //4.获取工作流信息
-            WorkflowRpcApi.QueryWorkStatusResponse response = grpcWorkflowServiceClient.queryWorkFlowStatus(channel, request);
-            if (response.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
-                //5.响应结果可能包含多个工作流
-                List<WorkflowRpcApi.WorkFlowStatus> workflowStatusListList = response.getWorkflowStatusListList();
-                workflowStatusListList.forEach(workFlowStatus -> {
-                    //更新工作流中的任务状态
-                    updateWorkflowRunTaskStatus(workflowTaskMap, workFlowStatus);
-
-                    //更新工作流执行状态
-                    updateWorkflowRunStatus(workflowRunStatus, workFlowStatus);
-                });
+            try {
+                ((ProcessWorkflowRunStatusTask) AopContext.currentProxy()).updateStatus(workflowRunStatus);
+            } catch (Throwable throwable) {
+                log.error("工作流状态更新失败:", workflowRunStatus.getId());
+                log.error("工作流状态更新失败", throwable);
             }
         });
+        log.info("同步更新子作业节点运行中任务结束>>>>");
+    }
 
+    @Transactional
+    public void updateStatus(WorkflowRunStatus workflowRunStatus) {
+        List<WorkflowTask> workflowTasks = workflowService.listExecutableDetailsByWorkflowVersion(
+                workflowRunStatus.getWorkflowId(),
+                workflowRunStatus.getWorkflowVersion());
+        Map<Long, WorkflowTask> workflowTaskMap = workflowTasks.stream()
+                .collect(Collectors.toMap(WorkflowTask::getWorkflowTaskId, me -> me));
+        //2.获取发起方组织
+        WorkflowTask workflowTask = workflowTasks.get(0);
+        String identityId = workflowTask.getIdentityId();
+        Channel channel = orgService.getChannel(identityId);
+
+        //3.构建请求体
+        List<String> workflowHashList = new ArrayList<>();
+        workflowHashList.add(workflowRunStatus.getWorkflowHash());
+        WorkflowRpcApi.QueryWorkStatusRequest request = WorkflowRpcApi.QueryWorkStatusRequest.newBuilder()
+                .addAllWorkflowId(workflowHashList)
+                .build();
+        //4.获取工作流信息
+        log.info("发起方组织:{}", identityId);
+        WorkflowRpcApi.QueryWorkStatusResponse response = grpcWorkflowServiceClient.queryWorkFlowStatus(channel, request);
+        if (response.getStatus() == GrpcConstant.GRPC_SUCCESS_CODE) {
+            //5.响应结果可能包含多个工作流
+            List<WorkflowRpcApi.WorkFlowStatus> workflowStatusListList = response.getWorkflowStatusListList();
+            workflowStatusListList.forEach(workFlowStatus -> {
+                //更新工作流中的任务状态
+                updateWorkflowRunTaskStatus(workflowTaskMap, workflowRunStatus, workFlowStatus);
+            });
+        }
     }
 
     private void updateWorkflowRunTaskStatus(Map<Long, WorkflowTask> workflowTaskMap,
+                                             WorkflowRunStatus workflowRunStatus,
                                              WorkflowRpcApi.WorkFlowStatus workFlowStatus) {
         List<WorkflowRpcApi.WorkFlowTaskStatus> taskListList = workFlowStatus.getTaskListList();
         taskListList.forEach(task -> {
             String taskId = task.getTaskId();
             if (StrUtil.isBlank(taskId)) {
-                return;
-            }
-            //说明任务还没更新过来
-            Task taskById = taskService.getTaskById(taskId);
-            if (taskById == null) {
                 return;
             }
 
@@ -130,20 +139,21 @@ public class ProcessWorkflowRunStatusTask {
             switch (taskStatus) {
                 case TaskState_Pending:
                 case TaskState_Running:
-                    taskRunning(byTaskName, taskById);
+                    taskRunning(byTaskName, task);
                     break;
                 case TaskState_Unknown:
                 case TaskState_Failed:
-                    taskFail(byTaskName, taskById);
+                    taskFail(byTaskName, task);
                     break;
                 case TaskState_Succeed:
-                    taskSuccess(byTaskName, taskById);
+                    taskSuccess(byTaskName, workflowRunStatus, task);
                     break;
             }
             //更新工作流中任务的状态
             workflowRunStatusTaskManager.updateById(byTaskName);
         });
-
+        //更新工作流执行状态
+        updateWorkflowRunStatus(workflowRunStatus, workFlowStatus);
     }
 
     private void updateWorkflowRunStatus(WorkflowRunStatus workflowRunStatus, WorkflowRpcApi.WorkFlowStatus workFlowStatus) {
@@ -165,27 +175,31 @@ public class ProcessWorkflowRunStatusTask {
         workflowRunStatusManager.updateById(workflowRunStatus);
     }
 
-    private void taskRunning(WorkflowRunStatusTask curWorkflowRunTaskStatus, Task task) {
+    private void taskRunning(WorkflowRunStatusTask curWorkflowRunTaskStatus, WorkflowRpcApi.WorkFlowTaskStatus task) {
         // 更新状态
-        curWorkflowRunTaskStatus.setBeginTime(task.getStartAt());
+        curWorkflowRunTaskStatus.setBeginTime(new Date(task.getStartAt()));
         curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_DOING);
     }
 
-    private void taskFail(WorkflowRunStatusTask curWorkflowRunTaskStatus, Task task) {
+    private void taskFail(WorkflowRunStatusTask curWorkflowRunTaskStatus, WorkflowRpcApi.WorkFlowTaskStatus task) {
         // 更新状态
         curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
         curWorkflowRunTaskStatus.setRunMsg("task fail!");
-        curWorkflowRunTaskStatus.setBeginTime(task.getStartAt());
-        curWorkflowRunTaskStatus.setEndTime(task.getEndAt());
+        curWorkflowRunTaskStatus.setBeginTime(new Date(task.getStartAt()));
+        curWorkflowRunTaskStatus.setEndTime(new Date(task.getEndAt()));
     }
 
-    private void taskSuccess(WorkflowRunStatusTask curWorkflowRunTaskStatus, Task task) {
+    private void taskSuccess(WorkflowRunStatusTask curWorkflowRunTaskStatus,
+                             WorkflowRunStatus workflowRunStatus,
+                             WorkflowRpcApi.WorkFlowTaskStatus task) {
+        String taskId = task.getTaskId();
+        String address = workflowRunStatus.getAddress();
         WorkflowTask workflowTask = curWorkflowRunTaskStatus.getWorkflowTask();
 
         // 更新状态
         curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
-        curWorkflowRunTaskStatus.setBeginTime(task.getStartAt());
-        curWorkflowRunTaskStatus.setEndTime(task.getEndAt());
+        curWorkflowRunTaskStatus.setBeginTime(new Date(task.getStartAt()));
+        curWorkflowRunTaskStatus.setEndTime(new Date(task.getEndAt()));
 
         // 结果文件
         Set<String> identityIdSet = workflowTask.getOutputList().stream().map(WorkflowTaskOutput::getIdentityId).collect(Collectors.toSet());
@@ -203,7 +217,7 @@ public class ProcessWorkflowRunStatusTask {
                 continue;
             }
 
-            SysRpcApi.GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(managedChannel, task.getId());
+            SysRpcApi.GetTaskResultFileSummary response = grpcSysServiceClient.getTaskResultFileSummary(managedChannel, taskId);
             if (Objects.isNull(response)) {
                 log.error("获取任务结果失败！ info = {}", response);
                 return;
@@ -211,7 +225,7 @@ public class ProcessWorkflowRunStatusTask {
             // 处理结果
             WorkflowRunTaskResult taskResult = new WorkflowRunTaskResult();
             taskResult.setIdentityId(identityId);
-            taskResult.setTaskId(task.getId());
+            taskResult.setTaskId(taskId);
             taskResult.setFileName(response.getMetadataName());
             taskResult.setMetadataId(response.getMetadataId());
             taskResult.setOriginId(response.getOriginId());
@@ -237,13 +251,13 @@ public class ProcessWorkflowRunStatusTask {
                 Model model = new Model();
                 model.setMetaDataId(taskResult.getMetadataId());
                 model.setIdentityId(identityId);
-                model.setName(algorithm.getAlgorithmName() + "(" + task.getId() + ")");
+                model.setName(algorithm.getAlgorithmName() + "(" + taskId + ")");
                 model.setFileId(taskResult.getOriginId());
                 model.setDataType(response.getDataTypeValue());
                 model.setMetadataOption(response.getMetadataOption());
-                model.setTrainTaskId(task.getId());
+                model.setTrainTaskId(taskId);
                 model.setTrainAlgorithmId(workflowTask.getAlgorithmId());
-                model.setTrainUserAddress(task.getAddress());
+                model.setTrainUserAddress(address);
                 model.setSupportedAlgorithmId(predictionAlgorithm.getAlgorithmId());
                 model.setFilePath(filePath);
                 modelList.add(model);
@@ -253,13 +267,13 @@ public class ProcessWorkflowRunStatusTask {
                 Psi psi = new Psi();
                 psi.setMetaDataId(taskResult.getMetadataId());
                 psi.setIdentityId(identityId);
-                psi.setName(algorithm.getAlgorithmName() + "(" + task.getId() + ")");
+                psi.setName(algorithm.getAlgorithmName() + "(" + taskId + ")");
                 psi.setFileId(taskResult.getOriginId());
                 psi.setDataType(response.getDataTypeValue());
                 psi.setMetadataOption(response.getMetadataOption());
-                psi.setTrainTaskId(task.getId());
+                psi.setTrainTaskId(taskId);
                 psi.setTrainAlgorithmId(workflowTask.getAlgorithmId());
-                psi.setTrainUserAddress(task.getAddress());
+                psi.setTrainUserAddress(address);
                 psi.setFilePath(filePath);
                 psiList.add(psi);
             }

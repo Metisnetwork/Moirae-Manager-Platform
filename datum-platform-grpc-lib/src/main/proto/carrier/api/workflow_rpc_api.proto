@@ -30,6 +30,8 @@ message WorkFlowTaskStatus {
   string                      task_id = 1;
   common.constant.TaskState  status = 2;
   string                      task_name = 3;
+  uint64                      start_at = 4;
+  uint64                      end_at = 5;
 }
 
 message QueryWorkStatusRequest {
