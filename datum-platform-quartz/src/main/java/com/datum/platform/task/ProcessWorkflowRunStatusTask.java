@@ -100,7 +100,7 @@ public class ProcessWorkflowRunStatusTask {
         List<String> workflowHashList = new ArrayList<>();
         workflowHashList.add(workflowRunStatus.getWorkflowHash());
         WorkflowRpcApi.QueryWorkStatusRequest request = WorkflowRpcApi.QueryWorkStatusRequest.newBuilder()
-                .addAllWorkflowId(workflowHashList)
+                .addAllWorkflowIds(workflowHashList)
                 .build();
         //4.获取工作流信息
         log.info("发起方组织:{}", identityId);
@@ -186,7 +186,7 @@ public class ProcessWorkflowRunStatusTask {
         curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
         curWorkflowRunTaskStatus.setRunMsg("task fail!");
         curWorkflowRunTaskStatus.setBeginTime(new Date(task.getStartAt()));
-        if(task.getStartAt() == 0){
+        if (task.getStartAt() == 0) {
             curWorkflowRunTaskStatus.setEndTime(new Date(task.getStartAt()));
         } else {
             curWorkflowRunTaskStatus.setEndTime(new Date(task.getEndAt()));
