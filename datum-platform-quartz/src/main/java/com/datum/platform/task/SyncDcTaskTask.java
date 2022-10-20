@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * @author hudenian
  * @date 2021/8/23
  */
-@ConditionalOnProperty(name="dev.quartz", havingValue="true")
+@ConditionalOnProperty(name = "dev.quartz", havingValue = "true")
 @Slf4j
 @Component
 public class SyncDcTaskTask {
@@ -51,7 +51,7 @@ public class SyncDcTaskTask {
     public void run() {
         long begin = DateUtil.current();
         try {
-            sysService.syncFromDc(DataSyncTypeEnum.TASK.getDataType(),DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
+            sysService.syncFromDc(DataSyncTypeEnum.TASK.getDataType(), DataSyncTypeEnum.TASK.getDesc(),//1.根据dataType同步类型获取新的同步时间DataSync
                     (latestSynced) -> {//2.根据新的同步时间latestSynced获取分页列表grpcResponseList
                         return grpcTaskService.getGlobalTaskDetailList(latestSynced);
                     },
@@ -78,28 +78,28 @@ public class SyncDcTaskTask {
         List<TaskMetaDataColumn> taskMetaDataColumnList = new ArrayList<>();
         List<TaskPowerProvider> taskPowerProviderList = new ArrayList<>();
         List<TaskResultConsumer> taskResultConsumerList = new ArrayList<>();
-        taskDetailResponseDtoList.stream().forEach(item ->{
+        taskDetailResponseDtoList.stream().forEach(item -> {
             try {
-                Tuple5<Task, TaskAlgoProvider, List<TaskDataProvider>,  List<TaskPowerProvider>, List<TaskResultConsumer>> tuple5 = convert(item.getInformation(), maxSeq);
+                Tuple5<Task, TaskAlgoProvider, List<TaskDataProvider>, List<TaskPowerProvider>, List<TaskResultConsumer>> tuple5 = convert(item.getInformation(), maxSeq);
                 taskList.add(tuple5.getValue1());
                 taskAlgoProviderList.add(tuple5.getValue2());
-                if(tuple5.getValue3().size() > 0){
+                if (tuple5.getValue3().size() > 0) {
                     taskDataProviderList.addAll(tuple5.getValue3());
                 }
-                if(tuple5.getValue4().size() > 0){
+                if (tuple5.getValue4().size() > 0) {
                     taskPowerProviderList.addAll(tuple5.getValue4());
                 }
-                if(tuple5.getValue5().size() > 0){
+                if (tuple5.getValue5().size() > 0) {
                     taskResultConsumerList.addAll(tuple5.getValue5());
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("任务信息同步, 明细异常。 taskId = " + item.getInformation().getTaskId(), e);
             }
         });
         taskService.batchReplace(taskList, taskAlgoProviderList, taskDataProviderList, taskMetaDataColumnList, taskPowerProviderList, taskResultConsumerList);
     }
 
-    private Tuple5<Task, TaskAlgoProvider, List<TaskDataProvider>,  List<TaskPowerProvider>, List<TaskResultConsumer>> convert(Taskdata.TaskDetailSummary information, AtomicLong maxSeq){
+    private Tuple5<Task, TaskAlgoProvider, List<TaskDataProvider>, List<TaskPowerProvider>, List<TaskResultConsumer>> convert(Taskdata.TaskDetailSummary information, AtomicLong maxSeq) {
         Task task = new Task();
         TaskAlgoProvider taskAlgoProvider = new TaskAlgoProvider();
         List<TaskDataProvider> taskDataProviderList = new ArrayList<>();
@@ -110,10 +110,10 @@ public class SyncDcTaskTask {
         taskAlgoProvider.setIdentityId(information.getAlgoSupplier().getIdentityId());
         taskAlgoProvider.setPartyId(information.getAlgoSupplier().getPartyId());
 
-        Map<String, Taskdata.TaskOrganization> dataMap =  information.getDataSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
+        Map<String, Taskdata.TaskOrganization> dataMap = information.getDataSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
         for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
             TaskDataProvider taskDataProvider = new TaskDataProvider();
-            if(information.getDataPolicyTypesList().get(i).compareTo(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue()) == 0){
+            if (information.getDataPolicyTypesList().get(i).compareTo(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue()) == 0) {
                 TaskDataPolicyPreTask dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyPreTask.class);
                 taskDataProvider.setTaskId(information.getTaskId());
                 taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
@@ -121,7 +121,7 @@ public class SyncDcTaskTask {
                 taskDataProvider.setInputType(dataPolicy.getInputType());
                 taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
                 taskDataProvider.setPartyId(dataPolicy.getPartyId());
-            }else{
+            } else {
                 TaskDataPolicyCsv dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyCsv.class);
                 taskDataProvider.setTaskId(information.getTaskId());
                 taskDataProvider.setMetaDataId(dataPolicy.getMetadataId());
@@ -131,36 +131,42 @@ public class SyncDcTaskTask {
                 taskDataProvider.setIdentityId(dataMap.get(dataPolicy.getPartyId()).getIdentityId());
                 taskDataProvider.setPartyId(dataPolicy.getPartyId());
                 taskDataProvider.setKeyColumnIdx(dataPolicy.getKeyColumn() == null ? null : dataPolicy.getKeyColumn().intValue());
-                if(dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0){
+                if (dataPolicy.getSelectedColumns() != null && dataPolicy.getSelectedColumns().size() > 0) {
                     taskDataProvider.setSelectedColumns(StringUtils.join(dataPolicy.getSelectedColumns(), ","));
                 }
                 // 设置数据消耗
-                dataPolicy.getConsume().ifPresent(consume ->{
+                dataPolicy.getConsume().ifPresent(consume -> {
                     taskDataProvider.setConsumeType(consume.getConsumeType());
                     taskDataProvider.setConsumeTokenAddress(consume.getTokenAddress());
                     taskDataProvider.setConsumeTokenId(consume.getTokenId());
                     taskDataProvider.setConsumeBalance(consume.getBalance());
                 });
             }
+
+            log.info("taskDataProvider,taskId:{},metaDataId:{},policyType:{}",
+                    taskDataProvider.getTaskId(),
+                    taskDataProvider.getMetaDataId(),
+                    information.getDataPolicyTypesList().get(i));
+
             taskDataProviderList.add(taskDataProvider);
         }
 
         Map<String, Taskdata.TaskPowerResourceOption> resourceMap = information.getPowerResourceOptionsList().stream().collect(Collectors.toMap(Taskdata.TaskPowerResourceOption::getPartyId, resource -> resource));
-        Map<String, Taskdata.TaskOrganization> powerMap =  information.getPowerSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
+        Map<String, Taskdata.TaskOrganization> powerMap = information.getPowerSuppliersList().stream().collect(Collectors.toMap(Taskdata.TaskOrganization::getPartyId, org -> org));
 
         for (int i = 0; i < information.getPowerPolicyTypesList().size(); i++) {
             Integer type = information.getPowerPolicyTypes(i);
             String partyId;
             String providerPartyId = null;
-            if(type == TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue()){
+            if (type == TaskPowerPolicyTypesEnum.POLICY_TYPES_1.getValue()) {
                 partyId = information.getPowerPolicyOptions(i);
-            }else{
+            } else {
                 // type = 2 或 3
                 TaskPowerPolicy taskPowerPolicy = JSONObject.parseObject(information.getPowerPolicyOptions(i), TaskPowerPolicy.class);
                 partyId = taskPowerPolicy.getPowerPartyId();
                 providerPartyId = taskPowerPolicy.getProviderPartyId();
             }
-            if(powerMap.containsKey(partyId)){
+            if (powerMap.containsKey(partyId)) {
                 TaskPowerProvider taskPowerProvider = new TaskPowerProvider();
                 taskPowerProvider.setTaskId(information.getTaskId());
                 taskPowerProvider.setIdentityId(powerMap.get(partyId).getIdentityId());
@@ -174,7 +180,7 @@ public class SyncDcTaskTask {
             }
         }
 
-        information.getReceiversList().forEach(subItem ->{
+        information.getReceiversList().forEach(subItem -> {
             TaskResultConsumer taskResultConsumer = new TaskResultConsumer();
             taskResultConsumer.setTaskId(information.getTaskId());
             taskResultConsumer.setIdentityId(subItem.getIdentityId());

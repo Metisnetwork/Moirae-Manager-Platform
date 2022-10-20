@@ -35,7 +35,7 @@ message WorkFlowTaskStatus {
 }
 
 message QueryWorkStatusRequest {
-  repeated string             workflow_id = 1;
+  repeated string             workflow_ids = 1;
 }
 
 
