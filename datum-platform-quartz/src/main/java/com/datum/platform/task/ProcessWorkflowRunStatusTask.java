@@ -186,7 +186,11 @@ public class ProcessWorkflowRunStatusTask {
         curWorkflowRunTaskStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
         curWorkflowRunTaskStatus.setRunMsg("task fail!");
         curWorkflowRunTaskStatus.setBeginTime(new Date(task.getStartAt()));
-        curWorkflowRunTaskStatus.setEndTime(new Date(task.getEndAt()));
+        if(task.getStartAt() == 0){
+            curWorkflowRunTaskStatus.setEndTime(new Date(task.getStartAt()));
+        } else {
+            curWorkflowRunTaskStatus.setEndTime(new Date(task.getEndAt()));
+        }
     }
 
     private void taskSuccess(WorkflowRunStatusTask curWorkflowRunTaskStatus,
