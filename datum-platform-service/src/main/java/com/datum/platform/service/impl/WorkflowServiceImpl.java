@@ -5,6 +5,7 @@ import carrier.api.WorkflowRpcApi;
 import carrier.types.Resourcedata;
 import carrier.types.Taskdata;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
@@ -282,109 +283,138 @@ public class WorkflowServiceImpl implements WorkflowService {
         //将rlp编码转换成byte数组
         RlpList rlpList = new RlpList(rlpTypes);
         byte[] rlp = RlpEncoder.encode(rlpList);
-        log.debug("rlp:{}", Numeric.toHexString(rlp));
+        log.info("rlp:{}", Numeric.toHexString(rlp));
 
         //将rlp编码的byte数组进行hash
         byte[] sha3Bytes = Hash.sha3(rlp);
         String sha3Str = Numeric.toHexString(sha3Bytes);
-        log.debug("sha3Str:{}", sha3Str);
+        log.info("sha3Str:{}", sha3Str);
         return sha3Str;
     }
 
     private List<RlpType> encodeTask(TaskRpcApi.PublishTaskDeclareRequest request) {
-
+        log.info("encodeTask..............");
         List<RlpType> list = new ArrayList<>();
 
         //将数据转换成rlp编码
         //        User1：utf-8编码byte数组,
+        log.info("user:{}", request.getUser());
         RlpType user1RlpType = rplEncode(request.getUser(), true);
         list.add(user1RlpType);
         //        UserType：大端uint32编码byte数组,
+        log.info("getUserTypeValue:{}", request.getUserTypeValue());
         RlpType userTypeRlpType = rplEncode(String.valueOf(request.getUserTypeValue()), false);
         list.add(userTypeRlpType);
         //        TaskName：utf-8编码byte数组,
+        log.info("getTaskName:{}", request.getTaskName());
         RlpType taskNameRlpType = rplEncode(request.getTaskName(), true);
         list.add(taskNameRlpType);
         //        Sender.NodeName：utf-8编码byte数组,
+        log.info("request.getSender().getNodeName():{}", request.getSender().getNodeName());
         RlpType senderNodeNameRlpType = rplEncode(request.getSender().getNodeName(), true);
         list.add(senderNodeNameRlpType);
         //        Sender.NodeId：utf-8编码byte数组,
+        log.info("request.getSender().getNodeId():{}", request.getSender().getNodeId());
         RlpType senderNodeIdRlpType = rplEncode(request.getSender().getNodeId(), true);
         list.add(senderNodeIdRlpType);
         //        Sender.IdentityId：utf-8编码byte数组,
+        log.info("request.getSender().getIdentityId():{}", request.getSender().getIdentityId());
         RlpType senderIdentityIdRlpType = rplEncode(request.getSender().getIdentityId(), true);
         list.add(senderIdentityIdRlpType);
         //        Sender.PartyId：utf-8编码byte数组,
+        log.info("request.getSender().getPartyId():{}", request.getSender().getPartyId());
         RlpType senderPartyIdRlpType = rplEncode(request.getSender().getPartyId(), true);
         list.add(senderPartyIdRlpType);
         //        AlgoSupplier.NodeName：utf-8编码byte数组,
+        log.info("request.getAlgoSupplier().getNodeName():{}", request.getAlgoSupplier().getNodeName());
         RlpType algoNodeNameRlpType = rplEncode(request.getAlgoSupplier().getNodeName(), true);
         list.add(algoNodeNameRlpType);
         //        AlgoSupplier.NodeId：utf-8编码byte数组,
+        log.info("request.getAlgoSupplier().getNodeId():{}", request.getAlgoSupplier().getNodeId());
         RlpType algoNodeIdRlpType = rplEncode(request.getAlgoSupplier().getNodeId(), true);
         list.add(algoNodeIdRlpType);
         //        AlgoSupplier.IdentityId：utf-8编码byte数组,
+        log.info("request.getAlgoSupplier().getIdentityId():{}", request.getAlgoSupplier().getIdentityId());
         RlpType algoIdentityIdRlpType = rplEncode(request.getAlgoSupplier().getIdentityId(), true);
         list.add(algoIdentityIdRlpType);
         //        AlgoSupplier.PartyId：utf-8编码byte数组,
+        log.info("getAlgoSupplier().getPartyId():{}", request.getAlgoSupplier().getPartyId());
         RlpType algoPartyIdRlpType = rplEncode(request.getAlgoSupplier().getPartyId(), true);
         list.add(algoPartyIdRlpType);
         //        length DataSuppliers：长度的大端uint16编码byte数组,
+        log.info("getDataSuppliersCount:{}", request.getDataSuppliersCount());
         RlpType dataSuppliersRlpType = rplEncode(String.valueOf(request.getDataSuppliersCount()), false);
         list.add(dataSuppliersRlpType);
         //        length PowerSuppliers：长度的大端uint16编码byte数组,
 //        RlpType powerSuppliersRlpType = rplEncode(, true);
         //        length Receivers：长度的大端uint16编码byte数组,
+        log.info("getReceiversCount:{}", request.getReceiversCount());
         RlpType receiversRlpType = rplEncode(String.valueOf(request.getReceiversCount()), false);
         list.add(receiversRlpType);
         //        length DataPolicyTypes：长度的大端uint32编码byte数组,
+        log.info("getDataPolicyTypesCount:{}", request.getDataPolicyTypesCount());
         RlpType dataPolicyTypesRlpType = rplEncode(String.valueOf(request.getDataPolicyTypesCount()), false);
         list.add(dataPolicyTypesRlpType);
         //        length DataPolicyOptions：长度的大端uint32编码byte数组,
+        log.info("getDataPolicyOptionsCount:{}", request.getDataPolicyOptionsCount());
         RlpType dataPolicyOptionsRlpType = rplEncode(String.valueOf(request.getDataPolicyOptionsCount()), false);
         list.add(dataPolicyOptionsRlpType);
         //        length PowerPolicyTypes：长度的大端uint32编码byte数组,
+        log.info("getPowerPolicyTypesCount:{}", request.getPowerPolicyTypesCount());
         RlpType powerPolicyTypesRlpType = rplEncode(String.valueOf(request.getPowerPolicyTypesCount()), false);
         list.add(powerPolicyTypesRlpType);
         //        length PowerPolicyOptions：长度的大端uint32编码byte数组,
+        log.info("getPowerPolicyOptionsCount:{}", request.getPowerPolicyOptionsCount());
         RlpType powerPolicyOptionsRlpType = rplEncode(String.valueOf(request.getPowerPolicyOptionsCount()), false);
         list.add(powerPolicyOptionsRlpType);
         //        length ReceiverPolicyTypes：长度的大端uint32编码byte数组,
+        log.info("getReceiverPolicyTypesCount:{}", request.getReceiverPolicyTypesCount());
         RlpType receiverPolicyTypesRlpType = rplEncode(String.valueOf(request.getReceiverPolicyTypesCount()), false);
         list.add(receiverPolicyTypesRlpType);
         //        length ReceiverPolicyOptions：长度的大端uint32编码byte数组,
+        log.info("getReceiverPolicyOptionsCount:{}", request.getReceiverPolicyOptionsCount());
         RlpType receiverPolicyOptionsRlpType = rplEncode(String.valueOf(request.getReceiverPolicyOptionsCount()), false);
         list.add(receiverPolicyOptionsRlpType);
         //        length DataFlowPolicyTypes：长度的大端uint32编码byte数组,
+        log.info("getDataFlowPolicyTypesCount:{}", request.getDataFlowPolicyTypesCount());
         RlpType dataFlowPolicyTypesRlpType = rplEncode(String.valueOf(request.getDataFlowPolicyTypesCount()), false);
         list.add(dataFlowPolicyTypesRlpType);
         //        length DataFlowPolicyOptions：长度的大端uint32编码byte数组,
+        log.info("getDataFlowPolicyOptionsCount:{}", request.getDataFlowPolicyOptionsCount());
         RlpType dataFlowPolicyOptionsRlpType = rplEncode(String.valueOf(request.getDataFlowPolicyOptionsCount()), false);
         list.add(dataFlowPolicyOptionsRlpType);
         //        OperationCost.Processor：大端uint32编码byte数组,
+        log.info("getProcessor:{}", request.getOperationCost().getProcessor());
         RlpType processorRlpType = rplEncode(String.valueOf(request.getOperationCost().getProcessor()), false);
         list.add(processorRlpType);
         //        OperationCost.Bandwidth：大端uint64编码byte数组,
+        log.info("getBandwidth:{}", request.getOperationCost().getBandwidth());
         RlpType bandwidthRlpType = rplEncode(String.valueOf(request.getOperationCost().getBandwidth()), false);
         list.add(bandwidthRlpType);
         //        OperationCost.Memory：大端uint64编码byte数组,
+        log.info("getMemory:{}", request.getOperationCost().getMemory());
         RlpType memoryRlpType = rplEncode(String.valueOf(request.getOperationCost().getMemory()), false);
         list.add(memoryRlpType);
         //        OperationCost.Duration：大端uint64编码byte数组,
+        log.info("getDuration:{}", request.getOperationCost().getDuration());
         RlpType durationRlpType = rplEncode(String.valueOf(request.getOperationCost().getDuration()), false);
         list.add(durationRlpType);
         //        AlgorithmCode：utf-8编码byte数组,
+        log.info("getAlgorithmCode:{}", request.getAlgorithmCode());
         RlpType algorithmCodeRlpType = rplEncode(request.getAlgorithmCode(), true);
         list.add(algorithmCodeRlpType);
         //        MetaAlgorithmId：utf-8编码byte数组,
+        log.info("getMetaAlgorithmId:{}", request.getMetaAlgorithmId());
         RlpType metaAlgorithmIdRlpType = rplEncode(request.getMetaAlgorithmId(), true);
         list.add(metaAlgorithmIdRlpType);
         //        AlgorithmCodeExtraParams：utf-8编码byte数组,
+        log.info("getAlgorithmCodeExtraParams:{}", request.getAlgorithmCodeExtraParams());
         RlpType algorithmCodeExtraParamsRlpType = rplEncode(request.getAlgorithmCodeExtraParams(), true);
         list.add(algorithmCodeExtraParamsRlpType);
         //        State：大端uint32编码byte数组,
 //        RlpType stateRlpType = rplEncode(, true);
         //        Desc：utf-8编码byte数组,
+        log.info("desc:{}", request.getDesc());
         RlpType descRlpType = rplEncode(request.getDesc(), true);
         list.add(descRlpType);
         //        length dependTask:长度的大端uint32编码byte数组
@@ -1183,11 +1213,11 @@ public class WorkflowServiceImpl implements WorkflowService {
                     .setDesc(workflowRunStatus.getWorkflow().getWorkflowName())
                     .setWorkflowName(workflowRunStatus.getWorkflow().getWorkflowName())
                     .setPolicyType(CarrierEnum.WorkFlowPolicyType.Ordinary_Policy)
-                    .setPolicy(JSONArray.toJSONString(workflowPolicyOrdinary.getOriginTaskList()))
+                    .setPolicy(JSONUtil.toJsonStr(workflowPolicyOrdinary.getOriginTaskList()))
                     .addAllTaskList(requestList)
                     .setUser(workflowRunStatus.getAddress())
                     .setUserType(CarrierEnum.UserType.User_1)
-                    .setSign(ByteString.copyFromUtf8(workflowRunStatus.getSign()))
+                    .setSign(getSign(workflowRunStatus.getSign()))
                     .build();
             //启动工作流，返回工作流ID
             WorkflowRpcApi.PublishWorkFlowDeclareResponse response = grpcWorkflowServiceClient.publishWorkFlowDeclare(channel, request);
@@ -1208,11 +1238,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowRunTaskStatusManager.updateById(firstWorkflowTask);
     }
 
+    private ByteString getSign(String sign) {
+        return sign == null ? ByteString.EMPTY : ByteString.copyFrom(Numeric.hexStringToByteArray(sign));
+    }
+
     private WorkflowPolicyOrdinary buildWorkflowPolicy(List<WorkflowRunStatusTask> workflowRunTaskStatusList,
                                                        Map<Integer, TaskRpcApi.PublishTaskDeclareRequest> requestMap) {
         WorkflowPolicyOrdinary workflowPolicyOrdinary = new WorkflowPolicyOrdinary();
         //将每个任务打包到工作流策略中
+        log.info("workflowRunTaskStatusList.size:{}", workflowRunTaskStatusList.size());
         workflowRunTaskStatusList.forEach(workflowRunStatusTask -> {
+            log.info("workflowTaskId:{}", workflowRunStatusTask.getWorkflowTaskId());
             WorkflowPolicyOrdinary.OriginTask originTask = new WorkflowPolicyOrdinary.OriginTask();
 
             Integer step = workflowRunStatusTask.getStep();
@@ -1233,14 +1269,11 @@ public class WorkflowServiceImpl implements WorkflowService {
                     referenceTask.getDependPartyId().add(partyId);
                     referenceTask.getDependParamsType().add(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue());
 
-                    //克隆一个新的input对象
-                    String cloneStr = JSONObject.toJSONString(workflowTaskInput);
-                    WorkflowTaskInput newWorkflowTaskInput = JSONObject.parseObject(cloneStr, WorkflowTaskInput.class);
-                    newWorkflowTaskInput.setPartyId(null);
-                    String dataPolicyItem = createDataPolicyItem(newWorkflowTaskInput);
+                    String dataPolicyItem = createDataPolicyItem(workflowTaskInput);
                     referenceTask.getDependParams().add(dataPolicyItem);
-                    originTask.getReference().add(referenceTask);
                 });
+                log.info("psi.referenceTask:{}", referenceTask);
+                originTask.getReference().add(referenceTask);
             }
 
             //是否需要依赖模型
@@ -1249,16 +1282,14 @@ public class WorkflowServiceImpl implements WorkflowService {
                 WorkflowPolicyOrdinary.ReferenceTask referenceTask = new WorkflowPolicyOrdinary.ReferenceTask();
                 referenceTask.setTarget(dependTaskRequest.getTaskName());
 
-                List<WorkflowTaskInput> inputList = workflowTask.getInputList();
-                inputList.forEach(workflowTaskInput -> {
-                    String partyId = workflowTaskInput.getPartyId();
-                    referenceTask.getDependPartyId().add(partyId);
-                    referenceTask.getDependParamsType().add(TaskDataPolicyTypesEnum.POLICY_TYPES_2.getValue());
+                String partyId = "model1";
+                referenceTask.getDependPartyId().add(partyId);
+                referenceTask.getDependParamsType().add(TaskDataPolicyTypesEnum.POLICY_TYPES_30002.getValue());
 
-                    String dataPolicyItem = createDataPolicyItem(null, null);
-                    referenceTask.getDependParams().add(dataPolicyItem);
-                    originTask.getReference().add(referenceTask);
-                });
+                String dataPolicyItem = createDataPolicyItem(null, partyId);
+                referenceTask.getDependParams().add(dataPolicyItem);
+                log.info("model.referenceTask:{}", referenceTask);
+                originTask.getReference().add(referenceTask);
             }
             workflowPolicyOrdinary.getOriginTaskList().add(originTask);
         });
@@ -1292,8 +1323,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowTaskInputList.forEach(workflowTaskInput -> {
             requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(workflowTaskInput.getOrg(), workflowTaskInput.getPartyId()));
             if (workflowTask.getInputPsi()) {
-                requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue());
-                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
+//                requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue());
+//                requestBuild.addDataPolicyOptions(createDataPolicyItem(workflowTaskInput));
             } else {
                 requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_40001.getValue());
                 requestBuild.addDataPolicyOptions(createDataPolicyItem(
@@ -1308,9 +1339,28 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (workflowTask.getInputModel()) {
             modelPartyId = "model1";
             Model model = curWorkflowRunTaskStatus.getModel();
-            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(model == null ? null : model.getOrg(), modelPartyId));
-            requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_2.getValue());
-            requestBuild.addDataPolicyOptions(createDataPolicyItem(model, modelPartyId));
+
+            Org modelOrg = null;
+
+            //模型所在的组织，先获取workflowtask依赖的上一个任务的output
+            if (model == null) {
+                Integer inputModelStep = workflowTask.getInputModelStep();
+                Long workflowId = workflowTask.getWorkflowId();
+                Long workflowVersion = workflowTask.getWorkflowVersion();
+                WorkflowTask outputModelTask = workflowTaskManager.getByStep(workflowId, workflowVersion, inputModelStep);
+                List<WorkflowTaskOutput> workflowTaskOutputs = workflowTaskOutputManager.listByWorkflowTaskId(outputModelTask.getWorkflowTaskId());
+                WorkflowTaskOutput workflowTaskOutput = workflowTaskOutputs.get(0);
+                String identityId = workflowTaskOutput.getIdentityId();
+                modelOrg = orgService.getOrgById(identityId);
+            } else {
+                modelOrg = model.getOrg();
+            }
+
+            requestBuild.addDataSuppliers(publishTaskOfGetTaskOrganization(modelOrg, modelPartyId));
+            if (model != null) {
+                requestBuild.addDataPolicyTypes(TaskDataPolicyTypesEnum.POLICY_TYPES_30002.getValue());
+                requestBuild.addDataPolicyOptions(createDataPolicyItem(model, modelPartyId));
+            }
         }
 
         // 接收方策略
@@ -1975,13 +2025,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (workflowTask.getInputModel()) {
             if (StringUtils.isNotBlank(workflowTask.getInputModelId())) {
                 // 用户输入
-                curWorkflowRunTaskStatus.setModel(dataService.getModelById(workflowTask.getInputModelId()));
-            }
-
-            // 模型的组织
-            Model model = curWorkflowRunTaskStatus.getModel();
-            if (model != null) {
-                model.setOrg(orgService.getOrgById(model.getIdentityId()));
+                Model model = dataService.getModelById(workflowTask.getInputModelId());
+                if (model != null) {
+                    model.setOrg(orgService.getOrgById(model.getIdentityId()));
+                }
+                curWorkflowRunTaskStatus.setModel(model);
             }
         }
 
