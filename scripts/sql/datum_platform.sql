@@ -808,6 +808,7 @@ CREATE TABLE `mo_workflow_run_status` (
   `cancel_status` tinyint DEFAULT NULL COMMENT '取消状态: 1-取消中,2-取消成功,3-取消失败',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `workflow_hash` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  COMMENT='工作流运行状态';
 
@@ -844,13 +845,14 @@ CREATE TABLE `mo_workflow_run_status_task` (
   `step` int DEFAULT NULL COMMENT '节点在工作流中序号,从1开始',
   `begin_time` datetime DEFAULT NULL COMMENT '开始时间',
   `end_time` datetime DEFAULT NULL COMMENT '结束时间',
-  `run_status` tinyint DEFAULT NULL COMMENT '运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败',
+  `run_status` tinyint DEFAULT NULL COMMENT '运行状态: :0-未开始 1-运行中,2-运行成功,3-运行失败,4-中止运行',
   `task_id` varchar(256) DEFAULT NULL COMMENT '任务ID,底层处理完成后返回',
   `run_msg` varchar(256) DEFAULT NULL COMMENT '任务处理结果描述',
   `model_id` varchar(128) DEFAULT '0' COMMENT '工作流节点需要的模型id',
   `psi_id` varchar(128) DEFAULT '0' COMMENT '工作流节点需要的psi的id',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `task_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  COMMENT='工作流任务运行状态';
 
