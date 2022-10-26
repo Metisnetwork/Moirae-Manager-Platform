@@ -268,17 +268,50 @@ public class WorkflowServiceImpl implements WorkflowService {
                 workflowTaskList,
                 metaDataCertificateList);
 
+        List<WorkflowRunStatusTask> workflowRunTaskStatusList = workflowRunStatus.getWorkflowRunTaskStatusList();
+
+        Map<Integer, TaskRpcApi.PublishTaskDeclareRequest> requestMap = new HashMap<>();
         //1.组装任务列表
-        List<TaskRpcApi.PublishTaskDeclareRequest> requestList = workflowRunStatus.getWorkflowRunTaskStatusList().stream()
+        List<TaskRpcApi.PublishTaskDeclareRequest> requestList = workflowRunTaskStatusList.stream()
                 .map(workflowRunStatusTask -> {
                     initModel(workflowRunStatusTask);
                     TaskRpcApi.PublishTaskDeclareRequest request = assemblyTask(workflowRunStatus, workflowRunStatusTask);
+                    requestMap.put(workflowRunStatusTask.getStep(), request);
                     return request;
                 })
                 .collect(Collectors.toList());
 
+
+        //构建工作流策略
+        WorkflowPolicyOrdinary workflowPolicyOrdinary = buildWorkflowPolicy(workflowRunTaskStatusList, requestMap);
+
         //2.将任务参数转换成byte数组
         List<byte[]> taskByteArrays = new ArrayList<>();
+
+        //2.1.工作流的相关参数
+//        User1:utf-8编码byte数组, //这个是工作流的user
+//        UserType：大端uint32编码byte数组,//这个是工作流的userType
+//        WorkflowName:utf-8编码byte数组,
+//        PolicyType:大端uint32编码byte数组,
+//        Policy:utf-8编码byte数组,
+        String workflowUser = workflowRunStatus.getAddress();
+        int workflowUserType = CarrierEnum.UserType.User_1.getNumber();
+        String workflowName = workflowRunStatus.getWorkflow().getWorkflowName();
+        int workflowPolicyType = CarrierEnum.WorkFlowPolicyType.Ordinary_Policy.getNumber();
+        String workflowPolicy = JSONUtil.toJsonStr(workflowPolicyOrdinary.getOriginTaskList());
+
+        byte[] workflowUserByteArray = workflowUser.getBytes(StandardCharsets.UTF_8);
+        byte[] workflowUserTypeByteArray = intToByteArray(workflowUserType);
+        byte[] workflowNameByteArray = workflowName.getBytes(StandardCharsets.UTF_8);
+        byte[] workflowPolicyTypeByteArray = intToByteArray(workflowPolicyType);
+        byte[] workflowPolicyByteArray = workflowPolicy.getBytes(StandardCharsets.UTF_8);
+
+        taskByteArrays.add(workflowUserByteArray);
+        taskByteArrays.add(workflowUserTypeByteArray);
+        taskByteArrays.add(workflowNameByteArray);
+        taskByteArrays.add(workflowPolicyTypeByteArray);
+        taskByteArrays.add(workflowPolicyByteArray);
+
         for (int i = 0; i < requestList.size(); i++) {
             List<byte[]> taskByteArray = encodeTask(requestList.get(i));
             taskByteArrays.addAll(taskByteArray);
@@ -291,137 +324,104 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         //4.将byte数组进行rlp编码
-        log.info("bytes.size:{},byte:{}", bytes.length, new String(bytes));
         RlpString rlpString = RlpString.create(bytes);
         byte[] rlp = RlpEncoder.encode(rlpString);
-        log.info("rlp:{}", Numeric.toHexString(rlp));
 
         //5.将rlp编码的byte数组进行hash
         byte[] sha3Bytes = Hash.sha3(rlp);
         String sha3Str = Numeric.toHexString(sha3Bytes);
-        log.info("sha3Str:{}", sha3Str);
         return sha3Str;
     }
 
     private List<byte[]> encodeTask(TaskRpcApi.PublishTaskDeclareRequest request) {
-        log.info("encodeTask..............");
         List<byte[]> list = new ArrayList<>();
 
         //将数据转换成rlp编码
         //        User1：utf-8编码byte数组,
-        log.info("user:{}", request.getUser());
         byte[] user1 = request.getUser().getBytes(StandardCharsets.UTF_8);
         list.add(user1);
         //        UserType：大端uint32编码byte数组,
-        log.info("getUserTypeValue:{}", request.getUserTypeValue());
         byte[] userType = intToByteArray(request.getUserTypeValue());
         list.add(userType);
         //        TaskName：utf-8编码byte数组,
-        log.info("getTaskName:{}", request.getTaskName());
         byte[] taskName = request.getTaskName().getBytes(StandardCharsets.UTF_8);
         list.add(taskName);
         //        Sender.NodeName：utf-8编码byte数组,
-        log.info("request.getSender().getNodeName():{}", request.getSender().getNodeName());
         byte[] senderNodeName = request.getSender().getNodeName().getBytes(StandardCharsets.UTF_8);
         list.add(senderNodeName);
         //        Sender.NodeId：utf-8编码byte数组,
-        log.info("request.getSender().getNodeId():{}", request.getSender().getNodeId());
         byte[] senderNodeId = request.getSender().getNodeId().getBytes(StandardCharsets.UTF_8);
         list.add(senderNodeId);
         //        Sender.IdentityId：utf-8编码byte数组,
-        log.info("request.getSender().getIdentityId():{}", request.getSender().getIdentityId());
         byte[] senderIdentityId = request.getSender().getIdentityId().getBytes(StandardCharsets.UTF_8);
         list.add(senderIdentityId);
         //        Sender.PartyId：utf-8编码byte数组,
-        log.info("request.getSender().getPartyId():{}", request.getSender().getPartyId());
         byte[] senderPartyId = request.getSender().getPartyId().getBytes(StandardCharsets.UTF_8);
         list.add(senderPartyId);
         //        AlgoSupplier.NodeName：utf-8编码byte数组,
-        log.info("request.getAlgoSupplier().getNodeName():{}", request.getAlgoSupplier().getNodeName());
         byte[] algoNodeName = request.getAlgoSupplier().getNodeName().getBytes(StandardCharsets.UTF_8);
         list.add(algoNodeName);
         //        AlgoSupplier.NodeId：utf-8编码byte数组,
-        log.info("request.getAlgoSupplier().getNodeId():{}", request.getAlgoSupplier().getNodeId());
         byte[] algoNodeId = request.getAlgoSupplier().getNodeId().getBytes(StandardCharsets.UTF_8);
         list.add(algoNodeId);
         //        AlgoSupplier.IdentityId：utf-8编码byte数组,
-        log.info("request.getAlgoSupplier().getIdentityId():{}", request.getAlgoSupplier().getIdentityId());
         byte[] algoIdentityId = request.getAlgoSupplier().getIdentityId().getBytes(StandardCharsets.UTF_8);
         list.add(algoIdentityId);
         //        AlgoSupplier.PartyId：utf-8编码byte数组,
-        log.info("getAlgoSupplier().getPartyId():{}", request.getAlgoSupplier().getPartyId());
         byte[] algoPartyId = request.getAlgoSupplier().getPartyId().getBytes(StandardCharsets.UTF_8);
         list.add(algoPartyId);
         //        length DataSuppliers：长度的大端uint16编码byte数组,
-        log.info("getDataSuppliersCount:{}", request.getDataSuppliersCount());
         byte[] dataSuppliers = shortToByteArray((short) request.getDataSuppliersCount());
         list.add(dataSuppliers);
         //        length Receivers：长度的大端uint16编码byte数组,
-        log.info("getReceiversCount:{}", request.getReceiversCount());
         byte[] receivers = shortToByteArray((short) request.getReceiversCount());
         list.add(receivers);
         //        length DataPolicyTypes：长度的大端uint32编码byte数组,
-        log.info("getDataPolicyTypesCount:{}", request.getDataPolicyTypesCount());
         byte[] dataPolicyTypes = intToByteArray(request.getDataPolicyTypesCount());
         list.add(dataPolicyTypes);
         //        length DataPolicyOptions：长度的大端uint32编码byte数组,
-        log.info("getDataPolicyOptionsCount:{}", request.getDataPolicyOptionsCount());
         byte[] dataPolicyOptions = intToByteArray(request.getDataPolicyOptionsCount());
         list.add(dataPolicyOptions);
         //        length PowerPolicyTypes：长度的大端uint32编码byte数组,
-        log.info("getPowerPolicyTypesCount:{}", request.getPowerPolicyTypesCount());
         byte[] powerPolicyTypes = intToByteArray(request.getPowerPolicyTypesCount());
         list.add(powerPolicyTypes);
         //        length PowerPolicyOptions：长度的大端uint32编码byte数组,
-        log.info("getPowerPolicyOptionsCount:{}", request.getPowerPolicyOptionsCount());
         byte[] powerPolicyOptions = intToByteArray(request.getPowerPolicyOptionsCount());
         list.add(powerPolicyOptions);
         //        length ReceiverPolicyTypes：长度的大端uint32编码byte数组,
-        log.info("getReceiverPolicyTypesCount:{}", request.getReceiverPolicyTypesCount());
         byte[] receiverPolicyTypes = intToByteArray(request.getReceiverPolicyTypesCount());
         list.add(receiverPolicyTypes);
         //        length ReceiverPolicyOptions：长度的大端uint32编码byte数组,
-        log.info("getReceiverPolicyOptionsCount:{}", request.getReceiverPolicyOptionsCount());
         byte[] receiverPolicyOptions = intToByteArray(request.getReceiverPolicyOptionsCount());
         list.add(receiverPolicyOptions);
         //        length DataFlowPolicyTypes：长度的大端uint32编码byte数组,
-        log.info("getDataFlowPolicyTypesCount:{}", request.getDataFlowPolicyTypesCount());
         byte[] dataFlowPolicyTypes = intToByteArray(request.getDataFlowPolicyTypesCount());
         list.add(dataFlowPolicyTypes);
         //        length DataFlowPolicyOptions：长度的大端uint32编码byte数组,
-        log.info("getDataFlowPolicyOptionsCount:{}", request.getDataFlowPolicyOptionsCount());
         byte[] dataFlowPolicyOptions = intToByteArray(request.getDataFlowPolicyOptionsCount());
         list.add(dataFlowPolicyOptions);
         //        OperationCost.Processor：大端uint32编码byte数组,
-        log.info("getProcessor:{}", request.getOperationCost().getProcessor());
         byte[] processor = intToByteArray(request.getOperationCost().getProcessor());
         list.add(processor);
         //        OperationCost.Bandwidth：大端uint64编码byte数组,
-        log.info("getBandwidth:{}", request.getOperationCost().getBandwidth());
         byte[] bandwidth = longToByteArray(request.getOperationCost().getBandwidth());
         list.add(bandwidth);
         //        OperationCost.Memory：大端uint64编码byte数组,
-        log.info("getMemory:{}", request.getOperationCost().getMemory());
         byte[] memory = longToByteArray(request.getOperationCost().getMemory());
         list.add(memory);
         //        OperationCost.Duration：大端uint64编码byte数组,
-        log.info("getDuration:{}", request.getOperationCost().getDuration());
         byte[] duration = longToByteArray(request.getOperationCost().getDuration());
         list.add(duration);
         //        AlgorithmCode：utf-8编码byte数组,
-        log.info("getAlgorithmCode:{}", request.getAlgorithmCode());
         byte[] algorithmCode = request.getAlgorithmCode().getBytes(StandardCharsets.UTF_8);
         list.add(algorithmCode);
         //        MetaAlgorithmId：utf-8编码byte数组,
-        log.info("getMetaAlgorithmId:{}", request.getMetaAlgorithmId());
         byte[] metaAlgorithmId = request.getMetaAlgorithmId().getBytes(StandardCharsets.UTF_8);
         list.add(metaAlgorithmId);
         //        AlgorithmCodeExtraParams：utf-8编码byte数组,
-        log.info("getAlgorithmCodeExtraParams:{}", request.getAlgorithmCodeExtraParams());
         byte[] algorithmCodeExtraParams = request.getAlgorithmCodeExtraParams().getBytes(StandardCharsets.UTF_8);
         list.add(algorithmCodeExtraParams);
         //        Desc：utf-8编码byte数组,
-        log.info("desc:{}", request.getDesc());
         byte[] desc = request.getDesc().getBytes(StandardCharsets.UTF_8);
         list.add(desc);
         return list;
@@ -1252,9 +1252,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                                                        Map<Integer, TaskRpcApi.PublishTaskDeclareRequest> requestMap) {
         WorkflowPolicyOrdinary workflowPolicyOrdinary = new WorkflowPolicyOrdinary();
         //将每个任务打包到工作流策略中
-        log.info("workflowRunTaskStatusList.size:{}", workflowRunTaskStatusList.size());
+        log.debug("workflowRunTaskStatusList.size:{}", workflowRunTaskStatusList.size());
         workflowRunTaskStatusList.forEach(workflowRunStatusTask -> {
-            log.info("workflowTaskId:{}", workflowRunStatusTask.getWorkflowTaskId());
+            log.debug("workflowTaskId:{}", workflowRunStatusTask.getWorkflowTaskId());
             WorkflowPolicyOrdinary.OriginTask originTask = new WorkflowPolicyOrdinary.OriginTask();
 
             Integer step = workflowRunStatusTask.getStep();
@@ -1278,7 +1278,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     String dataPolicyItem = createDataPolicyItem(workflowTaskInput);
                     referenceTask.getDependParams().add(dataPolicyItem);
                 });
-                log.info("psi.referenceTask:{}", referenceTask);
+                log.debug("psi.referenceTask:{}", referenceTask);
                 originTask.getReference().add(referenceTask);
             }
 
@@ -1294,7 +1294,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                 String dataPolicyItem = createDataPolicyItem(null, partyId);
                 referenceTask.getDependParams().add(dataPolicyItem);
-                log.info("model.referenceTask:{}", referenceTask);
+                log.debug("model.referenceTask:{}", referenceTask);
                 originTask.getReference().add(referenceTask);
             }
             workflowPolicyOrdinary.getOriginTaskList().add(originTask);

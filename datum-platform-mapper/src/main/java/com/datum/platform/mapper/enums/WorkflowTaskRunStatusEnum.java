@@ -14,6 +14,8 @@ public enum WorkflowTaskRunStatusEnum {
     RUN_DOING(1, "运行中"),
     RUN_SUCCESS(2, "运行成功"),
     RUN_FAIL(3, "运行失败"),
+
+    RUN_SUSPEND(4, "中止运行"),
     ;
 
     @JsonValue

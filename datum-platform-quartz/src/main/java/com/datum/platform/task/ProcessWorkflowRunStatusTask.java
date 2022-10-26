@@ -161,18 +161,39 @@ public class ProcessWorkflowRunStatusTask {
         switch (status) {
             case WorkFlowState_Unknown:
             case WorkFlowState_Failed:
-                workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
-                workflowRunStatus.setEndTime(new Date());
+                workflowFailed(workflowRunStatus);
                 break;
             case WorkFlowState_Succeed:
-                workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
-                workflowRunStatus.setEndTime(new Date());
+                workflowSuccess(workflowRunStatus);
                 break;
             default:
                 break;
         }
+    }
+
+    private void workflowSuccess(WorkflowRunStatus workflowRunStatus) {
+        workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUCCESS);
+        workflowRunStatus.setEndTime(new Date());
         //更新工作流状态
         workflowRunStatusManager.updateById(workflowRunStatus);
+    }
+
+    private void workflowFailed(WorkflowRunStatus workflowRunStatus) {
+        workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
+        workflowRunStatus.setEndTime(new Date());
+        //更新工作流状态
+        workflowRunStatusManager.updateById(workflowRunStatus);
+
+        //将所有还在等待中的任务设置为失败
+        List<WorkflowRunStatusTask> workflowRunStatusTasks = workflowRunStatusTaskManager.listOfUncompleted(workflowRunStatus.getId());
+        workflowRunStatusTasks.forEach(workflowRunStatusTask -> {
+
+            // 更新状态
+            workflowRunStatusTask.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUSPEND);
+            workflowRunStatusTask.setRunMsg("workflow fail!");
+
+            workflowRunStatusTaskManager.updateById(workflowRunStatusTask);
+        });
     }
 
     private void taskRunning(WorkflowRunStatusTask curWorkflowRunTaskStatus, WorkflowRpcApi.WorkFlowTaskStatus task) {

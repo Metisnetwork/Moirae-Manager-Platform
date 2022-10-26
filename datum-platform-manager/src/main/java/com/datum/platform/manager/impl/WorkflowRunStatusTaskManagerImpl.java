@@ -50,6 +50,14 @@ public class WorkflowRunStatusTaskManagerImpl extends ServiceImpl<WorkflowRunSta
     }
 
     @Override
+    public List<WorkflowRunStatusTask> listOfUncompleted(long workflowRunId) {
+        LambdaQueryWrapper<WorkflowRunStatusTask> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(WorkflowRunStatusTask::getRunStatus, WorkflowTaskRunStatusEnum.RUN_NEED);
+        wrapper.eq(WorkflowRunStatusTask::getWorkflowRunId,workflowRunId);
+        return list(wrapper);
+    }
+
+    @Override
     public List<WorkflowRunStatusTask> listByWorkflowRunId(Long workflowRunId) {
         LambdaQueryWrapper<WorkflowRunStatusTask> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WorkflowRunStatusTask::getWorkflowRunId, workflowRunId);

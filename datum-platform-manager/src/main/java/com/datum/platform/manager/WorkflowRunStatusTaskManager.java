@@ -21,6 +21,8 @@ public interface WorkflowRunStatusTaskManager extends IService<WorkflowRunStatus
 
     List<WorkflowRunStatusTask> listOfUnConfirmed();
 
+    List<WorkflowRunStatusTask> listOfUncompleted(long workflowRunId);
+
     List<WorkflowRunStatusTask> listByWorkflowRunId(Long workflowRunId);
 
     WorkflowRunStatusTask getByTaskId(String taskId);
