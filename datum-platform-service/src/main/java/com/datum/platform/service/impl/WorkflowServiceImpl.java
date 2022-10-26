@@ -5,6 +5,8 @@ import carrier.api.WorkflowRpcApi;
 import carrier.types.Resourcedata;
 import carrier.types.Taskdata;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ByteUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -51,9 +53,7 @@ import com.datum.platform.service.utils.TreeUtils;
 import com.datum.platform.service.utils.UserContext;
 import com.google.protobuf.ByteString;
 import com.platon.rlp.solidity.RlpEncoder;
-import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
-import com.platon.rlp.solidity.RlpType;
 import com.platon.utils.Numeric;
 import common.constant.CarrierEnum;
 import common.constant.TkEnum;
@@ -69,6 +69,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -266,7 +268,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 workflowTaskList,
                 metaDataCertificateList);
 
-        //组装任务列表
+        //1.组装任务列表
         List<TaskRpcApi.PublishTaskDeclareRequest> requestList = workflowRunStatus.getWorkflowRunTaskStatusList().stream()
                 .map(workflowRunStatusTask -> {
                     initModel(workflowRunStatusTask);
@@ -275,162 +277,166 @@ public class WorkflowServiceImpl implements WorkflowService {
                 })
                 .collect(Collectors.toList());
 
-        List<RlpType> rlpTypes = new ArrayList<>();
+        //2.将任务参数转换成byte数组
+        List<byte[]> taskByteArrays = new ArrayList<>();
         for (int i = 0; i < requestList.size(); i++) {
-            List<RlpType> rlpTypes1 = encodeTask(requestList.get(i));
-            rlpTypes.addAll(rlpTypes1);
+            List<byte[]> taskByteArray = encodeTask(requestList.get(i));
+            taskByteArrays.addAll(taskByteArray);
         }
-        //将rlp编码转换成byte数组
-        RlpList rlpList = new RlpList(rlpTypes);
-        byte[] rlp = RlpEncoder.encode(rlpList);
+
+        //3.将byte数组合并
+        byte[] bytes = new byte[0];
+        for (int i = 0; i < taskByteArrays.size(); i++) {
+            bytes = ArrayUtil.addAll(bytes, taskByteArrays.get(i));
+        }
+
+        //4.将byte数组进行rlp编码
+        log.info("bytes.size:{},byte:{}", bytes.length, new String(bytes));
+        RlpString rlpString = RlpString.create(bytes);
+        byte[] rlp = RlpEncoder.encode(rlpString);
         log.info("rlp:{}", Numeric.toHexString(rlp));
 
-        //将rlp编码的byte数组进行hash
+        //5.将rlp编码的byte数组进行hash
         byte[] sha3Bytes = Hash.sha3(rlp);
         String sha3Str = Numeric.toHexString(sha3Bytes);
         log.info("sha3Str:{}", sha3Str);
         return sha3Str;
     }
 
-    private List<RlpType> encodeTask(TaskRpcApi.PublishTaskDeclareRequest request) {
+    private List<byte[]> encodeTask(TaskRpcApi.PublishTaskDeclareRequest request) {
         log.info("encodeTask..............");
-        List<RlpType> list = new ArrayList<>();
+        List<byte[]> list = new ArrayList<>();
 
         //将数据转换成rlp编码
         //        User1：utf-8编码byte数组,
         log.info("user:{}", request.getUser());
-        RlpType user1RlpType = rplEncode(request.getUser(), true);
-        list.add(user1RlpType);
+        byte[] user1 = request.getUser().getBytes(StandardCharsets.UTF_8);
+        list.add(user1);
         //        UserType：大端uint32编码byte数组,
         log.info("getUserTypeValue:{}", request.getUserTypeValue());
-        RlpType userTypeRlpType = rplEncode(String.valueOf(request.getUserTypeValue()), false);
-        list.add(userTypeRlpType);
+        byte[] userType = intToByteArray(request.getUserTypeValue());
+        list.add(userType);
         //        TaskName：utf-8编码byte数组,
         log.info("getTaskName:{}", request.getTaskName());
-        RlpType taskNameRlpType = rplEncode(request.getTaskName(), true);
-        list.add(taskNameRlpType);
+        byte[] taskName = request.getTaskName().getBytes(StandardCharsets.UTF_8);
+        list.add(taskName);
         //        Sender.NodeName：utf-8编码byte数组,
         log.info("request.getSender().getNodeName():{}", request.getSender().getNodeName());
-        RlpType senderNodeNameRlpType = rplEncode(request.getSender().getNodeName(), true);
-        list.add(senderNodeNameRlpType);
+        byte[] senderNodeName = request.getSender().getNodeName().getBytes(StandardCharsets.UTF_8);
+        list.add(senderNodeName);
         //        Sender.NodeId：utf-8编码byte数组,
         log.info("request.getSender().getNodeId():{}", request.getSender().getNodeId());
-        RlpType senderNodeIdRlpType = rplEncode(request.getSender().getNodeId(), true);
-        list.add(senderNodeIdRlpType);
+        byte[] senderNodeId = request.getSender().getNodeId().getBytes(StandardCharsets.UTF_8);
+        list.add(senderNodeId);
         //        Sender.IdentityId：utf-8编码byte数组,
         log.info("request.getSender().getIdentityId():{}", request.getSender().getIdentityId());
-        RlpType senderIdentityIdRlpType = rplEncode(request.getSender().getIdentityId(), true);
-        list.add(senderIdentityIdRlpType);
+        byte[] senderIdentityId = request.getSender().getIdentityId().getBytes(StandardCharsets.UTF_8);
+        list.add(senderIdentityId);
         //        Sender.PartyId：utf-8编码byte数组,
         log.info("request.getSender().getPartyId():{}", request.getSender().getPartyId());
-        RlpType senderPartyIdRlpType = rplEncode(request.getSender().getPartyId(), true);
-        list.add(senderPartyIdRlpType);
+        byte[] senderPartyId = request.getSender().getPartyId().getBytes(StandardCharsets.UTF_8);
+        list.add(senderPartyId);
         //        AlgoSupplier.NodeName：utf-8编码byte数组,
         log.info("request.getAlgoSupplier().getNodeName():{}", request.getAlgoSupplier().getNodeName());
-        RlpType algoNodeNameRlpType = rplEncode(request.getAlgoSupplier().getNodeName(), true);
-        list.add(algoNodeNameRlpType);
+        byte[] algoNodeName = request.getAlgoSupplier().getNodeName().getBytes(StandardCharsets.UTF_8);
+        list.add(algoNodeName);
         //        AlgoSupplier.NodeId：utf-8编码byte数组,
         log.info("request.getAlgoSupplier().getNodeId():{}", request.getAlgoSupplier().getNodeId());
-        RlpType algoNodeIdRlpType = rplEncode(request.getAlgoSupplier().getNodeId(), true);
-        list.add(algoNodeIdRlpType);
+        byte[] algoNodeId = request.getAlgoSupplier().getNodeId().getBytes(StandardCharsets.UTF_8);
+        list.add(algoNodeId);
         //        AlgoSupplier.IdentityId：utf-8编码byte数组,
         log.info("request.getAlgoSupplier().getIdentityId():{}", request.getAlgoSupplier().getIdentityId());
-        RlpType algoIdentityIdRlpType = rplEncode(request.getAlgoSupplier().getIdentityId(), true);
-        list.add(algoIdentityIdRlpType);
+        byte[] algoIdentityId = request.getAlgoSupplier().getIdentityId().getBytes(StandardCharsets.UTF_8);
+        list.add(algoIdentityId);
         //        AlgoSupplier.PartyId：utf-8编码byte数组,
         log.info("getAlgoSupplier().getPartyId():{}", request.getAlgoSupplier().getPartyId());
-        RlpType algoPartyIdRlpType = rplEncode(request.getAlgoSupplier().getPartyId(), true);
-        list.add(algoPartyIdRlpType);
+        byte[] algoPartyId = request.getAlgoSupplier().getPartyId().getBytes(StandardCharsets.UTF_8);
+        list.add(algoPartyId);
         //        length DataSuppliers：长度的大端uint16编码byte数组,
         log.info("getDataSuppliersCount:{}", request.getDataSuppliersCount());
-        RlpType dataSuppliersRlpType = rplEncode(String.valueOf(request.getDataSuppliersCount()), false);
-        list.add(dataSuppliersRlpType);
-        //        length PowerSuppliers：长度的大端uint16编码byte数组,
-//        RlpType powerSuppliersRlpType = rplEncode(, true);
+        byte[] dataSuppliers = shortToByteArray((short) request.getDataSuppliersCount());
+        list.add(dataSuppliers);
         //        length Receivers：长度的大端uint16编码byte数组,
         log.info("getReceiversCount:{}", request.getReceiversCount());
-        RlpType receiversRlpType = rplEncode(String.valueOf(request.getReceiversCount()), false);
-        list.add(receiversRlpType);
+        byte[] receivers = shortToByteArray((short) request.getReceiversCount());
+        list.add(receivers);
         //        length DataPolicyTypes：长度的大端uint32编码byte数组,
         log.info("getDataPolicyTypesCount:{}", request.getDataPolicyTypesCount());
-        RlpType dataPolicyTypesRlpType = rplEncode(String.valueOf(request.getDataPolicyTypesCount()), false);
-        list.add(dataPolicyTypesRlpType);
+        byte[] dataPolicyTypes = intToByteArray(request.getDataPolicyTypesCount());
+        list.add(dataPolicyTypes);
         //        length DataPolicyOptions：长度的大端uint32编码byte数组,
         log.info("getDataPolicyOptionsCount:{}", request.getDataPolicyOptionsCount());
-        RlpType dataPolicyOptionsRlpType = rplEncode(String.valueOf(request.getDataPolicyOptionsCount()), false);
-        list.add(dataPolicyOptionsRlpType);
+        byte[] dataPolicyOptions = intToByteArray(request.getDataPolicyOptionsCount());
+        list.add(dataPolicyOptions);
         //        length PowerPolicyTypes：长度的大端uint32编码byte数组,
         log.info("getPowerPolicyTypesCount:{}", request.getPowerPolicyTypesCount());
-        RlpType powerPolicyTypesRlpType = rplEncode(String.valueOf(request.getPowerPolicyTypesCount()), false);
-        list.add(powerPolicyTypesRlpType);
+        byte[] powerPolicyTypes = intToByteArray(request.getPowerPolicyTypesCount());
+        list.add(powerPolicyTypes);
         //        length PowerPolicyOptions：长度的大端uint32编码byte数组,
         log.info("getPowerPolicyOptionsCount:{}", request.getPowerPolicyOptionsCount());
-        RlpType powerPolicyOptionsRlpType = rplEncode(String.valueOf(request.getPowerPolicyOptionsCount()), false);
-        list.add(powerPolicyOptionsRlpType);
+        byte[] powerPolicyOptions = intToByteArray(request.getPowerPolicyOptionsCount());
+        list.add(powerPolicyOptions);
         //        length ReceiverPolicyTypes：长度的大端uint32编码byte数组,
         log.info("getReceiverPolicyTypesCount:{}", request.getReceiverPolicyTypesCount());
-        RlpType receiverPolicyTypesRlpType = rplEncode(String.valueOf(request.getReceiverPolicyTypesCount()), false);
-        list.add(receiverPolicyTypesRlpType);
+        byte[] receiverPolicyTypes = intToByteArray(request.getReceiverPolicyTypesCount());
+        list.add(receiverPolicyTypes);
         //        length ReceiverPolicyOptions：长度的大端uint32编码byte数组,
         log.info("getReceiverPolicyOptionsCount:{}", request.getReceiverPolicyOptionsCount());
-        RlpType receiverPolicyOptionsRlpType = rplEncode(String.valueOf(request.getReceiverPolicyOptionsCount()), false);
-        list.add(receiverPolicyOptionsRlpType);
+        byte[] receiverPolicyOptions = intToByteArray(request.getReceiverPolicyOptionsCount());
+        list.add(receiverPolicyOptions);
         //        length DataFlowPolicyTypes：长度的大端uint32编码byte数组,
         log.info("getDataFlowPolicyTypesCount:{}", request.getDataFlowPolicyTypesCount());
-        RlpType dataFlowPolicyTypesRlpType = rplEncode(String.valueOf(request.getDataFlowPolicyTypesCount()), false);
-        list.add(dataFlowPolicyTypesRlpType);
+        byte[] dataFlowPolicyTypes = intToByteArray(request.getDataFlowPolicyTypesCount());
+        list.add(dataFlowPolicyTypes);
         //        length DataFlowPolicyOptions：长度的大端uint32编码byte数组,
         log.info("getDataFlowPolicyOptionsCount:{}", request.getDataFlowPolicyOptionsCount());
-        RlpType dataFlowPolicyOptionsRlpType = rplEncode(String.valueOf(request.getDataFlowPolicyOptionsCount()), false);
-        list.add(dataFlowPolicyOptionsRlpType);
+        byte[] dataFlowPolicyOptions = intToByteArray(request.getDataFlowPolicyOptionsCount());
+        list.add(dataFlowPolicyOptions);
         //        OperationCost.Processor：大端uint32编码byte数组,
         log.info("getProcessor:{}", request.getOperationCost().getProcessor());
-        RlpType processorRlpType = rplEncode(String.valueOf(request.getOperationCost().getProcessor()), false);
-        list.add(processorRlpType);
+        byte[] processor = intToByteArray(request.getOperationCost().getProcessor());
+        list.add(processor);
         //        OperationCost.Bandwidth：大端uint64编码byte数组,
         log.info("getBandwidth:{}", request.getOperationCost().getBandwidth());
-        RlpType bandwidthRlpType = rplEncode(String.valueOf(request.getOperationCost().getBandwidth()), false);
-        list.add(bandwidthRlpType);
+        byte[] bandwidth = longToByteArray(request.getOperationCost().getBandwidth());
+        list.add(bandwidth);
         //        OperationCost.Memory：大端uint64编码byte数组,
         log.info("getMemory:{}", request.getOperationCost().getMemory());
-        RlpType memoryRlpType = rplEncode(String.valueOf(request.getOperationCost().getMemory()), false);
-        list.add(memoryRlpType);
+        byte[] memory = longToByteArray(request.getOperationCost().getMemory());
+        list.add(memory);
         //        OperationCost.Duration：大端uint64编码byte数组,
         log.info("getDuration:{}", request.getOperationCost().getDuration());
-        RlpType durationRlpType = rplEncode(String.valueOf(request.getOperationCost().getDuration()), false);
-        list.add(durationRlpType);
+        byte[] duration = longToByteArray(request.getOperationCost().getDuration());
+        list.add(duration);
         //        AlgorithmCode：utf-8编码byte数组,
         log.info("getAlgorithmCode:{}", request.getAlgorithmCode());
-        RlpType algorithmCodeRlpType = rplEncode(request.getAlgorithmCode(), true);
-        list.add(algorithmCodeRlpType);
+        byte[] algorithmCode = request.getAlgorithmCode().getBytes(StandardCharsets.UTF_8);
+        list.add(algorithmCode);
         //        MetaAlgorithmId：utf-8编码byte数组,
         log.info("getMetaAlgorithmId:{}", request.getMetaAlgorithmId());
-        RlpType metaAlgorithmIdRlpType = rplEncode(request.getMetaAlgorithmId(), true);
-        list.add(metaAlgorithmIdRlpType);
+        byte[] metaAlgorithmId = request.getMetaAlgorithmId().getBytes(StandardCharsets.UTF_8);
+        list.add(metaAlgorithmId);
         //        AlgorithmCodeExtraParams：utf-8编码byte数组,
         log.info("getAlgorithmCodeExtraParams:{}", request.getAlgorithmCodeExtraParams());
-        RlpType algorithmCodeExtraParamsRlpType = rplEncode(request.getAlgorithmCodeExtraParams(), true);
-        list.add(algorithmCodeExtraParamsRlpType);
-        //        State：大端uint32编码byte数组,
-//        RlpType stateRlpType = rplEncode(, true);
+        byte[] algorithmCodeExtraParams = request.getAlgorithmCodeExtraParams().getBytes(StandardCharsets.UTF_8);
+        list.add(algorithmCodeExtraParams);
         //        Desc：utf-8编码byte数组,
         log.info("desc:{}", request.getDesc());
-        RlpType descRlpType = rplEncode(request.getDesc(), true);
-        list.add(descRlpType);
-        //        length dependTask:长度的大端uint32编码byte数组
-//        RlpType dependTaskRlpType = rplEncode(, true);
-
+        byte[] desc = request.getDesc().getBytes(StandardCharsets.UTF_8);
+        list.add(desc);
         return list;
     }
 
-    private RlpType rplEncode(String value, boolean isString) {
-        RlpType rlpType = null;
-        if (isString) {
-            rlpType = RlpString.create(value);
-        } else {
-            rlpType = RlpString.create(new BigInteger(value));
-        }
-        return rlpType;
+    public static byte[] shortToByteArray(short n) {
+        return ByteUtil.shortToBytes(n, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] intToByteArray(int n) {
+        return ByteUtil.intToBytes(n, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] longToByteArray(long n) {
+        return ByteUtil.longToBytes(n, ByteOrder.BIG_ENDIAN);
     }
 
     private CalculationProcess getCalculationProcessDetails(Long calculationProcessId) {
@@ -1824,6 +1830,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     WorkflowRunStatusTask workflowRunTaskStatus = new WorkflowRunStatusTask();
                     workflowRunTaskStatus.setWorkflowTaskId(item.getWorkflowTaskId());
                     workflowRunTaskStatus.setModelId(item.getInputModelId());
+                    workflowRunTaskStatus.setStep(item.getStep());
                     workflowRunTaskStatus.setWorkflowTask(item);
 
                     String taskName = publishTaskOfGetTaskName(workflowRunStatus, workflowRunTaskStatus);
