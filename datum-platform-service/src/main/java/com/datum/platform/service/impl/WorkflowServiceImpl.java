@@ -1193,7 +1193,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowRunStatusTask> workflowRunTaskStatusList = workflowRunStatus.getWorkflowRunTaskStatusList();
         //第一个将被执行的任务
         WorkflowRunStatusTask firstWorkflowTask = workflowRunTaskStatusList.stream()
-                .filter(workflowRunStatusTask -> workflowRunStatusTask.getStep() == 1)
                 .findFirst()
                 .get();
 
@@ -1241,7 +1240,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowRunStatus.setEndTime(new Date());
         }
         workflowRunStatusManager.updateById(workflowRunStatus);
-        workflowRunTaskStatusManager.updateById(firstWorkflowTask);
     }
 
     private ByteString getSign(String sign) {
@@ -1283,7 +1281,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
 
             //是否需要依赖模型
-            if (workflowTask.getInputModel()) {
+            if (workflowTask.getInputModel() && StringUtils.isBlank(workflowTask.getInputModelId())) {
                 TaskRpcApi.PublishTaskDeclareRequest dependTaskRequest = requestMap.get(workflowTask.getInputModelStep());
                 WorkflowPolicyOrdinary.ReferenceTask referenceTask = new WorkflowPolicyOrdinary.ReferenceTask();
                 referenceTask.setTarget(dependTaskRequest.getTaskName());
@@ -1662,8 +1660,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         TaskDataPolicyUnknown dataPolicy = new TaskDataPolicyUnknown();
         dataPolicy.setInputType(2);
         dataPolicy.setPartyId(partyId);
-        dataPolicy.setMetadataId(model == null ? null : model.getMetaDataId());
-        dataPolicy.setMetadataName(model == null ? null : model.getName());
+        dataPolicy.setTaskId(model == null ? null : model.getTrainTaskId());
+//        dataPolicy.setMetadataId(model == null ? null : model.getMetaDataId());
+//        dataPolicy.setMetadataName(model == null ? null : model.getName());
         return JSONObject.toJSONString(dataPolicy);
     }
 
