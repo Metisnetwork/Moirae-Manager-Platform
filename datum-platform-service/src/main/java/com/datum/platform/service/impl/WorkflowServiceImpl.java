@@ -583,7 +583,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     private String getPreTaskInput(Long workflowId, Long workflowVersion, Integer task2Step) {
         if(task2Step > 1){
-            WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, task2Step);
+            WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, task2Step - 1);
             if(workflowTask != null && StringUtils.isNotBlank(workflowTask.getIdentityId())){
                 return workflowTask.getIdentityId();
             }
