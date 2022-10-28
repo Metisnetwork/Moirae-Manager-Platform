@@ -35,4 +35,7 @@ public class PredictionInputDto {
     @Size(message = "{task.dataInput.size.equal.2}", min = 2, max = 2)
     @Valid
     private List<DataInputDto> item;
+
+    @ApiModelProperty(value = "训练时选择的输入(查询时返回，提交不需要)")
+    private String rainingInputIdentityId;
 }

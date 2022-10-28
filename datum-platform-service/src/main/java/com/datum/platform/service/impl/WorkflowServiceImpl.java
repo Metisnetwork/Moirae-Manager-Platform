@@ -551,9 +551,13 @@ public class WorkflowServiceImpl implements WorkflowService {
                 break;
             case INPUT_PREDICTION:
                 result.setPredictionInput(getPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
+                // 设置训练输入组织
+                result.getPredictionInput().setRainingInputIdentityId(getPreTaskInput(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
                 break;
             case PT_INPUT_PREDICTION:
                 result.setPtPredictionInput(getPTPredictionInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step()));
+                // 设置训练输入组织
+                result.getPtPredictionInput().setRainingInputIdentityId(getPreTaskInput(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask4Step()));
                 break;
             case INPUT_PSI:
                 result.setPsiInput(getPsiInputOfWizardMode(req.getWorkflowId(), req.getWorkflowVersion(), wizard.getTask2Step()));
@@ -575,6 +579,16 @@ public class WorkflowServiceImpl implements WorkflowService {
                 break;
         }
         return result;
+    }
+
+    private String getPreTaskInput(Long workflowId, Long workflowVersion, Integer task2Step) {
+        if(task2Step > 1){
+            WorkflowTask workflowTask = workflowTaskManager.getByStep(workflowId, workflowVersion, task2Step);
+            if(workflowTask != null && StringUtils.isNotBlank(workflowTask.getIdentityId())){
+                return workflowTask.getIdentityId();
+            }
+        }
+        return null;
     }
 
     private OutputDto getCommonOutputOfWizardMode(Long workflowId, Long workflowVersion, Integer taskStep) {

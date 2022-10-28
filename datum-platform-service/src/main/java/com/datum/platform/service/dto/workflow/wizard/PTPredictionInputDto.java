@@ -38,4 +38,7 @@ public class PTPredictionInputDto {
 
     @ApiModelProperty(value = "如果指定算力，算力提供组织")
     private String powerIdentityId;
+
+    @ApiModelProperty(value = "训练时选择的输入(查询时返回，提交不需要)")
+    private String rainingInputIdentityId;
 }
