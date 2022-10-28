@@ -1253,7 +1253,22 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowRunStatus.setRunStatus(WorkflowTaskRunStatusEnum.RUN_FAIL);
             workflowRunStatus.setEndTime(new Date());
         }
+        if(workflowRunStatus.getRunStatus() == WorkflowTaskRunStatusEnum.RUN_FAIL){
+            workflowFailed(workflowRunStatus.getId());
+        }
         workflowRunStatusManager.updateById(workflowRunStatus);
+    }
+
+    private void workflowFailed(Long workflowRunId) {
+        //将所有还在等待中的任务设置为失败
+        List<WorkflowRunStatusTask> workflowRunStatusTasks = workflowRunTaskStatusManager.listOfUncompleted(workflowRunId);
+        workflowRunStatusTasks.forEach(workflowRunStatusTask -> {
+            // 更新状态
+            workflowRunStatusTask.setRunStatus(WorkflowTaskRunStatusEnum.RUN_SUSPEND);
+            workflowRunStatusTask.setRunMsg("workflow fail!");
+
+            workflowRunTaskStatusManager.updateById(workflowRunStatusTask);
+        });
     }
 
     private ByteString getSign(String sign) {
