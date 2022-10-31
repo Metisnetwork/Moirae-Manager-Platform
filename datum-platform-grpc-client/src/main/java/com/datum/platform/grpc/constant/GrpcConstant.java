@@ -18,5 +18,6 @@ public class GrpcConstant {
     /**
      * 分页大小
      */
-    public static final long PAGE_SIZE = 100;
+    public static final long PAGE_SIZE = 5;
+
 }

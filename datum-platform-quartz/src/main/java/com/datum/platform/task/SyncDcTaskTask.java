@@ -114,8 +114,9 @@ public class SyncDcTaskTask {
         for (int i = 0; i < information.getDataPolicyTypesList().size(); i++) {
             TaskDataProvider taskDataProvider = new TaskDataProvider();
             Integer dataPolicyType = information.getDataPolicyTypesList().get(i);
-            if (dataPolicyType == TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue()
-                    || dataPolicyType == TaskDataPolicyTypesEnum.POLICY_TYPES_30002.getValue()) {
+
+            if (dataPolicyType.equals(TaskDataPolicyTypesEnum.POLICY_TYPES_30001.getValue())
+                    || dataPolicyType.equals(TaskDataPolicyTypesEnum.POLICY_TYPES_30002.getValue())) {
                 TaskDataPolicyPreTask dataPolicy = JSONObject.parseObject(information.getDataPolicyOptions(i), TaskDataPolicyPreTask.class);
                 taskDataProvider.setTaskId(information.getTaskId());
                 taskDataProvider.setMetaDataId("preTask:" + UUID.randomUUID());
@@ -145,7 +146,7 @@ public class SyncDcTaskTask {
                 });
             }
 
-            log.info("taskDataProvider,taskId:{},metaDataId:{},policyType:{}",
+            log.debug("taskDataProvider,taskId:{},metaDataId:{},policyType:{}",
                     taskDataProvider.getTaskId(),
                     taskDataProvider.getMetaDataId(),
                     information.getDataPolicyTypesList().get(i));
