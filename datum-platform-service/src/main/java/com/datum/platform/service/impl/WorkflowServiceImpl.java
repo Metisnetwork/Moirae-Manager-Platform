@@ -1928,7 +1928,14 @@ public class WorkflowServiceImpl implements WorkflowService {
         List<WorkflowFeeItemDto> tokenFeeList = new ArrayList<>();
         Map<String, BigInteger> metaDataId2consumptionMap = new HashMap<>();
         for (int i = 0; i < workflowTaskList.size(); i++) {
-            if ((workflowTaskList.get(i).getInputPsi() && workflowTaskList.get(i - 1) != null && workflowTaskList.get(i - 1).getAlgorithmId() == sysConfig.getDefaultPsi()) || workflowTaskList.get(i).getPowerType() != null) {
+            // 前置psi的训练和预测时
+            boolean isPrePsi = workflowTaskList.get(i).getInputPsi() && workflowTaskList.get(i - 1) != null && workflowTaskList.get(i - 1).getAlgorithmId() == sysConfig.getDefaultPsi();
+            // 明文算法
+            boolean isPt = workflowTaskList.get(i).getPowerType() != null;
+            // 单独psi
+            boolean isPsi = workflowTaskList.get(i).getAlgorithmId() == sysConfig.getDefaultPsi() && workflowTaskList.size() > i;
+
+            if (isPrePsi || isPt || isPsi) {
                 WorkflowTask workflowTask = workflowTaskList.get(i);
                 for (WorkflowTaskInput taskInput : workflowTask.getInputList()) {
                     MetaData metaData = dataService.getMetaDataById(taskInput.getMetaDataId(), false);
