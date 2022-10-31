@@ -1933,7 +1933,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             // 明文算法
             boolean isPt = workflowTaskList.get(i).getPowerType() != null;
             // 单独psi
-            boolean isPsi = workflowTaskList.get(i).getAlgorithmId() == sysConfig.getDefaultPsi() && workflowTaskList.size() > i;
+            boolean isPsi = workflowTaskList.get(i).getAlgorithmId() == sysConfig.getDefaultPsi() && StringUtils.isBlank(workflowTaskList.get(i).getInputList().get(0).getDataColumnIds());
 
             if (isPrePsi || isPt || isPsi) {
                 WorkflowTask workflowTask = workflowTaskList.get(i);
