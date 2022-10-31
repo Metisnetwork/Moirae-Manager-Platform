@@ -1930,12 +1930,14 @@ public class WorkflowServiceImpl implements WorkflowService {
         for (int i = 0; i < workflowTaskList.size(); i++) {
             // 前置psi的训练和预测时
             boolean isPrePsi = workflowTaskList.get(i).getInputPsi() && workflowTaskList.get(i - 1) != null && workflowTaskList.get(i - 1).getAlgorithmId() == sysConfig.getDefaultPsi();
-            // 明文算法
-            boolean isPt = workflowTaskList.get(i).getPowerType() != null;
-            // 单独psi
-            boolean isPsi = workflowTaskList.get(i).getAlgorithmId() == sysConfig.getDefaultPsi() && StringUtils.isBlank(workflowTaskList.get(i).getInputList().get(0).getDataColumnIds());
+//            // 明文算法
+//            boolean isPt = workflowTaskList.get(i).getPowerType() != null;
+//            // 单独psi
+//            boolean isPsi = workflowTaskList.get(i).getAlgorithmId() == sysConfig.getDefaultPsi() && StringUtils.isBlank(workflowTaskList.get(i).getInputList().get(0).getDataColumnIds());
+//            // 密文算法无psi
+//            boolean isNotPsi = workflowTaskList.get(i).
 
-            if (isPrePsi || isPt || isPsi) {
+            if (!isPrePsi) {
                 WorkflowTask workflowTask = workflowTaskList.get(i);
                 for (WorkflowTaskInput taskInput : workflowTask.getInputList()) {
                     MetaData metaData = dataService.getMetaDataById(taskInput.getMetaDataId(), false);
